@@ -1,0 +1,242 @@
+{
+ "fuente": "Trayectorias propuestas (J. C. Guzmán Salgado), tablas de optativas y seriación por nivel",
+ "lineas": {
+  "B": [
+   {
+    "area": "Biomecánica",
+    "linea": "I · Control inteligente",
+    "claves": [
+     "B322",
+     "B316",
+     "B410",
+     "B409"
+    ]
+   },
+   {
+    "area": "Biomecánica",
+    "linea": "II · Sistemas ergonómicos",
+    "claves": [
+     "B323",
+     "B317",
+     "B410",
+     "B409"
+    ]
+   },
+   {
+    "area": "Bioelectrónica",
+    "linea": "I · Bioinstrumentación",
+    "claves": [
+     "B319",
+     "B324",
+     "B407",
+     "B408"
+    ]
+   },
+   {
+    "area": "Bioelectrónica",
+    "linea": "II · Prótesis inteligentes",
+    "claves": [
+     "B317",
+     "B316",
+     "B414",
+     "B409"
+    ]
+   },
+   {
+    "area": "Biorobótica",
+    "linea": "I · Robótica suave",
+    "claves": [
+     "B318",
+     "B320",
+     "B413",
+     "B415"
+    ]
+   },
+   {
+    "area": "Biorobótica",
+    "linea": "II · Biorobótica",
+    "claves": [
+     "B321",
+     "B316",
+     "B412",
+     "B408"
+    ]
+   }
+  ],
+  "M": [
+   {
+    "area": "Robótica y sistemas inteligentes",
+    "linea": "Robótica y sistemas inteligentes",
+    "claves": [
+     "M315",
+     "M317",
+     "M313",
+     "M320",
+     "M407",
+     "M425",
+     "M410",
+     "M413",
+     "M409"
+    ]
+   },
+   {
+    "area": "Sistemas embebidos e interfaces hombre-máquina",
+    "linea": "Sistemas embebidos e interfaces hombre-máquina",
+    "claves": [
+     "M328",
+     "M317",
+     "M321",
+     "M312",
+     "M420",
+     "M407",
+     "M415",
+     "M426",
+     "M414",
+     "M424"
+    ]
+   },
+   {
+    "area": "Control y automatización",
+    "linea": "Control y automatización",
+    "claves": [
+     "M316",
+     "M311",
+     "M317",
+     "M322",
+     "M407",
+     "M423",
+     "M419",
+     "M416",
+     "M417"
+    ]
+   },
+   {
+    "area": "Sistemas de manufactura",
+    "linea": "Sistemas de manufactura",
+    "claves": [
+     "M319",
+     "M327",
+     "M323",
+     "M324",
+     "M313",
+     "M421",
+     "M416",
+     "M422",
+     "M412",
+     "M427",
+     "M418"
+    ]
+   },
+   {
+    "area": "Administración de sistemas",
+    "linea": "Administración de sistemas",
+    "claves": [
+     "M318",
+     "M310",
+     "M408"
+    ]
+   }
+  ],
+  "T": [
+   {
+    "area": "Comunicaciones",
+    "linea": "Redes",
+    "claves": [
+     "T226",
+     "T313",
+     "T316",
+     "T311",
+     "T312",
+     "T315"
+    ]
+   },
+   {
+    "area": "Comunicaciones",
+    "linea": "II",
+    "claves": [
+     "T227",
+     "T228",
+     "T310",
+     "T314"
+    ]
+   },
+   {
+    "area": "Informática",
+    "linea": "Informática",
+    "claves": [
+     "T230",
+     "T229",
+     "T310",
+     "T312",
+     "T315"
+    ]
+   },
+   {
+    "area": "Administración",
+    "linea": "Administración",
+    "claves": [
+     "T231",
+     "T310",
+     "T314"
+    ]
+   }
+  ]
+ },
+ "reglas_nivel": {
+  "B": {
+   "2": {
+    "1": 0.7
+   },
+   "3": {
+    "1": 1,
+    "2": 0.7
+   },
+   "4": {
+    "1": 1,
+    "2": 0.7,
+    "3": 0.6
+   },
+   "5": {
+    "1": 1,
+    "2": 1,
+    "3": 0.6,
+    "4": 0.6
+   }
+  },
+  "M": {
+   "2": {
+    "1": 0.7
+   },
+   "3": {
+    "1": 1,
+    "2": 0.7
+   },
+   "4": {
+    "1": 1,
+    "2": 0.7,
+    "3": 0.6
+   },
+   "5": {
+    "1": 1,
+    "2": 1,
+    "3": 0.6,
+    "4": 0.6
+   }
+  },
+  "T": {
+   "2": {
+    "1": 0.7
+   },
+   "3": {
+    "1": 1,
+    "2": 0.7
+   },
+   "4": {
+    "1": 1,
+    "2": 0.7,
+    "3": 0.6
+   }
+  }
+ },
+ "nota": "reglas_nivel[N][k] = fracción mínima de UAs obligatorias aprobadas del nivel k para cursar el nivel N (recomendación, no regla del SAES)"
+}

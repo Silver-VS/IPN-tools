@@ -1,0 +1,1746 @@
+{
+ "fuente": "Ingeniería telematica Trayectoria Tp.pdf",
+ "rows": [
+  [
+   1,
+   371.74
+  ],
+  [
+   2,
+   461.74
+  ],
+  [
+   3,
+   542.78
+  ],
+  [
+   4,
+   632.3
+  ],
+  [
+   5,
+   716.6139999999999
+  ],
+  [
+   6,
+   805.1800000000001
+  ],
+  [
+   7,
+   892.56
+  ],
+  [
+   8,
+   969.734
+  ],
+  [
+   9,
+   1056.934
+  ],
+  [
+   10,
+   1128.3600000000001
+  ]
+ ],
+ "cols": [],
+ "boxes": [
+  {
+   "x0": 1597.26,
+   "top": 868.3199999999999,
+   "x1": 1777.26,
+   "bottom": 913.0699999999999,
+   "fill": "#98ecb1",
+   "text": "LINEAS DE TRANSMISION Y ANTENAS",
+   "clave": "T302",
+   "nombre": "LINEAS DE TRANSMISION Y ANTENAS",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 576.72,
+   "top": 702.3699999999999,
+   "x1": 697.26,
+   "bottom": 745.95,
+   "fill": "#f9ddd3",
+   "text": "SISTEMAS DISTRIBUIDOS",
+   "clave": "T212",
+   "nombre": "SISTEMAS DISTRIBUIDOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 461.36,
+   "top": 948.31,
+   "x1": 587.7,
+   "bottom": 993.3799999999999,
+   "fill": "#98ecb1",
+   "text": "METODOLOGIA DE LA INVESTIGACION",
+   "clave": "T306",
+   "nombre": "METODOLOGIA DE LA INVESTIGACION",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 794.78,
+   "top": 948.31,
+   "x1": 941.13,
+   "bottom": 995.46,
+   "fill": "#ffc000",
+   "text": "REDES DE TELECOMUNICACIONES",
+   "clave": "T403",
+   "nombre": "REDES DE TELECOMUNICACIONES",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 454.79,
+   "top": 1035.96,
+   "x1": 594.26,
+   "bottom": 1075.4,
+   "fill": "#ffc000",
+   "text": "PROYECTO TERMINAL I",
+   "clave": "T401",
+   "nombre": "PROYECTO TERMINAL I",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 9
+  },
+  {
+   "x0": 454.79,
+   "top": 1107.3600000000001,
+   "x1": 594.26,
+   "bottom": 1146.81,
+   "fill": "#ffc000",
+   "text": "PROYECTO TERMINAL II",
+   "clave": "T402",
+   "nombre": "PROYECTO TERMINAL II",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 10
+  },
+  {
+   "x0": 526.82,
+   "top": 348.1299999999999,
+   "x1": 644.34,
+   "bottom": 392.8699999999999,
+   "fill": "#89ecfe",
+   "text": "ANALISIS Y DISEÑO DE SISTEMAS",
+   "clave": "T102",
+   "nombre": "ANALISIS Y DISEÑO DE SISTEMAS",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1169.76,
+   "top": 872.6600000000001,
+   "x1": 1273.21,
+   "bottom": 912.0999999999999,
+   "fill": "#98ecb1",
+   "text": "BASES DE DATOS DISTRIBUIDAS",
+   "clave": "T305",
+   "nombre": "BASES DE DATOS DISTRIBUIDAS",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1102.44,
+   "top": 520.96,
+   "x1": 1211.96,
+   "bottom": 565.96,
+   "fill": "#89ecfe",
+   "text": "ESTRUCTURA DE DATOS",
+   "clave": "T103",
+   "nombre": "ESTRUCTURA DE DATOS",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1430.79,
+   "top": 605.23,
+   "x1": 1534.24,
+   "bottom": 659.8799999999999,
+   "fill": "#89ecfe",
+   "text": "ARQUITECTURA DE COMPUTADORAS",
+   "clave": "T106",
+   "nombre": "ARQUITECTURA DE COMPUTADORAS",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1178.76,
+   "top": 784.21,
+   "x1": 1263.08,
+   "bottom": 823.6600000000001,
+   "fill": "#f9ddd3",
+   "text": "INGENIERIA WEB",
+   "clave": "T213",
+   "nombre": "INGENIERIA WEB",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1053.7,
+   "top": 956.01,
+   "x1": 1157.65,
+   "bottom": 995.46,
+   "fill": "#98ecb1",
+   "text": "MULTIMEDIA",
+   "clave": "T304",
+   "nombre": "MULTIMEDIA",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 452.75,
+   "top": 784.21,
+   "x1": 563.32,
+   "bottom": 827.99,
+   "fill": "#f9ddd3",
+   "text": "TEORIA DE LA INFORMACION",
+   "clave": "T205",
+   "nombre": "TEORIA DE LA INFORMACION",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1098.44,
+   "top": 437.96000000000004,
+   "x1": 1215.96,
+   "bottom": 483.03999999999996,
+   "fill": "#89ecfe",
+   "text": "PROGRAMACION",
+   "clave": "T101",
+   "nombre": "PROGRAMACION",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1085.2,
+   "top": 348.71000000000004,
+   "x1": 1229.2,
+   "bottom": 392.28999999999996,
+   "fill": "#89ecfe",
+   "text": "ADMINISTRACION DE SISTEMAS OPERATIVOS",
+   "clave": "T104",
+   "nombre": "ADMINISTRACION DE SISTEMAS OPERATIVOS",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1177.17,
+   "top": 694.3299999999999,
+   "x1": 1265.37,
+   "bottom": 733.78,
+   "fill": "#f9ddd3",
+   "text": "BASES DE DATOS",
+   "clave": "T215",
+   "nombre": "BASES DE DATOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1098.44,
+   "top": 612.24,
+   "x1": 1215.96,
+   "bottom": 649.8899999999999,
+   "fill": "#f9ddd3",
+   "text": "PRO G RA M A C ION A VA N ZA D A",
+   "clave": "T214",
+   "nombre": "PROGRAMACION AVANZADA",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 595.24,
+   "top": 948.31,
+   "x1": 705.81,
+   "bottom": 993.3799999999999,
+   "fill": "#ffc000",
+   "text": "SERVICIO SOCIAL",
+   "clave": "T406",
+   "nombre": "SERVICIO SOCIAL",
+   "nivel_saes": 4,
+   "creditos": 0.0,
+   "tipo": "T",
+   "sem": 8
+  },
+  {
+   "x0": 1166.86,
+   "top": 948.31,
+   "x1": 1275.68,
+   "bottom": 995.46,
+   "fill": "#ffc000",
+   "text": "APLICACIONES DISTRIBUIDAS",
+   "clave": "T404",
+   "nombre": "APLICACIONES DISTRIBUIDAS",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1431.15,
+   "top": 520.69,
+   "x1": 1533.87,
+   "bottom": 560.1399999999999,
+   "fill": "#89ecfe",
+   "text": "DISEÑO DIGITAL",
+   "clave": "T105",
+   "nombre": "DISEÑO DIGITAL",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1379.13,
+   "top": 954.3699999999999,
+   "x1": 1496.87,
+   "bottom": 1006.69,
+   "fill": "#ffc000",
+   "text": "DISPOSITIVOS PROGRAMABLES",
+   "clave": "T405",
+   "nombre": "DISPOSITIVOS PROGRAMABLES",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1298.79,
+   "top": 520.8799999999999,
+   "x1": 1407.61,
+   "bottom": 565.96,
+   "fill": "#f9ddd3",
+   "text": "TEORIA DE LOS CIRCUITOS",
+   "clave": "T204",
+   "nombre": "TEORIA DE LOS CIRCUITOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1298.53,
+   "top": 610.3799999999999,
+   "x1": 1407.88,
+   "bottom": 649.8299999999999,
+   "fill": "#f9ddd3",
+   "text": "ELECTRONICA",
+   "clave": "T203",
+   "nombre": "ELECTRONICA",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 737.95,
+   "top": 611.4300000000001,
+   "x1": 855.7,
+   "bottom": 650.8799999999999,
+   "fill": "#f9ddd3",
+   "text": "P R O C E S A M I E N T O D IG I TA L D E S E Ñ A L E S",
+   "clave": "T208",
+   "nombre": "PROCESAMIENTO DIGITAL DE SEÑALES",
+   "nivel_saes": 2,
+   "creditos": 10.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 814.78,
+   "top": 519.0,
+   "x1": 941.13,
+   "bottom": 556.2,
+   "fill": "#f9ddd3",
+   "text": "SEÑALES Y SISTEMAS",
+   "clave": "T201",
+   "nombre": "SEÑALES Y SISTEMAS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 882.53,
+   "top": 692.4300000000001,
+   "x1": 1008.88,
+   "bottom": 731.8799999999999,
+   "fill": "#f9ddd3",
+   "text": "COMUNICACIONES DIGITALES",
+   "clave": "T207",
+   "nombre": "COMUNICACIONES DIGITALES",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1046.03,
+   "top": 868.81,
+   "x1": 1156.26,
+   "bottom": 915.96,
+   "fill": "#98ecb1",
+   "text": "SEGURIDAD EN REDES",
+   "clave": "T303",
+   "nombre": "SEGURIDAD EN REDES",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 746.42,
+   "top": 696.9300000000001,
+   "x1": 856.99,
+   "bottom": 736.3799999999999,
+   "fill": "#f9ddd3",
+   "text": "TRANSMISION DE DATOS",
+   "clave": "T216",
+   "nombre": "TRANSMISION DE DATOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 886.94,
+   "top": 615.8399999999999,
+   "x1": 1004.46,
+   "bottom": 655.29,
+   "fill": "#f9ddd3",
+   "text": "T EO R IA D E L A S CO M U N IC AC I O N E S",
+   "clave": "T206",
+   "nombre": "TEORIA DE LAS COMUNICACIONES",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 756.53,
+   "top": 872.6600000000001,
+   "x1": 882.88,
+   "bottom": 912.0999999999999,
+   "fill": "#98ecb1",
+   "text": "REDES INTELIGENTES",
+   "clave": "T301",
+   "nombre": "REDES INTELIGENTES",
+   "nivel_saes": 3,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 886.94,
+   "top": 784.21,
+   "x1": 1004.46,
+   "bottom": 823.6600000000001,
+   "fill": "#f9ddd3",
+   "text": "TELEFONIA",
+   "clave": "T209",
+   "nombre": "TELEFONIA",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1043.24,
+   "top": 784.21,
+   "x1": 1160.76,
+   "bottom": 823.6600000000001,
+   "fill": "#f9ddd3",
+   "text": "PROTOCOLOS DE INTERNET",
+   "clave": "T211",
+   "nombre": "PROTOCOLOS DE INTERNET",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 891.7,
+   "top": 872.6600000000001,
+   "x1": 1002.27,
+   "bottom": 912.0999999999999,
+   "fill": "#f9ddd3",
+   "text": "SISTEMAS CELULARES",
+   "clave": "T210",
+   "nombre": "SISTEMAS CELULARES",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 2761.83,
+   "top": 877.76,
+   "x1": 2861.01,
+   "bottom": 921.54,
+   "fill": "#98ecb1",
+   "text": "Optativa 2",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 2761.83,
+   "top": 789.21,
+   "x1": 2861.01,
+   "bottom": 828.6600000000001,
+   "fill": "#f9ddd3",
+   "text": "OPTATIVA I",
+   "sem": 6,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 1820.01,
+   "top": 430.3799999999999,
+   "x1": 1926.89,
+   "bottom": 477.53,
+   "fill": "#89ecfe",
+   "text": "ECUACIONES DIFERENCIALES",
+   "clave": "T108",
+   "nombre": "ECUACIONES DIFERENCIALES",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1597.26,
+   "top": 689.23,
+   "x1": 1777.26,
+   "bottom": 736.3799999999999,
+   "fill": "#f9ddd3",
+   "text": "PROPAGACION DE ONDAS ELECTROMAGNETICAS",
+   "clave": "T202",
+   "nombre": "PROPAGACION DE ONDAS ELECTROMAGNETICAS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1931.29,
+   "top": 612.28,
+   "x1": 2077.64,
+   "bottom": 659.4300000000001,
+   "fill": "#89ecfe",
+   "text": "ELECTROMAGNETISMO",
+   "clave": "T113",
+   "nombre": "ELECTROMAGNETISMO",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 2047.26,
+   "top": 431.4200000000001,
+   "x1": 2157.83,
+   "bottom": 476.49,
+   "fill": "#89ecfe",
+   "text": "FUNDAMENTOS DE FISICA",
+   "clave": "T107",
+   "nombre": "FUNDAMENTOS DE FISICA",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1878.68,
+   "top": 521.81,
+   "x1": 1965.31,
+   "bottom": 561.26,
+   "fill": "#89ecfe",
+   "text": "VARIABLE COMPLEJA",
+   "clave": "T111",
+   "nombre": "VARIABLE COMPLEJA",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1995.51,
+   "top": 522.24,
+   "x1": 2086.78,
+   "bottom": 560.8399999999999,
+   "fill": "#89ecfe",
+   "text": "PROBABILIDAD",
+   "clave": "T109",
+   "nombre": "PROBABILIDAD",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1980.88,
+   "top": 350.78,
+   "x1": 2127.22,
+   "bottom": 390.22,
+   "fill": "#89ecfe",
+   "text": "CALCULO DIFERENCIAL E INTEGRAL",
+   "clave": "T110",
+   "nombre": "CALCULO DIFERENCIAL E INTEGRAL",
+   "nivel_saes": 1,
+   "creditos": 10.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1882.97,
+   "top": 350.78,
+   "x1": 1961.02,
+   "bottom": 390.22,
+   "fill": "#89ecfe",
+   "text": "ALGEBRA LINEAL",
+   "clave": "T112",
+   "nombre": "ALGEBRA LINEAL",
+   "nivel_saes": 1,
+   "creditos": 12.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1940.22,
+   "top": 430.3799999999999,
+   "x1": 2040.96,
+   "bottom": 477.53,
+   "fill": "#89ecfe",
+   "text": "CALCULO MULTIVARIABLE",
+   "clave": "T114",
+   "nombre": "CALCULO MULTIVARIABLE",
+   "nivel_saes": 1,
+   "creditos": 10.5,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 2211.99,
+   "top": 874.4200000000001,
+   "x1": 2332.53,
+   "bottom": 913.8699999999999,
+   "fill": "#98ecb1",
+   "text": "ADMINISTRACION DE PROYECTOS",
+   "clave": "T307",
+   "nombre": "ADMINISTRACION DE PROYECTOS",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 2349.33,
+   "top": 784.21,
+   "x1": 2456.2,
+   "bottom": 823.6600000000001,
+   "fill": "#98ecb1",
+   "text": "LIDERAZGO Y EMPRENDEDORES",
+   "clave": "T308",
+   "nombre": "LIDERAZGO Y EMPRENDEDORES",
+   "nivel_saes": 3,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 2416.39,
+   "top": 524.7,
+   "x1": 2513.15,
+   "bottom": 561.9000000000001,
+   "fill": "#89ecfe",
+   "text": "INGLES II",
+   "clave": "T119",
+   "nombre": "INGLES II",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 2181.25,
+   "top": 688.6399999999999,
+   "x1": 2361.87,
+   "bottom": 728.0899999999999,
+   "fill": "#f9ddd3",
+   "text": "INFORMACION FINANCIERA E INGENIERIA ECONOMICA",
+   "clave": "T217",
+   "nombre": "INFORMACION FINANCIERA E INGENIERIA ECONOMICA",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 2270.52,
+   "top": 352.53999999999996,
+   "x1": 2440.51,
+   "bottom": 391.99,
+   "fill": "#89ecfe",
+   "text": "COMUNICACION ORAL Y ESCRITA",
+   "clave": "T117",
+   "nombre": "COMUNICACION ORAL Y ESCRITA",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 2173.76,
+   "top": 430.6700000000001,
+   "x1": 2286.91,
+   "bottom": 470.6700000000001,
+   "fill": "#89ecfe",
+   "text": "ADMINISTRACION ORGANIZACIONAL",
+   "clave": "T115",
+   "nombre": "ADMINISTRACION ORGANIZACIONAL",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 2416.39,
+   "top": 430.95000000000005,
+   "x1": 2513.15,
+   "bottom": 470.3899999999999,
+   "fill": "#89ecfe",
+   "text": "INGLES I",
+   "clave": "T118",
+   "nombre": "INGLES I",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 2300.63,
+   "top": 430.95000000000005,
+   "x1": 2410.39,
+   "bottom": 470.3899999999999,
+   "fill": "#89ecfe",
+   "text": "ETICA, PROFESION Y SOCIEDAD",
+   "clave": "T116",
+   "nombre": "ETICA, PROFESION Y SOCIEDAD",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 2413.63,
+   "top": 612.02,
+   "x1": 2515.91,
+   "bottom": 649.22,
+   "fill": "#89ecfe",
+   "text": "INGLES III",
+   "clave": "T219",
+   "nombre": "INGLES III",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 2557.56,
+   "top": 354.79999999999995,
+   "x1": 2678.1,
+   "bottom": 401.95000000000005,
+   "fill": "#ffd862",
+   "text": "ELEGIBLE I PROGRAMACIÓN ESTRUCTURADA",
+   "clave": "T120",
+   "nombre": "PROGRAMACION ESTRUCTURADA",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 2557.56,
+   "top": 701.78,
+   "x1": 2678.1,
+   "bottom": 738.97,
+   "fill": "#ffc000",
+   "text": "ELEGIBLE II",
+   "sem": 5,
+   "slot": "Elegible"
+  },
+  {
+   "x0": 2557.56,
+   "top": 1043.1799999999998,
+   "x1": 2678.1,
+   "bottom": 1080.37,
+   "fill": "#ffc000",
+   "text": "ELEGIBLE IV",
+   "sem": 9,
+   "slot": "Elegible"
+  },
+  {
+   "x0": 2557.56,
+   "top": 953.1800000000001,
+   "x1": 2678.1,
+   "bottom": 990.3699999999999,
+   "fill": "#ffc000",
+   "text": "ELEGIBLE III",
+   "sem": 8,
+   "slot": "Elegible"
+  }
+ ],
+ "edges": [
+  {
+   "s": 24,
+   "d": 28,
+   "pts": [
+    [
+     878.0,
+     556.2
+    ],
+    [
+     878.0,
+     619.3
+    ],
+    [
+     885.6,
+     619.3
+    ]
+   ]
+  },
+  {
+   "s": 24,
+   "d": 23,
+   "pts": [
+    [
+     814.8,
+     537.6
+    ],
+    [
+     796.8,
+     537.6
+    ],
+    [
+     796.8,
+     606.6
+    ]
+   ]
+  },
+  {
+   "s": 27,
+   "d": 31,
+   "pts": [
+    [
+     801.7,
+     736.4
+    ],
+    [
+     801.7,
+     749.9
+    ],
+    [
+     942.7,
+     749.9
+    ],
+    [
+     945.7,
+     746.9
+    ],
+    [
+     948.7,
+     749.9
+    ],
+    [
+     1102.0,
+     749.9
+    ],
+    [
+     1102.0,
+     779.4
+    ]
+   ]
+  },
+  {
+   "s": 16,
+   "d": 31,
+   "pts": [
+    [
+     1157.2,
+     649.9
+    ],
+    [
+     1157.2,
+     757.2
+    ],
+    [
+     1157.3,
+     757.2
+    ],
+    [
+     1157.3,
+     782.8
+    ]
+   ]
+  },
+  {
+   "s": 15,
+   "d": 10,
+   "pts": [
+    [
+     1221.3,
+     733.8
+    ],
+    [
+     1221.3,
+     747.3
+    ],
+    [
+     1220.9,
+     747.3
+    ],
+    [
+     1220.9,
+     779.4
+    ]
+   ]
+  },
+  {
+   "s": 15,
+   "d": 7,
+   "pts": [
+    [
+     1262.8,
+     731.2
+    ],
+    [
+     1262.8,
+     743.0
+    ],
+    [
+     1277.2,
+     743.0
+    ],
+    [
+     1277.2,
+     840.3
+    ],
+    [
+     1221.5,
+     840.3
+    ],
+    [
+     1221.5,
+     867.8
+    ]
+   ]
+  },
+  {
+   "s": 31,
+   "d": 26,
+   "pts": [
+    [
+     1102.0,
+     823.7
+    ],
+    [
+     1102.0,
+     837.2
+    ],
+    [
+     1101.2,
+     837.2
+    ],
+    [
+     1101.2,
+     864.0
+    ]
+   ]
+  },
+  {
+   "s": 8,
+   "d": 15,
+   "pts": [
+    [
+     1212.0,
+     543.5
+    ],
+    [
+     1221.3,
+     543.5
+    ],
+    [
+     1221.3,
+     689.5
+    ]
+   ]
+  },
+  {
+   "s": 35,
+   "d": 21,
+   "pts": [
+    [
+     1820.0,
+     454.0
+    ],
+    [
+     1353.2,
+     454.0
+    ],
+    [
+     1353.2,
+     516.1
+    ]
+   ]
+  },
+  {
+   "s": 35,
+   "d": 24,
+   "pts": [
+    [
+     1823.1,
+     474.4
+    ],
+    [
+     1823.1,
+     504.5
+    ],
+    [
+     1356.2,
+     504.5
+    ],
+    [
+     1353.2,
+     501.5
+    ],
+    [
+     1350.2,
+     504.5
+    ],
+    [
+     1160.2,
+     504.5
+    ],
+    [
+     1157.2,
+     501.5
+    ],
+    [
+     1154.2,
+     504.5
+    ],
+    [
+     878.0,
+     504.5
+    ],
+    [
+     878.0,
+     514.2
+    ]
+   ]
+  },
+  {
+   "s": 16,
+   "d": 1,
+   "pts": [
+    [
+     1157.2,
+     649.9
+    ],
+    [
+     1157.2,
+     676.0
+    ],
+    [
+     948.7,
+     676.0
+    ],
+    [
+     945.7,
+     673.0
+    ],
+    [
+     942.7,
+     676.0
+    ],
+    [
+     637.0,
+     676.0
+    ],
+    [
+     637.0,
+     697.5
+    ]
+   ]
+  },
+  {
+   "s": 30,
+   "d": 32,
+   "pts": [
+    [
+     945.7,
+     823.7
+    ],
+    [
+     945.7,
+     837.2
+    ],
+    [
+     947.0,
+     837.2
+    ],
+    [
+     947.0,
+     867.8
+    ]
+   ]
+  },
+  {
+   "s": 40,
+   "d": 28,
+   "pts": [
+    [
+     2041.2,
+     560.8
+    ],
+    [
+     2041.2,
+     588.1
+    ],
+    [
+     1690.3,
+     588.1
+    ],
+    [
+     1687.3,
+     585.1
+    ],
+    [
+     1684.3,
+     588.1
+    ],
+    [
+     1485.5,
+     588.1
+    ],
+    [
+     1482.5,
+     585.1
+    ],
+    [
+     1479.5,
+     588.1
+    ],
+    [
+     1356.2,
+     588.1
+    ],
+    [
+     1353.2,
+     585.1
+    ],
+    [
+     1350.2,
+     588.1
+    ],
+    [
+     1224.3,
+     588.1
+    ],
+    [
+     1221.3,
+     585.1
+    ],
+    [
+     1218.3,
+     588.1
+    ],
+    [
+     1160.2,
+     588.1
+    ],
+    [
+     1157.2,
+     585.1
+    ],
+    [
+     1154.2,
+     588.1
+    ],
+    [
+     945.7,
+     588.1
+    ],
+    [
+     945.7,
+     611.0
+    ]
+   ]
+  },
+  {
+   "s": 40,
+   "d": 12,
+   "pts": [
+    [
+     2041.2,
+     560.8
+    ],
+    [
+     2041.2,
+     576.3
+    ],
+    [
+     1690.3,
+     576.3
+    ],
+    [
+     1687.3,
+     573.3
+    ],
+    [
+     1684.3,
+     576.3
+    ],
+    [
+     1485.5,
+     576.3
+    ],
+    [
+     1482.5,
+     573.3
+    ],
+    [
+     1479.5,
+     576.3
+    ],
+    [
+     1356.2,
+     576.3
+    ],
+    [
+     1353.2,
+     573.3
+    ],
+    [
+     1350.2,
+     576.3
+    ],
+    [
+     1224.3,
+     576.3
+    ],
+    [
+     1221.3,
+     573.3
+    ],
+    [
+     1218.3,
+     576.3
+    ],
+    [
+     1160.2,
+     576.3
+    ],
+    [
+     1157.2,
+     573.3
+    ],
+    [
+     1154.2,
+     576.3
+    ],
+    [
+     881.0,
+     576.3
+    ],
+    [
+     878.0,
+     573.3
+    ],
+    [
+     875.0,
+     576.3
+    ],
+    [
+     799.8,
+     576.3
+    ],
+    [
+     796.8,
+     573.3
+    ],
+    [
+     793.8,
+     576.3
+    ],
+    [
+     508.0,
+     576.3
+    ],
+    [
+     508.0,
+     779.4
+    ]
+   ]
+  },
+  {
+   "s": 27,
+   "d": 3,
+   "pts": [
+    [
+     801.7,
+     736.4
+    ],
+    [
+     801.7,
+     786.0
+    ],
+    [
+     747.7,
+     786.0
+    ],
+    [
+     747.7,
+     971.9
+    ],
+    [
+     790.0,
+     971.9
+    ]
+   ]
+  },
+  {
+   "s": 7,
+   "d": 18,
+   "pts": [
+    [
+     1221.5,
+     912.1
+    ],
+    [
+     1221.5,
+     925.6
+    ],
+    [
+     1221.3,
+     925.6
+    ],
+    [
+     1221.3,
+     943.5
+    ]
+   ]
+  },
+  {
+   "s": 37,
+   "d": 36,
+   "pts": [
+    [
+     2004.5,
+     659.4
+    ],
+    [
+     2004.5,
+     712.8
+    ],
+    [
+     1782.1,
+     712.8
+    ]
+   ]
+  },
+  {
+   "s": 38,
+   "d": 37,
+   "pts": [
+    [
+     2102.6,
+     476.5
+    ],
+    [
+     2102.6,
+     635.9
+    ],
+    [
+     2082.5,
+     635.9
+    ]
+   ]
+  },
+  {
+   "s": 43,
+   "d": 40,
+   "pts": [
+    [
+     1990.6,
+     477.5
+    ],
+    [
+     1990.6,
+     491.0
+    ],
+    [
+     2041.2,
+     491.0
+    ],
+    [
+     2041.2,
+     517.4
+    ]
+   ]
+  },
+  {
+   "s": 35,
+   "d": 36,
+   "pts": [
+    [
+     1873.5,
+     477.5
+    ],
+    [
+     1873.5,
+     520.4
+    ],
+    [
+     1687.3,
+     520.4
+    ],
+    [
+     1687.3,
+     684.4
+    ]
+   ]
+  },
+  {
+   "s": 47,
+   "d": 44,
+   "pts": [
+    [
+     2271.6,
+     728.1
+    ],
+    [
+     2271.6,
+     741.6
+    ],
+    [
+     2272.3,
+     741.6
+    ],
+    [
+     2272.3,
+     869.6
+    ]
+   ]
+  },
+  {
+   "s": 49,
+   "d": 47,
+   "pts": [
+    [
+     2230.3,
+     470.7
+    ],
+    [
+     2230.3,
+     484.2
+    ],
+    [
+     2271.6,
+     484.2
+    ],
+    [
+     2271.6,
+     683.8
+    ]
+   ]
+  },
+  {
+   "s": 47,
+   "d": 44,
+   "pts": [
+    [
+     2271.6,
+     728.1
+    ],
+    [
+     2271.6,
+     741.6
+    ],
+    [
+     2272.3,
+     741.6
+    ],
+    [
+     2272.3,
+     869.6
+    ]
+   ]
+  },
+  {
+   "s": 49,
+   "d": 47,
+   "pts": [
+    [
+     2230.3,
+     470.7
+    ],
+    [
+     2230.3,
+     484.2
+    ],
+    [
+     2271.6,
+     484.2
+    ],
+    [
+     2271.6,
+     683.8
+    ]
+   ]
+  },
+  {
+   "s": 4,
+   "d": 5,
+   "pts": [
+    [
+     524.5,
+     1075.4
+    ],
+    [
+     524.5,
+     1099.4
+    ]
+   ]
+  },
+  {
+   "s": 2,
+   "d": 4,
+   "pts": [
+    [
+     524.5,
+     993.4
+    ],
+    [
+     524.5,
+     1028.0
+    ]
+   ]
+  },
+  {
+   "s": 8,
+   "d": 16,
+   "pts": [
+    [
+     1157.2,
+     566.0
+    ],
+    [
+     1157.2,
+     607.4
+    ]
+   ]
+  },
+  {
+   "s": 21,
+   "d": 22,
+   "pts": [
+    [
+     1353.2,
+     566.0
+    ],
+    [
+     1353.2,
+     605.6
+    ]
+   ]
+  },
+  {
+   "s": 28,
+   "d": 25,
+   "pts": [
+    [
+     945.7,
+     655.3
+    ],
+    [
+     945.7,
+     687.6
+    ]
+   ]
+  },
+  {
+   "s": 36,
+   "d": 0,
+   "pts": [
+    [
+     1687.3,
+     736.4
+    ],
+    [
+     1687.3,
+     863.5
+    ]
+   ]
+  },
+  {
+   "s": 25,
+   "d": 30,
+   "pts": [
+    [
+     945.7,
+     731.9
+    ],
+    [
+     945.7,
+     779.4
+    ]
+   ]
+  },
+  {
+   "s": 19,
+   "d": 9,
+   "pts": [
+    [
+     1482.5,
+     560.1
+    ],
+    [
+     1482.5,
+     600.4
+    ]
+   ]
+  },
+  {
+   "s": 13,
+   "d": 8,
+   "pts": [
+    [
+     1157.2,
+     483.0
+    ],
+    [
+     1157.2,
+     516.1
+    ]
+   ]
+  },
+  {
+   "s": 50,
+   "d": 46,
+   "pts": [
+    [
+     2464.8,
+     470.4
+    ],
+    [
+     2464.8,
+     519.9
+    ]
+   ]
+  },
+  {
+   "s": 46,
+   "d": 52,
+   "pts": [
+    [
+     2464.8,
+     561.9
+    ],
+    [
+     2464.8,
+     607.2
+    ]
+   ]
+  },
+  {
+   "s": 50,
+   "d": 46,
+   "pts": [
+    [
+     2464.8,
+     470.4
+    ],
+    [
+     2464.8,
+     519.9
+    ]
+   ]
+  },
+  {
+   "s": 46,
+   "d": 52,
+   "pts": [
+    [
+     2464.8,
+     561.9
+    ],
+    [
+     2464.8,
+     607.2
+    ]
+   ]
+  },
+  {
+   "s": 34,
+   "d": 33,
+   "pts": [
+    [
+     2811.4,
+     828.7
+    ],
+    [
+     2811.4,
+     872.9
+    ]
+   ]
+  },
+  {
+   "s": 14,
+   "d": 13,
+   "pts": [
+    [
+     1157.2,
+     392.3
+    ],
+    [
+     1157.2,
+     433.1
+    ]
+   ]
+  }
+ ]
+}

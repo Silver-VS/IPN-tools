@@ -1,0 +1,33 @@
+{
+ "carrera": "E",
+ "plan": "18",
+ "estado": "Propuesta de organización elaborada a partir del plan de estudios (SAES y mapa curricular oficial). No ha sido revisada por las academias de Ingeniería en Energía.",
+ "criterio": "Áreas por disciplina, siguiendo la división habitual de los planes de ingeniería (ciencias básicas, ciencias de la ingeniería, ingeniería aplicada, ciencias económico-administrativas, formación integral). La seriación propuesta solo enlaza materias cuyo contenido es base directa de otra y que están en un semestre anterior del plan.",
+ "areas": [
+  {"nombre": "Matemáticas y computación", "claves": ["E102","E103","E107","E104","E202","E204","E303","E304","E306","E403"]},
+  {"nombre": "Física", "claves": ["E201","E301","E404","E502","E603"]},
+  {"nombre": "Química y materiales", "claves": ["E101","E106","E203","E406","E803"]},
+  {"nombre": "Termofluidos", "claves": ["E302","E405","E504","E507","E605"]},
+  {"nombre": "Eléctrica y control", "claves": ["E401","E402","E501","E601","E807"]},
+  {"nombre": "Energías convencionales", "claves": ["E305","E506","E604","E607"]},
+  {"nombre": "Energías renovables", "claves": ["E606","E702","E703","E706","E804","E806"]},
+  {"nombre": "Gestión, economía y normatividad", "claves": ["E206","E407","E503","E505","E701","E802","E903","E904","E905"]},
+  {"nombre": "Formación integral", "claves": ["E105","E205","E307","E602","E707"]},
+  {"nombre": "Titulación y optativas", "claves": ["E705","E805","E901"], "espacios": [["Optativa", 7], ["Optativa", 8], ["Optativa", 9]]}
+ ],
+ "seriacion_propuesta": [
+  ["E102","E202"],["E102","E204"],["E102","E201"],["E103","E403"],["E202","E403"],["E104","E304"],["E304","E403"],["E204","E303"],
+  ["E201","E301"],["E204","E301"],["E301","E404"],["E301","E402"],["E106","E502"],["E502","E603"],["E603","E803"],
+  ["E101","E203"],["E101","E406"],
+  ["E302","E405"],["E405","E507"],["E302","E605"],["E201","E504"],["E504","E605"],
+  ["E402","E501"],["E202","E601"],["E501","E807"],["E401","E807"],
+  ["E305","E604"],["E305","E607"],["E305","E606"],["E504","E606"],["E305","E702"],["E507","E702"],["E305","E703"],["E504","E703"],
+  ["E406","E706"],["E507","E804"],["E406","E806"],["E401","E806"],
+  ["E505","E802"],["E802","E904"],
+  ["E705","E805"],["E805","E901"]
+ ],
+ "lineas": [
+  {"area": "Optativas", "linea": "Eficiencia energética", "claves": ["E721","E722","E723","E724"]},
+  {"area": "Optativas", "linea": "Energías renovables", "claves": ["E725","E726","E727","E728"]}
+ ]
+}

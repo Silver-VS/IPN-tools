@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Guía de revisión · Herramientas UPIITA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,600;0,700;1,400&family=Noto+Sans+Mono&display=swap">
+<style>
+:root{--bg:#fafafa;--surface:#fff;--sunken:#f4f4f5;--fg:#18181b;--muted:#52525b;--line:#d9d9de;--accent:#750946;--accent-fg:#fff;--accent-soft:#f7eef2;
+  --ok:#15803d;--ok-soft:#ecfdf3;--bad:#b42346;--bad-soft:#fdecf0;--warn:#8a5a00;--warn-soft:#fdf6e3;--r:12px}
+@media (prefers-color-scheme:dark){:root{--bg:#09090b;--surface:#18181b;--sunken:#111113;--fg:#e4e4e7;--muted:#a1a1aa;--line:#323237;--accent:#ec9cbf;--accent-fg:#1d0a13;--accent-soft:#2e1a24;
+  --ok:#6ee7a0;--ok-soft:#0f2a1c;--bad:#fda4b8;--bad-soft:#3a1520;--warn:#f5c56b;--warn-soft:#2f230b;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Noto Sans",system-ui,sans-serif;padding-inline:16px}
+main{max-width:1080px;margin:0 auto;padding-block:40px 64px}
+h1{font-size:2.1rem;line-height:1.15;margin:0 0 8px;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:1.35rem;margin:44px 0 10px;padding-top:12px;border-top:1px solid var(--line);text-wrap:balance}
+h3{font-size:1.05rem;margin:22px 0 6px}
+p,li{max-width:76ch}
+.lead{color:var(--muted);font-size:1.05rem;margin:0}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 0;font-size:.88rem;color:var(--muted)}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:22px}
+a{color:var(--accent)}
+.card{display:block;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:var(--r);padding:14px 16px;color:inherit;text-decoration:none}
+.card b{display:block;font-size:1.05rem}
+.card span{color:var(--muted);font-size:.9rem}
+nav.toc{margin-top:26px;font-size:.92rem;display:flex;flex-wrap:wrap;gap:6px 16px}
+ol.steps{padding-left:1.3rem;display:flex;flex-direction:column;gap:8px}
+.note{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:8px;padding:10px 14px;font-size:.92rem;max-width:none}
+.note.ok{border-left-color:var(--ok)}
+kbd,code{font-family:"Noto Sans Mono",ui-monospace,monospace;font-size:.85em;background:var(--sunken);border:1px solid var(--line);border-radius:4px;padding:0 4px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:7px 16px;cursor:pointer;font:inherit;font-size:.9rem;font-weight:600}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+#demo-msg,#exp-msg{font-size:.88rem;color:var(--ok)}
+.reviewer{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:12px 0}
+.reviewer label{display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted);font-weight:600}
+input,select,textarea{font:inherit;font-size:.9rem;color:var(--fg);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 10px;max-width:100%}
+.progress{font-size:.9rem;color:var(--muted);margin:6px 0 12px}
+.tests{display:flex;flex-direction:column;gap:10px}
+.tc{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:6px 18px}
+.tc.pasa{border-left:4px solid var(--ok)} .tc.falla{border-left:4px solid var(--bad)} .tc.na{border-left:4px solid var(--line)}
+.tc h4{margin:0;font-size:1rem}
+.tc h4 .id{font-family:"Noto Sans Mono",monospace;font-size:.82rem;color:var(--muted);margin-right:8px}
+.tc .k{font-size:.78rem;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:6px}
+.tc ol{margin:2px 0;padding-left:1.2rem;font-size:.9rem}
+.tc .exp{font-size:.9rem;margin:2px 0}
+.tc .res{display:flex;flex-direction:column;gap:6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.seg button{border:0;background:none;padding:5px 10px;font:inherit;font-size:.82rem;cursor:pointer;color:var(--fg)}
+.seg button[aria-pressed="true"][data-v="pasa"]{background:var(--ok-soft);color:var(--ok);font-weight:700}
+.seg button[aria-pressed="true"][data-v="falla"]{background:var(--bad-soft);color:var(--bad);font-weight:700}
+.seg button[aria-pressed="true"][data-v="na"]{background:var(--sunken);font-weight:700}
+.tc textarea{min-height:58px;resize:vertical;font-size:.85rem}
+.grp{margin:22px 0 8px;font-size:.95rem;color:var(--muted);font-weight:700;letter-spacing:.02em}
+table{border-collapse:collapse;font-size:.9rem;width:100%}
+th,td{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-size:.82rem;color:var(--muted)}
+@media (max-width:720px){.tc{grid-template-columns:minmax(0,1fr)}}
+</style>
+<main>
+  <h1>Guía de revisión · Herramientas UPIITA</h1>
+  <p class="lead">Paquete de prueba de las herramientas de apoyo a la reinscripción y a la gestión escolar: instructivo, perfil de demostración y casos de prueba.</p>
+  <div class="meta"><span>Versión de prueba · octubre de 2026</span><span>Oferta del SAES capturada el 1 de octubre de 2026</span></div>
+  <div class="links">
+    <a class="card" href="horarios.html" target="_blank" rel="noopener"><b>Horarios UPIITA</b><span>Mapa curricular, oferta del SAES y armado de horario.</span></a>
+    <a class="card" href="electivas.html" target="_blank" rel="noopener"><b>Electivas UPIITA</b><span>Liberación de electivas: créditos y formatos llenos.</span></a>
+  </div>
+  <nav class="toc" aria-label="Contenido"><a href="#alcance">1. Alcance</a><a href="#requisitos">2. Requisitos</a><a href="#instructivo">3. Instructivo</a><a href="#demo">4. Perfil de demostración</a><a href="#casos">5. Casos de prueba</a><a href="#limitaciones">6. Limitaciones conocidas</a></nav>
+
+  <h2 id="alcance">1. Alcance</h2>
+  <p>Las herramientas permiten consultar la trayectoria académica, explorar la oferta de grupos, organizar y exportar el horario, y preparar la liberación de electivas. Son de consulta: <b>no inscriben ni modifican información en el SAES</b>.</p>
+  <ul>
+    <li><b>Sin datos del SAES</b>, funcionan como explorador de mapas curriculares y de la oferta.</li>
+    <li><b>Con datos del SAES</b> (opcional), incorporan el avance del alumno: acreditadas, reprobadas, desfase, materias en curso, carga autorizada y cita.</li>
+    <li>Toda la información se procesa y almacena en el navegador de quien la usa; no se envía a ningún servidor.</li>
+  </ul>
+  <p class="note ok">El marcador <b>Lector UPIITA</b> solo realiza consultas de lectura dentro del SAES (Kárdex, Estado general, Cita de reinscripción y horario actual). No captura contraseñas ni ejecuta trámites.</p>
+
+  <h2 id="requisitos">2. Requisitos</h2>
+  <ul>
+    <li>Navegador actualizado: Chrome, Edge, Firefox, Brave, Opera o Safari. Se recomienda computadora; el uso en teléfono es posible pero limitado.</li>
+    <li>Para las pruebas con datos reales: sesión del SAES de la UPIITA. Si no se cuenta con ella, utilice el <a href="#demo">perfil de demostración</a>.</li>
+    <li>Para abrir el archivo de Excel: Microsoft Excel, LibreOffice o Google Sheets.</li>
+  </ul>
+
+  <h2 id="instructivo">3. Instructivo</h2>
+  <h3>3.1 Explorar el mapa curricular</h3>
+  <ol class="steps">
+    <li>Abra <a href="horarios.html" target="_blank" rel="noopener">Horarios UPIITA</a> y elija la carrera.</li>
+    <li>Coloque el cursor sobre una materia: se resalta su cadena de requisitos y la barra <i>Explora el mapa</i> muestra sus datos.</li>
+    <li>Seleccione las materias que desea cursar; aparecen en <i>Materias que quieres cursar</i> con el total de créditos.</li>
+    <li>La simbología indica el nivel (franja de color) y el estado de cada materia.</li>
+  </ol>
+  <h3>3.2 Incorporar los datos del SAES</h3>
+  <ol class="steps">
+    <li>Pulse <b>Usar mis datos del SAES</b> (parte superior). Arrastre el botón <b>Lector UPIITA</b> a la barra de marcadores; la ventana incluye instrucciones para mostrar la barra y para la instalación manual.</li>
+    <li>Inicie sesión en el SAES y pulse el marcador. Revise el resumen y pulse <b>Copiar mis datos</b>.</li>
+    <li>Regrese a Horarios, abra <b>Usar mis datos del SAES</b> y pegue con <kbd>Ctrl</kbd>+<kbd>V</kbd>. Aparece el panel <i>Estado general</i> sobre el mapa.</li>
+    <li>Sin cuenta del SAES, pegue en el mismo recuadro el <a href="#demo">perfil de demostración</a>.</li>
+  </ol>
+  <h3>3.3 Armar el horario</h3>
+  <ol class="steps">
+    <li>Pulse <b>Ver sus horarios</b> o la pestaña <b>Planeación de horario</b>.</li>
+    <li>Filtros: turno, nivel, búsqueda, <i>En la escuela</i> (rango de horas) y <i>Excluir profesores</i>.</li>
+    <li>Agregue grupos desde la oferta, o abra <b>Generar horarios automáticamente</b> (días a la semana, descansos, profesores a priorizar) y use una opción en el horario actual o en uno nuevo. Con «+ Nuevo» puede crear tantos horarios como necesite.</li>
+    <li>Para llenar un hueco, haga clic en un bloque vacío del calendario: la oferta muestra los grupos que caben en ese horario.</li>
+    <li>Agregue actividades extracurriculares (trabajo, deporte, idiomas) desde la parte inferior de <i>Mi horario</i>.</li>
+  </ol>
+  <h3>3.4 Exportar</h3>
+  <ol class="steps">
+    <li>Pulse <b>Exportar horario</b>. Elija estilo (colorido o minimalista), qué incluir en cada clase (grupo, profesor) y el color de las actividades extracurriculares.</li>
+    <li>Descargue la imagen (PNG), el PDF o el Excel, o copie el texto.</li>
+  </ol>
+  <h3>3.5 Electivas</h3>
+  <ol class="steps">
+    <li>Abra <a href="electivas.html" target="_blank" rel="noopener">Electivas UPIITA</a>, elija la carrera y capture sus datos (o use <b>Usar mis datos del SAES</b>).</li>
+    <li>Describa las actividades realizadas en la búsqueda o consulte el catálogo; registre las horas.</li>
+    <li>Responda el formulario y descargue el DIE-03 y el formulario llenos.</li>
+  </ol>
+
+  <h2 id="demo">4. Perfil de demostración</h2>
+  <p>Alumno ficticio de Ingeniería Biónica con dos materias reprobadas (una desfasada), dos materias en curso y horario inscrito. Permite probar todas las funciones que requieren datos del SAES.</p>
+  <div class="row"><button class="btn primary" id="b-demo" type="button">Copiar perfil de demostración</button><span id="demo-msg" aria-live="polite"></span></div>
+  <p class="note">Después de copiarlo, abra Horarios o Electivas, pulse <b>Usar mis datos del SAES</b> y pegue con <kbd>Ctrl</kbd>+<kbd>V</kbd>. Para retirarlo, use <b>Borrar mis datos</b> en la misma ventana.</p>
+  <textarea id="demo-txt" readonly hidden aria-label="Perfil de demostración"></textarea>
+
+  <h2 id="casos">5. Casos de prueba</h2>
+  <p>Marque el resultado de cada caso y anote observaciones cuando falle o tenga comentarios. Las respuestas se guardan en este navegador; al terminar, use <b>Copiar resultados</b> o <b>Descargar CSV</b> y envíelos a quien le compartió este paquete.</p>
+  <div class="reviewer">
+    <label>Nombre de quien revisa<input id="rv-name" autocomplete="name"></label>
+    <label>Área o rol<input id="rv-role" placeholder="Gestión Escolar, TI, alumno…"></label>
+    <label>Navegador y dispositivo<input id="rv-dev" placeholder="Chrome 130, laptop"></label>
+  </div>
+  <div class="progress" id="progress"></div>
+  <div class="tests" id="tests"></div>
+  <div class="row" style="margin-top:16px"><button class="btn primary" id="b-copyres" type="button">Copiar resultados</button><button class="btn" id="b-csv" type="button">Descargar CSV</button><button class="btn" id="b-reset" type="button">Reiniciar respuestas</button><span id="exp-msg" aria-live="polite"></span></div>
+
+  <h2 id="limitaciones">6. Limitaciones conocidas</h2>
+  <table>
+    <tr><th>Tema</th><th>Detalle</th></tr>
+    <tr><td>Oferta</td><td>Corresponde a la captura del 1 de octubre de 2026; la oferta del próximo periodo puede estar incompleta y los salones aún no se asignan.</td></tr>
+    <tr><td>Ingeniería en Energía</td><td>Las áreas y la seriación del mapa son una propuesta elaborada a partir del plan de estudios, sujeta a validación por la academia.</td></tr>
+    <tr><td>Sistemas Automotrices</td><td>Se muestra solo la opción terminal impartida en la UPIITA (7.º a 9.º semestre).</td></tr>
+    <tr><td>Carga por créditos</td><td>Los límites mínimo, medio y máximo se toman de la Cita de reinscripción de cada alumno; sin datos del SAES solo están confirmados los de Ingeniería Biónica.</td></tr>
+    <tr><td>Desfase</td><td>Se calcula con la regla del SAES (reprobada con más de dos periodos sin acreditar); el dato oficial es el de la Cita de reinscripción.</td></tr>
+    <tr><td>Marcador</td><td>Si cambia la estructura de las páginas del SAES, el Lector puede requerir actualización. En teléfono, la instalación del marcador es manual; funciona en Firefox (Android e iOS) y en Safari (iOS), donde se crea editando un marcador y se ejecuta desde la barra de direcciones. En Chrome para Android se ejecuta escribiendo su nombre en la barra de direcciones; en Chrome para iOS, desde el marcador con el SAES abierto.</td></tr>
+  </table>
+
+  <footer>Herramientas de consulta para la planeación académica. La reinscripción oficial se realiza en el SAES.</footer>
+</main>
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('rev.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('rev.'+k,JSON.stringify(v))}catch(e){}}};
+
+/* perfil de demostración (alumno ficticio) en el formato del Lector UPIITA */
+const DEMO={upiita_saes:1,leido:"2026-10-01T12:00:00Z",boleta:"2099000000",nombre:"ALUMNO DE DEMOSTRACION PRUEBA UNO",carrera:"B",carrera_nombre:"INGENIERIA BIÓNICA",plan:"09",promedio:8.6,reprobadas_num:2,
+  cita:{inicio:"10/02/2026 04:40:00 p. m.",fin:"11/02/2026 04:40:00 p. m."},
+  carga:{total:399.5,max:80,media:40,min:27,duracion:10,duracion_max:15},
+  avance:{obtenidos:118.5,faltan:281,cursados:4,disponibles:11,autorizada:"TRANSITORIO (49.00 CREDITOS)"},
+  reprobadas:[["FISICA MODERNA Y OPTICA",7.5],["TEORIA DE LOS CIRCUITOS",9]],
+  desfase_saes:"No tienes materias reprobadas de mas de 2 periodos anteriores",
+  reprobadas_periodo:[["B204","20261",1],["B207","20252",1]],
+  en_curso:["B302","B315"],
+  horario_inscrito:[["3BV1","B302","DISPOSITIVOS ELECTRONICOS","",[[1,1140,1230],[2,1140,1230],[3,1140,1230]]],["3BV2","B315","SENSORES Y ACTUADORES","",[[0,1230,1320],[3,1050,1140],[4,1050,1140]]]],
+  acreditadas:"B101 B102 B103 B104 B105 B106 B107 B108 B109 B110 B111 B112 B114 B201 B202 B205 B301 B303".split(" ").map((k,i)=>[k,[9,8,9,10,9,10,10,10,6,9,7,10,10,10,10,8,8,10][i],"25/1","ORD"])};
+$('#b-demo').addEventListener('click',async()=>{const t=JSON.stringify(DEMO);try{await navigator.clipboard.writeText(t);$('#demo-msg').textContent='Copiado. Péguelo en «Usar mis datos del SAES».'}
+  catch(e){const a=$('#demo-txt');a.hidden=false;a.value=t;a.select();$('#demo-msg').textContent='Seleccione el texto y cópielo con Ctrl+C.'}});
+
+/* casos de prueba: [id, grupo, título, pasos, resultado esperado] */
+const G={H:'Horarios · mapa curricular',S:'Horarios · datos del SAES',A:'Horarios · armado del horario',E:'Exportación',L:'Electivas',X:'General'};
+const T=[
+ ['H-01','H','Consulta de requisitos en el mapa',['Abrir Horarios y elegir Ingeniería Biónica.','Colocar el cursor sobre «Bioquímica».'],'Se resalta su cadena de requisitos; la barra «Explora el mapa» muestra requisitos directos y «Es requisito de». El mapa no se desplaza.'],
+ ['H-02','H','Selección de materias',['Seleccionar tres materias en el mapa.','Pulsar «Ver sus horarios».'],'Las materias aparecen en «Materias que quieres cursar» con el total de créditos; la oferta muestra solo esas materias.'],
+ ['H-03','H','Mapa de Sistemas Automotrices',['Elegir «Ing. en Sistemas Automotrices».'],'Se muestran solo 7.º, 8.º y 9.º semestre (13 materias) y la nota de opción terminal.'],
+ ['H-04','H','Mapa de Ingeniería en Energía',['Elegir Ingeniería en Energía.'],'El mapa muestra áreas, seriación punteada y la nota de propuesta sujeta a validación.'],
+ ['H-05','H','Tema claro y oscuro',['Pulsar el botón junto al título.','Recargar la página.'],'Cambia entre claro y oscuro y conserva la elección al recargar.'],
+ ['S-01','S','Instalación del marcador',['Pulsar «Usar mis datos del SAES».','Arrastrar «Lector UPIITA» a la barra de marcadores (o seguir la instalación manual).'],'El marcador queda guardado en el navegador.'],
+ ['S-02','S','Lectura en el SAES',['Iniciar sesión en el SAES.','Pulsar el marcador «Lector UPIITA».'],'Aparece un resumen con boleta, carrera, promedio, materias acreditadas y en curso, y la cita; el botón «Copiar mis datos» copia la información.'],
+ ['S-03','S','Carga de datos y Estado general',['Pegar los datos (reales o del perfil de demostración) en «Usar mis datos del SAES».'],'Sobre el mapa aparece «Estado general» con promedio, créditos, periodo que se planea, carga autorizada, desfase oficial y cita.'],
+ ['S-04','S','Desfase con el perfil de demostración',['Cargar el perfil de demostración.'],'«Desfase oficial»: 1 materia (Teoría de los circuitos, desfasada en 27/1); Física moderna y óptica: debe acreditarse en 27/1.'],
+ ['S-05','S','Colores del mapa con datos',['Con datos cargados, revisar el mapa y su simbología.','Apagar «Ver sugeridas».'],'Verde: puede cursarse; anillo: sugerida; gris con punto: en curso; rojo: reprobada o desfasada. Al apagar «Ver sugeridas» desaparece solo el anillo.'],
+ ['S-06','S','Materia desfasada y carga con reprobadas',['Con el perfil de demostración, revisar «Materias que quieres cursar».','Intentar quitar Teoría de los circuitos desde el mapa.','En «Planeación de horario», agregar solo dos grupos de materias nuevas y revisar la barra de carga.'],'La desfasada aparece con la etiqueta «obligatoria» y no puede retirarse. La carga total suma los 16.5 créditos retenidos por las reprobadas más los de las materias nuevas; al agregar una reprobada la carga total no aumenta.'],
+ ['S-07','S','Simulación de fin de semestre',['Activar «Simular fin de semestre».','Marcar «Dispositivos electrónicos» como reprobada.'],'Aparece la etiqueta «Simulación»; cambian los créditos al terminar, el mapa, las sugerencias y la lista de reprobadas.'],
+ ['S-08','S','Otra carrera con datos cargados',['Con datos de Biónica, elegir Mecatrónica.','Pulsar «Volver a …».'],'Se muestra un aviso de que los datos corresponden a otra carrera; el botón regresa a Biónica.'],
+ ['S-09','S','Borrado de datos',['Abrir «Mis datos del SAES» y pulsar «Borrar mis datos» (confirmar).'],'Desaparece «Estado general» y la página vuelve al modo de exploración.'],
+ ['A-01','A','Orden de la oferta',['Con el perfil de demostración, abrir «Planeación de horario».'],'La oferta muestra primero la materia desfasada y después las reprobadas.'],
+ ['A-02','A','Excluir profesores',['Escribir y seleccionar un profesor en «Excluir profesores».','Activar «Ocultar las marcadas como No».'],'Sus grupos aparecen como «profesor excluido» y se ocultan al activar la casilla.'],
+ ['A-03','A','Horario en la escuela',['Definir «En la escuela» de 09:00 a 15:00.'],'La oferta deja de mostrar grupos fuera de ese rango.'],
+ ['A-04','A','Llenar huecos',['Agregar al menos un grupo.','Hacer clic en un bloque vacío del calendario y agregar un grupo de la oferta.'],'La oferta muestra solo grupos compatibles con ese bloque; al agregar uno, su materia pasa a las elegidas y el filtro de hueco se retira.'],
+ ['A-05','A','Generador y días a la semana',['Elegir cinco materias.','Generar horarios sin límite y luego con 4 días.'],'Las opciones no tienen traslapes, indican sus días e informan el mínimo de días posible.'],
+ ['A-06','A','Descansos',['Agregar un descanso de 1 h entre 13:00 y 15:00 solo el miércoles.','Generar.'],'Todas las opciones dejan libre ese intervalo los miércoles.'],
+ ['A-07','A','Versiones de horario',['Armar un horario en la versión A.','Pulsar «Duplicar A» y después «+ Nuevo».','Eliminar el horario vacío (×, confirmar).'],'«Duplicar» crea el horario B con el mismo contenido sin modificar A; «+ Nuevo» crea uno vacío; eliminar pide confirmación y no afecta a los demás.'],
+ ['A-08','A','Actividad extracurricular',['Agregar «Inglés» de lunes a viernes de 07:00 a 08:30.'],'El bloque aparece en el calendario y se indica si choca con alguna clase.'],
+ ['A-09','A','Horario inscrito',['Con el perfil de demostración, pulsar «Traer horario inscrito (SAES)».'],'Se cargan Dispositivos electrónicos (3BV1) y Sensores y actuadores (3BV2) en la versión seleccionada.'],
+ ['E-01','E','Imagen en estilo colorido',['Pulsar «Exportar horario», elegir «Colorido» e «Imagen (PNG)».'],'Se descarga una imagen nítida con el rango real de horas de la semana y la lista de materias.'],
+ ['E-02','E','PDF minimalista',['Elegir «Minimalista», incluir grupo y profesor, y descargar el PDF.'],'Una sola hoja: tabla con encabezados delgados, bordes gruesos y delgados, celdas unidas y lista de profesores con total de créditos.'],
+ ['E-03','E','Excel',['Descargar «Excel» y abrirlo en Excel o Google Sheets.'],'Hojas «Horario» y «Profesores» con celdas unidas, bordes, rellenos y suma de créditos.'],
+ ['E-04','E','Color de extracurriculares',['Cambiar el color de resalte y volver a exportar.'],'Las actividades extracurriculares usan el color elegido en las tres salidas.'],
+ ['L-01','L','Búsqueda de actividades',['Abrir Electivas y escribir «congreso» en la búsqueda.'],'Se muestra la actividad del instructivo, su clave y la equivalencia de horas por crédito.'],
+ ['L-02','L','Datos desde el SAES',['Pulsar «Usar mis datos del SAES» y pegar los datos.'],'Se llenan nombre, apellidos, boleta y carrera.'],
+ ['L-03','L','Formatos llenos',['Registrar una actividad con horas, completar datos y responder el formulario.','Descargar el DIE-03 y el formulario.'],'El PDF contiene los formatos oficiales con los datos y los créditos calculados.'],
+ ['X-01','X','Uso en teléfono',['Abrir ambas páginas en un teléfono.'],'El contenido es legible y no requiere desplazamiento horizontal.'],
+ ['X-02','X','Textos y redacción',['Revisar los textos de ambas páginas.'],'Redacción clara, profesional y sin errores.'],
+];
+const R=store.get('res',{});
+function render(){
+  let html='',last='';
+  T.forEach(([id,g,t,steps,exp])=>{
+    if(g!==last){html+=`<div class="grp">${G[g]}</div>`;last=g}
+    const r=R[id]||{};
+    html+=`<article class="tc ${r.v||''}" data-id="${id}"><div><h4><span class="id">${id}</span>${t}</h4>
+      <div class="k">Pasos</div><ol>${steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="k">Resultado esperado</div><p class="exp">${exp}</p></div>
+      <div class="res"><div class="seg" role="group" aria-label="Resultado de ${id}">${[['pasa','Pasa'],['falla','Falla'],['na','No aplica']].map(([v,l])=>`<button type="button" data-v="${v}" aria-pressed="${r.v===v}">${l}</button>`).join('')}</div>
+      <textarea placeholder="Observaciones" aria-label="Observaciones de ${id}">${(r.n||'').replace(/</g,'&lt;')}</textarea></div></article>`;
+  });
+  $('#tests').innerHTML=html;progress();
+}
+function progress(){const n=T.length,d=T.filter(t=>R[t[0]]?.v).length,f=T.filter(t=>R[t[0]]?.v==='falla').length;$('#progress').textContent=`${d} de ${n} casos revisados${f?` · ${f} con falla`:''}`}
+$('#tests').addEventListener('click',e=>{const b=e.target.closest('[data-v]');if(!b)return;const id=b.closest('.tc').dataset.id;R[id]={...(R[id]||{}),v:b.dataset.v};store.set('res',R);
+  const card=b.closest('.tc');card.className='tc '+b.dataset.v;card.querySelectorAll('[data-v]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));progress()});
+$('#tests').addEventListener('input',e=>{if(e.target.tagName!=='TEXTAREA')return;const id=e.target.closest('.tc').dataset.id;R[id]={...(R[id]||{}),n:e.target.value};store.set('res',R)});
+['name','role','dev'].forEach(k=>{const el=$('#rv-'+k);el.value=store.get(k,'');el.addEventListener('input',()=>store.set(k,el.value))});
+const L={pasa:'Pasa',falla:'Falla',na:'No aplica'};
+function asText(){return [`Revisión Herramientas UPIITA — ${$('#rv-name').value||'(sin nombre)'} · ${$('#rv-role').value||''} · ${$('#rv-dev').value||''}`,$('#progress').textContent,'',
+  ...T.map(([id,,t])=>{const r=R[id]||{};return `${id} ${t}: ${L[r.v]||'Sin revisar'}${r.n?` — ${r.n}`:''}`})].join('\n')}
+$('#b-copyres').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(asText());$('#exp-msg').textContent='Resultados copiados.'}catch(e){$('#exp-msg').textContent='No fue posible copiar; use «Descargar CSV».'}});
+$('#b-csv').addEventListener('click',()=>{const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+  const rows=[['Revisor','Rol','Dispositivo','ID','Caso','Resultado','Observaciones'],...T.map(([id,,t])=>{const r=R[id]||{};return [$('#rv-name').value,$('#rv-role').value,$('#rv-dev').value,id,t,L[r.v]||'Sin revisar',r.n||'']})];
+  const blob=new Blob(['﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='revision-herramientas-upiita.csv';document.body.appendChild(a);a.click();a.remove();$('#exp-msg').textContent='CSV descargado.'});
+let armed=false;$('#b-reset').addEventListener('click',e=>{if(!armed){armed=true;e.target.textContent='Confirmar: reiniciar';setTimeout(()=>{armed=false;e.target.textContent='Reiniciar respuestas'},4000);return}
+  for(const k in R)delete R[k];store.set('res',R);armed=false;e.target.textContent='Reiniciar respuestas';render()});
+render();
+</script>
+</html>

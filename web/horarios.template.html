@@ -1,0 +1,1902 @@
+<meta charset="utf-8">
+<title>Horarios UPIITA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,300..800;1,100,400&family=Noto+Sans+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: dos pantallas (trayectoria / horario). Trayectoria: mapa a la izquierda, panel de estado a la derecha.
+   Horario: barra de filtros, oferta (izq) y semana (der). Todo se apila en móvil. */
+:root{
+  /* Paleta web IPN (Manual de Diseño Web 2025): principal #750946 · #636569 · #000 · #fff; secundaria #5b1237 #721e45 #aa325a #f5f5f5 #f7f0f3 #ebe5d5 #577d63 #4d6f8d */
+  --bg:#f6f4f5; --surface:#fefdfd; --sunken:#f4eef1; --line:#e3dade;
+  --fg:#2b2427; --muted:#5c575a; --accent:#750946; --accent-strong:#5b1237; --accent-fg:#ffffff; --accent-soft:#f6edf1;
+  --ok:#3a6449; --ok-soft:#e6efe9; --warn:#6e521d; --warn-soft:#f4eedf; --bad:#9e2f52; --bad-soft:#f9e8ee;
+  --f-display:"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-body:"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"Noto Sans Mono",ui-monospace,Consolas,monospace;
+  --blk-s:42%; --blk-l:90%; --blk-fg:#2b2427; --blk-edge:40%; --own:#e6e1e3;
+  --st-done:#c9c3c5; --st-done-fg:#4d4447; --st-late:#b8473f; --st-late-fg:#ffffff; --st-now:#3f7d5a; --st-now-fg:#ffffff; --st-rest:#ffffff;
+  --band:#f3eff1; --edge:#8e8589;
+  --n1:#8a98c7; --n2:#c48aa6; --n3:#73a183; --n4:#5b7f9e; --n5:#c9b07a;
+  --r:6px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#1c191b; --surface:#252124; --sunken:#211d20; --line:#3b3438;
+  --fg:#e7e1e4; --muted:#ada4a8; --accent:#d993b2; --accent-strong:#e8b2c8; --accent-fg:#1d0a13; --accent-soft:#3a2430;
+  --ok:#93c4a2; --ok-soft:#1f3327; --warn:#dcbd88; --warn-soft:#3a2f1c; --bad:#ee9fb7; --bad-soft:#3f1f2b;
+  --blk-s:28%; --blk-l:30%; --blk-fg:#ece6e9; --blk-edge:65%; --own:#33292d;
+  --st-done:#4a4144; --st-done-fg:#cfc5c8; --st-late:#c96a62; --st-late-fg:#ffffff; --st-now:#5f9d78; --st-now-fg:#ffffff; --st-rest:#2a2226;
+  --band:#211d20; --edge:#8d7f84; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#1c191b; --surface:#252124; --sunken:#211d20; --line:#3b3438;
+  --fg:#e7e1e4; --muted:#ada4a8; --accent:#d993b2; --accent-strong:#e8b2c8; --accent-fg:#1d0a13; --accent-soft:#3a2430;
+  --ok:#93c4a2; --ok-soft:#1f3327; --warn:#dcbd88; --warn-soft:#3a2f1c; --bad:#ee9fb7; --bad-soft:#3f1f2b;
+  --blk-s:28%; --blk-l:30%; --blk-fg:#ece6e9; --blk-edge:65%; --own:#33292d;
+  --st-done:#4a4144; --st-done-fg:#cfc5c8; --st-late:#c96a62; --st-late-fg:#ffffff; --st-now:#5f9d78; --st-now-fg:#ffffff; --st-rest:#2a2226;
+  --band:#211d20; --edge:#8d7f84; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scrollbar-gutter:stable}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:16px;line-height:1.5;padding-inline:16px;padding-block:0 40px}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1480px;margin:0 auto}
+small,.muted{color:var(--muted)}
+h2{font-family:var(--f-display);font-stretch:87.5%;font-weight:600;font-size:1.35rem;margin:0;letter-spacing:.01em}
+h3.sub{font-family:var(--f-display);font-weight:600;font-size:1.1rem;margin:0 0 6px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:20px 0;border-bottom:2px solid var(--accent)}
+.brand h1{font-family:var(--f-display);font-stretch:87.5%;font-weight:700;font-size:2.1rem;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
+.brand p{margin:4px 0 12px;color:var(--muted);font-size:.9rem}
+.tabs{display:flex;gap:2px;align-self:flex-end}
+.tabs button{border:1px solid var(--line);border-bottom:0;background:var(--sunken);padding:9px 16px;border-radius:var(--r) var(--r) 0 0;cursor:pointer;font-family:var(--f-display);font-weight:600;font-size:1.05rem;letter-spacing:.02em;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.tabs b{font-family:var(--f-mono);font-weight:500;font-size:.8rem;opacity:.8;margin-right:6px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 14px;cursor:pointer;font-weight:500;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+
+.notice{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:.85rem;color:var(--muted);padding-block:10px;align-items:center}
+.notice b{color:var(--fg);font-weight:600}
+.saes-slot{margin-left:auto}
+@media (max-width:640px){.saes-slot{margin-left:0}}
+.bar-top{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding-block:12px;border-bottom:1px solid var(--line)}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>span,.lbl{font-size:.72rem;letter-spacing:.01em;color:var(--muted);font-weight:600}
+select,input[type=search],input[type=text],input[type=time],input[type=number],textarea{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:7px 10px;max-width:100%}
+input[type=number]{width:5rem}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;cursor:pointer;font-size:.88rem;font-variant-numeric:tabular-nums}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.check{display:flex;gap:6px;align-items:center;font-size:.88rem;cursor:pointer;padding-block:6px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:6px 12px;cursor:pointer;font-weight:500;font-size:.88rem}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.btn:disabled{opacity:.5;cursor:default}
+.link{border:0;background:none;color:var(--accent);cursor:pointer;font-weight:600;font-size:.84rem;padding:0;white-space:nowrap}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
+[data-view-panel]{padding-top:16px}
+
+/* ---------- mapa ---------- */
+.chosenbar{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.cb-head{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+.cb-head .actions{margin-left:auto}
+.wchips{display:flex;flex-wrap:wrap;gap:6px}
+.wchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 8px;font-size:.84rem;background:var(--bg)}
+.wchip .grp{font-size:.76rem}
+.wchip .x{padding:0 6px}
+.below{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
+.below .wide{grid-column:1/-1}
+/* Altura fija de dos renglones: al pasar el cursor cambia el contenido, nunca el tamaño (sin saltos de la página) */
+.insp{height:calc(2 * 1.5em + 12px);font-size:.88rem;line-height:1.5;padding:6px 10px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 var(--r) var(--r) 0;margin-block:8px 10px;overflow:hidden;contain:layout}
+.insp>span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.areas{position:sticky;top:0;z-index:3;height:30px;background:var(--surface);border-bottom:1px solid var(--line)}
+.areas div{position:absolute;font-stretch:75%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--f-display);font-weight:600;letter-spacing:.02em;color:var(--muted);border-left:1px solid var(--line);line-height:1;padding:0 2px;overflow:hidden}
+.edge.prop{stroke-dasharray:5 4}
+.maptools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:10px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:14px;height:14px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+.mapwrap{touch-action:pan-x pan-y;overflow:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);max-height:calc(88vh / var(--ui-zoom,1))}
+.map{position:relative;will-change:transform}
+.areas{will-change:transform}
+.map svg{position:absolute;inset:0;overflow:visible}
+.band{fill:var(--band)}
+.rowlbl{font-family:var(--f-display);font-weight:600;fill:var(--muted)}
+.edge{fill:none;stroke:var(--edge);stroke-width:1.4}
+.edge.hot{stroke:var(--accent);stroke-width:2.6}
+.edge.dim{opacity:.15}
+.box{position:absolute;font-stretch:75%;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:7px;border:1.5px solid var(--line);background:var(--st-rest);color:var(--fg);font-weight:600;line-height:1.08;padding:2px 4px 2px 8px;cursor:pointer;overflow:hidden;letter-spacing:.01em;transition:opacity .12s, box-shadow .12s}
+.box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--nv,transparent)}
+.box.done{opacity:.28;text-decoration:line-through;font-weight:500;border-style:dotted}
+.box.done.want,.box.done.hot{opacity:.6}
+.box.late{border:2px solid var(--st-late)}
+.box.fail{background:var(--bad-soft)}
+.box.fail:not(.late){border:2px dashed var(--st-late)}
+/* en curso: relleno verde y punto en la esquina (no se confunde con los bordes de "propuesta" ni con los guiones de "faltan requisitos") */
+/* modo personal: verde = la puedes cursar el siguiente periodo; contorno = sugerida; gris con punto = en curso */
+.box.avail:not(.want){background:var(--ok-soft);background:color-mix(in srgb,var(--st-now) 26%,var(--st-rest));border-color:var(--st-now)}
+/* sugerida: anillo interior del color del texto (contrasta con el verde y no invade la fila vecina) */
+.box.sug{box-shadow:inset 0 0 0 2px var(--fg)}
+.box.sug.hot{box-shadow:inset 0 0 0 2px var(--fg),0 0 0 3px var(--accent)}
+.box.curso{background:var(--sunken);border:1.5px solid var(--edge);color:var(--muted)}
+.box.curso::after{content:"";position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.legend i.l-fail{background:var(--bad-soft);border:2px dashed var(--st-late)}
+.legend i.l-curso{background:var(--sunken);border:1.5px solid var(--edge);position:relative}
+.legend i.l-curso::after{content:"";position:absolute;top:2px;right:2px;width:4px;height:4px;border-radius:50%;background:var(--muted)}
+.legend i.l-avail{background:var(--ok-soft);background:color-mix(in srgb,var(--st-now) 26%,var(--st-rest));border-color:var(--st-now)}
+.tgl i.l-sug{width:14px;height:14px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+.legend i.l-sug,.tgl i.l-sug{background:var(--ok-soft);background:color-mix(in srgb,var(--st-now) 26%,var(--st-rest));border-color:var(--st-now);box-shadow:inset 0 0 0 2px var(--fg)}
+.estado{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;padding:14px 16px}
+.est-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.est-head h2{margin:0;font-family:var(--f-display);font-size:1.2rem;font-weight:700}
+.est-head .link{margin-left:auto}
+.est-tiles{display:grid;grid-template-columns:repeat(var(--tiles,6),minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.tile{background:var(--surface);padding:9px 14px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.tile>span{font-size:.72rem;letter-spacing:.01em;color:var(--muted);font-weight:600}
+.tile>b{font-size:1.25rem;line-height:1.15;font-variant-numeric:tabular-nums;font-weight:650}
+.tile>b small{font-size:.7em;color:var(--muted);font-weight:500}
+.tile>small{font-size:.76rem;color:var(--muted)}
+.tile .minibar{display:block;margin-top:4px;height:6px}
+.tile .minibar i{background:var(--accent)}
+@media (max-width:900px){.est-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:480px){.est-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.est-note{margin:0;font-size:.78rem;color:var(--muted)}
+/* simulación de fin de semestre: interruptor + una pastilla por materia en curso (Aprobada / Reprobada) */
+.est-sim{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:.88rem}
+.tgl{display:inline-flex;align-items:center;gap:8px;cursor:pointer;position:relative}
+.tgl input{position:absolute;opacity:0;width:1px;height:1px}
+.tgl-ui{width:34px;height:20px;border-radius:999px;background:var(--line);position:relative;flex:none;transition:background .15s}
+.tgl-ui::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.3);transition:transform .15s}
+.tgl input:checked+.tgl-ui{background:var(--st-now)}
+.tgl input:checked+.tgl-ui::after{transform:translateX(14px)}
+.tgl input:focus-visible+.tgl-ui{outline:2px solid var(--accent);outline-offset:2px}
+.simchips{display:flex;flex-wrap:wrap;gap:6px}
+.simchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 11px;font-size:.84rem;cursor:pointer;color:var(--fg)}
+.simchip b{font-weight:600;color:var(--ok);margin-left:6px}
+.simchip .swap{margin-left:6px;color:var(--muted)}
+.simchip:not(:disabled):hover{border-color:var(--edge)}
+.sim-hint{font-size:.8rem;color:var(--muted)}
+.simchip.bad b{color:var(--bad)}
+.simchip:disabled{opacity:.45;cursor:default}
+.tag.sim{background:var(--warn-soft);color:var(--warn)}
+.desf{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.88rem;line-height:1.4}
+.desf li{border-left:3px solid var(--line);padding-left:9px}
+.desf li.desfasada{border-color:var(--bad)} .desf li.riesgo{border-color:var(--warn)}
+.box.late::after{content:"!";position:absolute;top:0;right:4px;color:var(--st-late);font-weight:700}
+.box.elec{border-style:dashed;cursor:help}
+.box.slot{border-style:dashed;background:var(--sunken);color:var(--muted);font-weight:500}
+.box.req{background:var(--accent-soft)}
+.box.want{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.box.want::after{content:"✓";position:absolute;top:1px;right:4px;font-size:.95em;color:inherit}
+.box.dim{opacity:.22}
+.box.hot{box-shadow:0 0 0 3px var(--accent);opacity:1}
+.box.offered-no{font-style:italic;color:var(--muted);font-weight:500}
+.box.want.offered-no{color:var(--accent-fg)}
+#load .fill.ret,.sw-ret{background:repeating-linear-gradient(135deg,var(--bad) 0 4px,color-mix(in srgb,var(--bad) 45%,transparent) 4px 8px)}
+#load .tick.tope{background:var(--bad)}#load .lbl.bad{color:var(--bad)}
+.load-note{margin:6px 0 0;font-size:.8rem;color:var(--muted);line-height:1.45}.sw-ret{display:inline-block;width:12px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.when .room{display:block;color:var(--muted);font-family:var(--f-ui,inherit);font-size:.8rem}
+.subj .lineas{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;width:100%}
+.plan-tab{display:inline-flex;align-items:center}
+.plan-tab .x.warn{color:var(--bad);font-size:.78rem;font-weight:600}
+.plan-new{border-style:dashed}
+.subj>.more{display:block;margin:6px 12px 10px}
+.tag.lin{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.legend i.l-niv{width:5px;height:15px;border:0;border-radius:2px;margin-left:4px}
+.legend .lg-niv{gap:3px;padding-right:6px;border-right:1px solid var(--line)}
+.legend i.l-want{background:var(--accent);border-color:var(--accent)}
+.legend i.l-req{background:var(--accent-soft)}
+.legend i.l-slot{background:var(--sunken);border-style:dashed}
+.legend i.l-done{background:var(--st-rest);opacity:.35;border-style:dotted}
+.legend i.l-late{border:2px solid var(--st-late)}
+.mapnote{font-size:.82rem;color:var(--muted);margin-top:8px}
+.side{display:flex;flex-direction:column;gap:12px}
+.kv{display:grid;grid-template-columns:1fr auto;gap:2px 12px;font-size:.88rem;font-variant-numeric:tabular-nums}
+.kv b{font-weight:600}
+.lvls{display:flex;flex-direction:column;gap:6px;font-size:.84rem}
+.lvl{display:flex;flex-direction:column;gap:3px;padding-block:4px;border-top:1px solid var(--line)}
+.lvl:first-of-type{border-top:0}
+.lvl-top{display:grid;grid-template-columns:4.2rem minmax(0,1fr) 4.6rem;gap:10px;align-items:center}
+.lvl-num{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.lvl-req{font-size:.8rem;color:var(--muted);display:flex;flex-wrap:wrap;gap:2px 10px;padding-left:4.2rem}
+.lvl-req span.ok{color:var(--ok)} .lvl-req span.warn{color:var(--warn)}
+.lvl-intro{margin:0 0 4px;font-size:.8rem;color:var(--muted)}
+.minibar{height:8px;background:var(--sunken);border-radius:999px;overflow:hidden;border:1px solid var(--line)}
+.minibar i{display:block;height:100%;background:var(--accent)}
+.ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.sugg{display:flex;flex-direction:column;gap:4px;font-size:.86rem}
+.sugg label{display:grid;grid-template-columns:auto 3.4rem minmax(0,1fr) auto;gap:8px;align-items:center;cursor:pointer}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+textarea.paste{width:100%;min-height:5rem;font-family:var(--f-mono);font-size:.76rem}
+#lineas{display:flex;flex-direction:column;gap:12px}
+.ol-head{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between}
+.ol-head p{margin:0;max-width:70ch;font-size:.9rem}
+.ol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+.ol-card{border:1px solid var(--line);border-top:4px solid var(--area);border-radius:var(--r);background:var(--bg);padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.ol-card header{display:flex;flex-direction:column;gap:2px}
+.ol-area{font-size:.74rem;font-weight:600;color:var(--muted)}
+.ol-card h4{margin:0;font-size:1rem;font-weight:600;line-height:1.25}
+.ol-stat{font-size:.8rem;color:var(--muted)}
+.ol-row{display:grid;grid-template-columns:4.2rem minmax(0,1fr);gap:8px;align-items:start}
+.ol-niv{font-size:.74rem;font-weight:600;color:var(--muted);padding-top:6px;font-variant-numeric:tabular-nums}
+.ol-boxes{display:flex;flex-wrap:wrap;gap:6px}
+.obox{border:1.5px solid var(--line);border-left:4px solid var(--area);background:var(--surface);color:var(--fg);border-radius:calc(var(--r) * .6);padding:5px 9px;font-size:.8rem;font-weight:600;line-height:1.2;text-align:left;cursor:pointer;text-transform:none}
+.obox::first-letter{text-transform:uppercase}
+.obox:hover{border-color:var(--accent);border-left-color:var(--area)}
+.obox.offno{border-style:dashed;border-left-style:solid;font-weight:500;font-style:italic;color:var(--muted);background:transparent}
+.obox.want{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.obox.done{opacity:.4;text-decoration:line-through}
+.legend i.ol-l-on{background:var(--surface);border:1.5px solid var(--edge)}
+.legend i.ol-l-off{border:1.5px dashed var(--edge)}
+
+/* ---------- horario ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding-block:12px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+.search{position:relative;width:min(360px,100%)}
+.search input{width:100%}
+.ac{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 24px rgb(0 0 0 / .14);list-style:none;margin:0;padding:4px;max-height:320px;overflow:auto;z-index:20}
+.ac li{display:grid;grid-template-columns:4.2rem minmax(0,1fr) auto;gap:8px;align-items:baseline;padding:6px 8px;border-radius:4px;cursor:pointer;font-size:.88rem}
+.ac li[aria-selected="true"]{background:var(--accent-soft)}
+.ac .k{font-size:.66rem;letter-spacing:.01em;color:var(--muted);font-weight:600}
+.ac mark{background:none;color:var(--accent);font-weight:600}
+.ac .r{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.active{display:flex;flex-wrap:wrap;gap:6px;padding-top:2px;width:100%}
+.active:empty{display:none}
+.pill{display:inline-flex;gap:6px;align-items:center;background:var(--accent-soft);border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 10px;font-size:.84rem}
+.pill i{font-style:normal;font-size:.74rem;color:var(--muted)}
+.pill button{border:0;background:none;cursor:pointer;color:var(--muted);padding:0 6px;font-size:1rem;line-height:1}
+
+.hlayout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:24px;padding-top:16px;align-items:start}
+@media (max-width:980px){.hlayout{grid-template-columns:minmax(0,1fr)}}
+.colhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.count{color:var(--muted);font-size:.85rem;font-variant-numeric:tabular-nums}
+.offer{display:flex;flex-direction:column;gap:10px}
+.subj{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.subj>header{display:flex;gap:10px;align-items:baseline;justify-content:space-between;padding:9px 12px;background:var(--sunken);border-bottom:1px solid var(--line)}
+.subj h3{margin:0;font-size:.95rem;font-weight:600;letter-spacing:.01em;min-width:0}
+.meta{font-family:var(--f-mono);font-size:.72rem;color:var(--muted);white-space:nowrap}
+.opt{display:grid;grid-template-columns:4.6rem minmax(0,1fr) auto;gap:4px 12px;align-items:start;padding:8px 12px;border-top:1px solid var(--line)}
+.opt:first-of-type{border-top:0}
+.opt:hover{background:var(--accent-soft)}
+.opt.no{opacity:.55}
+.grp{font-family:var(--f-mono);font-weight:500;font-size:.85rem;padding-top:1px}
+.who{font-size:.86rem;min-width:0}
+.when{font-family:var(--f-mono);font-size:.76rem;color:var(--muted);grid-column:2;display:flex;flex-direction:column}
+.tags{grid-column:2;display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:.72rem;font-weight:600;padding:1px 7px;border-radius:999px}
+.tag.bad{background:var(--bad-soft);color:var(--bad)}
+.tag.soft{background:var(--sunken);color:var(--muted)}
+.tag.good{background:var(--ok-soft);color:var(--ok)}
+.right{grid-row:1/span 4;grid-column:3;display:flex;flex-direction:column;gap:6px;align-items:flex-end}
+.add{border:1px solid var(--accent);color:var(--accent);background:none;border-radius:var(--r);padding:6px 10px;cursor:pointer;font-weight:600;font-size:.85rem;white-space:nowrap}
+.add[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.marks{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.marks button{border:0;background:var(--surface);padding:2px 8px;font-size:.72rem;cursor:pointer;color:var(--muted)}
+.marks button+button{border-left:1px solid var(--line)}
+.marks button:disabled{cursor:not-allowed;opacity:.6}
+.marks button[data-m="si"][aria-pressed="true"]{background:var(--ok-soft);color:var(--ok);font-weight:600}
+.marks button[data-m="quiza"][aria-pressed="true"]{background:var(--warn-soft);color:var(--warn);font-weight:600}
+.marks button[data-m="no"][aria-pressed="true"]{background:var(--bad-soft);color:var(--bad);font-weight:600}
+.note{grid-column:2;width:100%;font-size:.82rem;padding:4px 8px!important}
+.empty{padding:28px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r)}
+
+details.box2{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:8px 12px}
+details.box2>summary{cursor:pointer;font-weight:600;font-size:.92rem}
+.genrow{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:flex-end;padding-top:10px}
+.gtime{display:flex;flex-wrap:wrap;gap:10px 24px;align-items:flex-start;padding-top:12px}
+.trange,.gbrk{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.88rem}
+.trange input,.gbrk input[type=time]{width:7.2rem}
+.gbrk select{width:auto}
+.gdays-msg{margin:10px 0 6px;font-size:.9rem}
+.gdays-msg.warn{color:var(--warn)}
+.gbreaks{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+.brkdays{display:inline-flex;flex-wrap:wrap;gap:4px}
+.brkdays .chip{padding:2px 9px;font-size:.8rem}
+.gbrk .x{border:0;background:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:0 4px}
+.genres{display:flex;flex-direction:column;gap:8px;padding-top:10px}
+.gen{display:grid;grid-template-columns:minmax(0,1fr);gap:6px 12px;align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;font-size:.84rem}
+.gen .ls{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.gen .acts{display:flex;gap:4px;flex-wrap:wrap}
+
+/* fijo al desplazar, con su propio scroll: nunca más alto que la ventana (aunque la columna de la oferta sea larga) */
+.planner{position:sticky;top:calc(env(safe-area-inset-top,0px) + 96px);max-height:calc(100vh / var(--ui-zoom,1) - 96px - 12px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:4px}
+@media (max-width:980px){.planner{position:static;max-height:none;overflow:visible;padding-right:0}}
+.plans{display:flex;gap:4px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
+.plans .chip{font-family:var(--f-display);font-weight:600;letter-spacing:.02em}
+.plans .chip small{font-family:var(--f-mono);font-weight:400;color:inherit;opacity:.75;margin-left:4px}
+.calwrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:var(--r)}
+.cal{display:grid;grid-template-columns:3.2rem repeat(var(--days),minmax(84px,1fr));min-width:calc(3.2rem + var(--days)*84px)}
+.cal .dh{font-family:var(--f-display);font-weight:600;font-size:.95rem;text-align:center;padding:6px 0;border-bottom:1px solid var(--line);background:var(--sunken)}
+.hours{position:relative}
+/* escala en bloques de 1:30 (duración de una clase), alineados a las 7:00: franjas alternadas + línea en cada inicio */
+.hours div{position:absolute;right:6px;font-family:var(--f-mono);font-size:.68rem;color:var(--muted);padding-top:3px;line-height:1}
+.hours,.day{background-image:repeating-linear-gradient(to bottom,transparent 0 calc(var(--slot) * 3),var(--band) calc(var(--slot) * 3) calc(var(--slot) * 6))}
+.day{position:relative;border-left:1px solid var(--line);background-image:repeating-linear-gradient(to bottom,transparent 0 calc(var(--slot) * 3 - 1px),var(--line) calc(var(--slot) * 3 - 1px) calc(var(--slot) * 3)),repeating-linear-gradient(to bottom,transparent 0 calc(var(--slot) * 3),var(--band) calc(var(--slot) * 3) calc(var(--slot) * 6))}
+.exp-grid{display:grid;gap:16px;margin-top:8px}
+.exp-actions{display:flex;flex-wrap:wrap;gap:8px}
+.expshow{display:inline-flex;align-items:center;gap:8px;font-size:.84rem;color:var(--muted)}
+.expshow label{display:inline-flex;align-items:center;gap:4px;cursor:pointer;color:var(--fg)}
+.expcolor{display:inline-flex;align-items:center;gap:6px;font-size:.84rem;color:var(--muted);cursor:pointer}
+.expcolor input{width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:none;cursor:pointer}
+.gapcell{position:absolute;left:0;right:0;border:0;background:transparent;cursor:pointer;padding:0}
+.gapcell:hover{background:var(--accent-soft)}
+.gapcell:hover::after{content:"+ buscar";position:absolute;inset:0;display:grid;place-items:center;font-size:.7rem;color:var(--accent);font-weight:600}
+.gapcell.on{background:var(--accent-soft);box-shadow:inset 0 0 0 2px var(--accent)}
+.pill.gap{border-color:var(--accent)}
+.blk{position:absolute;border-radius:4px;padding:3px 5px;font-size:.7rem;line-height:1.2;overflow:hidden;background:hsl(var(--h) var(--blk-s) var(--blk-l));color:var(--blk-fg);border-left:3px solid hsl(var(--h) 55% var(--blk-edge));cursor:pointer}
+.blk b{display:block;font-weight:600;font-size:.72rem}
+.blk .t{font-family:var(--f-mono);font-size:.64rem;opacity:.85}
+.blk.own{background:repeating-linear-gradient(135deg,var(--own) 0 6px,var(--surface) 6px 12px);color:var(--fg);border-left-color:var(--muted)}
+.blk.clash{outline:2px solid var(--bad);outline-offset:-2px}
+.blk.ghost{background:transparent;border:2px dashed var(--accent);color:var(--fg);cursor:default;pointer-events:none}
+.summary{margin-top:12px;display:flex;flex-direction:column;gap:10px}
+.stats{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.88rem;font-variant-numeric:tabular-nums}
+.stats .bad{color:var(--bad);font-weight:600}
+.load{display:flex;flex-direction:column;gap:4px}
+.bar{position:relative;height:10px;background:var(--sunken);border-radius:999px;border:1px solid var(--line)}
+.bar .fill{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:999px}
+.bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg);opacity:.5}
+.ticks{position:relative;height:1rem;font-family:var(--f-mono);font-size:.66rem;color:var(--muted)}
+.ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.sel{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.sel>div{display:grid;grid-template-columns:.7rem 4.6rem minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 10px;border-top:1px solid var(--line);font-size:.86rem}
+.sel>div:first-child{border-top:0}
+.cr{font-family:var(--f-mono);font-size:.78rem;font-variant-numeric:tabular-nums}
+.sw{width:.7rem;height:.7rem;border-radius:2px;background:hsl(var(--h) 55% var(--blk-edge))}
+.sw.own{background:var(--muted)}
+.x{border:0;background:none;color:var(--muted);cursor:pointer;font-size:1.05rem;padding:0 4px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.ownrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;padding-top:10px}
+.ownrow input[type=text]{width:12rem}
+.daypick{display:flex;gap:3px;flex-wrap:wrap}
+.daypick .chip{padding:4px 8px}
+textarea.copy{width:100%;min-height:8rem;font-family:var(--f-mono);font-size:.78rem;background:var(--sunken);border:1px solid var(--line);border-radius:var(--r);padding:8px;color:var(--fg)}
+/* pie a todo lo ancho, separado por una línea */
+footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:.82rem}
+@media (prefers-reduced-motion:no-preference){.blk,.opt{transition:background-color .12s}}
+@media (prefers-reduced-motion:reduce){.box{transition:none}}
+
+/* Selección con fondo suave y borde guinda: menos superficie saturada (confort visual) */
+.seg button[aria-pressed="true"],.chip[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);border-color:var(--accent);font-weight:600}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--accent);border-color:var(--line);box-shadow:inset 0 3px 0 var(--accent)}
+@media (prefers-contrast: more){
+  :root{--line:#8e8589;--muted:#3f3a3d}
+  .box,.card,.subj,.act,section.step{border-width:2px}
+}
+@media (forced-colors: active){
+  .box.want,.add[aria-pressed="true"],.btn.primary{forced-color-adjust:none;background:Highlight;color:HighlightText}
+  .slot.full,.box.hot{outline:2px solid Highlight}
+}
+/*__SKINS__*/
+/* ---------- dispositivos: táctil, teléfono vertical y horizontal ---------- */
+.mobnote{display:none}
+.ftoggle,.calview{display:none}
+.insp.act{height:auto}
+.insp.act>span{white-space:normal}
+.insp-act{display:flex!important;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tlist{display:grid;gap:14px;margin-block:8px 12px}
+.tl-sem h4{margin:0 0 6px;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.tl-rows{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.tl-row{display:grid;grid-template-columns:5px minmax(0,1fr) auto;align-items:stretch;border-top:1px solid var(--line)}
+.tl-row:first-child{border-top:0}
+.tl-bar{background:var(--nv)}
+.tl-name{border:0;background:none;text-align:left;padding:10px 12px;color:var(--fg);cursor:pointer;min-width:0;font:inherit}
+.tl-name b{display:block;font-size:.92rem;font-weight:600;line-height:1.3}
+.tl-name small{display:block;color:var(--muted);font-size:.78rem;margin-top:2px}
+.tl-row.done .tl-name b{color:var(--muted);font-weight:500}
+.tl-row.want{background:var(--accent-soft)}
+.tl-tag{display:inline-block;border-radius:999px;padding:0 7px;font-size:.72rem;font-weight:600;margin-left:4px;background:var(--sunken);color:var(--muted)}
+.tl-tag.ok{background:var(--ok-soft);color:var(--ok)}.tl-tag.bad{background:var(--bad-soft);color:var(--bad)}.tl-tag.warn{background:var(--warn-soft);color:var(--warn)}
+.tl-want{border:0;border-left:1px solid var(--line);background:none;padding:0 14px;min-width:56px;font-size:1.25rem;color:var(--accent);cursor:pointer}
+.tl-want[aria-pressed="true"]{background:var(--accent);color:var(--accent-fg)}
+.tl-want:disabled{color:var(--muted);opacity:.5;cursor:default}
+.tl-more{grid-column:2/4;padding:0 12px 10px;font-size:.82rem;color:var(--muted);line-height:1.45}
+.agenda{display:grid;gap:12px;margin-top:4px}
+.ag-day h4{margin:0 0 6px;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.ag-it{display:grid;grid-template-columns:6.6rem minmax(0,1fr);gap:10px;align-items:start;padding:8px 10px;border-radius:var(--r);background:hsl(var(--h) var(--blk-s) var(--blk-l));color:var(--blk-fg);border-left:4px solid hsl(var(--h) 45% 40%);margin-bottom:6px;font-size:.85rem}
+.ag-it.own{--h:220;background:var(--sunken);color:var(--fg);border-left-color:var(--muted)}
+.ag-it.ghost{background:transparent;border:2px dashed var(--accent);color:var(--fg)}
+.ag-it.clash{outline:2px solid var(--bad);outline-offset:-2px}
+.ag-it .t{font-family:var(--f-mono);font-size:.76rem;line-height:1.5;white-space:nowrap}
+.ag-it small{display:block;opacity:.85}
+.ag-empty{color:var(--muted);font-size:.86rem}
+@media (hover:none){
+  .gapcell::after{content:"+";position:absolute;inset:0;display:grid;place-items:center;font-size:.8rem;color:var(--accent);opacity:.35}
+  .opt:hover{background:none}
+}
+@media (max-width:720px){
+  .mobnote:not([hidden]){display:flex;gap:10px;align-items:flex-start;justify-content:space-between;background:var(--accent-soft);border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin:10px 0 0;font-size:.86rem;line-height:1.45}
+  .brand p{font-size:.88rem}
+  .tabs button{padding:8px 10px;font-size:.92rem}
+  .ftoggle{display:inline-flex}
+  .filters:not(.open)>*:not(.search):not(.ftoggle):not(.active){display:none}
+  .calview{display:inline-flex}
+  .colhead .actions{flex-wrap:wrap}
+  /* tarjetas de la oferta: acciones en una fila propia para no comprimir profesor y horario */
+  .opt{grid-template-columns:3.8rem minmax(0,1fr)}
+  .opt>.right{grid-column:1/-1;grid-row:auto;flex-direction:row;display:flex;flex-wrap:wrap;align-items:center;gap:8px;justify-content:flex-start}
+}
+@media (max-height:520px) and (orientation:landscape){
+  .brand p{display:none}
+  .mapwrap{max-height:calc(100vh - 24px)}
+  .ftoggle{display:inline-flex}
+  .filters:not(.open)>*:not(.search):not(.ftoggle):not(.active){display:none}
+}
+/* Los bloques fijos (filtros y panel del horario) solo se fijan si hay pantalla suficiente; en pantallas bajas o
+   angostas ocupaban casi toda la altura y dejaban un espacio mínimo para desplazarse */
+@media (max-width:980px),(max-height:760px){
+  .filters{position:static}
+  .planner{position:static;max-height:none;overflow:visible;padding-right:0}
+}
+/*__SAES_CSS__*/
+</style>
+
+<!--__INST_HEADER__-->
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="title-row"><h1>Horarios UPIITA</h1><!--__THEME_BTN__--></div>
+      <p>Consulta tu trayectoria académica, selecciona materias y organiza tu horario para la reinscripción.</p>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Pantallas">
+      <button role="tab" id="t-tray" data-tab="tray" aria-controls="v-tray">Mi trayectoria</button>
+      <button role="tab" id="t-hor" data-tab="hor" aria-controls="v-hor">Planeación de horario</button>
+    </nav>
+  </header>
+
+  <div class="bar-top">
+    <label class="field"><span>Carrera</span><select id="f-carrera"></select></label>
+    <div class="field"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
+      <button data-per="proximo">Próximo</button><button data-per="actual">Actual</button>
+    </div></div>
+    <div class="field saes-slot"><span>Tu avance (opcional)</span><!--__SAES_CARD__--></div>
+    <div class="notice" id="notice"></div>
+  </div>
+  <div class="saes-mm" id="saes-mismatch" role="status" hidden></div>
+  <div class="mobnote" id="mobnote" role="note" hidden><span>Esta herramienta se aprovecha mejor en una <b>computadora</b> o tableta. En el teléfono, <b>gíralo a horizontal</b> para ver el mapa completo; en vertical se muestra una versión simplificada en lista.</span><button class="link" type="button" id="b-mobnote">Entendido</button></div>
+
+  <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
+  <section id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
+    <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
+    <section class="card estado" data-personal hidden aria-labelledby="h-estado">
+      <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
+      <div class="est-sim" id="est-sim" hidden></div>
+      <div class="est-tiles" id="status"></div>
+      <div id="desf"></div>
+      <p class="est-note" id="desf-note"></p>
+    </section>
+    <div class="maptools">
+      <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
+      <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
+        <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
+      </div>
+      <div class="legend" id="legend" aria-label="Simbología"></div>
+      <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
+    </div>
+    <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
+    <div class="tlist" id="tlist" hidden></div>
+    <div class="insp" id="insp" aria-live="polite"></div>
+    <div class="card chosenbar" aria-labelledby="h-chosen">
+      <div class="cb-head">
+        <h3 class="sub" id="h-chosen">Materias que quieres cursar</h3>
+        <span class="muted" id="chosen-help"></span>
+        <div class="actions"><button class="btn primary" id="b-go">Ver sus horarios</button><button class="btn" id="b-none">Quitar todas</button></div>
+      </div>
+      <div class="wchips" id="chosen"></div>
+      <small id="chosen-req"></small>
+    </div>
+    <p class="mapnote" id="mapnote"></p>
+    <div class="below">
+      <div class="card" data-personal hidden><h3 class="sub" id="h-sugg">Sugeridas</h3><div class="sugg" id="sugg"></div>
+        <div class="actions" style="margin-top:10px"><button class="btn" id="b-sugg">Elegir las sugeridas</button><button class="btn" id="b-all" title="Agrega al banco todas las materias que ya puedes cursar y tienen grupos; después indica en «Generar horarios» cuántas quieres llevar">Elegir todas las que puedes cursar</button></div></div>
+      <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
+      <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>
+    </div>
+  </section>
+
+  <!-- ============ PANTALLA 2: HORARIO ============ -->
+  <section id="v-hor" data-view-panel="hor" role="tabpanel" aria-labelledby="t-hor" hidden>
+    <section class="filters" aria-label="Filtros">
+      <button class="btn ftoggle" id="b-filt" type="button" aria-expanded="false" aria-controls="v-hor">Filtros</button>
+      <div class="field"><span>Turno</span><div class="chips" id="f-turno"></div></div>
+      <div class="field"><span>Nivel</span><div class="chips" id="f-nivel"></div></div>
+      <div class="field search">
+        <span id="q-lbl">Buscar</span>
+        <input id="f-q" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac" aria-labelledby="q-lbl" placeholder="Materia, clave, profesor o grupo" autocomplete="off">
+        <ul class="ac" id="ac" role="listbox" hidden></ul>
+      </div>
+      <div class="field"><span>Ver por</span><div class="seg" role="group" aria-label="Agrupar oferta">
+        <button data-view="materia">Materia</button><button data-view="grupo">Grupo</button>
+      </div></div>
+      <label class="check"><input type="checkbox" id="f-want"> <span id="f-want-l">Solo las elegidas en el mapa</span></label>
+      <label class="check"><input type="checkbox" id="f-hide"> Ocultar las marcadas como No</label>
+      <label class="check" title="Muestra los grupos de la carrera compatibles con el horario actual"><input type="checkbox" id="f-fit"> Solo lo que cabe en mi horario</label>
+      <div class="field"><span>En la escuela</span><div class="trange"><input type="time" id="g-from" step="1800" aria-label="Llegar desde"><span>a</span><input type="time" id="g-to" step="1800" aria-label="Salir a más tardar"></div></div>
+      <label class="field"><span>Excluir profesores</span><input type="text" id="g-avoid" list="proflist" autocomplete="off"></label>
+      <div class="active" id="active"></div>
+      <button type="button" class="btn" id="b-reset" title="Regresa a su valor inicial los filtros de la oferta, los profesores excluidos, el horario en la escuela y las preferencias del generador, y quita las marcas «Sí / Quizá / No». No borra tus horarios.">Restablecer filtros</button>
+    </section>
+
+    <div class="hlayout">
+      <section aria-labelledby="h-offer">
+        <details class="box2" id="gen" style="margin-bottom:12px">
+          <summary>Generar horarios automáticamente</summary>
+          <p style="font-size:.84rem;margin:8px 0 0">Genera combinaciones sin traslapes con los grupos de las materias seleccionadas. Prioriza los grupos marcados con «Sí» y los profesores indicados; omite los marcados con «No», los profesores excluidos y los grupos fuera del horario definido en los filtros.</p>
+          <div class="genrow">
+            <div class="field"><span>Turno preferido</span><div class="seg" role="group" aria-label="Turno preferido">
+              <button data-gt="*">Cualquiera</button><button data-gt="M">Matutino</button><button data-gt="V">Vespertino</button>
+            </div></div>
+            <label class="field"><span>Priorizar profesor</span><input type="text" id="g-pref" list="proflist" autocomplete="off"></label>
+            <datalist id="proflist"></datalist>
+            <label class="check" title="Prioriza horarios con menos tiempo libre entre clases y menos días en la escuela"><input type="checkbox" id="g-compact" checked> Menos tiempo libre entre clases</label>
+            <button class="btn primary" id="b-gen">Generar</button>
+          </div>
+          <div class="gtime">
+            <div class="field"><span>Días a la semana</span><div class="seg" role="group" aria-label="Días a la semana en la escuela" id="g-days">
+              <button type="button" data-gdays="">Sin límite</button><button type="button" data-gdays="3">3</button><button type="button" data-gdays="4">4</button><button type="button" data-gdays="5">5</button></div></div>
+            <div class="field"><span>Base para generar</span><div class="seg" role="group" aria-label="Base para generar" id="g-src">
+              <button type="button" data-gsrc="" title="Usa las materias y grupos que muestra la oferta con los filtros actuales">Filtros de la oferta</button><button type="button" data-gsrc="todo" title="Usa todas las materias elegidas y todos sus grupos, sin los filtros de la oferta (se respetan las marcas «No» y los profesores excluidos)">Todas las elegidas</button></div></div>
+            <div class="field"><span>Materias por horario</span><div class="seg" role="group" aria-label="Materias por horario" id="g-n">
+              <button type="button" data-gn="auto" title="El generador elige cuántas y cuáles materias, buscando la carga media y un horario saludable: permanencia razonable, espacio para comer y sin bloques largos sin descanso">Automático</button><button type="button" data-gn="">Todas</button><button type="button" data-gn="3">3</button><button type="button" data-gn="4">4</button><button type="button" data-gn="5">5</button><button type="button" data-gn="6">6</button><button type="button" data-gn="7">7</button><button type="button" data-gn="8">8</button></div></div>
+            <div class="field"><span>Descansos</span><div class="gbreaks" id="gbreaks"></div></div>
+          </div>
+          <div class="active" id="gprefs" style="padding-top:8px"></div>
+          <div class="genres" id="genres"></div>
+        </details>
+        <div class="colhead"><h2 id="h-offer">Oferta</h2><span class="count" id="offer-count"></span></div>
+        <div class="offer" id="offer"></div>
+      </section>
+      <section class="planner" aria-labelledby="h-plan">
+        <div class="colhead"><h2 id="h-plan">Mi horario</h2>
+          <div class="actions">
+            <div class="seg calview" role="group" aria-label="Vista del horario"><button type="button" data-cview="semana">Semana</button><button type="button" data-cview="dia">Por día</button></div>
+            <label class="check"><input type="checkbox" id="f-weekend"> Mostrar fin de semana</label>
+            <button class="btn primary" id="b-export" type="button" aria-haspopup="dialog">Exportar horario</button>
+            <button class="btn" id="b-saeshor" hidden title="Carga en la versión seleccionada el horario inscrito según el SAES">Traer horario inscrito (SAES)</button>
+            <button class="btn" id="b-clear">Vaciar</button>
+          </div>
+        </div>
+        <p class="muted" id="exp-msg" aria-live="polite" style="margin:0 0 6px;font-size:.84rem;min-height:1.3em"></p>
+        <div class="plans" id="plans" role="group" aria-label="Versiones de horario"></div>
+        <div class="calwrap"><div class="cal" id="cal"></div></div>
+        <div class="agenda" id="agenda" hidden></div>
+        <div class="summary">
+          <div class="stats" id="stats"></div>
+          <div class="load" id="load"></div>
+          <div class="sel" id="sel"></div>
+          <details class="box2" id="ownform">
+            <summary>Agregar actividad extracurricular</summary>
+            <form class="ownrow" id="own-f">
+              <label class="field"><span>Nombre</span><input type="text" id="own-n" placeholder="Inglés CELEX" required></label>
+              <div class="field"><span>Días</span><div class="daypick" id="own-d"></div></div>
+              <label class="field"><span>De</span><input type="time" id="own-a" value="09:00" step="1800" required></label>
+              <label class="field"><span>A</span><input type="time" id="own-b" value="12:00" step="1800" required></label>
+              <button class="btn primary" type="submit">Agregar</button>
+            </form>
+          </details>
+          <textarea class="copy" id="copybox" readonly hidden></textarea>
+        </div>
+      </section>
+    </div>
+  </section>
+
+
+  <!-- módulo "Exportar horario": formato, estilo, contenido de cada clase y color de extracurriculares -->
+  <dialog class="saes-dlg exp-dlg" id="exp-dlg" aria-labelledby="exp-h">
+    <div class="dl-head"><h2 id="exp-h">Exportar horario</h2><button class="x" id="exp-x" type="button" aria-label="Cerrar">×</button></div>
+    <div class="exp-grid">
+      <div class="field"><span>Estilo de la imagen, el PDF y el Excel</span>
+        <div class="seg" role="group" aria-label="Estilo" id="exp-style"><button type="button" data-exps="color">Colorido</button><button type="button" data-exps="min">Minimalista</button></div></div>
+      <div class="field"><span>Tema de la imagen y el PDF</span>
+        <div class="seg" role="group" aria-label="Tema de la exportación" id="exp-theme"><button type="button" data-ext="">Claro</button><button type="button" data-ext="dark">Oscuro</button></div></div>
+      <div class="field"><span>PDF con todos los horarios</span>
+        <div class="seg" role="group" aria-label="Horarios por hoja" id="exp-per"><button type="button" data-exper="2">Dos por hoja</button><button type="button" data-exper="1">Uno por hoja</button></div></div>
+      <div class="field"><span>Incluir en cada clase</span>
+        <span class="expshow"><label><input type="checkbox" checked disabled> Materia</label><label><input type="checkbox" data-exshow="g"> Grupo</label><label><input type="checkbox" data-exshow="p"> Profesor</label></span></div>
+      <div class="field"><span>Actividades extracurriculares</span>
+        <label class="expcolor"><input type="color" id="exp-own" aria-label="Color de las actividades extracurriculares"><span>Color de resalte</span></label></div>
+      <div class="field"><span>Formato</span>
+        <div class="exp-actions"><button class="btn primary" id="b-png" type="button">Imagen (PNG)</button><button class="btn primary" id="b-pdf" type="button">PDF</button><button class="btn" id="b-pdfall" type="button" hidden>PDF con todos los horarios</button><button class="btn primary" id="b-xlsx" type="button">Excel</button><button class="btn" id="b-copy" type="button">Copiar texto</button></div></div>
+    </div>
+    <p class="saes-note" id="exp-dmsg" aria-live="polite" style="margin:12px 0 0;min-height:1.3em"></p>
+  </dialog>
+  <footer id="foot"></footer>
+</div>
+
+<!--__SKINUI__-->
+<script>
+const DATA=/*__DATA__*/null;
+const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], DAYN=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+/* Dispositivo: en pantallas táctiles no existe el «hover»; tocar una materia la enfoca y un segundo toque la selecciona.
+   En teléfono vertical la trayectoria se muestra en lista y el horario como agenda por día (el usuario puede cambiarlo). */
+const MQ_PHONE=matchMedia('(max-width: 720px)'), MQ_NOHOVER=matchMedia('(hover: none)');
+let PT=MQ_NOHOVER.matches?'touch':'mouse';
+document.addEventListener('pointerdown',e=>{PT=e.pointerType||'mouse'},true);
+const tactil=()=>PT!=='mouse';
+const TURNOS={M:'Matutino',V:'Vespertino'};
+const TIPO={O:'Obligatoria',P:'Optativa',T:'Taller'};
+// Carga en créditos confirmada en SAES (Cita de reinscripción). Las demás carreras se agregan cuando se capturen.
+const CARGA={B:{min:27,media:40,max:80}};
+const LETRAS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const START=7*60, END=22*60, SLOT=30, SLOTPX=22, BLOCK=90;  // una clase dura 1:30
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const norm=s=>s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
+const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
+const fmtCr=n=>Number.isInteger(+n)?String(+n):(+n).toFixed(2).replace(/0$/,'');
+const store={get(k,d){try{const v=localStorage.getItem('hu.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('hu.'+k,JSON.stringify(v))}catch(e){}}};
+
+const S={tab:store.get('tab','tray'),per:store.get('per','proximo'),car:store.get('car','B'),tur:store.get('tur','*'),niv:store.get('niv','*'),q:'',view:store.get('view','materia'),
+  hide:store.get('hide',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
+  mode:'want',zoom:null,mapHover:null,gt:'*',gpref:[],gavoid:store.get('excl',[]),gen:null};
+if(!DATA.carreras[S.car]) S.car=Object.keys(DATA.carreras)[0];
+S.expand=new Set();S.mview=store.get('mview',null);S.cview=store.get('cview',null);S.mapFocus=false;S.lfocus=null;
+// vista por defecto según el dispositivo; la elección explícita del usuario se recuerda
+const mview=()=>S.mview||(MQ_PHONE.matches?'lista':'mapa'), cview=()=>S.cview||(MQ_PHONE.matches?'dia':'semana');
+
+/* ---------- estado guardado ---------- */
+const W={};
+for(const p of ['proximo','actual']){
+  W[p]=store.get('w.'+p,{plan:'A',plans:{A:{sel:store.get('sel.'+p,[])||[],own:[]}},marks:{}});
+}
+// horarios dinámicos: se empieza con A y el alumno agrega los que quiera; los vacíos heredados (B, C) se descartan
+for(const p in W){const w=W[p];Object.keys(w.plans).forEach(k=>{const x=w.plans[k];if(k!=='A'&&k!==w.plan&&!x.sel.length&&!(x.own||[]).length)delete w.plans[k]});
+  if(!w.plans[w.plan])w.plan=Object.keys(w.plans)[0]||'A';if(!w.plans.A&&!Object.keys(w.plans).length)w.plans.A={sel:[],own:[]}}
+const ws=()=>W[S.per], plan=()=>ws().plans[ws().plan];
+const planIds=()=>Object.keys(ws().plans).sort((a,b)=>a.length-b.length||a.localeCompare(b));
+// siguiente letra después de la última existente (A, B, C… Z, AA, AB…); nunca reutiliza ni sobrescribe un horario
+const planNum=id=>[...id].reduce((n,ch)=>n*26+LETRAS.indexOf(ch)+1,0);
+const nextPlan=()=>{let n=Math.max(0,...planIds().map(planNum))+1, id='';while(n>0){n--;id=LETRAS[n%26]+id;n=Math.floor(n/26)}return id};
+const save=()=>store.set('w.'+S.per,ws());
+/*__SAES_JS__*/
+// v1: solo se eligen materias para explorar. v2: el alumno pega sus datos del SAES (Lector UPIITA) y se activa la vista personal.
+let ALUMNO=SAES.load();
+const isPersonal=()=>!!ALUMNO&&ALUMNO.carrera===S.car;
+const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprobadas
+/* Simulación de fin de semestre (solo exploración, nunca toca los datos del SAES):
+   las materias en curso se dan por aprobadas, salvo las que el alumno marque como reprobadas. */
+const SIM=store.get('sim',{on:false,fail:[]});
+const tr=()=>{
+  if(!T[S.car]){
+    const t=store.get('t.'+S.car,{want:[]}), me=isPersonal();
+    const done0=me?ALUMNO.acreditadas.map(a=>a[0]):[];
+    const enCurso=me?(ALUMNO.en_curso||[]).filter(k=>cur()[k]&&!done0.includes(k)):[];
+    const sim=me&&SIM.on&&enCurso.length>0;
+    const simOk=sim?enCurso.filter(k=>!SIM.fail.includes(k)):[], simFail=sim?enCurso.filter(k=>SIM.fail.includes(k)):[];
+    const done=[...done0,...simOk], doneS=new Set(done);
+    // reprobadas: con periodo (Estado general del SAES) o, en datos viejos, solo por nombre (Cita)
+    const failP={}, veces={};
+    if(me)(ALUMNO.reprobadas_periodo||[]).forEach(([k,p,v])=>{if(!cur()[k]||doneS.has(k))return;const i=perIdx(p);if(!(k in failP)||(i!=null&&i<failP[k]))failP[k]=i;veces[k]=v});
+    const names=me?new Set((ALUMNO.reprobadas||[]).map(r=>norm(r[0]))):new Set();
+    Object.keys(cur()).forEach(k=>{if(names.has(norm(cur()[k][0]))&&!doneS.has(k)&&!(k in failP))failP[k]=null});
+    // reprobada en la simulación: cuenta desde el periodo que se cursa ahora
+    const pm=perMeta();simFail.forEach(k=>{if(failP[k]==null)failP[k]=pm!=null?pm-1:null;veces[k]=(veces[k]||0)+1});
+    const curso=sim?[]:enCurso;
+    // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
+    const pmeta=perMeta(), oblig=Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2);
+    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,done,fail:Object.keys(failP),failP,veces,curso,enCurso,sim,simOk,cursados:me?ALUMNO.avance?.cursados??null:null};
+  }
+  return T[S.car];
+};
+/* "dd/mm/aaaa hh:mm:ss p. m." del SAES → ¿la cita (fin) ya pasó? */
+const citaPasada=A=>{const m=String(A?.cita?.fin||A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);return !!m&&new Date(+m[3],+m[2]-1,+m[1]+1)<new Date()};
+/* ---------- periodos escolares ("25/2" o "20252") como índice consecutivo ---------- */
+const perIdx=p=>{const m=String(p??'').trim().match(/^(?:20)?(\d{2})\/?([12])$/);return m?(+m[1])*2+(+m[2]-1):null};
+const perName=i=>i==null?'—':`${Math.floor(i/2)}/${i%2+1}`;
+// periodo al que corresponde una cita: en ene–may se inscribe el /2; en jun–oct, el /1 del año siguiente
+const perDeFecha=s=>{const m=String(s||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(!m)return null;const mo=+m[2],y=+m[3]%100;return mo<=5?y*2+1:mo<=10?(y+1)*2:(y+1)*2+1};
+/* periodo para el que se planea: el de la cita vigente, o el siguiente al que se cursa ahora */
+function perMeta(){
+  const A=ALUMNO;if(!A)return null;
+  const c=perDeFecha(A.cita?.inicio);
+  const seen=[...(A.acreditadas||[]).map(a=>perIdx(a[2])),...(A.reprobadas_periodo||[]).map(r=>perIdx(r[1]))].filter(x=>x!=null);
+  let t=c==null?null:(citaPasada(A)?c+1:c);
+  if(seen.length){const min=Math.max(...seen)+((A.en_curso||[]).length?2:1);if(t==null||t<min)t=min}
+  return t;
+}
+/* Desfase OFICIAL (regla del SAES): una reprobada se desfasa cuando pasan más de 2 periodos sin acreditarla.
+   El "atraso" respecto al semestre propuesto solo aplica a planes por semestre (Energía); en los planes 2009
+   (por niveles) el orden de la trayectoria es una recomendación y llevar otro orden no es desfase. */
+const DESFASE_SEM=new Set(['E']);
+function failInfo(k){
+  const t=tr(); if(!(k in t.failP)) return null;
+  const idx=t.failP[k], meta=perMeta(), limite=idx==null?null:idx+2;
+  const estado=idx==null||meta==null?'sinperiodo':meta>limite?'desfasada':meta===limite?'riesgo':'reciente';
+  return {k,idx,limite,estado,veces:t.veces[k]??null,curso:t.curso.includes(k)};
+}
+const cargaDe=()=>isPersonal()&&ALUMNO.carga?.media?{min:ALUMNO.carga.min,media:ALUMNO.carga.media,max:ALUMNO.carga.max}:CARGA[S.car];
+/* Carga en créditos (Reglamento General de Estudios, art. 52):
+   - Las reprobadas pendientes retienen sus créditos de forma permanente hasta acreditarse; inscribirlas no suma de nuevo.
+   - Carga total = créditos retenidos + créditos de las materias nuevas (no reprobadas).
+   - Regular: entre la carga mínima y la máxima (fracción I). Con adeudos: al menos la mínima y sin rebasar la media
+     (fracción II), salvo que el SAES indique otra carga autorizada: esta ya incluye los créditos retenidos, por lo
+     que los créditos nuevos permitidos son la autorizada menos los retenidos. */
+const retenidos=()=>isPersonal()?tr().fail.filter(k=>cur()[k]).reduce((s,k)=>s+cur()[k][1],0):0;
+function cargaInfo(nuevos){
+  const L=cargaDe();if(!L)return null;
+  const ret=retenidos(), aut=isPersonal()?SAES.autorizada(ALUMNO):null, adeudo=ret>0;
+  const tope=aut!=null?aut:(adeudo?L.media:L.max), libre=Math.max(0,tope-ret);   // tope total y créditos nuevos permitidos
+  const total=ret+(nuevos||0);
+  return {L,ret,aut,adeudo,libre,tope,total,nuevos:nuevos||0,faltaMin:Math.max(0,L.min-total)};
+}
+const saveT=()=>store.set('t.'+S.car,{want:tr().want});
+
+/* ---------- oferta ---------- */
+// clase: [carrera,turno,nivel,grupo,asig,[prof],[[dia,ini,fin]],creditos,clave,tipo]
+const keyOf=c=>c[0]+'|'+c[3]+'|'+c[4];
+const name=c=>DATA.asig[c[4]];
+const profs=c=>c[5].map(i=>DATA.prof[i]).join(' / ');
+const hue=c=>(c[4]*137.508)%360;
+const classes=()=>DATA.periodos[S.per];
+let KEYMAP={};
+for(const p in DATA.periodos){const m=new Map();DATA.periodos[p].forEach(c=>m.set(keyOf(c),c));KEYMAP[p]=m}
+const byKey=k=>KEYMAP[S.per].get(k);
+const selected=()=>plan().sel.map(byKey).filter(Boolean);
+const ownAsClasses=()=>plan().own.map((o,i)=>({own:true,i,n:o.n,h:o.d.map(d=>[d,o.a,o.b])}));
+const slots=x=>x.own?x.h:x[6];
+const offeredClaves=()=>new Set(classes().filter(c=>c[0]===S.car).map(c=>c[8]));
+
+function overlaps(a,b){for(const x of slots(a))for(const y of slots(b))if(x[0]===y[0]&&x[1]<y[2]&&y[1]<x[2])return true;return false}
+function pattern(c){
+  if(!c[6].length) return ['Sin horario en SAES'];
+  const g={};c[6].forEach(([d,a,b])=>{const k=hm(a)+'–'+hm(b);(g[k]=g[k]||[]).push(DAYS[d])});
+  return Object.entries(g).map(([t,ds])=>ds.join(' ')+'  '+t);
+}
+
+/* =========================================================
+   TRAYECTORIA
+   ========================================================= */
+const MAP=()=>DATA.mapas[S.car];
+const cur=()=>MAP().cur;                       // clave -> [nombre, créditos, nivel, tipo]
+function prereqs(){                             // clave -> [claves requisito directas]: tutorías + flechas de la trayectoria
+  if(MAP().req) return MAP().req;
+  const L=MAP().layout, out={};
+  if(!L) return out;
+  L.edges.forEach(([s,d])=>{const a=L.boxes[s][4], b=L.boxes[d][4];if(a&&b)(out[b]=out[b]||[]).push(a)});
+  return out;
+}
+function dependents(){const out={};Object.entries(prereqs()).forEach(([b,as])=>as.forEach(a=>(out[a]=out[a]||[]).push(b)));return out}
+function semOf(){                               // clave -> semestre propuesto
+  const L=MAP().layout, out={};
+  if(L) L.boxes.forEach(b=>{if(b[4]&&!(b[4] in out))out[b[4]]=b[6]});
+  else Object.entries(cur()).forEach(([k,v])=>out[k]=v[2]);
+  return out;
+}
+function levelStats(){
+  const done=new Set(tr().done), by={};
+  Object.entries(cur()).forEach(([k,[n,cr,niv,t]])=>{if(t!=='O'||/^ELECTIVA/.test(n))return;const s=by[niv]||(by[niv]={tot:0,ok:0});s.tot++;if(done.has(k))s.ok++});
+  return by;
+}
+function levelOpen(niv){                        // ¿cumple la seriación recomendada para cursar ese nivel?
+  const r=MAP().reglas[niv];if(!r) return {ok:true,miss:[]};
+  const st=levelStats(), miss=[];
+  Object.entries(r).forEach(([k,f])=>{const s=st[k];if(s&&s.ok/s.tot<f-1e-9)miss.push(`N${k} ${Math.round(f*100)} %`)});
+  return {ok:!miss.length,miss};
+}
+// periodo escolar que se planea = "Periodos escolares que cursaste" (Cita del SAES) + 1. En los planes por niveles
+// es el conteo de periodos inscritos, no el semestre de las materias.
+function semNow(){const c=tr().cursados;return c==null?null:c+1}
+function ancestors(keys){const pre=prereqs(),out=new Set(),walk=k=>(pre[k]||[]).forEach(x=>{if(!out.has(x)){out.add(x);walk(x)}});keys.forEach(walk);return out}
+function statusOf(k){
+  if(!isPersonal()) return 'rest';
+  const done=new Set(tr().done);
+  if(done.has(k)) return 'done';
+  const fi=failInfo(k);
+  if(fi) return fi.estado==='desfasada'?'late fail':'fail';
+  if(tr().curso.includes(k)) return 'curso';
+  // las materias en curso cuentan como requisito cumplido (se planea suponiendo que se acreditan)
+  const req=(prereqs()[k]||[]).filter(x=>!done.has(x)&&!tr().curso.includes(x));
+  // solo la seriación directa bloquea: el plan es flexible y la oferta varía, así que si ya acreditaste los requisitos
+  // puedes cursar la materia aunque sea de otro semestre. La seriación por nivel queda como recomendación (inspector).
+  const lock=req.length>0;
+  const sn=semNow(), sp=semOf()[k];
+  let st='rest';
+  if(sn&&sp){if(sp<sn)st=DESFASE_SEM.has(S.car)?'late':'prev';else if(sp===sn)st='now'}
+  return st+(lock?' lock':'');
+}
+// Las electivas se acreditan por horas de actividades (DIE-03, Electivas UPIITA), nunca con un grupo del horario:
+// no se eligen para cursar, no suman créditos a la selección ni se sugieren.
+function isElec(k){return /^ELECTIVA/i.test(cur()[k]?.[0]||'')}
+function available(k){const s=statusOf(k);return !isElec(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')}
+
+function suggestions(){
+  // prioridad: desfasadas, reprobadas, atrasadas; después todo lo que ya puedes cursar (de cualquier semestre),
+  // primero las que desbloquean más materias y luego por semestre propuesto
+  const sp=semOf(), off=offeredClaves(), rank={late:0,fail:1,prev:2,now:3,rest:3};
+  const dep=dependents(), memo={}, unlocks=k=>memo[k]??(memo[k]=(()=>{const seen=new Set(),walk=x=>(dep[x]||[]).forEach(y=>{if(!seen.has(y)){seen.add(y);walk(y)}});walk(k);return seen.size})());
+  const ci=cargaInfo(0), failS=new Set(tr().fail), cost=k=>failS.has(k)?0:cur()[k][1];
+  // meta de créditos nuevos: con adeudos, lo autorizado además de los retenidos; regular, la carga media
+  const target=ci?(ci.adeudo?ci.libre:Math.min(ci.libre,ci.L.media)):40;
+  const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&cur()[k][3]==='O')
+    .sort((a,b)=>{const ra=rank[statusOf(a).split(' ')[0]], rb=rank[statusOf(b).split(' ')[0]];
+      return ra-rb||(ra===3?unlocks(b)-unlocks(a):0)||(sp[a]||99)-(sp[b]||99)||cur()[a][2]-cur()[b][2]});
+  const out=[];let cr=0;
+  for(const k of cands){if(cr+cost(k)>target+0.01)continue;out.push(k);cr+=cost(k)}
+  return {list:out,cr,target,cands,ret:ci?.ret||0};
+}
+
+let ZOOM=null, MAPSC=1;   // MAPSC: escala con la que se dibujó el mapa por última vez
+/* Bandas de semestre: el centro de cada fila es la mediana de sus bloques (las etiquetas del PDF pueden estar
+   corridas) y cada banda llega a la mitad del espacio con la vecina, así ningún bloque se ve en la fila de al lado. */
+function rowBands(L){
+  if(L._bands) return L._bands;
+  const cs=L.rows.map(()=>[]);
+  L.boxes.forEach(b=>{const cy=b[1]+b[3]/2;let j=0;L.rows.forEach((r,i)=>{if(Math.abs(r[1]-cy)<Math.abs(L.rows[j][1]-cy))j=i});cs[j].push(cy)});
+  // mapas generados por nosotros (Energía, 2×2 por celda) ya tienen filas exactas
+  const ys=L.rows.map(([n,y],i)=>{const v=cs[i].sort((a,b)=>a-b);return v.length&&!L.propuesto?v[Math.floor(v.length/2)]:y});
+  return L._bands=L.rows.map(([n],i)=>{const y=ys[i];
+    const a=i?(ys[i-1]+y)/2:Math.max(0,y-(ys[1]!=null?(ys[1]-y)/2:L.pitch/2));
+    const b=i<ys.length-1?(y+ys[i+1])/2:Math.min(L.h,y+(i?(y-ys[i-1])/2:L.pitch/2));
+    return [n,y,a,b]});
+}
+// modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
+let MARK={avail:new Set(),sug:new Set()};
+let SHOWSUG=store.get('verSug',true);
+function renderMap(){
+  const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
+  $('#mapwrap').hidden=mv==='lista';$('#zoomseg').hidden=mv==='lista';$('#tlist').hidden=mv!=='lista';
+  const L=MAP().layout, wrap=$('#mapwrap'), el=$('#map');
+  MARK=isPersonal()?{avail:new Set(Object.keys(cur()).filter(k=>cur()[k][3]==='O'&&available(k)&&!statusOf(k).includes('fail'))),sug:new Set(SHOWSUG?suggestions().list:[])}:{avail:new Set(),sug:new Set()};
+  $('#sug-tgl').hidden=!isPersonal();$('#sug-on').checked=SHOWSUG;
+  const want=new Set(tr().want), off=offeredClaves(), pre=prereqs();
+  const done=new Set(tr().done), req=new Set([...ancestors(want)].filter(k=>!want.has(k)&&!done.has(k)));
+  // cadena de requisitos y dependientes de la materia bajo el cursor
+  let hot=null;
+  if(S.mapHover){
+    hot=new Set([S.mapHover]);
+    const post={};Object.entries(pre).forEach(([b,as])=>as.forEach(a=>(post[a]=post[a]||[]).push(b)));
+    const walk=(k,g)=>{(g[k]||[]).forEach(x=>{if(!hot.has(x)){hot.add(x);walk(x,g)}})};
+    walk(S.mapHover,pre);walk(S.mapHover,post);
+  }
+  renderInsp();
+  if(!L){ // carrera sin trayectoria propuesta: cuadrícula por nivel del SAES
+    const by={};Object.entries(cur()).forEach(([k,v])=>(by[v[2]]=by[v[2]]||[]).push(k));
+    const cols=Math.max(...Object.values(by).map(a=>a.length)), bw=118, bh=48, gx=10, gy=18, lw=40;
+    const w=lw+cols*(bw+gx)+10, h=Object.keys(by).length*(bh+gy)+gy;
+    const sc=ZOOM??Math.min(1.2,Math.max(.6,(wrap.clientWidth-4)/w));MAPSC=sc;
+    let html=`<svg width="${w*sc}" height="${h*sc}" aria-hidden="true">`;
+    Object.keys(by).sort((a,b)=>a-b).forEach((n,i)=>{const y=gy/2+i*(bh+gy);html+=`<rect class="band" x="0" y="${y*sc}" width="${w*sc}" height="${(bh+gy/2)*sc}"/><text class="rowlbl" x="${12*sc}" y="${(y+bh/2+5)*sc}" font-size="${16*sc}">${n}</text>`});
+    html+='</svg>';
+    Object.keys(by).sort((a,b)=>a-b).forEach((n,i)=>by[n].forEach((k,j)=>{
+      const x=lw+j*(bw+gx), y=gy/2+i*(bh+gy)+gy/4;
+      html+=boxHtml(k,x,y,bw,bh,sc,want,off,hot,+n,req);
+    }));
+    el.style.width=w*sc+'px';el.style.height=h*sc+'px';el.innerHTML=html;$('#areas').hidden=true;
+    $('#mapnote').textContent='Esta carrera aún no tiene una trayectoria recomendada: se muestran sus materias por nivel según el SAES, sin seriación.';
+    return;
+  }
+  const sc=ZOOM??Math.min(1.1,(wrap.clientWidth-2)/L.w);MAPSC=sc;
+  let svg=`<svg width="${L.w*sc}" height="${L.h*sc}" viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--edge)"/></marker><marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>`;
+  rowBands(L).forEach(([n,y,a,b],i)=>{if(i%2===0)svg+=`<rect class="band" x="0" y="${a}" width="${L.w}" height="${b-a}"/>`;svg+=`<text class="rowlbl" x="12" y="${y+6}" font-size="18">${n}</text>`});
+  L.edges.forEach(([s,d,p])=>{
+    const a=L.boxes[s][4], b=L.boxes[d][4], on=hot&&hot.has(a)&&hot.has(b);
+    const pts=[];for(let i=0;i<p.length;i+=2)pts.push(p[i]+','+p[i+1]);
+    svg+=`<polyline class="edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}" points="${pts.join(' ')}" marker-end="url(#${on?'ahh':'ah'})"/>`;
+  });
+  svg+='</svg>';
+  let html=svg;
+  L.boxes.forEach(([x,y,w,h,k,slot,sem])=>{
+    if(k) html+=boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req);
+    else html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?'se acredita con actividades validadas por horas (Electivas UPIITA), no con un grupo del horario':'cualquiera de las ofertadas'}">${esc(slot)}</div>`;
+  });
+  el.style.width=L.w*sc+'px';el.style.height=L.h*sc+'px';el.innerHTML=html;
+  const ar=$('#areas');ar.hidden=!L.cols;ar.style.width=L.w*sc+'px';
+  ar.innerHTML=(L.cols||[]).map(([n,a,b])=>`<div style="left:${a*sc}px;width:${(b-a)*sc}px;font-size:${Math.max(9,Math.min(14,13*sc*1.4))}px" title="${esc(n)}">${esc(n)}</div>`).join('');
+  $('#mapnote').textContent=L.nota?L.nota:L.propuesto?
+    'Esta carrera aún no cuenta con una trayectoria recomendada. Las áreas y la seriación (líneas punteadas) constituyen una propuesta elaborada a partir del plan de estudios oficial, sujeta a validación por la academia.':
+    'Trayectoria recomendada. Las flechas indican la seriación recomendada; '+(tactil()?'al tocar una materia':'al colocar el cursor sobre una materia')+' se resalta su cadena de requisitos. Se sombrean las materias que conviene acreditar antes de las seleccionadas; en cursiva, las que no tienen grupos en el periodo consultado.';
+}
+function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
+  const [n,cr,niv]=cur()[k]||[k,0,1];
+  const st=statusOf(k);
+  const el=isElec(k);
+  const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${want.has(k)?' want':req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?' hot':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
+  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · se acredita por actividades (Electivas UPIITA)':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${want.has(k)}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}</div>`;
+}
+
+function inspParts(k){
+  const c=cur(), [n,cr,niv]=c[k], pre=(prereqs()[k]||[]).filter(x=>c[x]), post=(dependents()[k]||[]).filter(x=>c[x]);
+  const all=ancestors([k]), sem=semOf()[k], off=offeredClaves().has(k);
+  const nm=x=>esc(c[x][0].toLowerCase());
+  // con datos del SAES: qué falta para poder cursarla (en lugar de marcarlo en el mapa)
+  let ps='';
+  if(isPersonal()){const st=statusOf(k),dn=new Set([...tr().done,...tr().curso]);
+    const miss=pre.filter(x=>!dn.has(x)), lv=levelOpen(niv);
+    ps=st==='done'?'Ya acreditada · ':st==='curso'?'En curso · ':st.includes('fail')?'Por recursar · ':
+      st.includes('lock')?`<b>Requisitos pendientes: ${miss.map(nm).join(', ')}</b> · `:`<b>Puedes cursarla</b>${lv.ok?'':` (seriación recomendada por nivel: ${lv.miss.join(', ')})`} · `}
+  if(isElec(k)){const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span> · ${fmtCr(cr)} créditos · nivel ${niv}`;
+    return {l1,l2:(statusOf(k)==='done'?'Ya acreditada · ':'')+'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.'}}
+  const l2=ps+`${pre.length?'Requisitos directos: '+pre.map(nm).join(', '):'Sin requisitos registrados'}${all.size>pre.length?` · ${all.size} en la cadena de requisitos`:''}${post.length?' · Es requisito de: '+post.map(nm).join(', '):''}`;
+  const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span> · ${fmtCr(cr)} créditos · nivel ${niv}${sem?' · semestre propuesto '+sem:''}${off?'':' · <i>sin grupos este periodo</i>'}`;
+  return {l1,l2};
+}
+function renderInsp(){
+  const k=S.mapHover, c=cur(), el=$('#insp');
+  el.classList.toggle('act',!!(S.mapFocus&&k&&c[k]));
+  if(!k||!c[k]){el.innerHTML='<span><b>Explora el mapa</b></span><span class="muted">'+(tactil()?
+    'Toca una materia para consultar sus datos y su cadena de requisitos; tócala de nuevo o usa «Quiero cursarla» para agregarla a tu plan. Pellizca el mapa para acercar o alejar.':
+    'Coloca el cursor sobre una materia para consultar sus datos y su cadena de requisitos; selecciónala para agregarla a tu plan.')+'</span>';el.title='';return}
+  const {l1,l2}=inspParts(k), w=tr().want.includes(k), ob=tr().oblig.includes(k), done=statusOf(k)==='done';
+  el.innerHTML=`<span>${l1}</span><span class="muted">${l2}</span>`+(S.mapFocus?`<span class="insp-act">${ob||done||isElec(k)?'':`<button class="btn primary" type="button" data-fwant="${k}">${w?'Quitar de mi plan':'Quiero cursarla'}</button>`}<button class="btn" type="button" data-fclose="1">Cerrar</button></span>`:'');
+  el.title=l2.replace(/<[^>]+>/g,'');
+}
+function renderLegend(){
+  // franja de color a la izquierda de cada materia = nivel
+  const nivs=[...new Set(Object.values(cur()).map(v=>v[2]))].sort((a,b)=>a-b);
+  $('#legend').innerHTML=`<span class="lg-niv" title="Franja de color a la izquierda de cada materia">Nivel ${nivs.map(n=>`<i class="l-niv" style="background:var(--n${n})"></i>${n}`).join(' ')}</span>`+
+    '<span><i class="l-want"></i>Quiero cursarla</span><span><i class="l-req"></i>Conviene cursarla antes</span><span><i class="l-slot"></i>Optativa o electiva (libre)</span>'+
+    (isPersonal()?(()=>{ // solo los estados que de verdad aparecen en el mapa del alumno
+      const has=new Set(Object.keys(cur()).map(k=>statusOf(k)));const any=f=>[...has].some(f);
+      return '<span><i class="l-done"></i>Ya acreditada</span>'+
+        (any(s=>s==='curso')?'<span><i class="l-curso"></i>En curso</span>':'')+
+        (any(s=>s==='fail')?'<span><i class="l-fail"></i>Por recursar</span>':'')+
+        (any(s=>s.startsWith('late'))?`<span><i class="l-late"></i>${DESFASE_SEM.has(S.car)?'Desfasada':'Desfasada (SAES)'}</span>`:'')+
+        (MARK.avail.size?'<span><i class="l-avail"></i>Puedes cursarla</span>':'');
+    })():'');
+}
+function renderSide(){
+  const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
+  const req=[...ancestors(want)].filter(k=>!want.includes(k)&&!tr().done.includes(k));
+  $('#chosen-help').textContent=want.length?`${want.length} ${want.length>1?'materias':'materia'} · ${fmtCr(credWant)} créditos`:'Selecciona en el mapa las materias que deseas cursar; después consulta sus grupos para organizar tu horario.';
+  $('#chosen').innerHTML=want.sort((a,b)=>(semOf()[a]||99)-(semOf()[b]||99)).map(k=>`<span class="wchip"><span class="dot" style="background:var(--n${c[k][2]})"></span><span class="grp">${k}</span>${esc(c[k][0])}${off.has(k)?'':' <small>(sin grupos)</small>'}${tr().oblig.includes(k)?'<span class="tag bad" title="Obligatoria: al estar desfasada, el SAES no permite la reinscripción sin ella">obligatoria</span>':`<button class="x" data-unwant="${k}" aria-label="Quitar ${esc(c[k][0])}">×</button>`}</span>`).join('');
+  $('#chosen-req').textContent=req.length&&!isPersonal()?`Según la seriación, conviene haber cursado antes: ${req.map(k=>c[k][0].toLowerCase()).join(', ')}.`:'';
+  document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
+  if(isPersonal()){
+    const done=tr().done.filter(k=>c[k]), credDone=done.reduce((s,k)=>s+c[k][1],0);
+    const total=Object.values(c).filter(v=>v[3]==='O'&&!/^ELECTIVA/.test(v[0])).reduce((s,v)=>s+v[1],0);
+    const A=ALUMNO, meta=perMeta(), fis=tr().fail.map(failInfo).sort((a,b)=>(a.idx??99)-(b.idx??99));
+    const nDes=fis.filter(f=>f.estado==='desfasada').length, curso=tr().curso;
+    const atraso=DESFASE_SEM.has(S.car)?Object.keys(c).filter(k=>statusOf(k)==='late'||statusOf(k)==='late lock').length:0;
+    const tile=(lbl,val,sub='',cls='',tip='')=>`<div class="tile"${tip?` title="${esc(tip)}"`:''}><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
+    const simCr=tr().simOk.reduce((t,k)=>t+c[k][1],0), obt=(A.avance?.obtenidos??credDone)+simCr, tot=A.carga?.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
+    const cm=String(A.cita?.inicio||'').match(/(\d+\/\d+\/\d{4})\s+(\d+):(\d+)(?::\d+)?\s*(.*)/);
+    $('#status').innerHTML=
+      tile('Promedio',A.promedio??'—')+
+      tile(tr().sim?'Créditos al terminar':'Créditos',`${fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
+      tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${A.carga?.duracion?' de '+A.carga.duracion:''} periodos`:'','',
+        [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',A.carga?.duracion_max?`máximo ${A.carga.duracion_max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
+      tile('Carga autorizada',aut!=null?fmtCr(aut)+' cr':'—',autTipo?autTipo.charAt(0)+autTipo.slice(1).toLowerCase():'')+
+      tile('Desfase oficial',nDes?nDes+(nDes>1?' materias':' materia'):'Ninguno',meta!=null?'en '+perName(meta):'',nDes?'bad':'ok',A.desfase_saes?'Tu última cita: '+A.desfase_saes:'')+
+      (DESFASE_SEM.has(S.car)?tile('Atrasadas',atraso,'según el semestre propuesto',atraso?'warn':''):'')+
+      tile('Cita de reinscripción',cm?cm[1]:esc(A.cita?.inicio||'—'),citaPasada(A)?'vencida; aún no se publica la siguiente':cm?`${+cm[2]}:${cm[3]} ${cm[4]}`:'');
+    $('#status').style.setProperty('--tiles',$('#status').children.length);
+    const msg=f=>f.estado==='desfasada'?`<span class="bad">desfasada en ${perName(meta)}</span>; debes inscribirla: el SAES no permite reinscribirse sin ella`:
+      f.estado==='riesgo'?`<span class="warn">debe acreditarse en ${perName(meta)}</span> para evitar el desfase en ${perName(meta+1)}`:
+      f.estado==='reciente'?`acreditar a más tardar en ${perName(f.limite)}`:'actualiza tus datos del SAES para conocer el periodo de adeudo';
+    $('#desf').innerHTML=fis.length?`<ul class="desf">${fis.map(f=>`<li class="${f.estado}" title="${esc(`${f.k}${f.idx!=null?' · reprobada en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`)}"><b>${esc(pretty(c[f.k][0]))}</b> · ${msg(f)}${f.curso?' · en recursamiento':''}</li>`).join('')}</ul>`:'';
+    $('#desf-note').textContent=(fis.length?'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.':'')+
+      (DESFASE_SEM.has(S.car)?'':' En los planes por niveles, cursar las materias en un orden distinto al de la trayectoria no constituye desfase.');
+    $('#est-src').textContent='Leído del SAES el '+new Date(A.leido).toLocaleDateString('es-MX',{dateStyle:'medium'});
+    const ec=tr().enCurso;$('#est-sim').hidden=!ec.length;$('#sim-tag').hidden=!tr().sim;
+    $('#est-sim').innerHTML=ec.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+
+      `<div class="simchips" role="group" aria-label="Resultado simulado de tus materias en curso">${ec.map(k=>{const f=SIM.fail.includes(k);
+        return `<button type="button" class="simchip${f?' bad':''}" data-sim="${k}"${SIM.on?'':' disabled'} title="Alternar entre aprobada y reprobada">${esc(pretty(c[k][0]))}<b>${f?'Reprobada':'Aprobada'}</b><span class="swap" aria-hidden="true">⇄</span></button>`}).join('')}</div>`+
+      `<span class="sim-hint">${SIM.on?'Selecciona una materia para alternar entre aprobada y reprobada.':'Permite estimar el resultado del periodo en curso según apruebes o repruebes cada materia.'}</span>`:'';
+    $('#h-sugg').textContent=meta!=null?'Sugeridas para '+perName(meta):'Sugeridas';
+    const st=levelStats(), R=MAP().reglas;
+    // por nivel: avance (barra de ancho fijo) y, debajo, el porcentaje recomendado de niveles previos frente al tuyo
+    const pct=k=>st[k]?Math.round(st[k].ok/st[k].tot*100):0;
+    $('#lvls').innerHTML=`<p class="lvl-intro">Avance por nivel y porcentaje recomendado de los niveles previos para cursar cada uno.</p>`+
+      Object.keys(st).sort((a,b)=>a-b).map(n=>{const s=st[n], rq=Object.entries(R[n]||{});
+      const req=rq.length?`<div class="lvl-req">Para cursarlo se recomienda: ${rq.map(([k,f])=>{const ok=pct(k)>=Math.round(f*100);
+          return `<span class="${ok?'ok':'warn'}">${ok?'✓':'·'} Nivel ${k} al ${Math.round(f*100)} %${ok?'':` (llevas ${pct(k)} %)`}</span>`}).join(' ')}</div>`:'';
+      return `<div class="lvl"><div class="lvl-top"><b>Nivel ${n}</b><span class="minibar"><i style="width:${s.ok/s.tot*100}%;background:var(--n${n})"></i></span><span class="lvl-num">${s.ok} de ${s.tot}</span></div>${req}</div>`}).join('');
+    const sg=suggestions(), color={late:'var(--st-late)',fail:'var(--warn)',prev:'var(--line)',now:'var(--st-now)',rest:'var(--line)'};
+    $('#sugg').innerHTML=sg.list.map(k=>`<label><span class="dot" style="background:${color[statusOf(k).split(' ')[0]]}"></span><span class="grp">${k}</span><span>${esc(c[k][0])}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+
+      `<small>${fmtCr(sg.cr)} de ${fmtCr(sg.target)} créditos nuevos${sg.ret?` (además de ${fmtCr(sg.ret)} retenidos por reprobadas, que no se vuelven a contar al recursarlas)`:''}; orden: desfasadas y reprobadas; después las que ya puedes cursar de cualquier semestre, primero las que desbloquean más materias.${curso.length?' No incluye las materias en curso.':''}</small>`;
+  }
+  renderLegend();renderLineas();
+}
+function renderLineas(){
+  const ls=MAP().lineas, c=cur(), done=new Set(tr().done), want=new Set(tr().want), off=offeredClaves();
+  if(!ls.length){$('#lineas').innerHTML='<p class="muted">Sin líneas de especialización registradas para esta carrera.</p>';return}
+  const L=MAP().layout, slots=L?L.boxes.filter(b=>/^optativa/i.test(b[5])).length:0;
+  const AREA=['#8a98c7','#a76987','#577d63','#4d6f8d','#c9a36a','#721e45'], areas=[...new Set(ls.map(l=>l.area))];
+  // una optativa puede tener varias claves (una por semestre): se agrupan por nombre
+  const group=l=>{const by=new Map();l.claves.forEach(k=>{if(!c[k])return;const n=c[k][0].toUpperCase();const g=by.get(n)||{n,keys:[],niv:c[k][2],cr:c[k][1],done:false,off:false,want:false};g.keys.push(k);g.done||=done.has(k);g.off||=off.has(k);g.want||=want.has(k);g.niv=Math.min(g.niv,c[k][2]);by.set(n,g)});return [...by.values()]};
+  const gs=ls.map(group), score=gs.map(g=>g.filter(x=>x.done||x.want).length), best=Math.max(...score);
+  const head=`<div class="ol-head"><p>${slots?`El plan de estudios contempla <b>${slots} optativas</b>, señaladas en el mapa con espacios punteados.`:'Las optativas son de libre elección.'} Las líneas de especialización son orientativas y pueden combinarse según la oferta.</p>
+    <div class="legend"><span><i class="l-want"></i>Elegida</span><span><i class="ol-l-on"></i>Con grupos este periodo</span><span><i class="ol-l-off"></i>Sin grupos este periodo</span></div></div>`;
+  $('#lineas').innerHTML=head+'<div class="ol-grid">'+ls.map((l,i)=>{
+    const g=gs[i], color=AREA[areas.indexOf(l.area)%AREA.length], nOff=g.filter(x=>x.off&&!x.done).length, nWant=g.filter(x=>x.want).length;
+    const byNiv={};g.forEach(x=>(byNiv[x.niv]=byNiv[x.niv]||[]).push(x));
+    const rows=Object.keys(byNiv).sort((a,b)=>a-b).map(n=>`<div class="ol-row"><span class="ol-niv">Nivel ${n}</span><div class="ol-boxes">${byNiv[n].map(x=>{
+      const k=x.keys.find(k=>off.has(k))||x.keys[0];
+      return `<button class="obox${x.want?' want':''}${x.done?' done':''}${x.off?'':' offno'}" data-obox="${k}" aria-pressed="${x.want}" title="${esc(x.n)} · ${fmtCr(x.cr)} créditos${x.off?'':' · sin grupos este periodo'}">${esc(x.n.toLowerCase())}</button>`}).join('')}</div></div>`).join('');
+    return `<article class="ol-card" style="--area:${color}">
+      <header><span class="ol-area">${esc(l.area)}</span><h4>${esc(l.linea!==l.area?l.linea:l.area)}</h4>
+        <span class="ol-stat">${nOff} de ${g.length} con grupos${nWant?` · <b>${nWant} elegida${nWant>1?'s':''}</b>`:''}${best>0&&score[i]===best?' · <span class="tag good">línea con mayor avance</span>':''}</span></header>
+      ${rows}</article>`}).join('')+'</div>';
+}
+/* =========================================================
+   HORARIO
+   ========================================================= */
+function base(){return classes().filter(c=>c[0]===S.car&&(S.tur==='*'||c[1]===S.tur)&&(S.niv==='*'||c[2]===S.niv))}
+function filtered(){
+  const q=norm(S.q.trim()), marks=ws().marks, want=new Set(tr().want);
+  const m=S.chips.filter(x=>x.t==='m').map(x=>x.v), p=S.chips.filter(x=>x.t==='p').map(x=>x.v), g=S.chips.filter(x=>x.t==='g').map(x=>x.v);
+  // llenar huecos: en toda la carrera, sin lo ya elegido/acreditado, sin choques y (si hay hueco) con clase en ese bloque
+  const hunt=S.fit||!!S.gap, sel=selected(), own=ownAsClasses(), have=new Set(sel.map(c=>c[4])), done=new Set(isPersonal()?tr().done:[]);
+  const fits=c=>c[6].length&&!have.has(c[4])&&!done.has(c[8])&&![...sel,...own].some(x=>overlaps(x,c))&&
+    (!S.gap||c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b));
+  const mine=new Set(plan().sel);
+  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(hunt?fits(c):(!S.onlyWant||!want.size||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
+    (!S.hide||marks[keyOf(c)]?.s!=='no'||plan().sel.includes(keyOf(c)))&&
+    (!q||norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(q)));
+}
+function suggest(q){
+  q=norm(q.trim());if(!q)return[];
+  const cs=classes().filter(c=>c[0]===S.car), out=[], seen=new Set();
+  const hit=s=>norm(s).includes(q);
+  const push=(t,v,label,right)=>{const k=t+v;if(seen.has(k)||S.chips.some(x=>x.t===t&&x.v===v))return;seen.add(k);out.push({t,v,label,right})};
+  cs.forEach(c=>{if(hit(name(c))||hit(c[8]))push('m',c[4],name(c),`${c[8]} · ${fmtCr(c[7])} cr`)});
+  cs.forEach(c=>c[5].forEach(i=>{if(hit(DATA.prof[i]))push('p',i,DATA.prof[i],'')}));
+  cs.forEach(c=>{if(hit(c[3]))push('g',c[3],c[3],TURNOS[c[1]]||'')});
+  const rank=x=>(norm(x.label).startsWith(q)?0:1);
+  return out.sort((a,b)=>rank(a)-rank(b)||'mpg'.indexOf(a.t)-'mpg'.indexOf(b.t)).slice(0,10);
+}
+function hl(s,q){const i=norm(s).indexOf(norm(q.trim()));return i<0?esc(s):esc(s.slice(0,i))+'<mark>'+esc(s.slice(i,i+q.trim().length))+'</mark>'+esc(s.slice(i+q.trim().length))}
+function renderAC(){
+  const ac=$('#ac'), inp=$('#f-q');
+  S.acItems=suggest(S.q);
+  if(!S.acItems.length){ac.hidden=true;inp.setAttribute('aria-expanded','false');inp.removeAttribute('aria-activedescendant');return}
+  const K={m:'Materia',p:'Profesor',g:'Grupo'};
+  ac.innerHTML=S.acItems.map((x,i)=>`<li id="ac-${i}" role="option" data-i="${i}" aria-selected="${i===S.acIdx}"><span class="k">${K[x.t]}</span><span>${hl(x.label,S.q)}</span><span class="r">${esc(x.right)}</span></li>`).join('');
+  ac.hidden=false;inp.setAttribute('aria-expanded','true');
+  if(S.acIdx>=0)inp.setAttribute('aria-activedescendant','ac-'+S.acIdx);else inp.removeAttribute('aria-activedescendant');
+}
+function pick(i){const x=S.acItems[i];if(!x)return;S.chips.push({t:x.t,v:x.v});S.q='';$('#f-q').value='';S.acIdx=-1;renderAC();renderActive();renderOffer()}
+function renderActive(){
+  const K={m:'materia',p:'profesor',g:'grupo'};
+  const lab=x=>x.t==='m'?DATA.asig[x.v]:x.t==='p'?DATA.prof[x.v]:x.v;
+  $('#active').innerHTML=S.chips.map((x,i)=>`<span class="pill"><i>${K[x.t]}</i>${esc(lab(x))}<button data-unchip="${i}" aria-label="Quitar filtro ${esc(lab(x))}">×</button></span>`).join('')+
+    (S.chips.length>1?'<button class="link" data-unchip="all">Quitar todos</button>':'')+
+    S.gavoid.map((p,i)=>`<span class="pill"><i>excluir</i>${esc(p)}<button data-unga="${i}" aria-label="Quitar ${esc(p)}">×</button></span>`).join('')+
+    (S.gap?`<span class="pill gap"><i>hueco</i>${DAYS[S.gap.d]} ${hm(S.gap.a)}–${hm(S.gap.b)}<button data-ungap="1" aria-label="Quitar filtro de hueco">×</button></span>`:'');
+}
+function renderHFilters(){
+  document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
+  document.querySelectorAll('[data-gt]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gt===S.gt));
+  $('#f-hide').checked=S.hide;$('#f-weekend').checked=S.weekend;
+  const n=tr().want.length;$('#f-want').checked=S.onlyWant&&n>0;$('#f-want').disabled=!n;
+  $('#f-want-l').textContent=n?(n>1?`Solo las ${n} elegidas en el mapa`:'Solo la elegida en el mapa'):'Solo las elegidas en el mapa (selecciónalas en «Mi trayectoria»)';
+  const mine=classes().filter(c=>c[0]===S.car);
+  const turs=[...new Set(mine.map(c=>c[1]))].sort();
+  if(S.tur!=='*'&&!turs.includes(S.tur)) S.tur='*';
+  $('#f-turno').innerHTML=[['*','Todos'],...turs.map(t=>[t,TURNOS[t]||t])].map(([v,l])=>`<button class="chip" data-tur="${v}" aria-pressed="${v===S.tur}">${l}</button>`).join('');
+  const nivs=[...new Set(mine.map(c=>c[2]))].sort((a,b)=>a-b);
+  if(S.niv!=='*'&&!nivs.includes(S.niv)) S.niv='*';
+  $('#f-nivel').innerHTML=[['*','Todos'],...nivs.map(n=>[n,n])].map(([v,l])=>`<button class="chip" data-niv="${v}" aria-pressed="${v===S.niv}">${l}</button>`).join('');
+  $('#proflist').innerHTML=[...new Set(mine.flatMap(c=>c[5]))].map(i=>`<option value="${esc(DATA.prof[i])}">`).join('');
+  renderActive();renderGPrefs();
+}
+/* Salones (índice 10, paralelo a los bloques; solo periodo actual, del PDF de horarios por aula de la unidad) */
+const shortRoom=r=>String(r||'').replace(/^Aula\s+/,'');
+const roomAt=(c,d,a)=>{const i=(c[6]||[]).findIndex(x=>x[0]===d&&x[1]===a);return i>=0&&c[10]?c[10][i]||'':''};
+function roomsTxt(c){if(!c[10]||!c[10].some(Boolean))return '';const by=new Map();
+  c[6].forEach((b,i)=>{const r=c[10][i];if(!r)return;const ds=by.get(r)||[];if(!ds.includes(b[0]))ds.push(b[0]);by.set(r,ds)});
+  return [...by].map(([r,ds])=>`${esc(shortRoom(r))}${by.size>1?` (${ds.sort((x,y)=>x-y).map(d=>DAYS[d]).join(', ')})`:''}`).join(' · ')}
+/* Líneas de especialización de una optativa (por clave o por nombre, ya que una optativa puede tener varias claves) */
+function lineasDe(k){const c=cur(), n=c[k]?.[0]?.toUpperCase();if(!n)return[];
+  return (MAP().lineas||[]).filter(l=>l.claves.some(x=>x===k||c[x]?.[0]?.toUpperCase()===n)).map(l=>l.linea!==l.area?l.linea:l.area)}
+function optRow(c,sel,inGroup){
+  const k=keyOf(c), on=plan().sel.includes(k), mk=ws().marks[k]||{};
+  const clash=[...sel,...ownAsClasses()].filter(s=>(s.own||keyOf(s)!==k)&&overlaps(s,c));
+  const same=sel.find(s=>s[4]===c[4]&&keyOf(s)!==k);
+  let tags='';
+  if(!on&&clash.length) tags+=`<span class="tag bad">Choca con ${clash.map(s=>s.own?esc(s.n):s[3]+' '+name(s).toLowerCase()).join(', ')}</span>`;
+  if(!on&&same) tags+=`<span class="tag soft">Reemplaza ${same[3]}</span>`;
+  const who=inGroup?`<b>${esc(name(c))}</b> <small>${c[8]} · ${fmtCr(c[7])} cr</small><br>${esc(profs(c))}`:esc(profs(c));
+  if(isExcl(c)) tags+='<span class="tag soft">profesor excluido</span>';
+  return `<div class="opt${mk.s==='no'||isExcl(c)?' no':''}" data-k="${k}"><span class="grp">${inGroup?'':c[3]}</span><span class="who">${who}</span>
+    <div class="right"><button class="add" data-toggle="${k}" aria-pressed="${on}">${on?'Quitar':'Agregar'}</button>
+      <span class="marks" role="group" aria-label="Marcar opción"${isExcl(c)?' title="Profesor excluido: se trata como «No». Quítalo de «Excluir profesores» para marcar este grupo."':''}>${[['si','Sí'],['quiza','Quizá'],['no','No']].map(([m,l])=>isExcl(c)?`<button disabled data-m="${m}" aria-pressed="${m==='no'}">${l}</button>`:`<button data-mark="${m}" data-m="${m}" data-k="${k}" aria-pressed="${mk.s===m}">${l}</button>`).join('')}</span></div>
+    <span class="when">${pattern(c).map(p=>`<span>${p}</span>`).join('')}${roomsTxt(c)?`<span class="room">Salón: ${roomsTxt(c)}</span>`:''}</span>
+    ${tags?`<span class="tags">${tags}</span>`:''}
+    ${mk.s?`<input class="note" type="text" data-note="${k}" value="${esc(mk.n||'')}" placeholder="Nota sobre este grupo o profesor" aria-label="Nota">`:''}</div>`;
+}
+/* filtros globales: profesores excluidos (cuentan como "No") y horario en la escuela (de … a …) */
+const isExcl=c=>{const ex=S.gavoid.map(norm);return ex.length>0&&c[5].some(i=>ex.some(p=>norm(DATA.prof[i]).includes(p)))};
+const outWin=c=>{const ga=tmin(GT.a),gb=tmin(GT.b);return c[6].some(([d,a,b])=>(ga!=null&&a<ga)||(gb!=null&&b>gb))};
+// orden de la oferta: primero la desfasada (obligatoria), luego las reprobadas por recursar, después el orden normal
+const prio=k=>{if(!isPersonal()||!cur()[k])return 2;const st=statusOf(k);return st.startsWith('late fail')?0:st.startsWith('fail')?1:2};
+function renderOffer(){
+  const list=filtered(), sel=selected();
+  let html='';
+  if(S.view==='materia'){
+    const g=new Map();list.forEach(c=>{(g.get(c[4])||g.set(c[4],[]).get(c[4])).push(c)});
+    const items=[...g.values()].sort((a,b)=>prio(a[0][8])-prio(b[0][8])||a[0][2]-b[0][2]||name(a[0]).localeCompare(name(b[0])));
+    html=items.map(cs=>{cs.sort((a,b)=>a[3].localeCompare(b[3],'es',{numeric:true}));const c=cs[0];
+      const st=cur()[c[8]]?statusOf(c[8]).split(' ')[0]:'';
+      const fl=cur()[c[8]]&&statusOf(c[8]).includes('fail');
+      const badge=st==='late'?`<span class="tag bad">${fl?'desfasada: recursar':'desfasada'}</span> `:st==='fail'?'<span class="tag bad">por recursar</span> ':st==='now'?'<span class="tag good">de tu semestre</span> ':st==='curso'?'<span class="tag soft">en curso</span> ':st==='done'?'<span class="tag soft">ya acreditada</span> ':(isPersonal()&&cur()[c[8]]&&available(c[8]))?'<span class="tag good">puedes cursarla</span> ':'';
+      return `<article class="subj"><header><h3>${badge}${esc(name(c))}</h3><span class="meta">${c[8]} · ${fmtCr(c[7])} cr · Nivel ${c[2]}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="Línea de especialización">${esc(l)}</span>`).join('')}</span>`:''}</header>${(()=>{
+        // con una opción marcada «Sí», la materia se colapsa a esa(s) opción(es) (y la que esté en el horario)
+        const mk=ws().marks, keep=cs.filter(x=>mk[keyOf(x)]?.s==='si'||plan().sel.includes(keyOf(x)));
+        const col=keep.length&&keep.some(x=>mk[keyOf(x)]?.s==='si')&&keep.length<cs.length, open=S.expand.has(c[4]);
+        const rows=(col&&!open?keep:cs).map(x=>optRow(x,sel,false)).join('');
+        return rows+(col?`<button type="button" class="link more" data-expand="${c[4]}">${open?'Mostrar solo la opción elegida':`Ver ${cs.length-keep.length} ${cs.length-keep.length>1?'opciones más':'opción más'}`}</button>`:'')})()}</article>`}).join('');
+    $('#offer-count').textContent=`${g.size} materias · ${list.length} opciones`;
+  }else{
+    const g=new Map();list.forEach(c=>{(g.get(c[3])||g.set(c[3],[]).get(c[3])).push(c)});
+    const gp=cs=>Math.min(...cs.map(c=>prio(c[8])));
+    const items=[...g.entries()].sort((a,b)=>gp(a[1])-gp(b[1])||a[0].localeCompare(b[0],'es',{numeric:true}));
+    html=items.map(([grp,cs])=>`<article class="subj"><header><h3 class="grp">${grp}</h3><span class="meta">${fmtCr(cs.reduce((s,c)=>s+c[7],0))} cr <button class="link" data-group="${grp}">Agregar grupo completo</button></span></header>${cs.map(c=>optRow(c,sel,true)).join('')}</article>`).join('');
+    $('#offer-count').textContent=`${g.size} grupos · ${list.length} materias`;
+  }
+  $('#offer').innerHTML=html||'<p class="empty">No hay grupos que cumplan los filtros. Cambia el turno o el nivel, retira algún filtro de búsqueda o desactiva «Solo las elegidas en el mapa».</p>';
+}
+function lanes(items){
+  const out=[];
+  for(let d=0;d<7;d++){
+    const bs=items.filter(b=>b.d===d).sort((a,b)=>a.a-b.a||b.b-a.b);
+    let group=[],end=-1;
+    const flush=()=>{const le=[];group.forEach(b=>{let i=le.findIndex(e=>e<=b.a);if(i<0){i=le.length;le.push(0)}le[i]=b.b;b.lane=i});group.forEach(b=>{b.n=le.length;b.clash=le.length>1&&!b.ghost});out.push(...group);group=[]};
+    bs.forEach(b=>{if(b.a>=end&&group.length)flush();group.push(b);end=Math.max(end,b.b)});
+    if(group.length)flush();
+  }
+  return out;
+}
+/* horario inscrito (leído del SAES con el Lector): se carga en la versión seleccionada para exportarlo o compararlo */
+function loadInscrito(){
+  const H=(isPersonal()&&ALUMNO.horario_inscrito)||[];if(!H.length)return;
+  const find=(per,g,k)=>(DATA.periodos[per]||[]).find(c=>c[0]===S.car&&c[3]===g&&c[8]===k);
+  // periodo de la oferta con más coincidencias (grupo + clave)
+  const per=['proximo','actual'].filter(hasOffer).sort((a,b)=>H.filter(h=>find(b,h[0],h[1])).length-H.filter(h=>find(a,h[0],h[1])).length)[0]||S.per;
+  if(per!==S.per){S.per=per;store.set('per',per)}
+  const pl=plan();pl.sel=[];pl.own=pl.own.filter(o=>!o.saes);let sinOferta=0;
+  H.forEach(([g,k,n,pf,ses])=>{const c=find(per,g,k);if(c){pl.sel.push(keyOf(c));return}
+    // sin coincidencia en la oferta capturada: se agrega con las horas del SAES
+    sinOferta++;const by={};ses.forEach(([d,a,b])=>{(by[a+'-'+b]=by[a+'-'+b]||{a,b,d:[]}).d.push(d)});
+    Object.values(by).forEach(x=>pl.own.push({n:`${pretty(n)} (${g})`,d:x.d.sort(),a:x.a,b:x.b,saes:true}))});
+  render();
+  $('#exp-msg').textContent=`Horario inscrito cargado en la versión ${ws().plan} (${per==='proximo'?'próximo periodo':'periodo actual'}).`+
+    (sinOferta?` ${sinOferta} ${sinOferta>1?'materias no aparecen':'materia no aparece'} en la oferta capturada y se muestra${sinOferta>1?'n':''} con las horas del SAES.`:'');
+}
+function renderPlans(){
+  $('#b-saeshor').hidden=!(isPersonal()&&ALUMNO.horario_inscrito?.length);
+  const ids=planIds();
+  $('#plans').innerHTML='<span class="lbl" style="margin-right:4px">Versión</span>'+ids.map(p=>{const pl=ws().plans[p];const cr=pl.sel.map(byKey).filter(Boolean).reduce((s,c)=>s+c[7],0);
+    return `<span class="plan-tab"><button class="chip" data-plan="${p}" aria-pressed="${ws().plan===p}">Horario ${p}<small>${pl.sel.length?fmtCr(cr)+' cr':'vacío'}</small></button>${ids.length>1&&ws().plan===p?`<button class="x" data-delplan="${p}" aria-label="Eliminar el horario ${p}" title="Eliminar el horario ${p}">×</button>`:''}</span>`}).join('')+
+    `<button class="chip plan-new" data-newplan="1" title="Agregar un horario vacío">+ Nuevo</button><button class="link" data-dup style="margin-left:8px">Duplicar ${ws().plan}</button>`;
+}
+function renderCal(){
+  const sel=selected(), own=ownAsClasses();
+  const ghost=S.hover&&!plan().sel.includes(S.hover)?byKey(S.hover):null;
+  const all=[...sel,...own,...(ghost?[ghost]:[])];
+  const maxDay=Math.max(4,...all.flatMap(c=>slots(c).map(b=>b[0])));
+  const days=S.weekend?7:maxDay+1;
+  // bloques de 1:30 alineados a las 7:00 (si algo empieza antes, se agregan bloques completos hacia arriba)
+  const first=Math.min(START,...all.flatMap(c=>slots(c).map(b=>b[1])));
+  const lo=START-Math.ceil((START-first)/BLOCK)*BLOCK;
+  const hi=Math.max(14*60+30,...all.flatMap(c=>slots(c).map(b=>b[2])));
+  const end=lo+Math.ceil((hi-lo)/BLOCK)*BLOCK, h=(end-lo)/SLOT*SLOTPX;
+  const cal=$('#cal');cal.style.setProperty('--days',days);cal.style.setProperty('--slot',SLOTPX+'px');
+  let html='<div class="dh"></div>'+DAYS.slice(0,days).map(d=>`<div class="dh">${d}</div>`).join('');
+  html+=`<div class="hours" style="height:${h}px">`;
+  for(let m=lo;m<end;m+=BLOCK) html+=`<div style="top:${(m-lo)/SLOT*SLOTPX}px">${hm(m)}</div>`;
+  html+='</div>';
+  const items=lanes(all.flatMap(c=>slots(c).map(([d,a,b])=>({c,d,a,b,ghost:c===ghost}))));
+  for(let d=0;d<days;d++){
+    html+=`<div class="day" style="height:${h}px">`;
+    for(let m=lo;m<end;m+=BLOCK){const on=S.gap&&S.gap.d===d&&S.gap.a===m;
+      html+=`<button type="button" class="gapcell${on?' on':''}" data-gap="${d}|${m}" style="top:${(m-lo)/SLOT*SLOTPX}px;height:${BLOCK/SLOT*SLOTPX}px" title="Buscar materias para ${DAYS[d]} ${hm(m)}–${hm(m+BLOCK)}" aria-label="Buscar materias para ${DAYS[d]} ${hm(m)}"></button>`}
+    items.filter(b=>b.d===d).forEach(b=>{
+      const top=(b.a-lo)/SLOT*SLOTPX, ht=(b.b-b.a)/SLOT*SLOTPX-2, w=100/b.n, pos=`top:${top}px;height:${ht}px;left:calc(${b.lane*w}% + 2px);width:calc(${w}% - 4px)`;
+      if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}" style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
+      else html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)};${pos}" data-k="${keyOf(b.c)}" title="${b.c[3]} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}"><b>${esc(name(b.c))}</b><span class="t">${b.c[3]} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></div>`;
+    });
+    html+='</div>';
+  }
+  cal.innerHTML=html;
+  const cv=cview();document.querySelectorAll('[data-cview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.cview===cv)));
+  $('.calwrap').hidden=cv==='dia';$('#agenda').hidden=cv!=='dia';
+  if(cv==='dia'){const by={};items.forEach(b=>(by[b.d]=by[b.d]||[]).push(b));
+    $('#agenda').innerHTML=Object.keys(by).length?Object.keys(by).sort((a,b)=>a-b).map(d=>`<section class="ag-day"><h4>${DAYN[d]}</h4>`+by[d].sort((x,y)=>x.a-y.a).map(b=>b.c.own?
+      `<div class="ag-it own${b.clash?' clash':''}"><span class="t">${hm(b.a)}–${hm(b.b)}</span><span><b>${esc(b.c.n)}</b><small>Actividad extracurricular${b.clash?' · traslape':''}</small></span></div>`:
+      `<div class="ag-it${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)}"><span class="t">${hm(b.a)}–${hm(b.b)}</span><span><b>${esc(name(b.c))}</b><small>${b.c[3]}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''} · ${esc(profs(b.c))}${b.ghost?' · vista previa':''}${b.clash?' · traslape':''}</small></span></div>`).join('')+'</section>').join(''):
+      '<p class="ag-empty">Aún no hay materias en este horario.</p>'}
+  const cr=sel.reduce((s,c)=>s+c[7],0);
+  const mins=sel.reduce((s,c)=>s+c[6].reduce((t,b)=>t+b[2]-b[1],0),0);
+  const both=[...sel,...own];let clashes=0;
+  for(let i=0;i<both.length;i++)for(let j=i+1;j<both.length;j++)if(overlaps(both[i],both[j]))clashes++;
+  const noSched=sel.filter(c=>!c[6].length).length;
+  $('#stats').innerHTML=sel.length||own.length?`<span><b>${fmtCr(cr)}</b> créditos en el horario</span><span><b>${sel.length}</b> materias</span><span><b>${(mins/60).toFixed(1)}</b> h de clase a la semana</span>`+
+    (clashes?`<span class="bad">${clashes} ${clashes>1?'traslapes':'traslape'}</span>`:'<span>Sin traslapes</span>')+(noSched?`<span>${noSched} sin horario publicado</span>`:'')+
+    (()=>{const have=new Set(sel.map(c=>c[8])),miss=tr().oblig.filter(k=>!have.has(k));return miss.length?`<span class="bad">Falta ${miss.map(k=>esc(pretty(cur()[k][0]))).join(', ')}: obligatoria por desfase</span>`:''})():
+    '<span>Agrega grupos desde la oferta o genera horarios automáticamente. '+(tactil()?'Toca un grupo de la oferta para ver su vista previa.':'Al colocar el cursor sobre un grupo se muestra su vista previa.')+'</span>';
+  const failS=new Set(tr().fail), ci=cargaInfo(sel.filter(c=>!failS.has(c[8])).reduce((s,c)=>s+c[7],0));
+  if(ci&&(sel.length||ci.ret)){
+    const L=ci.L, t=ci.total, top=Math.max(L.max,t,ci.tope)*1.05, pct=v=>Math.min(100,v/top*100);
+    const tag=t<L.min?'Menor a la mínima':t>ci.tope+0.01?(ci.aut!=null?'Excede la carga autorizada':ci.adeudo?'Excede la carga media (con adeudos)':'Mayor a la máxima'):t<=L.media?'Entre mínima y media':'Entre media y máxima';
+    const bad=t<L.min||t>ci.tope+0.01;
+    $('#load').innerHTML=`<span class="lbl${bad?' bad':''}">Carga total: ${fmtCr(t)} cr · ${tag}</span><div class="bar">${ci.ret?`<div class="fill ret" style="width:${pct(ci.ret)}%"></div>`:''}<div class="fill" style="left:${pct(ci.ret)}%;width:${Math.max(0,pct(t)-pct(ci.ret))}%"></div>${['min','media','max'].map(k=>`<div class="tick" style="left:${pct(L[k])}%"></div>`).join('')}${ci.tope!==L.max&&ci.tope!==L.media?`<div class="tick tope" style="left:${pct(ci.tope)}%"></div>`:''}</div>
+      <div class="ticks">${[['min','mínima'],['media','media'],['max','máxima']].map(([k,l])=>`<span style="left:${pct(L[k])}%">${l} ${L[k]}</span>`).join('')}${ci.tope!==L.max&&ci.tope!==L.media?`<span class="bad" style="left:${pct(ci.tope)}%">autorizada ${fmtCr(ci.tope)}</span>`:''}</div>`+
+      (ci.ret?`<p class="load-note"><i class="sw-ret"></i>${fmtCr(ci.ret)} cr retenidos por reprobadas (cuentan aunque no las inscribas; recursarlas no suma de nuevo) · ${fmtCr(ci.nuevos)} cr de materias nuevas, de ${fmtCr(ci.libre)} permitidos (${ci.aut!=null?`carga autorizada de ${fmtCr(ci.aut)} cr`:'carga media'} menos los retenidos)${ci.faltaMin?` · faltan ${fmtCr(ci.faltaMin)} cr para la mínima`:''}.</p>`:'');
+  }else $('#load').innerHTML='';
+  $('#sel').hidden=!both.length;
+  $('#sel').innerHTML=sel.map(c=>`<div><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${c[3]}</span><span>${esc(name(c))}<br><small>${esc(profs(c))}</small></span><span class="cr">${fmtCr(c[7])} cr</span><button class="x" data-toggle="${keyOf(c)}" aria-label="Quitar ${esc(name(c))}">×</button></div>`).join('')+
+    own.map(o=>{const r=plan().own[o.i];return `<div><span class="sw own"></span><span class="grp">extra</span><span>${esc(o.n)}<br><small>${r.d.map(d=>DAYS[d]).join(' ')} ${hm(r.a)}–${hm(r.b)}</small></span><span></span><button class="x" data-unown="${o.i}" aria-label="Quitar ${esc(o.n)}">×</button></div>`}).join('');
+}
+function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="button" class="chip" data-oday="${i}" aria-pressed="${S.ownDays.includes(i)}">${d}</button>`).join('')}
+
+/* ---------- generador de horarios ---------- */
+/* horario en la escuela y descansos: preferencias del alumno para el generador (se guardan en este navegador) */
+const GT=Object.assign({a:'',b:'',breaks:[],days:'',n:'',src:''},store.get('gtime',{}));
+const daysOf=cs=>[...new Set(cs.flatMap(c=>c[6].map(x=>x[0])))].sort((a,b)=>a-b);
+const tmin=t=>{const m=String(t||'').match(/^(\d{1,2}):(\d{2})/);return m?+m[1]*60+ +m[2]:null}; // '' -> null
+const gtSave=()=>store.set('gtime',GT);
+function renderGTime(){
+  $('#g-from').value=GT.a;$('#g-to').value=GT.b;
+  document.querySelectorAll('[data-gdays]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gdays===String(GT.days||''))));
+  document.querySelectorAll('[data-gsrc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gsrc===String(GT.src||''))));
+  document.querySelectorAll('[data-gn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gn===String(GT.n||''))));
+  $('#gbreaks').innerHTML=GT.breaks.map((b,i)=>`<div class="gbrk" data-brk="${i}">al menos <select data-f="d" aria-label="Duración del descanso">${[30,60,90,120].map(m=>`<option value="${m}"${+b.d===m?' selected':''}>${({30:'30 min',60:'1 h',90:'1 h 30 min',120:'2 h'})[m]}</option>`).join('')}</select> libres entre <input type="time" step="1800" data-f="a" value="${b.a}" aria-label="Desde"> y <input type="time" step="1800" data-f="b" value="${b.b}" aria-label="Hasta"><span class="brkdays" role="group" aria-label="Días del descanso"><button type="button" class="chip" data-bday="all" aria-pressed="${!(b.days||[]).length}">Todos los días</button>${DAYS.slice(0,6).map((n,d)=>`<button type="button" class="chip" data-bday="${d}" aria-pressed="${(b.days||[]).includes(d)}">${n}</button>`).join('')}</span><button type="button" class="x" data-unbrk="${i}" aria-label="Quitar descanso">×</button></div>`).join('')+
+    `<button type="button" class="link" id="b-addbrk">+ Agregar descanso</button>`;
+}
+// ¿cada día con clases deja un hueco de al menos d minutos dentro de [a,b]?
+function breaksOk(cs){
+  const brk=GT.breaks.map(b=>({d:+b.d,a:tmin(b.a),b:tmin(b.b),days:b.days||[]})).filter(b=>b.a!=null&&b.b!=null&&b.b-b.a>=b.d);
+  if(!brk.length) return true;
+  const days=new Set(cs.flatMap(c=>c[6].map(x=>x[0])));
+  for(const d of days){
+    const busy=cs.flatMap(c=>c[6].filter(x=>x[0]===d).map(x=>[x[1],x[2]])).sort((x,y)=>x[0]-y[0]);
+    for(const b of brk){if(b.days.length&&!b.days.includes(d))continue;  // descanso solo en ciertos días
+      let t=b.a,gap=0;
+      for(const [x,y] of busy){if(y<=b.a||x>=b.b)continue;gap=Math.max(gap,Math.max(b.a,x)-t);t=Math.max(t,Math.min(y,b.b))}
+      gap=Math.max(gap,b.b-t);if(gap<b.d)return false}
+  }
+  return true;
+}
+function renderGPrefs(){
+  $('#gprefs').innerHTML=S.gpref.map((p,i)=>`<span class="pill"><i>priorizar</i>${esc(p)}<button data-ungp="${i}" aria-label="Quitar ${esc(p)}">×</button></span>`).join('');
+}
+function generate(){
+  // materias y grupos: los mismos que muestra la oferta con sus filtros (turno, nivel, búsqueda, materia, profesor, grupo,
+  // «solo las elegidas», horario en la escuela, excluidos). «Solo lo que cabe» y la búsqueda de huecos no aplican aquí.
+  const todo=GT.src==='todo';   // «Todas las elegidas»: sin los filtros de la oferta
+  const pool=todo?classes().filter(c=>c[0]===S.car):(()=>{const f=S.fit,g=S.gap;S.fit=false;S.gap=null;try{return filtered()}finally{S.fit=f;S.gap=g}})();
+  let want=todo?(tr().want.length?tr().want.slice():[...new Set(S.chips.filter(x=>x.t==='m').map(x=>classes().find(c=>c[4]===x.v)?.[8]).filter(Boolean))]):[...new Set(pool.map(c=>c[8]))];
+  if(!todo&&!S.onlyWant&&!S.chips.some(x=>x.t==='m')&&tr().want.length){const w=new Set(tr().want);want=want.filter(k=>w.has(k))}   // sin filtro de materias: las elegidas
+  tr().oblig.forEach(k=>{if(!want.includes(k))want.unshift(k)});   // la desfasada siempre se considera
+  const marks=ws().marks, own=ownAsClasses();
+  const pref=S.gpref.map(norm), avoid=S.gavoid.map(norm);
+  const pscore=c=>c[5].reduce((s,i)=>s+(pref.some(p=>norm(DATA.prof[i]).includes(p))?4:0),0);
+  const bad=c=>marks[keyOf(c)]?.s==='no'||c[5].some(i=>avoid.some(p=>norm(DATA.prof[i]).includes(p)))||(S.gt!=='*'&&c[1]!==S.gt)||own.some(o=>overlaps(o,c))||outside(c);
+  const ga=tmin(GT.a), gb=tmin(GT.b);
+  function outside(c){return c[6].some(([d,a,b])=>(ga!=null&&a<ga)||(gb!=null&&b>gb))}
+  const inPool=new Set(pool.map(keyOf));
+  const subj=want.map(k=>{const all=classes().filter(c=>c[0]===S.car&&c[8]===k&&!bad(c)), f=all.filter(c=>inPool.has(keyOf(c)));
+    return {k,must:tr().oblig.includes(k),opts:f.length||!tr().oblig.includes(k)?f:all}}).filter(s=>cur()[s.k]||s.opts.length);
+  if(!subj.length) return {msg:'Selecciona materias en «Mi trayectoria» o mediante el buscador para generar horarios.'};
+  if(GT.n==='auto') return generateBank(subj,'auto',{marks,pscore});
+  const N=+GT.n||0;
+  if(N&&N<subj.length) return generateBank(subj,N,{marks,pscore});
+  subj.sort((a,b)=>a.opts.length-b.opts.length);
+  const res=[];let nodes=0, minDays=Infinity;const maxD=+GT.days||0;
+  const pick=[];
+  const score=()=>{
+    const cs=pick.filter(Boolean);let s=cs.length*100;
+    cs.forEach(c=>{const m=marks[keyOf(c)]?.s;s+=m==='si'?6:m==='quiza'?2:0;s+=pscore(c)});
+    if($('#g-compact').checked){for(let d=0;d<6;d++){const b=cs.flatMap(c=>c[6].filter(x=>x[0]===d)).sort((x,y)=>x[1]-y[1]);if(b.length)s-=2;for(let i=1;i<b.length;i++)s-=Math.max(0,b[i][1]-b[i-1][2])/30}}
+    return s;
+  };
+  const rec=i=>{
+    if(++nodes>250000) return;
+    if(i===subj.length){const cs=pick.filter(Boolean);if(!cs.length||!breaksOk(cs))return;
+      const nd=daysOf(cs).length;
+      // mínimo de días posible llevando todas las materias que tienen grupos (antes de aplicar el límite)
+      if(subj.every((x,j)=>pick[j]||!x.opts.length))minDays=Math.min(minDays,nd);
+      if(maxD&&nd>maxD)return;
+      res.push({cs:cs.slice(),s:score(),miss:subj.filter((x,j)=>!pick[j]).map(x=>x.k),days:daysOf(cs)});return}
+    for(const c of subj[i].opts){if(pick.some(p=>p&&overlaps(p,c)))continue;pick[i]=c;rec(i+1)}
+    if(!subj[i].must||!subj[i].opts.length){pick[i]=null;rec(i+1)}   // una obligatoria con grupos no se puede omitir
+  };
+  rec(0);
+  const seen=new Set();
+  const top=res.sort((a,b)=>b.s-a.s).filter(r=>{const k=r.cs.map(keyOf).sort().join();if(seen.has(k))return false;seen.add(k);return true}).slice(0,6);
+  return {top,subj,trunc:nodes>250000,minDays:minDays===Infinity?null:minDays,maxD};
+}
+/* Banco de materias: horarios con exactamente N materias tomadas de las seleccionadas. Recorre subconjuntos en orden
+   de prioridad (obligatoria por desfase siempre incluida; luego reprobadas, atrasadas, sugeridas y marcadas «Sí»),
+   descarta los que exceden la carga permitida y, para cada subconjunto, busca la mejor combinación de grupos.
+   Se muestran opciones con materias distintas (la mejor de cada subconjunto). */
+/* Calidad de un horario (modo Automático). Criterios basados en recomendaciones sobre sueño, atención y descanso:
+   permanencia diaria ≤ 8 h (ideal ≤ 6.5 h), a lo sumo 3 clases (4.5 h) seguidas, espacio de ≥ 1 h para comer entre
+   12:00 y 16:30 si el día cruza el mediodía, pocas horas libres largas, evitar entrar a las 7:00 y salir después de las
+   19:00 el mismo día, y repartir las clases entre los días. Devuelve {ok, pen, span, comida}. */
+function qualityOf(cs){
+  let pen=0, ok=true, span=0, comida=true;const per=[];
+  for(let d=0;d<6;d++){
+    const b=cs.flatMap(c=>c[6].filter(x=>x[0]===d)).sort((x,y)=>x[1]-y[1]);if(!b.length)continue;
+    const a0=b[0][1], z=Math.max(...b.map(x=>x[2]));span=Math.max(span,z-a0);per.push(b.length);
+    if(z-a0>480)ok=false; else if(z-a0>390)pen+=(z-a0-390)/30*2;
+    let run=b[0][2]-b[0][1], meal=false;
+    for(let i=1;i<b.length;i++){const g=b[i][1]-Math.max(...b.slice(0,i).map(x=>x[2]));
+      if(g>=30){run=0;if(g>90)pen+=(g-90)/30*3;
+        const ga=Math.max(...b.slice(0,i).map(x=>x[2])), gb=b[i][1];if(Math.min(gb,990)-Math.max(ga,720)>=60)meal=true}
+      run+=b[i][2]-b[i][1];if(run>270)ok=false;else if(run>180)pen+=4}
+    if(a0<780&&z>900&&!meal){ok=false;comida=false}
+    if(a0<=420&&z>=1140)pen+=8;
+  }
+  if(per.length>1){const m=per.reduce((x,y)=>x+y,0)/per.length;pen+=per.reduce((x,y)=>x+(y-m)**2,0)/per.length*2}
+  return {ok,pen,span,comida};
+}
+function generateBank(subj,N,{marks,pscore}){
+  const auto=N==='auto';
+  const maxD=+GT.days||0, ci=cargaInfo(0), failS=new Set(tr().fail), sugS=new Set(MARK.sug);
+  const cost=k=>failS.has(k)?0:(cur()[k]?.[1]||0);
+  const prio=k=>{const st=statusOf(k);return (st==='late fail'?50:st==='fail'?35:st.startsWith('late')||st.startsWith('prev')?20:0)+(sugS.has(k)?10:0)};
+  // en Automático las reprobadas también son fijas: no suman créditos nuevos (ya están retenidos) y conviene acreditarlas pronto
+  const fixed=x=>x.must||(auto&&statusOf(x.k).includes('fail'));
+  const must=subj.filter(x=>fixed(x)&&x.opts.length), free=subj.filter(x=>!fixed(x)&&x.opts.length)
+    .sort((a,b)=>prio(b.k)-prio(a.k)||a.opts.length-b.opts.length);
+  const nuevosDe=set=>set.reduce((s,x)=>s+cost(x.k),0);
+  // meta de créditos nuevos en modo Automático: carga media (con adeudos, sin rebasar lo permitido además de los retenidos)
+  const meta=ci?(ci.adeudo?Math.max(0,Math.min(ci.L.media,ci.tope)-ci.ret):ci.L.media):40;
+  const sizes=auto?[3,4,5,6,7,8].filter(n=>n>=must.length&&n<=must.length+free.length):[N];
+  if(!sizes.length||sizes[0]-must.length<0) return {top:[],subj,bank:{N,M:subj.length},msg:null,trunc:false,minDays:null,maxD};
+  const res=[];let subsets=0,trunc=false;const CAP=auto?160:400;
+  const score=cs=>{let s=0;cs.forEach(c=>{const m=marks[keyOf(c)]?.s;s+=m==='si'?6:m==='quiza'?2:0;s+=pscore(c)+prio(c[8])});
+    if($('#g-compact').checked){for(let d=0;d<6;d++){const b=cs.flatMap(c=>c[6].filter(x=>x[0]===d)).sort((x,y)=>x[1]-y[1]);if(b.length)s-=2;for(let i=1;i<b.length;i++)s-=Math.max(0,b[i][1]-b[i-1][2])/30}}
+    return s};
+  // mejor combinación de grupos para un subconjunto fijo de materias
+  const bestFor=set=>{const ord=set.slice().sort((a,b)=>a.opts.length-b.opts.length), pick=[];let best=null,nodes=0;
+    const rec=i=>{if(++nodes>4000)return;
+      if(i===ord.length){if(!breaksOk(pick))return;const days=daysOf(pick);if(maxD&&days.length>maxD)return;
+        let s, q=null;
+        if(auto){q=qualityOf(pick);if(!q.ok)return;
+          // la cantidad la decide la meta de créditos: la prioridad cuenta como promedio, no como suma
+          const m=pick.reduce((t,c)=>{const mk=marks[keyOf(c)]?.s;return t+(mk==='si'?6:mk==='quiza'?2:0)+pscore(c)},0);
+          s=m+pick.reduce((t,c)=>t+prio(c[8]),0)/pick.length*2-q.pen*4}
+        else s=score(pick);
+        if(!best||s>best.s)best={cs:pick.slice(),s,days,miss:[],q};return}
+      for(const c of ord[i].opts){if(pick.some(p=>overlaps(p,c)))continue;pick.push(c);rec(i+1);pick.pop()}};
+    rec(0);return best};
+  // subconjuntos de tamaño need en orden de prioridad (combinaciones lexicográficas sobre la lista ordenada)
+  const chosen=[];let need=0;
+  const walk=start=>{if(subsets>=CAP){trunc=true;return}
+    if(chosen.length===need){const set=[...must,...chosen], nuevos=nuevosDe(set);
+      if(ci&&ci.ret+nuevos>ci.tope+0.01)return;
+      if(auto&&(nuevos>meta+7.5||(ci&&ci.ret+nuevos<ci.L.min-0.01&&set.length<must.length+free.length)))return;   // cerca de la meta y al menos la mínima
+      subsets++;const b=bestFor(set);if(b){if(auto)b.s-=(nuevos<meta?(meta-nuevos)*8:(nuevos-meta)*3);res.push(b)}return}
+    for(let i=start;i<=free.length-(need-chosen.length);i++){chosen.push(free[i]);walk(i+1);chosen.pop();if(subsets>=CAP){trunc=true;return}}};
+  for(const n of sizes){need=n-must.length;subsets=0;walk(0)}
+  const top=res.sort((a,b)=>b.s-a.s).slice(0,6);
+  const best=top.length?Math.max(...top.map(r=>nuevosDe(r.cs.map(c=>({k:c[8]}))))):0;
+  return {top,subj,bank:{N,M:subj.length,tope:ci?.tope??null,auto,meta,best},trunc,minDays:null,maxD};
+}
+function renderGen(){
+  const g=S.gen;
+  if(!g){$('#genres').innerHTML='';return}
+  if(g.msg){$('#genres').innerHTML=`<p class="empty">${g.msg}</p>`;return}
+  const dmsg=g.bank?.auto?`<p class="gdays-msg">Selección automática entre tus <b>${g.bank.M}</b> materias: busca cerca de <b>${fmtCr(g.bank.meta)} créditos nuevos</b> (carga media${g.bank.tope!=null?`, sin rebasar ${fmtCr(g.bank.tope)} cr en total`:''}) con un horario saludable: hasta 8 h en la escuela (idealmente 6.5 h o menos), no más de 3 clases seguidas, al menos 1 h para comer entre 12:00 y 16:30, pocas horas libres y clases repartidas entre los días.</p>${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">Con la oferta actual, las combinaciones que cumplen estos criterios llegan a <b>${fmtCr(g.bank.best)} créditos nuevos</b>. Para una carga mayor elige un número de materias por horario; esas opciones pueden tener jornadas más largas.</p>`:''}`:g.bank?`<p class="gdays-msg">Horarios de <b>${g.bank.N} materias</b> elegidas entre tus <b>${g.bank.M}</b> seleccionadas${g.bank.tope!=null?`, sin rebasar tu carga permitida (${fmtCr(g.bank.tope)} cr en total)`:''}. Cada opción combina materias distintas.</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">Con todas las materias seleccionadas, el mínimo es de <b>${g.minDays} ${g.minDays>1?'días':'día'}</b> a la semana.${g.maxD&&g.minDays>g.maxD?` En ${g.maxD} días no es posible incluirlas todas; las opciones omiten al menos una materia.`:g.maxD?` Es posible en ${g.maxD} días o menos.`:''}</p>`:'';
+  const none=g.subj.filter(s=>!s.opts.length).map(s=>s.k), mustNone=g.subj.filter(s=>s.must&&!s.opts.length).map(s=>s.k);
+  const must=g.subj.filter(s=>s.must&&s.opts.length).map(s=>s.k);
+  const omsg=(mustNone.length?`<p class="gdays-msg warn"><b>${mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')}</b> es obligatoria por desfase y ningún grupo cumple los filtros actuales. Ajusta el turno, el horario, los descansos o los días.</p>`:'')+
+    (must.length?`<p class="gdays-msg">Todas las opciones incluyen <b>${must.map(k=>esc(pretty(cur()[k][0]))).join(', ')}</b>, obligatoria por desfase.</p>`:'');
+  if(!g.top.length){$('#genres').innerHTML=dmsg+omsg+'<p class="empty">No hay combinaciones que cumplan los criterios. Reduce las preferencias o exclusiones, cambia el turno o amplía el horario y los descansos.</p>';return}
+  $('#genres').innerHTML=dmsg+omsg+
+    (none.length?`<small class="warn">Sin grupos que cumplan los filtros: ${none.map(k=>esc(cur()[k]?.[0]||k)).join(', ')}.</small>`:'')+
+    g.top.map((r,i)=>{const cr=r.cs.reduce((s,c)=>s+c[7],0);
+      return `<div class="gen"><div><b>Opción ${i+1}</b> · ${r.cs.length} ${r.cs.length>1?'materias':'materia'} · ${fmtCr(cr)} cr · ${r.days.length} ${r.days.length>1?'días':'día'}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?` · hasta ${(r.q.span/60).toFixed(1).replace('.0','')} h en la escuela · con espacio para comer`:''}${r.miss.length?` · <span class="warn">sin ${r.miss.length}: ${r.miss.map(k=>esc((cur()[k]?.[0]||k).toLowerCase())).join(', ')}</span>`:''}<div class="ls">${r.cs.map(c=>`${c[3]} ${esc(name(c).toLowerCase())}`).join(' · ')}</div></div>
+        <div class="acts"><button class="btn" data-useg="${i}" data-to="${ws().plan}">Usar en ${ws().plan}</button><button class="btn" data-useg="${i}" data-to="+">Usar en un horario nuevo</button><button class="btn" data-peekg="${i}">Ver</button></div></div>`}).join('')+
+    (g.trunc?(g.bank?'<small>Se analizaron las combinaciones de mayor prioridad (desfasadas, reprobadas, atrasadas y sugeridas primero).</small>':'<small>Búsqueda limitada por el número de combinaciones; reduce las materias seleccionadas para un análisis completo.</small>'):'');
+}
+
+/* ---------- render general ---------- */
+const hasOffer=p=>(DATA.periodos[p]||[]).length>0;
+function renderTop(){
+  if(!hasOffer(S.per)&&hasOffer('actual'))S.per='actual';
+  document.querySelectorAll('[data-per]').forEach(b=>{const ok=hasOffer(b.dataset.per);b.disabled=!ok;b.title=ok?'':'El SAES aún no publica la oferta de este periodo'});
+  document.querySelectorAll('[data-per]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.per===S.per));
+  document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
+  document.querySelectorAll('[data-view-panel]').forEach(p=>p.hidden=p.dataset.viewPanel!==S.tab);
+  $('#t-tray').textContent=isPersonal()?'Mi trayectoria':'Mapa curricular';
+  const cars=Object.entries(DATA.carreras).filter(([k])=>DATA.mapas[k]);
+  if(!cars.some(([k])=>k===S.car)) S.car=cars[0][0];
+  $('#f-carrera').innerHTML=cars.map(([k,v])=>`<option value="${k}"${k===S.car?' selected':''}>${v}</option>`).join('');
+  const f=new Date(DATA.capturado).toLocaleString('es-MX',{dateStyle:'long',timeStyle:'short'});
+  const n=new Set(classes().filter(c=>c[0]===S.car).map(c=>c[3])).size;
+  $('#notice').innerHTML=`<span>Captura del SAES: <b>${f}</b></span><span><b>${n}</b> grupos de esta carrera</span>`+
+    (!hasOffer('proximo')?'<span>El SAES aún no publica la oferta del próximo periodo; se muestra el periodo actual.</span>':S.per==='proximo'?'<span>La oferta del próximo periodo está en captura y puede estar incompleta.</span>':'')+
+    (n===0?'<span class="bad">Esta carrera no tiene grupos publicados en este periodo.</span>':'')+(S.per==='actual'&&DATA.salones?`<span>Salones según el horario por aula de la unidad (ciclo ${esc(DATA.salones.periodo)}).</span>`:'<span>Salones aún sin asignar para este periodo.</span>');
+}
+/* Vista en lista (teléfono): materias por semestre propuesto con su estado y un botón para agregarlas */
+function renderList(){
+  if(mview()!=='lista')return;
+  const c=cur(), want=new Set(tr().want), off=offeredClaves(), sp=semOf(), me=isPersonal(), oblig=new Set(tr().oblig);
+  const useSem=Object.keys(c).some(k=>sp[k]), by={};
+  Object.keys(c).forEach(k=>{const g=(useSem?sp[k]:null)||c[k][2];(by[g]=by[g]||[]).push(k)});
+  const tag=k=>{const st=statusOf(k);
+    if(st==='done')return['Acreditada','ok'];
+    if(isElec(k))return['Por actividades',''];
+    if(st==='curso')return['En curso',''];
+    if(st==='late fail')return['Desfasada','bad'];
+    if(st==='fail')return['Por recursar','warn'];
+    if(st.includes('lock'))return['Requisitos pendientes',''];
+    if(me&&MARK.sug.has(k))return['Sugerida','ok'];
+    if(me&&MARK.avail.has(k))return['Puedes cursarla','ok'];
+    return null};
+  $('#tlist').innerHTML=Object.keys(by).sort((a,b)=>a-b).map(g=>`<section class="tl-sem"><h4>${useSem?'Semestre propuesto '+g:'Nivel '+g}</h4><div class="tl-rows">`+
+    by[g].sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b)).map(k=>{const t=tag(k), w=want.has(k), done=statusOf(k)==='done', ob=oblig.has(k), open=S.lfocus===k;
+      return `<div class="tl-row${done?' done':''}${w?' want':''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
+        `<button type="button" class="tl-name" data-lfocus="${k}" aria-expanded="${open}"><b>${esc(pretty(c[k][0]))}</b><small>${k} · ${fmtCr(c[k][1])} cr${off.has(k)||isElec(k)?'':' · sin grupos'}${t?` <span class="tl-tag ${t[1]}">${t[0]}</span>`:''}${ob?' <span class="tl-tag bad">Obligatoria</span>':''}</small></button>`+
+        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${w?'✓':'+'}</button>`+
+        (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
+}
+function renderTray(){renderMap();renderList();renderSide()}
+function renderHor(){renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen()}
+function render(){
+  // carrera sin mapa curricular (otra escuela): solo planeación de horario
+  const gen=!!MAP()?.generico;$('#t-tray').hidden=gen;if(gen&&S.tab==='tray')S.tab='hor';
+  renderTop();renderAviso();if(S.tab==='tray')renderTray();else renderHor()}
+// perfil del SAES de otra carrera: se avisa y se ofrece volver; nada del perfil se aplica aquí
+function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()})}
+function refresh(){save();renderOffer();renderPlans();renderCal()}
+function addClass(c){const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
+function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1);else{const c=byKey(k);addClass(c);
+    // desde "llenar hueco": la materia pasa a las elegidas (para poder cambiar de grupo) y se suelta el hueco
+    if(S.gap||S.fit){if(cur()[c[8]]&&!tr().want.includes(c[8])){tr().want.push(c[8]);saveT()}S.gap=null;renderActive()}}
+  refresh()}
+function toggleBox(k){
+  if(isElec(k)){S.mapHover=k;S.mapFocus=true;renderMap();if(mview()==='lista'){S.lfocus=k;renderList()}return}   // se explica en el inspector
+  const w=tr().want,i=w.indexOf(k);
+  if(i>=0&&tr().oblig.includes(k)){$('#insp').innerHTML=`<span><b>${esc(cur()[k][0])} es obligatoria</b></span><span class="muted">Al estar desfasada, el SAES no permite la reinscripción sin ella.</span>`;return}
+  if(i>=0)w.splice(i,1);else w.push(k);saveT();renderTray()}
+
+/* ---------- eventos ---------- */
+document.addEventListener('click',e=>{
+  const li=e.target.closest('#ac li');if(li){pick(+li.dataset.i);return}
+  // táctil: un toque fuera del mapa y del inspector retira el enfoque
+  if(S.mapFocus&&!e.target.closest('#map,#insp,#lineas')){S.mapFocus=false;S.mapHover=null;renderMap()}
+  // táctil: el primer toque enfoca la materia (cadena de requisitos + inspector); el segundo la selecciona
+  const focus=k=>{if(tactil()&&S.mapHover!==k){S.mapHover=k;S.mapFocus=true;renderMap();return true}return false};
+  const bx=e.target.closest('[data-box]');if(bx){if(!focus(bx.dataset.box))toggleBox(bx.dataset.box);return}
+  const ob=e.target.closest('[data-obox]');if(ob){if(!focus(ob.dataset.obox))toggleBox(ob.dataset.obox);return}
+  // táctil: tocar un grupo de la oferta muestra (o retira) su vista previa en el horario
+  const op=e.target.closest('#offer .opt');if(op&&tactil()&&!e.target.closest('button,input,a,label,select,textarea,summary')){S.hover=S.hover===op.dataset.k?null:op.dataset.k;renderCal();return}
+  const t=e.target.closest('button');if(!t)return;
+  const d=t.dataset;
+  if(d.expand!==undefined){const k=+d.expand;S.expand.has(k)?S.expand.delete(k):S.expand.add(k);renderOffer();return}
+  if(d.lfocus){S.lfocus=S.lfocus===d.lfocus?null:d.lfocus;renderList();return}
+  if(d.lwant){toggleBox(d.lwant);return}
+  if(d.fwant){toggleBox(d.fwant);return}
+  if(d.fclose){S.mapFocus=false;S.mapHover=null;renderMap();return}
+  if(d.mview){S.mview=d.mview;store.set('mview',S.mview);renderTray();return}
+  if(d.cview){S.cview=d.cview;store.set('cview',S.cview);renderCal();return}
+  if(t.id==='b-filt'){const f=t.closest('.filters');f.classList.toggle('open');t.setAttribute('aria-expanded',String(f.classList.contains('open')));return}
+  if(t.id==='b-mobnote'){store.set('mobnote',1);$('#mobnote').hidden=true;return}
+  if(d.tab){S.tab=d.tab;store.set('tab',S.tab);S.hover=null;render()}
+  else if(d.per){S.per=d.per;store.set('per',S.per);S.hover=null;S.chips=[];S.gen=null;render()}
+  else if(d.unwant){toggleBox(d.unwant)}
+  else if(d.zoom!==undefined){const L=MAP().layout, base=$('#map').offsetWidth/(L?.w||$('#map').offsetWidth);ZOOM=d.zoom==='0'?null:Math.min(2,Math.max(.4,(ZOOM??base)*(d.zoom==='1'?1.2:1/1.2)));renderMap()}
+  else if(d.view){S.view=d.view;store.set('view',S.view);renderHFilters();renderOffer()}
+  else if(d.tur){S.tur=d.tur;store.set('tur',S.tur);renderHFilters();renderOffer()}
+  else if(d.niv){S.niv=d.niv==='*'?'*':+d.niv;store.set('niv',S.niv);renderHFilters();renderOffer()}
+  else if(d.ungap){S.gap=null;renderActive();renderOffer();renderCal()}
+  else if(d.unchip){if(d.unchip==='all')S.chips=[];else S.chips.splice(+d.unchip,1);renderActive();renderOffer()}
+  else if(d.toggle){S.hover=null;toggle(d.toggle)}
+  else if(d.mark){const m=ws().marks;const c=m[d.k]||{};if(c.s===d.mark){delete c.s;if(!c.n)delete m[d.k];else m[d.k]=c}else m[d.k]={...c,s:d.mark};save();renderOffer();const n=document.querySelector(`[data-note="${CSS.escape(d.k)}"]`);if(n&&m[d.k]?.s)n.focus()}
+  else if(d.group){filtered().filter(c=>c[3]===d.group).forEach(addClass);refresh()}
+  else if(d.plan){ws().plan=d.plan;S.hover=null;refresh()}
+  else if(d.newplan){const id=nextPlan();ws().plans[id]={sel:[],own:[]};ws().plan=id;S.hover=null;refresh()}
+  else if(d.delplan){const id=d.delplan;if(t.dataset.confirm!=='1'){t.dataset.confirm='1';t.textContent='¿Eliminar?';t.classList.add('warn');setTimeout(()=>{if(t.isConnected){t.dataset.confirm='';t.textContent='×';t.classList.remove('warn')}},3000);return}
+    delete ws().plans[id];ws().plan=planIds()[0];S.hover=null;refresh()}
+  else if('dup' in d){const id=nextPlan();ws().plans[id]=JSON.parse(JSON.stringify(plan()));ws().plan=id;refresh()}
+  else if(d.unown){plan().own.splice(+d.unown,1);refresh()}
+  else if(d.oday){const i=+d.oday;S.ownDays=S.ownDays.includes(i)?S.ownDays.filter(x=>x!==i):[...S.ownDays,i];renderOwnForm()}
+  else if(d.gt){S.gt=d.gt;renderHFilters()}
+  else if(d.ungp){S.gpref.splice(+d.ungp,1);renderGPrefs()}
+  else if(d.unga){S.gavoid.splice(+d.unga,1);store.set('excl',S.gavoid);renderActive();renderOffer()}
+  else if(d.useg!==undefined){const r=S.gen.top[+d.useg], to=d.to==='+'?nextPlan():d.to;ws().plans[to]=ws().plans[to]||{sel:[],own:[]};ws().plans[to].sel=r.cs.map(keyOf);ws().plan=to;refresh();renderGen()}
+  else if(d.peekg!==undefined){const r=S.gen.top[+d.peekg];S.hover=null;const keep=plan().sel;plan().sel=r.cs.map(keyOf);renderCal();plan().sel=keep;$('#stats').insertAdjacentHTML('afterbegin','<span class="warn">Vista previa, no guardada.</span>')}
+});
+document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();toggleBox(bx.dataset.box)}});
+document.addEventListener('change',e=>{if(e.target.dataset.note){const k=e.target.dataset.note,m=ws().marks;m[k]={...(m[k]||{}),n:e.target.value.trim()};save()}});
+$('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-box]');const k=b?b.dataset.box:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
+$('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
+$('#lineas').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
+$('#map').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
+$('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;render()});
+$('#b-all').addEventListener('click',()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&off.has(k))])];saveT();renderTray()});
+$('#b-sugg').addEventListener('click',()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT();renderTray()});
+$('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);renderMap()});
+// simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase
+const simSave=()=>{store.set('sim',SIM);for(const k in T)delete T[k];renderTray()};
+$('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simSave()}});
+$('#est-sim').addEventListener('click',e=>{const b=e.target.closest('[data-sim]');if(!b||b.disabled)return;const k=b.dataset.sim;
+  SIM.fail=SIM.fail.includes(k)?SIM.fail.filter(x=>x!==k):[...SIM.fail,k];simSave()});
+$('#b-none').addEventListener('click',()=>{tr().want=[...tr().oblig];saveT();renderTray()});
+$('#b-go').addEventListener('click',()=>{S.tab='hor';S.onlyWant=true;store.set('onlyWant',true);store.set('tab','hor');render();window.scrollTo({top:0})});
+$('#f-hide').addEventListener('change',e=>{S.hide=e.target.checked;store.set('hide',S.hide);renderOffer()});
+$('#f-fit').addEventListener('change',e=>{S.fit=e.target.checked;renderOffer()});
+$('#f-want').addEventListener('change',e=>{S.onlyWant=e.target.checked;store.set('onlyWant',S.onlyWant);renderOffer()});
+$('#f-weekend').addEventListener('change',e=>{S.weekend=e.target.checked;store.set('weekend',S.weekend);renderCal()});
+$('#f-q').addEventListener('input',e=>{S.q=e.target.value;S.acIdx=-1;renderAC();renderOffer()});
+$('#f-q').addEventListener('keydown',e=>{
+  const n=S.acItems.length;
+  if(e.key==='ArrowDown'&&n){e.preventDefault();S.acIdx=(S.acIdx+1)%n;renderAC()}
+  else if(e.key==='ArrowUp'&&n){e.preventDefault();S.acIdx=(S.acIdx-1+n)%n;renderAC()}
+  else if(e.key==='Enter'&&n){e.preventDefault();pick(S.acIdx<0?0:S.acIdx)}
+  else if(e.key==='Escape'){S.acIdx=-1;$('#ac').hidden=true;$('#f-q').setAttribute('aria-expanded','false')}
+  else if(e.key==='Backspace'&&!e.target.value&&S.chips.length){S.chips.pop();renderActive();renderOffer()}
+});
+$('#f-q').addEventListener('blur',()=>setTimeout(()=>{$('#ac').hidden=true;$('#f-q').setAttribute('aria-expanded','false')},150));
+$('#f-q').addEventListener('focus',()=>{if(S.q)renderAC()});
+for(const [id,list] of [['#g-pref','gpref'],['#g-avoid','gavoid']]){
+  const add=el=>{const v=el.value.trim();if(v&&!S[list].includes(v)){S[list].push(v);
+    if(list==='gavoid'){store.set('excl',S.gavoid);renderActive();renderOffer()}else renderGPrefs()}el.value=''};
+  $(id).addEventListener('change',e=>add(e.target));
+  // al elegir una opción del autocompletado se agrega de inmediato (sin Enter): el texto coincide con un profesor de la lista
+  $(id).addEventListener('input',e=>{const v=e.target.value.trim();if(v&&[...$('#proflist').options].some(o=>o.value===v))add(e.target)});
+}
+// horario en la escuela y descansos (se vuelven a generar las opciones si ya había resultados)
+const gtChanged=()=>{gtSave();renderOffer();if(S.gen){S.gen=generate();renderGen()}};
+$('#g-from').addEventListener('change',e=>{GT.a=e.target.value;gtChanged()});
+$('#g-to').addEventListener('change',e=>{GT.b=e.target.value;gtChanged()});
+$('#b-reset').addEventListener('click',()=>{
+  Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],hide:false,fit:false,gap:null,onlyWant:true,gavoid:[],gt:'*',gpref:[],gen:null});S.expand=new Set();
+  ws().marks={};save();   // también quita las marcas «Sí / Quizá / No» (y sus notas) del periodo consultado
+  ['tur','niv'].forEach(k=>store.set(k,'*'));store.set('hide',false);store.set('onlyWant',true);store.set('excl',[]);
+  Object.assign(GT,{a:'',b:'',breaks:[],days:'',n:'',src:''});gtSave();$('#f-q').value='';$('#g-avoid').value='';$('#g-pref').value='';
+  if($('#gen'))$('#gen').open=false;renderGTime();render()});
+$('#g-src').addEventListener('click',e=>{const b=e.target.closest('[data-gsrc]');if(!b)return;GT.src=b.dataset.gsrc;renderGTime();gtChanged()});
+$('#g-n').addEventListener('click',e=>{const b=e.target.closest('[data-gn]');if(!b)return;GT.n=b.dataset.gn;renderGTime();gtChanged()});
+$('#g-days').addEventListener('click',e=>{const b=e.target.closest('[data-gdays]');if(!b)return;GT.days=b.dataset.gdays;renderGTime();gtChanged()});
+$('#gbreaks').addEventListener('click',e=>{
+  if(e.target.id==='b-addbrk'){GT.breaks.push({d:30,a:'13:00',b:'15:00'});renderGTime();gtChanged()}
+  else if(e.target.dataset.unbrk){GT.breaks.splice(+e.target.dataset.unbrk,1);renderGTime();gtChanged()}
+  else if(e.target.dataset.bday){const b=GT.breaks[+e.target.closest('[data-brk]').dataset.brk],v=e.target.dataset.bday;
+    if(v==='all')b.days=[];else{const d=+v,ds=new Set(b.days||[]);ds.has(d)?ds.delete(d):ds.add(d);b.days=[...ds].sort()}
+    renderGTime();gtChanged()}});
+$('#gbreaks').addEventListener('change',e=>{const r=e.target.closest('[data-brk]'),f=e.target.dataset.f;if(!r||!f)return;GT.breaks[+r.dataset.brk][f]=e.target.value;gtChanged()});
+renderGTime();
+$('#b-gen').addEventListener('click',()=>{S.gen=generate();renderGen()});
+$('#offer').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||e.target.closest('.note'))return;const o=e.target.closest('.opt');const k=o?o.dataset.k:null;if(k!==S.hover){S.hover=k;renderCal()}});
+$('#offer').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.hover){S.hover=null;renderCal()}});
+$('#cal').addEventListener('click',e=>{
+  // clic en un hueco vacío: filtra la oferta a lo que cabe en ese bloque (otro clic en el mismo hueco lo quita)
+  const g=e.target.closest('.gapcell');
+  if(g){const [d,a]=g.dataset.gap.split('|').map(Number);S.gap=S.gap&&S.gap.d===d&&S.gap.a===a?null:{d,a,b:a+BLOCK};
+    renderActive();renderOffer();renderCal();if(S.gap)$('#h-offer').scrollIntoView({block:'start',behavior:'smooth'});return}
+  const b=e.target.closest('.blk[data-k]:not(.ghost)');if(!b)return;const o=document.querySelector(`.opt[data-k="${CSS.escape(b.dataset.k)}"]`);if(o)o.scrollIntoView({block:'center',behavior:'smooth'})});
+$('#own-f').addEventListener('submit',e=>{
+  e.preventDefault();const n=$('#own-n').value.trim(),a=toMin($('#own-a').value),b=toMin($('#own-b').value);
+  const msg=!S.ownDays.length?'Selecciona al menos un día':b<=a?'La hora final debe ser posterior a la inicial':'';
+  if(!n||msg){$('#own-n').setCustomValidity(msg);$('#own-n').reportValidity();$('#own-n').setCustomValidity('');return}
+  plan().own.push({n,d:[...S.ownDays].sort(),a,b});
+  if(S.ownDays.some(d=>d>=5)){S.weekend=true;store.set('weekend',true);$('#f-weekend').checked=true}
+  $('#own-n').value='';S.ownDays=[];renderOwnForm();refresh();
+});
+$('#b-saeshor').addEventListener('click',loadInscrito);
+$('#b-clear').addEventListener('click',()=>{plan().sel=[];plan().own=[];$('#copybox').hidden=true;refresh()});
+
+/* ---------- exportar horario: imagen PNG en alta resolución o PDF (pdf-lib, carga bajo demanda) ---------- */
+const DL=window.claude?.use?window.claude.use('downloads'):Promise.resolve(null);
+async function saveFile(name,blob){
+  const dl=window.claude?.use?await DL:null;
+  if(dl){try{await dl.save({filename:name,data:blob});return 'Listo: '+name}catch(e){return e?.code==='declined'?'Descarga cancelada.':'No se pudo guardar el archivo en esta vista.'}}
+  const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);return 'Listo: '+name;
+}
+function scheduleData(){
+  const sel=selected(),own=plan().own;
+  return {sel,own,cr:sel.reduce((s,c)=>s+c[7],0),hrs:sel.reduce((s,c)=>s+c[6].reduce((t,b)=>t+b[2]-b[1],0),0)/60};
+}
+// nombres del SAES (mayúsculas) en formato oración, conservando numerales romanos: "INGLES II" -> "Ingles II"
+const pretty=t=>{const l=String(t).toLowerCase().replace(/\b(i{1,3}|iv|vi{0,3}|ix|x)\b/g,m=>m.toUpperCase());return l.charAt(0).toUpperCase()+l.slice(1)};
+function wrapText(ctx,text,max){const w=String(text).split(/\s+/),out=[];let ln='';w.forEach(x=>{const t=ln?ln+' '+x:x;if(ctx.measureText(t).width>max&&ln){out.push(ln);ln=x}else ln=t});if(ln)out.push(ln);return out}
+// a qué periodo corresponde el horario: con datos del SAES, el periodo y el número de periodo escolar
+const perLabel=()=>{if(isPersonal()){const t=perMeta(),n=semNow(),out=[];if(t!=null)out.push('Periodo '+perName(t));if(n)out.push(n+'.º periodo escolar');if(out.length)return out.join(' · ')}
+  return S.per==='proximo'?'Próximo periodo':'Periodo actual'};
+/* dibuja en coordenadas lógicas (W ancho) y escala k; part: 'week' | 'list' | 'all' */
+async function drawSchedule(part,k=3){
+  await document.fonts?.ready;
+  // paleta clara u oscura (opción «Tema de la imagen y el PDF»)
+  const DK=EXP.dark, D=scheduleData(),W=1400,PAD=48,F='"Noto Sans",system-ui,sans-serif',ACC=DK?'#b64a7c':'#750946',INK=DK?'#ece6e9':'#231f20',MUT=DK?'#a9a0a5':'#5c575a',LINE=DK?'#3a3237':'#e3dade',
+    BG=DK?'#17141a':'#ffffff', BAND=DK?'#211c22':'#f6f4f5', blkBg=h=>DK?`hsl(${h} 28% 24%)`:`hsl(${h} 45% 90%)`, blkBar=h=>DK?`hsl(${h} 55% 62%)`:`hsl(${h} 45% 38%)`;
+  const ownFill=(x,y,w,h)=>{g.fillStyle=EXP.own;if(DK)g.globalAlpha=.32;g.fillRect(x,y,w,h);g.globalAlpha=1};
+  const allSlots=[...D.sel.flatMap(c=>c[6]),...D.own.flatMap(o=>o.d.map(d=>[d,o.a,o.b]))];
+  const days=Math.max(5,...allSlots.map(b=>b[0]+1));
+  // solo de la primera clase a la última de la semana
+  const lo=allSlots.length?Math.min(...allSlots.map(b=>b[1])):START, hi=allSlots.length?Math.max(...allSlots.map(b=>b[2])):START+BLOCK;
+  const HEAD=110, gridTop=HEAD+44, hourPx=46, gridH=(hi-lo)/60*hourPx, LEFT=PAD+56, colW=(W-LEFT-PAD)/days;
+  const rowsList=[...D.sel,...D.own.map(o=>({own:o}))], ROWH=46, listTop=part==='list'?HEAD:gridTop+gridH+48;
+  const H=part==='week'?gridTop+gridH+70:listTop+40+rowsList.length*ROWH+70;
+  const cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;const g=cv.getContext('2d');g.scale(k,k);
+  g.fillStyle=BG;g.fillRect(0,0,W,H);
+  g.fillStyle=ACC;g.fillRect(0,0,W,8);
+  const carN=DATA.carreras[S.car]||'', perN=perLabel();
+  g.fillStyle=INK;g.font=`700 30px ${F}`;g.fillText(`Horario ${ws().plan} · ${carN.charAt(0)+carN.slice(1).toLowerCase()}`,PAD,PAD+18);
+  g.fillStyle=MUT;g.font=`400 16px ${F}`;
+  g.fillText(`${perN} · ${fmtCr(D.cr)} créditos · ${D.sel.length} materias · ${D.hrs.toFixed(1)} h de clase a la semana`,PAD,PAD+48);
+  if(part!=='list'){
+    for(let d=0;d<days;d++){const x=LEFT+d*colW;g.fillStyle=BAND;g.fillRect(x,HEAD,colW,36);g.fillStyle=INK;g.font=`600 16px ${F}`;g.textAlign='center';g.fillText(DAYS[d],x+colW/2,HEAD+24);g.textAlign='left'}
+    g.strokeStyle=LINE;g.lineWidth=1;
+    for(let m=lo,i=0;m<hi;m+=BLOCK,i++){const y=gridTop+(m-lo)/60*hourPx;
+      if(i%2){g.fillStyle=BAND;g.fillRect(LEFT,y,W-PAD-LEFT,Math.min(BLOCK,hi-m)/60*hourPx)}
+      g.strokeStyle=LINE;g.beginPath();g.moveTo(LEFT,y);g.lineTo(W-PAD,y);g.stroke();
+      g.fillStyle=MUT;g.font=`400 13px ${F}`;g.textAlign='right';g.fillText(hm(m),LEFT-10,y+15);g.textAlign='left'}
+    g.beginPath();g.moveTo(LEFT,gridTop+gridH);g.lineTo(W-PAD,gridTop+gridH);g.stroke();
+    for(let d=0;d<=days;d++){const x=LEFT+d*colW;g.beginPath();g.moveTo(x,gridTop);g.lineTo(x,gridTop+gridH);g.stroke()}
+    const blocks=[...D.sel.flatMap(c=>c[6].map(([d,a,b])=>({c,d,a,b}))),...D.own.flatMap(o=>o.d.map(d=>({o,d,a:o.a,b:o.b})))];
+    blocks.forEach(B=>{
+      const x=LEFT+B.d*colW+3,y=gridTop+(B.a-lo)/60*hourPx+2,w=colW-6,h=(B.b-B.a)/60*hourPx-4,hu=B.c?hue(B.c):0;
+      g.save();g.beginPath();g.roundRect?g.roundRect(x,y,w,h,6):g.rect(x,y,w,h);g.clip();
+      if(B.c){g.fillStyle=blkBg(hu);g.fillRect(x,y,w,h);g.fillStyle=blkBar(hu);g.fillRect(x,y,5,h)}
+      else ownFill(x,y,w,h)
+      g.fillStyle=INK;g.font=`600 13px ${F}`;
+      const title=B.c?pretty(name(B.c)):B.o.n, lines=wrapText(g,title,w-16);let ty=y+18;
+      lines.slice(0,Math.max(1,Math.floor((h-22)/16))).forEach(l=>{g.fillText(l,x+11,ty);ty+=16});
+      g.fillStyle=MUT;g.font=`400 12px ${F}`;
+      const meta=[B.c&&EXP.show.g?B.c[3]:'',`${hm(B.a)}–${hm(B.b)}`].filter(Boolean).join(' · ');
+      if(ty<y+h-4){g.fillText(meta,x+11,ty);ty+=15}
+      if(B.c&&EXP.show.p&&ty<y+h-4)g.fillText(wrapText(g,proper(profs(B.c)),w-16)[0],x+11,ty);
+      g.restore();
+    });
+  }
+  if(part!=='week'){
+    g.fillStyle=INK;g.font=`700 18px ${F}`;g.fillText('Materias',PAD,listTop+8);
+    const cols=[[PAD,'Grupo'],[PAD+80,'Materia'],[PAD+470,'Profesor'],[PAD+800,'Horario'],[W-PAD-60,'Créditos']];
+    g.font=`600 13px ${F}`;g.fillStyle=MUT;cols.forEach(([x,t])=>g.fillText(t,x,listTop+36));
+    rowsList.forEach((c,i)=>{const y=listTop+40+i*ROWH;g.strokeStyle=LINE;g.beginPath();g.moveTo(PAD,y);g.lineTo(W-PAD,y);g.stroke();
+      g.fillStyle=INK;g.font=`400 14px ${F}`;
+      if(c.own){g.fillText('—',PAD,y+28);g.fillText(c.own.n,PAD+80,y+28);g.fillStyle=MUT;g.fillText('Actividad extracurricular',PAD+470,y+28);g.fillText(`${c.own.d.map(d=>DAYS[d]).join(' ')} ${hm(c.own.a)}–${hm(c.own.b)}`,PAD+800,y+28);return}
+      g.fillStyle=blkBar(hue(c));g.fillRect(PAD-12,y+12,5,22);g.fillStyle=INK;
+      g.fillText(c[3],PAD,y+28);g.fillText(wrapText(g,`${c[8]} ${pretty(name(c))}`,380)[0],PAD+80,y+28);
+      g.fillStyle=MUT;g.fillText(wrapText(g,profs(c),320)[0],PAD+470,y+28);g.fillText(wrapText(g,pattern(c).join('; '),400)[0],PAD+800,y+28);
+      g.fillStyle=INK;g.textAlign='right';g.fillText(fmtCr(c[7]),W-PAD,y+28);g.textAlign='left'});
+  }
+  const cap=new Date(DATA.capturado).toLocaleDateString('es-MX',{dateStyle:'long'});
+  g.fillStyle=MUT;g.font=`400 12px ${F}`;g.fillText(`Generado con Horarios UPIITA · Oferta del SAES capturada el ${cap}. Verifica cupo y horarios en el SAES antes de inscribirte.`,PAD,H-24);
+  return cv;
+}
+
+/* ---------- estilo minimalista: tabla con celdas unidas (huecos y clases contiguas por día) + lista de profesores ---------- */
+// nombres propios del SAES (mayúsculas) a formato nombre: "CANUL GOMEZ GIMCIAN" -> "Canul Gomez Gimcian"
+const proper=t=>String(t).toLowerCase().replace(/(^|[\s,/(-])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+// texto de una clase en la exportación según las casillas "Incluir: grupo, profesor"
+const classLabel=c=>[pretty(name(c)),EXP.show.g?c[3]:'',EXP.show.p?proper(profs(c)):''].filter(Boolean).join('\n');
+function weekGrid(){
+  const D=scheduleData();
+  const items=[...D.sel.flatMap(c=>c[6].map(([d,a,b])=>({d,a,b,t:classLabel(c),own:false}))),...D.own.flatMap(o=>o.d.map(d=>({d,a:o.a,b:o.b,t:o.n,own:true})))];
+  const days=Math.max(5,...items.map(x=>x.d+1));
+  const bounds=[...new Set(items.flatMap(x=>[x.a,x.b]))].sort((a,b)=>a-b);
+  const rows=bounds.slice(0,-1).map((t,i)=>[t,bounds[i+1]]);
+  const keyOfIt=it=>it?(it.own?'o:':'c:')+it.t+'|'+it.a+'|'+it.b:'';
+  // celda (renglón, día): la actividad que la cubre
+  const at=(r,d)=>items.find(x=>x.d===d&&x.a<=rows[r][0]&&x.b>=rows[r][1])||null;
+  // segmentos verticales por día: la misma actividad (o el vacío) en renglones seguidos se une
+  const segs=[];
+  for(let d=0;d<days;d++){let r=0;while(r<rows.length){const it=at(r,d),key=keyOfIt(it);let e=r+1;
+    while(e<rows.length&&keyOfIt(at(e,d))===key)e++;
+    segs.push({d,r0:r,r1:e,it,span:1});r=e}}
+  // unión horizontal solo para actividades propias iguales en días seguidos (p. ej. un idioma de lunes a viernes);
+  // las materias se dejan una por día, como en el formato en tabla
+  segs.sort((x,y)=>x.r0-y.r0||x.d-y.d);
+  const out=[];
+  segs.forEach(sg=>{const prev=out.filter(o=>o.r0===sg.r0&&o.r1===sg.r1&&o.d+o.span===sg.d).pop();
+    if(prev&&sg.it?.own&&prev.it?.own&&prev.it.t===sg.it.t)prev.span++;else out.push(sg)});
+  return {rows,days,cells:out,D};
+}
+async function drawTable(part,k=3){
+  await document.fonts?.ready;
+  // proporciones del formato en tabla: lienzo angosto (letra grande en carta), líneas delgadas dentro y gruesas en
+  // el contorno, debajo del título, debajo de los días y a la derecha de la columna de horas
+  const DK=EXP.dark, {rows,days,cells,D}=weekGrid(), W=1000, PAD=40, F='Arial,"Noto Sans",system-ui,sans-serif', INK=DK?'#efeaec':'#000', GRAY=DK?'#2b272b':'#e7e7e7', OWN=EXP.own,
+    BG=DK?'#141214':'#fff', SUB=DK?'#cfc7cb':'#333', FOOT=DK?'#a59ca1':'#555';
+  // HR: renglones de título y encabezado, delgados como en el formato del equipo
+  const THIN=1.4, THICK=3.4, HOURW=118, colW=(W-2*PAD-HOURW)/days, ROWH=46+21*((EXP.show.g?1:0)+(EXP.show.p?1:0)), HR=24, TOP=PAD+58, LROW=D.sel.some(c=>(c[10]||[]).filter(Boolean).length>1)?57:40;
+  const tableH=part==='list'?0:2*HR+rows.length*ROWH;
+  const listTop=part==='list'?TOP:TOP+tableH+34;
+  const H=part==='week'?TOP+tableH+46:listTop+2*HR+D.sel.length*LROW+70;
+  const cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;const g=cv.getContext('2d');g.scale(k,k);
+  g.fillStyle=BG;g.fillRect(0,0,W,H);
+  const carN=DATA.carreras[S.car]||'';
+  g.fillStyle=INK;g.font=`700 19px ${F}`;g.fillText(`Horario ${ws().plan} · ${pretty(carN)}`,PAD,PAD+8);
+  g.font=`400 13px ${F}`;g.fillStyle=SUB;g.fillText(`${perLabel()} · ${fmtCr(D.cr)} créditos · ${D.sel.length} materias`,PAD,PAD+30);
+  const cellText=(t,x,y,w,h,bold,italic)=>{g.fillStyle=INK;g.font=`${italic?'italic ':''}${bold?700:400} 14px ${F}`;g.textAlign='center';
+    const ls=String(t).split('\n').flatMap(seg=>wrapText(g,seg,w-10)).slice(0,Math.max(1,Math.floor((h-4)/17)));const y0=y+h/2-(ls.length-1)*8.5+5;ls.forEach((l,i)=>g.fillText(l,x+w/2,y0+i*17));g.textAlign='left'};
+  const fill=(x,y,w,h,c)=>{g.fillStyle=c;if(DK&&c===OWN)g.globalAlpha=.32;g.fillRect(x,y,w,h);g.globalAlpha=1};
+  const line=(x1,y1,x2,y2,lw)=>{g.strokeStyle=INK;g.lineWidth=lw;g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.stroke()};
+  const rect=(x,y,w,h,lw)=>{g.strokeStyle=INK;g.lineWidth=lw;g.strokeRect(x,y,w,h)};
+  if(part!=='list'){
+    const X0=PAD, Y0=TOP, TW=HOURW+colW*days, TH=2*HR+rows.length*ROWH, BY=Y0+2*HR;
+    const NAMES=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
+    cellText('Horario',X0,Y0,TW,HR,true);
+    cellText('Hora',X0,Y0+HR,HOURW,HR);
+    for(let d=0;d<days;d++)cellText(NAMES[d],X0+HOURW+d*colW,Y0+HR,colW,HR);
+    rows.forEach(([a,b],r)=>cellText(`${hm(a)}-${hm(b)}`,X0,BY+r*ROWH,HOURW,ROWH));
+    // celdas (con su color) y líneas delgadas
+    cells.forEach(c=>{const x=X0+HOURW+c.d*colW,y=BY+c.r0*ROWH,w=colW*c.span,h=(c.r1-c.r0)*ROWH;
+      fill(x,y,w,h,c.it?(c.it.own?OWN:BG):GRAY);rect(x,y,w,h,THIN);if(c.it)cellText(c.it.t,x,y,w,h)});
+    for(let d=1;d<days;d++)line(X0+HOURW+d*colW,Y0+HR,X0+HOURW+d*colW,BY,THIN);
+    rows.forEach((_,r)=>line(X0,BY+(r+1)*ROWH,X0+HOURW,BY+(r+1)*ROWH,THIN));
+    // líneas gruesas
+    rect(X0,Y0,TW,TH,THICK);line(X0,Y0+HR,X0+TW,Y0+HR,THICK);line(X0,BY,X0+TW,BY,THICK);line(X0+HOURW,Y0+HR,X0+HOURW,Y0+TH,THICK);
+  }
+  if(part!=='week'){
+    const C=[['Grupo',70],['Materia',262],['Profesor',314],['Créd',58],['Salón',216]], X0=PAD, TW=C.reduce((t,c)=>t+c[1],0), TH=2*HR+D.sel.length*LROW;
+    cellText('Lista de profesores por materia',X0,listTop,TW,HR,true);
+    let x=X0;C.forEach(([t,w])=>{cellText(t,x,listTop+HR,w,HR,false,true);x+=w});
+    D.sel.forEach((c,i)=>{x=X0;const y=listTop+2*HR+i*LROW;[c[3],pretty(name(c)),proper(profs(c)),fmtCr(c[7]),c[10]?[...new Set(c[10].filter(Boolean).map(shortRoom))].join(', '):''].forEach((t,j)=>{cellText(t,x,y,C[j][1],LROW);x+=C[j][1]});
+      line(X0,y,X0+TW,y,THIN)});
+    x=X0;C.slice(0,-1).forEach(([,w])=>{x+=w;line(x,listTop+HR,x,listTop+TH,THIN)});
+    rect(X0,listTop,TW,TH,THICK);line(X0,listTop+HR,X0+TW,listTop+HR,THICK);line(X0,listTop+2*HR,X0+TW,listTop+2*HR,THICK);
+    line(X0+C[0][1],listTop+HR,X0+C[0][1],listTop+TH,THICK);
+    g.font=`400 14px ${F}`;g.fillStyle=INK;g.textAlign='center';g.fillText(fmtCr(D.cr),X0+C[0][1]+C[1][1]+C[2][1]+C[3][1]/2,listTop+TH+22);g.textAlign='left';
+  }
+  const cap=new Date(DATA.capturado).toLocaleDateString('es-MX',{dateStyle:'long'});
+  g.fillStyle=FOOT;g.font=`400 10.5px ${F}`;g.fillText(`Generado con Horarios UPIITA · Oferta del SAES capturada el ${cap}. Verifica cupo y horarios en el SAES antes de inscribirte.`,PAD,H-16);
+  return cv;
+}
+const EXP={get perPage(){return store.get('expPer',2)},get dark(){return store.get('expDark',false)},get style(){return store.get('expStyle','color')},get own(){return store.get('expOwn','#dbe7f5')},get show(){return Object.assign({g:false,p:false},store.get('expShow',{}))}};
+const drawFor=(part,k)=>EXP.style==='min'?drawTable(part,k):drawSchedule(part,k);
+
+/* ---------- Excel (.xlsx, también se abre en Google Sheets): mismo formato que la tabla minimalista ---------- */
+async function loadExcelJS(){if(window.ExcelJS)return window.ExcelJS;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de Excel.'));document.head.appendChild(s)});return window.ExcelJS}
+async function exportXlsx(){
+  if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
+  const ExcelJS=await loadExcelJS(), wb=new ExcelJS.Workbook(), {rows,days,cells,D}=weekGrid();
+  wb.title=`Horario ${ws().plan} UPIITA`;
+  const NAMES=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'], argb=h=>'FF'+String(h).replace('#','').toUpperCase();
+  const FONT={name:'Arial',size:10}, CENTER={horizontal:'center',vertical:'middle',wrapText:true};
+  const T='thin', K='medium';
+  // aplica bordes: delgados en todo el rango y gruesos en los bordes indicados
+  const frame=(sh,r1,c1,r2,c2)=>{for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++){const b={top:{style:r===r1?K:T},bottom:{style:r===r2?K:T},left:{style:c===c1?K:T},right:{style:c===c2?K:T}};sh.getCell(r,c).border=b}};
+  // borde grueso en un lado; también en el lado opuesto de la celda vecina (Excel y Sheets muestran cualquiera de los dos)
+  const OPP={bottom:['top',1,0],right:['left',0,1]};
+  const thick=(sh,r1,c1,r2,c2,side)=>{for(let r=r1;r<=r2;r++)for(let c=c1;c<=c2;c++){const cell=sh.getCell(r,c);cell.border={...cell.border,[side]:{style:K}};
+    const [o,dr,dc]=OPP[side],nb=sh.getCell(r+dr,c+dc);nb.border={...nb.border,[o]:{style:K}}}};
+  const put=(sh,r,c,v,opt={})=>{const cell=sh.getCell(r,c);cell.value=v;cell.font={...FONT,...(opt.font||{})};cell.alignment=CENTER;if(opt.fill)cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(opt.fill)}};return cell};
+  const nl=1+(EXP.show.g?1:0)+(EXP.show.p?1:0);
+  // hoja 1: horario
+  const sh=wb.addWorksheet('Horario',{pageSetup:{orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0}});
+  sh.columns=[{width:13},...Array.from({length:days},()=>({width:22}))];
+  const last=1+days, R0=3, Rn=R0+rows.length-1;
+  sh.mergeCells(1,1,1,last);put(sh,1,1,'Horario',{font:{bold:true}});
+  put(sh,2,1,'Hora');for(let d=0;d<days;d++)put(sh,2,2+d,NAMES[d]);
+  sh.getRow(1).height=15;sh.getRow(2).height=15;
+  rows.forEach(([a,b],i)=>{put(sh,R0+i,1,`${hm(a)}-${hm(b)}`);sh.getRow(R0+i).height=16+13*nl});
+  frame(sh,1,1,Rn,last);
+  cells.forEach(c=>{const r1=R0+c.r0,r2=R0+c.r1-1,c1=2+c.d,c2=c1+c.span-1;
+    if(r2>r1||c2>c1)sh.mergeCells(r1,c1,r2,c2);
+    put(sh,r1,c1,c.it?c.it.t:'',{fill:c.it?(c.it.own?EXP.own:null):'#E7E7E7'});
+    for(let r=r1;r<=r2;r++)for(let k=c1;k<=c2;k++)if(!c.it||c.it.own){const cell=sh.getCell(r,k);cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:argb(c.it?EXP.own:'#E7E7E7')}}}});
+  frame(sh,1,1,Rn,last);   // los bordes se vuelven a aplicar sobre las celdas unidas
+  thick(sh,1,1,1,last,'bottom');thick(sh,2,1,2,last,'bottom');thick(sh,2,1,Rn,1,'right');
+  // hoja 2: profesores
+  const sp=wb.addWorksheet('Profesores',{pageSetup:{orientation:'portrait',fitToPage:true,fitToWidth:1,fitToHeight:0}});
+  sp.columns=[{width:9},{width:38},{width:42},{width:8},{width:12}];
+  sp.mergeCells(1,1,1,5);put(sp,1,1,'Lista de profesores por materia',{font:{bold:true}});
+  ['Grupo','Materia','Profesor','Créd','Salón'].forEach((t,i)=>put(sp,2,1+i,t,{font:{italic:true}}));
+  sp.getRow(1).height=15;sp.getRow(2).height=15;
+  D.sel.forEach((c,i)=>{const r=3+i;[c[3],pretty(name(c)),proper(profs(c)),+c[7],''].forEach((v,j)=>put(sp,r,1+j,v));sp.getRow(r).height=24});
+  const L=2+D.sel.length;frame(sp,1,1,L,5);thick(sp,1,1,1,5,'bottom');thick(sp,2,1,2,5,'bottom');thick(sp,2,1,L,1,'right');
+  put(sp,L+1,4,{formula:`SUM(D3:D${L})`,result:D.cr});
+  put(sp,L+3,1,`Horario ${ws().plan} · ${pretty(DATA.carreras[S.car]||'')} · ${perLabel()}`,{}).alignment={horizontal:'left'};sp.mergeCells(L+3,1,L+3,5);
+  const buf=await wb.xlsx.writeBuffer();
+  return saveFile(`horario-${ws().plan}-upiita.xlsx`,new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+}
+const toBlob=cv=>new Promise(r=>cv.toBlob(r,'image/png'));
+async function exportPng(){
+  if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
+  const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-upiita.png`,await toBlob(cv));
+}
+async function loadPdfLib(){if(window.PDFLib)return window.PDFLib;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de PDF.'));document.head.appendChild(s)});return window.PDFLib}
+// agrega una hoja carta al PDF con el horario dibujado (horizontal en colorido, vertical en minimalista)
+async function pdfPage(doc,rgb){
+  const cv=await drawFor('all',3), png=await doc.embedPng(new Uint8Array(await (await toBlob(cv)).arrayBuffer()));
+  const [PW,PH]=EXP.style==='min'?[612,792]:[792,612];
+  const pg=doc.addPage([PW,PH]), m=24, sc=Math.min((PW-2*m)/png.width,(PH-2*m)/png.height);
+  if(EXP.dark)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:EXP.style==='min'?rgb(.078,.071,.078):rgb(.09,.078,.102)});   // hoja oscura completa
+  pg.drawImage(png,{x:(PW-png.width*sc)/2,y:PH-m-png.height*sc,width:png.width*sc,height:png.height*sc});
+}
+async function exportPdf(){
+  if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
+  const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
+  await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
+  doc.setTitle(`Horario ${ws().plan} UPIITA`);
+  return saveFile(`horario-${ws().plan}-upiita.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
+}
+// todos los horarios con contenido en un solo PDF (una hoja por horario, en orden A, B, C…)
+const plansConContenido=()=>planIds().filter(id=>{const p=ws().plans[id];return p.sel.length||(p.own||[]).length});
+async function exportPdfAll(){
+  const ids=plansConContenido();
+  if(!ids.length)return 'Agrega materias a algún horario para exportarlo.';
+  const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create(), prev=ws().plan;
+  // dos por hoja: carta horizontal con dos columnas (como «2 páginas por hoja» al imprimir); uno por hoja: tamaño completo
+  const two=EXP.perPage===2, [PW,PH]=two||EXP.style!=='min'?[792,612]:[612,792], m=24, GAP=20, colW=two?(PW-2*m-GAP)/2:PW-2*m;
+  let pg=null, col=0;
+  const nueva=()=>{pg=doc.addPage([PW,PH]);if(EXP.dark)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:EXP.style==='min'?rgb(.078,.071,.078):rgb(.09,.078,.102)});col=0};
+  try{for(const id of ids){ws().plan=id;
+    const cv=await drawFor('all',3), png=await doc.embedPng(new Uint8Array(await (await toBlob(cv)).arrayBuffer()));
+    const sc=Math.min(colW/png.width,(PH-2*m)/png.height), w=png.width*sc, h=png.height*sc;
+    if(!pg||col>=(two?2:1))nueva();
+    const x0=m+col*(colW+GAP);
+    pg.drawImage(png,{x:x0+(colW-w)/2,y:PH-m-h,width:w,height:h});col++}}finally{ws().plan=prev}
+  doc.setTitle('Horarios UPIITA');
+  const r=await saveFile('horarios-upiita.pdf',new Blob([await doc.save()],{type:'application/pdf'}));
+  const n=doc.getPageCount();
+  return r.startsWith('Listo')?`${r} (${ids.length} ${ids.length>1?'horarios':'horario'} en ${n} ${n>1?'hojas':'hoja'})`:r;
+}
+// módulo de exportación (ventana)
+$('#b-export').addEventListener('click',()=>{const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||plan().own.length?'':'Agrega materias a tu horario para exportarlo.';dl.showModal?dl.showModal():dl.setAttribute('open','')});
+$('#exp-x').addEventListener('click',()=>$('#exp-dlg').close());
+$('#exp-dlg').addEventListener('click',e=>{if(e.target.id==='exp-dlg')e.target.close()});
+const renderExpStyle=()=>{document.querySelectorAll('[data-exps]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.exps===EXP.style)));
+  document.querySelectorAll('[data-ext]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.ext==='dark')===EXP.dark)));
+  document.querySelectorAll('[data-exper]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.exper===EXP.perPage)))};
+$('#exp-per').addEventListener('click',e=>{const b=e.target.closest('[data-exper]');if(!b)return;store.set('expPer',+b.dataset.exper);renderExpStyle()});
+$('#exp-theme').addEventListener('click',e=>{const b=e.target.closest('[data-ext]');if(!b)return;store.set('expDark',b.dataset.ext==='dark');renderExpStyle()});
+$('#exp-style').addEventListener('click',e=>{const b=e.target.closest('[data-exps]');if(!b)return;store.set('expStyle',b.dataset.exps);renderExpStyle()});
+renderExpStyle();
+$('#exp-own').value=EXP.own;
+document.querySelectorAll('[data-exshow]').forEach(i=>{i.checked=!!EXP.show[i.dataset.exshow];i.addEventListener('change',()=>{const v=EXP.show;v[i.dataset.exshow]=i.checked;store.set('expShow',v)})});
+$('#exp-own').addEventListener('input',e=>store.set('expOwn',e.target.value));
+for(const [id,fn] of [['#b-png',exportPng],['#b-pdf',exportPdf],['#b-pdfall',exportPdfAll],['#b-xlsx',exportXlsx]]){
+  $(id).addEventListener('click',async e=>{const b=e.currentTarget,t=b.textContent;b.disabled=true;b.textContent='Generando…';
+    let m;try{m=await fn()}catch(err){m='No se pudo exportar: '+err.message}$('#exp-msg').textContent=m;$('#exp-dmsg').textContent=m;
+    b.disabled=false;b.textContent=t});
+}
+
+$('#b-copy').addEventListener('click',async()=>{
+  const sel=selected();if(!sel.length&&!plan().own.length)return;
+  const cr=sel.reduce((s,c)=>s+c[7],0);
+  const txt=`Horario ${ws().plan} UPIITA (${S.per==='proximo'?'próximo periodo':'periodo actual'}) · ${fmtCr(cr)} créditos\n`+
+    sel.map(c=>`${c[3]}  ${c[8]} ${name(c)} (${fmtCr(c[7])} cr)\n   ${profs(c)}\n   ${pattern(c).join('; ')}`).join('\n')+
+    plan().own.map(o=>`\n—  ${o.n}\n   ${o.d.map(d=>DAYS[d]).join(' ')}  ${hm(o.a)}–${hm(o.b)}`).join('');
+  const box=$('#copybox');box.value=txt;
+  try{await navigator.clipboard.writeText(txt);$('#b-copy').textContent='Copiado';setTimeout(()=>$('#b-copy').textContent='Copiar texto',1500)}
+  catch(err){box.hidden=false;box.select()}
+});
+/* Zoom del mapa con pellizco (dos dedos) y con el trackpad o Ctrl + rueda, centrado en el punto del gesto.
+   Durante el pellizco solo se escala con CSS (instantáneo, sigue a los dedos); al soltar se redibuja una vez a la
+   escala final. La respuesta es proporcional y amplificada (exponente GAIN): un pellizco amplio acerca mucho más que
+   uno pequeño. Usa el mismo ZOOM que los botones +/−; desplazar con un dedo sigue siendo nativo. */
+(()=>{
+  const wrap=$('#mapwrap'), map=$('#map'), areas=$('#areas'), HEAD=30, GAIN=1.8, ZMAX=2.5;
+  const fit=()=>{const L=MAP().layout;return L?(wrap.clientWidth-2)/L.w:.6};   // escala de «mapa completo»
+  const clampZ=z=>Math.min(ZMAX,Math.max(Math.min(.4,fit()),z)), dist=(a,b)=>Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+  const rel=(x,y)=>{const r=wrap.getBoundingClientRect();return[x-r.left,y-r.top]};
+  // redibuja a la escala z manteniendo fijo el punto (cx,cy) del contenedor
+  const commit=(z,cx,cy)=>{const old=MAPSC;if(Math.abs(z-old)<.004)return;
+    const x=(wrap.scrollLeft+cx)/old, y=(wrap.scrollTop+cy-HEAD)/old;
+    ZOOM=z;renderMap();wrap.scrollLeft=x*MAPSC-cx;wrap.scrollTop=y*MAPSC-cy+HEAD};
+  let pinch=null;
+  const reset=()=>{map.style.transform=areas.style.transform='';map.style.transformOrigin=areas.style.transformOrigin=''};
+  const end=()=>{if(!pinch)return;const p=pinch;pinch=null;reset();commit(p.z,p.cx,p.cy)};
+  wrap.addEventListener('touchstart',e=>{
+    if(e.touches.length!==2){if(e.touches.length>2)end();return}
+    const [a,b]=e.touches, [cx,cy]=rel((a.clientX+b.clientX)/2,(a.clientY+b.clientY)/2);
+    pinch={d:dist(a,b)||1,z0:MAPSC,z:MAPSC,cx,cy};
+    const ox=wrap.scrollLeft+cx, oy=wrap.scrollTop+cy-HEAD;
+    map.style.transformOrigin=`${ox}px ${oy}px`;areas.style.transformOrigin=`${ox}px 0`;
+  },{passive:true});
+  wrap.addEventListener('touchmove',e=>{
+    if(!pinch||e.touches.length!==2)return;
+    if(e.cancelable)e.preventDefault();
+    const [a,b]=e.touches;
+    pinch.z=clampZ(pinch.z0*Math.pow(dist(a,b)/pinch.d,GAIN));
+    const k=pinch.z/pinch.z0;map.style.transform=`scale(${k})`;areas.style.transform=`scaleX(${k})`;
+  },{passive:false});
+  wrap.addEventListener('touchend',e=>{if(e.touches.length<2)end()});
+  wrap.addEventListener('touchcancel',end);               // si el navegador interrumpe el gesto, se conserva el zoom alcanzado
+  ['gesturestart','gesturechange'].forEach(t=>wrap.addEventListener(t,e=>e.preventDefault()));   // Safari (iOS)
+  let raf=0,pend=null;
+  wrap.addEventListener('wheel',e=>{if(!e.ctrlKey)return;e.preventDefault();const [cx,cy]=rel(e.clientX,e.clientY);
+    pend={z:clampZ((pend?.z??MAPSC)*Math.exp(-e.deltaY/200)),cx,cy};
+    if(!raf)raf=requestAnimationFrame(()=>{raf=0;const p=pend;pend=null;commit(p.z,p.cx,p.cy)})},{passive:false});
+})();
+let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(S.tab==='tray'&&ZOOM==null)renderMap()},150)});
+$('#foot').textContent='Herramienta de consulta para que el alumno planee su reinscripción. Los datos del SAES se consultan en modo de solo lectura y se almacenan únicamente en este navegador, al igual que las materias seleccionadas, marcas, notas y horarios. La reinscripción oficial se realiza en el SAES, donde deben verificarse la cita, la carga autorizada y el cupo.';
+if(ALUMNO&&DATA.mapas[ALUMNO.carrera])S.car=ALUMNO.carrera;
+const mobNote=()=>{$('#mobnote').hidden=!(MQ_PHONE.matches&&!store.get('mobnote',0))};
+mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
+render();
+SAES.status(ALUMNO);
+SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[d.carrera]){S.car=d.carrera;store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
+</script>

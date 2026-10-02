@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Herramientas UPIITA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#fafafa;--surface:#fff;--fg:#18181b;--muted:#52525b;--line:#d9d9de;--accent:#750946}
+@media (prefers-color-scheme:dark){:root{--bg:#09090b;--surface:#18181b;--fg:#e4e4e7;--muted:#a1a1aa;--line:#323237;--accent:#ec9cbf;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 "Noto Sans",system-ui,sans-serif;padding-inline:16px}
+main{max-width:760px;margin:0 auto;padding-block:56px 40px}
+h1{margin:0 0 6px;font-size:2rem;letter-spacing:-.02em}
+p{color:var(--muted);margin:0 0 28px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+a.card{display:block;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--accent)}
+a.card b{display:block;font-size:1.15rem;margin-bottom:4px}
+a.card span{color:var(--muted);font-size:.92rem}
+small{display:block;margin-top:32px;color:var(--muted)}
+</style>
+<main>
+  <h1>Herramientas UPIITA</h1>
+  <p>Versión de prueba de las herramientas de apoyo a la reinscripción y a la gestión escolar. La información se almacena únicamente en el navegador.</p>
+  <div class="grid">
+    <a class="card" href="horarios.html"><b>Horarios UPIITA</b><span>Mapa curricular, oferta del SAES y armado de horario.</span></a>
+    <a class="card" href="electivas.html"><b>Electivas UPIITA</b><span>Liberación de electivas: créditos y formatos llenos.</span></a>
+    <a class="card" href="revision.html"><b>Guía de revisión</b><span>Instructivo, perfil de demostración y casos de prueba.</span></a>
+  </div>
+  <small>Herramienta independiente de consulta; la inscripción oficial se hace en el SAES.</small>
+</main>
+</html>

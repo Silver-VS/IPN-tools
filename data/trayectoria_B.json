@@ -1,0 +1,1440 @@
+{
+ "fuente": "Ingenieria Bionica trayectoria 0624.pdf",
+ "rows": [
+  [
+   1,
+   482.53999999999996
+  ],
+  [
+   2,
+   565.75
+  ],
+  [
+   3,
+   654.77
+  ],
+  [
+   4,
+   730.51
+  ],
+  [
+   5,
+   797.23
+  ],
+  [
+   6,
+   890.8299999999999
+  ],
+  [
+   7,
+   962.78
+  ],
+  [
+   8,
+   1021.9000000000001
+  ],
+  [
+   9,
+   1105.8200000000002
+  ],
+  [
+   10,
+   1182.0700000000002
+  ]
+ ],
+ "cols": [
+  {
+   "text": "e",
+   "x0": 184.159996914368,
+   "x1": 202.159997312744
+  }
+ ],
+ "boxes": [
+  {
+   "x0": 712.52,
+   "top": 867.22,
+   "x1": 831.8,
+   "bottom": 918.52,
+   "fill": "#98ecb1",
+   "text": "ELECTRONICA ANALOGICA Y DE POTENCIA",
+   "clave": "B309",
+   "nombre": "ELECTRONICA ANALOGICA Y DE POTENCIA",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 535.89,
+   "top": 942.04,
+   "x1": 679.89,
+   "bottom": 985.2,
+   "fill": "#01b5d5",
+   "text": "MODELADO Y CONTROL DE SISTEMAS BIONICOS",
+   "clave": "B401",
+   "nombre": "MODELADO Y CONTROL DE SISTEMAS BIONICOS",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 236.57,
+   "top": 1081.95,
+   "x1": 322.92,
+   "bottom": 1127.17,
+   "fill": "#a6cb3c",
+   "text": "TRABAJO TERMINAL I",
+   "clave": "B505",
+   "nombre": "TRABAJO TERMINAL I",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 9
+  },
+  {
+   "x0": 266.62,
+   "top": 1161.15,
+   "x1": 352.97,
+   "bottom": 1206.37,
+   "fill": "#a6cb3c",
+   "text": "TRABAJO TERMINAL II",
+   "clave": "B506",
+   "nombre": "TRABAJO TERMINAL II",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 10
+  },
+  {
+   "x0": 716.01,
+   "top": 788.31,
+   "x1": 822.8,
+   "bottom": 841.44,
+   "fill": "#98ecb1",
+   "text": "DISPOSITIVOS ELECTRONICOS",
+   "clave": "B302",
+   "nombre": "DISPOSITIVOS ELECTRONICOS",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 849.8,
+   "top": 863.6300000000001,
+   "x1": 936.54,
+   "bottom": 915.3,
+   "fill": "#98ecb1",
+   "text": "ELECTRONICA DIGITAL",
+   "clave": "B303",
+   "nombre": "ELECTRONICA DIGITAL",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 774.89,
+   "top": 707.73,
+   "x1": 871.46,
+   "bottom": 752.95,
+   "fill": "#fad3d2",
+   "text": "TEORIA DE LOS CIRCUITOS",
+   "clave": "B207",
+   "nombre": "TEORIA DE LOS CIRCUITOS",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 787.89,
+   "top": 1009.36,
+   "x1": 895.82,
+   "bottom": 1059.55,
+   "fill": "#a6cb3c",
+   "text": "BIOELECTRONICA",
+   "clave": "B502",
+   "nombre": "BIOELECTRONICA",
+   "nivel_saes": 5,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 297.59,
+   "top": 466.5799999999999,
+   "x1": 384.22,
+   "bottom": 511.79999999999995,
+   "fill": "#ccecff",
+   "text": "BIOETICA",
+   "clave": "B114",
+   "nombre": "BIOETICA",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 843.67,
+   "top": 786.98,
+   "x1": 942.67,
+   "bottom": 836.28,
+   "fill": "#98ecb1",
+   "text": "SENSORES Y ACTUADORES",
+   "clave": "B315",
+   "nombre": "SENSORES Y ACTUADORES",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 781.73,
+   "top": 465.29999999999995,
+   "x1": 878.29,
+   "bottom": 515.24,
+   "fill": "#ccecff",
+   "text": "METROLOGIA",
+   "clave": "B109",
+   "nombre": "METROLOGIA",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 255.42,
+   "top": 1016.18,
+   "x1": 387.09,
+   "bottom": 1061.4099999999999,
+   "fill": "#a6cb3c",
+   "text": "METODOLOGIA DE LA INVESTIGACION",
+   "clave": "B504",
+   "nombre": "METODOLOGIA DE LA INVESTIGACION",
+   "nivel_saes": 5,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 330.57,
+   "top": 1082.98,
+   "x1": 408.8,
+   "bottom": 1126.1399999999999,
+   "fill": "#a6cb3c",
+   "text": "SERVICIO SOCIAL",
+   "clave": "B508",
+   "nombre": "SERVICIO SOCIAL",
+   "nivel_saes": 5,
+   "creditos": 0.0,
+   "tipo": "T",
+   "sem": 9
+  },
+  {
+   "x0": 1053.61,
+   "top": 866.0,
+   "x1": 1161.54,
+   "bottom": 915.3,
+   "fill": "#98ecb1",
+   "text": "BIOMATERIALES",
+   "clave": "B305",
+   "nombre": "BIOMATERIALES",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 769.89,
+   "top": 948.66,
+   "x1": 913.89,
+   "bottom": 993.88,
+   "fill": "#98ecb1",
+   "text": "BIOINSTRUMENTACION",
+   "clave": "B313",
+   "nombre": "BIOINSTRUMENTACION",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1059.29,
+   "top": 1012.78,
+   "x1": 1155.86,
+   "bottom": 1058.0,
+   "fill": "#a6cb3c",
+   "text": "BIOMECANICA",
+   "clave": "B503",
+   "nombre": "BIOMECANICA",
+   "nivel_saes": 5,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1134.28,
+   "top": 707.73,
+   "x1": 1208.53,
+   "bottom": 752.95,
+   "fill": "#fad3d2",
+   "text": "FISIOLOGIA",
+   "clave": "B208",
+   "nombre": "FISIOLOGIA",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1009.28,
+   "top": 631.99,
+   "x1": 1105.84,
+   "bottom": 677.21,
+   "fill": "#fad3d2",
+   "text": "FISICOQUIMICA",
+   "clave": "B205",
+   "nombre": "FISICOQUIMICA",
+   "nivel_saes": 2,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1118.15,
+   "top": 631.99,
+   "x1": 1204.89,
+   "bottom": 677.21,
+   "fill": "#fad3d2",
+   "text": "BIOLOGIA MOLECULAR",
+   "clave": "B210",
+   "nombre": "BIOLOGIA MOLECULAR",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1054.18,
+   "top": 786.98,
+   "x1": 1160.97,
+   "bottom": 832.2,
+   "fill": "#98ecb1",
+   "text": "MECANISMOS BIOMIMETICOS",
+   "clave": "B312",
+   "nombre": "MECANISMOS BIOMIMETICOS",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1133.46,
+   "top": 465.6199999999999,
+   "x1": 1219.82,
+   "bottom": 514.9200000000001,
+   "fill": "#ccecff",
+   "text": "QUIMICA ORGANICA",
+   "clave": "B102",
+   "nombre": "QUIMICA ORGANICA",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1011.87,
+   "top": 465.6199999999999,
+   "x1": 1098.23,
+   "bottom": 514.9200000000001,
+   "fill": "#ccecff",
+   "text": "BIOLOGIA CELULAR",
+   "clave": "B101",
+   "nombre": "BIOLOGIA CELULAR",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1058.08,
+   "top": 541.56,
+   "x1": 1157.08,
+   "bottom": 590.8599999999999,
+   "fill": "#ccecff",
+   "text": "ANATOMIA",
+   "clave": "B111",
+   "nombre": "ANATOMIA",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1132.29,
+   "top": 936.76,
+   "x1": 1218.92,
+   "bottom": 988.43,
+   "fill": "#01b5d5",
+   "text": "ANALISIS DE ESFUERZOS",
+   "clave": "B403",
+   "nombre": "ANALISIS DE ESFUERZOS",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 993.92,
+   "top": 937.62,
+   "x1": 1125.58,
+   "bottom": 987.56,
+   "fill": "#01b5d5",
+   "text": "MANUFACTURA DE ELEMENTOS BIOMIMETICOS",
+   "clave": "B404",
+   "nombre": "MANUFACTURA DE ELEMENTOS BIOMIMETICOS",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1054.18,
+   "top": 1079.8,
+   "x1": 1160.97,
+   "bottom": 1131.47,
+   "fill": "#a6cb3c",
+   "text": "BIOROBOTICA",
+   "clave": "B501",
+   "nombre": "BIOROBOTICA",
+   "nivel_saes": 5,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 9
+  },
+  {
+   "x0": 1009.24,
+   "top": 707.73,
+   "x1": 1105.8,
+   "bottom": 752.95,
+   "fill": "#fad3d2",
+   "text": "BIOQUIMICA",
+   "clave": "B206",
+   "nombre": "BIOQUIMICA",
+   "nivel_saes": 2,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 283.89,
+   "top": 866.1400000000001,
+   "x1": 370.24,
+   "bottom": 911.3599999999999,
+   "fill": "#fad3d2",
+   "text": "BIOGNOSIS",
+   "clave": "B213",
+   "nombre": "BIOGNOSIS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 2141.91,
+   "top": 1018.29,
+   "x1": 2244.44,
+   "bottom": 1061.45,
+   "fill": "#01b5d5",
+   "text": "Optativa 2",
+   "sem": 8,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 2145.24,
+   "top": 1083.03,
+   "x1": 2247.77,
+   "bottom": 1128.25,
+   "fill": "#01b5d5",
+   "text": "Opativa 3",
+   "sem": 9,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 1730.63,
+   "top": 623.1700000000001,
+   "x1": 1837.41,
+   "bottom": 677.21,
+   "fill": "#fad3d2",
+   "text": "FISICA MODERNA Y OPTICA",
+   "clave": "B204",
+   "nombre": "FISICA MODERNA Y OPTICA",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1566.27,
+   "top": 631.99,
+   "x1": 1673.06,
+   "bottom": 677.21,
+   "fill": "#fad3d2",
+   "text": "ECUACIONES DIFERENCIALES",
+   "clave": "B201",
+   "nombre": "ECUACIONES DIFERENCIALES",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1329.23,
+   "top": 789.4300000000001,
+   "x1": 1436.02,
+   "bottom": 839.52,
+   "fill": "#98ecb1",
+   "text": "ANALISIS NUMERICO",
+   "clave": "B301",
+   "nombre": "ANALISIS NUMERICO",
+   "nivel_saes": 3,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1695.1,
+   "top": 786.96,
+   "x1": 1839.1,
+   "bottom": 841.0,
+   "fill": "#fad3d2",
+   "text": "ONDAS ELECTROMAGNETICAS Y SISTEMAS RADIANTES",
+   "clave": "B203",
+   "nombre": "ONDAS ELECTROMAGNETICAS Y SISTEMAS RADIANTES",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1542.8,
+   "top": 702.3699999999999,
+   "x1": 1686.8,
+   "bottom": 754.05,
+   "fill": "#fad3d2",
+   "text": "FUNDAMENTOS MATEMATICOS DE INGENIERIA",
+   "clave": "B202",
+   "nombre": "FUNDAMENTOS MATEMATICOS DE INGENIERIA",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1566.27,
+   "top": 789.3299999999999,
+   "x1": 1673.06,
+   "bottom": 839.52,
+   "fill": "#fad3d2",
+   "text": "BIOFISICA",
+   "clave": "B209",
+   "nombre": "BIOFISICA",
+   "nivel_saes": 2,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 2141.55,
+   "top": 939.98,
+   "x1": 2244.08,
+   "bottom": 985.2,
+   "fill": "#98ecb1",
+   "text": "Optativa 1",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 1633.4,
+   "top": 540.3699999999999,
+   "x1": 1719.75,
+   "bottom": 592.04,
+   "fill": "#ccecff",
+   "text": "CALCULO VECTORIAL",
+   "clave": "B105",
+   "nombre": "CALCULO VECTORIAL",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1713.8,
+   "top": 707.73,
+   "x1": 1857.8,
+   "bottom": 760.25,
+   "fill": "#ccecff",
+   "text": "FUNDAMENTOS DE TEORIA ELECTROMAGNETICA",
+   "clave": "B107",
+   "nombre": "FUNDAMENTOS DE TEORIA ELECTROMAGNETICA",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1538.9,
+   "top": 464.6199999999999,
+   "x1": 1682.9,
+   "bottom": 515.9200000000001,
+   "fill": "#ccecff",
+   "text": "CALCULO DIFERENCIAL E INTEGRAL",
+   "clave": "B104",
+   "nombre": "CALCULO DIFERENCIAL E INTEGRAL",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1724.37,
+   "top": 467.6600000000001,
+   "x1": 1826.9,
+   "bottom": 512.8800000000001,
+   "fill": "#ccecff",
+   "text": "ALGEBRA LINEAL",
+   "clave": "B103",
+   "nombre": "ALGEBRA LINEAL",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1624.02,
+   "top": 864.8199999999999,
+   "x1": 1731.95,
+   "bottom": 916.49,
+   "fill": "#98ecb1",
+   "text": "BIOMAGNETISMO",
+   "clave": "B311",
+   "nombre": "BIOMAGNETISMO",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1730.63,
+   "top": 540.3699999999999,
+   "x1": 1872.27,
+   "bottom": 592.04,
+   "fill": "#ccecff",
+   "text": "FUNDAMENTOS DE FISICA PARA LA INGENIERIA",
+   "clave": "B106",
+   "nombre": "FUNDAMENTOS DE FISICA PARA LA INGENIERIA",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1527.83,
+   "top": 539.19,
+   "x1": 1624.4,
+   "bottom": 593.23,
+   "fill": "#ccecff",
+   "text": "BIOESTADISTICA",
+   "clave": "B108",
+   "nombre": "BIOESTADISTICA",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1310.62,
+   "top": 1017.26,
+   "x1": 1454.62,
+   "bottom": 1062.48,
+   "fill": "#01b5d5",
+   "text": "RECONOCIMIENTO DE PATRONES",
+   "clave": "B405",
+   "nombre": "RECONOCIMIENTO DE PATRONES",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1386.18,
+   "top": 868.04,
+   "x1": 1492.96,
+   "bottom": 913.26,
+   "fill": "#98ecb1",
+   "text": "PROCESAMIENTO DE IMAGENES",
+   "clave": "B310",
+   "nombre": "PROCESAMIENTO DE IMAGENES",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1273.89,
+   "top": 870.0799999999999,
+   "x1": 1376.42,
+   "bottom": 915.3,
+   "fill": "#01b5d5",
+   "text": "DISPOSITIVOS PROGRAMABLES",
+   "clave": "B402",
+   "nombre": "DISPOSITIVOS PROGRAMABLES",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1322.96,
+   "top": 943.21,
+   "x1": 1454.62,
+   "bottom": 988.43,
+   "fill": "#98ecb1",
+   "text": "PROCESAMIENTO DE SEÑALES BIOLOGICAS",
+   "clave": "B314",
+   "nombre": "PROCESAMIENTO DE SEÑALES BIOLOGICAS",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1310.99,
+   "top": 539.19,
+   "x1": 1471.87,
+   "bottom": 593.23,
+   "fill": "#ccecff",
+   "text": "HERRAMIENTAS COMPUTACIONALES",
+   "clave": "B112",
+   "nombre": "HERRAMIENTAS COMPUTACIONALES",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1311.12,
+   "top": 629.6300000000001,
+   "x1": 1472.0,
+   "bottom": 679.5799999999999,
+   "fill": "#ccecff",
+   "text": "PROGRAMACION ORIENTADA A OBJETOS",
+   "clave": "B110",
+   "nombre": "PROGRAMACION ORIENTADA A OBJETOS",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1894.4,
+   "top": 631.99,
+   "x1": 1961.3,
+   "bottom": 677.21,
+   "fill": "#fad3d2",
+   "text": "INGLES II",
+   "clave": "B216",
+   "nombre": "INGLES II",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1900.85,
+   "top": 707.73,
+   "x1": 1967.75,
+   "bottom": 752.95,
+   "fill": "#98ecb1",
+   "text": "INGLES III",
+   "clave": "B308",
+   "nombre": "INGLES III",
+   "nivel_saes": 3,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1997.67,
+   "top": 544.6300000000001,
+   "x1": 2104.46,
+   "bottom": 587.79,
+   "fill": "#ccecff",
+   "text": "DESARROLLO SOSTENIBLE",
+   "clave": "B115",
+   "nombre": "DESARROLLO SOSTENIBLE",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1965.16,
+   "top": 631.99,
+   "x1": 2109.16,
+   "bottom": 677.21,
+   "fill": "#fad3d2",
+   "text": "SISTEMAS DE GESTION DE CALIDAD",
+   "clave": "B212",
+   "nombre": "SISTEMAS DE GESTION DE CALIDAD",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1919.22,
+   "top": 544.6300000000001,
+   "x1": 1986.12,
+   "bottom": 587.79,
+   "fill": "#ccecff",
+   "text": "INGLES I",
+   "clave": "B116",
+   "nombre": "INGLES I",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1919.15,
+   "top": 1018.29,
+   "x1": 2117.15,
+   "bottom": 1063.51,
+   "fill": "#01b5d5",
+   "text": "NORMATIVIDAD Y GESTION TECNOLOGICA",
+   "clave": "B406",
+   "nombre": "NORMATIVIDAD Y GESTION TECNOLOGICA",
+   "nivel_saes": 4,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1977.39,
+   "top": 707.73,
+   "x1": 2096.67,
+   "bottom": 752.95,
+   "fill": "#fad3d2",
+   "text": "LIDERAZGO Y EMPRENDEDORES",
+   "clave": "B215",
+   "nombre": "LIDERAZGO Y EMPRENDEDORES",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1903.08,
+   "top": 783.9100000000001,
+   "x1": 2082.52,
+   "bottom": 835.5799999999999,
+   "fill": "#fad3d2",
+   "text": "INVESTIGACION Y DESARROLLO DE PROYECTOS",
+   "clave": "B211",
+   "nombre": "INVESTIGACION Y DESARROLLO DE PROYECTOS",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 440.0,
+   "top": 938.43,
+   "x1": 526.35,
+   "bottom": 983.65,
+   "fill": "#98ecb1",
+   "text": "TEORIA DEL CONTROL",
+   "clave": "B304",
+   "nombre": "TEORIA DEL CONTROL",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 513.41,
+   "top": 1016.18,
+   "x1": 609.97,
+   "bottom": 1061.4099999999999,
+   "fill": "#98ecb1",
+   "text": "CONTROL NEURODIFUSO",
+   "clave": "B306",
+   "nombre": "CONTROL NEURODIFUSO",
+   "nivel_saes": 3,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1666.97,
+   "top": 1080.37,
+   "x1": 1730.82,
+   "bottom": 1118.03,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 9,
+   "slot": "Electiva"
+  },
+  {
+   "x0": 2171.27,
+   "top": 631.99,
+   "x1": 2235.12,
+   "bottom": 669.6400000000001,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 3,
+   "slot": "Electiva"
+  },
+  {
+   "x0": 2171.27,
+   "top": 797.9300000000001,
+   "x1": 2235.12,
+   "bottom": 835.5799999999999,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 5,
+   "slot": "Electiva"
+  },
+  {
+   "x0": 1666.97,
+   "top": 950.78,
+   "x1": 1730.82,
+   "bottom": 988.43,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 7,
+   "slot": "Electiva"
+  }
+ ],
+ "edges": [
+  {
+   "s": 2,
+   "d": 3,
+   "pts": [
+    [
+     279.8,
+     1127.2
+    ],
+    [
+     279.8,
+     1140.7
+    ],
+    [
+     309.8,
+     1140.7
+    ],
+    [
+     309.8,
+     1156.3
+    ]
+   ]
+  },
+  {
+   "s": 11,
+   "d": 2,
+   "pts": [
+    [
+     321.2,
+     1061.4
+    ],
+    [
+     321.2,
+     1068.2
+    ],
+    [
+     279.8,
+     1068.2
+    ],
+    [
+     279.8,
+     1077.1
+    ]
+   ]
+  },
+  {
+   "s": 48,
+   "d": 49,
+   "pts": [
+    [
+     1391.4,
+     593.2
+    ],
+    [
+     1391.4,
+     606.7
+    ],
+    [
+     1391.6,
+     606.7
+    ],
+    [
+     1391.6,
+     624.8
+    ]
+   ]
+  },
+  {
+   "s": 54,
+   "d": 50,
+   "pts": [
+    [
+     1952.7,
+     587.8
+    ],
+    [
+     1952.7,
+     601.3
+    ],
+    [
+     1927.8,
+     601.3
+    ],
+    [
+     1927.8,
+     627.2
+    ]
+   ]
+  },
+  {
+   "s": 50,
+   "d": 51,
+   "pts": [
+    [
+     1927.8,
+     677.2
+    ],
+    [
+     1927.8,
+     690.7
+    ],
+    [
+     1934.3,
+     690.7
+    ],
+    [
+     1934.3,
+     702.9
+    ]
+   ]
+  },
+  {
+   "s": 36,
+   "d": 28,
+   "pts": [
+    [
+     2192.8,
+     985.2
+    ],
+    [
+     2192.8,
+     998.7
+    ],
+    [
+     2193.2,
+     998.7
+    ],
+    [
+     2193.2,
+     1013.5
+    ]
+   ]
+  },
+  {
+   "s": 17,
+   "d": 26,
+   "pts": [
+    [
+     1057.6,
+     677.2
+    ],
+    [
+     1057.6,
+     690.7
+    ],
+    [
+     1057.5,
+     690.7
+    ],
+    [
+     1057.5,
+     702.9
+    ]
+   ]
+  },
+  {
+   "s": 33,
+   "d": 41,
+   "pts": [
+    [
+     1767.1,
+     841.0
+    ],
+    [
+     1767.1,
+     890.7
+    ],
+    [
+     1736.8,
+     890.7
+    ]
+   ]
+  },
+  {
+   "s": 27,
+   "d": 1,
+   "pts": [
+    [
+     327.1,
+     911.4
+    ],
+    [
+     327.1,
+     924.9
+    ],
+    [
+     607.9,
+     924.9
+    ],
+    [
+     607.9,
+     937.2
+    ]
+   ]
+  },
+  {
+   "s": 39,
+   "d": 37,
+   "pts": [
+    [
+     1610.9,
+     515.9
+    ],
+    [
+     1610.9,
+     529.4
+    ],
+    [
+     1676.6,
+     529.4
+    ],
+    [
+     1676.6,
+     535.5
+    ]
+   ]
+  },
+  {
+   "s": 28,
+   "d": 29,
+   "pts": [
+    [
+     2193.2,
+     1061.5
+    ],
+    [
+     2193.2,
+     1068.2
+    ],
+    [
+     2196.5,
+     1068.2
+    ],
+    [
+     2196.5,
+     1078.2
+    ]
+   ]
+  },
+  {
+   "s": 22,
+   "d": 16,
+   "pts": [
+    [
+     1157.1,
+     566.2
+    ],
+    [
+     1222.0,
+     566.2
+    ],
+    [
+     1222.0,
+     730.3
+    ],
+    [
+     1213.4,
+     730.3
+    ]
+   ]
+  },
+  {
+   "s": 58,
+   "d": 59,
+   "pts": [
+    [
+     483.2,
+     983.6
+    ],
+    [
+     483.2,
+     1038.8
+    ],
+    [
+     508.6,
+     1038.8
+    ]
+   ]
+  },
+  {
+   "s": 6,
+   "d": 4,
+   "pts": [
+    [
+     823.2,
+     753.0
+    ],
+    [
+     823.2,
+     766.5
+    ],
+    [
+     769.4,
+     766.5
+    ],
+    [
+     769.4,
+     783.5
+    ]
+   ]
+  },
+  {
+   "s": 4,
+   "d": 0,
+   "pts": [
+    [
+     769.4,
+     841.4
+    ],
+    [
+     769.4,
+     854.9
+    ],
+    [
+     772.2,
+     854.9
+    ],
+    [
+     772.2,
+     862.4
+    ]
+   ]
+  },
+  {
+   "s": 5,
+   "d": 14,
+   "pts": [
+    [
+     893.2,
+     915.3
+    ],
+    [
+     893.2,
+     928.8
+    ],
+    [
+     841.9,
+     928.8
+    ],
+    [
+     841.9,
+     943.8
+    ]
+   ]
+  },
+  {
+   "s": 32,
+   "d": 45,
+   "pts": [
+    [
+     1382.6,
+     839.5
+    ],
+    [
+     1382.6,
+     853.0
+    ],
+    [
+     1439.6,
+     853.0
+    ],
+    [
+     1439.6,
+     863.2
+    ]
+   ]
+  },
+  {
+   "s": 47,
+   "d": 44,
+   "pts": [
+    [
+     1388.8,
+     988.4
+    ],
+    [
+     1388.8,
+     1001.9
+    ],
+    [
+     1382.6,
+     1001.9
+    ],
+    [
+     1382.6,
+     1012.4
+    ]
+   ]
+  },
+  {
+   "s": 45,
+   "d": 44,
+   "pts": [
+    [
+     1439.6,
+     913.3
+    ],
+    [
+     1439.6,
+     935.9
+    ],
+    [
+     1479.8,
+     935.9
+    ],
+    [
+     1479.8,
+     1003.8
+    ],
+    [
+     1468.1,
+     1003.8
+    ],
+    [
+     1468.1,
+     1039.9
+    ],
+    [
+     1459.5,
+     1039.9
+    ]
+   ]
+  },
+  {
+   "s": 42,
+   "d": 30,
+   "pts": [
+    [
+     1801.5,
+     592.0
+    ],
+    [
+     1801.5,
+     605.5
+    ],
+    [
+     1784.0,
+     605.5
+    ],
+    [
+     1784.0,
+     618.3
+    ]
+   ]
+  },
+  {
+   "s": 38,
+   "d": 33,
+   "pts": [
+    [
+     1785.8,
+     760.2
+    ],
+    [
+     1785.8,
+     773.8
+    ],
+    [
+     1767.1,
+     773.8
+    ],
+    [
+     1767.1,
+     782.1
+    ]
+   ]
+  },
+  {
+   "s": 57,
+   "d": 55,
+   "pts": [
+    [
+     1992.8,
+     835.6
+    ],
+    [
+     1992.8,
+     849.1
+    ],
+    [
+     2018.2,
+     849.1
+    ],
+    [
+     2018.2,
+     1013.5
+    ]
+   ]
+  },
+  {
+   "s": 15,
+   "d": 25,
+   "pts": [
+    [
+     1107.6,
+     1058.0
+    ],
+    [
+     1107.6,
+     1075.0
+    ]
+   ]
+  },
+  {
+   "s": 9,
+   "d": 5,
+   "pts": [
+    [
+     893.2,
+     836.3
+    ],
+    [
+     893.2,
+     858.8
+    ]
+   ]
+  }
+ ]
+}

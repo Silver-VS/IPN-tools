@@ -1,0 +1,1693 @@
+{
+ "fuente": "Ingenieria Mecatronica trayectoria v1706.pdf",
+ "rows": [
+  [
+   1,
+   430.7587500000001
+  ],
+  [
+   2,
+   503.93652777777777
+  ],
+  [
+   3,
+   577.1143055555555
+  ],
+  [
+   4,
+   650.2920833333332
+  ],
+  [
+   5,
+   723.4698611111108
+  ],
+  [
+   6,
+   796.6476388888885
+  ],
+  [
+   7,
+   869.8254166666662
+  ],
+  [
+   8,
+   943.0031944444439
+  ],
+  [
+   9,
+   1016.1809722222216
+  ],
+  [
+   10,
+   1089.3587499999994
+  ]
+ ],
+ "cols": [
+  {
+   "text": "e S",
+   "x0": 89.629999227008,
+   "x1": 107.63
+  },
+  {
+   "text": "integral",
+   "x0": 1342.56,
+   "x1": 1406.62788
+  },
+  {
+   "text": "especialización",
+   "x0": 1754.57,
+   "x1": 1878.9582799999998
+  },
+  {
+   "text": "MECÁNICA",
+   "x0": 2019.26,
+   "x1": 2072.3959999999997
+  },
+  {
+   "text": "Electromecánica",
+   "x0": 2117.57,
+   "x1": 2200.91
+  },
+  {
+   "text": "EL E E L C É T C R T Ó RI N C I A",
+   "x0": 2236.44,
+   "x1": 2298.614
+  }
+ ],
+ "boxes": [
+  {
+   "x0": 929.82,
+   "top": 770.4100000000001,
+   "x1": 1056.21,
+   "bottom": 817.5600000000001,
+   "fill": "#98ecb1",
+   "text": "MODELADO Y SIMULACION DE SISTEMAS MECATRONICOS",
+   "clave": "M304",
+   "nombre": "MODELADO Y SIMULACION DE SISTEMAS MECATRONICOS",
+   "nivel_saes": 3,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 670.31,
+   "top": 848.6800000000001,
+   "x1": 767.69,
+   "bottom": 891.69,
+   "fill": "#98ecb1",
+   "text": "INSTRUMENTACION VIRTUAL",
+   "clave": "M303",
+   "nombre": "INSTRUMENTACION VIRTUAL",
+   "nivel_saes": 3,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 399.33,
+   "top": 848.6800000000001,
+   "x1": 525.37,
+   "bottom": 888.1300000000001,
+   "fill": "#98ecb1",
+   "text": "DISEÑO AVANZADO DE ELEMENTOS DE MAQUINAS",
+   "clave": "M306",
+   "nombre": "DISEÑO AVANZADO DE ELEMENTOS DE MAQUINAS",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1779.96,
+   "top": 629.2400000000001,
+   "x1": 1846.86,
+   "bottom": 668.6800000000001,
+   "fill": "#98ecb1",
+   "text": "Optativa 1",
+   "sem": 4,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 1779.96,
+   "top": 703.0600000000001,
+   "x1": 1846.86,
+   "bottom": 742.5000000000001,
+   "fill": "#98ecb1",
+   "text": "Optativa 2",
+   "sem": 5,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 848.27,
+   "top": 770.8600000000001,
+   "x1": 922.16,
+   "bottom": 817.1100000000001,
+   "fill": "#98ecb1",
+   "text": "PROCESADOR DIGITAL DE SEÑALES",
+   "clave": "M308",
+   "nombre": "PROCESADOR DIGITAL DE SEÑALES",
+   "nivel_saes": 3,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 244.27,
+   "top": 848.6800000000001,
+   "x1": 330.63,
+   "bottom": 888.1300000000001,
+   "fill": "#98ecb1",
+   "text": "PROYECTO INTEGRADOR",
+   "clave": "M314",
+   "nombre": "PROYECTO INTEGRADOR",
+   "nivel_saes": 3,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 149.49,
+   "top": 842.9500000000002,
+   "x1": 225.94,
+   "bottom": 893.8700000000001,
+   "fill": "#01b5d5",
+   "text": "INGENIERIA ASISTIDA POR COMPUTADORA",
+   "clave": "M403",
+   "nombre": "INGENIERIA ASISTIDA POR COMPUTADORA",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 853.28,
+   "top": 989.8100000000001,
+   "x1": 942.32,
+   "bottom": 1034.88,
+   "fill": "#a6cb3c",
+   "text": "CONTROL DE MAQUINAS ELECTRICAS",
+   "clave": "M501",
+   "nombre": "CONTROL DE MAQUINAS ELECTRICAS",
+   "nivel_saes": 5,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 9
+  },
+  {
+   "x0": 1779.96,
+   "top": 774.2600000000001,
+   "x1": 1846.86,
+   "bottom": 813.7100000000002,
+   "fill": "#98ecb1",
+   "text": "Optativa 3",
+   "sem": 6,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 853.12,
+   "top": 920.2400000000001,
+   "x1": 942.16,
+   "bottom": 967.3800000000001,
+   "fill": "#98ecb1",
+   "text": "AUTOMATIZACION INDUSTRIAL",
+   "clave": "M305",
+   "nombre": "AUTOMATIZACION INDUSTRIAL",
+   "nivel_saes": 3,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1779.96,
+   "top": 848.6800000000001,
+   "x1": 1846.86,
+   "bottom": 888.1300000000001,
+   "fill": "#01b5d5",
+   "text": "Optativa 4",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 1103.36,
+   "top": 924.0900000000001,
+   "x1": 1220.88,
+   "bottom": 963.5300000000001,
+   "fill": "#01b5d5",
+   "text": "SISTEMAS DE VISION ARTIFICIAL",
+   "clave": "M406",
+   "nombre": "SISTEMAS DE VISION ARTIFICIAL",
+   "nivel_saes": 4,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 958.3,
+   "top": 921.2700000000001,
+   "x1": 1041.63,
+   "bottom": 966.3500000000001,
+   "fill": "#01b5d5",
+   "text": "CONTROL DE SISTEMAS MECATRONICOS",
+   "clave": "M401",
+   "nombre": "CONTROL DE SISTEMAS MECATRONICOS",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 242.08,
+   "top": 920.2400000000001,
+   "x1": 328.43,
+   "bottom": 967.3800000000001,
+   "fill": "#01b5d5",
+   "text": "METODOLOGIA DE LA INVESTIGACION",
+   "clave": "M404",
+   "nombre": "METODOLOGIA DE LA INVESTIGACION",
+   "nivel_saes": 4,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1779.96,
+   "top": 924.0900000000001,
+   "x1": 1846.86,
+   "bottom": 963.5300000000001,
+   "fill": "#01b5d5",
+   "text": "Optativa 5",
+   "sem": 8,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 242.08,
+   "top": 992.5300000000001,
+   "x1": 328.43,
+   "bottom": 1035.54,
+   "fill": "#a6cb3c",
+   "text": "TRABAJO TERMINAL I",
+   "clave": "M503",
+   "nombre": "TRABAJO TERMINAL I",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 9
+  },
+  {
+   "x0": 1779.96,
+   "top": 994.3100000000001,
+   "x1": 1846.86,
+   "bottom": 1033.7600000000002,
+   "fill": "#01b5d5",
+   "text": "Opativa 6",
+   "sem": 9,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 240.25,
+   "top": 1067.44,
+   "x1": 326.6,
+   "bottom": 1106.88,
+   "fill": "#a6cb3c",
+   "text": "TRABAJO TERMINAL II",
+   "clave": "M504",
+   "nombre": "TRABAJO TERMINAL II",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 10
+  },
+  {
+   "x0": 894.15,
+   "top": 557.4300000000001,
+   "x1": 1012.4,
+   "bottom": 596.8800000000001,
+   "fill": "#fad3d2",
+   "text": "ANALISIS DE SEÑALES Y SISTEMAS",
+   "clave": "M202",
+   "nombre": "ANALISIS DE SEÑALES Y SISTEMAS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 502.87,
+   "top": 624.7600000000001,
+   "x1": 595.73,
+   "bottom": 671.0100000000001,
+   "fill": "#fad3d2",
+   "text": "ANALISIS Y SINTESIS DE MECANISMOS",
+   "clave": "M203",
+   "nombre": "ANALISIS Y SINTESIS DE MECANISMOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 372.37,
+   "top": 553.5800000000002,
+   "x1": 478.84,
+   "bottom": 600.7300000000001,
+   "fill": "#fad3d2",
+   "text": "MANTENIMIENTO Y SISTEMAS DE MANUFACTURA",
+   "clave": "M210",
+   "nombre": "MANTENIMIENTO Y SISTEMAS DE MANUFACTURA",
+   "nivel_saes": 2,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 635.62,
+   "top": 703.0600000000001,
+   "x1": 709.87,
+   "bottom": 750.2000000000002,
+   "fill": "#fad3d2",
+   "text": "ELECTRONICA ANALOGICA",
+   "clave": "M207",
+   "nombre": "ELECTRONICA ANALOGICA",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1554.74,
+   "top": 629.2400000000001,
+   "x1": 1628.99,
+   "bottom": 668.6800000000001,
+   "fill": "#fad3d2",
+   "text": "OSCILACIONES Y OPTICA",
+   "clave": "M215",
+   "nombre": "OSCILACIONES Y OPTICA",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1582.87,
+   "top": 552.4100000000001,
+   "x1": 1701.11,
+   "bottom": 595.9800000000001,
+   "fill": "#fad3d2",
+   "text": "PROBABILIDAD Y ESTADISTICA PARA INGENIERIA",
+   "clave": "M216",
+   "nombre": "PROBABILIDAD Y ESTADISTICA PARA INGENIERIA",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1079.35,
+   "top": 557.4300000000001,
+   "x1": 1168.39,
+   "bottom": 596.8800000000001,
+   "fill": "#fad3d2",
+   "text": "PROGRAMACION AVANZADA",
+   "clave": "M217",
+   "nombre": "PROGRAMACION AVANZADA",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 727.19,
+   "top": 699.2100000000002,
+   "x1": 844.71,
+   "bottom": 746.3500000000001,
+   "fill": "#fad3d2",
+   "text": "SIMULACION ELECTRONICA Y DISEÑO DE CIRCUITOS IMPRESOS",
+   "clave": "M219",
+   "nombre": "SIMULACION ELECTRONICA Y DISEÑO DE CIRCUITOS IMPRESOS",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 749.51,
+   "top": 624.9000000000001,
+   "x1": 835.87,
+   "bottom": 669.9700000000001,
+   "fill": "#fad3d2",
+   "text": "CIRCUITOS LOGICOS",
+   "clave": "M204",
+   "nombre": "CIRCUITOS LOGICOS",
+   "nivel_saes": 2,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 353.0,
+   "top": 626.4200000000001,
+   "x1": 479.39,
+   "bottom": 671.5000000000001,
+   "fill": "#fad3d2",
+   "text": "DISEÑO BASICO DE ELEMENTOS DE MAQUINAS",
+   "clave": "M205",
+   "nombre": "DISEÑO BASICO DE ELEMENTOS DE MAQUINAS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 508.32,
+   "top": 703.0600000000001,
+   "x1": 605.7,
+   "bottom": 742.5000000000001,
+   "fill": "#fad3d2",
+   "text": "MECANICA DE FLUIDOS",
+   "clave": "M212",
+   "nombre": "MECANICA DE FLUIDOS",
+   "nivel_saes": 2,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1111.72,
+   "top": 770.4100000000001,
+   "x1": 1229.97,
+   "bottom": 817.5600000000001,
+   "fill": "#fad3d2",
+   "text": "MICROPROCESADORES, MICROCONTROLADORES E INTERFAZ",
+   "clave": "M213",
+   "nombre": "MICROPROCESADORES, MICROCONTROLADORES E INTERFAZ",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1535.73,
+   "top": 774.2600000000001,
+   "x1": 1653.25,
+   "bottom": 813.7100000000002,
+   "fill": "#fad3d2",
+   "text": "TEORIA ELECTROMAGNETICA",
+   "clave": "M221",
+   "nombre": "TEORIA ELECTROMAGNETICA",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1124.83,
+   "top": 698.0500000000001,
+   "x1": 1213.87,
+   "bottom": 742.5000000000001,
+   "fill": "#fad3d2",
+   "text": "DISPOSITIVOS LOGICOS PROGRAMABLES",
+   "clave": "M206",
+   "nombre": "DISPOSITIVOS LOGICOS PROGRAMABLES",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 861.11,
+   "top": 844.8300000000002,
+   "x1": 944.45,
+   "bottom": 888.6100000000001,
+   "fill": "#fad3d2",
+   "text": "MAQUINAS ELECTRICAS",
+   "clave": "M211",
+   "nombre": "MAQUINAS ELECTRICAS",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 485.68,
+   "top": 776.1300000000001,
+   "x1": 583.06,
+   "bottom": 815.5800000000002,
+   "fill": "#fad3d2",
+   "text": "NEUMATICA E HIDRAULICA",
+   "clave": "M214",
+   "nombre": "NEUMATICA E HIDRAULICA",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 706.18,
+   "top": 773.8800000000001,
+   "x1": 803.56,
+   "bottom": 817.6700000000001,
+   "fill": "#fad3d2",
+   "text": "SENSORES Y ACONDICIONADORES DE SEÑAL",
+   "clave": "M218",
+   "nombre": "SENSORES Y ACONDICIONADORES DE SEÑAL",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 906.85,
+   "top": 703.0600000000001,
+   "x1": 1013.32,
+   "bottom": 742.5000000000001,
+   "fill": "#fad3d2",
+   "text": "SISTEMAS NEURODIFUSOS",
+   "clave": "M220",
+   "nombre": "SISTEMAS NEURODIFUSOS",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1129.33,
+   "top": 481.0500000000002,
+   "x1": 1218.37,
+   "bottom": 525.95,
+   "fill": "#ccecff",
+   "text": "ANALISIS Y DISEÑO DE PROGRAMAS",
+   "clave": "M102",
+   "nombre": "ANALISIS Y DISEÑO DE PROGRAMAS",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 436.22,
+   "top": 480.96000000000004,
+   "x1": 522.57,
+   "bottom": 526.0400000000002,
+   "fill": "#ccecff",
+   "text": "PROCESO DE MANUFACTURA",
+   "clave": "M120",
+   "nombre": "PROCESO DE MANUFACTURA",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1573.61,
+   "top": 483.7800000000002,
+   "x1": 1649.5,
+   "bottom": 523.23,
+   "fill": "#ccecff",
+   "text": "ELECTRICIDAD Y MAGNETISMO",
+   "clave": "M109",
+   "nombre": "ELECTRICIDAD Y MAGNETISMO",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 502.87,
+   "top": 556.8900000000001,
+   "x1": 600.24,
+   "bottom": 600.7300000000001,
+   "fill": "#ccecff",
+   "text": "RESISTENCIA DE MATERIALES",
+   "clave": "M121",
+   "nombre": "RESISTENCIA DE MATERIALES",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 664.51,
+   "top": 554.2400000000001,
+   "x1": 790.91,
+   "bottom": 600.0600000000001,
+   "fill": "#ccecff",
+   "text": "CIRCUITOS ELECTRICOS AVANZADOS",
+   "clave": "M106",
+   "nombre": "CIRCUITOS ELECTRICOS AVANZADOS",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1481.84,
+   "top": 409.1500000000001,
+   "x1": 1557.72,
+   "bottom": 453.9000000000001,
+   "fill": "#ccecff",
+   "text": "C A L C U L O DIF E R E N C I AL E INTEGRAL",
+   "clave": "M103",
+   "nombre": "CALCULO DIFERENCIAL E INTEGRAL",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 484.19,
+   "top": 410.0200000000002,
+   "x1": 601.71,
+   "bottom": 453.0300000000002,
+   "fill": "#ccecff",
+   "text": "DIBUJO ASISTIDO POR COMPUTADORA",
+   "clave": "M107",
+   "nombre": "DIBUJO ASISTIDO POR COMPUTADORA",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 354.81,
+   "top": 409.1500000000001,
+   "x1": 472.34,
+   "bottom": 453.9000000000001,
+   "fill": "#ccecff",
+   "text": "E S T R U C T U R A Y PRO P I E D A D E S D E L OS MATERIALES",
+   "clave": "M110",
+   "nombre": "ESTRUCTURA Y PROPIEDADES DE LOS MATERIALES",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1165.93,
+   "top": 404.99,
+   "x1": 1272.41,
+   "bottom": 451.25,
+   "fill": "#ccecff",
+   "text": "H ER R A M IE N T A S CO M P U T AC IO N A L E S",
+   "clave": "M113",
+   "nombre": "HERRAMIENTAS COMPUTACIONALES",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 192.12,
+   "top": 408.99,
+   "x1": 278.47,
+   "bottom": 454.0600000000002,
+   "fill": "#ccecff",
+   "text": "INTRODUCCION A LA MECATRONICA",
+   "clave": "M116",
+   "nombre": "INTRODUCCION A LA MECATRONICA",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1075.33,
+   "top": 406.35000000000014,
+   "x1": 1160.39,
+   "bottom": 451.25,
+   "fill": "#ccecff",
+   "text": "INTROD U C CION A L A PROGRAMACION",
+   "clave": "M117",
+   "nombre": "INTRODUCCION A LA PROGRAMACION",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1662.95,
+   "top": 411.8000000000002,
+   "x1": 1729.85,
+   "bottom": 451.25,
+   "fill": "#ccecff",
+   "text": "MECANICA DE LA PARTICULA",
+   "clave": "M118",
+   "nombre": "MECANICA DE LA PARTICULA",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1473.19,
+   "top": 482.0,
+   "x1": 1566.04,
+   "bottom": 525.0100000000002,
+   "fill": "#ccecff",
+   "text": "CALCULO VECTORIAL",
+   "clave": "M104",
+   "nombre": "CALCULO VECTORIAL",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 674.48,
+   "top": 480.96000000000004,
+   "x1": 780.95,
+   "bottom": 526.0400000000002,
+   "fill": "#ccecff",
+   "text": "CIRCUITOS ELECTRICOS",
+   "clave": "M105",
+   "nombre": "CIRCUITOS ELECTRICOS",
+   "nivel_saes": 1,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1658.5,
+   "top": 483.7800000000002,
+   "x1": 1725.4,
+   "bottom": 523.23,
+   "fill": "#ccecff",
+   "text": "MECANICA DEL CUERPO RIGIDO",
+   "clave": "M119",
+   "nombre": "MECANICA DEL CUERPO RIGIDO",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1477.7,
+   "top": 558.3300000000002,
+   "x1": 1561.52,
+   "bottom": 595.9800000000001,
+   "fill": "#ccecff",
+   "text": "ECUACIONES DIFERENCIALES",
+   "clave": "M108",
+   "nombre": "ECUACIONES DIFERENCIALES",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 637.87,
+   "top": 623.8600000000001,
+   "x1": 744.34,
+   "bottom": 671.0100000000001,
+   "fill": "#ccecff",
+   "text": "FUNDAMENTOS DE ELECTRONICA",
+   "clave": "M112",
+   "nombre": "FUNDAMENTOS DE ELECTRONICA",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 687.74,
+   "top": 921.2700000000001,
+   "x1": 767.69,
+   "bottom": 966.3500000000001,
+   "fill": "#01b5d5",
+   "text": "ELECTRONICA DE POTENCIA",
+   "clave": "M402",
+   "nombre": "ELECTRONICA DE POTENCIA",
+   "nivel_saes": 4,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 960.85,
+   "top": 848.6800000000001,
+   "x1": 1039.08,
+   "bottom": 888.1300000000001,
+   "fill": "#98ecb1",
+   "text": "CONTROL CLASICO",
+   "clave": "M301",
+   "nombre": "CONTROL CLASICO",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1566.47,
+   "top": 409.74,
+   "x1": 1652.82,
+   "bottom": 453.3100000000002,
+   "fill": "#ccecff",
+   "text": "ALG EB R A L IN E A L Y N U M E R O S COMPLEJOS",
+   "clave": "M101",
+   "nombre": "ALGEBRA LINEAL Y NUMEROS COMPLEJOS",
+   "nivel_saes": 1,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 1
+  },
+  {
+   "x0": 1311.73,
+   "top": 774.2600000000001,
+   "x1": 1429.25,
+   "bottom": 813.7100000000002,
+   "fill": "#98ecb1",
+   "text": "ETICA PARA EL EJERCICIO PROFESIONAL",
+   "clave": "M302",
+   "nombre": "ETICA PARA EL EJERCICIO PROFESIONAL",
+   "nivel_saes": 3,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 6
+  },
+  {
+   "x0": 1311.73,
+   "top": 848.6800000000001,
+   "x1": 1429.25,
+   "bottom": 888.1300000000001,
+   "fill": "#98ecb1",
+   "text": "FINANZA E INGENIERIA ECONOMICA",
+   "clave": "M307",
+   "nombre": "FINANZAS E INGENIERIA ECONOMICA",
+   "nivel_saes": 3,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 7
+  },
+  {
+   "x0": 1311.73,
+   "top": 924.0900000000001,
+   "x1": 1429.25,
+   "bottom": 963.5300000000001,
+   "fill": "#01b5d5",
+   "text": "PROYECTOS DE INVERSION",
+   "clave": "M405",
+   "nombre": "PROYECTOS DE INVERSION",
+   "nivel_saes": 4,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 8
+  },
+  {
+   "x0": 1317.25,
+   "top": 992.2500000000001,
+   "x1": 1423.73,
+   "bottom": 1035.8200000000002,
+   "fill": "#98ecb1",
+   "text": "INGENIERIA AMBIENTAL",
+   "clave": "M309",
+   "nombre": "INGENIERIA AMBIENTAL",
+   "nivel_saes": 3,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 9
+  },
+  {
+   "x0": 147.27,
+   "top": 991.5000000000001,
+   "x1": 223.71,
+   "bottom": 1036.5700000000002,
+   "fill": "#a6cb3c",
+   "text": "SERVICIO SOCIAL",
+   "clave": "M505",
+   "nombre": "SERVICIO SOCIAL",
+   "nivel_saes": 5,
+   "creditos": 0.0,
+   "tipo": "T",
+   "sem": 9
+  },
+  {
+   "x0": 1367.36,
+   "top": 629.2400000000001,
+   "x1": 1452.42,
+   "bottom": 668.6800000000001,
+   "fill": "#fad3d2",
+   "text": "ADMINISTRACION ORGANIZACIONAL",
+   "clave": "M201",
+   "nombre": "ADMINISTRACION ORGANIZACIONAL",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1287.58,
+   "top": 629.2400000000001,
+   "x1": 1354.48,
+   "bottom": 668.6800000000001,
+   "fill": "#fad3d2",
+   "text": "INGLES III",
+   "clave": "M208",
+   "nombre": "INGLES III",
+   "nivel_saes": 2,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 4
+  },
+  {
+   "x0": 1317.25,
+   "top": 703.0600000000001,
+   "x1": 1423.73,
+   "bottom": 742.5000000000001,
+   "fill": "#fad3d2",
+   "text": "LIDERAZGO Y EMPRENDEDORES",
+   "clave": "M209",
+   "nombre": "LIDERAZGO Y EMPRENDEDORES",
+   "nivel_saes": 2,
+   "creditos": 4.5,
+   "tipo": "O",
+   "sem": 5
+  },
+  {
+   "x0": 1360.53,
+   "top": 479.93000000000006,
+   "x1": 1446.88,
+   "bottom": 527.0800000000002,
+   "fill": "#ccecff",
+   "text": "COMUNICACION ORAL Y ESCRITA",
+   "clave": "M111",
+   "nombre": "COMUNICACION ORAL Y ESCRITA",
+   "nivel_saes": 1,
+   "creditos": 6.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1287.88,
+   "top": 557.4300000000001,
+   "x1": 1354.78,
+   "bottom": 596.8800000000001,
+   "fill": "#ccecff",
+   "text": "INGLES II",
+   "clave": "M115",
+   "nombre": "INGLES II",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 3
+  },
+  {
+   "x0": 1287.58,
+   "top": 479.93000000000006,
+   "x1": 1354.48,
+   "bottom": 527.0800000000002,
+   "fill": "#ccecff",
+   "text": "INGLES I",
+   "clave": "M114",
+   "nombre": "INGLES I",
+   "nivel_saes": 1,
+   "creditos": 3.0,
+   "tipo": "O",
+   "sem": 2
+  },
+  {
+   "x0": 1569.52,
+   "top": 849.5800000000002,
+   "x1": 1633.37,
+   "bottom": 887.2300000000001,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 7,
+   "slot": "Electiva"
+  },
+  {
+   "x0": 1569.52,
+   "top": 924.9900000000001,
+   "x1": 1633.37,
+   "bottom": 962.6400000000001,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 8,
+   "slot": "Electiva"
+  },
+  {
+   "x0": 1569.52,
+   "top": 995.2100000000002,
+   "x1": 1633.37,
+   "bottom": 1032.8600000000001,
+   "fill": null,
+   "text": "Electiva",
+   "sem": 9,
+   "slot": "Electiva"
+  },
+  {
+   "x0": 374.46,
+   "top": 700.8900000000001,
+   "x1": 480.94,
+   "bottom": 744.6700000000001,
+   "fill": "#fad3d2",
+   "text": "TERMODINAMICA",
+   "clave": "M222",
+   "nombre": "TERMODINAMICA",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O",
+   "sem": 5
+  }
+ ],
+ "edges": [
+  {
+   "s": 16,
+   "d": 18,
+   "pts": [
+    [
+     285.3,
+     1035.5
+    ],
+    [
+     285.3,
+     1049.0
+    ],
+    [
+     283.4,
+     1049.0
+    ],
+    [
+     283.4,
+     1062.6
+    ]
+   ]
+  },
+  {
+   "s": 6,
+   "d": 14,
+   "pts": [
+    [
+     287.4,
+     888.1
+    ],
+    [
+     287.4,
+     901.6
+    ],
+    [
+     285.3,
+     901.6
+    ],
+    [
+     285.3,
+     915.4
+    ]
+   ]
+  },
+  {
+   "s": 41,
+   "d": 53,
+   "pts": [
+    [
+     727.7,
+     600.1
+    ],
+    [
+     727.7,
+     613.6
+    ],
+    [
+     691.1,
+     613.6
+    ],
+    [
+     691.1,
+     619.0
+    ]
+   ]
+  },
+  {
+   "s": 53,
+   "d": 22,
+   "pts": [
+    [
+     691.1,
+     671.0
+    ],
+    [
+     691.1,
+     684.5
+    ],
+    [
+     672.7,
+     684.5
+    ],
+    [
+     672.7,
+     698.2
+    ]
+   ]
+  },
+  {
+   "s": 28,
+   "d": 2,
+   "pts": [
+    [
+     356.7,
+     667.8
+    ],
+    [
+     356.7,
+     786.7
+    ],
+    [
+     462.4,
+     786.7
+    ],
+    [
+     462.4,
+     843.9
+    ]
+   ]
+  },
+  {
+   "s": 33,
+   "d": 8,
+   "pts": [
+    [
+     902.8,
+     888.6
+    ],
+    [
+     902.8,
+     913.5
+    ],
+    [
+     948.9,
+     913.5
+    ],
+    [
+     948.9,
+     983.1
+    ],
+    [
+     897.8,
+     983.1
+    ],
+    [
+     897.8,
+     985.0
+    ]
+   ]
+  },
+  {
+   "s": 67,
+   "d": 66,
+   "pts": [
+    [
+     1321.0,
+     527.1
+    ],
+    [
+     1321.0,
+     540.6
+    ],
+    [
+     1321.3,
+     540.6
+    ],
+    [
+     1321.3,
+     552.6
+    ]
+   ]
+  },
+  {
+   "s": 66,
+   "d": 63,
+   "pts": [
+    [
+     1321.3,
+     596.9
+    ],
+    [
+     1321.3,
+     610.4
+    ],
+    [
+     1321.0,
+     610.4
+    ],
+    [
+     1321.0,
+     624.4
+    ]
+   ]
+  },
+  {
+   "s": 47,
+   "d": 25,
+   "pts": [
+    [
+     1117.9,
+     451.2
+    ],
+    [
+     1117.9,
+     458.0
+    ],
+    [
+     1123.9,
+     458.0
+    ],
+    [
+     1123.9,
+     552.6
+    ]
+   ]
+  },
+  {
+   "s": 0,
+   "d": 55,
+   "pts": [
+    [
+     993.0,
+     817.6
+    ],
+    [
+     993.0,
+     831.1
+    ],
+    [
+     1000.0,
+     831.1
+    ],
+    [
+     1000.0,
+     843.9
+    ]
+   ]
+  },
+  {
+   "s": 29,
+   "d": 34,
+   "pts": [
+    [
+     557.0,
+     742.5
+    ],
+    [
+     557.0,
+     756.0
+    ],
+    [
+     534.4,
+     756.0
+    ],
+    [
+     534.4,
+     771.3
+    ]
+   ]
+  },
+  {
+   "s": 48,
+   "d": 51,
+   "pts": [
+    [
+     1696.4,
+     454.4
+    ],
+    [
+     1692.0,
+     454.4
+    ],
+    [
+     1692.0,
+     479.0
+    ]
+   ]
+  },
+  {
+   "s": 42,
+   "d": 49,
+   "pts": [
+    [
+     1519.8,
+     453.9
+    ],
+    [
+     1519.8,
+     467.4
+    ],
+    [
+     1519.6,
+     467.4
+    ],
+    [
+     1519.6,
+     477.2
+    ]
+   ]
+  },
+  {
+   "s": 39,
+   "d": 24,
+   "pts": [
+    [
+     1611.6,
+     523.2
+    ],
+    [
+     1611.6,
+     536.7
+    ],
+    [
+     1642.0,
+     536.7
+    ],
+    [
+     1642.0,
+     547.6
+    ]
+   ]
+  },
+  {
+   "s": 19,
+   "d": 5,
+   "pts": [
+    [
+     953.3,
+     596.9
+    ],
+    [
+     953.3,
+     610.4
+    ],
+    [
+     885.2,
+     610.4
+    ],
+    [
+     885.2,
+     766.0
+    ]
+   ]
+  },
+  {
+   "s": 35,
+   "d": 1,
+   "pts": [
+    [
+     754.9,
+     817.7
+    ],
+    [
+     754.9,
+     831.2
+    ],
+    [
+     719.0,
+     831.2
+    ],
+    [
+     719.0,
+     843.9
+    ]
+   ]
+  },
+  {
+   "s": 24,
+   "d": 31,
+   "pts": [
+    [
+     1697.7,
+     592.5
+    ],
+    [
+     1714.6,
+     592.5
+    ],
+    [
+     1714.6,
+     794.0
+    ],
+    [
+     1658.1,
+     794.0
+    ]
+   ]
+  },
+  {
+   "s": 52,
+   "d": 23,
+   "pts": [
+    [
+     1519.6,
+     596.0
+    ],
+    [
+     1519.6,
+     609.5
+    ],
+    [
+     1591.9,
+     609.5
+    ],
+    [
+     1591.9,
+     624.4
+    ]
+   ]
+  },
+  {
+   "s": 23,
+   "d": 31,
+   "pts": [
+    [
+     1591.9,
+     668.7
+    ],
+    [
+     1591.9,
+     682.2
+    ],
+    [
+     1594.5,
+     682.2
+    ],
+    [
+     1594.5,
+     769.4
+    ]
+   ]
+  },
+  {
+   "s": 22,
+   "d": 54,
+   "pts": [
+    [
+     672.7,
+     750.2
+    ],
+    [
+     672.7,
+     798.6
+    ],
+    [
+     646.9,
+     798.6
+    ],
+    [
+     646.9,
+     943.8
+    ],
+    [
+     682.9,
+     943.8
+    ]
+   ]
+  },
+  {
+   "s": 27,
+   "d": 32,
+   "pts": [
+    [
+     835.9,
+     647.4
+    ],
+    [
+     882.2,
+     647.4
+    ],
+    [
+     885.2,
+     644.4
+    ],
+    [
+     888.2,
+     647.4
+    ],
+    [
+     1169.3,
+     647.4
+    ],
+    [
+     1169.3,
+     693.2
+    ]
+   ]
+  },
+  {
+   "s": 32,
+   "d": 30,
+   "pts": [
+    [
+     1169.3,
+     742.5
+    ],
+    [
+     1169.3,
+     756.0
+    ],
+    [
+     1170.8,
+     756.0
+    ],
+    [
+     1170.8,
+     765.6
+    ]
+   ]
+  },
+  {
+   "s": 50,
+   "d": 41,
+   "pts": [
+    [
+     727.7,
+     526.0
+    ],
+    [
+     727.7,
+     549.4
+    ]
+   ]
+  },
+  {
+   "s": 3,
+   "d": 4,
+   "pts": [
+    [
+     1813.4,
+     668.7
+    ],
+    [
+     1813.4,
+     698.2
+    ]
+   ]
+  },
+  {
+   "s": 4,
+   "d": 9,
+   "pts": [
+    [
+     1813.4,
+     742.5
+    ],
+    [
+     1813.4,
+     769.4
+    ]
+   ]
+  },
+  {
+   "s": 15,
+   "d": 17,
+   "pts": [
+    [
+     1813.4,
+     963.5
+    ],
+    [
+     1813.4,
+     989.5
+    ]
+   ]
+  },
+  {
+   "s": 49,
+   "d": 52,
+   "pts": [
+    [
+     1519.6,
+     525.0
+    ],
+    [
+     1519.6,
+     553.5
+    ]
+   ]
+  },
+  {
+   "s": 58,
+   "d": 59,
+   "pts": [
+    [
+     1370.5,
+     888.1
+    ],
+    [
+     1370.5,
+     919.3
+    ]
+   ]
+  },
+  {
+   "s": 55,
+   "d": 13,
+   "pts": [
+    [
+     1000.0,
+     888.1
+    ],
+    [
+     1000.0,
+     916.5
+    ]
+   ]
+  },
+  {
+   "s": 9,
+   "d": 11,
+   "pts": [
+    [
+     1813.4,
+     813.7
+    ],
+    [
+     1813.4,
+     842.5
+    ]
+   ]
+  },
+  {
+   "s": 11,
+   "d": 15,
+   "pts": [
+    [
+     1813.4,
+     888.1
+    ],
+    [
+     1813.4,
+     919.3
+    ]
+   ]
+  },
+  {
+   "s": 14,
+   "d": 16,
+   "pts": [
+    [
+     285.3,
+     967.4
+    ],
+    [
+     285.3,
+     987.7
+    ]
+   ]
+  }
+ ]
+}
