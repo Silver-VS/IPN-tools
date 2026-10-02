@@ -1899,6 +1899,7 @@ if(ALUMNO&&DATA.mapas[ALUMNO.carrera])S.car=ALUMNO.carrera;
 const mobNote=()=>{$('#mobnote').hidden=!(MQ_PHONE.matches&&!store.get('mobnote',0))};
 mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
 render();
+IPNT.bienvenida({select:'#f-carrera'});   // primera visita: unidad, carrera o inicio de sesión
 SAES.status(ALUMNO);
 SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[d.carrera]){S.car=d.carrera;store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
 </script>

@@ -12,7 +12,12 @@ import os
 import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-IPN_TENANT = "f94bf4d9-8097-4794-adf6-a5466ca28563"   # login.microsoftonline.com/alumno.ipn.mx (también ipn.mx)
+IPN_TENANT = "f94bf4d9-8097-4794-adf6-a5466ca28563"
+# unidades que ofrece la bienvenida (data/cuenta.json "unidades" la sustituye); "url" para las publicadas en otro sitio
+UNIDADES = [
+    {"id": "upiita", "siglas": "UPIITA", "nombre": "Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas", "disponible": True},
+    {"id": "escom", "siglas": "ESCOM", "nombre": "Escuela Superior de Cómputo", "disponible": False},
+]   # login.microsoftonline.com/alumno.ipn.mx (también ipn.mx)
 MSAL = ("https://cdn.jsdelivr.net/npm/@azure/msal-browser@4.30.0/lib/msal-browser.min.js",
         "sha384-RGxxfG5yRS8DLU7ZJ8OoLhbV/BsJFHyPuMVHrTLbpj3t5Z15LnviJmaznKY/a7LZ")
 
@@ -23,6 +28,7 @@ def config():
     v = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").exists() else ""
     return {"clientId": os.environ.get("IPNT_CLIENT_ID", c.get("clientId", "")), "tenant": c.get("tenant", IPN_TENANT),
             "googleClientId": os.environ.get("IPNT_GOOGLE_CLIENT_ID", c.get("googleClientId", "")),
+            "unidades": c.get("unidades", UNIDADES),
             "version": v, "unidad": c.get("unidad", "upiita"), "msal": MSAL[0], "sri": MSAL[1]}
 
 
@@ -313,8 +319,44 @@ var IPNT=window.IPNT=(()=>{
       prov=p;cuenta=a;ls.set('ipnt.prov',id);ls.set('ipnt.cuenta',a.username);pintar();sincronizar(true);
     }).catch(e=>{st.fase='error';st.error=texto(e);pintar()});
   }
+  /* ---- bienvenida: primera visita (sin carrera, planes, marcas, actividades ni sesión en este navegador) ---- */
+  const NUEVO=!ls.get('ipnt.bienvenida')&&!ls.get('ipnt.cuenta')&&!ls.keys().some(k=>/^(hu\.|ue\.|saes\.alumno$)/.test(k)&&!LOCAL.test(k));
+  function bienvenida(o){
+    const dl=$i('ipnt-hola'), sel=document.querySelector(o.select);
+    if(!NUEVO||!dl||!sel) return;
+    const UN=CFG.unidades||[], cars=[...sel.options].map(op=>[op.value,op.textContent.trim()]).filter(c=>c[0]);
+    let uni=CFG.unidad;
+    const listo=()=>{ls.set('ipnt.bienvenida','1');if(dl.close)dl.close();else dl.removeAttribute('open')};
+    const pintarH=()=>{
+      $i('ipnt-h-unis').innerHTML=UN.map(u=>`<button type="button" class="ipnt-uni" data-uni="${esc(u.id)}" aria-pressed="${u.id===uni}"><b>${esc(u.siglas)}</b><small>${esc(u.nombre)}</small>${u.disponible?'':'<em>En preparación</em>'}</button>`).join('');
+      const u=UN.find(x=>x.id===uni)||{};
+      $i('ipnt-h-cars').innerHTML=u.id===CFG.unidad?
+        `<h3>2. Elige tu carrera</h3><div class="ipnt-cars">${cars.map(([k,v])=>`<button type="button" class="btn" data-car="${esc(k)}">${esc(v)}</button>`).join('')}</div>`:
+        u.url?`<p>La herramienta de ${esc(u.siglas)} está en <a href="${esc(u.url)}">${esc(u.url)}</a>.</p>`:
+        `<p class="saes-note">La versión para ${esc(u.siglas||'tu unidad')} se está preparando con alumnos de la unidad. Mientras tanto puedes explorar la de la ${esc((UN.find(x=>x.id===CFG.unidad)||{}).siglas||'')}.</p>`;
+      $i('ipnt-h-yo').hidden=!cuenta;
+      if(cuenta)$i('ipnt-h-yo').textContent=`Sesión iniciada: ${cuenta.name||cuenta.username}. Si ya tenías datos guardados, la página se actualizará sola; si no, elige tu carrera.`;
+      $i('ipnt-h-ms').hidden=!MS.disponible();$i('ipnt-h-go').hidden=!GO.disponible();
+      $i('ipnt-h-login').hidden=!!cuenta||!(MS.disponible()||GO.disponible());
+    };
+    dl.addEventListener('click',async e=>{
+      const b=e.target.closest('button');if(!b)return;
+      if(b.dataset.uni){uni=b.dataset.uni;pintarH();return}
+      if(b.dataset.car){sel.value=b.dataset.car;sel.dispatchEvent(new Event('change',{bubbles:true}));listo();return}
+      if(b.dataset.prov){
+        const m=$i('ipnt-h-msg');m.className='ipnt-state';m.textContent='Abriendo el inicio de sesión…';
+        await entrar(b.dataset.prov);
+        if(cuenta){m.textContent='';ls.set('ipnt.bienvenida','1')}else{m.className='ipnt-state bad';m.textContent=st.error||''}
+        pintarH();return}
+      if(b.hasAttribute('data-hola-x'))listo();
+    });
+    dl.addEventListener('cancel',()=>ls.set('ipnt.bienvenida','1'));   // Esc: no se vuelve a mostrar
+    if(MS.disponible())MS.listo().catch(()=>{});if(GO.disponible())GO.listo().catch(()=>{});   // listas para el clic
+    pintarH();
+    if(dl.showModal)dl.showModal();else dl.setAttribute('open','');
+  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else setTimeout(wire,0);
-  return {set,touch,borrar,documento,fusionar,validar,sincronizar,descargar,restaurar,get cuenta(){return cuenta},get proveedor(){return prov?.id||null}};
+  return {bienvenida,set,touch,borrar,documento,fusionar,validar,sincronizar,descargar,restaurar,get cuenta(){return cuenta},get proveedor(){return prov?.id||null}};
 })();
 """
 
@@ -335,6 +377,15 @@ CSS = r"""
 .ipnt-file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .ipnt-ms{display:inline-flex;align-items:center;gap:8px}
 .ipnt-dlg button:disabled{opacity:.5;cursor:not-allowed}
+.ipnt-hola{width:min(640px,calc(100vw / var(--ui-zoom,1) - 32px))}
+.ipnt-hola .lead{margin:0;font-size:.95rem;color:var(--muted)}
+.ipnt-unis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.ipnt-uni{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:10px 12px;font:inherit;cursor:pointer}
+.ipnt-uni b{font-size:1rem} .ipnt-uni small{color:var(--muted);font-size:.78rem;line-height:1.3}
+.ipnt-uni em{font-style:normal;font-size:.72rem;font-weight:600;color:var(--warn)}
+.ipnt-uni[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.ipnt-cars{display:flex;flex-wrap:wrap;gap:8px}
+.ipnt-hola .alt{margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
 """
 
 UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dialog" title="Inicia sesión para guardar tus datos en tu nube">
@@ -364,6 +415,21 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
   <div class="row"><button class="btn" id="ipnt-down" type="button">Descargar respaldo</button><label class="btn ipnt-file">Restaurar desde archivo<input type="file" id="ipnt-file" accept=".json,application/json"></label></div>
   <p class="ipnt-state" id="ipnt-filemsg" aria-live="polite"></p>
   <p class="saes-note" style="margin:14px 0 0">Tus datos se guardan en tu propia nube: en OneDrive, en la carpeta <b>Aplicaciones › IPN-tools</b>; en Google Drive, en un espacio privado de la aplicación que no aparece entre tus archivos. La herramienta solo tiene acceso a ese espacio. No hay servidor intermedio: nadie más puede consultarlos.</p>
+</dialog>
+<dialog class="saes-dlg ipnt-dlg ipnt-hola" id="ipnt-hola" aria-labelledby="ipnt-hola-h">
+  <div class="dl-head"><h2 id="ipnt-hola-h">Bienvenida</h2><button class="x" type="button" data-hola-x aria-label="Cerrar">×</button></div>
+  <p class="lead">Para empezar, dinos de qué unidad y carrera eres. Puedes cambiarlo después.</p>
+  <h3>1. Elige tu unidad académica</h3>
+  <div class="ipnt-unis" id="ipnt-h-unis"></div>
+  <div id="ipnt-h-cars"></div>
+  <div class="alt">
+    <div id="ipnt-h-login"><p style="margin:0 0 8px;font-size:.92rem">¿Ya la usaste en otro dispositivo? Inicia sesión y se cargan tus datos.</p>
+      <div class="row"><button class="btn ipnt-ms" id="ipnt-h-ms" type="button" data-prov="ms"><svg viewBox="0 0 21 21" width="16" height="16" aria-hidden="true"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>Continuar con Microsoft</button>
+      <button class="btn ipnt-ms" id="ipnt-h-go" type="button" data-prov="google"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</button></div></div>
+    <p id="ipnt-h-yo" hidden style="margin:0;font-size:.92rem"></p>
+    <p class="ipnt-state" id="ipnt-h-msg" aria-live="polite"></p>
+    <p style="margin:6px 0 0"><button class="link" type="button" data-hola-x>Explorar sin elegir</button></p>
+  </div>
 </dialog>"""
 
 AUTH = """<!doctype html><html lang="es"><meta charset="utf-8"><title>Iniciando sesión…</title>

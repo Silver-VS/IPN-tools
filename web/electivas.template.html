@@ -579,6 +579,7 @@ const fromSaes=d=>{if(!d)return;const w=(d.nombre||'').trim().split(/\s+/);
   if(REQ[d.carrera]){S.car=d.carrera;S.o.car=d.carrera}save()};
 fromSaes(SAES.load());
 renderCat();render();
+IPNT.bienvenida({select:'#carrera'});   // primera visita: unidad, carrera o inicio de sesión
 SAES.status(SAES.load());
 SAES.wire(d=>{fromSaes(d);render();SAES.status(d)});
 </script>
