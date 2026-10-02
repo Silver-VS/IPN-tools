@@ -267,6 +267,8 @@ def main():
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", payload)
     from skins import inject
     html = inject(html)
+    import cuenta   # perfil IPN-tools: respaldo y sincronización con la cuenta institucional
+    html = cuenta.inject(html)
     import saes
     # el marcador de la versión compartida abre esta herramienta; el de la versión institucional, la URL del servidor (pendiente)
     OUT.write_text(saes.inject(html, "horarios", "https://claude.ai/artifact/2ujcEF2YK8FZrYjoyPbKEk"), encoding="utf-8")
@@ -274,6 +276,7 @@ def main():
     import os
     site = os.environ.get("UPIITA_SITE", "")  # p. ej. https://silver-vs.github.io/upiita/ : el marcador abre esta dirección
     write_dist("horarios", saes.inject(html, "horarios", site + "horarios.html" if site else ""))
+    (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")   # retorno del inicio de sesión (ventana emergente)
     if site:   # Lector publicado como archivo para el marcador corto (Chrome para Android corta los marcadores largos)
         (ROOT / "web" / "dist" / "lector.js").write_text(saes.lector_js(site + "horarios.html"), encoding="utf-8")
         # capturador de la oferta del SAES (cualquier unidad) para el marcador corto

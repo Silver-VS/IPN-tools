@@ -55,6 +55,8 @@ def main():
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", __import__("acentos").acentuar(json.dumps(data, ensure_ascii=False, separators=(",", ":"))))
     from skins import inject
     html = inject(html)
+    import cuenta   # perfil IPN-tools: respaldo y sincronización con la cuenta institucional
+    html = cuenta.inject(html)
     import saes
     # el marcador de la versión compartida abre esta herramienta; el de la versión institucional, la URL del servidor (pendiente)
     OUT.write_text(saes.inject(html, "electivas", "https://claude.ai/artifact/DT1GkGs8Jzmu9D3CgiSTGg"), encoding="utf-8")

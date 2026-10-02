@@ -127,6 +127,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 }
 /*__SKINS__*/
 /*__SAES_CSS__*/
+/*__CUENTA_CSS__*/
 .slot.saes{border:1.5px solid var(--ok);color:var(--ok);font-weight:600}
 </style>
 
@@ -134,7 +135,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 <div class="wrap">
   <header class="top">
     <div>
-      <div class="title-row"><h1>Electivas UPIITA</h1><!--__THEME_BTN__--></div>
+      <div class="title-row"><h1>Electivas UPIITA</h1><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div>
       <p>Identifica las actividades acreditables como electiva, calcula los créditos y genera el formato DIE-03 y el formulario, listos para firma y entrega.</p>
     </div>
     <label class="field" style="min-width:240px"><span>Tu carrera</span>
@@ -295,7 +296,8 @@ const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const norm=s=>String(s).normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
 const floor2=x=>Math.floor(x*100+1e-6)/100;
 const fmt=x=>(+x).toFixed(2).replace(/\.?0+$/,'');
-const store={get(k,d){try{const v=localStorage.getItem('ue.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('ue.'+k,JSON.stringify(v))}catch(e){}}};
+/*__CUENTA_JS__*/
+const store={get(k,d){try{const v=localStorage.getItem('ue.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){IPNT.set('ue.'+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
 
 const S=store.get('s',{car:'B',d:{ap:'',no:'',bo:'',co:''},acts:[],f:{q1:'',sob:'',q2:'',q2p:'',q3:'',q3n:'',q3a:'',q3r:'',q3p:'',q4:'',q5:'si',obs:''},o:{car:'',cls:'',per:'27/1',pmail:'',dep:''}});
 const save=()=>store.set('s',S);

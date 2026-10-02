@@ -37,8 +37,8 @@ JS = r"""
 const SAES={
   KEY:'saes.alumno',
   load(){try{const v=JSON.parse(localStorage.getItem(this.KEY)||'null');return v&&v.upiita_saes===1?v:null}catch(e){return null}},
-  save(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
-  clear(){try{localStorage.removeItem(this.KEY)}catch(e){}},
+  save(d){if(window.IPNT)IPNT.set(this.KEY,JSON.stringify(d));else try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
+  clear(){try{localStorage.removeItem(this.KEY)}catch(e){}if(window.IPNT)IPNT.borrar(this.KEY)},
   parse(t){try{const d=JSON.parse(String(t||'').trim());if(d&&d.upiita_saes===1&&Array.isArray(d.acreditadas))return d}catch(e){}return null},
   autorizada(d){const m=String(d?.avance?.autorizada||'').match(/(\d+(?:\.\d+)?)\s*CR/i)||String(d?.avance?.autorizada||'').match(/(\d+(?:\.\d+)?)/);return m?+m[1]:null},
   open(){const dl=document.getElementById('saes-dlg');if(!dl)return;if(dl.showModal&&!dl.open)dl.showModal();else dl.setAttribute('open','')},

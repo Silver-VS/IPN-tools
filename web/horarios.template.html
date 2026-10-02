@@ -430,13 +430,14 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   .planner{position:static;max-height:none;overflow:visible;padding-right:0}
 }
 /*__SAES_CSS__*/
+/*__CUENTA_CSS__*/
 </style>
 
 <!--__INST_HEADER__-->
 <div class="wrap">
   <header class="top">
     <div class="brand">
-      <div class="title-row"><h1>Horarios UPIITA</h1><!--__THEME_BTN__--></div>
+      <div class="title-row"><h1>Horarios UPIITA</h1><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div>
       <p>Consulta tu trayectoria académica, selecciona materias y organiza tu horario para la reinscripción.</p>
     </div>
     <nav class="tabs" role="tablist" aria-label="Pantallas">
@@ -626,7 +627,8 @@ const norm=s=>s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
 const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
 const fmtCr=n=>Number.isInteger(+n)?String(+n):(+n).toFixed(2).replace(/0$/,'');
-const store={get(k,d){try{const v=localStorage.getItem('hu.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('hu.'+k,JSON.stringify(v))}catch(e){}}};
+/*__CUENTA_JS__*/
+const store={get(k,d){try{const v=localStorage.getItem('hu.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){IPNT.set('hu.'+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
 
 const S={tab:store.get('tab','tray'),per:store.get('per','proximo'),car:store.get('car','B'),tur:store.get('tur','*'),niv:store.get('niv','*'),q:'',view:store.get('view','materia'),
   hide:store.get('hide',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
