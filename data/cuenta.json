@@ -1,5 +1,6 @@
 {
-  "clientId": "",
-  "tenant": "f94bf4d9-8097-4794-adf6-a5466ca28563",
+  "clientId": "7e8e5a95-4337-4652-8b07-3450306cda8f",
+  "tenant": "common",
+  "tenant_produccion": "f94bf4d9-8097-4794-adf6-a5466ca28563",
   "unidad": "upiita"
 }
