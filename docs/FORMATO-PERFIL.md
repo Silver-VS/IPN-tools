@@ -70,10 +70,16 @@ su `t` es mayor que la del valor. Así, dos dispositivos que editan claves disti
 - **Restaurar un respaldo:** reemplaza los valores del navegador por los del archivo (con la hora actual), y
   después se sincronizan como cualquier cambio.
 
-## Almacenamiento en la cuenta institucional
+## Almacenamiento en la nube del alumno
 
-- Inicio de sesión con Microsoft Entra ID (MSAL.js), solo cuentas del tenant del IPN
-  (`f94bf4d9-8097-4794-adf6-a5466ca28563`: `@alumno.ipn.mx`, `@ipn.mx`).
+Dos proveedores con la misma interfaz (`tools/cuenta.py`): Microsoft (OneDrive) y Google (Google Drive,
+`appDataFolder`, ver `docs/CUENTA-GOOGLE.md`). El archivo y el formato son los mismos en ambos.
+
+### Microsoft
+
+- Inicio de sesión con Microsoft Entra ID (MSAL.js). En producción, solo cuentas del tenant del IPN
+  (`f94bf4d9-8097-4794-adf6-a5466ca28563`: `@alumno.ipn.mx`, `@ipn.mx`); en pruebas, `common` (también personales).
+  Las cuentas del IPN requieren la aprobación del administrador del IPN (app multiinquilino de editor no verificado).
 - Permiso único: `Files.ReadWrite.AppFolder`. La aplicación solo ve su propia carpeta
   (`OneDrive › Aplicaciones › IPN-tools`), no el resto de los archivos del alumno.
 - Archivo: `perfil.ipnt.json` en esa carpeta (Graph: `/me/drive/special/approot:/perfil.ipnt.json`).
