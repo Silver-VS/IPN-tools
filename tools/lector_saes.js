@@ -1,15 +1,21 @@
 /* Lector UPIITA (marcador / bookmarklet).
-   Se ejecuta dentro del SAES de la UPIITA con la sesión del alumno ya iniciada.
+   Se ejecuta dentro del SAES de cualquier unidad (saes.<unidad>.ipn.mx) con la sesión del alumno ya iniciada.
+   Los ids cambian entre unidades (UPIITA: ctl00_mainCopy_…, ESCOM: mainCopy_…): se buscan por terminación.
    Solo LEE dos páginas (GET): Kárdex y Cita de reinscripción. No envía datos a ningún servidor:
    arma un resumen, lo muestra en pantalla y lo copia al portapapeles cuando el alumno lo pide,
    para pegarlo en Horarios UPIITA o Electivas UPIITA.
    tools/saes.py lo convierte en un enlace javascript: y sustituye __TOOL_URL__. */
 (async function () {
   var TOOL = '__TOOL_URL__';
-  if (!/saes\.upiita\.ipn\.mx$/i.test(location.hostname)) {
-    alert('Abre este marcador dentro del SAES de la UPIITA (saes.upiita.ipn.mx), con tu sesión iniciada.');
+  var UM = location.hostname.match(/(?:^|\.)saes\.([a-z0-9-]+)\.ipn\.mx$/i);
+  if (!UM) {
+    alert('Abre este marcador dentro del SAES de tu unidad (por ejemplo, saes.upiita.ipn.mx), con tu sesión iniciada.');
     return;
   }
+  var UNIDAD = UM[1].toLowerCase();
+  // claves: letra + 3 dígitos (B101) o con letras (optativas de la ESCOM); siempre con al menos un dígito
+  var CLAVE = /^(?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6}$/i;
+  var byId = function (d, id) { return d.querySelector('[id$="mainCopy_' + id + '"]'); };
   var old = document.getElementById('upiita-lector');
   if (old) old.remove();
   var clean = function (s) { return String(s || '').replace(/\s+/g, ' ').trim(); };
@@ -20,7 +26,7 @@
   };
   var get = async function (path) {
     var d = await getRaw(path);
-    if (!d.getElementById('ctl00_mainCopy_Lbl_Nombre') && !d.querySelector('[id*="Lbl_Kardex"]')) throw new Error('sesion');
+    if (!byId(d, 'Lbl_Nombre') && !d.querySelector('[id*="Lbl_Kardex"]')) throw new Error('sesion');
     return d;
   };
   /* tablas de la cita: renglón de encabezados seguido de renglón de valores */
@@ -57,12 +63,12 @@
   try {
     var cita = await get('/Alumnos/Reinscripciones/fichas_reinscripcion.aspx');
     var kx = await get('/Alumnos/boleta/kardex.aspx');
-    var gen = clean((cita.getElementById('ctl00_mainCopy_Lbl_General') || {}).textContent);
+    var gen = clean((byId(cita, 'Lbl_General') || {}).textContent);
     var p = pairs(cita);
     var acred = [];
     kx.querySelectorAll('[id*="Lbl_Kardex"] table tr').forEach(function (tr) {
       var c = Array.prototype.map.call(tr.cells, function (x) { return clean(x.textContent); });
-      if (c.length >= 6 && /^[A-Z]\d{3}$/i.test(c[0])) {
+      if (c.length >= 6 && CLAVE.test(c[0])) {
         var cal = num(c[5]);
         if (cal !== null && cal >= 6) acred.push([c[0].toUpperCase(), cal, c[3], c[4]]);
       }
@@ -77,31 +83,39 @@
         if (on && c.length >= 2 && !/total/i.test(c[0]) && num(c[1]) !== null) repro.push([c[0], num(c[1])]);
       });
     });
-    /* opcionales: Estado General (reprobadas con periodo y veces cursada) e Inscripción actual (materias en curso) */
-    var estado = [], curso = [], horario = [];
+    /* opcionales: Estado General e Inscripción actual (materias en curso).
+       Estado General tiene secciones con su título (MATERIAS REPROBADAS, NO CURSADAS, DESFASADAS) seguidas de su tabla;
+       las no cursadas y desfasadas aparecen en los planes por semestre (ESCOM). Renglón: No_Periodo | clave | nombre | periodo | veces */
+    var estado = [], curso = [], horario = [], secc = { reprobadas: [], no_cursadas: [], desfasadas: [] };
     try {
-      var est = await getRaw('/Alumnos/boleta/Estado_Alumno.aspx');
-      var gv = est.getElementById('ctl00_mainCopy_GV_Reprobadas');
-      if (gv) Array.prototype.slice.call(gv.rows, 1).forEach(function (r) {
-        var c = Array.prototype.map.call(r.cells, function (x) { return clean(x.textContent); });
-        if (/^[A-Z]\d{3}$/i.test(c[1] || '')) estado.push([c[1].toUpperCase(), c[3], num(c[4])]);
+      var est = await getRaw('/Alumnos/boleta/Estado_Alumno.aspx'), sec = 'reprobadas';
+      est.querySelectorAll('[id*="mainCopy_"]').forEach(function (el) {
+        var t = clean(el.value || (el.tagName === 'TABLE' ? '' : el.textContent));
+        if (el.tagName !== 'TABLE' && !el.closest('[id*="GV_"]') && !el.querySelector('table') && /^MATERIAS\s/i.test(t)) { sec = /NO CURSADAS/i.test(t) ? 'no_cursadas' : /DESFASADAS/i.test(t) ? 'desfasadas' : 'reprobadas'; return; }
+        if (el.tagName !== 'TABLE' || !/GV_/i.test(el.id)) return;
+        var dest = /Reprobadas/i.test(el.id) ? 'reprobadas' : sec;   // UPIITA: GV_Reprobadas
+        Array.prototype.slice.call(el.rows, 1).forEach(function (r) {
+          var c = Array.prototype.map.call(r.cells, function (x) { return clean(x.textContent); });
+          if (CLAVE.test(c[1] || '')) secc[dest].push([c[1].toUpperCase(), c[3] || null, num(c[4]), num(c[0])]);
+        });
       });
-    } catch (e) { estado = null; }
+      estado = secc.reprobadas.map(function (r) { return r.slice(0, 3); });
+    } catch (e) { estado = null; secc = null; }
     try {
       var hor = await getRaw('/Alumnos/Informacion_semestral/Horario_Alumno.aspx');
       hor.querySelectorAll('[id*="GV_Horario"] [id$="Lbl_Materia"]').forEach(function (s) {
-        var m = clean(s.textContent).match(/^([A-Z]\d{3})\b/i);
+        var m = clean(s.textContent).match(/^((?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6})\b/i);
         if (m) curso.push(m[1].toUpperCase());
       });
       /* horario inscrito completo: [grupo, clave, materia, profesores, [[día, inicio, fin], ...]] (minutos desde 0:00) */
-      var gvh = hor.getElementById('ctl00_mainCopy_GV_Horario');
+      var gvh = byId(hor, 'GV_Horario');
       if (gvh && gvh.rows.length > 1) {
         var DIAS = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado'];
         var hdr = Array.prototype.map.call(gvh.rows[0].cells, function (c) { return clean(c.textContent).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); });
         var mins = function (t) { var x = t.split(':'); return +x[0] * 60 + +x[1]; };
         Array.prototype.slice.call(gvh.rows, 1).forEach(function (r) {
           var c = Array.prototype.map.call(r.cells, function (x) { return clean(x.textContent); });
-          var m = (c[1] || '').match(/^([A-Z]\d{3})\s*-\s*(.*)$/i);
+          var m = (c[1] || '').match(/^((?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6})\s*-\s*(.*)$/i);
           if (!m) return;
           var ses = [];
           hdr.forEach(function (h, i) {
@@ -112,15 +126,17 @@
         });
       }
     } catch (e) { curso = null; horario = null; }
-    var claveCar = acred.length ? acred[0][0][0] : null;
+    var freq = {}; acred.forEach(function (a) { freq[a[0][0]] = (freq[a[0][0]] || 0) + 1; });
+    var claveCar = Object.keys(freq).sort(function (a, b) { return freq[b] - freq[a]; })[0] || null;
     var data = {
       upiita_saes: 1,
+      unidad: UNIDAD,
       leido: new Date().toISOString(),
       boleta: (gen.match(/BOLETA:\s*(\d{10})/i) || [])[1] || ((label(cita, /^BOLETA:?$/i) || '').match(/\d{10}/) || [])[0] || null,
-      nombre: (gen.match(/NOMBRE:\s*(.+?)\s*(CARRERA|PLAN|$)/i) || [])[1] || label(cita, /^NOMBRE:?$/i) || clean((cita.getElementById('ctl00_mainCopy_Lbl_Nombre') || {}).textContent),
+      nombre: (gen.match(/NOMBRE:\s*(.+?)\s*(CARRERA|PLAN|$)/i) || [])[1] || label(cita, /^NOMBRE:?$/i) || clean((byId(cita, 'Lbl_Nombre') || {}).textContent),
       carrera: claveCar,
-      carrera_nombre: clean((cita.querySelector('#ctl00_mainCopy_DpdCarrera option:checked') || {}).textContent),
-      plan: (cita.querySelector('#ctl00_mainCopy_dpdPlanEstudios option:checked') || {}).value || null,
+      carrera_nombre: clean((cita.querySelector('[id$="mainCopy_DpdCarrera"] option:checked') || {}).textContent),
+      plan: (cita.querySelector('[id$="mainCopy_dpdPlanEstudios"] option:checked') || {}).value || null,
       promedio: num(pick(p, /^promedio/i)),
       reprobadas_num: num(pick(p, /reprobadas$/i)),
       cita: { inicio: pick(p, /fecha inscrip/i), fin: pick(p, /caducidad/i) },
@@ -137,6 +153,9 @@
       reprobadas: repro,
       desfase_saes: pick(p, /reprobadas de \d/i),
       reprobadas_periodo: estado,
+      /* planes por semestre: lo que el propio SAES calcula ([clave, periodo, veces, semestre]) */
+      no_cursadas: secc ? secc.no_cursadas : null,
+      desfasadas_saes: secc ? secc.desfasadas : null,
       en_curso: curso,
       horario_inscrito: horario,
       acreditadas: acred

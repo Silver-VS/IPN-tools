@@ -51,6 +51,7 @@ const SAES={
     dl.querySelector('#saes-x').addEventListener('click',()=>SAES.close());
     dl.addEventListener('click',e=>{if(e.target===dl)SAES.close()});   // clic fuera de la ventana
     const take=t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector UPIITA. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
+      if(d.unidad&&d.unidad!=='upiita'){msg.innerHTML='<span class="bad">Estos datos son del SAES de '+String(d.unidad).toUpperCase()+'. Esta versión de la herramienta es de la UPIITA.</span>';return}
       SAES.save(d);paste.value='';msg.innerHTML='<span class="ok">Datos del SAES cargados.</span>';onLoad(d);setTimeout(()=>SAES.close(),900)};
     paste.addEventListener('paste',e=>{e.preventDefault();take(e.clipboardData.getData('text'))});
     paste.addEventListener('input',()=>{if(paste.value.trim().startsWith('{'))take(paste.value)});
