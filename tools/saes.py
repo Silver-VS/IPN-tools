@@ -82,7 +82,7 @@ const SAES={
   },
   status(d){
     const st=document.getElementById('saes-status'), btn=document.getElementById('saes-open');
-    if(btn){btn.classList.toggle('on',!!d);btn.querySelector('span').textContent=d?'Mis datos del SAES':'Usar mis datos del SAES';
+    if(btn){btn.classList.toggle('on',!!d);btn.querySelector('span').textContent=d?'Actualizar mis datos del SAES':'Usar mis datos del SAES';
       btn.title=d?'Datos del SAES cargados. Selecciona para actualizarlos o eliminarlos.':'Incorpora tu avance desde el SAES (opcional)'}
     if(!st)return;
     st.hidden=!d;document.getElementById('saes-steps').hidden=!!d;document.getElementById('saes-clear').hidden=!d;

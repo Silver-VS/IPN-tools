@@ -38,11 +38,12 @@ var IPNT=window.IPNT=(()=>{
   const CFG=/*__IPNT_CFG__*/{}, FILE='perfil.ipnt.json', MS_SCOPES=['Files.ReadWrite.AppFolder'],
     GO_SCOPES='openid email profile https://www.googleapis.com/auth/drive.appdata';
   // qué se guarda: todo lo de Horarios (hu.) y Electivas (ue.), menos el estado de pantalla de cada dispositivo
-  const SYNC=/^(hu\.|ue\.)|^saes\.alumno$/, LOCAL=/^hu\.(tab|per|tur|niv|view|mview|cview|mobnote)$/;
+  const SYNC=/^(hu\.|ue\.)|^saes\.alumno$|^perfil\.opciones$/, LOCAL=/^hu\.(tab|per|tur|niv|view|mview|cview|mobnote)$/;
   const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}},
     del(k){try{localStorage.removeItem(k)}catch(e){}},keys(){try{return Object.keys(localStorage)}catch(e){return[]}},
     obj(k,d){try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}},put(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(e){}}};
-  const opt=()=>ls.obj('ipnt.opt',{saes:false});
+  const opt=()=>ls.obj('perfil.opciones',null)||ls.obj('ipnt.opt',{saes:false});   // ipnt.opt: versión anterior (solo local)
+  if(!ls.get('perfil.opciones')&&ls.get('ipnt.opt')) ls.set('perfil.opciones',ls.get('ipnt.opt'));   // migración de la casilla local
   const sincroniza=k=>SYNC.test(k)&&!LOCAL.test(k)&&(k!=='saes.alumno'||opt().saes);
   const parse=s=>{try{return JSON.parse(s)}catch(e){return s}};
   let timer=null, busy=null, prov=null, cuenta=null, st={fase:'',ultimo:ls.get('ipnt.last'),error:''};
@@ -63,17 +64,22 @@ var IPNT=window.IPNT=(()=>{
     if(d.ipnt>1) throw new Error('El perfil se guardó con una versión más nueva de la herramienta. Actualiza la página.');
     return d;
   }
-  // fusión clave por clave: gana la marca de tiempo más reciente; devuelve cuántas claves cambiaron aquí
-  function fusionar(d){
+  // fusión clave por clave: gana la marca de tiempo más reciente; devuelve cuántas claves cambiaron aquí.
+  // nubeGana (al iniciar sesión): lo guardado en la cuenta sustituye lo que había en el navegador; lo que solo
+  // existe en el navegador se conserva y se sube.
+  function fusionar(d,nubeGana){
     const t=ls.obj('ipnt.t',{}), b=ls.obj('ipnt.b',{});let n=0;
-    for(const [k,e] of Object.entries(d.claves||{})){
+    // perfiles guardados antes de que la casilla se sincronizara: si la nube trae datos del SAES, el alumno ya lo autorizó
+    if(d.claves?.['saes.alumno']&&!d.claves['perfil.opciones']&&!ls.get('perfil.opciones')){ls.set('perfil.opciones',JSON.stringify({saes:true}));t['perfil.opciones']=0}
+    const es=Object.entries(d.claves||{}).sort(([a],[c])=>(c==='perfil.opciones')-(a==='perfil.opciones'));
+    for(const [k,e] of es){
       if(!sincroniza(k)||!e) continue;
       const mia=t[k]??b[k]??null, hay=ls.get(k)!=null;
-      if((e.t||0)>(mia||0)||(!hay&&mia==null)){const v=JSON.stringify(e.v);if(ls.get(k)!==v){ls.set(k,v);n++}t[k]=e.t||0;delete b[k]}
+      if(nubeGana||(e.t||0)>(mia||0)||(!hay&&mia==null)){const v=JSON.stringify(e.v);if(ls.get(k)!==v){ls.set(k,v);n++}t[k]=e.t||0;delete b[k]}
     }
     for(const [k,bt] of Object.entries(d.borrados||{})){
       if(!sincroniza(k)) continue;
-      if(bt>(t[k]||0)&&ls.get(k)!=null){ls.del(k);n++;b[k]=bt;delete t[k]}
+      if((nubeGana||bt>(t[k]||0))&&ls.get(k)!=null){ls.del(k);n++;b[k]=bt;delete t[k]}
     }
     ls.put('ipnt.t',t);ls.put('ipnt.b',b);return n;
   }
@@ -84,7 +90,7 @@ var IPNT=window.IPNT=(()=>{
   // escritura de las páginas: solo cuenta como cambio si el valor es distinto (volver a guardar lo mismo no gana la fusión)
   function set(k,v){const antes=ls.get(k);if(!ls.set(k,v))return;if(antes!==v)touch(k)}
   function borrar(k){if(!sincroniza(k))return;const t=ls.obj('ipnt.t',{}),b=ls.obj('ipnt.b',{});delete t[k];b[k]=Date.now();ls.put('ipnt.t',t);ls.put('ipnt.b',b);programar()}
-  function programar(){if(!cuenta)return;clearTimeout(timer);timer=setTimeout(()=>{timer=null;sincronizar(false)},3000)}
+  function programar(){if(!cuenta)return;clearTimeout(timer);timer=setTimeout(()=>{timer=null;sincronizar('auto')},3000)}
 
   /* ---- proveedores: misma interfaz (disponible, listo, recuperar, entrar, bajar, subir, salir) ---- */
   const cargar=(src,attrs={})=>new Promise((ok,no)=>{const s=document.createElement('script');s.src=src;Object.assign(s,attrs);
@@ -198,7 +204,9 @@ var IPNT=window.IPNT=(()=>{
   };
   const PROV={ms:MS,google:GO};
 
-  function sincronizar(alAbrir){
+  /* modo: 'login' (gana la nube y se recarga), 'abrir' y 'volver' (al abrir la página o regresar a la pestaña: se
+     recarga si llegaron cambios de otro dispositivo), 'auto' (tras un cambio propio: solo se avisa) */
+  function sincronizar(modo){
     if(!cuenta||!prov) return Promise.resolve(0);
     if(busy){programar();return busy}
     st.fase='sync';st.error='';pintar();
@@ -206,7 +214,7 @@ var IPNT=window.IPNT=(()=>{
       let cambios=0;
       for(let i=0;i<3;i++){
         const {doc,ver}=await prov.bajar();
-        if(doc) cambios+=fusionar(doc);
+        if(doc) cambios+=fusionar(doc,modo==='login'&&i===0);
         const mio=documento(doc);
         if(doc&&firma(doc)===firma(mio)) return cambios;
         if(await prov.subir(mio,ver)) return cambios;
@@ -215,12 +223,11 @@ var IPNT=window.IPNT=(()=>{
     })().then(n=>{
       st.fase='ok';st.ultimo=new Date().toISOString();ls.set('ipnt.last',st.ultimo);
       if(n>0){
-        // con la página recién abierta se recarga sola (una vez); a mitad del uso, se avisa
-        let ya=false;try{ya=sessionStorage.getItem('ipnt.recarga')==='1'}catch(e){}
-        if(alAbrir&&!ya){try{sessionStorage.setItem('ipnt.recarga','1')}catch(e){}location.reload();return n}
+        // la página lee sus datos al cargar: se recarga para mostrarlos (sin repetir en menos de 15 s, para no ciclar)
+        let ult=0;try{ult=+sessionStorage.getItem('ipnt.recarga')||0}catch(e){}
+        if(modo!=='auto'&&Date.now()-ult>15000){try{sessionStorage.setItem('ipnt.recarga',String(Date.now()))}catch(e){}location.reload();return n}
         st.fase='cambios';
       }
-      try{sessionStorage.removeItem('ipnt.recarga')}catch(e){}
       return n;
     }).catch(e=>{st.fase=e?.expirada?'expirada':'error';st.error=texto(e);return 0}).finally(()=>{busy=null;pintar()});
     return busy;
@@ -237,7 +244,7 @@ var IPNT=window.IPNT=(()=>{
       const a=await p.entrar();if(!a)return;   // redirección en curso
       if(prov&&prov!==p) await prov.salir();
       prov=p;cuenta=a;ls.set('ipnt.prov',id);ls.set('ipnt.cuenta',a.username);
-      await sincronizar(true);
+      await sincronizar('login');
     }catch(e){st.fase='error';st.error=texto(e);pintar()}
   }
   async function salir(borrarLocal){
@@ -259,7 +266,7 @@ var IPNT=window.IPNT=(()=>{
     const b=ls.obj('ipnt.b',{});
     for(const [k,e] of Object.entries(d.claves)) if(SYNC.test(k)&&!LOCAL.test(k)&&e){ls.set(k,JSON.stringify(e.v));t[k]=ahora;delete b[k];n++}
     ls.put('ipnt.t',t);ls.put('ipnt.b',b);
-    if(cuenta) await sincronizar(false);
+    if(cuenta) await sincronizar('auto');
     return n;
   }
 
@@ -297,11 +304,11 @@ var IPNT=window.IPNT=(()=>{
     btn.addEventListener('click',abrir);$i('ipnt-x').addEventListener('click',cerrar);dl.addEventListener('click',e=>{if(e.target===dl)cerrar()});
     $i('ipnt-login').addEventListener('click',()=>entrar('ms'));$i('ipnt-glogin').addEventListener('click',()=>entrar('google'));
     $i('ipnt-relogin').addEventListener('click',()=>entrar(prov?.id||ls.get('ipnt.prov')||'ms'));
-    $i('ipnt-sync').addEventListener('click',()=>sincronizar(false));
+    $i('ipnt-sync').addEventListener('click',()=>sincronizar('volver'));
     $i('ipnt-logout').addEventListener('click',()=>salir(false));
     $i('ipnt-wipe').addEventListener('click',()=>{const c=$i('ipnt-wipe-ok');c.hidden=!c.hidden});
     $i('ipnt-wipe-yes').addEventListener('click',()=>salir(true));
-    $i('ipnt-saes').addEventListener('change',e=>{const o=opt();o.saes=e.target.checked;ls.put('ipnt.opt',o);if(o.saes)touch('saes.alumno');programar()});
+    $i('ipnt-saes').addEventListener('change',e=>{const o={...opt(),saes:e.target.checked};set('perfil.opciones',JSON.stringify(o));if(o.saes&&ls.get('saes.alumno'))touch('saes.alumno')});
     $i('ipnt-down').addEventListener('click',descargar);
     $i('ipnt-file').addEventListener('change',async e=>{const f=e.target.files[0],m=$i('ipnt-filemsg');if(!f)return;
       try{const n=await restaurar(f);m.className='ipnt-state ok';m.textContent=`Respaldo restaurado (${n} elementos). Recargando…`;setTimeout(()=>location.reload(),900)}
@@ -309,14 +316,15 @@ var IPNT=window.IPNT=(()=>{
     dl.addEventListener('click',e=>{if(e.target.closest('[data-ipnt-reload]'))location.reload()});
     // al volver a la pestaña se traen los cambios de otros dispositivos; al salir se guarda lo pendiente
     document.addEventListener('visibilitychange',()=>{if(!cuenta||st.fase==='expirada')return;
-      if(document.visibilityState==='hidden'){if(timer){clearTimeout(timer);timer=null;sincronizar(false)}}
-      else if(!st.ultimo||Date.now()-new Date(st.ultimo)>60000)sincronizar(false)});
+      if(document.visibilityState==='hidden'){if(timer){clearTimeout(timer);timer=null;sincronizar('auto')}}
+      else if(!timer&&(!st.ultimo||Date.now()-new Date(st.ultimo)>20000))sincronizar('volver')});
     pintar();
     // sesión guardada (o regreso del inicio de sesión de Microsoft en la misma pestaña)
     const id=ls.get('ipnt.prov')||(ls.get('ipnt.cuenta')||/[#&?](code|error)=/.test(location.hash+location.search)?'ms':null), p=PROV[id];
     if(p&&p.disponible()) p.recuperar().then(a=>{
       if(!a){if(st.error)st.fase='error';pintar();return}
-      prov=p;cuenta=a;ls.set('ipnt.prov',id);ls.set('ipnt.cuenta',a.username);pintar();sincronizar(true);
+      const recien=!ls.get('ipnt.cuenta');   // regreso del inicio de sesión en la misma pestaña (Microsoft en teléfono)
+      prov=p;cuenta=a;ls.set('ipnt.prov',id);ls.set('ipnt.cuenta',a.username);pintar();sincronizar(recien?'login':'abrir');
     }).catch(e=>{st.fase='error';st.error=texto(e);pintar()});
   }
   /* ---- bienvenida: primera visita (sin carrera, planes, marcas, actividades ni sesión en este navegador) ---- */
