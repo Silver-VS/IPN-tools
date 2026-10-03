@@ -35,3 +35,11 @@ Elegir H periodos enteros positivos e incluir/excluir el actual. Con escenario a
 El origen se infiere de cita/historial y se declara. Preferencias de meta se guardan por carrera en `hu.<unidad>.meta.<carrera>` mediante el almacén existente. El simulador aparece también sin notas si se dispone de saldo oficial. Tests de metas2–6, carga desconocida, saldo0/null, ritmo0 y semestre incluido/excluido. El presupuesto de tiempo (etapa D) permanece fuera de esta entrega.
 
 El conteo proyectado es aproximado: el contador SAES se ancla al periodo actual inferido para mantener el mismo conteo ante escenarios con la misma fecha final. No resuelve la semántica administrativa del contador. Si hay materias inscritas sin correspondencia, se informa; con escenario activo no se proyecta un saldo final completo a partir de una simulación parcial. Los renderizados asíncronos obsoletos se descartan al cambiar carrera o escenario.
+
+## Vistas de estadísticas (2026-10-03)
+
+Tres vistas en lugar de seis gráficas tradicionales:
+
+- **Tu camino en la carrera:** regla del plan completo (acreditado, en curso o simulado, lo que falta) con marcas de los periodos cursados y de la estimación a tu ritmo; aviso si se rebasa el plazo de referencia.
+- **Tu kárdex por periodo:** una columna por periodo (promedio, cambio ▲▼ y créditos) con un cuadro por materia que muestra su calificación, color de 6 a 10 y la forma de evaluación (E, T, R); reúne tendencia, distribución y tipo de evaluación.
+- **Tus áreas frente a tu promedio:** barras divergentes respecto a tu promedio de aprobadas.

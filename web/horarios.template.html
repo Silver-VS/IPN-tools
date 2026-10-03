@@ -16,7 +16,7 @@
   --f-mono:"Noto Sans Mono",ui-monospace,Consolas,monospace;
   --blk-s:42%; --blk-l:90%; --blk-fg:#2b2427; --blk-edge:40%; --own:#e6e1e3;
   --st-done:#c9c3c5; --st-done-fg:#4d4447; --st-late:#b8473f; --st-late-fg:#ffffff; --st-now:#3f7d5a; --st-now-fg:#ffffff; --st-rest:#ffffff;
-  --band:#f3eff1; --edge:#8e8589; --rel-pre:#2f7fc1; --rel-post:#c7741a; --ch-alert:#d9480f;
+  --band:#f3eff1; --edge:#8e8589; --rel-pre:#2f7fc1; --rel-post:#c7741a; --ch-alert:#d9480f; --g10:#1f7a47; --g9:#3d8b4f; --g8:#5f8a2c; --g7:#a8761a; --g6:#bf4b2c;
   --n1:#8a98c7; --n2:#c48aa6; --n3:#73a183; --n4:#5b7f9e; --n5:#c9b07a; --n6:#9b86c4; --n7:#c99a7a; --n8:#6fa3a8;
   --r:6px;
 }
@@ -210,6 +210,25 @@ input[type=number]{width:5rem}
 .charts figure figure{border:0;padding:0;background:none;margin:0}   /* Plot envuelve en <figure> las gráficas con leyenda */
 .charts figcaption{display:flex;flex-direction:column;gap:1px;margin-bottom:6px;min-height:3.4em}
 .charts figcaption b{font-size:.92rem}
+.cm-h{display:flex;flex-wrap:wrap;justify-content:space-between;gap:4px 16px;margin:4px 0 10px;font-size:.9rem}.cm-h span{color:var(--muted)}.cm-h span b{color:var(--fg)}.cm-h .cm-n{color:var(--fg)}.cm-h .cm-n b{font-size:1.15rem}
+.cm-track{position:relative;height:18px;border-radius:999px;background:var(--line);overflow:hidden;display:flex}
+.cm-track i{display:block;height:100%}.cm-track .hecho{background:var(--accent)}
+.cm-track .rayado{background:repeating-linear-gradient(135deg,var(--accent) 0 4px,transparent 4px 9px);opacity:.75}
+.cm-past,.cm-fut{position:relative;height:22px;font-size:.72rem;color:var(--muted)}
+.cm-m{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.cm-past .cm-m{bottom:2px}.cm-past .cm-m::after{content:'';position:absolute;left:50%;bottom:-6px;height:6px;border-left:1px solid var(--muted)}
+.cm-fut .cm-m{top:4px;color:var(--accent)}.cm-fut .cm-m::before{content:'';position:absolute;left:50%;top:-8px;height:7px;border-left:2px solid var(--accent)}
+.cm-fut .cm-m.fuera{color:var(--ch-alert)}.cm-fut .cm-m.fuera::before{border-color:var(--ch-alert)}
+.cm-alerta{margin:6px 0 0;font-size:.82rem;color:var(--ch-alert)}
+.kx{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.kx-col{flex:1 0 74px;max-width:170px;display:flex;flex-direction:column;gap:6px}
+.kx-h{display:flex;flex-direction:column;align-items:center;font-size:.82rem;line-height:1.25}.kx-h small{color:var(--muted);font-size:.72rem;text-align:center}
+.kx-h em{font-style:normal;font-size:.7rem}.kx-h em.up{color:var(--ok)}.kx-h em.down{color:var(--ch-alert)}
+.kx-cs{display:flex;flex-wrap:wrap;gap:3px;justify-content:center}
+.kx-c{position:relative;width:30px;height:26px;border-radius:5px;display:inline-grid;place-items:center;font-size:.78rem;font-weight:700;color:#fff;cursor:default}
+.kx-c i{position:absolute;top:-5px;right:-5px;font-style:normal;font-size:.6rem;line-height:1;padding:2px 3px;border-radius:999px;background:var(--surface);color:var(--fg);border:1px solid var(--line)}
+.kx-c.sim{outline:1.5px dashed var(--fg);outline-offset:1px}
+.kx-c.g10{background:var(--g10)}.kx-c.g9{background:var(--g9)}.kx-c.g8{background:var(--g8)}.kx-c.g7{background:var(--g7)}.kx-c.g6{background:var(--g6)}
 .ley{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:.78rem;color:var(--muted)}.ley>span{display:inline-flex;align-items:center;gap:6px}.ley svg{flex:none}
 .charts svg{max-width:100%;height:auto}
 .charts [aria-label="tip"] path{fill:var(--surface);stroke:var(--line)}
@@ -1837,6 +1856,11 @@ function ley(items){
     guion:`<path d="M1 7H21" stroke="${c}" stroke-width="1.6" stroke-dasharray="2 3"/>`,
     area:`<rect x="1" y="2" width="20" height="10" rx="2" fill="${c}" fill-opacity=".2"/>`,
     numero:`<text x="11" y="11" text-anchor="middle" font-size="10" font-weight="700" fill="${c}">8.5</text>`,
+    rayado:`<rect x="1" y="2" width="20" height="10" rx="2" fill="${c}" fill-opacity=".35"/><path d="M4 12L10 2M10 12L16 2M16 12L21 4" stroke="${c}" stroke-width="1.5"/>`,
+    marca:`<path d="M11 1V13" stroke="${c}" stroke-width="2"/>`,
+    grado:`<rect x="0" y="2" width="4" height="10" fill="var(--g6)"/><rect x="4.5" y="2" width="4" height="10" fill="var(--g7)"/><rect x="9" y="2" width="4" height="10" fill="var(--g8)"/><rect x="13.5" y="2" width="4" height="10" fill="var(--g9)"/><rect x="18" y="2" width="4" height="10" fill="var(--g10)"/>`,
+    letra:`<text x="11" y="11" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg)">${c}</text>`,
+    simulada:`<rect x="4" y="1.5" width="14" height="11" rx="2" fill="none" stroke="${c}" stroke-dasharray="2 2"/>`,
     cuadro:`<rect x="5" y="2" width="12" height="10" rx="2" fill="${c}"/>`,
     rango:`<path d="M11 2V12" stroke="${c}" stroke-opacity=".35" stroke-width="7" stroke-linecap="round"/>`,
     barra:`<rect x="4" y="3" width="6" height="10" fill="${c}" fill-opacity=".75"/><rect x="12" y="6" width="6" height="7" fill="${c}" fill-opacity=".75"/>`,
@@ -1869,12 +1893,9 @@ async function renderStats(){
     ${plazo.calculado?`<p class="st-note">Referencia de duración: ${fmtCr(A.carga.total)} créditos del plan ÷ ${fmtCr(A.carga.min)} de carga mínima = ${plazo.max} periodos. El SAES indica una duración de ${A.carga.duracion??'—'} y un máximo de ${A.carga.duracion_max??'—'} periodos; confirma tu plazo con Gestión Escolar.</p>`:''}
     ${metaPanel(D)}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Créditos acumulados</b>${ley([['linea','var(--accent)','Lo que llevas'],['punteada','var(--accent)','Estimado a tu ritmo'],['guion','var(--muted)','Total del plan'],...(limite0!=null?[['guion','var(--ch-alert)','Plazo de referencia']]:[]),...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-avance"></div></figure>
-      <figure><figcaption><b>Promedio por periodo</b>${ley([['linea','var(--accent)','Promedio'],['rango','var(--accent)','Rango'],['guion','var(--muted)','General']])}</figcaption><div id="ch-prom"></div></figure>
-      <figure><figcaption><b>Tus calificaciones</b>${ley([['barra','var(--accent)','Materias'],['vertical','var(--fg)','Promedio'],['vertical-p','var(--fg)','Mediana']])}</figcaption><div id="ch-dist"></div></figure>
-      <figure><figcaption><b>Promedio por área</b>${ley([['barra','var(--accent)','Promedio del área (n.º de materias)']])}</figcaption><div id="ch-cat"></div></figure>
-      <figure><figcaption><b>Tipo de evaluación por periodo</b>${ley(Object.keys(FORMA_COLOR).filter(f=>D.rows.some(r=>r.forma===f)).map(f=>['cuadro',`var(${FORMA_COLOR[f]})`,f]))}</figcaption><div id="ch-forma"></div></figure>
-      <figure class="ch-wide"><figcaption><b>Promedio por área y periodo</b></figcaption><div id="ch-heat"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tu camino en la carrera</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio</b>${ley([['vertical','var(--fg)',`Tu promedio de aprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} materias acreditadas por equivalencia, revalidación o dictamen, por ejemplo al cambiar de carrera (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}): cuentan en tus calificaciones, en las áreas y en tus créditos iniciales, pero no en el promedio por periodo ni en los créditos por periodo.</p>`:''}`;
@@ -1889,68 +1910,42 @@ async function renderStats(){
   const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
   const put=(id,fig)=>montarGrafica($(id),fig);
   const tickPer=d=>perName(d);
-  // 1) avance acumulado (burn-up)
-  const C=D.curva, x0=C[0]?.per??(D.meta!=null?D.meta-1:0), tot=D.total;
-  // Anclar el inicio al número de periodos cursados, incluyendo periodos sin acreditaciones.
-  const inicio=D.actual!=null&&cursados!=null?D.actual-cursados+1:x0;
-  const proy=proyeccionCreditos(D), fin=proy.at(-1);
-  const limite=plazo.max&&cursados!=null&&D.actual!=null?inicio+plazo.max-1:null;
-  const puntos=proy.slice(1), excede=d=>limite!=null&&d.per>limite, BAD=tok('--ch-alert')||'#d9480f';   // alerta de las gráficas: distinta del color de acento en ambos temas
-  const ticks=[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])].sort((a,b)=>a-b);
-  const paso=Math.max(1,Math.ceil(ticks.length/Math.max(2,Math.floor($('#ch-avance').clientWidth/58))));
-  const tickVisibles=ticks.filter((d,i)=>i%paso===0||i===ticks.length-1);
-  put('#ch-avance',P.plot({...base('#ch-avance'),height:260,marginBottom:50,x:{label:'Periodo',tickFormat:tickPer,ticks:tickVisibles},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt||1)*1.12]},
-    marks:[
-      tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
-      tot?P.text([tot],{y:d=>d,x:x0,text:()=>`total ${fmtCr(tot)}`,dy:-6,textAnchor:'start',fill:MUT}):null,
-      limite!=null&&ticks.at(-1)>=limite?P.ruleX([limite],{stroke:BAD,strokeDasharray:'3 4'}):null,
-      limite!=null&&ticks.at(-1)>=limite?P.text([{per:limite,acum:0}],{x:'per',y:'acum',text:()=>plazo.calculado?`Referencia: ${plazo.max} periodos`:`Máximo: ${plazo.max} periodos`,dy:32,dx:-4,textAnchor:'end',fill:BAD}):null,
-      P.areaY(C.filter(d=>!d.sim),{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
-      P.line(C.filter(d=>!d.sim),{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
-      C.some(d=>d.sim)?P.line(C.slice(-2),{x:'per',y:'acum',stroke:ACC,strokeDasharray:'2 3'}):null,
-      P.line(proy,{x:'per',y:'acum',stroke:ACC,strokeDasharray:'5 4'}),
-      P.dot(C,{x:'per',y:'acum',fill:d=>d.sim?'var(--bg)':ACC,stroke:ACC,r:3.5}),
-      P.dot(puntos,{x:'per',y:'acum',stroke:d=>excede(d)?BAD:ACC,fill:'var(--bg)',r:4}),
-      puntos.length&&ticks.length<=Math.floor($('#ch-avance').clientWidth/65)?P.text(puntos,{x:'per',y:'acum',text:d=>fmtCr(d.acum),dy:-12,fill:d=>excede(d)?BAD:ACC}):null,
-      fin?P.text([fin],{x:'per',y:'acum',text:d=>`conclusión ${perName(d.per)}`,dy:-30,fill:excede(fin)?BAD:ACC}):null,
-      // Una sola búsqueda de proximidad evita que cada serie muestre un punto distinto bajo el mismo cursor.
-      P.tip([...C.map(d=>({...d,detalle:`${d.lbl}${d.sim?' · simulado':''}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} aprobados en el periodo`})),
-        ...(proy.length&&!C.some(d=>d.per===proy[0].per)?[{...proy[0],detalle:`Créditos actuales${tr().sim?' (con simulación)':' según el SAES'}\n${fmtCr(D.obt)} créditos`}]:[]),
-        ...puntos.map(d=>({...d,detalle:`${perName(d.per)} · periodo ${d.per-inicio+1}\n${fmtCr(d.acum)} créditos acumulados (estimado)${excede(d)?'\nRebasa '+(plazo.calculado?'el plazo de referencia':'el plazo máximo'):''}`}))],
-        P.pointer({x:'per',y:'acum',title:'detalle',maxRadius:$('#ch-avance').clientWidth/Math.max(1,ticks.length)/4})),
-    ].filter(Boolean)}));
-  // 2) promedio por periodo con rango
-  const HF=Math.max(210,new Set(D.rows.map(r=>r.cat)).size*26+44);   // misma altura en la fila: las gráficas quedan alineadas
-  put('#ch-prom',P.plot({...base('#ch-prom'),height:HF,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
-    // rango de cada periodo como barra vertical propia (sin unir periodos con formas suavizadas)
-    marks:[P.ruleX(D.porPer.filter(d=>d.prom!=null),{x:'per',y1:'min',y2:'max',stroke:ACC,strokeOpacity:.28,strokeWidth:10,strokeLinecap:'round'}),
-      D.media!=null?P.ruleY([D.media],{stroke:MUT,strokeDasharray:'4 3'}):null,
-      P.line(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',stroke:ACC,strokeWidth:2}),
-      P.dot(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\npromedio ${f2(d.prom)}\nrango ${d.min}–${d.max} · ${d.n} materias`})].filter(Boolean)}));
-  // 3) distribución
-  put('#ch-dist',P.plot({...base('#ch-dist'),height:HF,x:{label:'Calificación',domain:[5.5,10.5]},y:{label:'Materias',grid:true},
-    marks:[P.rectY(D.rows,P.binX({y:'count'},{x:'cal',thresholds:[5.5,6.5,7.5,8.5,9.5,10.5],fill:ACC,fillOpacity:.75,inset:2,tip:true})),
-      P.ruleX([D.media],{stroke:tok('--fg'),strokeWidth:1.5}),P.ruleX([D.mediana],{stroke:tok('--fg'),strokeDasharray:'3 3'}),P.ruleY([0])]}));
-  // 4) por categoría: puntos (dispersión vertical leve) y media
-  const cats=d3.groups(D.rows,r=>r.cat).map(([k,v])=>({cat:k,media:d3.mean(v,r=>r.cal)})).sort((a,b)=>b.media-a.media).map(d=>d.cat);
-  const jit=D.rows.map((r,i)=>({...r,j:((i*0.618)%1-.5)*0.5}));
-  const porArea=cats.map(cat=>{const v=D.rows.filter(r=>r.cat===cat);return {cat,media:d3.mean(v,r=>r.cal),n:v.length}});
-  put('#ch-cat',P.plot({...base('#ch-cat'),height:HF,marginLeft:150,marginRight:56,x:{label:null,domain:[0,10],ticks:[0,5,10],grid:true},y:{label:null,domain:cats,padding:.3},
-    marks:[P.barX(porArea,{x:'media',y:'cat',fill:ACC,fillOpacity:.75,rx:3,tip:true,title:d=>`${d.cat}\npromedio ${f2(d.media)} · ${d.n} ${d.n>1?'materias':'materia'}`}),
-      P.text(porArea,{x:'media',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:6,textAnchor:'start',fill:tok('--fg'),fontWeight:600})]}));
-  // 5) forma de acreditación por periodo (barras apiladas)
-  const fr=D.rows.map(r=>({...r,lbl:r.eqv?'Equiv.':perName(r.per)}));
-  const ordenLbl=[...(D.rows.some(r=>r.eqv)?['Equiv.']:[]),...D.porPer.map(d=>d.lbl),...(D.rows.some(r=>!r.eqv&&r.per==null)?['—']:[])];
-  const formas=Object.keys(FORMA_COLOR).filter(f=>D.rows.some(r=>r.forma===f));
-  put('#ch-forma',P.plot({...base('#ch-forma'),height:HF,x:{label:null,domain:ordenLbl},y:{label:'Materias',grid:true},
-    color:{legend:false,domain:formas,range:formas.map(f=>tok(FORMA_COLOR[f]))},
-    marks:[P.barY(fr,P.groupX({y:'count'},{x:'lbl',fill:'forma',inset:1,tip:true})),P.ruleY([0])]}));
-  // 6) mapa de calor categoría × periodo
-  const hm=d3.flatRollup(D.reg,v=>({m:d3.mean(v,r=>r.cal),n:v.length}),r=>r.cat,r=>r.per).map(([cat,per,o])=>({cat,per,lbl:perName(per),...o}));
-  put('#ch-heat',P.plot({...base('#ch-heat'),height:Math.max(150,cats.length*30+50),marginLeft:150,padding:.06,x:{label:null,domain:D.porPer.map(d=>d.lbl)},y:{label:null,domain:cats.filter(k=>hm.some(h=>h.cat===k))},
-    color:{type:'linear',domain:[6,10],scheme:'viridis',legend:true,label:'Promedio'},
-    marks:[P.cell(hm,{x:'lbl',y:'cat',fill:'m',inset:1,rx:3,tip:true,title:d=>`${d.cat} · ${d.lbl}\nmedia ${f2(d.m)} (${d.n})`}),
-      P.text(hm,{x:'lbl',y:'cat',text:d=>f2(d.m).replace(/\.00$/,''),fill:d=>d.m>8.4?'#111':'#fff'})]}));
+  // 1) camino en la carrera: regla del plan completo con lo acreditado, lo que está en curso y la estimación por periodo
+  {const host=$('#ch-camino'), tot=D.total;
+    if(!(tot>0)||D.obt==null){host.innerHTML='<p class="muted">Faltan los créditos del plan para dibujar tu camino.</p>'}else{
+      const ec=tr().sim?0:[...new Set(tr().enCurso)].reduce((t,k)=>t+(cur()[k]?.[1]||0),0);
+      const hecho=Math.min(tot,D.obt-(D.simCr||0)), sim=Math.min(tot-hecho,D.simCr||0), curso=Math.min(tot-hecho-sim,ec);
+      const pc=v=>(v/tot*100).toFixed(2)+'%';
+      const proy=proyeccionCreditos(D).slice(1), cursados=A.avance?.cursados;
+      const inicio=D.actual!=null&&cursados!=null?D.actual-cursados+1:null, limite=plazo.max&&inicio!=null?inicio+plazo.max-1:null;
+      const W=host.clientWidth||600;let ult=-1e9;
+      const marcas=(lst,cls)=>lst.map(d=>{const x=d.acum/tot*W, ver=x-ult>=46;if(ver)ult=x;
+        return `<span class="cm-m ${cls}${limite!=null&&d.per>limite?' fuera':''}" style="left:${pc(d.acum)}" title="${esc(perName(d.per))}: ${fmtCr(d.acum)} créditos${cls==='fut'?' (estimado)':''}">${ver?esc(perName(d.per)):''}</span>`}).join('');
+      ult=-1e9;const pasado=marcas(D.curva.filter(d=>!d.sim),'pas');ult=-1e9;const futuro=marcas(proy,'fut');
+      const fin=D.falta===0?'Créditos completos':D.fin!=null?`Terminarías en <b>${esc(perName(D.fin))}</b>${totalPer?` (unos ${totalPer} periodos en total)`:''}`:'';
+      host.innerHTML=`<p class="cm-h"><span class="cm-n"><b>${fmtCr(D.obt)}</b> de ${fmtCr(tot)} créditos · ${Math.round(D.obt/tot*100)} %${D.falta?` · te faltan ${fmtCr(D.falta)}`:''}</span><span>${fin}</span></p>`+
+        `<div class="cm-past">${pasado}</div><div class="cm-track"><i class="hecho" style="width:${pc(hecho)}"></i><i class="rayado" style="width:${pc(sim+curso)}"></i></div><div class="cm-fut">${futuro}</div>`+
+        (limite!=null&&totalPer>plazo.max?`<p class="cm-alerta">A tu ritmo actual rebasarías el plazo de referencia de ${plazo.max} periodos (${esc(perName(limite))}).</p>`:'')}}
+  // 2) kárdex por periodo: cada materia es un cuadro con su calificación; encabezado con promedio y créditos
+  {const host=$('#ch-kx');
+    const col=(t,sub,rs)=>`<div class="kx-col"><div class="kx-h"><b>${esc(t)}</b><small>${sub}</small></div><div class="kx-cs">${rs.slice().sort((a,b)=>b.cal-a.cal).map(r=>{
+      const l={EXT:'E',ETS:'T',REC:'R'}[r.codigo]||'';
+      return `<span class="kx-c g${Math.round(r.cal)}${r.sim?' sim':''}" title="${esc(r.nombre)} · ${r.cal} · ${esc(r.forma)}${r.sim?' · simulada':''}">${r.cal}${l?`<i>${l}</i>`:''}</span>`}).join('')}</div></div>`;
+    const eq=D.rows.filter(r=>r.eqv), sinP=D.rows.filter(r=>!r.eqv&&r.per==null);
+    let prev=null;
+    host.innerHTML=`<div class="kx">`+(eq.length?col('Equivalencias',`${eq.length} materias`,eq):'')+
+      D.porPer.filter(d=>d.n).map(d=>{const rs=D.rows.filter(r=>!r.eqv&&r.per===d.per), dif=prev!=null?d.prom-prev:null;prev=d.prom;
+        return col(d.lbl,`${f2(d.prom)}${dif!=null&&Math.abs(dif)>=.01?` <em class="${dif>0?'up':'down'}">${dif>0?'▲':'▼'}</em>`:''} · ${d.cr!=null?fmtCr(d.cr)+' cr':''}`,rs)}).join('')+
+      (sinP.length?col('Sin periodo',`${sinP.length} materias`,sinP):'')+`</div>`}
+  // 3) áreas frente a tu promedio: barras divergentes alrededor de tu promedio de aprobadas
+  const porArea=d3.groups(D.rows,r=>r.cat).map(([cat,v])=>({cat,media:d3.mean(v,r=>r.cal),n:v.length})).map(d=>({...d,dif:d.media-D.media})).sort((a,b)=>b.dif-a.dif);
+  const lim=Math.max(1,...porArea.map(d=>Math.abs(d.dif)))*1.25, ALT=tok('--ch-alert')||'#d9480f';
+  put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(150,porArea.length*28+50),marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
+    x:{axis:null,domain:[-lim,lim]},y:{label:null,domain:porArea.map(d=>d.cat),padding:.3},
+    marks:[P.barX(porArea,{x:'dif',y:'cat',fill:d=>d.dif>=0?OK:ALT,fillOpacity:.8,rx:3,tip:true,title:d=>`${d.cat}\npromedio ${f2(d.media)} (${d.n} ${d.n>1?'materias':'materia'})\n${d.dif>=0?'+':''}${d.dif.toFixed(2)} frente a tu promedio`}),
+      P.text(porArea.filter(d=>d.dif>=0),{x:'dif',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:6,textAnchor:'start',fill:tok('--fg'),fontWeight:600}),
+      P.text(porArea.filter(d=>d.dif<0),{x:'dif',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:-6,textAnchor:'end',fill:tok('--fg'),fontWeight:600}),
+      P.ruleX([0],{stroke:tok('--fg'),strokeWidth:1.5})]}));
 }
 
 /* ---------- análisis descriptivo: hechos y antecedentes, sin pronosticar notas ---------- */
@@ -2010,15 +2005,7 @@ function renderAnalisis(D){
   el.innerHTML=`<h3 class="an-h">Observaciones para planear</h3><div class="an-grid">
     <section><h4>Tus materias elegidas y reprobadas</h4><p class="an-sub">Lo que les falta y lo que desbloquean.</p>${cuid}</section>
     ${lin}<section><h4>Cadena de seriación más larga</h4>${ruta}</section>
-    ${X.carga.length?'<section><h4>Créditos aprobados y promedio por periodo</h4>'+ley([['barra','var(--accent)','Créditos aprobados'],['numero','var(--fg)','Promedio del periodo']])+'<div id="ch-carga"></div></section>':''}
     </div>`;
-  if(window.Plot&&X.carga.length){const P=window.Plot,cs=getComputedStyle(document.documentElement),tok=n=>cs.getPropertyValue(n).trim(),host=$('#ch-carga');
-    // en orden de periodos: barra = créditos aprobados; número encima = promedio del periodo
-    const top=Math.max(...X.carga.map(d=>d.cr));
-    montarGrafica(host,P.plot({width:Math.max(260,host.clientWidth),height:200,marginLeft:40,marginBottom:32,marginTop:22,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
-      x:{label:null,domain:X.carga.map(d=>d.lbl),padding:.25},y:{label:'Créditos aprobados',grid:true,domain:[0,top*1.15]},
-      marks:[P.barY(X.carga,{x:'lbl',y:'cr',fill:tok('--accent'),fillOpacity:.75,rx:3,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos aprobados\npromedio ${d.prom.toFixed(2)} (${d.n} materias)`}),
-        P.text(X.carga,{x:'lbl',y:'cr',text:d=>d.prom.toFixed(1),dy:-9,fill:tok('--fg'),fontWeight:600}),P.ruleY([0])]}))}
 }
 
 function renderTray(){renderMap();renderList();renderSide();renderStats()}
