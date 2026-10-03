@@ -204,6 +204,7 @@ input[type=number]{width:5rem}
 .kpi b{font-size:1.65rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
 .kpi small{font-size:.78rem;color:var(--muted)}
 .kpi-v{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
+.tip-flot{position:fixed;z-index:60;max-width:min(320px,calc(100vw - 16px));padding:8px 10px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:.8rem;line-height:1.4;box-shadow:0 6px 20px rgb(0 0 0 / .25);pointer-events:none}
 .info{display:inline-grid;place-items:center;width:1.15em;height:1.15em;border-radius:50%;font-size:.8em;color:var(--muted);cursor:help;text-transform:none;letter-spacing:0;vertical-align:1px}
 .info:hover,.info:focus{color:var(--accent);outline:none}
 .k-regla{position:relative;flex:1;max-width:120px;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--g6),var(--g7),var(--g8),var(--g9),var(--g10));margin-bottom:10px}
@@ -1858,7 +1859,7 @@ function metaResumen(D,H,incluyeActual){
       ${marca(M.necesarios,'nec','necesitas','arriba',pos(M.necesarios)>82)}${ab.map(([v,c,t],j)=>marca(v,c,t,lugar[j].fila2?'abajo fila2':'abajo',lugar[j].izq)).join('')}</div>
     <p class="mt-e${M.supera?' warn':''}">${estado}${M.bajoMin?' Es menos que la carga mínima; requiere autorización.':''} ${info('Promedio de créditos que necesitas aprobar por periodo, no una lista exacta de materias. Tu carga autorizada puede cambiar cada periodo; los periodos se estiman con tu cita de reinscripción y tu kárdex.')}</p>`;
 }
-const info=t=>`<span class="info" tabindex="0" role="img" aria-label="${esc(t)}" title="${esc(t)}">ⓘ</span>`;
+const info=t=>`<span class="info" tabindex="0" role="img" aria-label="${esc(t)}" data-tip="${esc(t)}">ⓘ</span>`;
 function metaPanel(D){
   const cfg=store.get('meta.'+S.car,{periodos:4,actual:true}), incluye=D.simulado?false:cfg.actual!==false;
   return `<section class="meta-panel" aria-labelledby="meta-h"><h3 id="meta-h">¿En cuántos periodos quieres terminar?</h3>
@@ -2166,6 +2167,22 @@ const cambiarMeta=e=>{
   $('#meta-periodos').setAttribute('aria-invalid',String(!metaCreditos(D,cfg.periodos,cfg.actual).valida));
 };
 $('#kstats').addEventListener('input',cambiarMeta);
+/* globo de ayuda inmediato (el «title» nativo tarda ~1 s): un solo elemento fijo, colocado junto al ⓘ sin salirse de la
+   pantalla ni quedar recortado por recuadros con overflow; cursor, teclado y toque */
+const TIP=(()=>{const d=document.createElement('div');d.className='tip-flot';d.setAttribute('role','tooltip');d.hidden=true;document.body.appendChild(d);return d})();
+let tipDe=null;
+function tipMuestra(el){tipDe=el;TIP.textContent=el.dataset.tip;TIP.hidden=false;
+  const r=el.getBoundingClientRect(),w=TIP.offsetWidth,h=TIP.offsetHeight,m=8;
+  let x=Math.min(Math.max(m,r.left+r.width/2-w/2),innerWidth-w-m), y=r.bottom+6;
+  if(y+h>innerHeight-m)y=r.top-h-6;
+  TIP.style.left=x+'px';TIP.style.top=Math.max(m,y)+'px'}
+function tipOculta(){tipDe=null;TIP.hidden=true}
+document.addEventListener('pointerover',e=>{const el=e.target.closest?.('[data-tip]');if(el&&e.pointerType==='mouse')tipMuestra(el)});
+document.addEventListener('pointerout',e=>{const el=e.target.closest?.('[data-tip]');if(el&&e.pointerType==='mouse'&&!el.contains(e.relatedTarget))tipOculta()});
+document.addEventListener('focusin',e=>{const el=e.target.closest?.('[data-tip]');if(el)tipMuestra(el)});
+document.addEventListener('focusout',e=>{if(e.target.closest?.('[data-tip]'))tipOculta()});
+document.addEventListener('click',e=>{const el=e.target.closest?.('[data-tip]');if(el){e.preventDefault();tipDe===el?tipOculta():tipMuestra(el)}else if(tipDe)tipOculta()},true);
+addEventListener('scroll',()=>{if(tipDe)tipOculta()},{passive:true,capture:true});
 $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stats',false));renderStats()});
 // las gráficas toman los colores del tema al dibujarse: se redibujan si cambia el tema (sistema o botón)
 {const redibuja=()=>{if(!$('#kstats')?.hidden)renderStats()};
