@@ -3,5 +3,13 @@
   "tenant": "common",
   "tenant_produccion": "f94bf4d9-8097-4794-adf6-a5466ca28563",
   "unidad": "upiita",
-  "googleClientId": "959269733-d3h3qm0dtqpshebnabum1jr2g0l6geoa.apps.googleusercontent.com"
+  "googleClientId": "959269733-d3h3qm0dtqpshebnabum1jr2g0l6geoa.apps.googleusercontent.com",
+  "unidades": [
+    {
+      "id": "upiita",
+      "siglas": "UPIITA",
+      "nombre": "Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas",
+      "disponible": true
+    }
+  ]
 }

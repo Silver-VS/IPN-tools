@@ -365,10 +365,12 @@ var IPNT=window.IPNT=(()=>{
     let uni=CFG.unidad;
     const listo=()=>{ls.set('ipnt.bienvenida','1');if(dl.close)dl.close();else dl.removeAttribute('open')};
     const pintarH=()=>{
+      $i('ipnt-h-uni').hidden=UN.length<2;
+      if(UN.length<2)$i('ipnt-h-lead').textContent='Para empezar, elige tu carrera. Puedes cambiarla después.';
       $i('ipnt-h-unis').innerHTML=UN.map(u=>`<button type="button" class="ipnt-uni" data-uni="${esc(u.id)}" aria-pressed="${u.id===uni}"><b>${esc(u.siglas)}</b><small>${esc(u.nombre)}</small>${u.disponible?'':'<em>En preparación</em>'}</button>`).join('');
       const u=UN.find(x=>x.id===uni)||{};
       $i('ipnt-h-cars').innerHTML=u.id===CFG.unidad?
-        `<h3>2. Elige tu carrera</h3><div class="ipnt-cars">${cars.map(([k,v])=>`<button type="button" class="btn" data-car="${esc(k)}">${esc(v)}</button>`).join('')}</div>`:
+        `<h3>${UN.length>1?'2. ':''}Elige tu carrera</h3><div class="ipnt-cars">${cars.map(([k,v])=>`<button type="button" class="btn" data-car="${esc(k)}">${esc(v)}</button>`).join('')}</div>`:
         u.url?`<p>La herramienta de ${esc(u.siglas)} está en <a href="${esc(u.url)}">${esc(u.url)}</a>.</p>`:
         `<p class="saes-note">La versión para ${esc(u.siglas||'tu unidad')} se está preparando con alumnos de la unidad. Mientras tanto puedes explorar la de la ${esc((UN.find(x=>x.id===CFG.unidad)||{}).siglas||'')}.</p>`;
       $i('ipnt-h-yo').hidden=!cuenta;
@@ -468,9 +470,9 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
 </dialog>
 <dialog class="saes-dlg ipnt-dlg ipnt-hola" id="ipnt-hola" aria-labelledby="ipnt-hola-h">
   <div class="dl-head"><h2 id="ipnt-hola-h">Bienvenida</h2><button class="x" type="button" data-hola-x aria-label="Cerrar">×</button></div>
-  <p class="lead">Para empezar, dinos de qué unidad y carrera eres. Puedes cambiarlo después.</p>
-  <h3>1. Elige tu unidad académica</h3>
-  <div class="ipnt-unis" id="ipnt-h-unis"></div>
+  <p class="lead" id="ipnt-h-lead">Para empezar, dinos de qué unidad y carrera eres. Puedes cambiarlo después.</p>
+  <div id="ipnt-h-uni"><h3>1. Elige tu unidad académica</h3>
+  <div class="ipnt-unis" id="ipnt-h-unis"></div></div>
   <div id="ipnt-h-cars"></div>
   <div class="alt">
     <div id="ipnt-h-login"><p style="margin:0 0 8px;font-size:.92rem">¿Ya la usaste en otro dispositivo? Inicia sesión y se cargan tus datos.</p>
