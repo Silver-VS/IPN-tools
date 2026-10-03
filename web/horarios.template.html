@@ -984,15 +984,15 @@ function perfilDemo(){
   const car=S.car, m=DATA.mapas?.[car];if(!m)return null;
   const op=DATA.opciones_plan?.[car]||{carrera:car,plan:null}, c=m.cur;
   const ob=Object.keys(c).filter(k=>c[k][3]==='O'&&!isElec(k)&&c[k][1]>0).sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b));
-  const acr=ob.slice(0,Math.round(ob.length*.45)), resto=ob.slice(acr.length), nmax=Math.max(1,...acr.map(k=>c[k][2]));
-  const base=perIdx('26/1')-nmax+1, cal=[9,8,10,8,9,7,9,8,10,6,9,8];
-  const acreditadas=acr.map((k,i)=>[k,cal[i%cal.length],perName(base+c[k][2]-1),i%11===5?'EXT':i%13===7?'ETS':'ORD']);
+  const acr=ob.slice(0,Math.round(ob.length*.45)), resto=ob.slice(acr.length), nper=Math.max(1,Math.ceil(acr.length/6));   // ~6 materias por periodo
+  const base=perIdx('26/1')-nper+1, cal=[9,8,10,8,9,7,9,8,10,6,9,8];
+  const acreditadas=acr.map((k,i)=>[k,cal[i%cal.length],perName(base+Math.floor(i/6)),i%11===5?'EXT':i%13===7?'ETS':'ORD']);
   const rep=resto[0], enCurso=resto.slice(1,6), obt=acr.reduce((t,k)=>t+c[k][1],0), total=ob.reduce((t,k)=>t+c[k][1],0);
   const prom=acreditadas.reduce((t,a)=>t+a[1],0)/Math.max(1,acreditadas.length);
   return {upiita_saes:1,demo:true,unidad:UNIDAD,leido:new Date().toISOString(),boleta:'0000000000',nombre:'ALUMNO DE DEMOSTRACIÓN',
     carrera:op.carrera,carrera_nombre:DATA.carreras[car],plan:op.plan,promedio:+(prom-.2).toFixed(2),acreditadas,en_curso:enCurso,
-    horario_inscrito:[],reprobadas:[],reprobadas_periodo:rep?[[rep,perName(base+nmax-1),1]]:[],
-    avance:{obtenidos:obt,faltan:total-obt,cursados:nmax+1,autorizada:`MÁXIMA (${fmtCr(Math.round(total/8))} CREDITOS)`},
+    horario_inscrito:[],reprobadas:[],reprobadas_periodo:rep?[[rep,perName(base+nper-1),1]]:[],
+    avance:{obtenidos:obt,faltan:total-obt,cursados:nper+1,autorizada:`MÁXIMA (${fmtCr(Math.round(total/8))} CREDITOS)`},
     carga:{total,min:Math.round(total/12),max:Math.round(total/8)},cita:{}};
 }
 if(DEMO){
