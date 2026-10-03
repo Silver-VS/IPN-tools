@@ -170,17 +170,22 @@ input[type=number]{width:5rem}
 .box.slot{border-style:dashed;background:var(--sunken);color:var(--muted);font-weight:500}
 .box.req{background:var(--accent-soft)}
 .box.far{opacity:.5;filter:saturate(.35)}
-.stats{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
-.st-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
-.st-grid2 figure{margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
-.st-grid2 figcaption{font-weight:600;font-size:.9rem;margin-bottom:6px}
-.st-wide{grid-column:1/-1}
-.st-svg{width:100%;height:auto;display:block;overflow:visible}
-.st-t{font-size:11px;fill:var(--fg);font-variant-numeric:tabular-nums}.st-t.mut{fill:var(--muted)}.st-t.acc{fill:var(--accent);font-size:10px}
-.st-grid{stroke:var(--line);stroke-width:1}.st-gen{stroke:var(--accent);stroke-dasharray:4 4;stroke-width:1.2}
-.st-line{fill:none;stroke:var(--accent);stroke-width:2}.st-dot{fill:var(--accent)}.st-bar{fill:var(--accent);opacity:.85}
-.st-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.82rem;color:var(--muted)}.st-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
-.st-note{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
+.kstats{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.kpi{background:var(--surface);padding:10px 14px;display:flex;flex-direction:column;gap:2px;min-width:0}
+.kpi span{font-size:.75rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.kpi b{font-size:1.65rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
+.kpi small{font-size:.78rem;color:var(--muted)}
+.kpi .up{color:var(--ok);font-weight:600}.kpi .down,.kpi b.down{color:var(--bad)}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-top:12px}
+.charts figure{margin:0;padding:12px 14px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
+.charts .ch-wide{grid-column:1/-1}
+.charts figure figure{border:0;padding:0;background:none;margin:0}   /* Plot envuelve en <figure> las gráficas con leyenda */
+.charts figcaption{display:flex;flex-direction:column;gap:1px;margin-bottom:6px}
+.charts figcaption b{font-size:.92rem}.charts figcaption span{font-size:.78rem;color:var(--muted)}
+.charts svg{max-width:100%;height:auto}
+.charts [aria-label="tip"] path{fill:var(--surface);stroke:var(--line)}
+.st-note{margin:8px 0 0;font-size:.8rem;color:var(--muted)}
 .mapcut{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);font-size:.88rem;color:var(--muted)}
 .minimap{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:4px;cursor:pointer;line-height:0;flex:none}
 .minimap:hover{border-color:var(--accent)}
@@ -491,7 +496,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="est-tiles" id="status"></div>
       <div id="desf"></div>
       <p class="est-note" id="desf-note"></p>
-      <div class="stats" id="stats" hidden></div>
+      <div class="kstats" id="kstats" hidden></div>
     </section>
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
@@ -1553,71 +1558,113 @@ function renderList(){
         `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${w?'✓':'+'}</button>`+
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
-/* ---------- estadísticas del kárdex (solo con datos del SAES; se calculan en el navegador) ---------- */
+/* ---------- estadísticas del kárdex (solo con datos del SAES; se calculan en el navegador) ----------
+   Gráficas con Observable Plot (D3), que se carga solo al abrir esta sección. */
 const FORMAS={ORD:'Ordinario',REC:'Recurse',ETS:'ETS',EXT:'Extraordinario',EQV:'Equivalencia',REV:'Revalidación',DIC:'Dictamen'};
-const FCOL={ORD:'var(--ok)',REC:'var(--warn)',ETS:'var(--bad)',EXT:'var(--accent)',EQV:'var(--n4)',REV:'var(--n6)',DIC:'var(--n8)'};
+const LIB_PLOT=[['https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js','sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i'],
+  ['https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js','sha384-JUpn2GgRr0gxU0xOBd8D8P634jhRCwobtG8G2MMEkX1RnGJ7/FJNnuukpfT+H2w1']];
+let PLOT_P=null;
+const cargarPlot=()=>window.Plot?Promise.resolve():PLOT_P||(PLOT_P=LIB_PLOT.reduce((p,[src,sri])=>p.then(()=>new Promise((ok,no)=>{
+  const s=document.createElement('script');s.src=src;s.integrity=sri;s.crossOrigin='anonymous';s.onload=ok;s.onerror=()=>{PLOT_P=null;no(new Error('No se pudo cargar la biblioteca de gráficas.'))};document.head.appendChild(s)})),Promise.resolve()));
 function catDe(){                                // clave -> categoría (columna del mapa)
   const L=MAP().layout,out={};if(!L?.cols?.length)return out;
   L.boxes.forEach(([x,y,w,h,k])=>{if(!k)return;const cx=x+w/2,c=L.cols.find(([n,a,b])=>cx>=a&&cx<b);if(c)out[k]=c[0]});
   return out;
 }
-function renderStats(){
-  const box=$('#stats'),btn=$('#stats-btn');if(!box||!btn)return;
+function statsDatos(){
+  const c=cur(), A=ALUMNO, cat=catDe();
+  const rows=(A.acreditadas||[]).filter(a=>a&&a[1]!=null).map(a=>{const f=String(a[3]||'—').toUpperCase();
+    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:+a[1],per:perIdx(a[2]),forma:FORMAS[f]||f,eqv:f==='EQV',cat:cat[a[0]]||'Sin categoría',cr:c[a[0]]?.[1]||0}});
+  const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
+  const reg=rows.filter(r=>!r.eqv&&r.per!=null), pers=[...new Set(reg.map(r=>r.per))].sort((a,b)=>a-b);
+  const porPer=pers.map(p=>{const v=reg.filter(r=>r.per===p).map(r=>r.cal);return {per:p,lbl:perName(p),prom:mean(v),min:Math.min(...v),max:Math.max(...v),n:v.length,cr:reg.filter(r=>r.per===p).reduce((s,r)=>s+r.cr,0)}});
+  const crEqv=rows.filter(r=>r.eqv).reduce((s,r)=>s+r.cr,0);
+  let acum=crEqv;const curva=porPer.map(d=>({...d,acum:(acum+=d.cr)}));
+  const cal=rows.map(r=>r.cal).sort((a,b)=>a-b), media=A.promedio??mean(cal), mediana=cal.length?(cal[(cal.length-1)>>1]+cal[cal.length>>1])/2:null;
+  const sd=cal.length>1?Math.sqrt(cal.reduce((s,x)=>s+(x-mean(cal))**2,0)/(cal.length-1)):0;
+  const ritmo=mean(porPer.slice(-3).map(d=>d.cr)), total=A.carga?.total, obt=A.avance?.obtenidos??acum, falta=A.avance?.faltan??(total!=null?total-obt:null);
+  const nper=ritmo&&falta!=null?Math.ceil(falta/ritmo):null, meta=perMeta(), fin=nper!=null&&meta!=null?meta+nper-1:null;
+  return {rows,reg,porPer,curva,crEqv,media,mediana,sd,ritmo,total,obt,falta,nper,fin,mean,
+    ord:reg.length?reg.filter(r=>r.forma==='Ordinario').length/reg.length:null,
+    delta:porPer.length>1?porPer.at(-1).prom-porPer.at(-2).prom:null};
+}
+async function renderStats(){
+  const box=$('#kstats'),btn=$('#stats-btn');if(!box||!btn)return;
   const on=isPersonal()&&store.get('stats',false);btn.hidden=!isPersonal();btn.textContent=on?'Ocultar estadísticas':'Ver estadísticas';box.hidden=!on;
   if(!on)return;
-  const c=cur(), A=ALUMNO, ac=(A.acreditadas||[]).filter(a=>a&&a[1]!=null);
-  if(!ac.length){box.innerHTML='<p class="muted">El kárdex no trae calificaciones.</p>';return}
-  const W=360,H=170,P={l:30,r:10,t:14,b:30};
-  const svg=(inner,h=H,w=W)=>`<svg viewBox="0 0 ${w} ${h}" role="img" class="st-svg">${inner}</svg>`;
-  const t=(x,y,s,a='middle',cls='')=>`<text x="${x}" y="${y}" text-anchor="${a}" class="st-t ${cls}">${esc(String(s))}</text>`;
-  const prom=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null, f1=v=>v==null?'—':v.toFixed(2).replace(/\.?0+$/,'');
-  const eqv=a=>String(a[3]||'').toUpperCase()==='EQV';
-  // 1) promedio por periodo (sin equivalencias: son de otra carrera)
-  const porPer={};ac.filter(a=>!eqv(a)).forEach(a=>{const i=perIdx(a[2]);if(i!=null)(porPer[i]=porPer[i]||[]).push(+a[1])});
-  const pers=Object.keys(porPer).map(Number).sort((a,b)=>a-b), gen=A.promedio??prom(ac.map(a=>+a[1]));
-  let g1='';
-  if(pers.length){
-    const X=i=>P.l+(pers.length===1?(W-P.l-P.r)/2:i*(W-P.l-P.r)/(pers.length-1)), Y=v=>P.t+(10-v)/4*(H-P.t-P.b);
-    [6,7,8,9,10].forEach(v=>{g1+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" class="st-grid"/>`+t(P.l-6,Y(v)+4,v,'end','mut')});
-    if(gen!=null)g1+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(gen)}" y2="${Y(gen)}" class="st-gen"/>`+t(W-P.r,Y(gen)-4,'general '+f1(+gen),'end','acc');
-    g1+=`<polyline points="${pers.map((p,i)=>X(i)+','+Y(prom(porPer[p]))).join(' ')}" class="st-line"/>`;
-    pers.forEach((p,i)=>{const v=prom(porPer[p]);g1+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" class="st-dot"/>`+t(X(i),Y(v)-8,f1(v))+t(X(i),H-10,perName(p),'middle','mut')});
-  }
-  // 2) distribución de calificaciones
-  const dist={6:0,7:0,8:0,9:0,10:0};ac.forEach(a=>{const v=Math.round(+a[1]);if(v in dist)dist[v]++});
-  const dmax=Math.max(1,...Object.values(dist)), bw=(W-P.l-P.r)/5;
-  let g2='';Object.entries(dist).forEach(([v,n],i)=>{const h=n/dmax*(H-P.t-P.b),x=P.l+i*bw+bw*.18;
-    g2+=`<rect x="${x}" y="${H-P.b-h}" width="${bw*.64}" height="${h}" rx="3" class="st-bar"/>`+t(x+bw*.32,H-P.b-h-4,n)+t(x+bw*.32,H-12,v,'middle','mut')});
-  // 3) forma de acreditación
-  const fm={};ac.forEach(a=>{const k=String(a[3]||'—').toUpperCase();fm[k]=(fm[k]||0)+1});
-  const tot=ac.length;let x0=0, g3='';
-  const fs=Object.entries(fm).sort((a,b)=>b[1]-a[1]);
-  fs.forEach(([k,n])=>{const w=n/tot*(W-20);g3+=`<rect x="${10+x0}" y="20" width="${Math.max(w-2,1)}" height="26" rx="4" fill="${FCOL[k]||'var(--muted)'}"/>`;x0+=w});
-  const leg3=fs.map(([k,n])=>`<span><i style="background:${FCOL[k]||'var(--muted)'}"></i>${esc(FORMAS[k]||k)}: <b>${n}</b> (${Math.round(n/tot*100)} %)</span>`).join('');
-  // 4) promedio por categoría (columnas del mapa)
-  const cat=catDe(), pc={};ac.forEach(a=>{const k=cat[a[0]];if(k)(pc[k]=pc[k]||[]).push(+a[1])});
-  const cats=Object.entries(pc).map(([k,v])=>[k,prom(v),v.length]).sort((a,b)=>b[1]-a[1]);
-  const rowH=22, H4=Math.max(60,cats.length*rowH+16);let g4='';
-  cats.forEach(([k,v,n],i)=>{const y=8+i*rowH,w=(v-5)/5*(W-190);g4+=t(150,y+14,k,'end','mut')+`<rect x="156" y="${y+3}" width="${Math.max(w,2)}" height="14" rx="3" class="st-bar"/>`+t(160+Math.max(w,2),y+14,`${f1(v)} · ${n}`,'start')});
-  // 5) ritmo: créditos acreditados por periodo y proyección
-  const crPer={};ac.forEach(a=>{const i=eqv(a)?'EQV':perIdx(a[2]);if(i==null)return;crPer[i]=(crPer[i]||0)+(c[a[0]]?.[1]||0)});
-  const pk=Object.keys(crPer).filter(k=>k!=='EQV').map(Number).sort((a,b)=>a-b), cmax=Math.max(1,...Object.values(crPer));
-  const W5=780, cols5=[...(crPer.EQV?['EQV']:[]),...pk], bw5=Math.min(90,(W5-P.l-P.r)/Math.max(cols5.length,1));let g5='';   // gráfica ancha: proporción propia
-  cols5.forEach((p,i)=>{const v=crPer[p],h=v/cmax*(H-P.t-P.b),x=P.l+i*bw5+bw5*.15;
-    g5+=`<rect x="${x}" y="${H-P.b-h}" width="${bw5*.7}" height="${h}" rx="3" class="st-bar" ${p==='EQV'?'style="fill:var(--n4)"':''}/>`+t(x+bw5*.35,H-P.b-h-4,fmtCr(v))+t(x+bw5*.35,H-12,p==='EQV'?'equiv.':perName(p),'middle','mut')});
-  const ult=pk.slice(-3).map(p=>crPer[p]), ritmo=prom(ult), falta=A.avance?.faltan??null;
-  const nper=ritmo&&falta!=null?Math.ceil(falta/ritmo):null, meta=perMeta(), fin=nper!=null&&meta!=null?perName(meta+nper-1):null;
-  const dur=A.carga?.duracion, cursados=A.avance?.cursados, totalPer=nper!=null&&cursados!=null?cursados+nper:null;
-  const proy=ritmo?`A tu ritmo de los últimos periodos (<b>${fmtCr(ritmo)}</b> créditos por periodo), te faltan unos <b>${nper}</b> periodos${fin?`: terminarías en <b>${fin}</b>`:''}.`+
-    (totalPer&&dur?` Serían ${totalPer} periodos en total; el plan dura ${dur}${A.carga?.duracion_max?` y el máximo es ${A.carga.duracion_max}`:''}.`:''):'';
-  const nEqv=ac.filter(eqv).length;
-  box.innerHTML=`<div class="st-grid2">
-    <figure><figcaption>Promedio por periodo</figcaption>${pers.length?svg(g1):'<p class="muted">Sin periodos con calificación.</p>'}${nEqv?`<p class="st-note">No incluye ${nEqv} materias acreditadas por equivalencia.</p>`:''}</figure>
-    <figure><figcaption>Calificaciones</figcaption>${svg(g2)}</figure>
-    <figure><figcaption>Forma de acreditación</figcaption>${svg(g3,60)}<div class="st-leg">${leg3}</div></figure>
-    ${cats.length?`<figure><figcaption>Promedio por categoría</figcaption>${svg(g4,H4)}</figure>`:''}
-    <figure class="st-wide"><figcaption>Créditos acreditados por periodo</figcaption>${svg(g5,H,W5)}<p class="st-note">${proy}</p></figure>
-  </div>`;
+  const D=statsDatos(), A=ALUMNO;
+  if(!D.rows.length){box.innerHTML='<p class="muted">El kárdex no trae calificaciones.</p>';return}
+  const f2=v=>v==null||!isFinite(v)?'—':(+v).toFixed(2), sg=v=>v==null?'':(v>=0?'+':'')+v.toFixed(2);
+  const dur=A.carga?.duracion, cursados=A.avance?.cursados, totalPer=D.nper!=null&&cursados!=null?cursados+D.nper:null;
+  const kpi=(lbl,val,sub='',cls='')=>`<div class="kpi"><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
+  box.innerHTML=`<div class="kpis">
+      ${kpi('Promedio',f2(D.media),D.delta!=null?`<span class="${D.delta>=0?'up':'down'}">${D.delta>=0?'▲':'▼'} ${sg(D.delta)}</span> vs. periodo anterior`:'')}
+      ${kpi('Dispersión (σ)',f2(D.sd),`mediana ${f2(D.mediana)} · n = ${D.rows.length}`)}
+      ${kpi('En ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.reg.length} materias sin equivalencias`)}
+      ${kpi('Ritmo',D.ritmo?fmtCr(D.ritmo)+' cr':'—','por periodo (últimos 3)')}
+      ${kpi('Egreso estimado',D.fin!=null?perName(D.fin):'—',totalPer?`${totalPer} periodos${dur?` · plan ${dur}${A.carga?.duracion_max?`, máx. ${A.carga.duracion_max}`:''}`:''}`:'',totalPer&&A.carga?.duracion_max&&totalPer>A.carga.duracion_max?'down':'')}
+    </div>
+    <div class="charts">
+      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>Créditos acumulados por periodo frente a la trayectoria del plan; la línea punteada proyecta tu ritmo actual.</span></figcaption><div id="ch-avance"></div></figure>
+      <figure><figcaption><b>Promedio por periodo</b><span>Media (línea) y rango mínimo–máximo de cada periodo.</span></figcaption><div id="ch-prom"></div></figure>
+      <figure><figcaption><b>Distribución de calificaciones</b><span>Frecuencia; reglas de media (—) y mediana (┄).</span></figcaption><div id="ch-dist"></div></figure>
+      <figure><figcaption><b>Calificaciones por categoría</b><span>Cada punto es una materia; la marca vertical es la media.</span></figcaption><div id="ch-cat"></div></figure>
+      <figure><figcaption><b>Forma de acreditación por periodo</b><span>Materias acreditadas por tipo de evaluación.</span></figcaption><div id="ch-forma"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Mapa de calor: categoría × periodo</b><span>Promedio de cada área de conocimiento en cada periodo.</span></figcaption><div id="ch-heat"></div></figure>
+    </div>
+    ${D.crEqv?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} materias acreditadas por equivalencia (${fmtCr(D.crEqv)} créditos): cuentan en la distribución, las categorías y el avance inicial, pero no en el promedio por periodo ni en el ritmo.</p>`:''}`;
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
+  try{await cargarPlot()}catch(e){box.querySelector('.charts').innerHTML=`<p class="muted">${esc(e.message)}</p>`;return}
+  const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
+  const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
+  const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
+  const put=(id,fig)=>{const el=$(id);el.replaceChildren(fig)};
+  const tickPer=d=>perName(d);
+  // 1) avance acumulado (burn-up)
+  const C=D.curva, x0=C.length?C[0].per:0, durP=A.carga?.duracion||10, tot=D.total;
+  const ideal=tot?d3.range(0,durP+1).map(i=>({per:x0-1+i,acum:tot*i/durP})):[];
+  const proy=D.fin!=null&&C.length&&tot?[{per:C.at(-1).per,acum:C.at(-1).acum},{per:D.fin,acum:tot}]:[];
+  put('#ch-avance',P.plot({...base('#ch-avance'),height:230,x:{label:'Periodo',tickFormat:tickPer,ticks:[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])]},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt)*1.05]},
+    marks:[
+      tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
+      tot?P.text([tot],{y:d=>d,x:x0,text:()=>`total ${fmtCr(tot)}`,dy:-6,textAnchor:'start',fill:MUT}):null,
+      P.line(ideal,{x:'per',y:'acum',stroke:MUT,strokeOpacity:.6,curve:'linear'}),
+      P.areaY(C,{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
+      P.line(C,{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
+      P.line(proy,{x:'per',y:'acum',stroke:ACC,strokeDasharray:'5 4'}),
+      P.dot(C,{x:'per',y:'acum',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} en el periodo`}),
+      proy.length?P.dot([proy[1]],{x:'per',y:'acum',stroke:ACC,fill:'none',r:4}):null,
+      proy.length?P.text([proy[1]],{x:'per',y:'acum',text:d=>`egreso ${perName(d.per)}`,dy:-10,fill:ACC}):null,
+    ].filter(Boolean)}));
+  // 2) promedio por periodo con rango
+  put('#ch-prom',P.plot({...base('#ch-prom'),height:210,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
+    marks:[P.areaY(D.porPer,{x:'per',y1:'min',y2:'max',fill:ACC,fillOpacity:.15,curve:'monotone-x'}),
+      D.media!=null?P.ruleY([D.media],{stroke:MUT,strokeDasharray:'4 3'}):null,
+      P.line(D.porPer,{x:'per',y:'prom',stroke:ACC,strokeWidth:2,curve:'monotone-x'}),
+      P.dot(D.porPer,{x:'per',y:'prom',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\npromedio ${f2(d.prom)}\nrango ${d.min}–${d.max} · ${d.n} materias`})].filter(Boolean)}));
+  // 3) distribución
+  put('#ch-dist',P.plot({...base('#ch-dist'),height:210,x:{label:'Calificación',domain:[5.5,10.5]},y:{label:'Materias',grid:true},
+    marks:[P.rectY(D.rows,P.binX({y:'count'},{x:'cal',thresholds:[5.5,6.5,7.5,8.5,9.5,10.5],fill:ACC,fillOpacity:.75,inset:2,tip:true})),
+      P.ruleX([D.media],{stroke:tok('--fg'),strokeWidth:1.5}),P.ruleX([D.mediana],{stroke:tok('--fg'),strokeDasharray:'3 3'}),P.ruleY([0])]}));
+  // 4) por categoría: puntos (dispersión vertical leve) y media
+  const cats=d3.groups(D.rows,r=>r.cat).map(([k,v])=>({cat:k,media:d3.mean(v,r=>r.cal)})).sort((a,b)=>b.media-a.media).map(d=>d.cat);
+  const jit=D.rows.map((r,i)=>({...r,j:((i*0.618)%1-.5)*0.5}));
+  put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(170,cats.length*34+40),marginLeft:150,x:{label:'Calificación',domain:[5.5,10.5],grid:true},y:{label:null,domain:cats},
+    color:{legend:false},
+    marks:[P.dot(jit,{x:d=>d.cal+d.j*.3,y:'cat',fill:d=>d.eqv?MUT:ACC,fillOpacity:.75,r:4,tip:true,title:d=>`${d.nombre}\n${d.cal} · ${d.forma}${d.per!=null?' · '+perName(d.per):''}`}),
+      P.tickX(D.rows,P.groupY({x:'mean'},{x:'cal',y:'cat',stroke:tok('--fg'),strokeWidth:2}))]}));
+  // 5) forma de acreditación por periodo (barras apiladas)
+  const fr=D.rows.map(r=>({...r,lbl:r.eqv?'Equiv.':perName(r.per)}));
+  const ordenLbl=[...(D.crEqv?['Equiv.']:[]),...D.porPer.map(d=>d.lbl)];
+  put('#ch-forma',P.plot({...base('#ch-forma'),height:210,x:{label:null,domain:ordenLbl},y:{label:'Materias',grid:true},
+    color:{legend:true,domain:Object.values(FORMAS).filter(f=>D.rows.some(r=>r.forma===f)),range:[OK,tok('--warn'),tok('--bad'),ACC,tok('--n4'),tok('--n6'),tok('--n8')]},
+    marks:[P.barY(fr,P.groupX({y:'count'},{x:'lbl',fill:'forma',inset:1,tip:true})),P.ruleY([0])]}));
+  // 6) mapa de calor categoría × periodo
+  const hm=d3.flatRollup(D.reg,v=>({m:d3.mean(v,r=>r.cal),n:v.length}),r=>r.cat,r=>r.per).map(([cat,per,o])=>({cat,per,lbl:perName(per),...o}));
+  put('#ch-heat',P.plot({...base('#ch-heat'),height:Math.max(150,cats.length*30+50),marginLeft:150,padding:.06,x:{label:null,domain:D.porPer.map(d=>d.lbl)},y:{label:null,domain:cats.filter(k=>hm.some(h=>h.cat===k))},
+    color:{type:'linear',domain:[6,10],scheme:'viridis',legend:true,label:'Promedio'},
+    marks:[P.cell(hm,{x:'lbl',y:'cat',fill:'m',inset:1,rx:3,tip:true,title:d=>`${d.cat} · ${d.lbl}\npromedio ${f2(d.m)} (${d.n})`}),
+      P.text(hm,{x:'lbl',y:'cat',text:d=>f2(d.m).replace(/\.00$/,''),fill:d=>d.m>8.4?'#111':'#fff'})]}));
 }
 
 function renderTray(){renderMap();renderList();renderSide();renderStats()}
