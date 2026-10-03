@@ -215,16 +215,15 @@ input[type=number]{width:5rem}
 .k-chip{display:inline-block;padding:0 6px;border-radius:999px;border:1px solid var(--line);font-size:.72rem;font-weight:600;color:var(--fg)}
 .kpi em.up{font-style:normal;color:var(--ok);font-weight:600}.kpi em.down{font-style:normal;color:var(--ch-alert);font-weight:600}
 .cm-ref{margin:4px 0 0;font-size:.78rem;color:var(--muted)}
-.mt-h{margin:6px 0 2px;font-size:1rem}
-.mt-regla{position:relative;height:10px;margin:30px 0 30px;border-radius:999px;background:var(--line)}
+.mt-h{margin:6px 0 2px;font-size:1rem}.mt-mat{display:inline-block;margin-left:6px;padding:1px 10px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-size:.82rem;font-weight:600}.mt-mat .info{color:inherit}
+.mt-regla{position:relative;height:10px;margin:30px 0 48px;border-radius:999px;background:var(--line)}
 .mt-zona{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--ok);opacity:.35}
 .mt-regla.supera .mt-zona{background:var(--line)}
 .mt-m{position:absolute;top:-4px;height:18px;border-left:3px solid var(--muted);transform:translateX(-1.5px)}
-.mt-m b,.mt-m small{position:absolute;left:4px;white-space:nowrap;font-size:.74rem}
-.mt-m b{top:-20px}.mt-m small{top:20px;color:var(--muted)}
-.mt-m.nec{border-color:var(--accent)}.mt-m.nec b{color:var(--accent)}
-.mt-m.max{border-color:var(--ok)}.mt-regla.supera .mt-m.nec{border-color:var(--ch-alert)}.mt-regla.supera .mt-m.nec b{color:var(--ch-alert)}
-.mt-m.max b,.mt-m.max small{left:auto;right:4px}
+.mt-m>span{position:absolute;left:4px;white-space:nowrap;font-size:.74rem;color:var(--muted)}.mt-m>span b{color:var(--fg)}
+.mt-m.arriba>span{bottom:20px}.mt-m.abajo>span{top:20px}.mt-m.fila2>span{top:36px}.mt-m.fila2{height:36px}.mt-m.izq>span{left:auto;right:4px}
+.mt-m.nec{border-color:var(--accent)}.mt-m.nec>span,.mt-m.nec>span b{color:var(--accent)}
+.mt-m.max{border-color:var(--ok)}.mt-regla.supera .mt-m.nec{border-color:var(--ch-alert)}.mt-regla.supera .mt-m.nec>span,.mt-regla.supera .mt-m.nec>span b{color:var(--ch-alert)}
 .mt-e{margin:0;font-size:.84rem}
 .eqv-fichas{display:flex;flex-wrap:wrap;gap:6px}
 .eqv-f{display:inline-flex;flex-wrap:wrap;align-items:baseline;gap:4px;padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:.84rem}
@@ -1842,11 +1841,21 @@ function metaResumen(D,H,incluyeActual){
   if(M.pendientes===0)return '<p><b>Ya completaste los créditos del plan.</b> Consulta con Gestión Escolar los demás requisitos para concluir tus estudios.</p>';
   // regla: lo que has aprobado por periodo, lo que necesitas y tu máximo autorizado
   const tope=Math.max(M.necesarios,D.ritmo||0,M.autorizada||0)*1.15||1, x=v=>(v/tope*100).toFixed(1)+'%';
-  const marca=(v,cls,t)=>v==null?'':`<span class="mt-m ${cls}" style="left:${x(v)}"><b>${fmtCr(v)}</b><small>${t}</small></span>`;
+  // «necesitas» arriba; «tu ritmo» y «máximo» abajo. En un mismo lado, si dos marcas quedan cerca (o junto al borde
+  // derecho), la etiqueta de la izquierda se escribe hacia la izquierda de su línea para no encimarse.
+  const pos=v=>v/tope*100, ab=[[D.ritmo||null,'ritmo','tu ritmo'],[M.autorizada,'max','máximo']].filter(m=>m[0]!=null).sort((p,q)=>p[0]-q[0]);
+  // abajo: si las dos marcas están cerca, sus etiquetas van a lados opuestos; si el borde derecho no lo permite,
+  // la de la izquierda baja a un segundo renglón
+  const lugar=ab.map(([v])=>({izq:pos(v)>82,fila2:false}));
+  if(ab.length===2&&pos(ab[1][0])-pos(ab[0][0])<16){lugar[0].izq=true;if(pos(ab[1][0])>82){lugar[1].izq=true;lugar[0].fila2=true}}
+  const marca=(v,cls,t,lado,aIzq)=>v==null?'':`<span class="mt-m ${cls} ${lado}${aIzq?' izq':''}" style="left:${x(v)}"><span><b>${fmtCr(v)}</b> ${t}</span></span>`;
   const estado=M.autorizada==null?'No se conoce tu carga máxima autorizada para compararla.':M.supera?`Rebasa tu carga máxima autorizada (${fmtCr(M.autorizada)} cr).`:'Cabe en tu carga máxima autorizada; revisa también la seriación y que haya grupos.';
-  return `<p class="mt-h"><b>${fmtCr(M.necesarios)} créditos por periodo</b>${M.fin!=null?` · de ${perName(M.inicio)} a ${perName(M.fin)}`:''}</p>
+  // equivalencia aproximada en materias: promedio de créditos de las materias del plan que te faltan
+  let porMat=null;try{const c=cur(),hechas=new Set(tr().done),cr=Object.keys(c).filter(k=>!hechas.has(k)&&!isElec(k)&&c[k][1]>0).map(k=>c[k][1]);if(cr.length)porMat=cr.reduce((a,b)=>a+b,0)/cr.length}catch(e){}
+  const nMat=porMat?Math.max(1,Math.round(M.necesarios/porMat)):null;
+  return `<p class="mt-h"><b>${fmtCr(M.necesarios)} créditos por periodo</b>${nMat?` <span class="mt-mat">≈ ${nMat} ${nMat===1?'materia':'materias'} ${info(`Aproximado con el promedio de créditos de las materias que te faltan (${porMat.toFixed(1)} créditos por materia).`)}</span>`:''}${M.fin!=null?` · de ${perName(M.inicio)} a ${perName(M.fin)}`:''}</p>
     <div class="mt-regla${M.supera?' supera':''}" aria-hidden="true"><i class="mt-zona" style="width:${M.autorizada!=null?x(M.autorizada):'100%'}"></i>
-      ${marca(D.ritmo||null,'ritmo','tu ritmo')}${marca(M.necesarios,'nec','necesitas')}${marca(M.autorizada,'max','máximo')}</div>
+      ${marca(M.necesarios,'nec','necesitas','arriba',pos(M.necesarios)>82)}${ab.map(([v,c,t],j)=>marca(v,c,t,lugar[j].fila2?'abajo fila2':'abajo',lugar[j].izq)).join('')}</div>
     <p class="mt-e${M.supera?' warn':''}">${estado}${M.bajoMin?' Es menos que la carga mínima; requiere autorización.':''} ${info('Promedio de créditos que necesitas aprobar por periodo, no una lista exacta de materias. Tu carga autorizada puede cambiar cada periodo; los periodos se estiman con tu cita de reinscripción y tu kárdex.')}</p>`;
 }
 const info=t=>`<span class="info" tabindex="0" role="img" aria-label="${esc(t)}" title="${esc(t)}">ⓘ</span>`;
