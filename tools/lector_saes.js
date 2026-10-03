@@ -14,7 +14,7 @@
   }
   var UNIDAD = UM[1].toLowerCase();
   var SIG = UNIDAD.toUpperCase();
-  if (TOOL && UNIDAD !== 'upiita') TOOL = TOOL.replace(/horarios\.html$/, 'horarios-' + UNIDAD + '.html');   // herramienta de esa unidad
+  if (TOOL) TOOL = TOOL.replace(/horarios(-[a-z]+)?\.html$/, 'horarios-' + UNIDAD + '.html');   // herramienta de esa unidad
   // claves: letra + 3 dígitos (B101) o con letras (optativas de la ESCOM); siempre con al menos un dígito
   var CLAVE = /^(?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6}$/i;
   var byId = function (d, id) { return d.querySelector('[id$="mainCopy_' + id + '"]'); };

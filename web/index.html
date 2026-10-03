@@ -3,8 +3,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="assets/icono/favicon.ico">
-<title>IPN-tools · Herramientas de libre acceso para el alumnado de la UPIITA-IPN</title>
-<meta name="description" content="IPN-tools: herramientas digitales de libre acceso para el alumnado de la UPIITA-IPN: planeación de la reinscripción, armado de horarios y liberación de electivas.">
+<title>IPN-tools · Herramientas de libre acceso para el alumnado del IPN</title>
+<meta name="description" content="IPN-tools: herramientas digitales de libre acceso para el alumnado del IPN (UPIITA, ESCOM y UPIBI): planeación de la reinscripción, armado de horarios y liberación de electivas.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap">
 <style>
@@ -31,18 +31,22 @@ a.card b{display:block;font-size:1.1rem;margin-bottom:4px}
 a.card span{color:var(--muted);font-size:.92rem}
 ul{padding-left:1.2rem;margin:0 0 10px} li{margin-bottom:6px}
 a{color:var(--accent)}
+.unis{display:grid;gap:10px}
+.uni{border:1px solid var(--line);border-radius:12px;background:var(--surface);overflow:hidden}
+.uni>button{display:flex;align-items:center;gap:14px;width:100%;padding:14px 18px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.uni>button b{font-size:1.1rem;min-width:4.5em}.uni>button span{color:var(--muted);font-size:.9rem;flex:1}
+.uni>button i{font-style:normal;color:var(--muted);transition:transform .15s}.uni>button[aria-expanded="true"] i{transform:rotate(90deg)}
+.uni>button[aria-expanded="true"]{border-bottom:1px solid var(--line)}.uni:has(>button[aria-expanded="true"]){border-color:var(--accent)}
+.uni .grid{padding:14px}.uni .grid[hidden]{display:none}.uni a.card{background:var(--bg)}
 footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 18px}
 </style>
 <main>
   <div class="brand"><img src="assets/icono/ipn-tools-icono-192.png" alt="Ícono de IPN-tools"><h1>IPN-tools</h1><!--__CUENTA_BTN__--></div>
-  <p class="lead">Herramientas digitales de libre acceso para el alumnado de la UPIITA-IPN. Apoyan la planeación de la reinscripción, el armado de horarios y la liberación de electivas, y se irán ampliando a otros procesos académicos. Versión de prueba.</p>
+  <p class="lead">Herramientas digitales de libre acceso para el alumnado del IPN. Apoyan la planeación de la reinscripción, el armado de horarios y la liberación de electivas; las unidades académicas se incorporan de forma gradual. Versión de prueba.</p>
 
-  <div class="grid">
-    <a class="card" href="horarios.html"><b>Horarios UPIITA</b><span>Mapa curricular y trayectoria, oferta del SAES, armado y generación de horarios.</span></a>
-    <a class="card" href="horarios-escom.html"><b>Horarios ESCOM</b><span>Versión de prueba para la Escuela Superior de Cómputo: mapas 2020, oferta y armado de horarios.</span></a>
-    <a class="card" href="electivas.html"><b>Electivas UPIITA</b><span>Actividades acreditables, créditos y formatos DIE-03 y formulario llenos.</span></a>
-    <a class="card" href="revision.html"><b>Guía de revisión</b><span>Instructivo, perfil de demostración y casos de prueba.</span></a>
-  </div>
+  <h2>Elige tu unidad académica</h2>
+  <div class="unis" id="unis"></div>
+  <p style="margin-top:14px;font-size:.9rem"><a href="revision.html">Guía de revisión</a>: instructivo, perfil de demostración y casos de prueba.</p>
 
   <h2>Tus datos</h2>
   <p>IPN-tools no tiene servidor ni base de datos: todo se procesa en tu navegador. Si quieres usar tus datos en varios dispositivos, puedes iniciar sesión con Microsoft o con Google. Tu información se guarda en tu propio OneDrive o Google Drive, en un espacio al que solo tiene acceso la aplicación.</p>
@@ -56,5 +60,23 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:v
 </main>
 <script>
 /*__CUENTA_JS__*/
+// Unidades académicas y sus herramientas: al elegir una se despliegan sus herramientas (se recuerda en este navegador)
+(function(){
+  const UNIS=/*__UNIDADES__*/[];
+  const EXTRA={upiita:[{t:'Electivas UPIITA',u:'electivas.html',d:'Actividades acreditables, créditos y formatos DIE-03 y formulario llenos.'}]};
+  const DESC={upiita:'Mapa curricular y trayectoria, oferta del SAES, estadísticas, armado y generación de horarios.',
+    escom:'Mapas curriculares 2020, trayectoria, oferta del SAES y armado de horarios.',
+    upibi:'Mapas por nivel, oferta del SAES, equivalencias entre carreras y armado de horarios.'};
+  const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let sel=null;try{sel=localStorage.getItem('ipnt.unidad')}catch(e){}
+  const box=document.getElementById('unis');
+  const pinta=()=>{box.innerHTML=UNIS.filter(u=>u.disponible).map(u=>{const on=u.id===sel;
+    const tools=[{t:'Horarios '+u.siglas,u:u.url,d:DESC[u.id]||'Mapa curricular, oferta del SAES y armado de horarios.'},...(EXTRA[u.id]||[])];
+    return `<div class="uni"><button type="button" data-uni="${esc(u.id)}" aria-expanded="${on}" aria-controls="t-${esc(u.id)}"><b>${esc(u.siglas)}</b><span>${esc(u.nombre)}</span><i aria-hidden="true">›</i></button>`+
+      `<div class="grid" id="t-${esc(u.id)}"${on?'':' hidden'}>${tools.map(x=>`<a class="card" href="${esc(x.u)}"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></a>`).join('')}</div></div>`}).join('')};
+  box.addEventListener('click',e=>{const b=e.target.closest('[data-uni]');if(!b)return;
+    sel=sel===b.dataset.uni?null:b.dataset.uni;try{sel?localStorage.setItem('ipnt.unidad',sel):localStorage.removeItem('ipnt.unidad')}catch(e){}pinta()});
+  pinta();
+})();
 </script>
 </html>

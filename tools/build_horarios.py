@@ -834,10 +834,15 @@ def main():
         write_dist(nombre, saes.inject(html, "horarios", site + nombre + ".html" if site else "", UCONF), f" | {UCONF['siglas']} IPN", UCONF)
         print(OUT, len(html), {k: len(v) for k, v in data["periodos"].items()}, "salones", data.get("salones"))
         return
-    write_dist("horarios", saes.inject(html, "horarios", site + "horarios.html" if site else ""))
+    write_dist("horarios-upiita", saes.inject(html, "horarios", site + "horarios-upiita.html" if site else ""))
+    # horarios.html ya no es la UPIITA: lleva a la unidad que este navegador ya usa o muestra el selector de unidad
+    # (los marcadores y enlaces anteriores apuntan aquí)
+    unis = json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8")).get("unidades", [])
+    (ROOT / "web" / "dist" / "horarios.html").write_text(selector_horarios(unis), encoding="utf-8")
     (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
     idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
+    idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8")).get("unidades", []), ensure_ascii=False), 1)
     (ROOT / "web" / "dist" / "index.html").write_text(idx, encoding="utf-8")   # página principal con inicio de sesión
     for f in ("revision.html", "privacidad.html", "condiciones.html"):
         shutil.copy(ROOT / "web" / f, ROOT / "web" / "dist" / f)
@@ -847,10 +852,52 @@ def main():
         if f.suffix in (".png", ".ico", ".svg") and (f.name.startswith("ipn-tools-icono") or f.name == "favicon.ico"):   # no los bocetos
             shutil.copy(f, ico / f.name)   # retorno del inicio de sesión (ventana emergente)
     if site:   # Lector publicado como archivo para el marcador corto (Chrome para Android corta los marcadores largos)
-        (ROOT / "web" / "dist" / "lector.js").write_text(saes.lector_js(site + "horarios.html"), encoding="utf-8")
+        (ROOT / "web" / "dist" / "lector.js").write_text(saes.lector_js(site + "horarios-upiita.html"), encoding="utf-8")
         # capturador de la oferta del SAES (cualquier unidad) para el marcador corto
         (ROOT / "web" / "dist" / "captura.js").write_text((ROOT / "tools" / "captura_saes.js").read_text(encoding="utf-8"), encoding="utf-8")  # versión con encabezado institucional para el servidor de la UPIITA
     print(OUT, len(html), {k: len(v) for k, v in data["periodos"].items()})
+
+
+def selector_horarios(unis):
+    """Página horarios.html: redirige a la unidad recordada (ipnt.unidad, el Lector o datos guardados) o deja elegirla."""
+    import html as h
+    lista = "".join(f'<a class="u" href="{h.escape(u["url"])}"><b>Horarios {h.escape(u["siglas"])}</b><span>{h.escape(u["nombre"])}</span></a>'
+                    for u in unis if u.get("disponible"))
+    destinos = json.dumps({u["id"]: u["url"] for u in unis if u.get("disponible")})
+    return f"""<!doctype html>
+<html lang="es">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Horarios | IPN-tools</title>
+<link rel="icon" href="assets/icono/favicon.ico">
+<script>
+// Unidad recordada: la última página de Horarios abierta, la unidad del Lector o datos guardados de la UPIITA (claves hu.*)
+(function(){{var D={destinos},u=null;
+  try{{u=localStorage.getItem('ipnt.unidad');
+    if(!D[u]){{var a=JSON.parse(localStorage.getItem('saes.alumno')||'null');u=a&&(a.unidad||'upiita')}}
+    if(!D[u]){{for(var i=0;i<localStorage.length;i++){{var k=localStorage.key(i);if(/^hu[.]/.test(k)&&!/^hu[.](escom|upibi)[.]/.test(k)){{u='upiita';break}}}}}}
+  }}catch(e){{}}
+  if(D[u])location.replace(D[u]+location.search+location.hash);}})();
+</script>
+<style>
+:root{{--bg:#faf8f9;--fg:#231f20;--muted:#6b6266;--line:#e4dde0;--surface:#fff;--accent:#8a1849}}
+@media (prefers-color-scheme:dark){{:root{{--bg:#171416;--fg:#ece6e9;--muted:#a99ea3;--line:#332c30;--surface:#211d20;--accent:#e889b2}}}}
+body{{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,sans-serif}}
+main{{max-width:720px;margin:0 auto;padding:40px 16px}}
+h1{{font-size:1.5rem;margin:0 0 6px}} p{{color:var(--muted);margin:0 0 20px}}
+.g{{display:grid;gap:12px}}
+a.u{{display:block;padding:16px 18px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:inherit;text-decoration:none}}
+a.u:hover{{border-color:var(--accent)}} a.u b{{display:block;font-size:1.05rem}} a.u span{{color:var(--muted);font-size:.9rem}}
+a{{color:var(--accent)}}
+</style>
+<main>
+  <h1>Horarios</h1>
+  <p>Selecciona tu unidad académica.</p>
+  <div class="g">{lista}</div>
+  <p style="margin-top:24px"><a href="index.html">Volver a IPN-tools</a></p>
+</main>
+</html>
+"""
 
 
 if __name__ == "__main__":

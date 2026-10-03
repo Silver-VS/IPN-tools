@@ -10,7 +10,9 @@ Herramientas web estáticas de libre acceso para el alumnado del IPN (sin servid
 
 - **Horarios** (`web/horarios.template.html`): mapa curricular, trayectoria con datos del SAES, minimapa de avance,
   simulación de fin de semestre, estadísticas y análisis, oferta del SAES y armado/generación de horarios.
-  Unidades: UPIITA (`horarios.html`), ESCOM (`horarios-escom.html`, `UNIDAD=escom`) y UPIBI (`horarios-upibi.html`, `UNIDAD=upibi`).
+  Unidades: UPIITA (`horarios-upiita.html`), ESCOM (`horarios-escom.html`, `UNIDAD=escom`) y UPIBI (`horarios-upibi.html`,
+  `UNIDAD=upibi`). `horarios.html` es un selector: redirige a la unidad recordada (`ipnt.unidad`) o deja elegirla.
+  La página de inicio (`web/index.html`) agrupa las herramientas por unidad académica.
 - **Electivas** (`web/electivas.template.html`): DIE-03 por modalidad y formulario (solo UPIITA).
 - **Lector** (`tools/lector_saes.js`): marcador que lee el SAES del alumno (solo lectura) en cualquier unidad.
 - **Capturador** (`tools/captura_saes.js`): oferta y mapa curricular del SAES de cualquier unidad.
@@ -36,10 +38,10 @@ Sitio en vivo: https://silver-vs.github.io/upiita/ (se publica desde el reposito
 
 ```bash
 export UPIITA_SITE=https://silver-vs.github.io/upiita/
-python tools/build_horarios.py              # UPIITA -> web/dist/horarios.html (+ index, legales, íconos)
+python tools/build_horarios.py              # UPIITA -> web/dist/horarios-upiita.html (+ horarios.html, index, legales, íconos)
 UNIDAD=escom python tools/build_horarios.py # ESCOM  -> web/dist/horarios-escom.html
 python tools/build_electivas.py
-python -m http.server 8080 --directory web  # http://localhost:8080/dist/horarios.html
+python -m http.server 8080 --directory web  # http://localhost:8080/dist/index.html
 ```
 
 Comprobación mínima tras cada cambio: compila sin errores, los `<script>` de `web/dist/*.html` se parsean

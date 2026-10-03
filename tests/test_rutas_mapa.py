@@ -21,7 +21,7 @@ def cruza_caja(a, b, box, m=1.0):
 
 class RutasMapa(unittest.TestCase):
     def mapas(self):
-        for f in ('horarios.html', 'horarios-escom.html', 'horarios-upibi.html'):
+        for f in ('horarios-upiita.html', 'horarios-escom.html', 'horarios-upibi.html'):
             html = (DIST / f).read_text(encoding='utf8')
             data = json.loads(re.search(r'const DATA=(.*?);\n', html).group(1))
             for car, mp in data.get('mapas', {}).items():

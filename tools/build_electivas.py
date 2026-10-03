@@ -63,7 +63,7 @@ def main():
     from institucional import write_dist
     import os
     site = os.environ.get("UPIITA_SITE", "")  # p. ej. https://silver-vs.github.io/upiita/ : el marcador abre esta dirección
-    write_dist("electivas", saes.inject(html, "electivas", site + "horarios.html" if site else ""))  # versión con encabezado institucional para el servidor de la UPIITA
+    write_dist("electivas", saes.inject(html, "electivas", site + "horarios-upiita.html" if site else ""))  # versión con encabezado institucional para el servidor de la UPIITA
     print(OUT, round(len(html) / 1024), "KB", len(rows), "clases", len(curric), "materias")
 
 

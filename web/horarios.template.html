@@ -732,6 +732,7 @@ let ALUMNO=SAES.load();
 // El perfil conserva los ids del SAES; la vista distingue los planes que reutilizan claves.
 const carreraPerfil=d=>d?(Object.entries(DATA.opciones_plan||{}).find(([,v])=>v.carrera===d.carrera&&v.plan===d.plan)?.[0]||
   (Object.values(DATA.opciones_plan||{}).some(v=>v.carrera===d.carrera)?null:d.carrera)):null;
+try{localStorage.setItem('ipnt.unidad',UNIDAD)}catch(e){}   // horarios.html e inicio: abrir directo esta unidad
 const isPersonal=()=>!!ALUMNO&&carreraPerfil(ALUMNO)===S.car;
 const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprobadas
 /* Simulación de fin de semestre (solo exploración, nunca toca los datos del SAES):
