@@ -204,7 +204,7 @@ input[type=number]{width:5rem}
 .kpi b{font-size:1.65rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
 .kpi small{font-size:.78rem;color:var(--muted)}
 .kpi-v{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
-.tip-flot{position:fixed;z-index:60;max-width:min(320px,calc(100vw - 16px));padding:8px 10px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:.8rem;line-height:1.4;box-shadow:0 6px 20px rgb(0 0 0 / .25);pointer-events:none}
+.tip-flot{position:fixed;z-index:60;font-family:system-ui,sans-serif;max-width:min(320px,calc(100vw - 16px));padding:8px 10px;border-radius:8px;background:var(--fg);color:var(--bg);font-size:.8rem;line-height:1.4;box-shadow:0 6px 20px rgb(0 0 0 / .25);pointer-events:none}
 .info{display:inline-grid;place-items:center;width:1.15em;height:1.15em;border-radius:50%;font-size:.8em;color:var(--muted);cursor:help;text-transform:none;letter-spacing:0;vertical-align:1px}
 .info:hover,.info:focus{color:var(--accent);outline:none}
 .k-regla{position:relative;flex:1;max-width:120px;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--g6),var(--g7),var(--g8),var(--g9),var(--g10));margin-bottom:10px}
@@ -241,7 +241,8 @@ input[type=number]{width:5rem}
 .cm-track i{display:block;height:100%}.cm-track .hecho{background:var(--accent)}
 .cm-track .rayado{background:repeating-linear-gradient(135deg,var(--accent) 0 4px,transparent 4px 9px);opacity:.75}
 .cm-past,.cm-fut{position:relative;height:22px;font-size:.72rem;color:var(--muted)}
-.cm-m{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.cm-m{position:absolute;transform:translateX(-50%);white-space:nowrap}.cm-m.der{transform:translateX(-100%)}.cm-m.izq{transform:none}
+.cm-m.der::before,.cm-m.der::after{left:100%!important}.cm-m.izq::before,.cm-m.izq::after{left:0!important}
 .cm-past .cm-m{bottom:2px}.cm-past .cm-m::after{content:'';position:absolute;left:50%;bottom:-6px;height:6px;border-left:1px solid var(--muted)}
 .cm-fut .cm-m{top:4px;color:var(--accent)}.cm-fut .cm-m::before{content:'';position:absolute;left:50%;top:-8px;height:7px;border-left:2px solid var(--accent)}
 .cm-fut .cm-m.fuera{color:var(--ch-alert)}.cm-fut .cm-m.fuera::before{border-color:var(--ch-alert)}
@@ -426,7 +427,7 @@ details.box2>summary{cursor:pointer;font-weight:600;font-size:.92rem}
 
 /* fijo al desplazar, con su propio scroll: nunca más alto que la ventana (aunque la columna de la oferta sea larga) */
 .planner{position:sticky;top:calc(env(safe-area-inset-top,0px) + 96px);max-height:calc(100vh / var(--ui-zoom,1) - 96px - 12px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:4px}
-@media (max-width:980px){.planner{position:static;max-height:none;overflow:visible;padding-right:0}}
+@media (max-width:980px){.planner{position:static;max-height:none;overflow:visible;padding-right:0;order:-1}}   /* teléfono: el horario arriba de la oferta */
 .plans{display:flex;gap:4px;align-items:center;margin-bottom:8px;flex-wrap:wrap}
 .plans .chip{font-family:var(--f-display);font-weight:600;letter-spacing:.02em}
 .plans .chip small{font-family:var(--f-mono);font-weight:400;color:inherit;opacity:.75;margin-left:4px}
@@ -798,12 +799,16 @@ const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprob
    las materias en curso se dan por aprobadas, salvo las que el alumno marque como reprobadas. */
 const SIM=Object.assign({on:false,fail:[],res:{},rec:{}},store.get('sim',{}));   // res: {clave:{ok,cal}}; rec: {clave:{forma,cal}}
 (SIM.fail||[]).forEach(k=>{SIM.res[k]=SIM.res[k]||{ok:false}});SIM.fail=[];   // versión anterior: solo lista de reprobadas
+// materias de este plan equivalentes a una clave de otra carrera o plan, según la tabla de Equivalencias del SAES
+const eqvPlan=k=>{const c=cur(),out=new Set();(DATA.equiv?.rel||[]).forEach(([o,ko,,d,kd])=>{if(ko===k&&d===S.car&&c[kd])out.add(kd);if(kd===k&&o===S.car&&c[ko])out.add(ko)});return [...out]};
 const tr=()=>{
   if(!T[S.car]){
     const t=store.get('t.'+S.car,{want:[]}), me=isPersonal();
     const done0=me?[...new Set((ALUMNO.acreditadas||[]).filter(a=>a&&a[1]!=null&&String(a[1]).trim()!==''&&Number.isFinite(+a[1])&&+a[1]>=6&&+a[1]<=10).map(a=>a[0]))]:[];
     const enc=me?((ALUMNO.en_curso||[]).length?ALUMNO.en_curso:(ALUMNO.horario_inscrito||[]).map(h=>h[1])):[];
-    const enCurso=enc.filter(k=>cur()[k]&&!done0.includes(k));
+    // inscrita de otra carrera o plan con equivalencia registrada (tabla del SAES): cuenta como su materia de este plan
+    const encEqv=enc.filter(k=>!cur()[k]).flatMap(eqvPlan);
+    const enCurso=[...new Set([...enc,...encEqv])].filter(k=>cur()[k]&&!done0.includes(k));
     const pendRep=me?[...new Set([...(ALUMNO.reprobadas_periodo||[]).map(r=>r[0]),...Object.keys(cur()).filter(k=>(ALUMNO.reprobadas||[]).some(r=>norm(r[0])===norm(cur()[k][0])))])]
       .filter(k=>cur()[k]&&!done0.includes(k)&&!enCurso.includes(k)):[];
     const sim=me&&SIM.on&&(enCurso.length>0||pendRep.length>0);
@@ -821,7 +826,7 @@ const tr=()=>{
     const desfS=me?(ALUMNO.desfasadas_saes||[]).map(r=>r[0]).filter(k=>cur()[k]&&!doneS.has(k)):[];
     // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
     const pmeta=perMeta(), oblig=[...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS];
-    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
+    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,encEqv,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
   }
   return T[S.car];
 };
@@ -1195,8 +1200,8 @@ function renderEqvHorario(A){
   const H=(A.horario_inscrito||[]).filter(h=>h&&h[1]&&!c[h[1]]);
   const ext=[...new Map(H.map(h=>[h[1],h])).values()];
   box.hidden=!ext.length;if(!ext.length){box.innerHTML='';return}
-  const eq=k=>{const out=new Set();(DATA.equiv?.rel||[]).forEach(([o,ko,,d,kd])=>{if(ko===k&&d===S.car&&c[kd])out.add(kd);if(kd===k&&o===S.car&&c[ko])out.add(ko)});return [...out]};
-  box.innerHTML=`<h3>Equivalencias en tu horario ${info('Materias inscritas de otra carrera o plan (por ejemplo, por movilidad/flexibilidad académica o cambio de carrera). No se cuentan en tu avance ni en la simulación hasta que el SAES las reconozca en tu plan. Correspondencia según la tabla de Equivalencias del SAES.')}</h3><div class="eqv-fichas">`+
+  const eq=eqvPlan;
+  box.innerHTML=`<h3>Equivalencias en tu horario ${info('Materias inscritas de otra carrera o plan (por ejemplo, por movilidad/flexibilidad académica o cambio de carrera). En el mapa y en la simulación cuentan como su materia equivalente de tu plan; en tus créditos oficiales, cuando el SAES las reconozca. Correspondencia según la tabla de Equivalencias del SAES.')}</h3><div class="eqv-fichas">`+
     ext.map(h=>{const m=eq(h[1]);return `<span class="eqv-f${m.length?'':' sin'}" title="${esc(pretty(h[2]||h[1]))} ${esc(h[1])}${h[0]?' · grupo '+esc(h[0]):''}"><b>${esc(pretty(h[2]||h[1]))}</b> <span class="mono">${esc(h[1])}</span><i aria-hidden="true">→</i>${m.length?m.map(k=>`<b>${esc(pretty(c[k][0]))}</b> <span class="mono">${esc(k)}</span>`).join(' o '):'<em>sin equivalencia registrada</em>'}</span>`}).join('')+'</div>';
 }
 function renderInsp(){
@@ -1240,6 +1245,7 @@ function renderSide(){
     const D=statsDatos(), obt=D.obt, tot=D.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
     const cm=String(A.cita?.inicio||'').match(/(\d+\/\d+\/\d{4})\s+(\d+):(\d+)(?::\d+)?\s*(.*)/);
     $('#status').innerHTML=
+      (()=>{const v=(A.acreditadas||[]).map(x=>+x?.[1]).filter(x=>Number.isFinite(x)&&x>=6&&x<=10);return v.length?tile('Promedio sin reprobadas',(v.reduce((t,x)=>t+x,0)/v.length).toFixed(2),`${v.length} materias acreditadas`,'','Promedio de tus materias acreditadas, sin contar reprobadas ni no acreditadas (incluye equivalencias y revalidaciones).'):''})()+
       tile('Promedio oficial',A.promedio??'—',A.promedio==null?'El SAES no lo mostró: suele aparecer con tu cita de reinscripción; actualiza tus datos cuando se publique':tr().sim?'La simulación no cambia tu promedio oficial':'')+
       tile(tr().sim?'Créditos (simulación)':'Créditos',`${obt==null?'—':fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot&&obt!=null?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
       tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
@@ -1261,7 +1267,7 @@ function renderSide(){
     $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+
       `<span class="sim-hint">${SIM.on?'El mapa, las sugeridas y las estadísticas se recalculan con tu simulación; tus datos del SAES no cambian.':'Prueba qué pasaría con tus materias en curso y tus reprobadas: aprobar con cierta calificación, reprobar o acreditar por ETS, recurse o extraordinario.'}</span>`+
       `<div class="simrows${SIM.on?'':' off'}">`+
-      ec.map(k=>{const r=SIM.res[k]||{},ok=r.ok!==false;return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small>En curso</small></span>`+
+      ec.map(k=>{const r=SIM.res[k]||{},ok=r.ok!==false;return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small>${tr().encEqv?.includes(k)?'En curso por equivalencia':'En curso'}</small></span>`+
         `<div class="seg sm" role="group"><button type="button" data-simok="${k}" aria-pressed="${ok}"${SIM.on?'':' disabled'}>Aprobada</button><button type="button" data-simko="${k}" aria-pressed="${!ok}"${SIM.on?'':' disabled'}>Reprobada</button></div>`+
         (ok?calSel(k,'simcal',r.cal??8):'<span class="sim-x">pasa a recursar</span>')+`</div>`}).join('')+
       pr.map(k=>{const r=SIM.rec[k]||{};return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small class="bad">Reprobada</small></span>`+
@@ -1854,7 +1860,7 @@ function metaResumen(D,H,incluyeActual){
   // equivalencia aproximada en materias: promedio de créditos de las materias del plan que te faltan
   let porMat=null;try{const c=cur(),hechas=new Set(tr().done),cr=Object.keys(c).filter(k=>!hechas.has(k)&&!isElec(k)&&c[k][1]>0).map(k=>c[k][1]);if(cr.length)porMat=cr.reduce((a,b)=>a+b,0)/cr.length}catch(e){}
   const nMat=porMat?Math.max(1,Math.round(M.necesarios/porMat)):null;
-  return `<p class="mt-h"><b>${fmtCr(M.necesarios)} créditos por periodo</b>${nMat?` <span class="mt-mat">≈ ${nMat} ${nMat===1?'materia':'materias'} ${info(`Aproximado con el promedio de créditos de las materias que te faltan (${porMat.toFixed(1)} créditos por materia).`)}</span>`:''}${M.fin!=null?` · de ${perName(M.inicio)} a ${perName(M.fin)}`:''}</p>
+  return `<p class="mt-h"><b>${fmtCr(M.necesarios)} créditos por periodo</b>${nMat?` <span class="mt-mat">≈ ${nMat} ${nMat===1?'materia':'materias'} por periodo ${info(`Aproximado con el promedio de créditos de las materias que te faltan (${porMat.toFixed(1)} créditos por materia).`)}</span>`:''}${M.fin!=null?` · de ${perName(M.inicio)} a ${perName(M.fin)}`:''}</p>
     <div class="mt-regla${M.supera?' supera':''}" aria-hidden="true"><i class="mt-zona" style="width:${M.autorizada!=null?x(M.autorizada):'100%'}"></i>
       ${marca(M.necesarios,'nec','necesitas','arriba',pos(M.necesarios)>82)}${ab.map(([v,c,t],j)=>marca(v,c,t,lugar[j].fila2?'abajo fila2':'abajo',lugar[j].izq)).join('')}</div>
     <p class="mt-e${M.supera?' warn':''}">${estado}${M.bajoMin?' Es menos que la carga mínima; requiere autorización.':''} ${info('Promedio de créditos que necesitas aprobar por periodo, no una lista exacta de materias. Tu carga autorizada puede cambiar cada periodo; los periodos se estiman con tu cita de reinscripción y tu kárdex.')}</p>`;
@@ -1930,7 +1936,7 @@ async function renderStats(){
   const barras=ult.length?`<span class="k-bars" aria-hidden="true">${ult.map(d=>`<i style="height:${Math.max(4,d.cr/crmax*100)}%" title="${esc(d.lbl)}: ${fmtCr(d.cr)} créditos"></i>`).join('')}</span>`:'';
   const dTxt=D.delta!=null&&Math.abs(D.delta)>=.01?`<em class="${D.delta>0?'up':'down'}">${D.delta>0?'▲':'▼'} ${Math.abs(D.delta).toFixed(2)}</em> frente al periodo anterior`:`${D.rows.length} materias`;
   box.innerHTML=`${D.avisos.length?`<p class="st-note">${D.avisos.map(esc).join(' ')}</p>`:''}<div class="kpis">
-      ${kpi(D.rows.some(r=>r.sim)?'Promedio de aprobadas · simulado':'Promedio de aprobadas',f2(D.media),regla(D.media),dTxt,`Promedio de tus ${D.rows.length} materias aprobadas. A diferencia del promedio oficial, no incluye reprobadas.`)}
+      ${kpi(D.rows.some(r=>r.sim)?'Promedio sin reprobadas · simulado':'Promedio sin reprobadas',f2(D.media),regla(D.media),dTxt,`Promedio de tus ${D.rows.length} materias acreditadas (incluye equivalencias y revalidaciones). A diferencia del promedio oficial, no cuenta reprobadas ni no acreditadas: las que debes se acreditarán con calificación aprobatoria.`)}
       ${kpi('Tus calificaciones',moda!=null&&D.rows.length?`La mayoría en ${moda}`:'—',hist,`mediana ${f2(D.mediana)}`,`Cuántas materias aprobaste con cada calificación, de 6 a 10. Desviación estándar: ${f2(D.sd)} (entre más baja, más parejas).`)}
       ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([l,n])=>`<span class="k-chip">${l} ${n}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario (E), ETS (T) o recurse (R)${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
       ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
@@ -1939,10 +1945,10 @@ async function renderStats(){
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu camino en la carrera</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
       <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
-      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio</b>${ley([['vertical','var(--fg)',`Tu promedio de aprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
-    ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} materias acreditadas por equivalencia, revalidación o dictamen, por ejemplo al cambiar de carrera (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}): cuentan en tus calificaciones, en las áreas y en tus créditos iniciales, pero no en el promedio por periodo ni en los créditos por periodo.</p>`:''}`;
+    ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
   if(!D.rows.length){box.querySelector('.charts').innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';renderAnalisis(D);return}
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
   if(revision!==ST_RENDER)return;
@@ -1964,7 +1970,8 @@ async function renderStats(){
       const inicio=D.actual!=null&&cursados!=null?D.actual-cursados+1:null, limite=plazo.max&&inicio!=null?inicio+plazo.max-1:null;
       const W=host.clientWidth||600;let ult=-1e9;
       const marcas=(lst,cls)=>lst.map(d=>{const x=d.acum/tot*W, ver=x-ult>=46;if(ver)ult=x;
-        return `<span class="cm-m ${cls}${limite!=null&&d.per>limite?' fuera':''}" style="left:${pc(d.acum)}" title="${esc(perName(d.per))}: ${fmtCr(d.acum)} créditos${cls==='fut'?' (estimado)':''}">${ver?esc(perName(d.per)):''}</span>`}).join('');
+        const pp=d.acum/tot*100;
+        return `<span class="cm-m ${cls}${limite!=null&&d.per>limite?' fuera':''}${pp>94?' der':pp<6?' izq':''}" style="left:${pc(d.acum)}" title="${esc(perName(d.per))}: ${fmtCr(d.acum)} créditos${cls==='fut'?' (estimado)':''}">${ver?esc(perName(d.per)):''}</span>`}).join('');
       ult=-1e9;const pasado=marcas(D.curva.filter(d=>!d.sim),'pas');ult=-1e9;const futuro=marcas(proy,'fut');
       const fin=D.falta===0?'Créditos completos':D.fin!=null?`Terminarías en <b>${esc(perName(D.fin))}</b>${totalPer?` (unos ${totalPer} periodos en total)`:''}`:'';
       host.innerHTML=`<p class="cm-h"><span class="cm-n"><b>${fmtCr(D.obt)}</b> de ${fmtCr(tot)} créditos · ${Math.round(D.obt/tot*100)} %${D.falta?` · te faltan ${fmtCr(D.falta)}`:''}</span><span>${fin}</span></p>`+
@@ -1984,10 +1991,12 @@ async function renderStats(){
       (sinP.length?col('Sin periodo',`${sinP.length} materias`,sinP):'')+`</div>`}
   // 3) áreas frente a tu promedio: barras divergentes alrededor de tu promedio de aprobadas
   const porArea=d3.groups(D.rows,r=>r.cat).map(([cat,v])=>({cat,media:d3.mean(v,r=>r.cal),n:v.length})).map(d=>({...d,dif:d.media-D.media})).sort((a,b)=>b.dif-a.dif);
-  const lim=Math.max(1,...porArea.map(d=>Math.abs(d.dif)))*1.25, ALT=tok('--ch-alert')||'#d9480f';
+  // escala fija de al menos ±2.5 puntos: diferencias pequeñas se ven pequeñas; ±0.25 se considera similar (gris)
+  const lim=Math.max(2.5,...porArea.map(d=>Math.abs(d.dif)*1.2)), ALT=tok('--ch-alert')||'#d9480f', SIM_=Math.abs, col=d=>SIM_(d.dif)<.25?MUT:d.dif>0?OK:ALT;
   put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(150,porArea.length*28+50),marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
     x:{axis:null,domain:[-lim,lim]},y:{label:null,domain:porArea.map(d=>d.cat),padding:.3},
-    marks:[P.barX(porArea,{x:'dif',y:'cat',fill:d=>d.dif>=0?OK:ALT,fillOpacity:.8,rx:3,tip:true,title:d=>`${d.cat}\npromedio ${f2(d.media)} (${d.n} ${d.n>1?'materias':'materia'})\n${d.dif>=0?'+':''}${d.dif.toFixed(2)} frente a tu promedio`}),
+    marks:[P.rectX([0],{x1:-.25,x2:.25,fill:MUT,fillOpacity:.06}),
+      P.barX(porArea,{x:'dif',y:'cat',fill:col,fillOpacity:.6,rx:3,tip:true,title:d=>`${d.cat}\npromedio ${f2(d.media)} (${d.n} ${d.n>1?'materias':'materia'})\n${d.dif>=0?'+':''}${d.dif.toFixed(2)} frente a tu promedio`}),
       P.text(porArea.filter(d=>d.dif>=0),{x:'dif',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:6,textAnchor:'start',fill:tok('--fg'),fontWeight:600}),
       P.text(porArea.filter(d=>d.dif<0),{x:'dif',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:-6,textAnchor:'end',fill:tok('--fg'),fontWeight:600}),
       P.ruleX([0],{stroke:tok('--fg'),strokeWidth:1.5})]}));
@@ -2169,9 +2178,10 @@ const cambiarMeta=e=>{
 $('#kstats').addEventListener('input',cambiarMeta);
 /* globo de ayuda inmediato (el «title» nativo tarda ~1 s): un solo elemento fijo, colocado junto al ⓘ sin salirse de la
    pantalla ni quedar recortado por recuadros con overflow; cursor, teclado y toque */
-const TIP=(()=>{const d=document.createElement('div');d.className='tip-flot';d.setAttribute('role','tooltip');d.hidden=true;document.body.appendChild(d);return d})();
+const TIP=(()=>{const d=document.createElement('div');d.className='tip-flot';d.setAttribute('role','tooltip');d.hidden=true;document.documentElement.appendChild(d);return d})();   // fuera del <body>: no hereda su «zoom» (--ui-zoom)
 let tipDe=null;
-function tipMuestra(el){tipDe=el;TIP.textContent=el.dataset.tip;TIP.hidden=false;
+let tipT=0;
+function tipMuestra(el){tipDe=el;tipT=performance.now();TIP.textContent=el.dataset.tip;TIP.hidden=false;
   const r=el.getBoundingClientRect(),w=TIP.offsetWidth,h=TIP.offsetHeight,m=8;
   let x=Math.min(Math.max(m,r.left+r.width/2-w/2),innerWidth-w-m), y=r.bottom+6;
   if(y+h>innerHeight-m)y=r.top-h-6;
@@ -2181,7 +2191,7 @@ document.addEventListener('pointerover',e=>{const el=e.target.closest?.('[data-t
 document.addEventListener('pointerout',e=>{const el=e.target.closest?.('[data-tip]');if(el&&e.pointerType==='mouse'&&!el.contains(e.relatedTarget))tipOculta()});
 document.addEventListener('focusin',e=>{const el=e.target.closest?.('[data-tip]');if(el)tipMuestra(el)});
 document.addEventListener('focusout',e=>{if(e.target.closest?.('[data-tip]'))tipOculta()});
-document.addEventListener('click',e=>{const el=e.target.closest?.('[data-tip]');if(el){e.preventDefault();tipDe===el?tipOculta():tipMuestra(el)}else if(tipDe)tipOculta()},true);
+document.addEventListener('click',e=>{const el=e.target.closest?.('[data-tip]');if(el){e.preventDefault();if(tipDe===el&&performance.now()-tipT>400)tipOculta();else tipMuestra(el)}else if(tipDe)tipOculta()},true);
 addEventListener('scroll',()=>{if(tipDe)tipOculta()},{passive:true,capture:true});
 $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stats',false));renderStats()});
 // las gráficas toman los colores del tema al dibujarse: se redibujan si cambia el tema (sistema o botón)
