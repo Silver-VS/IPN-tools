@@ -1,0 +1,100 @@
+{
+ "carrera": "A",
+ "plan": "20",
+ "estado": "Clasificación propuesta (tools/categorias_escom.py), pendiente de revisión por las academias.",
+ "fuente_seriacion": "mapaCurricularLCD2020H.pdf",
+ "areas": [
+  {
+   "nombre": "Físico-matemáticas",
+   "claves": [
+    "A702",
+    "A505",
+    "A504",
+    "A405",
+    "A305",
+    "A304",
+    "A204",
+    "A202",
+    "A104",
+    "A102"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Informática y computación",
+   "claves": [
+    "A402",
+    "A401",
+    "A301",
+    "A201",
+    "A101"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencia de datos e IA",
+   "claves": [
+    "A701",
+    "A602",
+    "A604",
+    "A601",
+    "A603",
+    "A503",
+    "A501",
+    "A502",
+    "A403",
+    "A404",
+    "A303",
+    "A302",
+    "A105"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación integral",
+   "claves": [
+    "A801",
+    "A802",
+    "A704",
+    "A406",
+    "A306",
+    "A203",
+    "A103"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación profesional",
+   "claves": [
+    "A803",
+    "A804",
+    "A703",
+    "A506"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Especialización",
+   "claves": [],
+   "espacios": [
+    [
+     "Optativa D",
+     7
+    ],
+    [
+     "Optativa C",
+     7
+    ],
+    [
+     "Optativa B",
+     6
+    ],
+    [
+     "Optativa A",
+     6
+    ]
+   ]
+  }
+ ],
+ "seriacion": []
+}

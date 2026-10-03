@@ -152,8 +152,9 @@ def main():
         yc = (b["top"] + b["bottom"]) / 2
         b["sem"] = min(sems, key=lambda r: abs(r[1] - yc))[0]
         n = norm(b["text"])
-        if re.match(r"(?i)^optativa", b["text"]):
-            b["slot"] = "Optativa"
+        mo = re.search(r"(?i)optativa\s+[A-Z]\d?", b["text"])   # el texto puede empezar con las horas («7.5 3/1.5 …»)
+        if mo:
+            b["slot"], b["text"] = "Optativa", mo.group(0)
             continue
         # se compara cada nombre del SAES con el inicio del texto (algunos PDF repiten el texto de la caja)
         # primero entre las materias del mismo semestre que la caja; si no hay parecido suficiente, entre todas

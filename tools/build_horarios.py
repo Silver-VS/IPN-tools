@@ -128,11 +128,19 @@ AREAS = {
 def energia_layout(cur):
     """Mapa generado para Energía (sin trayectoria de academia): columnas por área, filas por semestre del plan."""
     e = json.loads((ROOT / "data" / "energia_areas.json").read_text(encoding="utf-8"))
+    return layout_por_areas(cur, e), e
+
+
+def layout_por_areas(cur, e):
+    """Mapa generado: columnas por área (categoría), filas por semestre, hasta 2 materias por renglón en cada celda.
+    `e["areas"]`: [{nombre, claves, espacios: [[nombre, semestre]]}]; seriación en `e["seriacion"]` (oficial) o
+    `e["seriacion_propuesta"]` (propuesta, líneas punteadas); «@Nombre» se refiere a un espacio (p. ej. «@Optativa A1»)."""
     bw, bh, gap, top, left = 128, 44, 8, 40, 40
     items = []  # (col, sem, clave, slot)
     for ci, a in enumerate(e["areas"]):
         for k in a["claves"]:
-            items.append((ci, cur[k][2], k, ""))
+            if k in cur:
+                items.append((ci, cur[k][2], k, ""))
         for name, sem in a.get("espacios", []):
             items.append((ci, sem, "", name))
     per = {}
@@ -156,17 +164,28 @@ def energia_layout(cur):
                 pos[k] = len(boxes)
             boxes.append([x, y, bw, bh, k, sl, sem])
     edges = []
-    for a, b in e["seriacion_propuesta"]:
+    for (ci, sem), lst in sorted(per.items()):   # posición de los espacios por nombre
+        pass
+    for i, bx in enumerate(boxes):
+        if not bx[4] and bx[5]:
+            pos.setdefault("@" + bx[5], i)
+    propuesta = "seriacion_propuesta" in e
+    for a, b in e.get("seriacion_propuesta", e.get("seriacion", [])):
+        if a not in pos or b not in pos:
+            continue
         A, B = boxes[pos[a]], boxes[pos[b]]
         sx, sy, dx, dy = A[0] + A[2] / 2, A[1] + A[3], B[0] + B[2] / 2, B[1]
         mid = dy - 10
         edges.append([pos[a], pos[b], [round(v, 1) for v in (sx, sy, sx, mid, dx, mid, dx, dy)]])
-    return {
+    out = {
         "w": xs[-1] + widths[-1] + 20, "h": top + (nsem - 1) * pitch + pitch / 2 + 4, "pitch": pitch,
         "rows": [[s, top + (s - 1) * pitch] for s in range(1, nsem + 1)],
-        "boxes": boxes, "edges": edges, "propuesto": True,
+        "boxes": boxes, "edges": edges, "propuesto": propuesta,
         "cols": [[a["nombre"], xs[i], xs[i] + widths[i]] for i, a in enumerate(e["areas"])],
-    }, e
+    }
+    if e.get("nota"):
+        out["nota"] = e["nota"]
+    return out
 
 
 # ISISA: en la UPIITA solo se imparte la opción terminal (7.º a 9.º semestre, línea "S" del plan 08). El resto del plan
@@ -191,6 +210,15 @@ def isisa_layout():
             "nota": "En la UPIITA, Ingeniería en Sistemas Automotrices se imparte únicamente como opción terminal "
                     "(7.º a 9.º semestre). Control inteligente I y II "
                     "corresponden en el SAES a Tópicos selectos de ingeniería I y II."}
+
+
+CATS = json.loads((ROOT / "data" / "categorias.json").read_text(encoding="utf-8")) if (ROOT / "data" / "categorias.json").exists() else {}
+
+
+def nombre_cat(n):
+    """Nombre de columna del catálogo común (data/categorias.json); las áreas propias de una carrera se conservan."""
+    k = CATS.get("sinonimos", {}).get(n)
+    return CATS["categorias"][k]["nombre"] if k else n
 
 
 def layout_de(t, areas=()):
@@ -246,7 +274,15 @@ def load_maps(offer, upiita=True, extra=None):
             if ft.exists():
                 t = json.loads(ft.read_text(encoding="utf-8"))
                 if plan.get(c) == t.get("plan", plan.get(c)):
-                    entry["layout"], entry["generico"] = layout_de(t), False
+                    fa = UNI_DIR / f"areas_{c}.json"
+                    if fa.exists():   # columnas por categoría (data/categorias.json); seriación del mapa oficial
+                        ea = json.loads(fa.read_text(encoding="utf-8"))
+                        ea["nota"] = (f"Mapa curricular {UCONF['siglas']} organizado por áreas de conocimiento (clasificación propuesta, "
+                                      "sujeta a revisión). Las flechas indican la seriación del mapa oficial; al colocar el cursor sobre una "
+                                      "materia se resalta su cadena de requisitos.")
+                        entry["layout"], entry["generico"] = layout_por_areas(cur[c], ea), False
+                    else:
+                        entry["layout"], entry["generico"] = layout_de(t), False
                     if UCONF.get("modelo"):   # el modelo de la unidad aplica a los planes con mapa (ESCOM: planes 2020)
                         entry["modelo"] = UCONF["modelo"]
                     req = {}
@@ -260,7 +296,7 @@ def load_maps(offer, upiita=True, extra=None):
             maps[c] = entry
             continue
         if f.exists():
-            entry["layout"] = layout_de(json.loads(f.read_text(encoding="utf-8")), AREAS.get(c, []))
+            entry["layout"] = layout_de(json.loads(f.read_text(encoding="utf-8")), [[nombre_cat(n), x0, x1] for n, x0, x1 in AREAS.get(c, [])])
             entry["req"] = seri.get(c, {})
         elif c == "S":
             keep = {k for _, ks in ISISA for k in ks}

@@ -1,0 +1,25 @@
+{
+  "descripcion": "Catálogo común de categorías (áreas de conocimiento) para organizar los mapas de todas las carreras en columnas. Base: las áreas de las trayectorias de la UPIITA. Las categorías propias de una carrera se conservan con su nombre.",
+  "orden": ["fm", "comp", "datos", "elec", "ctrl", "redes", "propia", "integral", "prof", "esp"],
+  "categorias": {
+    "fm": {"nombre": "Físico-matemáticas", "incluye": "Matemáticas, física, probabilidad y estadística, métodos numéricos y cuantitativos."},
+    "comp": {"nombre": "Informática y computación", "incluye": "Programación, algoritmos, teoría de la computación, sistemas operativos, ingeniería y desarrollo de software."},
+    "datos": {"nombre": "Ciencia de datos e IA", "incluye": "Bases de datos, inteligencia artificial, aprendizaje de máquina, minería y analítica de datos, visión, lenguaje natural.", "nueva": "Agregada para la ESCOM (LCD, IIA, ISC); no tiene equivalente en las trayectorias de la UPIITA."},
+    "elec": {"nombre": "Electrónica", "incluye": "Circuitos, electrónica analógica y digital, arquitectura de computadoras, procesamiento de señales."},
+    "ctrl": {"nombre": "Sistemas y control", "incluye": "Control, instrumentación, modelado de sistemas dinámicos."},
+    "redes": {"nombre": "Comunicaciones y redes", "incluye": "Redes de computadoras, comunicaciones, sistemas distribuidos y servicios en red."},
+    "integral": {"nombre": "Formación integral", "incluye": "Comunicación, ética, economía, finanzas, gestión, liderazgo y habilidades sociales."},
+    "prof": {"nombre": "Formación profesional", "incluye": "Trabajo terminal, estancia profesional, metodología de la investigación."},
+    "esp": {"nombre": "Especialización", "incluye": "Optativas y líneas de especialización."}
+  },
+  "sinonimos": {
+    "Formación profesional": "prof", "Profesional": "prof",
+    "Sistemas y control": "ctrl", "Control": "ctrl",
+    "Electrónica": "elec",
+    "Informática": "comp", "Computación": "comp",
+    "Físico-matemáticas": "fm",
+    "Formación integral": "integral",
+    "Comunicaciones": "redes",
+    "Especialización": "esp", "Línea de especialización": "esp", "Línea de aplicación": "esp"
+  }
+}

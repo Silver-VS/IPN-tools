@@ -1,0 +1,108 @@
+{
+ "carrera": "B",
+ "plan": "20",
+ "estado": "Clasificación propuesta (tools/categorias_escom.py), pendiente de revisión por las academias.",
+ "fuente_seriacion": "mapaCurricularIIA2020.pdf",
+ "areas": [
+  {
+   "nombre": "Físico-matemáticas",
+   "claves": [
+    "B104",
+    "B105",
+    "B204",
+    "B303",
+    "B403",
+    "B402",
+    "B202",
+    "B102"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Informática y computación",
+   "claves": [
+    "B101",
+    "B201",
+    "B301",
+    "B503",
+    "B302",
+    "B405",
+    "B603",
+    "B404",
+    "B601"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencia de datos e IA",
+   "claves": [
+    "B502",
+    "B505",
+    "B702",
+    "B304",
+    "B401",
+    "B506",
+    "B501",
+    "B406",
+    "B602"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Electrónica",
+   "claves": [
+    "B504",
+    "B203",
+    "B305"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación integral",
+   "claves": [
+    "B703",
+    "B103",
+    "B205",
+    "B306",
+    "B802",
+    "B206",
+    "B804",
+    "B106"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación profesional",
+   "claves": [
+    "B803",
+    "B701",
+    "B801",
+    "B604"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Especialización",
+   "claves": [],
+   "espacios": [
+    [
+     "Optativa A",
+     6
+    ],
+    [
+     "Optativa B",
+     6
+    ],
+    [
+     "Optativa D",
+     7
+    ],
+    [
+     "Optativa C",
+     7
+    ]
+   ]
+  }
+ ],
+ "seriacion": []
+}

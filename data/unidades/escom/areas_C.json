@@ -1,0 +1,262 @@
+{
+ "carrera": "C",
+ "plan": "20",
+ "estado": "Clasificación propuesta (tools/categorias_escom.py), pendiente de revisión por las academias.",
+ "fuente_seriacion": "mapaCurricularISC2020.pdf",
+ "areas": [
+  {
+   "nombre": "Físico-matemáticas",
+   "claves": [
+    "C102",
+    "C103",
+    "C104",
+    "C204",
+    "C203",
+    "C303",
+    "C403",
+    "C402",
+    "C603",
+    "C202"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Informática y computación",
+   "claves": [
+    "C101",
+    "C201",
+    "C301",
+    "C401",
+    "C501",
+    "C302",
+    "C407",
+    "C505",
+    "C618",
+    "C717",
+    "C406"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencia de datos e IA",
+   "claves": [
+    "C601",
+    "C306"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Electrónica",
+   "claves": [
+    "C304",
+    "C305",
+    "C405",
+    "C503",
+    "C502",
+    "C602",
+    "C404"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Sistemas y control",
+   "claves": [
+    "C504"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Comunicaciones y redes",
+   "claves": [
+    "C702",
+    "C507",
+    "C619",
+    "C718"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación integral",
+   "claves": [
+    "C105",
+    "C205",
+    "C802",
+    "C803",
+    "C206",
+    "C506",
+    "C307",
+    "C805"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación profesional",
+   "claves": [
+    "C804",
+    "C701",
+    "C801"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Especialización",
+   "claves": [],
+   "espacios": [
+    [
+     "Optativa A1",
+     6
+    ],
+    [
+     "Optativa B1",
+     6
+    ],
+    [
+     "Optativa B2",
+     7
+    ],
+    [
+     "Optativa A2",
+     7
+    ]
+   ]
+  }
+ ],
+ "seriacion": [
+  [
+   "C502",
+   "C602"
+  ],
+  [
+   "C203",
+   "C402"
+  ],
+  [
+   "C201",
+   "C301"
+  ],
+  [
+   "C201",
+   "C407"
+  ],
+  [
+   "C403",
+   "C502"
+  ],
+  [
+   "C405",
+   "C504"
+  ],
+  [
+   "C404",
+   "C503"
+  ],
+  [
+   "C503",
+   "C602"
+  ],
+  [
+   "C102",
+   "C306"
+  ],
+  [
+   "C201",
+   "C401"
+  ],
+  [
+   "C306",
+   "C505"
+  ],
+  [
+   "C505",
+   "C618"
+  ],
+  [
+   "C401",
+   "C501"
+  ],
+  [
+   "C619",
+   "C702"
+  ],
+  [
+   "C302",
+   "C406"
+  ],
+  [
+   "C201",
+   "C302"
+  ],
+  [
+   "C507",
+   "C619"
+  ],
+  [
+   "C619",
+   "C718"
+  ],
+  [
+   "C101",
+   "C201"
+  ],
+  [
+   "C102",
+   "C304"
+  ],
+  [
+   "C104",
+   "C204"
+  ],
+  [
+   "C204",
+   "C305"
+  ],
+  [
+   "C206",
+   "C307"
+  ],
+  [
+   "C303",
+   "C403"
+  ],
+  [
+   "C305",
+   "C405"
+  ],
+  [
+   "C304",
+   "C404"
+  ],
+  [
+   "C306",
+   "C406"
+  ],
+  [
+   "C307",
+   "C506"
+  ],
+  [
+   "C506",
+   "C618"
+  ],
+  [
+   "@Optativa A1",
+   "@Optativa A2"
+  ],
+  [
+   "@Optativa B1",
+   "@Optativa B2"
+  ],
+  [
+   "C701",
+   "C801"
+  ],
+  [
+   "C103",
+   "C203"
+  ],
+  [
+   "C203",
+   "C303"
+  ]
+ ]
+}

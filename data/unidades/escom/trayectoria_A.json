@@ -94,6 +94,26 @@
    "tipo": "O"
   },
   {
+   "x0": 499.05916741386716,
+   "top": 312.41586390467216,
+   "x1": 552.9532459682805,
+   "bottom": 337.5664338967317,
+   "fill": "#ffff00",
+   "text": "Optativa D",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 420.73310658145317,
+   "top": 312.41586390467216,
+   "x1": 474.62718513586645,
+   "bottom": 337.5664338967317,
+   "fill": "#ffff00",
+   "text": "Optativa C",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
    "x0": 338.0955194646861,
    "top": 312.41586390467216,
    "x1": 391.9895980190994,
@@ -155,7 +175,7 @@
    "x1": 552.2346582542217,
    "bottom": 287.9838816266715,
    "fill": "#ffff88",
-   "text": "Optativa B Optativa B Optativa B",
+   "text": "Optativa B",
    "sem": 6,
    "slot": "Optativa"
   },
@@ -165,7 +185,7 @@
    "x1": 473.9085974218076,
    "bottom": 287.9838816266715,
    "fill": "#ffff88",
-   "text": "Optativa A Optativa A Optativa A",
+   "text": "Optativa A",
    "sem": 6,
    "slot": "Optativa"
   },
