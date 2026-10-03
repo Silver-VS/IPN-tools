@@ -139,7 +139,9 @@
       carrera: claveCar,
       carrera_nombre: clean((cita.querySelector('[id$="mainCopy_DpdCarrera"] option:checked') || {}).textContent),
       plan: (cita.querySelector('[id$="mainCopy_dpdPlanEstudios"] option:checked') || {}).value || null,
-      promedio: num(pick(p, /^promedio/i)),
+      // el promedio aparece en la cita de reinscripción; si no está publicada, se busca en el kárdex («PROMEDIO: 8.14»)
+      promedio: num(pick(p, /^promedio/i)) ?? num(label(kx, /^promedio/i)) ??
+        num(((clean(kx.body ? kx.body.textContent : kx.textContent) || '').match(/PROMEDIO(?:\s+GENERAL)?\s*:?\s*(\d{1,2}(?:\.\d{1,2})?)/i) || [])[1]),
       reprobadas_num: num(pick(p, /reprobadas$/i)),
       cita: { inicio: pick(p, /fecha inscrip/i), fin: pick(p, /caducidad/i) },
       carga: {

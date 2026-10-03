@@ -295,7 +295,7 @@ ALUMNO.acreditadas=[];ALUMNO.avance={};ALUMNO.carga={};D=statsDatos();assert.str
         credito=re.search(r'const creditoValido=.*?;',html).group(0)
         script="""
 const assert=require('assert');const ALUMNO={carga:{min:36.5}},SAES={autorizada:()=>73};
-const fmtCr=String,perName=i=>`${Math.floor(i/2)}/${i%2+1}`;
+const fmtCr=String,perName=i=>`${Math.floor(i/2)}/${i%2+1}`,esc=String;
 const D={falta:198,ritmo:49.5,meta:54,actual:54,simulado:false,ritmoParcial:true};
 """+credito+fn+"""
 for(const [h,v] of [[2,99],[3,66],[4,49.5],[5,39.6],[6,33]])assert.strictEqual(metaCreditos(D,h,true).necesarios,v);
