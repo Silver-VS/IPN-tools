@@ -124,6 +124,22 @@ const MS={disponible:()=>false},GO=MS;
         result = subprocess.run(['node','-e',script],text=True,capture_output=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
+    def test_proyeccion_por_periodo_y_referencia_de_carga(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        fn=html[html.index('function plazoReferencia('):html.index('function statsDatos(')]
+        script="const assert=require('assert');let UNIDAD='upibi';Array.prototype.at=function(i){return this[i<0?this.length+i:i]};"+fn+"""
+const A={carga:{total:438,min:36.5,duracion:15,duracion_max:23}};
+assert.deepStrictEqual(plazoReferencia(A),{dur:null,max:12,calculado:true});
+UNIDAD='upiita';assert.deepStrictEqual(plazoReferencia(A),{dur:15,max:23,calculado:false});
+const points=proyeccionCreditos({curva:[{per:53,acum:240}],fin:57,total:438,obt:240,ritmo:49.5});
+assert.deepStrictEqual(points.map(d=>d.acum),[240,289.5,339,388.5,438]);
+assert.deepStrictEqual(points.map(d=>d.per),[53,54,55,56,57]);
+assert.deepStrictEqual(proyeccionCreditos({curva:[],fin:57,total:438,ritmo:49.5}),[]);
+assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,total:300,obt:240,ritmo:40}).map(d=>d.acum),[240,280,300]);
+"""
+        result=subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_scripts_compilados(self):
         for unit in ('horarios','horarios-escom','horarios-upibi'):
             html = (ROOT/f'web/dist/{unit}.html').read_text(encoding='utf8')

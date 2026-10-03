@@ -1118,8 +1118,8 @@ function renderSide(){
     $('#status').innerHTML=
       tile(tr().sim?'Promedio estimado':'Promedio',tr().sim&&A.promedio!=null?promEstimado().toFixed(2):A.promedio??'—',tr().sim?`actual ${A.promedio??'—'}`:'')+
       tile(tr().sim?'Créditos al terminar':'Créditos',`${fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
-      tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${A.carga?.duracion?' de '+A.carga.duracion:''} periodos`:'','',
-        [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',A.carga?.duracion_max?`máximo ${A.carga.duracion_max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
+      tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
+        [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',plazoReferencia(A).max?`${plazoReferencia(A).calculado?'referencia a carga mínima':'máximo'} ${plazoReferencia(A).max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
       tile('Carga autorizada',aut!=null?fmtCr(aut)+' cr':'—',autTipo?autTipo.charAt(0)+autTipo.slice(1).toLowerCase():'')+
       tile('Desfase oficial',nDes?nDes+(nDes>1?' materias':' materia'):'Ninguno',meta!=null?'en '+perName(meta):'',nDes?'bad':'ok',A.desfase_saes?'Tu última cita: '+A.desfase_saes:'')+
       (DESFASE_SEM.has(S.car)?tile('Atrasadas',atraso,'según el semestre propuesto',atraso?'warn':''):'')+
@@ -1623,6 +1623,16 @@ function promEstimado(){
   const add=[...tr().simOk.map(k=>SIM.res[k]?.cal??8),...tr().simRec.map(k=>SIM.rec[k]?.cal??7),...tr().enCurso.filter(k=>SIM.res[k]?.ok===false).map(()=>5)];
   return (P*n+add.reduce((a,b)=>a+b,0))/(n+add.length);
 }
+// En UPIBI la duración capturada no concuerda con las cargas: usar una referencia explícita, no un plazo reglamentario.
+function plazoReferencia(A){
+  const c=A.carga||{}, calculado=UNIDAD==='upibi'&&c.total>0&&c.min>0;
+  return {dur:calculado?null:c.duracion,max:calculado?Math.ceil(c.total/c.min):c.duracion_max,calculado};
+}
+function proyeccionCreditos(D){
+  const C=D.curva, ultimo=C.at(-1);
+  if(!ultimo||D.fin==null||!D.total||!(D.ritmo>0)||D.fin<=ultimo.per)return [];
+  return Array.from({length:D.fin-ultimo.per+1},(_,i)=>({per:ultimo.per+i,acum:i?Math.min(D.total,D.obt+D.ritmo*i):ultimo.acum}));
+}
 function statsDatos(){
   const c=cur(), A=ALUMNO, cat=catDe();
   const rows=simKardex().map(a=>{const f=String(a[3]||'—').toUpperCase();
@@ -1647,17 +1657,18 @@ async function renderStats(){
   const D=statsDatos(), A=ALUMNO;
   if(!D.rows.length){box.innerHTML='<p class="muted">El kárdex no trae calificaciones.</p>';return}
   const f2=v=>v==null||!isFinite(v)?'—':(+v).toFixed(2), sg=v=>v==null?'':(v>=0?'+':'')+v.toFixed(2);
-  const dur=A.carga?.duracion, cursados=A.avance?.cursados, totalPer=D.nper!=null&&cursados!=null?cursados+D.nper:null;
+  const plazo=plazoReferencia(A), dur=plazo.dur, cursados=A.avance?.cursados, totalPer=D.nper!=null&&cursados!=null?cursados+D.nper:null;
   const kpi=(lbl,val,sub='',cls='')=>`<div class="kpi"><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
   box.innerHTML=`<div class="kpis">
       ${kpi(D.rows.some(r=>r.sim)?'Promedio estimado':'Promedio',f2(D.media),D.delta!=null?`<span class="${D.delta>=0?'up':'down'}">${D.delta>=0?'▲':'▼'} ${sg(D.delta)}</span> vs. periodo anterior`:'')}
       ${kpi('Dispersión (σ)',f2(D.sd),`mediana ${f2(D.mediana)} · n = ${D.rows.length}`)}
       ${kpi('En ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.reg.length} materias sin equivalencias`)}
       ${kpi('Ritmo',D.ritmo?fmtCr(D.ritmo)+' cr':'—','por periodo (últimos 3)')}
-      ${kpi('Egreso estimado',D.fin!=null?perName(D.fin):'—',totalPer?`${totalPer} periodos${dur?` · plan ${dur}${A.carga?.duracion_max?`, máx. ${A.carga.duracion_max}`:''}`:''}`:'',totalPer&&A.carga?.duracion_max&&totalPer>A.carga.duracion_max?'down':'')}
+      ${kpi('Egreso estimado',D.fin!=null?perName(D.fin):'—',totalPer?`${totalPer} periodos${dur?` · plan ${dur}`:''}${plazo.max?` · ${plazo.calculado?'referencia a carga mínima':'máx.'} ${plazo.max}`:''}`:'',totalPer&&plazo.max&&totalPer>plazo.max?'down':'')}
     </div>
+    ${plazo.calculado?`<p class="st-note">Referencia a carga mínima: ${fmtCr(A.carga.total)} ÷ ${fmtCr(A.carga.min)} = ${fmtCr(A.carga.total/A.carga.min)} periodos (redondeados hacia arriba: ${plazo.max}). El SAES indica duración ${A.carga.duracion??'—'} y máxima ${A.carga.duracion_max??'—'}; el plazo reglamentario requiere confirmación con Gestión Escolar.</p>`:''}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>Créditos acumulados por periodo frente a la trayectoria del plan; la línea punteada proyecta tu ritmo actual.</span></figcaption><div id="ch-avance"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>La línea punteada y sus puntos proyectan los créditos a tu ritmo actual. Los puntos rojos exceden el límite indicado; consulta cada punto para ver sus créditos.</span></figcaption><div id="ch-avance"></div></figure>
       <figure><figcaption><b>Promedio por periodo</b><span>Media (línea) y rango mínimo–máximo de cada periodo.</span></figcaption><div id="ch-prom"></div></figure>
       <figure><figcaption><b>Distribución de calificaciones</b><span>Frecuencia; reglas de media (—) y mediana (┄).</span></figcaption><div id="ch-dist"></div></figure>
       <figure><figcaption><b>Calificaciones por categoría</b><span>Cada punto es una materia; la marca vertical es la media.</span></figcaption><div id="ch-cat"></div></figure>
@@ -1675,20 +1686,31 @@ async function renderStats(){
   const put=(id,fig)=>{const el=$(id);el.replaceChildren(fig)};
   const tickPer=d=>perName(d);
   // 1) avance acumulado (burn-up)
-  const C=D.curva, x0=C.length?C[0].per:0, durP=A.carga?.duracion||10, tot=D.total;
-  const ideal=tot?d3.range(0,durP+1).map(i=>({per:x0-1+i,acum:tot*i/durP})):[];
-  const proy=D.fin!=null&&C.length&&tot?[{per:C.at(-1).per,acum:C.at(-1).acum},{per:D.fin,acum:tot}]:[];
-  put('#ch-avance',P.plot({...base('#ch-avance'),height:230,x:{label:'Periodo',tickFormat:tickPer,ticks:[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])]},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt)*1.05]},
+  const C=D.curva, x0=C.length?C[0].per:0, tot=D.total;
+  // Anclar el inicio al número de periodos cursados, incluyendo periodos sin acreditaciones.
+  const inicio=C.length&&cursados!=null?C.at(-1).per-cursados+1:x0;
+  const durP=plazo.calculado?plazo.max:dur, proy=proyeccionCreditos(D), fin=proy.at(-1);
+  const limite=plazo.max&&cursados!=null?inicio+plazo.max-1:null;
+  const finIdeal=Math.min(inicio+(durP||1)-1,fin?.per??C.at(-1)?.per??inicio);
+  const ideal=tot&&durP? [{per:inicio-1,acum:0},{per:finIdeal,acum:tot*(finIdeal-inicio+1)/durP}]:[];
+  const puntos=proy.slice(1), excede=d=>limite!=null&&d.per>limite, BAD=tok('--bad')||'#e66b83';
+  const ticks=[...new Set([...C.map(d=>d.per),...puntos.map(d=>d.per)])].sort((a,b)=>a-b);
+  const paso=Math.max(1,Math.ceil(ticks.length/Math.max(2,Math.floor($('#ch-avance').clientWidth/58))));
+  const tickVisibles=ticks.filter((d,i)=>i%paso===0||i===ticks.length-1);
+  put('#ch-avance',P.plot({...base('#ch-avance'),height:260,marginBottom:50,x:{label:'Periodo',tickFormat:tickPer,ticks:tickVisibles},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt)*1.12]},
     marks:[
       tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
       tot?P.text([tot],{y:d=>d,x:x0,text:()=>`total ${fmtCr(tot)}`,dy:-6,textAnchor:'start',fill:MUT}):null,
       P.line(ideal,{x:'per',y:'acum',stroke:MUT,strokeOpacity:.6,curve:'linear'}),
+      limite!=null&&ticks.at(-1)>=limite?P.ruleX([limite],{stroke:BAD,strokeDasharray:'3 4'}):null,
+      limite!=null&&ticks.at(-1)>=limite?P.text([{per:limite,acum:0}],{x:'per',y:'acum',text:()=>plazo.calculado?`Referencia: ${plazo.max} periodos`:`Máximo: ${plazo.max} periodos`,dy:32,fill:BAD}):null,
       P.areaY(C,{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
       P.line(C,{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
       P.line(proy,{x:'per',y:'acum',stroke:ACC,strokeDasharray:'5 4'}),
       P.dot(C,{x:'per',y:'acum',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} en el periodo`}),
-      proy.length?P.dot([proy[1]],{x:'per',y:'acum',stroke:ACC,fill:'none',r:4}):null,
-      proy.length?P.text([proy[1]],{x:'per',y:'acum',text:d=>`egreso ${perName(d.per)}`,dy:-10,fill:ACC}):null,
+      P.dot(puntos,{x:'per',y:'acum',stroke:d=>excede(d)?BAD:ACC,fill:'var(--bg)',r:4,tip:true,title:d=>`${perName(d.per)} · periodo ${d.per-inicio+1}\n${fmtCr(d.acum)} créditos acumulados proyectados${excede(d)?'\nExcede '+(plazo.calculado?'la referencia a carga mínima':'el máximo indicado'):''}`}),
+      puntos.length&&ticks.length<=Math.floor($('#ch-avance').clientWidth/65)?P.text(puntos,{x:'per',y:'acum',text:d=>fmtCr(d.acum),dy:16,fill:d=>excede(d)?BAD:ACC}):null,
+      fin?P.text([fin],{x:'per',y:'acum',text:d=>`egreso ${perName(d.per)}`,dy:-12,fill:excede(fin)?BAD:ACC}):null,
     ].filter(Boolean)}));
   // 2) promedio por periodo con rango
   put('#ch-prom',P.plot({...base('#ch-prom'),height:210,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
