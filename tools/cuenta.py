@@ -376,26 +376,27 @@ var IPNT=window.IPNT=(()=>{
     $i('ipnt-hola-h').textContent=o.force?'Cambiar unidad académica':'Bienvenida';
     $i('ipnt-h-lead').textContent=o.force?'Elige la unidad académica que quieres consultar.':'Selecciona tu unidad y programa académico.';
     const UN=CFG.unidades||[], cars=[...sel.options].map(op=>[op.value,op.textContent.trim()]).filter(c=>c[0]);
-    let uni=CFG.unidad;
+    let uni=(CFG.unidades||[]).length>1?null:CFG.unidad;   // con varias unidades, el programa se elige después de la unidad
     const listo=()=>{ls.set(BKEY,'1');if(dl.close)dl.close();else dl.removeAttribute('open')};
     const pintarH=()=>{
       $i('ipnt-h-uni').hidden=UN.length<2;
-      if(UN.length<2)$i('ipnt-h-lead').textContent='Para empezar, elige tu carrera.';
+      if(UN.length<2)$i('ipnt-h-lead').textContent='Selecciona tu programa académico.';
       $i('ipnt-h-unis').innerHTML=UN.map(u=>`<button type="button" class="ipnt-uni" data-uni="${esc(u.id)}" aria-pressed="${u.id===uni}"><b>${esc(u.siglas)}</b><small>${esc(u.nombre)}</small>${u.disponible?'':'<em>En preparación</em>'}</button>`).join('');
       const u=UN.find(x=>x.id===uni)||{};
-      $i('ipnt-h-cars').innerHTML=u.id===CFG.unidad?
-        `<h3>${UN.length>1?'2. ':''}Elige tu carrera</h3><div class="ipnt-cars">${cars.map(([k,v])=>`<button type="button" class="btn" data-car="${esc(k)}">${esc(v)}</button>`).join('')}</div>`:
+      $i('ipnt-h-cars').hidden=!uni;
+      $i('ipnt-h-cars').innerHTML=!uni?'':u.id===CFG.unidad?
+        `<h3>${UN.length>1?'2. ':''}Elige tu programa académico</h3><div class="ipnt-cars">${cars.map(([k,v])=>`<button type="button" class="btn" data-car="${esc(k)}">${esc(v)}</button>`).join('')}</div>`:
         u.url?`<h3>${UN.length>1?'2. ':''}Continúa en la herramienta de tu unidad</h3><p><a class="btn primary" href="${esc(u.url)}">Ir a Horarios ${esc(u.siglas)}</a></p>`:
         `<p class="saes-note">La versión para ${esc(u.siglas||'tu unidad')} se está preparando con alumnos de la unidad. Mientras tanto puedes explorar la de la ${esc((UN.find(x=>x.id===CFG.unidad)||{}).siglas||'')}.</p>`;
       $i('ipnt-h-yo').hidden=!cuenta;
-      if(cuenta)$i('ipnt-h-yo').textContent=`Sesión iniciada: ${cuenta.name||cuenta.username}. Si ya tenías datos guardados, la página se actualizará sola; si no, elige tu carrera.`;
+      if(cuenta)$i('ipnt-h-yo').textContent=`Sesión iniciada: ${cuenta.name||cuenta.username}. Si ya tenías datos guardados, la página se actualizará sola; si no, elige tu unidad y programa académico.`;
       $i('ipnt-h-ms').hidden=!MS.disponible();$i('ipnt-h-go').hidden=!GO.disponible();pintar();
       $i('ipnt-h-login').hidden=!!cuenta||!(MS.disponible()||GO.disponible());
     };
     // Reabrir el selector reemplaza sus manejadores para evitar cambios duplicados.
     dl.onclick=async e=>{
       const b=e.target.closest('button');if(!b)return;
-      if(b.dataset.uni){uni=b.dataset.uni;pintarH();return}
+      if(b.dataset.uni){uni=b.dataset.uni;pintarH();$i('ipnt-h-cars').scrollIntoView?.({block:'nearest',behavior:'smooth'});return}
       if(b.dataset.car){sel.value=b.dataset.car;sel.dispatchEvent(new Event('change',{bubbles:true}));listo();return}
       if(b.dataset.prov){
         const m=$i('ipnt-h-msg');m.className='ipnt-state';m.textContent='Abriendo el inicio de sesión…';
@@ -435,7 +436,7 @@ CSS = r"""
 .ipnt-conf-op .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 14px;border-radius:10px;height:auto;white-space:normal}
 .ipnt-conf-op small{font-weight:400;font-size:.8rem;color:inherit;opacity:.85}
 .ipnt-prueba{margin:10px 0 0;font-size:.84rem;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
-.ipnt-hola{width:min(640px,calc(100vw / var(--ui-zoom,1) - 32px))}
+.ipnt-hola{width:min(640px,calc(100vw / var(--ui-zoom,1) - 32px));max-height:calc(100dvh - 24px);overflow:auto}
 .ipnt-hola .lead{margin:0;font-size:.95rem;color:var(--muted)}
 .ipnt-unis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
 .ipnt-uni{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:10px 12px;font:inherit;cursor:pointer}
