@@ -208,7 +208,7 @@ input[type=number]{width:5rem}
 .charts figure{margin:0;padding:12px 14px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
 .charts .ch-wide{grid-column:1/-1}
 .charts figure figure{border:0;padding:0;background:none;margin:0}   /* Plot envuelve en <figure> las gráficas con leyenda */
-.charts figcaption{display:flex;flex-direction:column;gap:1px;margin-bottom:6px}
+.charts figcaption{display:flex;flex-direction:column;gap:1px;margin-bottom:6px;min-height:3.4em}
 .charts figcaption b{font-size:.92rem}
 .ley{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:.78rem;color:var(--muted)}.ley>span{display:inline-flex;align-items:center;gap:6px}.ley svg{flex:none}
 .charts svg{max-width:100%;height:auto}
@@ -229,7 +229,9 @@ input[type=number]{width:5rem}
 .an-bars li{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;gap:2px 8px;align-items:center;font-size:.84rem}
 .an-bars li>small{grid-column:1/-1;color:var(--muted);font-size:.74rem;margin-top:-2px}.an-ln small{display:block;color:var(--muted);font-size:.72rem}
 .an-bar{height:8px;background:var(--sunken);border-radius:999px;overflow:hidden}.an-bar i{display:block;height:100%;background:var(--accent)}
-.an-chain{margin:6px 0 0;padding-left:1.2rem;font-size:.84rem;display:flex;flex-direction:column;gap:2px}
+.an-chain{list-style:none;margin:8px 0 0;padding:0;font-size:.82rem;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.an-chain li{padding:4px 10px;border:1px solid var(--line);border-radius:999px;background:var(--bg)}
+.an-chain li+li::before{content:'→';margin:0 8px 0 -2px;color:var(--muted)}
 .mapcut{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);font-size:.88rem;color:var(--muted)}
 .minimap{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:4px;cursor:pointer;line-height:0;flex:none}
 .minimap:hover{border-color:var(--accent)}
@@ -943,7 +945,7 @@ function rowBands(L){
 }
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
 let MARK={avail:new Set(),sug:new Set()};
-let SHOWSUG=store.get('verSug',true);
+let SHOWSUG=store.get('verSug',false);   // apagadas por defecto: el alumno las activa a propósito
 // planes por niveles (UPIBI 2006): las filas del mapa son niveles, no semestres
 const porNiveles=()=>MAP().modelo==='niveles';
 // vista del mapa con datos del SAES: 'todo' (mapa completo), 'pend' (pendientes, por defecto) o 'sigue' (recomendaciones)
@@ -1678,6 +1680,7 @@ function renderList(){
    Gráficas con Observable Plot (D3), que se carga solo al abrir esta sección. */
 const notaValida=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<6||+v>10?null:+v;
 const FORMAS={ORD:'Ordinario',REC:'Recurse',ETS:'ETS',EXT:'Extraordinario',EQV:'Equivalencia',REV:'Revalidación',DIC:'Dictamen'};
+const FORMA_COLOR={Ordinario:'--ok',Extraordinario:'--warn',ETS:'--ch-alert',Recurse:'--rel-pre',Equivalencia:'--muted',Revalidación:'--n4',Dictamen:'--n6','No identificada':'--line'};
 const LIB_PLOT=[['https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js','sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i'],
   ['https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js','sha384-JUpn2GgRr0gxU0xOBd8D8P634jhRCwobtG8G2MMEkX1RnGJ7/FJNnuukpfT+H2w1']];
 let PLOT_P=null;
@@ -1834,6 +1837,7 @@ function ley(items){
     guion:`<path d="M1 7H21" stroke="${c}" stroke-width="1.6" stroke-dasharray="2 3"/>`,
     area:`<rect x="1" y="2" width="20" height="10" rx="2" fill="${c}" fill-opacity=".2"/>`,
     numero:`<text x="11" y="11" text-anchor="middle" font-size="10" font-weight="700" fill="${c}">8.5</text>`,
+    cuadro:`<rect x="5" y="2" width="12" height="10" rx="2" fill="${c}"/>`,
     rango:`<path d="M11 2V12" stroke="${c}" stroke-opacity=".35" stroke-width="7" stroke-linecap="round"/>`,
     barra:`<rect x="4" y="3" width="6" height="10" fill="${c}" fill-opacity=".75"/><rect x="12" y="6" width="6" height="7" fill="${c}" fill-opacity=".75"/>`,
     punto:`<circle cx="11" cy="7" r="4" fill="${c}" fill-opacity=".8"/>`,
@@ -1866,10 +1870,10 @@ async function renderStats(){
     ${metaPanel(D)}
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Créditos acumulados</b>${ley([['linea','var(--accent)','Lo que llevas'],['punteada','var(--accent)','Estimado a tu ritmo'],['guion','var(--muted)','Total del plan'],...(limite0!=null?[['guion','var(--ch-alert)','Plazo de referencia']]:[]),...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-avance"></div></figure>
-      <figure><figcaption><b>Promedio por periodo</b>${ley([['linea','var(--accent)','Promedio del periodo'],['rango','var(--accent)','De tu calificación más baja a la más alta'],['guion','var(--muted)','Tu promedio general']])}</figcaption><div id="ch-prom"></div></figure>
+      <figure><figcaption><b>Promedio por periodo</b>${ley([['linea','var(--accent)','Promedio'],['rango','var(--accent)','Rango'],['guion','var(--muted)','General']])}</figcaption><div id="ch-prom"></div></figure>
       <figure><figcaption><b>Tus calificaciones</b>${ley([['barra','var(--accent)','Materias'],['vertical','var(--fg)','Promedio'],['vertical-p','var(--fg)','Mediana']])}</figcaption><div id="ch-dist"></div></figure>
-      <figure><figcaption><b>Calificaciones por área</b>${ley([['punto','var(--accent)','Una materia'],['vertical','var(--fg)','Promedio del área'],...(D.rows.some(r=>r.eqv)?[['punto','var(--muted)','Por equivalencia']]:[])])}</figcaption><div id="ch-cat"></div></figure>
-      <figure><figcaption><b>Tipo de evaluación por periodo</b></figcaption><div id="ch-forma"></div></figure>
+      <figure><figcaption><b>Promedio por área</b>${ley([['barra','var(--accent)','Promedio del área (n.º de materias)']])}</figcaption><div id="ch-cat"></div></figure>
+      <figure><figcaption><b>Tipo de evaluación por periodo</b>${ley(Object.keys(FORMA_COLOR).filter(f=>D.rows.some(r=>r.forma===f)).map(f=>['cuadro',`var(${FORMA_COLOR[f]})`,f]))}</figcaption><div id="ch-forma"></div></figure>
       <figure class="ch-wide"><figcaption><b>Promedio por área y periodo</b></figcaption><div id="ch-heat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
@@ -1916,28 +1920,30 @@ async function renderStats(){
         P.pointer({x:'per',y:'acum',title:'detalle',maxRadius:$('#ch-avance').clientWidth/Math.max(1,ticks.length)/4})),
     ].filter(Boolean)}));
   // 2) promedio por periodo con rango
-  put('#ch-prom',P.plot({...base('#ch-prom'),height:210,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
+  const HF=Math.max(210,new Set(D.rows.map(r=>r.cat)).size*26+44);   // misma altura en la fila: las gráficas quedan alineadas
+  put('#ch-prom',P.plot({...base('#ch-prom'),height:HF,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
     // rango de cada periodo como barra vertical propia (sin unir periodos con formas suavizadas)
     marks:[P.ruleX(D.porPer.filter(d=>d.prom!=null),{x:'per',y1:'min',y2:'max',stroke:ACC,strokeOpacity:.28,strokeWidth:10,strokeLinecap:'round'}),
       D.media!=null?P.ruleY([D.media],{stroke:MUT,strokeDasharray:'4 3'}):null,
       P.line(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',stroke:ACC,strokeWidth:2}),
       P.dot(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\npromedio ${f2(d.prom)}\nrango ${d.min}–${d.max} · ${d.n} materias`})].filter(Boolean)}));
   // 3) distribución
-  put('#ch-dist',P.plot({...base('#ch-dist'),height:210,x:{label:'Calificación',domain:[5.5,10.5]},y:{label:'Materias',grid:true},
+  put('#ch-dist',P.plot({...base('#ch-dist'),height:HF,x:{label:'Calificación',domain:[5.5,10.5]},y:{label:'Materias',grid:true},
     marks:[P.rectY(D.rows,P.binX({y:'count'},{x:'cal',thresholds:[5.5,6.5,7.5,8.5,9.5,10.5],fill:ACC,fillOpacity:.75,inset:2,tip:true})),
       P.ruleX([D.media],{stroke:tok('--fg'),strokeWidth:1.5}),P.ruleX([D.mediana],{stroke:tok('--fg'),strokeDasharray:'3 3'}),P.ruleY([0])]}));
   // 4) por categoría: puntos (dispersión vertical leve) y media
   const cats=d3.groups(D.rows,r=>r.cat).map(([k,v])=>({cat:k,media:d3.mean(v,r=>r.cal)})).sort((a,b)=>b.media-a.media).map(d=>d.cat);
   const jit=D.rows.map((r,i)=>({...r,j:((i*0.618)%1-.5)*0.5}));
-  put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(170,cats.length*34+40),marginLeft:150,x:{label:'Calificación',domain:[5.5,10.5],grid:true},y:{label:null,domain:cats},
-    color:{legend:false},
-    marks:[P.dot(jit,{x:d=>d.cal+d.j*.3,y:'cat',fill:d=>d.eqv?MUT:ACC,fillOpacity:.75,r:4,tip:true,title:d=>`${d.nombre}${d.sim?' · escenario':''}\n${d.cal} · ${d.forma}${d.per!=null?' · '+perName(d.per):''}`}),
-      P.tickX(D.rows,P.groupY({x:'mean'},{x:'cal',y:'cat',stroke:tok('--fg'),strokeWidth:2}))]}));
+  const porArea=cats.map(cat=>{const v=D.rows.filter(r=>r.cat===cat);return {cat,media:d3.mean(v,r=>r.cal),n:v.length}});
+  put('#ch-cat',P.plot({...base('#ch-cat'),height:HF,marginLeft:150,marginRight:56,x:{label:null,domain:[0,10],ticks:[0,5,10],grid:true},y:{label:null,domain:cats,padding:.3},
+    marks:[P.barX(porArea,{x:'media',y:'cat',fill:ACC,fillOpacity:.75,rx:3,tip:true,title:d=>`${d.cat}\npromedio ${f2(d.media)} · ${d.n} ${d.n>1?'materias':'materia'}`}),
+      P.text(porArea,{x:'media',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:6,textAnchor:'start',fill:tok('--fg'),fontWeight:600})]}));
   // 5) forma de acreditación por periodo (barras apiladas)
   const fr=D.rows.map(r=>({...r,lbl:r.eqv?'Equiv.':perName(r.per)}));
   const ordenLbl=[...(D.rows.some(r=>r.eqv)?['Equiv.']:[]),...D.porPer.map(d=>d.lbl),...(D.rows.some(r=>!r.eqv&&r.per==null)?['—']:[])];
-  put('#ch-forma',P.plot({...base('#ch-forma'),height:210,x:{label:null,domain:ordenLbl},y:{label:'Materias',grid:true},
-    color:{legend:true,domain:[...Object.values(FORMAS),'No identificada'].filter(f=>D.rows.some(r=>r.forma===f)),range:[OK,tok('--warn'),tok('--bad'),ACC,tok('--n4'),tok('--n6'),tok('--n8')]},
+  const formas=Object.keys(FORMA_COLOR).filter(f=>D.rows.some(r=>r.forma===f));
+  put('#ch-forma',P.plot({...base('#ch-forma'),height:HF,x:{label:null,domain:ordenLbl},y:{label:'Materias',grid:true},
+    color:{legend:false,domain:formas,range:formas.map(f=>tok(FORMA_COLOR[f]))},
     marks:[P.barY(fr,P.groupX({y:'count'},{x:'lbl',fill:'forma',inset:1,tip:true})),P.ruleY([0])]}));
   // 6) mapa de calor categoría × periodo
   const hm=d3.flatRollup(D.reg,v=>({m:d3.mean(v,r=>r.cal),n:v.length}),r=>r.cat,r=>r.per).map(([cat,per,o])=>({cat,per,lbl:perName(per),...o}));
@@ -1996,13 +2002,13 @@ function renderAnalisis(D){
   const el=$('#kanal');if(!el)return;
   const X=analisis(), f2=v=>v==null?'—':(+v).toFixed(2);
   const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><b>${esc(X.nm(r.k))}</b><small>${esc(r.motivos.join('; '))}.</small></li>`).join('')}</ul>`:
-    '<p class="muted">Tus materias elegidas y reprobadas no tienen requisitos pendientes.</p>';
-  const lin=X.lineas.length?`<section><h4>Promedio por línea de especialización</h4><p class="an-sub">Promedio de las materias de cada línea que ya aprobaste. Sirve para comparar; tus intereses también cuentan.</p><ul class="an-bars">${X.lineas.map(l=>`<li><span>${esc(l.nombre)}${l.sim?' · simulado':''}</span><b>${f2(l.prom)}</b><small>${l.n} de ${l.total} materias · ${esc(l.claves.map(X.nm).join(', '))}</small></li>`).join('')}</ul></section>`:'';
+    '<p class="muted">Sin requisitos pendientes.</p>';
+  const lin=X.lineas.length?`<section><h4>Promedio por línea de especialización</h4><p class="an-sub">Tus materias aprobadas de cada línea.</p><ul class="an-bars">${X.lineas.map(l=>`<li><span>${esc(l.nombre)}${l.sim?' · simulado':''}</span><b>${f2(l.prom)}</b><small>${l.n} de ${l.total} materias · ${esc(l.claves.map(X.nm).join(', '))}</small></li>`).join('')}</ul></section>`:'';
   const ruta=X.ciclo?'<p class="muted">No se puede mostrar la cadena: el mapa tiene requisitos circulares.</p>':X.cadena.length?
-    `<p>Tu cadena de materias seriadas pendiente más larga tiene <b>${X.cadena.length} materias</b>: cada una es requisito de la siguiente, así que se cursan en periodos distintos. Revisa en el SAES qué seriaciones son obligatorias.</p><ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:
+    `<p class="an-sub">${X.cadena.length} materias seguidas: cada una abre la siguiente, así que se cursan en periodos distintos.</p><ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:
     '<p class="muted">No tienes cadenas de materias seriadas pendientes.</p>';
   el.innerHTML=`<h3 class="an-h">Observaciones para planear</h3><div class="an-grid">
-    <section><h4>Tus materias elegidas y reprobadas</h4><p class="an-sub">Qué requisitos les faltan y de qué materias son requisito. Confirma en el SAES qué seriaciones son obligatorias.</p>${cuid}</section>
+    <section><h4>Tus materias elegidas y reprobadas</h4><p class="an-sub">Lo que les falta y lo que desbloquean.</p>${cuid}</section>
     ${lin}<section><h4>Cadena de seriación más larga</h4>${ruta}</section>
     ${X.carga.length?'<section><h4>Créditos aprobados y promedio por periodo</h4>'+ley([['barra','var(--accent)','Créditos aprobados'],['numero','var(--fg)','Promedio del periodo']])+'<div id="ch-carga"></div></section>':''}
     </div>`;
@@ -2134,12 +2140,14 @@ $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stat
 {const redibuja=()=>{if(!$('#kstats')?.hidden)renderStats()};
   try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redibuja)}catch(e){}
   new MutationObserver(redibuja).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-skin']})}
-$('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vista]');if(!b)return;store.set('mapVista',b.dataset.vista);renderMap()});
+$('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vista]');if(!b)return;store.set('mapVista',b.dataset.vista);
+  if(b.dataset.vista==='sigue'&&!SHOWSUG){SHOWSUG=true;store.set('verSug',true)}renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapVista',mapVista()==='todo'?'sigue':'todo');renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
 $('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;render()});
 $('#b-all').addEventListener('click',()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&off.has(k))])];saveT();renderTray()});
 $('#b-sugg').addEventListener('click',()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT();renderTray()});
-$('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);renderMap()});
+$('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);
+  if(SHOWSUG)store.set('mapVista','sigue');else if(mapVista()==='sigue')store.set('mapVista','pend');renderMap()});
 // simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase
 const simSave=()=>{store.set('sim',SIM);for(const k in T)delete T[k];renderTray()};
 $('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simSave()}});
