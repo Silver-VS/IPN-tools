@@ -1695,10 +1695,8 @@ async function renderStats(){
   const C=D.curva, x0=C.length?C[0].per:0, tot=D.total;
   // Anclar el inicio al número de periodos cursados, incluyendo periodos sin acreditaciones.
   const inicio=C.length&&cursados!=null?C.at(-1).per-cursados+1:x0;
-  const durP=plazo.calculado?plazo.max:dur, proy=proyeccionCreditos(D), fin=proy.at(-1);
+  const proy=proyeccionCreditos(D), fin=proy.at(-1);
   const limite=plazo.max&&cursados!=null?inicio+plazo.max-1:null;
-  const finIdeal=Math.min(inicio+(durP||1)-1,fin?.per??C.at(-1)?.per??inicio);
-  const ideal=tot&&durP? [{per:inicio-1,acum:0},{per:finIdeal,acum:tot*(finIdeal-inicio+1)/durP}]:[];
   const puntos=proy.slice(1), excede=d=>limite!=null&&d.per>limite, BAD=tok('--bad')||'#e66b83';
   const ticks=[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])].sort((a,b)=>a-b);
   const paso=Math.max(1,Math.ceil(ticks.length/Math.max(2,Math.floor($('#ch-avance').clientWidth/58))));
@@ -1707,7 +1705,6 @@ async function renderStats(){
     marks:[
       tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
       tot?P.text([tot],{y:d=>d,x:x0,text:()=>`total ${fmtCr(tot)}`,dy:-6,textAnchor:'start',fill:MUT}):null,
-      P.line(ideal,{x:'per',y:'acum',stroke:MUT,strokeOpacity:.6,curve:'linear'}),
       limite!=null&&ticks.at(-1)>=limite?P.ruleX([limite],{stroke:BAD,strokeDasharray:'3 4'}):null,
       limite!=null&&ticks.at(-1)>=limite?P.text([{per:limite,acum:0}],{x:'per',y:'acum',text:()=>plazo.calculado?`Referencia: ${plazo.max} periodos`:`Máximo: ${plazo.max} periodos`,dy:32,fill:BAD}):null,
       P.areaY(C,{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
