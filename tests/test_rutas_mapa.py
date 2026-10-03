@@ -1,4 +1,4 @@
-"""Flechas de los mapas por áreas: ninguna atraviesa una materia ni se encima con otra."""
+"""Flechas de los mapas por áreas: ninguna atraviesa una materia ni se encima con otra de las que se dibujan completas."""
 import json, pathlib, re, unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -31,7 +31,7 @@ class RutasMapa(unittest.TestCase):
     def test_flechas_ortogonales_sin_atravesar_materias(self):
         n = 0
         for f, car, L in self.mapas():
-            for s, d, p in L['edges']:
+            for s, d, p, *_ in L['edges']:
                 for a, b in segmentos(p):
                     self.assertTrue(abs(a[0] - b[0]) < .01 or abs(a[1] - b[1]) < .01, (f, car, s, d))
                     for i, box in enumerate(L['boxes']):
@@ -42,7 +42,9 @@ class RutasMapa(unittest.TestCase):
     def test_flechas_de_materias_distintas_no_se_enciman(self):
         for f, car, L in self.mapas():
             tramos = []
-            for s, d, p in L['edges']:
+            for s, d, p, larga, *_ in L['edges']:
+                if larga:
+                    continue   # conector: solo se dibuja completa al resaltar, con las demás atenuadas
                 for a, b in segmentos(p):
                     tramos.append((s, d, a, b))
             for i, (s1, d1, a1, b1) in enumerate(tramos):

@@ -6,7 +6,7 @@
  "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos.",
  "areas": [
   {
-   "nombre": "Físico-matemáticas",
+   "nombre": "Ciencias básicas",
    "claves": [
     "B106",
     "B105",
@@ -20,16 +20,51 @@
    "espacios": []
   },
   {
-   "nombre": "Informática y computación",
+   "nombre": "Computación",
    "claves": [
     "B109"
    ],
    "espacios": []
   },
   {
-   "nombre": "Sistemas y control",
+   "nombre": "Control y automatización",
    "claves": [
     "B430"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencias biológicas",
+   "claves": [
+    "B101",
+    "B542"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Química",
+   "claves": [
+    "B110",
+    "B215"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ingeniería de procesos",
+   "claves": [
+    "B217",
+    "B325",
+    "B319",
+    "B429",
+    "B433",
+    "B327",
+    "B539",
+    "B538",
+    "B647",
+    "B645",
+    "B644",
+    "B646",
+    "B859"
    ],
    "espacios": []
   },
@@ -37,39 +72,22 @@
    "nombre": "Biotecnología y bioprocesos",
    "claves": [
     "B102",
-    "B110",
-    "B101",
-    "B215",
     "B214",
-    "B217",
     "B322",
-    "B325",
     "B324",
-    "B319",
     "B432",
     "B431",
     "B428",
-    "B429",
-    "B433",
-    "B327",
-    "B542",
     "B536",
     "B537",
-    "B539",
-    "B538",
     "B540",
     "B541",
     "B648",
-    "B647",
-    "B645",
-    "B644",
-    "B646",
     "B758",
     "B756",
     "B753",
     "B757",
     "B754",
-    "B859",
     "B860",
     "B755",
     "B318"
@@ -77,7 +95,7 @@
    "espacios": []
   },
   {
-   "nombre": "Formación integral",
+   "nombre": "Humanidades y gestión",
    "claves": [
     "B104",
     "B107",
@@ -93,7 +111,7 @@
    "espacios": []
   },
   {
-   "nombre": "Especialización",
+   "nombre": "Especialidad",
    "claves": [],
    "espacios": [
     [

@@ -6,7 +6,7 @@
  "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos.",
  "areas": [
   {
-   "nombre": "Físico-matemáticas",
+   "nombre": "Ciencias básicas",
    "claves": [
     "L105",
     "L103",
@@ -19,16 +19,51 @@
    "espacios": []
   },
   {
-   "nombre": "Informática y computación",
+   "nombre": "Computación",
    "claves": [
     "L107"
    ],
    "espacios": []
   },
   {
-   "nombre": "Sistemas y control",
+   "nombre": "Control y automatización",
    "claves": [
     "L542"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencias biológicas",
+   "claves": [
+    "L101",
+    "L213"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Química",
+   "claves": [
+    "L108",
+    "L214",
+    "L324",
+    "L321"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ingeniería de procesos",
+   "claves": [
+    "L216",
+    "L325",
+    "L318",
+    "L429",
+    "L545",
+    "L547",
+    "L653",
+    "L654",
+    "L655",
+    "L658",
+    "L759"
    ],
    "espacios": []
   },
@@ -36,24 +71,12 @@
    "nombre": "Ciencia e ingeniería de alimentos",
    "claves": [
     "L102",
-    "L108",
-    "L101",
-    "L214",
-    "L324",
-    "L321",
     "L428",
     "L543",
-    "L216",
-    "L325",
-    "L213",
     "L322",
-    "L318",
     "L430",
-    "L429",
     "L541",
     "L539",
-    "L545",
-    "L547",
     "L544",
     "L427",
     "L426",
@@ -65,12 +88,7 @@
     "L762",
     "L764",
     "L765",
-    "L653",
-    "L654",
-    "L655",
-    "L658",
     "L760",
-    "L759",
     "L761",
     "L431",
     "L657",
@@ -79,7 +97,7 @@
    "espacios": []
   },
   {
-   "nombre": "Formación integral",
+   "nombre": "Humanidades y gestión",
    "claves": [
     "L104",
     "L106",
@@ -93,7 +111,7 @@
    "espacios": []
   },
   {
-   "nombre": "Especialización",
+   "nombre": "Especialidad",
    "claves": [],
    "espacios": [
     [

@@ -6,7 +6,7 @@
  "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos.",
  "areas": [
   {
-   "nombre": "Físico-matemáticas",
+   "nombre": "Ciencias básicas",
    "claves": [
     "M105",
     "M103",
@@ -19,7 +19,7 @@
    "espacios": []
   },
   {
-   "nombre": "Informática y computación",
+   "nombre": "Computación",
    "claves": [
     "M107"
    ],
@@ -39,7 +39,7 @@
    "espacios": []
   },
   {
-   "nombre": "Sistemas y control",
+   "nombre": "Control y automatización",
    "claves": [
     "M871",
     "M429",
@@ -51,21 +51,33 @@
    "espacios": []
   },
   {
+   "nombre": "Ciencias biológicas",
+   "claves": [
+    "M318",
+    "M101"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Química",
+   "claves": [
+    "M108",
+    "M214",
+    "M320",
+    "M427"
+   ],
+   "espacios": []
+  },
+  {
    "nombre": "Ciencias e ingeniería biomédica",
    "claves": [
     "M102",
-    "M108",
-    "M214",
-    "M318",
-    "M320",
-    "M101",
     "M649",
     "M874",
     "M213",
     "M323",
     "M322",
     "M428",
-    "M427",
     "M538",
     "M539",
     "M536",
@@ -85,7 +97,7 @@
    "espacios": []
   },
   {
-   "nombre": "Formación integral",
+   "nombre": "Humanidades y gestión",
    "claves": [
     "M104",
     "M106",
@@ -101,7 +113,7 @@
    "espacios": []
   },
   {
-   "nombre": "Formación profesional",
+   "nombre": "Práctica profesional",
    "claves": [
     "M652",
     "M764",
@@ -110,7 +122,7 @@
    "espacios": []
   },
   {
-   "nombre": "Especialización",
+   "nombre": "Especialidad",
    "claves": [],
    "espacios": [
     [

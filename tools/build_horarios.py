@@ -154,14 +154,40 @@ def layout_por_areas(cur, e):
     bw, bh, sg = 120, 46, 10           # caja y separación entre cajas de una celda
     TS, MG, MINGAP = 6, 9, 34          # separación entre pistas, margen del canal a las cajas, canal mínimo
     left, top = 22, 30
+    # Un área de una sola materia no se aísla en su propia columna: las vecinas de una materia se agrupan en una sola
+    # columna («A · B»); si queda sola, se une a su vecina de la izquierda. La categoría de cada materia se
+    # conserva en `cat` (estadísticas por área).
+    cnt = [sum(k in cur for k in a["claves"]) + len(a.get("espacios", [])) for a in e["areas"]]
+    grupos = []
+    for i, n in enumerate(cnt):
+        if not n:
+            continue
+        if grupos and n == 1 and all(cnt[j] == 1 for j in grupos[-1]) and len(grupos[-1]) < 3:
+            grupos[-1].append(i)
+        else:
+            grupos.append([i])
+    cambio = True
+    while cambio:
+        cambio = False
+        for gi, g in enumerate(grupos):
+            if len(grupos) > 1 and sum(cnt[j] for j in g) == 1:
+                v = gi - 1 if gi else gi + 1   # la vecina de la izquierda: en el catálogo, el área más general
+                grupos[v] = sorted(grupos[v] + g)
+                del grupos[gi]
+                cambio = True
+                break
+    cat = {k: nombre_cat(a["nombre"]) for a in e["areas"] for k in a["claves"] if k in cur}
+    areas = [{"nombre": " · ".join(nombre_cat(e["areas"][j]["nombre"]) for j in g),
+              "claves": [k for j in g for k in e["areas"][j]["claves"]],
+              "espacios": [x for j in g for x in e["areas"][j].get("espacios", [])]} for g in grupos]
     items = []                         # [col, sem, clave, espacio]
-    for ci, a in enumerate(e["areas"]):
+    for ci, a in enumerate(areas):
         for k in a["claves"]:
             if k in cur:
                 items.append([ci, cur[k][2], k, ""])
         for name, sem in a.get("espacios", []):
             items.append([ci, sem, "", name])
-    ncols, nsem = len(e["areas"]), max(it[1] for it in items)
+    ncols, nsem = len(areas), max(it[1] for it in items)
     cells = {}
     for i, it in enumerate(items):
         cells.setdefault((it[0], it[1]), []).append(i)
@@ -235,10 +261,88 @@ def layout_por_areas(cur, e):
                 lst.sort(key=lambda i: (d[i], slot[i]))
                 acomoda(lst, K[ci], [d[i] - ustart[ci] - .5 for i in lst])
 
-    # 2) topología de cada flecha: canales horizontales (entre semestres) y vertical (entre columnas) si salta semestres
+    # 1b) búsqueda local: mover una materia a una casilla libre de su celda o intercambiarla con otra si así las flechas
+    #     quedan más cortas, más rectas o con menos cruces (p. ej. una seriación que salta un semestre baja recta por
+    #     una casilla vacía en lugar de rodear por un canal lateral)
     sem_of = lambda i: items[i][1]
+    col_of = lambda i: items[i][0]
+    occ = {}
+    for i in range(len(items)):
+        occ.setdefault((col_of(i), sem_of(i)), {})[slot[i]] = i
+    gu = [ustart[g] - .5 for g in range(ncols)] + [sum(K) + ncols + .5]
+    def libre(ci, s, s0, s1):
+        return all(s not in occ.get((ci, m), {}) for m in range(s0 + 1, s1))
+    def largo(f):
+        a, b = f
+        sa, sb = sem_of(a), sem_of(b)
+        if sb == sa + 1:
+            d = abs(ux(a) - ux(b))
+            return d + (.6 if d > .01 else 0)
+        if sb > sa + 1:
+            if col_of(a) == col_of(b) and slot[a] == slot[b] and libre(col_of(a), slot[a], sa, sb):
+                return 0
+            return 1.5 + min(abs(g - ux(a)) + abs(g - ux(b)) for g in gu)
+        return 1
+    por_gap = {}
+    for f in pares:
+        if sem_of(f[1]) == sem_of(f[0]) + 1:
+            por_gap.setdefault(sem_of(f[0]), []).append(f)
+    def cruza(f, g):
+        return (ux(f[0]) - ux(g[0])) * (ux(f[1]) - ux(g[1])) < -1e-9
+    incid = {}
+    for f in pares:
+        incid.setdefault(f[0], []).append(f)
+        incid.setdefault(f[1], []).append(f)
+    def costo_de(mov, ci, sm):
+        fs = {f for i in mov for f in incid.get(i, [])}
+        fs |= {f for f in pares if col_of(f[0]) == ci == col_of(f[1]) and sem_of(f[0]) < sm < sem_of(f[1])}   # cruzan la celda
+        c = sum(largo(f) for f in fs)
+        for f in fs:
+            for g in por_gap.get(sem_of(f[0]), []) if sem_of(f[1]) == sem_of(f[0]) + 1 else []:
+                if g != f and cruza(f, g):
+                    c += .5 if g in fs else 1
+        return c
+    for _ in range(30):
+        mejoro = False
+        for (ci, sm), lst in sorted(cells.items()):
+            for i in list(lst):
+                for t in range(K[ci]):
+                    if t == slot[i]:
+                        continue
+                    j = occ[(ci, sm)].get(t)
+                    mov = [i] + ([j] if j is not None else [])
+                    antes = costo_de(mov, ci, sm)
+                    si = slot[i]
+                    def aplica(si_, t_):
+                        occ[(ci, sm)].pop(si_, None)
+                        if j is not None:
+                            occ[(ci, sm)].pop(t_, None)
+                            slot[j] = si_
+                            occ[(ci, sm)][si_] = j
+                        slot[i] = t_
+                        occ[(ci, sm)][t_] = i
+                    aplica(si, t)
+                    if costo_de(mov, ci, sm) < antes - 1e-6:
+                        mejoro = True
+                    else:   # deshace
+                        occ[(ci, sm)].pop(t, None)
+                        if j is not None:
+                            occ[(ci, sm)].pop(si, None)
+                            slot[j] = t
+                            occ[(ci, sm)][t] = j
+                        slot[i] = si
+                        occ[(ci, sm)][si] = i
+        if not mejoro:
+            break
+
+    # 2) topología de cada flecha: canales horizontales (entre semestres), recta por casillas vacías o canal vertical
+    #    entre columnas si salta semestres
+    recta = {f for f in pares if sem_of(f[1]) > sem_of(f[0]) + 1 and col_of(f[0]) == col_of(f[1])
+             and slot[f[0]] == slot[f[1]] and libre(col_of(f[0]), slot[f[0]], sem_of(f[0]), sem_of(f[1]))}
     via = {}                                                          # flecha -> canal vertical
     for a, b in pares:
+        if (a, b) in recta:
+            continue
         if abs(sem_of(b) - sem_of(a)) > 1 or sem_of(b) <= sem_of(a):
             if sem_of(b) == sem_of(a):
                 continue
@@ -299,6 +403,10 @@ def layout_por_areas(cur, e):
         elif len(lados[(b, "top")]) == 1 and bx[b] + 8 < ports[(f, "out")] < bx[b] + bw - 8:
             ports[(f, "in")] = ports[(f, "out")]
 
+    # seriación recta por casillas vacías: el mismo x en la salida y en la llegada
+    for f in recta:
+        x = ports[(f, "out")] if len(lados[(f[0], "bot")]) > 1 else ports[(f, "in")]
+        ports[(f, "out")] = ports[(f, "in")] = x
     # una llegada no comparte x con una salida de otra flecha en el mismo canal (se encimarían sus tramos verticales)
     for f in pares:
         a, b = f
@@ -313,9 +421,44 @@ def layout_por_areas(cur, e):
                 x = ports[(f, "in")] + paso
         ports[(f, "in")] = x
 
+    # Ruta en «L»: si el renglón del origen está libre hacia un costado hasta la columna de la llegada y la bajada no toca
+    # otra materia, la flecha sale por el lado, cruza recta y baja directo (una sola curva).
+    fila_cajas = {}
+    for i in range(len(items)):
+        fila_cajas.setdefault(sem_of(i), []).append(i)
+    ele, ele_h = {}, {}   # flecha -> (lado, desplazamiento vertical); fila -> [(x0, x1, desplazamiento)]
+    def toca(i, x0, x1, m=4):
+        return bx[i] - m < x1 and x0 < bx[i] + bw + m
+    for f in sorted(pares, key=lambda f: abs(ports[(f, "in")] - bx[f[0]] - bw / 2)):
+        a, b = f
+        sa, sb = sem_of(a), sem_of(b)
+        if sb <= sa or f in recta:
+            continue
+        x = ports[(f, "in")]
+        if bx[a] - 6 <= x <= bx[a] + bw + 6:
+            continue   # destino debajo del origen: la ruta normal ya es recta o casi
+        der = x > bx[a] + bw
+        h0, h1 = (bx[a] + bw, x) if der else (x, bx[a])
+        if any(toca(i, h0, h1) for i in fila_cajas[sa] if i != a):
+            continue
+        if any(toca(i, x - 3, x + 3, 6) for m in range(sa + 1, sb) for i in fila_cajas.get(m, [])):
+            continue
+        for d in (0, -9, 9):
+            if not any(d == dd and x0 < h1 + 6 and h0 < x1 + 6 for x0, x1, dd in ele_h.get(sa, [])):
+                ele[f] = ("der" if der else "izq", d)
+                ele_h.setdefault(sa, []).append((h0, h1, d))
+                break
+
     # 5) tramos horizontales por canal; cada tramo: (flecha, parte, [(x, lado)]) con lado 'up' = viene/va arriba
+    # Flecha larga (salta filas o cruza más de dos columnas y media): se dibuja como conector, con un tramo de salida y uno
+    # de llegada; completa solo al resaltar. No ocupa pista en los canales.
+    larga = {f: f not in recta and f not in ele and sem_of(f[1]) > sem_of(f[0]) and (sem_of(f[1]) - sem_of(f[0]) > 1 or
+                                                abs(ports[(f, "out")] - ports[(f, "in")]) > 2.3 * (bw + sg)) for f in pares}
+    tramo = {(f, ext): 12 for f in pares if larga[f] for ext in ("out", "in")}   # tramo corto de salida y de llegada
     canal = {}
     for f in pares:
+        if larga[f] or f in recta or f in ele:
+            continue
         a, b = f
         sa, sb = sem_of(a), sem_of(b)
         po, pi = ports[(f, "out")], ports[(f, "in")]
@@ -373,13 +516,16 @@ def layout_por_areas(cur, e):
             pista[(f, parte)] = (s, tr.get(j))
 
     # 6) coordenadas y: el canal entre semestres crece con sus pistas
-    gapH = {s: max(MINGAP, (ntr.get(s, 0) - 1) * TS + 2 * MG + 4) for s in range(1, nsem + 1)}
+    sal = {s: max([v for (f, ext), v in tramo.items() if ext == "out" and sem_of(f[0]) == s] or [0]) for s in range(1, nsem + 1)}
+    lle = {s: max([v for (f, ext), v in tramo.items() if ext == "in" and sem_of(f[1]) == s + 1] or [0]) for s in range(1, nsem + 1)}
+    gapH = {s: max(MINGAP, sal[s] + lle[s] + (ntr.get(s, 1) - 1) * TS + 2 * MG) for s in range(1, nsem + 1)}
     rtop = {1: top}
     for s in range(1, nsem):
         rtop[s + 1] = rtop[s] + bh + gapH[s]
     def ty(s, t):
-        g0, n = rtop[s] + bh, ntr.get(s, 1)
-        return g0 + gapH[s] / 2 + (t - (n - 1) / 2) * TS if t is not None else g0 + gapH[s] / 2
+        g0, n = rtop[s] + bh + sal[s], ntr.get(s, 1)   # las pistas van entre los tramos de salida y los de llegada
+        h = gapH[s] - sal[s] - lle[s]
+        return g0 + h / 2 + (t - (n - 1) / 2) * TS if t is not None else g0 + h / 2
     H = rtop[nsem] + bh + (gapH[nsem] if ntr.get(nsem) else MINGAP / 2) + 4
 
     boxes, idx = [], {}
@@ -394,15 +540,25 @@ def layout_por_areas(cur, e):
         po, pi = ports[(f, "out")], ports[(f, "in")]
         y0 = rtop[sa] + bh
         y1 = rtop[sb] if sb > sa else rtop[sb] + bh
-        s0, t0 = pista[(f, 0)]
-        pts = [(po, y0), (po, ty(s0, t0))]
-        if (f, 1) in pista:
-            s1, t1 = pista[(f, 1)]
-            g = gtx(f)
-            pts += [(g, ty(s0, t0)), (g, ty(s1, t1)), (pi, ty(s1, t1))]
+        if f in recta:
+            pts = [(po, y0), (po, y1)]
+        elif f in ele:
+            lado, d = ele[f]
+            ym = rtop[sa] + bh / 2 + d
+            pts = [(bx[a] + bw if lado == "der" else bx[a], ym), (pi, ym), (pi, y1)]
+        elif larga[f]:
+            ys, yd = y0 + tramo[(f, "out")], y1 - tramo[(f, "in")]
+            pts = [(po, y0), (po, ys)] + ([(gtx(f), ys), (gtx(f), yd), (pi, yd)] if f in via else [(pi, ys)]) + [(pi, y1)]
         else:
-            pts.append((pi, ty(s0, t0)))
-        pts.append((pi, y1))
+            s0, t0 = pista[(f, 0)]
+            pts = [(po, y0), (po, ty(s0, t0))]
+            if (f, 1) in pista:
+                s1, t1 = pista[(f, 1)]
+                g = gtx(f)
+                pts += [(g, ty(s0, t0)), (g, ty(s1, t1)), (pi, ty(s1, t1))]
+            else:
+                pts.append((pi, ty(s0, t0)))
+            pts.append((pi, y1))
         limpio = []
         for p in pts:   # sin puntos repetidos ni colineales
             if limpio and abs(p[0] - limpio[-1][0]) < .05 and abs(p[1] - limpio[-1][1]) < .05:
@@ -412,7 +568,8 @@ def layout_por_areas(cur, e):
                 limpio[-1] = p
                 continue
             limpio.append(p)
-        edges.append([idx[a], idx[b], [r1(v) for p in limpio for v in p]])
+        pp = [r1(v) for p in limpio for v in p]
+        edges.append([idx[a], idx[b], pp, 1, tramo[(f, "out")], tramo[(f, "in")]] if larga[f] else [idx[a], idx[b], pp, 0])
     centros = [[s, rtop[s] + bh / 2] for s in range(1, nsem + 1)]
     out = {
         "w": r1(W), "h": r1(H),
@@ -420,7 +577,7 @@ def layout_por_areas(cur, e):
         "rows": [[s, r1(y)] for s, y in centros],
         "boxes": [[r1(v) if isinstance(v, float) else v for v in b] for b in boxes], "edges": edges,
         "propuesto": "seriacion_propuesta" in e, "filas_exactas": True, "rutas": True, "ocultas": len(redundantes),
-        "cols": [[a["nombre"], r1(gx0[i] + GW[i] / 2), r1(gx0[i + 1] + GW[i + 1] / 2)] for i, a in enumerate(e["areas"])],
+        "cols": [[a["nombre"], r1(gx0[i] + GW[i] / 2), r1(gx0[i + 1] + GW[i + 1] / 2)] for i, a in enumerate(areas)], "cat": cat,
     }
     if e.get("nota"):
         out["nota"] = e["nota"]
@@ -457,7 +614,7 @@ CATS = json.loads((ROOT / "data" / "categorias.json").read_text(encoding="utf-8"
 def nombre_cat(n):
     """Nombre de columna del catálogo común (data/categorias.json); las áreas propias de una carrera se conservan."""
     k = CATS.get("sinonimos", {}).get(n)
-    return CATS["categorias"][k]["nombre"] if k else n
+    return CATS["categorias"][k]["nombre"] if k else CATS.get("cortos", {}).get(n, n)
 
 
 # categoría (data/categorias.json) de cada línea de especialización de la UPIITA: base de la afinidad del alumno
@@ -517,13 +674,13 @@ def load_maps(offer, upiita=True, extra=None):
     maps = {}
     for c in cur:
         f = ROOT / "data" / f"trayectoria_{c}.json"
-        entry = {"cur": cur[c], "lineas": [dict(l, categoria=CAT_LINEA_UPIITA.get((c, l["linea"]))) for l in esp["lineas"].get(c, [])],
+        entry = {"cur": cur[c], "lineas": [dict(l, categoria=nombre_cat(CAT_LINEA_UPIITA.get((c, l["linea"]))) if CAT_LINEA_UPIITA.get((c, l["linea"])) else None) for l in esp["lineas"].get(c, [])],
                  "reglas": esp["reglas_nivel"].get(c, {})}
         if not upiita:
             # otra escuela: sin trayectorias propias; con mapa curricular del SAES se muestra la cuadrícula por nivel
             entry.update(lineas=[], reglas={}, generico=not any(v[1] for v in cur[c].values()))   # sin créditos: solo horarios
             if OPTA.get("lineas", {}).get(c):
-                entry["lineas"] = OPTA["lineas"][c]
+                entry["lineas"] = [dict(l, categoria=nombre_cat(l["categoria"])) if l.get("categoria") else l for l in OPTA["lineas"][c]]
             ft = UNI_DIR / f"trayectoria_{c}.json"
             if ft.exists():
                 t = json.loads(ft.read_text(encoding="utf-8"))
@@ -600,6 +757,25 @@ def main():
         "siglas": UCONF["siglas"],
         "opciones_plan": opciones,
     }
+    # Equivalencias entre carreras de la misma unidad (tabla del SAES), solo entre los planes que se ofrecen aquí.
+    # Se muestran como consulta en la planeación de horario; no modifican el avance ni la seriación.
+    fe = UNI_DIR / "equivalencias.json"
+    if fe.exists():
+        eq = json.loads(fe.read_text(encoding="utf-8"))
+        def ident(c_, p_):
+            i_ = carrera_plan(c_, p_)
+            ok = i_ in data["carreras"] and (opciones[i_]["plan"] == p_ if i_ in opciones else PLANES.get(c_) == p_)
+            return i_ if ok else None
+        rel = []
+        for r in eq["relaciones"]:
+            o, dd = r["origen"], r["destino"]
+            io, idd = ident(o[0], o[1]), ident(dd[0], dd[1])
+            if io and idd and io != idd:
+                rel.append([io, o[3], o[2], idd, dd[3], dd[2]])
+        mult = [[ident(*m["origen"][:2]), m["origen"][3], ident(*m["destino_contexto"][:2]), [x[3] for x in m["destinos"]]]
+                for m in eq.get("multiples", [])]
+        data["equiv"] = {"fuente": eq["fuente"], "consultado": eq["consultado"], "rel": rel,
+                         "multiples": [m for m in mult if m[0] and m[2]]}
     # materias sin mapa curricular (otra escuela o materia nueva): clave interna estable por carrera y nombre,
     # para que el armado de horario funcione aunque no haya trayectoria ni créditos
     upiita = UNIDAD == "upiita" and "saes.upiita" in d.get("fuente", "saes.upiita")

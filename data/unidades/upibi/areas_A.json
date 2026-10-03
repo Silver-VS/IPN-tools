@@ -6,7 +6,7 @@
  "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos.",
  "areas": [
   {
-   "nombre": "Físico-matemáticas",
+   "nombre": "Ciencias básicas",
    "claves": [
     "A105",
     "A103",
@@ -20,16 +20,53 @@
    "espacios": []
   },
   {
-   "nombre": "Informática y computación",
+   "nombre": "Computación",
    "claves": [
     "A107"
    ],
    "espacios": []
   },
   {
-   "nombre": "Sistemas y control",
+   "nombre": "Control y automatización",
    "claves": [
     "A325"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencias biológicas",
+   "claves": [
+    "A102",
+    "A210",
+    "A326"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Química",
+   "claves": [
+    "A108",
+    "A215",
+    "A327",
+    "A328",
+    "A324"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ingeniería de procesos",
+   "claves": [
+    "A217",
+    "A320",
+    "A323",
+    "A536",
+    "A538",
+    "A434",
+    "A432",
+    "A649",
+    "A537",
+    "A756",
+    "A648"
    ],
    "espacios": []
   },
@@ -37,39 +74,20 @@
    "nombre": "Ciencias ambientales y bioprocesos",
    "claves": [
     "A101",
-    "A108",
-    "A215",
-    "A102",
-    "A210",
-    "A326",
-    "A327",
-    "A328",
     "A429",
     "A541",
     "A651",
     "A762",
     "A863",
-    "A217",
-    "A320",
-    "A323",
-    "A324",
     "A435",
     "A430",
     "A431",
-    "A536",
-    "A538",
-    "A434",
-    "A432",
     "A539",
     "A650",
     "A760",
     "A652",
     "A653",
-    "A649",
-    "A537",
     "A761",
-    "A756",
-    "A648",
     "A646",
     "A757",
     "A758",
@@ -79,7 +97,7 @@
    "espacios": []
   },
   {
-   "nombre": "Formación integral",
+   "nombre": "Humanidades y gestión",
    "claves": [
     "A104",
     "A106",
@@ -94,7 +112,7 @@
    "espacios": []
   },
   {
-   "nombre": "Especialización",
+   "nombre": "Especialidad",
    "claves": [],
    "espacios": [
     [
