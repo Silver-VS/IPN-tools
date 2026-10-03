@@ -43,3 +43,9 @@ Tres vistas en lugar de seis gráficas tradicionales:
 - **Tu camino en la carrera:** regla del plan completo (acreditado, en curso o simulado, lo que falta) con marcas de los periodos cursados y de la estimación a tu ritmo; aviso si se rebasa el plazo de referencia.
 - **Tu kárdex por periodo:** una columna por periodo (promedio, cambio ▲▼ y créditos) con un cuadro por materia que muestra su calificación, color de 6 a 10 y la forma de evaluación (E, T, R); reúne tendencia, distribución y tipo de evaluación.
 - **Tus áreas frente a tu promedio:** barras divergentes respecto a tu promedio de aprobadas.
+
+## Promedio meta (2026-10-04)
+
+«¿Qué promedio quieres alcanzar?»: con el promedio sin reprobadas (n materias acreditadas, suma S) y una meta T, el promedio necesario en k materias es (T·(n+k) − S) ÷ k. Se muestra para las materias en curso (este periodo) y para las obligatorias que faltan (al terminar la carrera); si rebasa 10, se indica a cuánto llegarías con 10 en todas. «Probar en la simulación» asigna calificaciones enteras a las materias en curso que suman lo necesario. El promedio oficial del SAES cuenta también reprobadas que el kárdex no detalla; por eso la meta se calcula sobre el promedio sin reprobadas.
+
+Equivalencias, revalidaciones (incluida la movilidad académica) y dictámenes cuentan en los promedios, áreas y créditos; no entran en el promedio por periodo ni en el ritmo porque el SAES las registra al reconocerlas, no en el periodo en que se cursaron.

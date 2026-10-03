@@ -216,7 +216,12 @@ input[type=number]{width:5rem}
 .k-chip{display:inline-block;padding:0 6px;border-radius:999px;border:1px solid var(--line);font-size:.72rem;font-weight:600;color:var(--fg)}
 .kpi em.up{font-style:normal;color:var(--ok);font-weight:600}.kpi em.down{font-style:normal;color:var(--ch-alert);font-weight:600}
 .cm-ref{margin:4px 0 0;font-size:.78rem;color:var(--muted)}
-.mt-h{margin:6px 0 2px;font-size:1rem}.mt-mat{display:inline-block;margin-left:6px;padding:1px 10px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-size:.82rem;font-weight:600}.mt-mat .info{color:inherit}
+.mt-h{margin:6px 0 2px;font-size:1rem}
+.pm .meta-controls input[type=number]{width:5rem}
+.pm-fila{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-top:1px solid var(--line)}
+.pm-fila>div{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.88rem}.pm-t{font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+.pm-regla{flex:0 0 140px;max-width:140px}
+.pm #prom-sim{margin-top:8px}.mt-mat{display:inline-block;margin-left:6px;padding:1px 10px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-size:.82rem;font-weight:600}.mt-mat .info{color:inherit}
 .mt-regla{position:relative;height:10px;margin:30px 0 48px;border-radius:999px;background:var(--line)}
 .mt-zona{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--ok);opacity:.35}
 .mt-regla.supera .mt-zona{background:var(--line)}
@@ -1889,6 +1894,33 @@ function montarGrafica(host,fig){
     return new DOMMatrix([k,0,0,k,x,y]);
   };
 }
+/* Promedio meta: con qué promedio deberías salir de tus materias en curso (y del resto de la carrera) para llegar al
+   promedio que quieres. Se calcula sobre el promedio sin reprobadas (exacto con tu kárdex); el oficial también cuenta
+   reprobadas que el SAES no detalla, así que para subirlo puede hacer falta más. */
+function promMeta(D,T){
+  const reales=D.rows.filter(r=>!r.sim), n=reales.length, suma=reales.reduce((t,r)=>t+r.cal,0);
+  const k=tr().enCurso.length, c=cur(), hechas=new Set([...tr().done,...tr().enCurso]);
+  const R=Object.keys(c).filter(x=>!hechas.has(x)&&!isElec(x)&&c[x][3]==='O'&&c[x][1]>0).length+k;   // obligatorias que te faltan (sin las opciones de optativas), más las en curso
+  const nec=m=>m>0?(T*(n+m)-suma)/m:null;
+  return {n,actual:n?suma/n:null,k,R,periodo:nec(k),carrera:nec(R),max:k?(suma+10*k)/(n+k):null};
+}
+function promMetaPanel(D){
+  const T=store.get('promMeta.'+S.car,null), v=T??(D.media!=null?Math.min(10,Math.ceil((D.media+.3)*10)/10):8.5), M=promMeta(D,v);
+  return `<section class="meta-panel pm" aria-labelledby="pm-h"><h3 id="pm-h">¿Qué promedio quieres alcanzar? ${info('Se calcula con tu promedio sin reprobadas (tus materias acreditadas). El promedio oficial del SAES también cuenta calificaciones reprobadas, así que para subirlo puede hacer falta un poco más.')}</h3>
+    <div class="meta-controls"><label for="prom-meta">Promedio meta <input id="prom-meta" type="number" min="6" max="10" step="0.1" value="${v}"></label>
+    <span class="muted">Hoy: ${M.actual!=null?M.actual.toFixed(2):'—'} (${M.n} materias)</span></div>
+    <div id="pm-res">${promMetaHtml(M)}</div></section>`;
+}
+const pmEst=x=>x==null?'':x<=6?'cualquier calificación aprobatoria te alcanza':x>10?'no alcanzable':`<b>${x.toFixed(2)}</b>`;
+const pmEscala=x=>x==null||x>10||x<6?'':`<span class="k-regla pm-regla" aria-hidden="true"><i style="left:${(x-6)/4*100}%"></i><em>6</em><em>10</em></span>`;
+function promMetaHtml(M){
+  const est=pmEst, escala=pmEscala;
+  if(!M.n)return '<p class="muted">Aún no hay materias acreditadas para calcular.</p>';
+  const per=M.k?`<div class="pm-fila"><div><span class="pm-t">Este periodo</span><span>Necesitas promediar ${est(M.periodo)} en tus ${M.k} ${M.k===1?'materia':'materias'} en curso${M.periodo>10&&M.max!=null?`; aun con 10 en todas llegarías a ${M.max.toFixed(2)}`:''}.</span></div>${escala(M.periodo)}</div>`:'<p class="muted">No tienes materias en curso registradas.</p>';
+  const car=M.R?`<div class="pm-fila"><div><span class="pm-t">Al terminar la carrera</span><span>Necesitas promediar ${est(M.carrera)} en las ${M.R} materias obligatorias que te faltan.</span></div>${escala(M.carrera)}</div>`:'';
+  const boton=M.k&&M.periodo!=null&&M.periodo<=10?`<button class="btn" type="button" id="prom-sim">Probar en la simulación</button>`:'';
+  return per+car+boton;
+}
 // leyenda visual de una gráfica: [tipo, color, texto]; tipos: linea, punteada, guion, area, barra, punto, anillo, vertical, vertical-p
 function ley(items){
   const m=(t,c)=>({linea:`<path d="M1 7H21" stroke="${c}" stroke-width="2.4"/><circle cx="11" cy="7" r="2.6" fill="${c}"/>`,
@@ -1941,7 +1973,7 @@ async function renderStats(){
       ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([l,n])=>`<span class="k-chip">${l} ${n}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario (E), ETS (T) o recurse (R)${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
       ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
     </div>
-    ${metaPanel(D)}
+    ${metaPanel(D)}${promMetaPanel(D)}
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu camino en la carrera</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
       <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
@@ -2176,6 +2208,16 @@ const cambiarMeta=e=>{
   $('#meta-periodos').setAttribute('aria-invalid',String(!metaCreditos(D,cfg.periodos,cfg.actual).valida));
 };
 $('#kstats').addEventListener('input',cambiarMeta);
+$('#kstats').addEventListener('input',e=>{if(e.target.id!=='prom-meta')return;const v=+e.target.value;if(!(v>=6&&v<=10))return;
+  store.set('promMeta.'+S.car,v);const D=statsDatos(),M=promMeta(D,v);
+  $('#pm-res').innerHTML=promMetaHtml(M)});
+// «Probar en la simulación»: calificaciones enteras en las materias en curso que suman lo necesario para la meta
+$('#kstats').addEventListener('click',e=>{if(e.target.id!=='prom-sim')return;
+  const v=store.get('promMeta.'+S.car,null)??+$('#prom-meta').value, M=promMeta(statsDatos(),v), ec=tr().enCurso;
+  if(!ec.length||M.periodo==null||M.periodo>10)return;
+  let falta=Math.max(6*ec.length,Math.min(10*ec.length,Math.ceil(M.periodo*ec.length-1e-9)));
+  ec.forEach((k,i)=>{const resto=ec.length-i, cal=Math.max(6,Math.min(10,Math.ceil(falta/resto)));SIM.res[k]={ok:true,cal};falta-=cal});
+  SIM.on=true;simSave();renderStats()});
 /* globo de ayuda inmediato (el «title» nativo tarda ~1 s): un solo elemento fijo, colocado junto al ⓘ sin salirse de la
    pantalla ni quedar recortado por recuadros con overflow; cursor, teclado y toque */
 const TIP=(()=>{const d=document.createElement('div');d.className='tip-flot';d.setAttribute('role','tooltip');d.hidden=true;document.documentElement.appendChild(d);return d})();   // fuera del <body>: no hereda su «zoom» (--ui-zoom)
