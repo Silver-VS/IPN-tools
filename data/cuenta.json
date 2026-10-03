@@ -9,7 +9,15 @@
       "id": "upiita",
       "siglas": "UPIITA",
       "nombre": "Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas",
-      "disponible": true
+      "disponible": true,
+      "url": "horarios.html"
+    },
+    {
+      "id": "escom",
+      "siglas": "ESCOM",
+      "nombre": "Escuela Superior de Cómputo",
+      "disponible": true,
+      "url": "horarios-escom.html"
     }
   ],
   "googlePrueba": true,

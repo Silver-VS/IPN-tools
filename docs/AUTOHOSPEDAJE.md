@@ -38,6 +38,20 @@ El código del capturador está en `tools/captura_saes.js`.
    exclusivo de la UPIITA: trayectorias, líneas de especialización, reglas por nivel y salones.
    Las materias que no aparecen en el mapa curricular reciben una clave interna para que el armado funcione.
 
+## Varias unidades en un mismo sitio
+
+Cada unidad adicional vive en `data/unidades/<unidad>/`:
+
+| Archivo | Contenido |
+|---|---|
+| `unidad.json` | `id`, `siglas`, `nombre`, `saes` (dirección del SAES) y `modelo` (`semestral` para planes por semestres) |
+| `horarios_saes.json`, `mapa_curricular_saes.json` | Captura del SAES (capturador) |
+| `trayectoria_<carrera>.json` | Mapa extraído del PDF de la unidad (opcional; ESCOM: `tools/extract_mapa_escom.py`) |
+
+`UNIDAD=<unidad> python tools/build_horarios.py` genera `web/dist/horarios-<unidad>.html` con el encabezado y el
+nombre de la unidad. Los datos del navegador se guardan con el prefijo `hu.<unidad>.`, así que las unidades no se
+mezclan aunque compartan sitio. Agrega la unidad a `unidades` en `data/cuenta.json` para que aparezca en la bienvenida.
+
 ## 3. Publicar
 
 Sube el contenido de `web/dist/` a cualquier hosting estático (GitHub Pages, Netlify, el servidor de la

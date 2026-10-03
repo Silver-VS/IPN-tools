@@ -17,7 +17,7 @@
   --blk-s:42%; --blk-l:90%; --blk-fg:#2b2427; --blk-edge:40%; --own:#e6e1e3;
   --st-done:#c9c3c5; --st-done-fg:#4d4447; --st-late:#b8473f; --st-late-fg:#ffffff; --st-now:#3f7d5a; --st-now-fg:#ffffff; --st-rest:#ffffff;
   --band:#f3eff1; --edge:#8e8589;
-  --n1:#8a98c7; --n2:#c48aa6; --n3:#73a183; --n4:#5b7f9e; --n5:#c9b07a;
+  --n1:#8a98c7; --n2:#c48aa6; --n3:#73a183; --n4:#5b7f9e; --n5:#c9b07a; --n6:#9b86c4; --n7:#c99a7a; --n8:#6fa3a8;
   --r:6px;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -169,6 +169,7 @@ input[type=number]{width:5rem}
 .box.elec{border-style:dashed;cursor:help}
 .box.slot{border-style:dashed;background:var(--sunken);color:var(--muted);font-weight:500}
 .box.req{background:var(--accent-soft)}
+.box.far{opacity:.5;filter:saturate(.35)}
 .box.want{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .box.want::after{content:"✓";position:absolute;top:1px;right:4px;font-size:.95em;color:inherit}
 .box.dim{opacity:.22}
@@ -610,6 +611,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 <!--__SKINUI__-->
 <script>
 const DATA=/*__DATA__*/null;
+const UNIDAD=DATA.unidad||'upiita';window.IPNT_UNIDAD=UNIDAD;   // la UPIITA conserva el prefijo hu.; otras unidades, hu.<unidad>.
 const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], DAYN=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 /* Dispositivo: en pantallas táctiles no existe el «hover»; tocar una materia la enfoca y un segundo toque la selecciona.
    En teléfono vertical la trayectoria se muestra en lista y el horario como agenda por día (el usuario puede cambiarlo). */
@@ -630,7 +632,8 @@ const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
 const fmtCr=n=>Number.isInteger(+n)?String(+n):(+n).toFixed(2).replace(/0$/,'');
 /*__CUENTA_JS__*/
-const store={get(k,d){try{const v=localStorage.getItem('hu.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){IPNT.set('hu.'+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
+const HU=UNIDAD==='upiita'?'hu.':'hu.'+UNIDAD+'.';
+const store={get(k,d){try{const v=localStorage.getItem(HU+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){IPNT.set(HU+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
 
 const S={tab:store.get('tab','tray'),per:store.get('per','proximo'),car:store.get('car','B'),tur:store.get('tur','*'),niv:store.get('niv','*'),q:'',view:store.get('view','materia'),
   hide:store.get('hide',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
@@ -678,9 +681,10 @@ const tr=()=>{
     // reprobada en la simulación: cuenta desde el periodo que se cursa ahora
     const pm=perMeta();simFail.forEach(k=>{if(failP[k]==null)failP[k]=pm!=null?pm-1:null;veces[k]=(veces[k]||0)+1});
     const curso=sim?[]:enCurso;
+    const desfS=me?(ALUMNO.desfasadas_saes||[]).map(r=>r[0]).filter(k=>cur()[k]&&!doneS.has(k)):[];
     // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
-    const pmeta=perMeta(), oblig=Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2);
-    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,done,fail:Object.keys(failP),failP,veces,curso,enCurso,sim,simOk,cursados:me?ALUMNO.avance?.cursados??null:null};
+    const pmeta=perMeta(), oblig=[...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS];
+    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,sim,simOk,cursados:me?ALUMNO.avance?.cursados??null:null};
   }
   return T[S.car];
 };
@@ -703,7 +707,16 @@ function perMeta(){
 /* Desfase OFICIAL (regla del SAES): una reprobada se desfasa cuando pasan más de 2 periodos sin acreditarla.
    El "atraso" respecto al semestre propuesto solo aplica a planes por semestre (Energía); en los planes 2009
    (por niveles) el orden de la trayectoria es una recomendación y llevar otro orden no es desfase. */
-const DESFASE_SEM=new Set(['E']);
+const SEMESTRAL=()=>MAP()?.modelo==='semestral'||(UNIDAD==='upiita'&&S.car==='E');
+const DESFASE_SEM={has:()=>SEMESTRAL()};   // compatibilidad con los usos anteriores
+/* Modelo por semestres: no se pueden inscribir materias de más de un año (dos semestres) adelante del semestre de
+   referencia, que es el más bajo con materias obligatorias pendientes (sin acreditar ni en curso). */
+function semRef(){
+  if(!SEMESTRAL()||!isPersonal())return null;
+  const t=tr(),hecho=new Set([...t.done,...t.curso]),sp=semOf();let m=null;
+  Object.entries(cur()).forEach(([k,v])=>{if(v[3]!=='O'||isElec(k)||hecho.has(k))return;const x=sp[k];if(x!=null&&(m==null||x<m))m=x});
+  return m;
+}
 function failInfo(k){
   const t=tr(); if(!(k in t.failP)) return null;
   const idx=t.failP[k], meta=perMeta(), limite=idx==null?null:idx+2;
@@ -790,6 +803,7 @@ function statusOf(k){
   const fi=failInfo(k);
   if(fi) return fi.estado==='desfasada'?'late fail':'fail';
   if(tr().curso.includes(k)) return 'curso';
+  if((tr().desfS||[]).includes(k)) return 'late';   // desfasada según el SAES (plan por semestres)
   // las materias en curso cuentan como requisito cumplido (se planea suponiendo que se acreditan)
   const req=(prereqs()[k]||[]).filter(x=>!done.has(x)&&!tr().curso.includes(x));
   // solo la seriación directa bloquea: el plan es flexible y la oferta varía, así que si ya acreditaste los requisitos
@@ -798,12 +812,13 @@ function statusOf(k){
   const sn=semNow(), sp=semOf()[k];
   let st='rest';
   if(sn&&sp){if(sp<sn)st=DESFASE_SEM.has(S.car)?'late':'prev';else if(sp===sn)st='now'}
-  return st+(lock?' lock':'');
+  const r=semRef(), far=r!=null&&sp!=null&&sp>r+2;   // fuera de la ventana de un año
+  return st+(lock?' lock':'')+(far?' far':'');
 }
 // Las electivas se acreditan por horas de actividades (DIE-03, Electivas UPIITA), nunca con un grupo del horario:
 // no se eligen para cursar, no suman créditos a la selección ni se sugieren.
 function isElec(k){return /^ELECTIVA/i.test(cur()[k]?.[0]||'')}
-function available(k){const s=statusOf(k);return !isElec(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')}
+function available(k){const s=statusOf(k);return !isElec(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')&&!s.includes('far')}
 
 function suggestions(){
   // prioridad: desfasadas, reprobadas, atrasadas; después todo lo que ya puedes cursar (de cualquier semestre),
@@ -897,7 +912,7 @@ function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
   const st=statusOf(k);
   const el=isElec(k);
   const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${want.has(k)?' want':req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?' hot':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
-  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · se acredita por actividades (Electivas UPIITA)':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · se acredita por actividades (Electivas UPIITA)':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
   return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${want.has(k)}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}</div>`;
 }
 
@@ -952,7 +967,8 @@ function renderSide(){
     const done=tr().done.filter(k=>c[k]), credDone=done.reduce((s,k)=>s+c[k][1],0);
     const total=Object.values(c).filter(v=>v[3]==='O'&&!/^ELECTIVA/.test(v[0])).reduce((s,v)=>s+v[1],0);
     const A=ALUMNO, meta=perMeta(), fis=tr().fail.map(failInfo).sort((a,b)=>(a.idx??99)-(b.idx??99));
-    const nDes=fis.filter(f=>f.estado==='desfasada').length, curso=tr().curso;
+    const dS=(tr().desfS||[]).filter(k=>!fis.some(f=>f.k===k));   // desfasadas que reporta el SAES (planes por semestre)
+    const nDes=fis.filter(f=>f.estado==='desfasada').length+dS.length, curso=tr().curso;
     const atraso=DESFASE_SEM.has(S.car)?Object.keys(c).filter(k=>statusOf(k)==='late'||statusOf(k)==='late lock').length:0;
     const tile=(lbl,val,sub='',cls='',tip='')=>`<div class="tile"${tip?` title="${esc(tip)}"`:''}><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
     const simCr=tr().simOk.reduce((t,k)=>t+c[k][1],0), obt=(A.avance?.obtenidos??credDone)+simCr, tot=A.carga?.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
@@ -970,7 +986,7 @@ function renderSide(){
     const msg=f=>f.estado==='desfasada'?`<span class="bad">desfasada en ${perName(meta)}</span>; debes inscribirla: el SAES no permite reinscribirse sin ella`:
       f.estado==='riesgo'?`<span class="warn">debe acreditarse en ${perName(meta)}</span> para evitar el desfase en ${perName(meta+1)}`:
       f.estado==='reciente'?`acreditar a más tardar en ${perName(f.limite)}`:'actualiza tus datos del SAES para conocer el periodo de adeudo';
-    $('#desf').innerHTML=fis.length?`<ul class="desf">${fis.map(f=>`<li class="${f.estado}" title="${esc(`${f.k}${f.idx!=null?' · reprobada en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`)}"><b>${esc(pretty(c[f.k][0]))}</b> · ${msg(f)}${f.curso?' · en recursamiento':''}</li>`).join('')}</ul>`:'';
+    $('#desf').innerHTML=fis.length||dS.length?`<ul class="desf">${dS.map(k=>`<li class="desfasada" title="${esc(k)}"><b>${esc(pretty(c[k][0]))}</b> · <span class="bad">desfasada según el SAES</span>; debes inscribirla para reinscribirte</li>`).join('')}${fis.map(f=>`<li class="${f.estado}" title="${esc(`${f.k}${f.idx!=null?' · reprobada en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`)}"><b>${esc(pretty(c[f.k][0]))}</b> · ${msg(f)}${f.curso?' · en recursamiento':''}</li>`).join('')}</ul>`:'';
     $('#desf-note').textContent=(fis.length?'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.':'')+
       (DESFASE_SEM.has(S.car)?'':' En los planes por niveles, cursar las materias en un orden distinto al de la trayectoria no constituye desfase.');
     $('#est-src').textContent='Leído del SAES el '+new Date(A.leido).toLocaleDateString('es-MX',{dateStyle:'medium'});
@@ -1407,7 +1423,7 @@ function renderTop(){
   const n=new Set(classes().filter(c=>c[0]===S.car).map(c=>c[3])).size;
   $('#notice').innerHTML=`<span>Captura del SAES: <b>${f}</b></span><span><b>${n}</b> grupos de esta carrera</span>`+
     (!hasOffer('proximo')?'<span>El SAES aún no publica la oferta del próximo periodo; se muestra el periodo actual.</span>':S.per==='proximo'?'<span>La oferta del próximo periodo está en captura y puede estar incompleta.</span>':'')+
-    (n===0?'<span class="bad">Esta carrera no tiene grupos publicados en este periodo.</span>':'')+(S.per==='actual'&&DATA.salones?`<span>Salones según el horario por aula de la unidad (ciclo ${esc(DATA.salones.periodo)}).</span>`:'<span>Salones aún sin asignar para este periodo.</span>');
+    (n===0?'<span class="bad">Esta carrera no tiene grupos publicados en este periodo.</span>':'')+(DATA.salones?.fuente==='saes'?'<span>Salones según el SAES.</span>':S.per==='actual'&&DATA.salones?`<span>Salones según el horario por aula de la unidad (ciclo ${esc(DATA.salones.periodo)}).</span>`:'<span>Salones aún sin asignar para este periodo.</span>');
 }
 /* Vista en lista (teléfono): materias por semestre propuesto con su estado y un botón para agregarlas */
 function renderList(){

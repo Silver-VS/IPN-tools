@@ -4,11 +4,12 @@ docs/consulta-carga.md
 docs/propuesta-planeacion-anual.md
 programas/
 programas.zip
-ESCOM/
+/ESCOM/
 
 # Salidas de compilación (se generan con tools/build_*.py)
 web/dist/
 web/horarios.html
+web/horarios-*.html
 web/electivas.html
 web/_*.html
 # Pruebas y renders locales

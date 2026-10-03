@@ -40,7 +40,7 @@ var IPNT=window.IPNT=(()=>{
   const CFG=/*__IPNT_CFG__*/{}, FILE='perfil.ipnt.json', MS_SCOPES=['Files.ReadWrite.AppFolder'],
     GO_SCOPES='openid email profile https://www.googleapis.com/auth/drive.appdata';
   // qué se guarda: todo lo de Horarios (hu.) y Electivas (ue.), menos el estado de pantalla de cada dispositivo
-  const SYNC=/^(hu\.|ue\.)|^saes\.alumno$|^perfil\.opciones$/, LOCAL=/^hu\.(tab|per|tur|niv|view|mview|cview|mobnote)$/;
+  const SYNC=/^(hu\.|ue\.)|^saes\.alumno$|^perfil\.opciones$/, LOCAL=/^hu\.(?:[a-z]+\.)?(tab|per|tur|niv|view|mview|cview|mobnote)$/;
   const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}},
     del(k){try{localStorage.removeItem(k)}catch(e){}},keys(){try{return Object.keys(localStorage)}catch(e){return[]}},
     obj(k,d){try{return JSON.parse(localStorage.getItem(k)||'null')||d}catch(e){return d}},put(k,o){try{localStorage.setItem(k,JSON.stringify(o))}catch(e){}}};
@@ -210,7 +210,7 @@ var IPNT=window.IPNT=(()=>{
      recarga si llegaron cambios de otro dispositivo), 'auto' (tras un cambio propio: solo se avisa) */
 
   /* ---- al iniciar sesión: si la cuenta y el navegador tienen datos distintos, el alumno elige ---- */
-  const ETQ=k=>/^hu\.w\./.test(k)?'planes de horario y marcas':/^hu\.t\./.test(k)?'materias elegidas en el mapa':/^ue\./.test(k)?'actividades de Electivas':
+  const ETQ=k=>/^hu\.(?:[a-z]+\.)?w\./.test(k)?'planes de horario y marcas':/^hu\.(?:[a-z]+\.)?t\./.test(k)?'materias elegidas en el mapa':/^ue\./.test(k)?'actividades de Electivas':
     k==='saes.alumno'?'datos del SAES':'preferencias y filtros';
   function diferencias(d){
     const out=new Set();
@@ -365,13 +365,17 @@ var IPNT=window.IPNT=(()=>{
     }).catch(e=>{st.fase='error';st.error=texto(e);pintar()});
   }
   /* ---- bienvenida: primera visita (sin carrera, planes, marcas, actividades ni sesión en este navegador) ---- */
-  const NUEVO=!ls.get('ipnt.bienvenida')&&!ls.get('ipnt.cuenta')&&!ls.keys().some(k=>/^(hu\.|ue\.|saes\.alumno$)/.test(k)&&!LOCAL.test(k));
+  // por unidad: la UPIITA usa hu./ue.; otras unidades, hu.<unidad>. (mismo sitio, datos separados)
+  const UNI=CFG.unidad||'upiita', BKEY=UNI==='upiita'?'ipnt.bienvenida':'ipnt.bienvenida.'+UNI;
+  const OTRAS=new RegExp('^hu[.]('+((CFG.unidades||[]).map(u=>u.id).filter(x=>x&&x!=='upiita').join('|')||'-')+')[.]');
+  const propia=k=>UNI==='upiita'?/^(hu\.|ue\.)/.test(k)&&!OTRAS.test(k):k.startsWith('hu.'+UNI+'.');
+  const NUEVO=!ls.get(BKEY)&&!ls.get('ipnt.cuenta')&&!ls.keys().some(k=>propia(k)&&!LOCAL.test(k));
   function bienvenida(o){
     const dl=$i('ipnt-hola'), sel=document.querySelector(o.select);
     if(!NUEVO||!dl||!sel) return;
     const UN=CFG.unidades||[], cars=[...sel.options].map(op=>[op.value,op.textContent.trim()]).filter(c=>c[0]);
     let uni=CFG.unidad;
-    const listo=()=>{ls.set('ipnt.bienvenida','1');if(dl.close)dl.close();else dl.removeAttribute('open')};
+    const listo=()=>{ls.set(BKEY,'1');if(dl.close)dl.close();else dl.removeAttribute('open')};
     const pintarH=()=>{
       $i('ipnt-h-uni').hidden=UN.length<2;
       if(UN.length<2)$i('ipnt-h-lead').textContent='Para empezar, elige tu carrera.';
@@ -379,7 +383,7 @@ var IPNT=window.IPNT=(()=>{
       const u=UN.find(x=>x.id===uni)||{};
       $i('ipnt-h-cars').innerHTML=u.id===CFG.unidad?
         `<h3>${UN.length>1?'2. ':''}Elige tu carrera</h3><div class="ipnt-cars">${cars.map(([k,v])=>`<button type="button" class="btn" data-car="${esc(k)}">${esc(v)}</button>`).join('')}</div>`:
-        u.url?`<p>La herramienta de ${esc(u.siglas)} está en <a href="${esc(u.url)}">${esc(u.url)}</a>.</p>`:
+        u.url?`<h3>${UN.length>1?'2. ':''}Continúa en la herramienta de tu unidad</h3><p><a class="btn primary" href="${esc(u.url)}">Ir a Horarios ${esc(u.siglas)}</a></p>`:
         `<p class="saes-note">La versión para ${esc(u.siglas||'tu unidad')} se está preparando con alumnos de la unidad. Mientras tanto puedes explorar la de la ${esc((UN.find(x=>x.id===CFG.unidad)||{}).siglas||'')}.</p>`;
       $i('ipnt-h-yo').hidden=!cuenta;
       if(cuenta)$i('ipnt-h-yo').textContent=`Sesión iniciada: ${cuenta.name||cuenta.username}. Si ya tenías datos guardados, la página se actualizará sola; si no, elige tu carrera.`;
@@ -393,11 +397,11 @@ var IPNT=window.IPNT=(()=>{
       if(b.dataset.prov){
         const m=$i('ipnt-h-msg');m.className='ipnt-state';m.textContent='Abriendo el inicio de sesión…';
         await entrar(b.dataset.prov);
-        if(cuenta){m.textContent='';ls.set('ipnt.bienvenida','1')}else{m.className='ipnt-state bad';m.textContent=st.error||''}
+        if(cuenta){m.textContent='';ls.set(BKEY,'1')}else{m.className='ipnt-state bad';m.textContent=st.error||''}
         pintarH();return}
       if(b.hasAttribute('data-hola-x'))listo();
     });
-    dl.addEventListener('cancel',()=>ls.set('ipnt.bienvenida','1'));   // Esc: no se vuelve a mostrar
+    dl.addEventListener('cancel',()=>ls.set(BKEY,'1'));   // Esc: no se vuelve a mostrar
     if(MS.disponible())MS.listo().catch(()=>{});if(GO.disponible())GO.listo().catch(()=>{});   // listas para el clic
     pintarH();
     if(dl.showModal)dl.showModal();else dl.setAttribute('open','');
@@ -499,8 +503,10 @@ AUTH = """<!doctype html><html lang="es"><meta charset="utf-8"><title>Iniciando 
 """
 
 
-def inject(html):
+def inject(html, unidad=None):
     cfg = config()
+    if unidad:
+        cfg["unidad"] = unidad
     js = JS.replace("/*__IPNT_CFG__*/{}", json.dumps(cfg), 1)
     html = html.replace("/*__CUENTA_JS__*/", js, 1).replace("/*__CUENTA_CSS__*/", CSS, 1)
     return html.replace("<!--__CUENTA_BTN__-->", UI, 1)

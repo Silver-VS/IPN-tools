@@ -13,6 +13,8 @@
     return;
   }
   var UNIDAD = UM[1].toLowerCase();
+  var SIG = UNIDAD.toUpperCase();
+  if (TOOL && UNIDAD !== 'upiita') TOOL = TOOL.replace(/horarios\.html$/, 'horarios-' + UNIDAD + '.html');   // herramienta de esa unidad
   // claves: letra + 3 dígitos (B101) o con letras (optativas de la ESCOM); siempre con al menos un dígito
   var CLAVE = /^(?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6}$/i;
   var byId = function (d, id) { return d.querySelector('[id$="mainCopy_' + id + '"]'); };
@@ -55,9 +57,9 @@
   var box = document.createElement('div');
   box.id = 'upiita-lector';
   box.setAttribute('role', 'dialog');
-  box.setAttribute('aria-label', 'Lector UPIITA');
+  box.setAttribute('aria-label', 'Lector ' + SIG);
   box.style.cssText = 'position:fixed;z-index:2147483647;right:16px;top:16px;width:min(420px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;background:#fff;color:#18181b;border:1px solid #d9d9de;border-radius:12px;box-shadow:0 18px 50px -12px rgba(0,0,0,.35);font:14px/1.5 system-ui,-apple-system,Segoe UI,sans-serif;padding:16px';
-  box.innerHTML = '<b style="font-size:16px">Lector UPIITA</b><p style="margin:6px 0 0;color:#52525b">Leyendo tu Kárdex y tu Cita de reinscripción (solo lectura)…</p>';
+  box.innerHTML = '<b style="font-size:16px">Lector ' + SIG + '</b><p style="margin:6px 0 0;color:#52525b">Leyendo tu Kárdex y tu Cita de reinscripción (solo lectura)…</p>';
   document.body.appendChild(box);
 
   try {
@@ -162,7 +164,7 @@
     };
     var json = JSON.stringify(data);
     var row = function (k, v) { return '<tr><td style="color:#52525b;padding:2px 12px 2px 0">' + k + '</td><td style="font-weight:600">' + (v == null || v === '' ? '—' : v) + '</td></tr>'; };
-    box.innerHTML = '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:16px">Lector UPIITA</b><button id="ul-x" style="border:0;background:none;font-size:20px;cursor:pointer" aria-label="Cerrar">×</button></div>' +
+    box.innerHTML = '<div style="display:flex;justify-content:space-between;gap:8px;align-items:center"><b style="font-size:16px">Lector ' + SIG + '</b><button id="ul-x" style="border:0;background:none;font-size:20px;cursor:pointer" aria-label="Cerrar">×</button></div>' +
       '<p style="margin:4px 0 10px;color:#52525b">Resumen de la información consultada en el SAES. No se envió a ningún servidor.</p>' +
       '<table style="border-collapse:collapse;font-size:13px">' +
       row('Boleta', data.boleta) + row('Carrera', data.carrera_nombre + (data.plan ? ' (plan ' + data.plan + ')' : '')) +
@@ -172,7 +174,7 @@
       row('Cita de reinscripción', data.cita.inicio) + '</table>' +
       '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px">' +
       '<button id="ul-copy" style="background:#750946;color:#fff;border:0;border-radius:999px;padding:8px 16px;font-weight:600;cursor:pointer">Copiar mis datos</button>' +
-      (TOOL ? '<a id="ul-open" href="' + TOOL + '" target="_blank" rel="noopener" style="border:1px solid #d9d9de;border-radius:999px;padding:8px 16px;color:#18181b;text-decoration:none;font-weight:500">Abrir Horarios UPIITA</a>' : '') + '</div>' +
+      (TOOL ? '<a id="ul-open" href="' + TOOL + '" target="_blank" rel="noopener" style="border:1px solid #d9d9de;border-radius:999px;padding:8px 16px;color:#18181b;text-decoration:none;font-weight:500">Abrir Horarios ' + SIG + '</a>' : '') + '</div>' +
       '<p id="ul-msg" style="margin:10px 0 0;color:#52525b;font-size:13px">Después, en la herramienta, pulsa <b>Usar mis datos del SAES</b> y pega con Ctrl+V.</p>' +
       '<textarea id="ul-txt" readonly style="position:absolute;left:-9999px;width:1px;height:1px"></textarea>';
     document.getElementById('ul-x').onclick = function () { box.remove(); };
@@ -183,7 +185,7 @@
       msg.innerHTML = '<b style="color:#15803d">Copiado.</b> Ahora abre la herramienta, pulsa <b>Usar mis datos del SAES</b> y pega con Ctrl+V.';
     };
   } catch (e) {
-    box.innerHTML = '<b style="font-size:16px">Lector UPIITA</b><p style="margin:6px 0 0">' +
+    box.innerHTML = '<b style="font-size:16px">Lector ' + SIG + '</b><p style="margin:6px 0 0">' +
       (e.message === 'sesion' ? 'No se detectó una sesión activa del SAES. Inicia sesión y ejecuta nuevamente el marcador.' : 'No fue posible leer la información: ' + e.message) +
       '</p><button onclick="this.parentNode.remove()" style="margin-top:10px;border:1px solid #d9d9de;background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer">Cerrar</button>';
   }

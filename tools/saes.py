@@ -36,7 +36,8 @@ JS = r"""
 /* ---------- datos del SAES (v2): solo en este navegador ---------- */
 const SAES={
   KEY:'saes.alumno',
-  load(){try{const v=JSON.parse(localStorage.getItem(this.KEY)||'null');return v&&v.upiita_saes===1?v:null}catch(e){return null}},
+  U(){return window.IPNT_UNIDAD||'upiita'},   // unidad de la página; los datos sin unidad son de la UPIITA (versiones anteriores)
+  load(){try{const v=JSON.parse(localStorage.getItem(this.KEY)||'null');return v&&v.upiita_saes===1&&(v.unidad||'upiita')===this.U()?v:null}catch(e){return null}},
   save(d){if(window.IPNT)IPNT.set(this.KEY,JSON.stringify(d));else try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
   clear(){try{localStorage.removeItem(this.KEY)}catch(e){}if(window.IPNT)IPNT.borrar(this.KEY)},
   parse(t){try{const d=JSON.parse(String(t||'').trim());if(d&&d.upiita_saes===1&&Array.isArray(d.acreditadas))return d}catch(e){}return null},
@@ -51,7 +52,7 @@ const SAES={
     dl.querySelector('#saes-x').addEventListener('click',()=>SAES.close());
     dl.addEventListener('click',e=>{if(e.target===dl)SAES.close()});   // clic fuera de la ventana
     const take=t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector UPIITA. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
-      if(d.unidad&&d.unidad!=='upiita'){msg.innerHTML='<span class="bad">Estos datos son del SAES de '+String(d.unidad).toUpperCase()+'. Esta versión de la herramienta es de la UPIITA.</span>';return}
+      if((d.unidad||'upiita')!==SAES.U()){msg.innerHTML='<span class="bad">Estos datos son del SAES de '+String(d.unidad||'upiita').toUpperCase()+'. Esta página es de la '+SAES.U().toUpperCase()+'.</span>';return}
       SAES.save(d);paste.value='';msg.innerHTML='<span class="ok">Datos del SAES cargados.</span>';onLoad(d);setTimeout(()=>SAES.close(),900)};
     paste.addEventListener('paste',e=>{e.preventDefault();take(e.clipboardData.getData('text'))});
     paste.addEventListener('input',()=>{if(paste.value.trim().startsWith('{'))take(paste.value)});
@@ -122,14 +123,14 @@ CSS = r"""
 """
 
 
-def card(bm_href, page="horarios", short=""):
+def card(bm_href, page="horarios", short="", u=None):
     # en el sitio publicado, el código para teléfono es el marcador corto (descarga lector.js)
     code_text = html.escape(short or bm_href)
     copy_note = " (versión corta: descarga el Lector desde este sitio)" if short else ""
     version = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")   # para saber si el navegador ya cargó la última versión
     what = ("tu avance académico: materias acreditadas, reprobadas y en curso, carga autorizada y fecha de cita"
             if page == "horarios" else "tu nombre, boleta y carrera, así como las electivas liberadas")
-    return f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>
+    out = f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>
 <dialog class="saes-dlg" id="saes-dlg" aria-labelledby="saes-h">
   <div class="dl-head"><h2 id="saes-h">Usa tus datos del SAES</h2><button class="x" id="saes-x" type="button" aria-label="Cerrar">×</button></div>
   <p style="margin:0;font-size:.92rem">Opcional. Incorpora {what}. La información se procesa en tu navegador y no se envía a ningún servidor.</p>
@@ -170,10 +171,14 @@ def card(bm_href, page="horarios", short=""):
   <p class="saes-note" style="margin:10px 0 0">El marcador solo consulta tu Kárdex, tu Estado general, tu horario actual y tu Cita de reinscripción; no inscribe, no modifica ni envía nada. Los datos se guardan únicamente en este navegador.</p>
   <p class="saes-note" style="margin:6px 0 0">Versión de la página: {version}</p>
 </dialog>"""
+    if u and u.get("id", "upiita") != "upiita":   # otra unidad: nombre del marcador y dirección de su SAES
+        out = out.replace("Lector UPIITA", f"Lector {u['siglas']}").replace(SAES_URL, u.get("saes", SAES_URL)) \
+                 .replace("saes.upiita.ipn.mx", u.get("saes", SAES_URL).split("//")[-1].strip("/").replace("www.", ""))
+    return out
 
 
-def inject(html, page, tool_url=""):
+def inject(html, page, tool_url="", u=None):
     bm = bookmarklet(tool_url)
     short = loader(tool_url.rsplit("/", 1)[0] + "/") if tool_url.startswith("https://") and "claude.ai" not in tool_url else ""
     html = html.replace("/*__SAES_JS__*/", JS, 1).replace("/*__SAES_CSS__*/", CSS, 1)
-    return html.replace("<!--__SAES_CARD__-->", card(bm, page, short), 1)
+    return html.replace("<!--__SAES_CARD__-->", card(bm, page, short, u), 1)

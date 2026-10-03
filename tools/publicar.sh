@@ -10,6 +10,9 @@ cd "$ROOT"
 export UPIITA_SITE="https://silver-vs.github.io/upiita/"
 python tools/build_horarios.py
 python tools/build_electivas.py
+for u in data/unidades/*/; do   # otras unidades (data/unidades/<unidad>/): horarios-<unidad>.html
+  UNIDAD="$(basename "$u")" python tools/build_horarios.py
+done
 
 mkdir -p "$SITE/upiita"
 cp -r web/dist/. "$SITE/upiita/"

@@ -13,6 +13,14 @@ CUR = ROOT / "data" / "mapa_curricular_saes.json"
 TPL = ROOT / "web" / "horarios.template.html"
 OUT = ROOT / "web" / "horarios.html"
 DAYS = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
+import os
+UNIDAD = os.environ.get("UNIDAD", "upiita").lower()
+UNI_DIR = ROOT / "data" / "unidades" / UNIDAD
+UCONF = (json.loads((UNI_DIR / "unidad.json").read_text(encoding="utf-8")) if (UNI_DIR / "unidad.json").exists()
+         else {"id": "upiita", "siglas": "UPIITA"})
+if UNIDAD != "upiita":
+    SRC, CUR, OUT = UNI_DIR / "horarios_saes.json", UNI_DIR / "mapa_curricular_saes.json", ROOT / "web" / f"horarios-{UNIDAD}.html"
+PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la oferta)
 
 
 def clean(s):
@@ -43,7 +51,7 @@ def load_curriculum():
     m = json.loads(CUR.read_text(encoding="utf-8")) if CUR.exists() else {"rows": []}   # opcional fuera de la UPIITA
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
-        if p == "98":
+        if p == "98" or (PLANES.get(c) and p != PLANES[c]):
             continue
         cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), float(cred), tipo[0]))
     return cur
@@ -59,7 +67,7 @@ def lookup(cur, carrera, nombre, nivel):
     return [best[2], best[1], best[3]]
 
 
-def build(rows, asig, prof, cur):
+def build(rows, asig, prof, cur, salon=False):
     def idx(lst, v):
         if v not in lst:
             lst.append(v)
@@ -68,7 +76,10 @@ def build(rows, asig, prof, cur):
     classes = {}
     for r in rows:
         key = (r["carrera"], r["turno"], r["Grupo"], clean(r["Asignatura"]))
-        c = classes.setdefault(key, {"n": r["nivel"], "p": [], "h": []})
+        c = classes.setdefault(key, {"n": r["nivel"], "p": [], "h": [], "r": ""})
+        sa, ed = clean(r.get("Salón") or r.get("Salon") or ""), clean(r.get("Edificio") or "")
+        if salon and sa and not c["r"]:
+            c["r"] = f"Edif. {ed} · {sa}" if ed else sa
         p = idx(prof, clean(r["Profesor"]))
         if p not in c["p"]:
             c["p"].append(p)
@@ -77,7 +88,10 @@ def build(rows, asig, prof, cur):
                 c["h"].append(b)
     out = []
     for (car, tur, grp, a), c in classes.items():
-        out.append([car, tur, c["n"], grp, idx(asig, a), c["p"], sorted(c["h"]), *lookup(cur, car, a, c["n"])])
+        row = [car, tur, c["n"], grp, idx(asig, a), c["p"], sorted(c["h"]), *lookup(cur, car, a, c["n"])]
+        if c["r"]:
+            row.append([c["r"]] * len(c["h"]))   # índice 10: salón por bloque
+        out.append(row)
     return out
 
 
@@ -160,6 +174,24 @@ def isisa_layout():
                     "corresponden en el SAES a Tópicos selectos de ingeniería I y II."}
 
 
+def layout_de(t, areas=()):
+    """Trazado del mapa (cajas, filas y flechas) relativo a su esquina, desde data/.../trayectoria_<c>.json."""
+    bx = t["boxes"]
+    x0 = min(b["x0"] for b in bx) - 40
+    y0 = min(r[1] for r in t["rows"]) - 40
+    r1 = lambda v: round(v, 1)
+    return {
+        "w": r1(max(b["x1"] for b in bx) - x0 + 20),
+        "h": r1(max(r[1] for r in t["rows"]) - y0 + 40),
+        "pitch": r1((t["rows"][-1][1] - t["rows"][0][1]) / (len(t["rows"]) - 1)),
+        "rows": [[r[0], r1(r[1] - y0)] for r in t["rows"]],
+        "boxes": [[r1(b["x0"] - x0), r1(b["top"] - y0), r1(b["x1"] - b["x0"]), r1(b["bottom"] - b["top"]),
+                   b.get("clave") or "", b.get("slot") or "", b["sem"]] for b in bx],
+        "edges": [[e["s"], e["d"], [r1(v - (x0 if i % 2 == 0 else y0)) for pt in e["pts"] for i, v in enumerate(pt)]] for e in t["edges"]],
+        "cols": [[n, r1(a - x0), r1(b - x0)] for n, a, b in areas],
+    }
+
+
 def load_maps(offer, upiita=True, extra=None):
     """Mapas curriculares: plan vigente del SAES + cajas/flechas de las trayectorias propuestas.
     `offer`: oferta del SAES (para saber el plan vigente de cada carrera); `upiita`: aplica las trayectorias y mapas
@@ -189,24 +221,23 @@ def load_maps(offer, upiita=True, extra=None):
         if not upiita:
             # otra escuela: sin trayectorias propias; con mapa curricular del SAES se muestra la cuadrícula por nivel
             entry.update(lineas=[], reglas={}, generico=not any(v[1] for v in cur[c].values()))   # sin créditos: solo horarios
+            ft = UNI_DIR / f"trayectoria_{c}.json"
+            if ft.exists():
+                t = json.loads(ft.read_text(encoding="utf-8"))
+                if plan.get(c) == t.get("plan", plan.get(c)):
+                    entry["layout"], entry["generico"] = layout_de(t), False
+                    if UCONF.get("modelo"):   # el modelo de la unidad aplica a los planes con mapa (ESCOM: planes 2020)
+                        entry["modelo"] = UCONF["modelo"]
+                    req = {}
+                    for e in t["edges"]:
+                        a_, b_ = t["boxes"][e["s"]].get("clave"), t["boxes"][e["d"]].get("clave")
+                        if a_ and b_:
+                            req.setdefault(b_, []).append(a_)
+                    entry["req"] = req
             maps[c] = entry
             continue
         if f.exists():
-            t = json.loads(f.read_text(encoding="utf-8"))
-            bx = t["boxes"]
-            x0 = min(b["x0"] for b in bx) - 40
-            y0 = min(r[1] for r in t["rows"]) - 40
-            r1 = lambda v: round(v, 1)
-            entry["layout"] = {
-                "w": r1(max(b["x1"] for b in bx) - x0 + 20),
-                "h": r1(max(r[1] for r in t["rows"]) - y0 + 40),
-                "pitch": r1((t["rows"][-1][1] - t["rows"][0][1]) / (len(t["rows"]) - 1)),
-                "rows": [[r[0], r1(r[1] - y0)] for r in t["rows"]],
-                "boxes": [[r1(b["x0"] - x0), r1(b["top"] - y0), r1(b["x1"] - b["x0"]), r1(b["bottom"] - b["top"]),
-                           b.get("clave") or "", b.get("slot") or "", b["sem"]] for b in bx],
-                "edges": [[e["s"], e["d"], [r1(v - (x0 if i % 2 == 0 else y0)) for pt in e["pts"] for i, v in enumerate(pt)]] for e in t["edges"]],
-                "cols": [[n, r1(a - x0), r1(b - x0)] for n, a, b in AREAS.get(c, [])],
-            }
+            entry["layout"] = layout_de(json.loads(f.read_text(encoding="utf-8")), AREAS.get(c, []))
             entry["req"] = seri.get(c, {})
         elif c == "S":
             keep = {k for _, ks in ISISA for k in ks}
@@ -231,17 +262,22 @@ def main():
     import sys
     sys.path.insert(0, str(ROOT / "tools"))
     d = json.loads(SRC.read_text(encoding="utf-8"))
+    if UNIDAD != "upiita":   # plan vigente por carrera
+        from collections import Counter
+        for (c_, pl), _ in Counter((r["carrera"], r.get("plan")) for k in ("actual", "proximo") for r in d.get(k, [])).most_common():
+            PLANES.setdefault(c_, pl)
     asig, prof, cur = [], [], load_curriculum()
     data = {
         "capturado": d["capturado"],
         "carreras": d["carreras"],
         "asig": asig,
         "prof": prof,
-        "periodos": {k: build(d[k], asig, prof, cur) for k in ("proximo", "actual")},
+        "periodos": {k: build(d[k], asig, prof, cur, salon=UNIDAD != "upiita") for k in ("proximo", "actual")},
+        "unidad": UNIDAD,
     }
     # materias sin mapa curricular (otra escuela o materia nueva): clave interna estable por carrera y nombre,
     # para que el armado de horario funcione aunque no haya trayectoria ni créditos
-    upiita = "saes.upiita" in d.get("fuente", "saes.upiita")
+    upiita = UNIDAD == "upiita" and "saes.upiita" in d.get("fuente", "saes.upiita")
     extra, syn = {}, {}
     for per in data["periodos"].values():
         for c in per:
@@ -262,19 +298,30 @@ def main():
         if cob >= 0.7:
             data["salones"] = {"periodo": sd.get("ciclo") or sd["periodo"], "cobertura": round(cob, 3)}
         print("salones", sal[-1].name, f"cobertura {cob:.1%}", "aplicados" if cob >= 0.7 else "NO aplicados (otro periodo)")
+    nb = sum(len(c[6]) for per in data["periodos"].values() for c in per)
+    con = sum(1 for per in data["periodos"].values() for c in per if len(c) > 10 for _ in c[6])
+    if not upiita and con:
+        data["salones"] = {"fuente": "saes", "periodo": "SAES", "cobertura": round(con / nb, 3)}
     from acentos import acentuar  # el SAES publica los nombres sin tildes
     payload = acentuar(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", payload)
+    if UNIDAD != "upiita":   # nombre de la herramienta según la unidad
+        html = html.replace("Horarios UPIITA", f"Horarios {UCONF['siglas']}")
     from skins import inject
     html = inject(html)
     import cuenta   # perfil IPN-tools: respaldo y sincronización con la cuenta institucional
-    html = cuenta.inject(html)
+    html = cuenta.inject(html, UNIDAD)
     import saes
     # el marcador de la versión compartida abre esta herramienta; el de la versión institucional, la URL del servidor (pendiente)
-    OUT.write_text(saes.inject(html, "horarios", "https://claude.ai/artifact/2ujcEF2YK8FZrYjoyPbKEk"), encoding="utf-8")
+    OUT.write_text(saes.inject(html, "horarios", "https://claude.ai/artifact/2ujcEF2YK8FZrYjoyPbKEk", UCONF), encoding="utf-8")
     from institucional import write_dist
     import os
     site = os.environ.get("UPIITA_SITE", "")  # p. ej. https://silver-vs.github.io/upiita/ : el marcador abre esta dirección
+    if UNIDAD != "upiita":
+        nombre = f"horarios-{UNIDAD}"
+        write_dist(nombre, saes.inject(html, "horarios", site + nombre + ".html" if site else "", UCONF), f" | {UCONF['siglas']} IPN", UCONF)
+        print(OUT, len(html), {k: len(v) for k, v in data["periodos"].items()}, "salones", data.get("salones"))
+        return
     write_dist("horarios", saes.inject(html, "horarios", site + "horarios.html" if site else ""))
     (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)

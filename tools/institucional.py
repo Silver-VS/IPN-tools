@@ -63,17 +63,23 @@ HOME = """<a class="ipnt-home" href="./" title="Ir a la página principal de IPN
 .ipnt-home:hover{color:var(--accent);background:var(--surface)}.ipnt-home img{border-radius:6px}</style>"""
 
 
-def write_dist(name, html, title_suffix=" | UPIITA IPN"):
+def write_dist(name, html, title_suffix=" | UPIITA IPN", unidad=None):
     """Escribe web/dist/<name>.html con el encabezado institucional y el título del sitio."""
     DIST.mkdir(parents=True, exist_ok=True)
     logos = DIST / "assets" / "logos"
     logos.mkdir(parents=True, exist_ok=True)
     (logos / "README.md").write_text(README, encoding="utf-8")
-    html = html.replace("<!--__INST_HEADER__-->", HEADER, 1)
+    head = HEADER
+    if unidad and unidad.get("id", "upiita") != "upiita":
+        # otra unidad: escudo del IPN y nombre de la unidad (sin el logotipo de la UPIITA)
+        head = re.sub(r'\s*<a class="unit".*?</a>', "", head, flags=re.S)
+        head = head.replace("Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas", unidad["nombre"])
+    html = html.replace("<!--__INST_HEADER__-->", head, 1)
     html = html.replace("<!--__IPNT_HOME__-->", HOME, 1)   # regreso a la página principal de IPN-tools
     # pleca SEP | IPN al pie: retirada a petición del equipo (2026-10-01); FOOTER se conserva por si se vuelve a requerir
     # "Horarios UPIITA" -> "Horarios | UPIITA IPN" (manual web: nombre de la marca al final del título)
-    html = re.sub(r"<title>([^<]+)</title>", lambda m: f"<title>{re.sub(r'\s*UPIITA$', '', m.group(1))}{title_suffix}</title>", html, count=1)
+    sig = re.escape((unidad or {}).get("siglas", "UPIITA"))
+    html = re.sub(r"<title>([^<]+)</title>", lambda m: f"<title>{re.sub(r'\s*' + sig + '$', '', m.group(1))}{title_suffix}</title>", html, count=1)
     if not html.lstrip().lower().startswith("<!doctype"):
         # las plantillas omiten <html>/<head>/<body> (el navegador los infiere); aquí se fija idioma y viewport
         html = '<!doctype html>\n<html lang="es">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n' + html

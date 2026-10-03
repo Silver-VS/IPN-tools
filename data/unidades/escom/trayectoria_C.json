@@ -1,0 +1,1347 @@
+{
+ "fuente": "mapaCurricularISC2020.pdf",
+ "plan": "20",
+ "rows": [
+  [
+   1,
+   59.41743859999974
+  ],
+  [
+   2,
+   185.6514256999999
+  ],
+  [
+   3,
+   303.53675169999985
+  ],
+  [
+   4,
+   429.1571400999999
+  ],
+  [
+   5,
+   552.3789153999999
+  ],
+  [
+   6,
+   670.2828353
+  ],
+  [
+   7,
+   798.0415221999999
+  ],
+  [
+   8,
+   915.8524726
+  ]
+ ],
+ "cols": [],
+ "boxes": [
+  {
+   "x0": 1259.6239999999998,
+   "top": 30.0,
+   "x1": 1392.437,
+   "bottom": 91.89499999999998,
+   "fill": "#deff1c",
+   "text": "Fundamentos de Programación",
+   "sem": 1,
+   "clave": "C101",
+   "nombre": "FUNDAMENTOS DE PROGRAMACION",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1260.8139999999999,
+   "top": 152.43600000000004,
+   "x1": 1391.245,
+   "bottom": 213.21900000000005,
+   "fill": "#deff1c",
+   "text": "Algoritmos y Estructuras de Datos",
+   "sem": 2,
+   "clave": "C201",
+   "nombre": "ALGORITMOS Y ESTRUCTURA DE DATOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1453.2839999999999,
+   "top": 273.40100000000007,
+   "x1": 1583.715,
+   "bottom": 334.182,
+   "fill": "#deff1c",
+   "text": "Análisis y Diseño de Algoritmos",
+   "sem": 3,
+   "clave": "C301",
+   "nombre": "ANALISIS Y DISEÑO DE ALGORITMOS",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1452.8139999999999,
+   "top": 397.26199999999994,
+   "x1": 1583.245,
+   "bottom": 458.043,
+   "fill": "#58ff00",
+   "text": "Teoría de la Computación",
+   "sem": 4,
+   "clave": "C401",
+   "nombre": "TEORIA DE LA COMPUTACION",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1251.001,
+   "top": 518.401,
+   "x1": 1381.432,
+   "bottom": 579.18,
+   "fill": "#deff1c",
+   "text": "Compiladores",
+   "sem": 5,
+   "clave": "C501",
+   "nombre": "COMPILADORES",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1251.001,
+   "top": 642.428,
+   "x1": 1381.432,
+   "bottom": 703.209,
+   "fill": "#ff330d",
+   "text": "Inteligencia Artiﬁcial",
+   "sem": 6,
+   "clave": "C601",
+   "nombre": "INTELIGENCIA ARTIFICIAL",
+   "nivel_saes": 6,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1260.8139999999999,
+   "top": 273.40100000000007,
+   "x1": 1391.245,
+   "bottom": 334.183,
+   "fill": "#deff1c",
+   "text": "Paradigmas de Programación",
+   "sem": 3,
+   "clave": "C302",
+   "nombre": "PARADIGMAS DE PROGRAMACION",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1251.0,
+   "top": 397.177,
+   "x1": 1381.433,
+   "bottom": 457.96000000000004,
+   "fill": "#deff1c",
+   "text": "Sistemas Operativos",
+   "sem": 4,
+   "clave": "C407",
+   "nombre": "SISTEMAS OPERATIVOS",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1251.0,
+   "top": 764.45,
+   "x1": 1381.432,
+   "bottom": 825.231,
+   "fill": "#ff330d",
+   "text": "Sistemas Distribuidos",
+   "sem": 7,
+   "clave": "C702",
+   "nombre": "SISTEMAS DISTRIBUIDOS",
+   "nivel_saes": 7,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1452.8120000000001,
+   "top": 518.374,
+   "x1": 1583.246,
+   "bottom": 579.155,
+   "fill": "#deff1c",
+   "text": "Redes de Computadoras",
+   "sem": 5,
+   "clave": "C507",
+   "nombre": "REDES DE COMPUTADORAS",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1452.8120000000001,
+   "top": 642.426,
+   "x1": 1583.246,
+   "bottom": 703.211,
+   "fill": "#deff1c",
+   "text": "Aplicaciones para Comunicaciones en Red",
+   "sem": 6,
+   "clave": "C619",
+   "nombre": "APLICACIONES PARA COMUNICACIONES EN RED",
+   "nivel_saes": 6,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1452.8120000000001,
+   "top": 764.488,
+   "x1": 1583.246,
+   "bottom": 825.273,
+   "fill": "#deff1c",
+   "text": "Administración de Servicios en Red",
+   "sem": 7,
+   "clave": "C718",
+   "nombre": "ADMINISTRACION DE SERVICIOS EN RED",
+   "nivel_saes": 7,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 852.312,
+   "top": 518.398,
+   "x1": 982.744,
+   "bottom": 579.183,
+   "fill": "#deff1c",
+   "text": "Análisis y Diseño de Sistemas",
+   "sem": 5,
+   "clave": "C505",
+   "nombre": "ANALISIS Y DISEÑO DE SISTEMAS",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1050.245,
+   "top": 642.43,
+   "x1": 1180.673,
+   "bottom": 703.207,
+   "fill": "#deff1c",
+   "text": "Ingeniería de Software",
+   "sem": 6,
+   "clave": "C618",
+   "nombre": "INGENIERIA DE SOFTWARE",
+   "nivel_saes": 6,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 240.15599999999998,
+   "top": 764.491,
+   "x1": 370.585,
+   "bottom": 825.269,
+   "fill": "#ff330d",
+   "text": "Desarrollo de Aplicaciones Móviles Nativas",
+   "sem": 7,
+   "clave": "C717",
+   "nombre": "DESARROLLO DE APLICACIONES MOVILES NATIVAS",
+   "nivel_saes": 7,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 852.3130000000001,
+   "top": 397.2629999999999,
+   "x1": 982.743,
+   "bottom": 458.0419999999999,
+   "fill": "#deff1c",
+   "text": "Tecnologías para el Desarrollo de Aplicaciones Web",
+   "sem": 4,
+   "clave": "C406",
+   "nombre": "TECNOLOGIAS PARA DESARROLLO DE APLICACIONES WEB",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 852.311,
+   "top": 273.40100000000007,
+   "x1": 982.745,
+   "bottom": 334.182,
+   "fill": "#deff1c",
+   "text": "Bases de Datos",
+   "sem": 3,
+   "clave": "C306",
+   "nombre": "BASES DE DATOS",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 645.984,
+   "top": 30.0,
+   "x1": 778.796,
+   "bottom": 91.89499999999998,
+   "fill": "#58ff00",
+   "text": "Matemáticas Discretas",
+   "sem": 1,
+   "clave": "C102",
+   "nombre": "MATEMATICAS DISCRETAS",
+   "nivel_saes": 1,
+   "creditos": 10.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 238.964,
+   "top": 30.020999999999958,
+   "x1": 371.777,
+   "bottom": 91.91599999999994,
+   "fill": "#58ff00",
+   "text": "Cálculo",
+   "sem": 1,
+   "clave": "C103",
+   "nombre": "CALCULO",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 445.345,
+   "top": 30.0,
+   "x1": 578.159,
+   "bottom": 91.89599999999996,
+   "fill": "#58ff00",
+   "text": "Análisis Vectorial",
+   "sem": 1,
+   "clave": "C104",
+   "nombre": "ANALISIS VECTORIAL",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 851.1229999999999,
+   "top": 30.0,
+   "x1": 983.934,
+   "bottom": 91.89300000000003,
+   "fill": "#46e2ff",
+   "text": "Comunicación Oral y Escrita",
+   "sem": 1,
+   "clave": "C105",
+   "nombre": "COMUNICACION ORAL Y ESCRITA",
+   "nivel_saes": 1,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 852.311,
+   "top": 152.43600000000004,
+   "x1": 982.745,
+   "bottom": 213.21900000000005,
+   "fill": "#46e2ff",
+   "text": "Ingeniería, Ética y Sociedad",
+   "sem": 2,
+   "clave": "C205",
+   "nombre": "INGENIERIA ETICA Y SOCIEDAD",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 1250.998,
+   "top": 887.327,
+   "x1": 1381.432,
+   "bottom": 948.108,
+   "fill": "#46e2ff",
+   "text": "Liderazgo Personal",
+   "sem": 8,
+   "clave": "C802",
+   "nombre": "LIDERAZGO PERSONAL",
+   "nivel_saes": 8,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 446.538,
+   "top": 887.327,
+   "x1": 576.967,
+   "bottom": 948.108,
+   "fill": "#ff330d",
+   "text": "Estancia Profesional",
+   "sem": 8,
+   "clave": "C804",
+   "nombre": "ESTANCIA PROFESIONAL",
+   "nivel_saes": 8,
+   "creditos": 3.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 446.538,
+   "top": 152.43600000000004,
+   "x1": 576.966,
+   "bottom": 213.21900000000005,
+   "fill": "#58ff00",
+   "text": "Mecánica y Electrómagnetismo",
+   "sem": 2,
+   "clave": "C204",
+   "nombre": "MECANICA Y ELECTROMAGNETISMO",
+   "nivel_saes": 2,
+   "creditos": 10.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 240.15599999999998,
+   "top": 152.43499999999995,
+   "x1": 370.585,
+   "bottom": 213.21900000000005,
+   "fill": "#58ff00",
+   "text": "Cálculo Aplicado",
+   "sem": 2,
+   "clave": "C203",
+   "nombre": "CALCULO APLICADO",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 240.15599999999998,
+   "top": 273.4,
+   "x1": 370.585,
+   "bottom": 334.183,
+   "fill": "#58ff00",
+   "text": "Ecuaciones Diferenciales",
+   "sem": 3,
+   "clave": "C303",
+   "nombre": "ECUACIONES DIFERENCIALES",
+   "nivel_saes": 3,
+   "creditos": 9.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 240.15599999999998,
+   "top": 397.26,
+   "x1": 370.585,
+   "bottom": 458.04499999999996,
+   "fill": "#58ff00",
+   "text": "Matemáticas Avanzadas para la Ingeniería",
+   "sem": 4,
+   "clave": "C403",
+   "nombre": "MATEMATICAS AVANZADAS PARA LA INGENIERIA",
+   "nivel_saes": 4,
+   "creditos": 9.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 35.111999999999995,
+   "top": 397.26099999999997,
+   "x1": 165.545,
+   "bottom": 458.0440000000001,
+   "fill": "#58ff00",
+   "text": "Probabilidad y Estadística",
+   "sem": 4,
+   "clave": "C402",
+   "nombre": "PROBABILIDAD Y ESTADISTICA",
+   "nivel_saes": 4,
+   "creditos": 9.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 647.174,
+   "top": 273.40100000000007,
+   "x1": 777.604,
+   "bottom": 334.182,
+   "fill": "#deff1c",
+   "text": "Fundamentos de Diseño Digital",
+   "sem": 3,
+   "clave": "C304",
+   "nombre": "FUNDAMENTOS DE DISEÑO DIGITAL",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 446.53599999999994,
+   "top": 273.40100000000007,
+   "x1": 576.968,
+   "bottom": 334.182,
+   "fill": "#deff1c",
+   "text": "Circuitos Eléctricos",
+   "sem": 3,
+   "clave": "C305",
+   "nombre": "CIRCUITOS ELECTRICOS",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 446.53599999999994,
+   "top": 397.179,
+   "x1": 576.968,
+   "bottom": 457.96000000000004,
+   "fill": "#deff1c",
+   "text": "Electrónica Analógica",
+   "sem": 4,
+   "clave": "C405",
+   "nombre": "ELECTRONICA ANALOGICA",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 240.156,
+   "top": 518.399,
+   "x1": 370.586,
+   "bottom": 579.182,
+   "fill": "#deff1c",
+   "text": "Instrumentación y Control",
+   "sem": 5,
+   "clave": "C504",
+   "nombre": "INSTRUMENTACION Y CONTROL",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 446.538,
+   "top": 518.374,
+   "x1": 576.967,
+   "bottom": 579.155,
+   "fill": "#deff1c",
+   "text": "Arquitectura de Computadoras",
+   "sem": 5,
+   "clave": "C503",
+   "nombre": "ARQUITECTURA DE COMPUTADORAS",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 35.0,
+   "top": 518.374,
+   "x1": 165.433,
+   "bottom": 579.155,
+   "fill": "#deff1c",
+   "text": "Procesamiento Digital de Señales",
+   "sem": 5,
+   "clave": "C502",
+   "nombre": "PROCESAMIENTO DIGITAL DE SEÑALES",
+   "nivel_saes": 5,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 854.1089999999999,
+   "top": 642.33,
+   "x1": 984.54,
+   "bottom": 703.111,
+   "fill": "#58ff00",
+   "text": "Métodos Cuantitativos para la Toma de Decisiones",
+   "sem": 6,
+   "clave": "C603",
+   "nombre": "METODOS CUANTITATIVOS PARA LA TOMA DE DECISIONES",
+   "nivel_saes": 6,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 240.15599999999998,
+   "top": 642.426,
+   "x1": 370.585,
+   "bottom": 703.211,
+   "fill": "#ff330d",
+   "text": "Sistemas en Chip",
+   "sem": 6,
+   "clave": "C602",
+   "nombre": "SISTEMAS EN CHIP",
+   "nivel_saes": 6,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 647.174,
+   "top": 397.26099999999997,
+   "x1": 777.604,
+   "bottom": 458.0440000000001,
+   "fill": "#deff1c",
+   "text": "Diseño de Sistemas Digitales",
+   "sem": 4,
+   "clave": "C404",
+   "nombre": "DISEÑO DE SISTEMAS DIGITALES",
+   "nivel_saes": 4,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 35.114000000000004,
+   "top": 152.43600000000004,
+   "x1": 165.542,
+   "bottom": 213.21900000000005,
+   "fill": "#58ff00",
+   "text": "Álgebra Lineal",
+   "sem": 2,
+   "clave": "C202",
+   "nombre": "ALGEBRA LINEAL",
+   "nivel_saes": 2,
+   "creditos": 9.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 446.53599999999994,
+   "top": 642.428,
+   "x1": 576.968,
+   "bottom": 703.209,
+   "fill": "#deff1c",
+   "text": "Optativa A1",
+   "sem": 6,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 647.173,
+   "top": 642.428,
+   "x1": 777.605,
+   "bottom": 703.209,
+   "fill": "#deff1c",
+   "text": "Optativa B1",
+   "sem": 6,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 647.176,
+   "top": 764.49,
+   "x1": 777.604,
+   "bottom": 825.271,
+   "fill": "#deff1c",
+   "text": "Optativa B2",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 446.53599999999994,
+   "top": 764.45,
+   "x1": 576.968,
+   "bottom": 825.231,
+   "fill": "#deff1c",
+   "text": "Optativa A2",
+   "sem": 7,
+   "slot": "Optativa"
+  },
+  {
+   "x0": 1047.109,
+   "top": 887.327,
+   "x1": 1177.541,
+   "bottom": 948.108,
+   "fill": "#ff330d",
+   "text": "Gestión Empresarial",
+   "sem": 8,
+   "clave": "C803",
+   "nombre": "GESTION EMPRESARIAL",
+   "nivel_saes": 8,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1050.243,
+   "top": 152.437,
+   "x1": 1180.675,
+   "bottom": 213.21800000000007,
+   "fill": "#deff1c",
+   "text": "7.5 3/1.5 Fundamentos Económicos",
+   "sem": 2,
+   "clave": "C206",
+   "nombre": "FUNDAMENTOS ECONOMICOS",
+   "nivel_saes": 2,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 1050.243,
+   "top": 518.399,
+   "x1": 1180.675,
+   "bottom": 579.182,
+   "fill": "#deff1c",
+   "text": "Formulación y Evaluación de Proyectos Informáticos",
+   "sem": 5,
+   "clave": "C506",
+   "nombre": "FORMULACION Y EVALUACION DE PROYECTOS INFORMATICOS",
+   "nivel_saes": 5,
+   "creditos": 6.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 1050.245,
+   "top": 273.40100000000007,
+   "x1": 1180.673,
+   "bottom": 334.182,
+   "fill": "#deff1c",
+   "text": "7.5 3/1.5 Finanzas Empresariales",
+   "sem": 3,
+   "clave": "C307",
+   "nombre": "FINANZAS EMPRESARIALES",
+   "nivel_saes": 3,
+   "creditos": 7.5,
+   "tipo": "O"
+  },
+  {
+   "x0": 852.312,
+   "top": 764.49,
+   "x1": 982.745,
+   "bottom": 825.271,
+   "fill": "#ff330d",
+   "text": "Trabajo Terminal I",
+   "sem": 7,
+   "clave": "C701",
+   "nombre": "TRABAJO TERMINAL I",
+   "nivel_saes": 7,
+   "creditos": 12.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 852.312,
+   "top": 887.327,
+   "x1": 982.745,
+   "bottom": 948.108,
+   "fill": "#ff330d",
+   "text": "Trabajo Terminal II",
+   "sem": 8,
+   "clave": "C801",
+   "nombre": "TRABAJO TERMINAL II",
+   "nivel_saes": 8,
+   "creditos": 12.0,
+   "tipo": "O"
+  },
+  {
+   "x0": 647.172,
+   "top": 887.327,
+   "x1": 777.606,
+   "bottom": 948.108,
+   "fill": "#ff330d",
+   "text": "Desarrollo de Habilidades Sociales para la Alta Dirección",
+   "sem": 8,
+   "clave": "C805",
+   "nombre": "DESARROLLO DE HABILIDADES SOCIALES PARA LA ALTA DIRECCION",
+   "nivel_saes": 8,
+   "creditos": 3.0,
+   "tipo": "O"
+  }
+ ],
+ "edges": [
+  {
+   "s": 34,
+   "d": 36,
+   "pts": [
+    [
+     121.0,
+     579.9
+    ],
+    [
+     121.0,
+     599.9
+    ],
+    [
+     261.0,
+     599.9
+    ],
+    [
+     261.0,
+     639.9
+    ]
+   ]
+  },
+  {
+   "s": 25,
+   "d": 28,
+   "pts": [
+    [
+     271.0,
+     213.9
+    ],
+    [
+     271.0,
+     258.9
+    ],
+    [
+     102.0,
+     258.9
+    ],
+    [
+     102.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 1,
+   "d": 2,
+   "pts": [
+    [
+     1365.0,
+     212.9
+    ],
+    [
+     1365.0,
+     224.9
+    ],
+    [
+     1509.0,
+     224.9
+    ],
+    [
+     1509.0,
+     270.9
+    ]
+   ]
+  },
+  {
+   "s": 1,
+   "d": 7,
+   "pts": [
+    [
+     1317.0,
+     212.9
+    ],
+    [
+     1317.0,
+     265.9
+    ],
+    [
+     1410.0,
+     265.9
+    ],
+    [
+     1410.0,
+     351.9
+    ],
+    [
+     1334.0,
+     351.9
+    ],
+    [
+     1334.0,
+     395.9
+    ]
+   ]
+  },
+  {
+   "s": 27,
+   "d": 34,
+   "pts": [
+    [
+     275.0,
+     457.9
+    ],
+    [
+     275.0,
+     476.9
+    ],
+    [
+     103.0,
+     476.9
+    ],
+    [
+     103.0,
+     516.9
+    ]
+   ]
+  },
+  {
+   "s": 31,
+   "d": 32,
+   "pts": [
+    [
+     493.0,
+     457.9
+    ],
+    [
+     493.0,
+     476.9
+    ],
+    [
+     326.0,
+     476.9
+    ],
+    [
+     326.0,
+     515.9
+    ]
+   ]
+  },
+  {
+   "s": 37,
+   "d": 33,
+   "pts": [
+    [
+     705.0,
+     457.9
+    ],
+    [
+     705.0,
+     476.9
+    ],
+    [
+     532.0,
+     476.9
+    ],
+    [
+     532.0,
+     515.9
+    ]
+   ]
+  },
+  {
+   "s": 33,
+   "d": 36,
+   "pts": [
+    [
+     486.0,
+     578.9
+    ],
+    [
+     486.0,
+     599.9
+    ],
+    [
+     340.0,
+     599.9
+    ],
+    [
+     340.0,
+     639.9
+    ]
+   ]
+  },
+  {
+   "s": 17,
+   "d": 16,
+   "pts": [
+    [
+     744.0,
+     91.9
+    ],
+    [
+     744.0,
+     223.9
+    ],
+    [
+     918.0,
+     223.9
+    ],
+    [
+     918.0,
+     270.9
+    ]
+   ]
+  },
+  {
+   "s": 1,
+   "d": 3,
+   "pts": [
+    [
+     1339.0,
+     212.9
+    ],
+    [
+     1339.0,
+     254.9
+    ],
+    [
+     1427.0,
+     254.9
+    ],
+    [
+     1427.0,
+     350.9
+    ],
+    [
+     1509.0,
+     350.9
+    ],
+    [
+     1509.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 16,
+   "d": 12,
+   "pts": [
+    [
+     870.0,
+     333.9
+    ],
+    [
+     870.0,
+     381.9
+    ],
+    [
+     825.0,
+     381.9
+    ],
+    [
+     825.0,
+     476.9
+    ],
+    [
+     900.0,
+     476.9
+    ],
+    [
+     900.0,
+     515.9
+    ]
+   ]
+  },
+  {
+   "s": 12,
+   "d": 13,
+   "pts": [
+    [
+     937.0,
+     578.9
+    ],
+    [
+     937.0,
+     596.9
+    ],
+    [
+     1070.0,
+     596.9
+    ],
+    [
+     1070.0,
+     639.9
+    ]
+   ]
+  },
+  {
+   "s": 3,
+   "d": 4,
+   "pts": [
+    [
+     1509.0,
+     457.9
+    ],
+    [
+     1509.0,
+     473.9
+    ],
+    [
+     1316.0,
+     473.9
+    ],
+    [
+     1316.0,
+     515.9
+    ]
+   ]
+  },
+  {
+   "s": 10,
+   "d": 8,
+   "pts": [
+    [
+     1492.0,
+     702.9
+    ],
+    [
+     1492.0,
+     719.9
+    ],
+    [
+     1316.0,
+     719.9
+    ],
+    [
+     1316.0,
+     762.9
+    ]
+   ]
+  },
+  {
+   "s": 6,
+   "d": 15,
+   "pts": [
+    [
+     1283.0,
+     334.9
+    ],
+    [
+     1283.0,
+     350.9
+    ],
+    [
+     948.0,
+     350.9
+    ],
+    [
+     948.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 1,
+   "d": 6,
+   "pts": [
+    [
+     1294.0,
+     212.9
+    ],
+    [
+     1294.0,
+     270.9
+    ]
+   ]
+  },
+  {
+   "s": 9,
+   "d": 10,
+   "pts": [
+    [
+     1519.0,
+     578.9
+    ],
+    [
+     1519.0,
+     639.9
+    ]
+   ]
+  },
+  {
+   "s": 10,
+   "d": 11,
+   "pts": [
+    [
+     1519.0,
+     702.9
+    ],
+    [
+     1519.0,
+     761.9
+    ]
+   ]
+  },
+  {
+   "s": 0,
+   "d": 1,
+   "pts": [
+    [
+     1334.0,
+     91.9
+    ],
+    [
+     1334.0,
+     149.9
+    ]
+   ]
+  },
+  {
+   "s": 17,
+   "d": 29,
+   "pts": [
+    [
+     715.0,
+     92.9
+    ],
+    [
+     715.0,
+     269.9
+    ]
+   ]
+  },
+  {
+   "s": 19,
+   "d": 24,
+   "pts": [
+    [
+     518.0,
+     91.9
+    ],
+    [
+     518.0,
+     149.9
+    ]
+   ]
+  },
+  {
+   "s": 24,
+   "d": 30,
+   "pts": [
+    [
+     518.0,
+     212.9
+    ],
+    [
+     518.0,
+     270.9
+    ]
+   ]
+  },
+  {
+   "s": 44,
+   "d": 46,
+   "pts": [
+    [
+     1110.0,
+     212.9
+    ],
+    [
+     1110.0,
+     270.9
+    ]
+   ]
+  },
+  {
+   "s": 26,
+   "d": 27,
+   "pts": [
+    [
+     308.0,
+     334.9
+    ],
+    [
+     308.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 30,
+   "d": 31,
+   "pts": [
+    [
+     514.0,
+     333.9
+    ],
+    [
+     514.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 29,
+   "d": 37,
+   "pts": [
+    [
+     715.0,
+     333.9
+    ],
+    [
+     715.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 16,
+   "d": 15,
+   "pts": [
+    [
+     917.0,
+     333.9
+    ],
+    [
+     917.0,
+     394.9
+    ]
+   ]
+  },
+  {
+   "s": 46,
+   "d": 45,
+   "pts": [
+    [
+     1109.0,
+     334.9
+    ],
+    [
+     1109.0,
+     515.9
+    ]
+   ]
+  },
+  {
+   "s": 45,
+   "d": 13,
+   "pts": [
+    [
+     1109.0,
+     578.9
+    ],
+    [
+     1109.0,
+     639.9
+    ]
+   ]
+  },
+  {
+   "s": 39,
+   "d": 42,
+   "pts": [
+    [
+     517.0,
+     702.9
+    ],
+    [
+     517.0,
+     761.9
+    ]
+   ]
+  },
+  {
+   "s": 40,
+   "d": 41,
+   "pts": [
+    [
+     714.0,
+     702.9
+    ],
+    [
+     714.0,
+     761.9
+    ]
+   ]
+  },
+  {
+   "s": 47,
+   "d": 48,
+   "pts": [
+    [
+     919.0,
+     825.9
+    ],
+    [
+     919.0,
+     884.9
+    ]
+   ]
+  },
+  {
+   "s": 18,
+   "d": 25,
+   "pts": [
+    [
+     317.0,
+     91.9
+    ],
+    [
+     317.0,
+     149.9
+    ]
+   ]
+  },
+  {
+   "s": 25,
+   "d": 26,
+   "pts": [
+    [
+     311.0,
+     213.9
+    ],
+    [
+     311.0,
+     270.9
+    ]
+   ]
+  }
+ ]
+}
