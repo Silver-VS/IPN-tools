@@ -81,6 +81,9 @@ input[type=number]{width:5rem}
 .est-eqv{margin-top:12px;padding:10px 12px;border:1px dashed var(--line);border-radius:var(--r)}
 .est-eqv h3{margin:0 0 4px;font-size:.95rem}.est-eqv p{margin:0 0 6px;font-size:.82rem}.est-eqv ul{margin:0;padding-left:1.1em;display:grid;gap:4px;font-size:.88rem}
 .est-eqv small{display:block;color:var(--muted);font-size:.8rem}
+.demo-bar{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:8px 16px;background:var(--warn);color:#fff;font-size:.88rem}
+.demo-bar .btn{margin-left:auto;background:#fff;color:#222;border-color:#fff}
+.demo-open{font-size:.84rem}
 /* botón de estadísticas: relleno mientras están ocultas (invita a abrirlas), contorno cuando se muestran */
 .stats-btn{display:inline-flex;align-items:center;gap:8px;margin-left:auto;padding:8px 16px;border-radius:999px;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-fg);font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;box-shadow:0 1px 3px rgb(0 0 0 / .18);transition:transform .12s,box-shadow .12s}
 .stats-btn:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgb(0 0 0 / .22)}
@@ -772,8 +775,12 @@ const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
 const fmtCr=n=>Number.isInteger(+n)?String(+n):(+n).toFixed(2).replace(/0$/,'');
 /*__CUENTA_JS__*/
-const HU=UNIDAD==='upiita'?'hu.':'hu.'+UNIDAD+'.';
-const store={get(k,d){try{const v=localStorage.getItem(HU+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){IPNT.set(HU+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
+// modo demostración: perfil ficticio solo en esta pestaña; no toca los datos reales ni la cuenta (enlace «…#demo»)
+if(location.hash==='#demo'){try{sessionStorage.setItem('ipnt.demo',UNIDAD)}catch(e){}history.replaceState(null,'',location.pathname+location.search)}
+const DEMO=(()=>{try{return sessionStorage.getItem('ipnt.demo')===UNIDAD}catch(e){return false}})();
+const HU=DEMO?'hu.demo.'+UNIDAD+'.':UNIDAD==='upiita'?'hu.':'hu.'+UNIDAD+'.';
+const ALM=DEMO?sessionStorage:localStorage;
+const store={get(k,d){try{const v=ALM.getItem(HU+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){if(DEMO){try{ALM.setItem(HU+k,JSON.stringify(v))}catch(e){}}else IPNT.set(HU+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
 
 const S={tab:store.get('tab','tray'),per:store.get('per','proximo'),car:store.get('car','B'),tur:store.get('tur','*'),niv:store.get('niv','*'),q:'',view:store.get('view','materia'),
   hide:store.get('hide',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
@@ -799,7 +806,7 @@ const nextPlan=()=>{let n=Math.max(0,...planIds().map(planNum))+1, id='';while(n
 const save=()=>store.set('w.'+S.per,ws());
 /*__SAES_JS__*/
 // v1: solo se eligen materias para explorar. v2: el alumno pega sus datos del SAES (Lector IPN-tools) y se activa la vista personal.
-let ALUMNO=SAES.load();
+let ALUMNO=DEMO?null:SAES.load();   // en modo demostración se genera después de conocer las funciones del mapa
 // El perfil conserva los ids del SAES; la vista distingue los planes que reutilizan claves.
 const carreraPerfil=d=>d?(Object.entries(DATA.opciones_plan||{}).find(([,v])=>v.carrera===d.carrera&&v.plan===d.plan)?.[0]||
   (Object.values(DATA.opciones_plan||{}).some(v=>v.carrera===d.carrera)?null:d.carrera)):null;
@@ -971,6 +978,29 @@ function statusOf(k){
 // Las electivas se acreditan por horas de actividades (DIE-03, Electivas UPIITA), nunca con un grupo del horario:
 // no se eligen para cursar, no suman créditos a la selección ni se sugieren.
 function isElec(k){return /^ELECTIVA/i.test(cur()[k]?.[0]||'')}
+/* Perfil ficticio para conocer la herramienta sin datos del SAES: a partir del mapa de la carrera elegida, ~45 % de las
+   obligatorias acreditadas (con algunos extraordinarios y ETS), una reprobada pendiente y cinco materias en curso. */
+function perfilDemo(){
+  const car=S.car, m=DATA.mapas?.[car];if(!m)return null;
+  const op=DATA.opciones_plan?.[car]||{carrera:car,plan:null}, c=m.cur;
+  const ob=Object.keys(c).filter(k=>c[k][3]==='O'&&!isElec(k)&&c[k][1]>0).sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b));
+  const acr=ob.slice(0,Math.round(ob.length*.45)), resto=ob.slice(acr.length), nmax=Math.max(1,...acr.map(k=>c[k][2]));
+  const base=perIdx('26/1')-nmax+1, cal=[9,8,10,8,9,7,9,8,10,6,9,8];
+  const acreditadas=acr.map((k,i)=>[k,cal[i%cal.length],perName(base+c[k][2]-1),i%11===5?'EXT':i%13===7?'ETS':'ORD']);
+  const rep=resto[0], enCurso=resto.slice(1,6), obt=acr.reduce((t,k)=>t+c[k][1],0), total=ob.reduce((t,k)=>t+c[k][1],0);
+  const prom=acreditadas.reduce((t,a)=>t+a[1],0)/Math.max(1,acreditadas.length);
+  return {upiita_saes:1,demo:true,unidad:UNIDAD,leido:new Date().toISOString(),boleta:'0000000000',nombre:'ALUMNO DE DEMOSTRACIÓN',
+    carrera:op.carrera,carrera_nombre:DATA.carreras[car],plan:op.plan,promedio:+(prom-.2).toFixed(2),acreditadas,en_curso:enCurso,
+    horario_inscrito:[],reprobadas:[],reprobadas_periodo:rep?[[rep,perName(base+nmax-1),1]]:[],
+    avance:{obtenidos:obt,faltan:total-obt,cursados:nmax+1,autorizada:`MÁXIMA (${fmtCr(Math.round(total/8))} CREDITOS)`},
+    carga:{total,min:Math.round(total/12),max:Math.round(total/8)},cita:{}};
+}
+if(DEMO){
+  ALUMNO=perfilDemo();
+  document.body.insertAdjacentHTML('afterbegin',`<div class="demo-bar" role="status"><b>Modo demostración</b><span>Ves los datos de un alumno ficticio; nada se guarda en tu cuenta ni en tus datos del SAES.</span><button class="btn" type="button" id="demo-salir">Salir del modo demostración</button></div>`);
+  $('#demo-salir').addEventListener('click',()=>{try{sessionStorage.removeItem('ipnt.demo')}catch(e){}location.reload()});
+}
+document.addEventListener('click',e=>{if(!e.target.closest?.('[data-demo-open]'))return;e.preventDefault();try{sessionStorage.setItem('ipnt.demo',UNIDAD)}catch(e){}location.reload()});
 function available(k){const s=statusOf(k);return !isElec(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')&&!s.includes('far')}
 
 function suggestions(){
@@ -2266,7 +2296,7 @@ $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stat
 $('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vista]');if(!b)return;store.set('mapVista',b.dataset.vista);
   if(b.dataset.vista==='sigue'&&!SHOWSUG){SHOWSUG=true;store.set('verSug',true)}renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapVista',mapVista()==='todo'?'sigue':'todo');renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
-$('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;render()});
+$('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;if(DEMO){ALUMNO=perfilDemo();for(const k in T)delete T[k]}render()});
 $('#b-all').addEventListener('click',()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&off.has(k))])];saveT();renderTray()});
 $('#b-sugg').addEventListener('click',()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT();renderTray()});
 $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);

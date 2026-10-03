@@ -130,7 +130,9 @@ def card(bm_href, page="horarios", short="", u=None):
     version = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")   # para saber si el navegador ya cargó la última versión
     what = ("tu avance académico: materias acreditadas, reprobadas y en curso, carga autorizada y fecha de cita"
             if page == "horarios" else "tu nombre, boleta y carrera, así como las electivas liberadas")
-    out = f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>
+    demo = ('<button class="link demo-open" type="button" data-demo-open title="Perfil de un alumno ficticio: '
+            'conoce la herramienta sin usar tus datos del SAES">Probar con datos de ejemplo</button>') if page == "horarios" else ""
+    out = f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>{demo}
 <dialog class="saes-dlg" id="saes-dlg" aria-labelledby="saes-h">
   <div class="dl-head"><h2 id="saes-h">Usa tus datos del SAES</h2><button class="x" id="saes-x" type="button" aria-label="Cerrar">×</button></div>
   <p style="margin:0;font-size:.92rem">Opcional. Incorpora {what}. La información se procesa en tu navegador y no se envía a ningún servidor.</p>

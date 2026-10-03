@@ -71,7 +71,8 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:v
   let sel=null;try{sel=localStorage.getItem('ipnt.unidad')}catch(e){}
   const box=document.getElementById('unis');
   const pinta=()=>{box.innerHTML=UNIS.filter(u=>u.disponible).map(u=>{const on=u.id===sel;
-    const tools=[{t:'Horarios '+u.siglas,u:u.url,d:DESC[u.id]||'Mapa curricular, oferta del SAES y armado de horarios.'},...(EXTRA[u.id]||[])];
+    const tools=[{t:'Horarios '+u.siglas,u:u.url,d:DESC[u.id]||'Mapa curricular, oferta del SAES y armado de horarios.'},...(EXTRA[u.id]||[]),
+      {t:'Probar con datos de ejemplo',u:u.url+'#demo',d:'Conoce Horarios '+u.siglas+' con un alumno ficticio, sin usar tus datos del SAES.'}];
     return `<div class="uni"><button type="button" data-uni="${esc(u.id)}" aria-expanded="${on}" aria-controls="t-${esc(u.id)}"><b>${esc(u.siglas)}</b><span>${esc(u.nombre)}</span><i aria-hidden="true">›</i></button>`+
       `<div class="grid" id="t-${esc(u.id)}"${on?'':' hidden'}>${tools.map(x=>`<a class="card" href="${esc(x.u)}"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></a>`).join('')}</div></div>`}).join('')};
   box.addEventListener('click',e=>{const b=e.target.closest('[data-uni]');if(!b)return;
