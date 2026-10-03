@@ -8,11 +8,17 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap">
 <style>
-:root{--bg:#fafafa;--surface:#fff;--fg:#18181b;--muted:#52525b;--line:#d9d9de;--accent:#750946}
-@media (prefers-color-scheme:dark){:root{--bg:#09090b;--surface:#18181b;--fg:#e4e4e7;--muted:#a1a1aa;--line:#323237;--accent:#ec9cbf;color-scheme:dark}}
+:root{--bg:#fafafa;--surface:#fff;--fg:#18181b;--muted:#52525b;--line:#d9d9de;--accent:#750946;--accent-fg:#fff;--ok:#3a6449;--warn:#6e521d;--bad:#9e2f52;--r:6px}
+@media (prefers-color-scheme:dark){:root{--bg:#09090b;--surface:#18181b;--fg:#e4e4e7;--muted:#a1a1aa;--line:#323237;--accent:#ec9cbf;--accent-fg:#1d0a13;--ok:#93c4a2;--warn:#dcbd88;--bad:#ee9fb7;color-scheme:dark}}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Noto Sans",system-ui,sans-serif;padding-inline:16px}
 main{max-width:760px;margin:0 auto;padding-block:48px 40px}
 .brand{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.brand .ipnt-btn{margin-left:auto}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:var(--r);padding:6px 12px;cursor:pointer;font:inherit;font-weight:500;font-size:.88rem}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+.link{border:0;background:none;color:var(--accent);cursor:pointer;font:inherit;font-weight:600;font-size:.84rem;padding:0}
+/*__SAES_CSS__*/
+/*__CUENTA_CSS__*/
 .brand img{width:56px;height:56px;flex:none}
 h1{margin:0;font-size:2.2rem;letter-spacing:-.02em}
 .lead{color:var(--muted);margin:6px 0 28px;font-size:1.05rem;max-width:62ch}
@@ -28,7 +34,7 @@ a{color:var(--accent)}
 footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 18px}
 </style>
 <main>
-  <div class="brand"><img src="assets/icono/ipn-tools-icono-192.png" alt="Ícono de IPN-tools"><h1>IPN-tools</h1></div>
+  <div class="brand"><img src="assets/icono/ipn-tools-icono-192.png" alt="Ícono de IPN-tools"><h1>IPN-tools</h1><!--__CUENTA_BTN__--></div>
   <p class="lead">Herramientas digitales de libre acceso para el alumnado de la UPIITA-IPN. Apoyan la planeación de la reinscripción, el armado de horarios y la liberación de electivas, y se irán ampliando a otros procesos académicos. Versión de prueba.</p>
 
   <div class="grid">
@@ -47,4 +53,7 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:v
 
   <footer><span>Herramienta independiente; la inscripción oficial se hace en el SAES.</span><a href="privacidad.html">Aviso de privacidad</a><a href="condiciones.html">Condiciones de uso</a><a href="https://github.com/Silver-VS/IPN-tools">Código fuente</a></footer>
 </main>
+<script>
+/*__CUENTA_JS__*/
+</script>
 </html>

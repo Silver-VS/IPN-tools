@@ -278,7 +278,9 @@ def main():
     write_dist("horarios", saes.inject(html, "horarios", site + "horarios.html" if site else ""))
     (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
-    for f in ("index.html", "revision.html", "privacidad.html", "condiciones.html"):
+    idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
+    (ROOT / "web" / "dist" / "index.html").write_text(idx, encoding="utf-8")   # página principal con inicio de sesión
+    for f in ("revision.html", "privacidad.html", "condiciones.html"):
         shutil.copy(ROOT / "web" / f, ROOT / "web" / "dist" / f)
     ico = ROOT / "web" / "dist" / "assets" / "icono"
     ico.mkdir(parents=True, exist_ok=True)
