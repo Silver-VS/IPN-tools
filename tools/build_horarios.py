@@ -24,6 +24,12 @@ PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la
 OPTA = json.loads((UNI_DIR / "optativas.json").read_text(encoding="utf-8")) if (UNI_DIR / "optativas.json").exists() else {}
 
 
+def carrera_plan(c, p):
+    """Separa planes simultáneos que reutilizan claves; el primer plan conserva el id del SAES."""
+    planes = UCONF.get("planes", {}).get(c, [])
+    return f"{c}_{p}" if planes and p != planes[0] else c
+
+
 def nombre_vis(n):
     """Nombre para mostrar: «LÍNEA|MATERIA» del SAES (optativas de la ESCOM) -> «MATERIA (LÍNEA)»."""
     if "|" not in n:
@@ -67,6 +73,7 @@ def load_curriculum():
     m = json.loads(CUR.read_text(encoding="utf-8")) if CUR.exists() else {"rows": []}   # opcional fuera de la UPIITA
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
+        c = carrera_plan(c, p)
         if p == "98" or (PLANES.get(c) and p != PLANES[c]):
             continue
         cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), float(cred), tipo_letra(tipo)))
@@ -95,21 +102,24 @@ def build(rows, asig, prof, cur, salon=False):
     classes = {}
     for r in rows:
         key = (r["carrera"], r["turno"], r["Grupo"], clean(r["Asignatura"]))
-        c = classes.setdefault(key, {"n": r["nivel"], "p": [], "h": [], "r": ""})
+        c = classes.setdefault(key, {"n": r["nivel"], "p": [], "h": [], "r": {}})
         sa, ed = clean(r.get("Salón") or r.get("Salon") or ""), clean(r.get("Edificio") or "")
-        if salon and sa and not c["r"]:
-            c["r"] = f"Edif. {ed} · {sa}" if ed else sa
         p = idx(prof, clean(r["Profesor"]))
         if p not in c["p"]:
             c["p"].append(p)
         for b in blocks(r):
             if b not in c["h"]:
                 c["h"].append(b)
+            if salon and sa:
+                rooms = c["r"].setdefault(tuple(b), [])
+                room = f"Edif. {ed} · {sa}" if ed else sa
+                if room not in rooms:
+                    rooms.append(room)
     out = []
     for (car, tur, grp, a), c in classes.items():
         row = [car, tur, c["n"], grp, idx(asig, a), c["p"], sorted(c["h"]), *lookup(cur, car, a, c["n"])]
         if c["r"]:
-            row.append([c["r"]] * len(c["h"]))   # índice 10: salón por bloque
+            row.append([" / ".join(c["r"].get(tuple(b), [])) for b in row[6]])   # índice 10: salón por bloque
         out.append(row)
     return out
 
@@ -267,6 +277,7 @@ def load_maps(offer, upiita=True, extra=None):
         plan.update({"B": "09", "M": "09", "T": "09", "E": "18", "S": "08"})
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
+        c = carrera_plan(c, p)
         if plan.get(c) == p:
             cur.setdefault(c, {})[clave.upper()] = [nom, float(cred), int(niv), tipo_letra(tipo)]
     for c, extra_c in (extra or {}).items():
@@ -291,14 +302,14 @@ def load_maps(offer, upiita=True, extra=None):
                     fa = UNI_DIR / f"areas_{c}.json"
                     if fa.exists():   # columnas por categoría (data/categorias.json); seriación del mapa oficial
                         ea = json.loads(fa.read_text(encoding="utf-8"))
-                        ea["nota"] = (f"Mapa curricular {UCONF['siglas']} organizado por áreas de conocimiento (clasificación propuesta, "
+                        ea.setdefault("nota", (f"Mapa curricular {UCONF['siglas']} organizado por áreas de conocimiento (clasificación propuesta, "
                                       "sujeta a revisión). Las flechas indican la seriación del mapa oficial; al colocar el cursor sobre una "
-                                      "materia se resalta su cadena de requisitos.")
+                                      "materia se resalta su cadena de requisitos."))
                         entry["layout"], entry["generico"] = layout_por_areas(cur[c], ea), False
                     else:
                         entry["layout"], entry["generico"] = layout_de(t), False
-                    if UCONF.get("modelo"):   # el modelo de la unidad aplica a los planes con mapa (ESCOM: planes 2020)
-                        entry["modelo"] = UCONF["modelo"]
+                    if t.get("modelo") or UCONF.get("modelo"):   # el modelo de la unidad aplica a los planes con mapa (ESCOM: planes 2020)
+                        entry["modelo"] = t.get("modelo", UCONF.get("modelo"))
                     req = {}
                     for e in t["edges"]:
                         a_, b_ = t["boxes"][e["s"]].get("clave"), t["boxes"][e["d"]].get("clave")
@@ -335,6 +346,16 @@ def main():
     import sys
     sys.path.insert(0, str(ROOT / "tools"))
     d = json.loads(SRC.read_text(encoding="utf-8"))
+    opciones = {}
+    for c, planes in UCONF.get("planes", {}).items():
+        nombre = d["carreras"].pop(c)
+        for p in planes:
+            ident = carrera_plan(c, p)
+            d["carreras"][ident] = f"{nombre} (plan 20{p})"
+            opciones[ident] = {"carrera": c, "plan": p}
+    for per in ("actual", "proximo"):
+        for row in d[per]:
+            row["carrera"] = carrera_plan(row["carrera"], row["plan"])
     if UNIDAD != "upiita":   # plan vigente por carrera
         from collections import Counter
         for (c_, pl), _ in Counter((r["carrera"], r.get("plan")) for k in ("actual", "proximo") for r in d.get(k, [])).most_common():
@@ -347,6 +368,8 @@ def main():
         "prof": prof,
         "periodos": {k: build(d[k], asig, prof, cur, salon=UNIDAD != "upiita") for k in ("proximo", "actual")},
         "unidad": UNIDAD,
+        "siglas": UCONF["siglas"],
+        "opciones_plan": opciones,
     }
     # materias sin mapa curricular (otra escuela o materia nueva): clave interna estable por carrera y nombre,
     # para que el armado de horario funcione aunque no haya trayectoria ni créditos

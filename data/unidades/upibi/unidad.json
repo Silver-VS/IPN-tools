@@ -1,0 +1,14 @@
+{
+  "id": "upibi",
+  "siglas": "UPIBI",
+  "nombre": "Unidad Profesional Interdisciplinaria de Biotecnología",
+  "modelo": "niveles",
+  "saes": "https://www.saes.upibi.ipn.mx/",
+  "planes": {
+    "B": [
+      "24",
+      "06"
+    ]
+  },
+  "fuente_mapas": "Mapas oficiales UPIBI 2006 y Biotecnológica 2024, empatados con el SAES"
+}

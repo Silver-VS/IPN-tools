@@ -1,0 +1,300 @@
+{
+ "carrera": "F",
+ "plan": "06",
+ "estado": "Clasificación propuesta, pendiente de revisión por las academias.",
+ "fuente_seriacion": "farmaceutica-2006.pdf",
+ "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos.",
+ "areas": [
+  {
+   "nombre": "Físico-matemáticas",
+   "claves": [
+    "F108",
+    "F103",
+    "F426",
+    "F210",
+    "F209",
+    "F317"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Informática y computación",
+   "claves": [
+    "F105"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencias farmacéuticas",
+   "claves": [
+    "F102",
+    "F104",
+    "F213",
+    "F101",
+    "F316",
+    "F544",
+    "F862",
+    "F861",
+    "F211",
+    "F215",
+    "F318",
+    "F321",
+    "F320",
+    "F319",
+    "F427",
+    "F432",
+    "F543",
+    "F545",
+    "F539",
+    "F546",
+    "F547",
+    "F428",
+    "F429",
+    "F540",
+    "F433",
+    "F434",
+    "F435",
+    "F648",
+    "F759",
+    "F860",
+    "F755",
+    "F542",
+    "F650",
+    "F649",
+    "F652",
+    "F541",
+    "F322",
+    "F324"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación integral",
+   "claves": [
+    "F106",
+    "F107",
+    "F212",
+    "F325",
+    "F214",
+    "F323",
+    "F430",
+    "F431",
+    "F538"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación profesional",
+   "claves": [
+    "F651",
+    "F758",
+    "F863"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Especialización",
+   "claves": [],
+   "espacios": [
+    [
+     "Optativa I",
+     4
+    ],
+    [
+     "Optativa III",
+     7
+    ],
+    [
+     "Optativa II",
+     6
+    ]
+   ]
+  }
+ ],
+ "seriacion": [
+  [
+   "F107",
+   "F212"
+  ],
+  [
+   "F102",
+   "F214"
+  ],
+  [
+   "F104",
+   "F213"
+  ],
+  [
+   "F213",
+   "F322"
+  ],
+  [
+   "F101",
+   "F211"
+  ],
+  [
+   "F108",
+   "F215"
+  ],
+  [
+   "F103",
+   "F210"
+  ],
+  [
+   "F103",
+   "F209"
+  ],
+  [
+   "F544",
+   "F650"
+  ],
+  [
+   "F651",
+   "F758"
+  ],
+  [
+   "F758",
+   "F863"
+  ],
+  [
+   "F105",
+   "F426"
+  ],
+  [
+   "F212",
+   "F325"
+  ],
+  [
+   "F214",
+   "F323"
+  ],
+  [
+   "F323",
+   "F435"
+  ],
+  [
+   "F211",
+   "F319"
+  ],
+  [
+   "F211",
+   "F324"
+  ],
+  [
+   "F215",
+   "F318"
+  ],
+  [
+   "F215",
+   "F321"
+  ],
+  [
+   "F215",
+   "F319"
+  ],
+  [
+   "F210",
+   "F320"
+  ],
+  [
+   "F209",
+   "F316"
+  ],
+  [
+   "F209",
+   "F317"
+  ],
+  [
+   "F318",
+   "F427"
+  ],
+  [
+   "F318",
+   "F428"
+  ],
+  [
+   "F320",
+   "F430"
+  ],
+  [
+   "F320",
+   "F431"
+  ],
+  [
+   "F320",
+   "@Optativa I"
+  ],
+  [
+   "F319",
+   "F432"
+  ],
+  [
+   "F319",
+   "F433"
+  ],
+  [
+   "F427",
+   "F544"
+  ],
+  [
+   "F427",
+   "F545"
+  ],
+  [
+   "F430",
+   "F538"
+  ],
+  [
+   "F543",
+   "F755"
+  ],
+  [
+   "F545",
+   "F648"
+  ],
+  [
+   "F546",
+   "F652"
+  ],
+  [
+   "F428",
+   "F543"
+  ],
+  [
+   "F429",
+   "F542"
+  ],
+  [
+   "F433",
+   "F539"
+  ],
+  [
+   "F435",
+   "F547"
+  ],
+  [
+   "F648",
+   "F759"
+  ],
+  [
+   "F542",
+   "@Optativa II"
+  ],
+  [
+   "@Optativa II",
+   "F860"
+  ],
+  [
+   "F649",
+   "F759"
+  ],
+  [
+   "F652",
+   "F861"
+  ],
+  [
+   "F317",
+   "F426"
+  ]
+ ]
+}

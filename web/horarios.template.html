@@ -671,7 +671,7 @@ const tactil=()=>PT!=='mouse';
 const TURNOS={M:'Matutino',V:'Vespertino'};
 const TIPO={O:'Obligatoria',P:'Optativa',T:'Taller'};
 // Carga en créditos confirmada en SAES (Cita de reinscripción). Las demás carreras se agregan cuando se capturen.
-const CARGA={B:{min:27,media:40,max:80}};
+const CARGA=UNIDAD==='upiita'?{B:{min:27,media:40,max:80}}:{};
 const LETRAS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const START=7*60, END=22*60, SLOT=30, SLOTPX=22, BLOCK=90;  // una clase dura 1:30
 const $=s=>document.querySelector(s);
@@ -709,7 +709,10 @@ const save=()=>store.set('w.'+S.per,ws());
 /*__SAES_JS__*/
 // v1: solo se eligen materias para explorar. v2: el alumno pega sus datos del SAES (Lector IPN-tools) y se activa la vista personal.
 let ALUMNO=SAES.load();
-const isPersonal=()=>!!ALUMNO&&ALUMNO.carrera===S.car;
+// El perfil conserva los ids del SAES; la vista distingue los planes que reutilizan claves.
+const carreraPerfil=d=>d?(Object.entries(DATA.opciones_plan||{}).find(([,v])=>v.carrera===d.carrera&&v.plan===d.plan)?.[0]||
+  (Object.values(DATA.opciones_plan||{}).some(v=>v.carrera===d.carrera)?null:d.carrera)):null;
+const isPersonal=()=>!!ALUMNO&&carreraPerfil(ALUMNO)===S.car;
 const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprobadas
 /* Simulación de fin de semestre (solo exploración, nunca toca los datos del SAES):
    las materias en curso se dan por aprobadas, salvo las que el alumno marque como reprobadas. */
@@ -1046,7 +1049,7 @@ function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
   const st=statusOf(k);
   const el=isElec(k);
   const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${want.has(k)?' want':req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?' hot':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
-  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · se acredita por actividades (Electivas UPIITA)':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
   return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${want.has(k)}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}</div>`;
 }
 
@@ -1061,7 +1064,7 @@ function inspParts(k){
     ps=st==='done'?'Ya acreditada · ':st==='curso'?'En curso · ':st.includes('fail')?'Por recursar · ':
       st.includes('lock')?`<b>Requisitos pendientes: ${miss.map(nm).join(', ')}</b> · `:`<b>Puedes cursarla</b>${lv.ok?'':` (seriación recomendada por nivel: ${lv.miss.join(', ')})`} · `}
   if(isElec(k)){const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span> · ${fmtCr(cr)} créditos · nivel ${niv}`;
-    return {l1,l2:(statusOf(k)==='done'?'Ya acreditada · ':'')+'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.'}}
+    return {l1,l2:(statusOf(k)==='done'?'Ya acreditada · ':'')+(UNIDAD==='upiita'?'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.':'Consulta con Gestión Escolar de tu unidad los requisitos y actividades para acreditar esta electiva.')}}
   const l2=ps+`${pre.length?'Requisitos directos: '+pre.map(nm).join(', '):'Sin requisitos registrados'}${all.size>pre.length?` · ${all.size} en la cadena de requisitos`:''}${post.length?' · Es requisito de: '+post.map(nm).join(', '):''}`;
   const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span> · ${fmtCr(cr)} créditos · nivel ${niv}${sem?' · semestre propuesto '+sem:''}${off?'':' · <i>sin grupos este periodo</i>'}`;
   return {l1,l2};
@@ -1798,7 +1801,7 @@ function render(){
   const gen=!!MAP()?.generico;$('#t-tray').hidden=gen;if(gen&&S.tab==='tray')S.tab='hor';
   renderTop();renderAviso();if(S.tab==='tray')renderTray();else renderHor()}
 // perfil del SAES de otra carrera: se avisa y se ofrece volver; nada del perfil se aplica aquí
-function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()})}
+function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()},carreraPerfil)}
 function refresh(){save();renderOffer();renderPlans();renderCal()}
 function addClass(c){const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
 function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1);else{const c=byKey(k);addClass(c);
@@ -2111,7 +2114,7 @@ async function loadExcelJS(){if(window.ExcelJS)return window.ExcelJS;await new P
 async function exportXlsx(){
   if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
   const ExcelJS=await loadExcelJS(), wb=new ExcelJS.Workbook(), {rows,days,cells,D}=weekGrid();
-  wb.title=`Horario ${ws().plan} UPIITA`;
+  wb.title=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`;
   const NAMES=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'], argb=h=>'FF'+String(h).replace('#','').toUpperCase();
   const FONT={name:'Arial',size:10}, CENTER={horizontal:'center',vertical:'middle',wrapText:true};
   const T='thin', K='medium';
@@ -2169,7 +2172,7 @@ async function exportPdf(){
   if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
   const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
   await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
-  doc.setTitle(`Horario ${ws().plan} UPIITA`);
+  doc.setTitle(`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`);
   return saveFile(`horario-${ws().plan}-upiita.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
 }
 // todos los horarios con contenido en un solo PDF (una hoja por horario, en orden A, B, C…)
@@ -2216,7 +2219,7 @@ for(const [id,fn] of [['#b-png',exportPng],['#b-pdf',exportPdf],['#b-pdfall',exp
 $('#b-copy').addEventListener('click',async()=>{
   const sel=selected();if(!sel.length&&!plan().own.length)return;
   const cr=sel.reduce((s,c)=>s+c[7],0);
-  const txt=`Horario ${ws().plan} UPIITA (${S.per==='proximo'?'próximo periodo':'periodo actual'}) · ${fmtCr(cr)} créditos\n`+
+  const txt=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()} (${S.per==='proximo'?'próximo periodo':'periodo actual'}) · ${fmtCr(cr)} créditos\n`+
     sel.map(c=>`${c[3]}  ${c[8]} ${name(c)} (${fmtCr(c[7])} cr)\n   ${profs(c)}\n   ${pattern(c).join('; ')}`).join('\n')+
     plan().own.map(o=>`\n—  ${o.n}\n   ${o.d.map(d=>DAYS[d]).join(' ')}  ${hm(o.a)}–${hm(o.b)}`).join('');
   const box=$('#copybox');box.value=txt;
@@ -2263,11 +2266,11 @@ $('#b-copy').addEventListener('click',async()=>{
 })();
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(S.tab==='tray'&&ZOOM==null)renderMap()},150)});
 $('#foot').textContent='Herramienta de consulta para que el alumno planee su reinscripción. Los datos del SAES se consultan en modo de solo lectura y se almacenan únicamente en este navegador, al igual que las materias seleccionadas, marcas, notas y horarios. La reinscripción oficial se realiza en el SAES, donde deben verificarse la cita, la carga autorizada y el cupo.';
-if(ALUMNO&&DATA.mapas[ALUMNO.carrera])S.car=ALUMNO.carrera;
+if(ALUMNO&&DATA.mapas[carreraPerfil(ALUMNO)])S.car=carreraPerfil(ALUMNO);
 const mobNote=()=>{$('#mobnote').hidden=!(MQ_PHONE.matches&&!store.get('mobnote',0))};
 mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
 render();
 IPNT.bienvenida({select:'#f-carrera'});   // primera visita: unidad, carrera o inicio de sesión
 SAES.status(ALUMNO);
-SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[d.carrera]){S.car=d.carrera;store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
+SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[carreraPerfil(d)]){S.car=carreraPerfil(d);store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
 </script>

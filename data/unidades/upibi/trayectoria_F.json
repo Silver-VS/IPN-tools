@@ -1,0 +1,816 @@
+{
+ "fuente": "farmaceutica-2006.pdf",
+ "plan": "06",
+ "modelo": "niveles",
+ "rows": [
+  [
+   1,
+   122
+  ],
+  [
+   2,
+   222
+  ],
+  [
+   3,
+   322
+  ],
+  [
+   4,
+   422
+  ],
+  [
+   5,
+   522
+  ],
+  [
+   6,
+   622
+  ],
+  [
+   7,
+   722
+  ],
+  [
+   8,
+   822
+  ]
+ ],
+ "boxes": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 100,
+   "bottom": 144,
+   "clave": "F106"
+  },
+  {
+   "nombre": "Inglés I",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 108,
+   "bottom": 152,
+   "clave": "F107"
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 116,
+   "bottom": 160,
+   "clave": "F102"
+  },
+  {
+   "nombre": "Química General Aplicada",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 124,
+   "bottom": 168,
+   "clave": "F104"
+  },
+  {
+   "nombre": "Química Bioorgánica",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 232,
+   "bottom": 276,
+   "clave": "F213"
+  },
+  {
+   "nombre": "Biología Celular",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 140,
+   "bottom": 184,
+   "clave": "F101"
+  },
+  {
+   "nombre": "Física del Movimiento Aplicada",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 148,
+   "bottom": 192,
+   "clave": "F108"
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 156,
+   "bottom": 200,
+   "clave": "F103"
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 300,
+   "bottom": 344,
+   "clave": "F316"
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 408,
+   "bottom": 452,
+   "clave": "F426"
+  },
+  {
+   "nombre": "Mecánica de Fluidos y Sólidos",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 516,
+   "bottom": 560,
+   "clave": "F544"
+  },
+  {
+   "nombre": "Proyecto Terminal I",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 624,
+   "bottom": 668,
+   "clave": "F651"
+  },
+  {
+   "nombre": "Proyecto Terminal II",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 732,
+   "bottom": 776,
+   "clave": "F758"
+  },
+  {
+   "nombre": "Proyecto Terminal III",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 840,
+   "bottom": 884,
+   "clave": "F863"
+  },
+  {
+   "nombre": "Ingeniería de Productos Biológicos",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 848,
+   "bottom": 892,
+   "clave": "F862"
+  },
+  {
+   "nombre": "Diseño y Estabilidad de Medicamentos",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 856,
+   "bottom": 900,
+   "clave": "F861"
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 100,
+   "bottom": 144,
+   "clave": "F105"
+  },
+  {
+   "nombre": "Inglés II",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 208,
+   "bottom": 252,
+   "clave": "F212"
+  },
+  {
+   "nombre": "Inglés III",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "F325"
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 224,
+   "bottom": 268,
+   "clave": "F214"
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 332,
+   "bottom": 376,
+   "clave": "F323"
+  },
+  {
+   "nombre": "Fisiología",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 240,
+   "bottom": 284,
+   "clave": "F211"
+  },
+  {
+   "nombre": "Termodinámica",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 248,
+   "bottom": 292,
+   "clave": "F215"
+  },
+  {
+   "nombre": "Estadística",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 256,
+   "bottom": 300,
+   "clave": "F210"
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 200,
+   "bottom": 244,
+   "clave": "F209"
+  },
+  {
+   "nombre": "Balance de Materia y Energía",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 308,
+   "bottom": 352,
+   "clave": "F318"
+  },
+  {
+   "nombre": "Fisicoquímica",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "F321"
+  },
+  {
+   "nombre": "Sistemas de Calidad",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 324,
+   "bottom": 368,
+   "clave": "F320"
+  },
+  {
+   "nombre": "Bioquímica Farmacéutica",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 332,
+   "bottom": 376,
+   "clave": "F319"
+  },
+  {
+   "nombre": "Fenómenos de Transporte",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 440,
+   "bottom": 484,
+   "clave": "F427"
+  },
+  {
+   "nombre": "Administración de la Producción",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 448,
+   "bottom": 492,
+   "clave": "F430"
+  },
+  {
+   "nombre": "Legislación Farmacéutica",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 456,
+   "bottom": 500,
+   "clave": "F431"
+  },
+  {
+   "nombre": "Farmacología",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 400,
+   "bottom": 444,
+   "clave": "F432"
+  },
+  {
+   "nombre": "Laboratorio de Bioingeniería",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 508,
+   "bottom": 552,
+   "clave": "F543"
+  },
+  {
+   "nombre": "Procesos de Transferencia de Calor",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 516,
+   "bottom": 560,
+   "clave": "F545"
+  },
+  {
+   "nombre": "Biotecnología Farmacéutica",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 524,
+   "bottom": 568,
+   "clave": "F539"
+  },
+  {
+   "nombre": "Tecnología Farmacéutica I",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 532,
+   "bottom": 576,
+   "clave": "F546"
+  },
+  {
+   "nombre": "Validación de Procesos Farmacéuticos",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 540,
+   "bottom": 584,
+   "clave": "F547"
+  },
+  {
+   "nombre": "Ingeniería de Biorreactores",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 448,
+   "bottom": 492,
+   "clave": "F428"
+  },
+  {
+   "nombre": "Optativa I",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 456,
+   "bottom": 500,
+   "slot": "Optativa I",
+   "text": "Optativa I"
+  },
+  {
+   "nombre": "Elementos para el Diseño I",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 400,
+   "bottom": 444,
+   "clave": "F429"
+  },
+  {
+   "nombre": "Electiva I",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 508,
+   "bottom": 552,
+   "clave": "F540"
+  },
+  {
+   "nombre": "Biotecnología de Cultivos Celulares",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 416,
+   "bottom": 460,
+   "clave": "F433"
+  },
+  {
+   "nombre": "Métodos Analíticos e Instrumentales",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 424,
+   "bottom": 468,
+   "clave": "F434"
+  },
+  {
+   "nombre": "Diseño de Fármacos",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 432,
+   "bottom": 476,
+   "clave": "F435"
+  },
+  {
+   "nombre": "Bioseparaciones Fluido-Fluido",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 640,
+   "bottom": 684,
+   "clave": "F648"
+  },
+  {
+   "nombre": "Síntesis y Análisis de Bioprocesos",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 748,
+   "bottom": 792,
+   "clave": "F759"
+  },
+  {
+   "nombre": "Diseño de Plantas (Taller)",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 856,
+   "bottom": 900,
+   "clave": "F860"
+  },
+  {
+   "nombre": "Laboratorio de Bioseparaciones",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 700,
+   "bottom": 744,
+   "clave": "F755"
+  },
+  {
+   "nombre": "Optativa III",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 708,
+   "bottom": 752,
+   "slot": "Optativa III",
+   "text": "Optativa III"
+  },
+  {
+   "nombre": "Elementos para el Diseño II",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 516,
+   "bottom": 560,
+   "clave": "F542"
+  },
+  {
+   "nombre": "Optativa II",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 624,
+   "bottom": 668,
+   "slot": "Optativa II",
+   "text": "Optativa II"
+  },
+  {
+   "nombre": "Bioseparaciones Mecánicas",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 632,
+   "bottom": 676,
+   "clave": "F650"
+  },
+  {
+   "nombre": "Bioseparaciones Sólido-Fluido",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 640,
+   "bottom": 684,
+   "clave": "F649"
+  },
+  {
+   "nombre": "Administración de Proyectos",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 548,
+   "bottom": 592,
+   "clave": "F538"
+  },
+  {
+   "nombre": "Tecnología Farmacéutica II",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 656,
+   "bottom": 700,
+   "clave": "F652"
+  },
+  {
+   "nombre": "Electiva II",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 500,
+   "bottom": 544,
+   "clave": "F541"
+  },
+  {
+   "nombre": "Química Heterocíclica",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 308,
+   "bottom": 352,
+   "clave": "F322"
+  },
+  {
+   "nombre": "Microbiología Farmacéutica",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "F324"
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 324,
+   "bottom": 368,
+   "clave": "F317"
+  }
+ ],
+ "edges": [
+  {
+   "s": 1,
+   "d": 17,
+   "pts": []
+  },
+  {
+   "s": 2,
+   "d": 19,
+   "pts": []
+  },
+  {
+   "s": 3,
+   "d": 4,
+   "pts": []
+  },
+  {
+   "s": 4,
+   "d": 57,
+   "pts": []
+  },
+  {
+   "s": 5,
+   "d": 21,
+   "pts": []
+  },
+  {
+   "s": 6,
+   "d": 22,
+   "pts": []
+  },
+  {
+   "s": 7,
+   "d": 23,
+   "pts": []
+  },
+  {
+   "s": 7,
+   "d": 24,
+   "pts": []
+  },
+  {
+   "s": 10,
+   "d": 52,
+   "pts": []
+  },
+  {
+   "s": 11,
+   "d": 12,
+   "pts": []
+  },
+  {
+   "s": 12,
+   "d": 13,
+   "pts": []
+  },
+  {
+   "s": 16,
+   "d": 9,
+   "pts": []
+  },
+  {
+   "s": 17,
+   "d": 18,
+   "pts": []
+  },
+  {
+   "s": 19,
+   "d": 20,
+   "pts": []
+  },
+  {
+   "s": 20,
+   "d": 44,
+   "pts": []
+  },
+  {
+   "s": 21,
+   "d": 28,
+   "pts": []
+  },
+  {
+   "s": 21,
+   "d": 58,
+   "pts": []
+  },
+  {
+   "s": 22,
+   "d": 25,
+   "pts": []
+  },
+  {
+   "s": 22,
+   "d": 26,
+   "pts": []
+  },
+  {
+   "s": 22,
+   "d": 28,
+   "pts": []
+  },
+  {
+   "s": 23,
+   "d": 27,
+   "pts": []
+  },
+  {
+   "s": 24,
+   "d": 8,
+   "pts": []
+  },
+  {
+   "s": 24,
+   "d": 59,
+   "pts": []
+  },
+  {
+   "s": 25,
+   "d": 29,
+   "pts": []
+  },
+  {
+   "s": 25,
+   "d": 38,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 30,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 31,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 39,
+   "pts": []
+  },
+  {
+   "s": 28,
+   "d": 32,
+   "pts": []
+  },
+  {
+   "s": 28,
+   "d": 42,
+   "pts": []
+  },
+  {
+   "s": 29,
+   "d": 10,
+   "pts": []
+  },
+  {
+   "s": 29,
+   "d": 34,
+   "pts": []
+  },
+  {
+   "s": 30,
+   "d": 54,
+   "pts": []
+  },
+  {
+   "s": 33,
+   "d": 48,
+   "pts": []
+  },
+  {
+   "s": 34,
+   "d": 45,
+   "pts": []
+  },
+  {
+   "s": 36,
+   "d": 55,
+   "pts": []
+  },
+  {
+   "s": 38,
+   "d": 33,
+   "pts": []
+  },
+  {
+   "s": 40,
+   "d": 50,
+   "pts": []
+  },
+  {
+   "s": 42,
+   "d": 35,
+   "pts": []
+  },
+  {
+   "s": 44,
+   "d": 37,
+   "pts": []
+  },
+  {
+   "s": 45,
+   "d": 46,
+   "pts": []
+  },
+  {
+   "s": 50,
+   "d": 51,
+   "pts": []
+  },
+  {
+   "s": 51,
+   "d": 47,
+   "pts": []
+  },
+  {
+   "s": 53,
+   "d": 46,
+   "pts": []
+  },
+  {
+   "s": 55,
+   "d": 15,
+   "pts": []
+  },
+  {
+   "s": 59,
+   "d": 9,
+   "pts": []
+  }
+ ]
+}

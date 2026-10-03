@@ -1,0 +1,228 @@
+{
+ "carrera": "L",
+ "plan": "06",
+ "estado": "Clasificación propuesta, pendiente de revisión por las academias.",
+ "fuente_seriacion": "alimentos-2006.pdf",
+ "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos.",
+ "areas": [
+  {
+   "nombre": "Físico-matemáticas",
+   "claves": [
+    "L105",
+    "L103",
+    "L212",
+    "L210",
+    "L209",
+    "L433",
+    "L319"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Informática y computación",
+   "claves": [
+    "L107"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Sistemas y control",
+   "claves": [
+    "L542"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencia e ingeniería de alimentos",
+   "claves": [
+    "L102",
+    "L108",
+    "L101",
+    "L214",
+    "L324",
+    "L321",
+    "L428",
+    "L543",
+    "L216",
+    "L325",
+    "L213",
+    "L322",
+    "L318",
+    "L430",
+    "L429",
+    "L541",
+    "L539",
+    "L545",
+    "L547",
+    "L544",
+    "L427",
+    "L426",
+    "L432",
+    "L656",
+    "L540",
+    "L652",
+    "L548",
+    "L762",
+    "L764",
+    "L765",
+    "L653",
+    "L654",
+    "L655",
+    "L658",
+    "L760",
+    "L759",
+    "L761",
+    "L431",
+    "L657",
+    "L317"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Formación integral",
+   "claves": [
+    "L104",
+    "L106",
+    "L211",
+    "L323",
+    "L215",
+    "L320",
+    "L763",
+    "L546"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Especialización",
+   "claves": [],
+   "espacios": [
+    [
+     "Optativa I",
+     4
+    ],
+    [
+     "Optativa II",
+     5
+    ]
+   ]
+  }
+ ],
+ "seriacion": [
+  [
+   "L106",
+   "L211"
+  ],
+  [
+   "L108",
+   "L214"
+  ],
+  [
+   "L108",
+   "L212"
+  ],
+  [
+   "L101",
+   "L213"
+  ],
+  [
+   "L214",
+   "L324"
+  ],
+  [
+   "L324",
+   "L426"
+  ],
+  [
+   "L321",
+   "L428"
+  ],
+  [
+   "L321",
+   "L427"
+  ],
+  [
+   "L105",
+   "L216"
+  ],
+  [
+   "L103",
+   "L209"
+  ],
+  [
+   "L107",
+   "L210"
+  ],
+  [
+   "L211",
+   "L323"
+  ],
+  [
+   "L212",
+   "L321"
+  ],
+  [
+   "L216",
+   "L325"
+  ],
+  [
+   "L325",
+   "L429"
+  ],
+  [
+   "L325",
+   "L432"
+  ],
+  [
+   "L210",
+   "L319"
+  ],
+  [
+   "L213",
+   "L322"
+  ],
+  [
+   "L209",
+   "L317"
+  ],
+  [
+   "L322",
+   "L430"
+  ],
+  [
+   "L318",
+   "L429"
+  ],
+  [
+   "L318",
+   "L432"
+  ],
+  [
+   "L653",
+   "L765"
+  ],
+  [
+   "L654",
+   "L760"
+  ],
+  [
+   "L655",
+   "L759"
+  ],
+  [
+   "L658",
+   "L763"
+  ],
+  [
+   "L317",
+   "L433"
+  ],
+  [
+   "L433",
+   "L543"
+  ],
+  [
+   "L319",
+   "L433"
+  ]
+ ]
+}
