@@ -149,11 +149,11 @@ assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,tota
 
     def test_leyenda_roja_solo_si_la_tendencia_excede_el_limite(self):
         html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
-        expression=re.search(r"\$\{(totalPer!=null.*?Los puntos rojos.*?)\}",html).group(1)
-        script="const assert=require('assert');const legend=(totalPer,plazo)=>"+expression+";"+"""
+        expression=re.search(r"\.\.\.(\(totalPer!=null&&plazo\.max&&totalPer>plazo\.max\?\[\['anillo'.*?\]\]:\[\]\))",html).group(1)
+        script="const assert=require('assert');const legend=(totalPer,plazo)=>"+expression+".map(x=>x[2]).join('');"+"""
 assert.strictEqual(legend(10,{max:12}),'');
 assert.strictEqual(legend(12,{max:12}),'');
-assert.ok(legend(13,{max:12}).includes('Los puntos rojos'));
+assert.ok(legend(13,{max:12}).includes('Rebasa el plazo'));
 assert.strictEqual(legend(null,{max:12}),'');
 assert.strictEqual(legend(13,{}),'');
 """
@@ -279,7 +279,7 @@ ALUMNO.acreditadas.forEach(a=>a[2]=a[0]==='DEMO0'?'25/1':'26/1');
 D=statsDatos();assert.ok(D.avisos.some(x=>x.includes('no tienen información')));
 ALUMNO.periodos_confirmados=[{periodo:'25/2',creditos:0,completo:true}];
 D=statsDatos();assert.strictEqual(D.porPer.find(x=>x.per===51).cr,0);assert.strictEqual(D.ritmo,80);
-ALUMNO.en_curso=['NO_CORRESPONDE'];t.sim=true;assert.strictEqual(statsDatos().falta,null);t.sim=false;ALUMNO.en_curso=[];
+t.sim=true;const sinExterna=statsDatos().falta;ALUMNO.en_curso=['NO_CORRESPONDE'];assert.ok(sinExterna!=null);assert.strictEqual(statsDatos().falta,sinExterna);t.sim=false;ALUMNO.en_curso=[];   // otra carrera: no suma créditos ni anula la proyección
 ALUMNO.reprobadas_periodo=null;assert.ok(statsDatos().avisos.some(x=>x.includes('Estado general')));
 ALUMNO.avance.faltan=197;D=statsDatos();assert.strictEqual(D.falta,null);assert.strictEqual(D.obt,240);assert.strictEqual(D.fin,null);
 ALUMNO.acreditadas=[];ALUMNO.avance={};ALUMNO.carga={};D=statsDatos();assert.strictEqual(D.obt,null);assert.strictEqual(D.media,null);assert.strictEqual(D.fin,null);
