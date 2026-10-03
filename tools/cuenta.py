@@ -374,7 +374,7 @@ var IPNT=window.IPNT=(()=>{
     const dl=$i('ipnt-hola'), sel=document.querySelector(o.select);
     if(!dl||!sel||(!NUEVO&&!o.force)) return;
     $i('ipnt-hola-h').textContent=o.force?'Cambiar unidad académica':'Bienvenida';
-    $i('ipnt-h-lead').textContent=o.force?'Elige la unidad académica que quieres consultar.':'Para empezar, dinos de qué unidad y carrera eres.';
+    $i('ipnt-h-lead').textContent=o.force?'Elige la unidad académica que quieres consultar.':'Selecciona tu unidad y programa académico.';
     const UN=CFG.unidades||[], cars=[...sel.options].map(op=>[op.value,op.textContent.trim()]).filter(c=>c[0]);
     let uni=CFG.unidad;
     const listo=()=>{ls.set(BKEY,'1');if(dl.close)dl.close();else dl.removeAttribute('open')};
@@ -487,7 +487,7 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
 </dialog>
 <dialog class="saes-dlg ipnt-dlg ipnt-hola" id="ipnt-hola" aria-labelledby="ipnt-hola-h">
   <div class="dl-head"><h2 id="ipnt-hola-h">Bienvenida</h2><button class="x" type="button" data-hola-x aria-label="Cerrar">×</button></div>
-  <p class="lead" id="ipnt-h-lead">Para empezar, dinos de qué unidad y carrera eres.</p>
+  <p class="lead" id="ipnt-h-lead">Selecciona tu unidad y programa académico.</p>
   <div id="ipnt-h-uni"><h3>1. Elige tu unidad académica</h3>
   <div class="ipnt-unis" id="ipnt-h-unis"></div></div>
   <div id="ipnt-h-cars"></div>
