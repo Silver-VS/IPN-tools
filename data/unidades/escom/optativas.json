@@ -21,6 +21,7 @@
    {
     "area": "Optativas",
     "linea": "Algoritmos Bioinspirados",
+    "categoria": "Ciencia de datos e IA",
     "claves": [
      "C612",
      "C711"
@@ -29,6 +30,7 @@
    {
     "area": "Optativas",
     "linea": "Big Data",
+    "categoria": "Ciencia de datos e IA",
     "claves": [
      "C604",
      "C703"
@@ -37,6 +39,7 @@
    {
     "area": "Optativas",
     "linea": "Computación Gráfica",
+    "categoria": "Informática y computación",
     "claves": [
      "C613",
      "C712"
@@ -45,6 +48,7 @@
    {
     "area": "Optativas",
     "linea": "Criptografía",
+    "categoria": "Informática y computación",
     "claves": [
      "C610",
      "C709"
@@ -53,6 +57,7 @@
    {
     "area": "Optativas",
     "linea": "Desarrollo de Aplicaciones",
+    "categoria": "Informática y computación",
     "claves": [
      "C605",
      "C704"
@@ -61,6 +66,7 @@
    {
     "area": "Optativas",
     "linea": "Gestión de Empresas de Alta Tecnología",
+    "categoria": "Formación integral",
     "claves": [
      "C616",
      "C715"
@@ -69,6 +75,7 @@
    {
     "area": "Optativas",
     "linea": "Gobierno de TI",
+    "categoria": "Comunicaciones y redes",
     "claves": [
      "C609",
      "C708"
@@ -77,6 +84,7 @@
    {
     "area": "Optativas",
     "linea": "Instrumentación Virtual",
+    "categoria": "Sistemas y control",
     "claves": [
      "C607",
      "C706"
@@ -85,6 +93,7 @@
    {
     "area": "Optativas",
     "linea": "Internet de las Cosas",
+    "categoria": "Electrónica",
     "claves": [
      "C608",
      "C707"
@@ -93,6 +102,7 @@
    {
     "area": "Optativas",
     "linea": "Minería de Datos",
+    "categoria": "Ciencia de datos e IA",
     "claves": [
      "C606",
      "C705"
@@ -101,6 +111,7 @@
    {
     "area": "Optativas",
     "linea": "Procesamiento de Lenguaje Natural",
+    "categoria": "Ciencia de datos e IA",
     "claves": [
      "C611",
      "C710"
@@ -109,6 +120,7 @@
    {
     "area": "Optativas",
     "linea": "Sistemas Complejos",
+    "categoria": "Físico-matemáticas",
     "claves": [
      "C615",
      "C714"
@@ -117,6 +129,7 @@
    {
     "area": "Optativas",
     "linea": "Tópicos Selectos de Computación",
+    "categoria": "Informática y computación",
     "claves": [
      "C617",
      "C716"
@@ -125,6 +138,7 @@
    {
     "area": "Optativas",
     "linea": "Visión por Computadora",
+    "categoria": "Ciencia de datos e IA",
     "claves": [
      "C614",
      "C713"

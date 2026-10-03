@@ -154,6 +154,12 @@ input[type=number]{width:5rem}
 .tgl input:checked+.tgl-ui::after{transform:translateX(14px)}
 .tgl input:focus-visible+.tgl-ui{outline:2px solid var(--accent);outline-offset:2px}
 .simchips{display:flex;flex-wrap:wrap;gap:6px}
+.simrows{flex-basis:100%;display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:6px 14px}
+.simrows.off{opacity:.55}
+.simrow{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
+.simrow .sim-n{flex:1;min-width:0;font-size:.84rem;line-height:1.2}.simrow .sim-n small{display:block;font-size:.72rem;color:var(--muted)}.simrow .sim-n small.bad{color:var(--bad)}
+.simrow select{font-size:.8rem;padding:2px 4px}.simrow .sim-x{font-size:.78rem;color:var(--bad)}
+.seg.sm button{padding:2px 8px;font-size:.78rem}
 .simchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 11px;font-size:.84rem;cursor:pointer;color:var(--fg)}
 .simchip b{font-weight:600;color:var(--ok);margin-left:6px}
 .simchip .swap{margin-left:6px;color:var(--muted)}
@@ -186,6 +192,20 @@ input[type=number]{width:5rem}
 .charts svg{max-width:100%;height:auto}
 .charts [aria-label="tip"] path{fill:var(--surface);stroke:var(--line)}
 .st-note{margin:8px 0 0;font-size:.8rem;color:var(--muted)}
+.kanal{margin-top:16px}.an-h{margin:0 0 8px;font-size:1.05rem}
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.an-grid section{padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
+.an-grid h4{margin:0;font-size:.92rem}.an-sub{margin:2px 0 8px;font-size:.78rem;color:var(--muted)}
+.an-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
+.an-list li{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:baseline;font-size:.86rem}
+.an-list small{grid-column:1/-1;color:var(--muted);font-size:.78rem}
+.an-tag{font-size:.68rem;font-weight:600;padding:1px 6px;border-radius:999px;border:1px solid}.an-tag.alto{color:var(--bad)}.an-tag.medio{color:var(--warn)}
+.an-pred{font-variant-numeric:tabular-nums;color:var(--muted)}
+.an-bars{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.an-bars li{display:grid;grid-template-columns:minmax(0,1.3fr) 1fr auto;gap:2px 8px;align-items:center;font-size:.84rem}
+.an-bars li>small{grid-column:1/-1;color:var(--muted);font-size:.74rem;margin-top:-2px}.an-ln small{display:block;color:var(--muted);font-size:.72rem}
+.an-bar{height:8px;background:var(--sunken);border-radius:999px;overflow:hidden}.an-bar i{display:block;height:100%;background:var(--accent)}
+.an-chain{margin:6px 0 0;padding-left:1.2rem;font-size:.84rem;display:flex;flex-direction:column;gap:2px}
 .mapcut{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);font-size:.88rem;color:var(--muted)}
 .minimap{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:4px;cursor:pointer;line-height:0;flex:none}
 .minimap:hover{border-color:var(--accent)}
@@ -693,16 +713,20 @@ const isPersonal=()=>!!ALUMNO&&ALUMNO.carrera===S.car;
 const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprobadas
 /* Simulación de fin de semestre (solo exploración, nunca toca los datos del SAES):
    las materias en curso se dan por aprobadas, salvo las que el alumno marque como reprobadas. */
-const SIM=store.get('sim',{on:false,fail:[]});
+const SIM=Object.assign({on:false,fail:[],res:{},rec:{}},store.get('sim',{}));   // res: {clave:{ok,cal}}; rec: {clave:{forma,cal}}
+(SIM.fail||[]).forEach(k=>{SIM.res[k]=SIM.res[k]||{ok:false}});SIM.fail=[];   // versión anterior: solo lista de reprobadas
 const tr=()=>{
   if(!T[S.car]){
     const t=store.get('t.'+S.car,{want:[]}), me=isPersonal();
     const done0=me?ALUMNO.acreditadas.map(a=>a[0]):[];
     const enc=me?((ALUMNO.en_curso||[]).length?ALUMNO.en_curso:(ALUMNO.horario_inscrito||[]).map(h=>h[1])):[];
     const enCurso=enc.filter(k=>cur()[k]&&!done0.includes(k));
-    const sim=me&&SIM.on&&enCurso.length>0;
-    const simOk=sim?enCurso.filter(k=>!SIM.fail.includes(k)):[], simFail=sim?enCurso.filter(k=>SIM.fail.includes(k)):[];
-    const done=[...done0,...simOk], doneS=new Set(done);
+    const pendRep=me?[...new Set([...(ALUMNO.reprobadas_periodo||[]).map(r=>r[0]),...Object.keys(cur()).filter(k=>(ALUMNO.reprobadas||[]).some(r=>norm(r[0])===norm(cur()[k][0])))])]
+      .filter(k=>cur()[k]&&!done0.includes(k)&&!enCurso.includes(k)):[];
+    const sim=me&&SIM.on&&(enCurso.length>0||pendRep.length>0);
+    const simOk=sim?enCurso.filter(k=>SIM.res[k]?.ok!==false):[], simFail=sim?enCurso.filter(k=>SIM.res[k]?.ok===false):[];
+    const simRec=sim?pendRep.filter(k=>SIM.rec[k]?.forma):[];   // reprobadas que se simulan acreditadas (ETS, recurse, extraordinario)
+    const done=[...done0,...simOk,...simRec], doneS=new Set(done);
     // reprobadas: con periodo (Estado general del SAES) o, en datos viejos, solo por nombre (Cita)
     const failP={}, veces={};
     if(me)(ALUMNO.reprobadas_periodo||[]).forEach(([k,p,v])=>{if(!cur()[k]||doneS.has(k))return;const i=perIdx(p);if(!(k in failP)||(i!=null&&i<failP[k]))failP[k]=i;veces[k]=v});
@@ -714,7 +738,7 @@ const tr=()=>{
     const desfS=me?(ALUMNO.desfasadas_saes||[]).map(r=>r[0]).filter(k=>cur()[k]&&!doneS.has(k)):[];
     // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
     const pmeta=perMeta(), oblig=[...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS];
-    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,sim,simOk,cursados:me?ALUMNO.avance?.cursados??null:null};
+    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
   }
   return T[S.car];
 };
@@ -1081,10 +1105,10 @@ function renderSide(){
     const nDes=fis.filter(f=>f.estado==='desfasada').length+dS.length, curso=tr().curso;
     const atraso=DESFASE_SEM.has(S.car)?Object.keys(c).filter(k=>statusOf(k)==='late'||statusOf(k)==='late lock').length:0;
     const tile=(lbl,val,sub='',cls='',tip='')=>`<div class="tile"${tip?` title="${esc(tip)}"`:''}><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
-    const simCr=tr().simOk.reduce((t,k)=>t+c[k][1],0), obt=(A.avance?.obtenidos??credDone)+simCr, tot=A.carga?.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
+    const simCr=[...tr().simOk,...tr().simRec].reduce((t,k)=>t+c[k][1],0), obt=(A.avance?.obtenidos??credDone)+simCr, tot=A.carga?.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
     const cm=String(A.cita?.inicio||'').match(/(\d+\/\d+\/\d{4})\s+(\d+):(\d+)(?::\d+)?\s*(.*)/);
     $('#status').innerHTML=
-      tile('Promedio',A.promedio??'—')+
+      tile(tr().sim?'Promedio estimado':'Promedio',tr().sim&&A.promedio!=null?promEstimado().toFixed(2):A.promedio??'—',tr().sim?`actual ${A.promedio??'—'}`:'')+
       tile(tr().sim?'Créditos al terminar':'Créditos',`${fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
       tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${A.carga?.duracion?' de '+A.carga.duracion:''} periodos`:'','',
         [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',A.carga?.duracion_max?`máximo ${A.carga.duracion_max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
@@ -1100,11 +1124,17 @@ function renderSide(){
     $('#desf-note').textContent=(fis.length?'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.':'')+
       (DESFASE_SEM.has(S.car)?'':' En los planes por niveles, cursar las materias en un orden distinto al de la trayectoria no constituye desfase.');
     $('#est-src').textContent='Leído del SAES el '+new Date(A.leido).toLocaleDateString('es-MX',{dateStyle:'medium'});
-    const ec=tr().enCurso;$('#est-sim').hidden=!ec.length;$('#sim-tag').hidden=!tr().sim;
-    $('#est-sim').innerHTML=ec.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+
-      `<div class="simchips" role="group" aria-label="Resultado simulado de tus materias en curso">${ec.map(k=>{const f=SIM.fail.includes(k);
-        return `<button type="button" class="simchip${f?' bad':''}" data-sim="${k}"${SIM.on?'':' disabled'} title="Alternar entre aprobada y reprobada">${esc(pretty(c[k][0]))}<b>${f?'Reprobada':'Aprobada'}</b><span class="swap" aria-hidden="true">⇄</span></button>`}).join('')}</div>`+
-      `<span class="sim-hint">${SIM.on?'Selecciona una materia para alternar entre aprobada y reprobada.':'Permite estimar el resultado del periodo en curso según apruebes o repruebes cada materia.'}</span>`:'';
+    const ec=tr().enCurso, pr=tr().pendRep;$('#est-sim').hidden=!ec.length&&!pr.length;$('#sim-tag').hidden=!tr().sim;
+    const calSel=(k,attr,v)=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${[10,9,8,7,6].map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
+    $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+
+      `<span class="sim-hint">${SIM.on?'Prueba escenarios: el mapa, las sugeridas y las estadísticas se recalculan; tus datos del SAES no cambian.':'Prueba qué pasaría con tus materias en curso y tus reprobadas: aprobar con cierta calificación, reprobar o acreditar por ETS, recurse o extraordinario.'}</span>`+
+      `<div class="simrows${SIM.on?'':' off'}">`+
+      ec.map(k=>{const r=SIM.res[k]||{},ok=r.ok!==false;return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small>En curso</small></span>`+
+        `<div class="seg sm" role="group"><button type="button" data-simok="${k}" aria-pressed="${ok}"${SIM.on?'':' disabled'}>Aprobada</button><button type="button" data-simko="${k}" aria-pressed="${!ok}"${SIM.on?'':' disabled'}>Reprobada</button></div>`+
+        (ok?calSel(k,'simcal',r.cal??8):'<span class="sim-x">pasa a recursar</span>')+`</div>`}).join('')+
+      pr.map(k=>{const r=SIM.rec[k]||{};return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small class="bad">Reprobada</small></span>`+
+        `<select data-simrec="${k}" aria-label="Cómo se acredita"${SIM.on?'':' disabled'}><option value="">Sigue pendiente</option>${['ETS','REC','EXT'].map(f=>`<option value="${f}"${r.forma===f?' selected':''}>Acreditada por ${FORMAS[f].toLowerCase()}</option>`).join('')}</select>`+
+        (r.forma?calSel(k,'simreccal',r.cal??7):'')+`</div>`}).join('')+`</div>`:'';
     $('#h-sugg').textContent=meta!=null?'Sugeridas para '+perName(meta):'Sugeridas';
     const st=levelStats(), R=MAP().reglas;
     // por nivel: avance (barra de ancho fijo) y, debajo, el porcentaje recomendado de niveles previos frente al tuyo
@@ -1571,16 +1601,30 @@ function catDe(){                                // clave -> categoría (columna
   L.boxes.forEach(([x,y,w,h,k])=>{if(!k)return;const cx=x+w/2,c=L.cols.find(([n,a,b])=>cx>=a&&cx<b);if(c)out[k]=c[0]});
   return out;
 }
+/* kárdex con la simulación: materias en curso aprobadas y reprobadas acreditadas, con su calificación simulada,
+   en el periodo que se cursa (el anterior al que se planea). Quinto campo = simulada. */
+function simKardex(){
+  const A=ALUMNO, base=(A.acreditadas||[]).filter(a=>a&&a[1]!=null);if(!isPersonal()||!tr().sim)return base;
+  const pm=perMeta(), p=pm!=null?perName(pm-1):null, rep=new Set((A.reprobadas_periodo||[]).map(r=>r[0]));
+  return [...base,...tr().simOk.map(k=>[k,SIM.res[k]?.cal??8,p,rep.has(k)?'REC':'ORD',1]),...tr().simRec.map(k=>[k,SIM.rec[k]?.cal??7,p,SIM.rec[k].forma,1])];
+}
+/* Promedio estimado con la simulación: se parte del promedio oficial (incluye reprobatorias, que el kárdex no
+   trae) y se agregan las calificaciones simuladas; una reprobada simulada cuenta como 5. */
+function promEstimado(){
+  const A=ALUMNO,P=A?.promedio,n=(A?.acreditadas||[]).length;if(P==null||!isPersonal()||!tr().sim||!n)return P;
+  const add=[...tr().simOk.map(k=>SIM.res[k]?.cal??8),...tr().simRec.map(k=>SIM.rec[k]?.cal??7),...tr().enCurso.filter(k=>SIM.res[k]?.ok===false).map(()=>5)];
+  return (P*n+add.reduce((a,b)=>a+b,0))/(n+add.length);
+}
 function statsDatos(){
   const c=cur(), A=ALUMNO, cat=catDe();
-  const rows=(A.acreditadas||[]).filter(a=>a&&a[1]!=null).map(a=>{const f=String(a[3]||'—').toUpperCase();
-    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:+a[1],per:perIdx(a[2]),forma:FORMAS[f]||f,eqv:f==='EQV',cat:cat[a[0]]||'Sin categoría',cr:c[a[0]]?.[1]||0}});
+  const rows=simKardex().map(a=>{const f=String(a[3]||'—').toUpperCase();
+    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:+a[1],per:perIdx(a[2]),forma:FORMAS[f]||f,eqv:f==='EQV',sim:!!a[4],cat:cat[a[0]]||'Sin categoría',cr:c[a[0]]?.[1]||0}});
   const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
   const reg=rows.filter(r=>!r.eqv&&r.per!=null), pers=[...new Set(reg.map(r=>r.per))].sort((a,b)=>a-b);
   const porPer=pers.map(p=>{const v=reg.filter(r=>r.per===p).map(r=>r.cal);return {per:p,lbl:perName(p),prom:mean(v),min:Math.min(...v),max:Math.max(...v),n:v.length,cr:reg.filter(r=>r.per===p).reduce((s,r)=>s+r.cr,0)}});
   const crEqv=rows.filter(r=>r.eqv).reduce((s,r)=>s+r.cr,0);
   let acum=crEqv;const curva=porPer.map(d=>({...d,acum:(acum+=d.cr)}));
-  const cal=rows.map(r=>r.cal).sort((a,b)=>a-b), media=A.promedio??mean(cal), mediana=cal.length?(cal[(cal.length-1)>>1]+cal[cal.length>>1])/2:null;
+  const cal=rows.map(r=>r.cal).sort((a,b)=>a-b), media=promEstimado()??mean(cal), mediana=cal.length?(cal[(cal.length-1)>>1]+cal[cal.length>>1])/2:null;
   const sd=cal.length>1?Math.sqrt(cal.reduce((s,x)=>s+(x-mean(cal))**2,0)/(cal.length-1)):0;
   const ritmo=mean(porPer.slice(-3).map(d=>d.cr)), total=A.carga?.total, obt=A.avance?.obtenidos??acum, falta=A.avance?.faltan??(total!=null?total-obt:null);
   const nper=ritmo&&falta!=null?Math.ceil(falta/ritmo):null, meta=perMeta(), fin=nper!=null&&meta!=null?meta+nper-1:null;
@@ -1598,7 +1642,7 @@ async function renderStats(){
   const dur=A.carga?.duracion, cursados=A.avance?.cursados, totalPer=D.nper!=null&&cursados!=null?cursados+D.nper:null;
   const kpi=(lbl,val,sub='',cls='')=>`<div class="kpi"><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
   box.innerHTML=`<div class="kpis">
-      ${kpi('Promedio',f2(D.media),D.delta!=null?`<span class="${D.delta>=0?'up':'down'}">${D.delta>=0?'▲':'▼'} ${sg(D.delta)}</span> vs. periodo anterior`:'')}
+      ${kpi(D.rows.some(r=>r.sim)?'Promedio estimado':'Promedio',f2(D.media),D.delta!=null?`<span class="${D.delta>=0?'up':'down'}">${D.delta>=0?'▲':'▼'} ${sg(D.delta)}</span> vs. periodo anterior`:'')}
       ${kpi('Dispersión (σ)',f2(D.sd),`mediana ${f2(D.mediana)} · n = ${D.rows.length}`)}
       ${kpi('En ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.reg.length} materias sin equivalencias`)}
       ${kpi('Ritmo',D.ritmo?fmtCr(D.ritmo)+' cr':'—','por periodo (últimos 3)')}
@@ -1612,9 +1656,11 @@ async function renderStats(){
       <figure><figcaption><b>Forma de acreditación por periodo</b><span>Materias acreditadas por tipo de evaluación.</span></figcaption><div id="ch-forma"></div></figure>
       <figure class="ch-wide"><figcaption><b>Mapa de calor: categoría × periodo</b><span>Promedio de cada área de conocimiento en cada periodo.</span></figcaption><div id="ch-heat"></div></figure>
     </div>
+    <div class="kanal" id="kanal"></div>
     ${D.crEqv?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} materias acreditadas por equivalencia (${fmtCr(D.crEqv)} créditos): cuentan en la distribución, las categorías y el avance inicial, pero no en el promedio por periodo ni en el ritmo.</p>`:''}`;
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
-  try{await cargarPlot()}catch(e){box.querySelector('.charts').innerHTML=`<p class="muted">${esc(e.message)}</p>`;return}
+  try{await cargarPlot()}catch(e){box.querySelector('.charts').innerHTML=`<p class="muted">${esc(e.message)}</p>`;renderAnalisis(D);return}
+  renderAnalisis(D);
   const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
   const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
   const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
@@ -1665,6 +1711,84 @@ async function renderStats(){
     color:{type:'linear',domain:[6,10],scheme:'viridis',legend:true,label:'Promedio'},
     marks:[P.cell(hm,{x:'lbl',y:'cat',fill:'m',inset:1,rx:3,tip:true,title:d=>`${d.cat} · ${d.lbl}\npromedio ${f2(d.m)} (${d.n})`}),
       P.text(hm,{x:'lbl',y:'cat',text:d=>f2(d.m).replace(/\.00$/,''),fill:d=>d.m>8.4?'#111':'#fff'})]}));
+}
+
+/* ---------- análisis: materias a cuidar, afinidad con líneas, ruta crítica y carga vs. rendimiento ----------
+   Heurísticas transparentes (no un modelo entrenado): cada resultado muestra en qué se basa. */
+function analisis(){
+  const c=cur(), pre=prereqs(), t=tr(), K=simKardex(), cal={}, forma={}, cat=catDe();
+  K.forEach(a=>{cal[a[0]]=+a[1];forma[a[0]]=String(a[3]||'').toUpperCase()});
+  const nm=k=>pretty(c[k]?.[0]||k), failed=new Set(t.fail), done=new Set(t.done), veces=t.veces||{};
+  const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
+  const porCat={};Object.keys(cal).forEach(k=>{if(cat[k])(porCat[cat[k]]=porCat[cat[k]]||[]).push(cal[k])});
+  // 1) materias que conviene cuidar
+  const pend=Object.keys(c).filter(k=>!done.has(k)&&!isElec(k)&&(c[k][3]==='O'||c[k][3]==='P'));
+  const riesgo=pend.map(k=>{
+    const dir=(pre[k]||[]).filter(x=>x in cal), lej=[...ancestors([k])].filter(x=>x in cal&&!dir.includes(x)), w=[], motivos=[];
+    dir.forEach(x=>w.push([cal[x],2]));lej.forEach(x=>w.push([cal[x],1]));
+    if(!w.length&&cat[k]&&porCat[cat[k]])porCat[cat[k]].forEach(v=>w.push([v,1]));
+    if(!w.length&&!failed.has(k))return null;
+    let pred=w.length?w.reduce((s,[v,p])=>s+v*p,0)/w.reduce((s,[,p])=>s+p,0):7;
+    dir.forEach(x=>{const f=forma[x];
+      if(f&&!['ORD','EQV'].includes(f)){pred-=.4;motivos.push(`su requisito ${nm(x)} se acreditó por ${(FORMAS[f]||f).toLowerCase()} con ${cal[x]}`)}
+      else if(cal[x]<=7)motivos.push(`su requisito ${nm(x)} se acreditó con ${cal[x]}`)});
+    [...ancestors([k])].filter(x=>failed.has(x)).forEach(x=>{pred-=.5;motivos.push(`${nm(x)}, en su cadena de requisitos, está reprobada`)});
+    if(failed.has(k)){pred-=.6;motivos.unshift(`ya la reprobaste${veces[k]?` (${veces[k]} ${veces[k]>1?'veces':'vez'})`:''}`)}
+    if(!dir.length&&!lej.length&&cat[k]&&porCat[cat[k]])motivos.push(`tu promedio en ${cat[k]} es ${mean(porCat[cat[k]]).toFixed(2)}`);
+    const nivel=pred<7.5||failed.has(k)?'alto':pred<8.5||motivos.length?'medio':'bajo';
+    return {k,pred:Math.max(5,pred),motivos,n:w.length,nivel,base:dir.length?'requisitos':lej.length?'cadena de requisitos':'área'};
+  }).filter(Boolean);
+  // relevantes: lo que puedes cursar pronto (disponibles, elegidas, sugeridas o reprobadas)
+  const sug=new Set(suggestions().list), want=new Set(t.want);
+  const cuidar=riesgo.filter(r=>r.nivel!=='bajo'&&(available(r.k)||want.has(r.k)||sug.has(r.k)||failed.has(r.k)))
+    .sort((a,b)=>({alto:0,medio:1}[a.nivel]-{alto:0,medio:1}[b.nivel])||a.pred-b.pred).slice(0,8);
+  // 2) afinidad con líneas de especialización
+  const lineas=(MAP().lineas||[]).map(l=>{
+    const rel=new Set();
+    l.claves.forEach(k=>{ancestors([k]).forEach(x=>rel.add(x));if(cat[k])Object.keys(cal).filter(x=>cat[x]===cat[k]).forEach(x=>rel.add(x))});
+    // área de la línea: la indicada o la predominante entre sus requisitos (aunque estén pendientes)
+    let lc=l.categoria;if(!lc){const f={};l.claves.forEach(k=>ancestors([k]).forEach(x=>{if(cat[x])f[cat[x]]=(f[cat[x]]||0)+1}));lc=Object.keys(f).sort((a,b)=>f[b]-f[a])[0]}
+    if(lc)Object.keys(cal).filter(x=>cat[x]===lc).forEach(x=>rel.add(x));
+    const v=[...rel].filter(x=>x in cal).map(x=>cal[x]);
+    return {nombre:l.linea!==l.area?l.linea:l.area,area:l.area,cat:lc,prom:mean(v),n:v.length,hechas:l.claves.filter(k=>done.has(k)).length,total:l.claves.length};
+  }).filter(l=>l.n>=2).sort((a,b)=>b.prom-a.prom);
+  // 3) ruta crítica: cadena más larga de materias obligatorias pendientes (cada eslabón, al menos un periodo)
+  const memo={}, largo=k=>memo[k]??(memo[k]=1+Math.max(0,...(dependents()[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O').map(largo)));
+  const obligP=pend.filter(k=>c[k][3]==='O');
+  let cadena=[];if(obligP.length){let k=obligP.reduce((a,b)=>largo(b)>largo(a)?b:a);cadena=[k];
+    while(true){const nx=(dependents()[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O').sort((a,b)=>largo(b)-largo(a))[0];if(!nx)break;cadena.push(nx);k=nx}}
+  // 4) carga vs. rendimiento por periodo (sin equivalencias)
+  const pp={};K.forEach(a=>{const f=String(a[3]||'').toUpperCase(),i=perIdx(a[2]);if(f==='EQV'||i==null)return;(pp[i]=pp[i]||{cr:0,v:[]}).cr+=c[a[0]]?.[1]||0;pp[i].v.push(+a[1])});
+  const carga=Object.entries(pp).map(([i,o])=>({per:+i,lbl:perName(+i),cr:o.cr,prom:mean(o.v),n:o.v.length})).sort((a,b)=>a.per-b.per);
+  let r=null;if(carga.length>=3){const mx=mean(carga.map(d=>d.cr)),my=mean(carga.map(d=>d.prom));
+    const sxy=carga.reduce((s,d)=>s+(d.cr-mx)*(d.prom-my),0),sx=Math.sqrt(carga.reduce((s,d)=>s+(d.cr-mx)**2,0)),sy=Math.sqrt(carga.reduce((s,d)=>s+(d.prom-my)**2,0));r=sx&&sy?sxy/(sx*sy):null}
+  return {cuidar,lineas,cadena,carga,r,nm};
+}
+function renderAnalisis(D){
+  const el=$('#kanal');if(!el)return;
+  const X=analisis(), f2=v=>v==null?'—':(+v).toFixed(2);
+  const lvl={alto:'Riesgo alto',medio:'Atención'};
+  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><span class="an-tag ${r.nivel}">${lvl[r.nivel]}</span><b>${esc(X.nm(r.k))}</b><span class="an-pred" title="Calificación esperada según ${r.base}">≈ ${r.pred.toFixed(1)}</span>
+      <small>${esc(r.motivos.length?r.motivos.join('; '):`calificación esperada según tus ${r.base}`)}.</small></li>`).join('')}</ul>`:'<p class="muted">Ninguna de las materias que puedes cursar pronto muestra señales de riesgo en tus requisitos.</p>';
+  const lin=X.lineas.length?`<ul class="an-bars">${X.lineas.slice(0,8).map((l,i)=>`<li><span class="an-ln">${esc(l.nombre)}${l.area&&l.area!==l.nombre&&l.area!=='Optativas'?`<small>${esc(l.area)}</small>`:''}</span>
+      <span class="an-bar"><i style="width:${Math.max(4,(l.prom-6)/4*100)}%"></i></span><b>${f2(l.prom)}</b><small>${l.n} materias${l.cat?` · área ${esc(l.cat)}`:''}${l.hechas?` · ${l.hechas} de ${l.total} cursadas`:''}</small></li>`).join('')}</ul>`:'<p class="muted">Aún no hay suficientes materias relacionadas para estimar la afinidad con las líneas.</p>';
+  const rc=X.cadena.length;
+  const ruta=rc?`<p>La cadena de seriación pendiente más larga tiene <b>${rc} ${rc>1?'materias':'materia'}</b>: necesitas al menos <b>${rc} ${rc>1?'periodos':'periodo'}</b> más, sin importar la carga${D.nper?` (por créditos, a tu ritmo, ${D.nper})`:''}.</p>
+      <ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:'<p class="muted">No quedan cadenas de seriación pendientes.</p>';
+  el.innerHTML=`<h3 class="an-h">Análisis y recomendaciones</h3>
+    <div class="an-grid">
+      <section><h4>Materias que conviene cuidar</h4><p class="an-sub">Calificación esperada a partir de tus requisitos y tu área; prioriza su planeación o tómalas con menos carga.</p>${cuid}</section>
+      <section><h4>Afinidad con líneas de especialización</h4><p class="an-sub">Tu promedio en las materias que preparan cada línea (requisitos y área). Orientativo: considera también tus intereses.</p>${lin}</section>
+      <section><h4>Ruta crítica</h4><p class="an-sub">El mínimo de periodos que impone la seriación.</p>${ruta}</section>
+      <section><h4>Carga vs. rendimiento</h4><p class="an-sub">Créditos acreditados y promedio de cada periodo${X.r!=null?`; correlación r = ${X.r.toFixed(2)} (${Math.abs(X.r)<.3?'sin relación clara':X.r<0?'te va mejor con menos carga':'te va mejor con más carga'}${X.carga.length<5?'; con pocos periodos es solo una tendencia':''})`:''}.</p><div id="ch-carga"></div></section>
+    </div>
+    <p class="st-note">Estas estimaciones son heurísticas transparentes basadas en tu kárdex, no predicciones garantizadas.</p>`;
+  if(window.Plot&&X.carga.length){const P=window.Plot,cs=getComputedStyle(document.documentElement),tok=n=>cs.getPropertyValue(n).trim(),host=$('#ch-carga');
+    host.replaceChildren(P.plot({width:Math.max(260,host.clientWidth),height:190,marginLeft:40,marginBottom:32,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
+      x:{label:'Créditos acreditados en el periodo',grid:true},y:{label:'Promedio',domain:[5.5,10.2],grid:true},
+      marks:[X.carga.length>=3?P.linearRegressionY(X.carga,{x:'cr',y:'prom',stroke:tok('--muted'),fill:tok('--muted'),fillOpacity:.08}):null,
+        P.dot(X.carga,{x:'cr',y:'prom',fill:tok('--accent'),r:5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos · promedio ${d.prom.toFixed(2)} (${d.n})`}),
+        P.text(X.carga,{x:'cr',y:'prom',text:'lbl',dy:-10,fill:tok('--muted')})].filter(Boolean)}))}
 }
 
 function renderTray(){renderMap();renderList();renderSide();renderStats()}
@@ -1750,8 +1874,12 @@ $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('v
 // simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase
 const simSave=()=>{store.set('sim',SIM);for(const k in T)delete T[k];renderTray()};
 $('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simSave()}});
-$('#est-sim').addEventListener('click',e=>{const b=e.target.closest('[data-sim]');if(!b||b.disabled)return;const k=b.dataset.sim;
-  SIM.fail=SIM.fail.includes(k)?SIM.fail.filter(x=>x!==k):[...SIM.fail,k];simSave()});
+$('#est-sim').addEventListener('click',e=>{const b=e.target.closest('[data-simok],[data-simko]');if(!b||b.disabled)return;
+  const k=b.dataset.simok||b.dataset.simko;SIM.res[k]={...(SIM.res[k]||{}),ok:!!b.dataset.simok};simSave()});
+$('#est-sim').addEventListener('change',e=>{const t=e.target,d=t.dataset;
+  if(d.simcal){SIM.res[d.simcal]={...(SIM.res[d.simcal]||{ok:true}),cal:+t.value};simSave()}
+  else if(d.simrec!==undefined){if(t.value)SIM.rec[d.simrec]={...(SIM.rec[d.simrec]||{}),forma:t.value};else delete SIM.rec[d.simrec];simSave()}
+  else if(d.simreccal){SIM.rec[d.simreccal]={...(SIM.rec[d.simreccal]||{}),cal:+t.value};simSave()}});
 $('#b-none').addEventListener('click',()=>{tr().want=[...tr().oblig];saveT();renderTray()});
 $('#b-go').addEventListener('click',()=>{S.tab='hor';S.onlyWant=true;store.set('onlyWant',true);store.set('tab','hor');render();window.scrollTo({top:0})});
 $('#f-hide').addEventListener('change',e=>{S.hide=e.target.checked;store.set('hide',S.hide);renderOffer()});

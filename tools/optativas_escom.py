@@ -38,7 +38,14 @@ def main():
     for r in opt("C"):
         pre = r[4].split("|")[0].strip()
         lin.setdefault(LINEAS_C.get(pre, pre.title()), {})[int(r[2])] = r[3].upper()
-    out["lineas"]["C"] = [{"area": "Optativas", "linea": n, "claves": [v[s] for s in sorted(v)]} for n, v in sorted(lin.items())]
+    # área de conocimiento de cada línea (data/categorias.json): base para la afinidad del alumno con la línea
+    CAT_LINEA = {"Algoritmos Bioinspirados": "Ciencia de datos e IA", "Big Data": "Ciencia de datos e IA", "Minería de Datos": "Ciencia de datos e IA",
+                 "Procesamiento de Lenguaje Natural": "Ciencia de datos e IA", "Visión por Computadora": "Ciencia de datos e IA",
+                 "Computación Gráfica": "Informática y computación", "Criptografía": "Informática y computación",
+                 "Desarrollo de Aplicaciones": "Informática y computación", "Tópicos Selectos de Computación": "Informática y computación",
+                 "Gestión de Empresas de Alta Tecnología": "Formación integral", "Gobierno de TI": "Comunicaciones y redes",
+                 "Instrumentación Virtual": "Sistemas y control", "Internet de las Cosas": "Electrónica", "Sistemas Complejos": "Físico-matemáticas"}
+    out["lineas"]["C"] = [{"area": "Optativas", "linea": n, "categoria": CAT_LINEA.get(n), "claves": [v[s] for s in sorted(v)]} for n, v in sorted(lin.items())]
     out["req"]["C"] = {v[7]: [v[6]] for v in lin.values() if 6 in v and 7 in v}
 
     # IIA y LCD: tabla 6.º | 7.º del PDF

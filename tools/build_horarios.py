@@ -221,6 +221,19 @@ def nombre_cat(n):
     return CATS["categorias"][k]["nombre"] if k else n
 
 
+# categoría (data/categorias.json) de cada línea de especialización de la UPIITA: base de la afinidad del alumno
+CAT_LINEA_UPIITA = {
+    ("B", "I · Bioinstrumentación"): "Electrónica", ("B", "II · Prótesis inteligentes"): "Electrónica",
+    ("B", "I · Control inteligente"): "Sistemas y control", ("B", "II · Sistemas ergonómicos"): "Estructura de los materiales",
+    ("B", "I · Robótica suave"): "Sistemas y control", ("B", "II · Biorobótica"): "Sistemas y control",
+    ("M", "Administración de sistemas"): "Formación integral", ("M", "Control y automatización"): "Sistemas y control",
+    ("M", "Robótica y sistemas inteligentes"): "Sistemas y control", ("M", "Sistemas de manufactura"): "Mecánica",
+    ("M", "Sistemas embebidos e interfaces hombre-máquina"): "Electrónica",
+    ("T", "Administración"): "Formación integral", ("T", "II"): "Comunicaciones y redes", ("T", "Redes"): "Comunicaciones y redes",
+    ("T", "Informática"): "Informática y computación",
+}
+
+
 def layout_de(t, areas=()):
     """Trazado del mapa (cajas, filas y flechas) relativo a su esquina, desde data/.../trayectoria_<c>.json."""
     bx = t["boxes"]
@@ -264,7 +277,8 @@ def load_maps(offer, upiita=True, extra=None):
     maps = {}
     for c in cur:
         f = ROOT / "data" / f"trayectoria_{c}.json"
-        entry = {"cur": cur[c], "lineas": esp["lineas"].get(c, []), "reglas": esp["reglas_nivel"].get(c, {})}
+        entry = {"cur": cur[c], "lineas": [dict(l, categoria=CAT_LINEA_UPIITA.get((c, l["linea"]))) for l in esp["lineas"].get(c, [])],
+                 "reglas": esp["reglas_nivel"].get(c, {})}
         if not upiita:
             # otra escuela: sin trayectorias propias; con mapa curricular del SAES se muestra la cuadrícula por nivel
             entry.update(lineas=[], reglas={}, generico=not any(v[1] for v in cur[c].values()))   # sin créditos: solo horarios
