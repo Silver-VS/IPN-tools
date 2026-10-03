@@ -1675,7 +1675,7 @@ async function renderStats(){
     </div>
     ${plazo.calculado?`<p class="st-note">Referencia a carga mínima: ${fmtCr(A.carga.total)} ÷ ${fmtCr(A.carga.min)} = ${fmtCr(A.carga.total/A.carga.min)} periodos (redondeados hacia arriba: ${plazo.max}). El SAES indica duración ${A.carga.duracion??'—'} y máxima ${A.carga.duracion_max??'—'}; el plazo reglamentario requiere confirmación con Gestión Escolar.</p>`:''}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>La línea punteada y sus puntos proyectan los créditos a tu ritmo actual. Los puntos rojos exceden el límite indicado; consulta cada punto para ver sus créditos.</span></figcaption><div id="ch-avance"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>La línea punteada y sus puntos proyectan los créditos a tu ritmo actual.${totalPer!=null&&plazo.max&&totalPer>plazo.max?' Los puntos rojos exceden el límite indicado;':''} Consulta cada punto para ver sus créditos.</span></figcaption><div id="ch-avance"></div></figure>
       <figure><figcaption><b>Promedio por periodo</b><span>Media (línea) y rango mínimo–máximo de cada periodo.</span></figcaption><div id="ch-prom"></div></figure>
       <figure><figcaption><b>Distribución de calificaciones</b><span>Frecuencia; reglas de media (—) y mediana (┄).</span></figcaption><div id="ch-dist"></div></figure>
       <figure><figcaption><b>Calificaciones por categoría</b><span>Cada punto es una materia; la marca vertical es la media.</span></figcaption><div id="ch-cat"></div></figure>

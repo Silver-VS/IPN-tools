@@ -146,6 +146,19 @@ assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,tota
         result=subprocess.run(['node','-e',script],text=True,capture_output=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
+    def test_leyenda_roja_solo_si_la_tendencia_excede_el_limite(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        expression=re.search(r"\$\{(totalPer!=null.*?Los puntos rojos.*?)\}",html).group(1)
+        script="const assert=require('assert');const legend=(totalPer,plazo)=>"+expression+";"+"""
+assert.strictEqual(legend(10,{max:12}),'');
+assert.strictEqual(legend(12,{max:12}),'');
+assert.ok(legend(13,{max:12}).includes('Los puntos rojos'));
+assert.strictEqual(legend(null,{max:12}),'');
+assert.strictEqual(legend(13,{}),'');
+"""
+        result=subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_scripts_compilados(self):
         for unit in ('horarios','horarios-escom','horarios-upibi'):
             html = (ROOT/f'web/dist/{unit}.html').read_text(encoding='utf8')
