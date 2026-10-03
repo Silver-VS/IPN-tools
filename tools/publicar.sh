@@ -16,7 +16,8 @@ done
 
 mkdir -p "$SITE/upiita"
 cp -r web/dist/. "$SITE/upiita/"
+python tools/huellas_sitio.py "$SITE"   # manifiesto de archivos protegidos del portafolio (si existe)
 
-git -C "$SITE" add upiita
+git -C "$SITE" add upiita src/build/protected.json 2>/dev/null || git -C "$SITE" add upiita
 git -C "$SITE" commit -m "$MSG"
 git -C "$SITE" push
