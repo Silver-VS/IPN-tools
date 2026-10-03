@@ -1,0 +1,931 @@
+{
+ "fuente": "biomedica-2006.pdf",
+ "plan": "06",
+ "modelo": "niveles",
+ "rows": [
+  [
+   1,
+   122
+  ],
+  [
+   2,
+   222
+  ],
+  [
+   3,
+   322
+  ],
+  [
+   4,
+   422
+  ],
+  [
+   5,
+   522
+  ],
+  [
+   6,
+   622
+  ],
+  [
+   7,
+   722
+  ],
+  [
+   8,
+   822
+  ]
+ ],
+ "boxes": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 100,
+   "bottom": 144,
+   "clave": "M104"
+  },
+  {
+   "nombre": "Inglés I",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 108,
+   "bottom": 152,
+   "clave": "M106"
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 116,
+   "bottom": 160,
+   "clave": "M102"
+  },
+  {
+   "nombre": "Química General Aplicada",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 124,
+   "bottom": 168,
+   "clave": "M108"
+  },
+  {
+   "nombre": "Química Orgánica Aplicada",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 232,
+   "bottom": 276,
+   "clave": "M214"
+  },
+  {
+   "nombre": "Bioquímica Clínica",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 340,
+   "bottom": 384,
+   "clave": "M318"
+  },
+  {
+   "nombre": "Electroquímica I",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 348,
+   "bottom": 392,
+   "clave": "M320"
+  },
+  {
+   "nombre": "Biología Celular",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 156,
+   "bottom": 200,
+   "clave": "M101"
+  },
+  {
+   "nombre": "Física del Movimiento Aplicada",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 100,
+   "bottom": 144,
+   "clave": "M105"
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 108,
+   "bottom": 152,
+   "clave": "M103"
+  },
+  {
+   "nombre": "Redes y Telecomunicaciones",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 516,
+   "bottom": 560,
+   "clave": "M541"
+  },
+  {
+   "nombre": "Informática Médica (Taller)",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 624,
+   "bottom": 668,
+   "clave": "M649"
+  },
+  {
+   "nombre": "Tópicos Selectos de Ingeniería Biomédica II",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 832,
+   "bottom": 876,
+   "clave": "M874"
+  },
+  {
+   "nombre": "Bioinstrumentación V",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 840,
+   "bottom": 884,
+   "clave": "M871"
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 148,
+   "bottom": 192,
+   "clave": "M107"
+  },
+  {
+   "nombre": "Inglés II",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 256,
+   "bottom": 300,
+   "clave": "M212"
+  },
+  {
+   "nombre": "Inglés III",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 300,
+   "bottom": 344,
+   "clave": "M324"
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 208,
+   "bottom": 252,
+   "clave": "M215"
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "M321"
+  },
+  {
+   "nombre": "Física de la Energía Aplicada",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 224,
+   "bottom": 268,
+   "clave": "M211"
+  },
+  {
+   "nombre": "Morfología",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 232,
+   "bottom": 276,
+   "clave": "M213"
+  },
+  {
+   "nombre": "Estadística",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 240,
+   "bottom": 284,
+   "clave": "M210"
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 248,
+   "bottom": 292,
+   "clave": "M209"
+  },
+  {
+   "nombre": "Análisis de Circuitos",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 356,
+   "bottom": 400,
+   "clave": "M316"
+  },
+  {
+   "nombre": "Ingeniería Eléctrica",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 300,
+   "bottom": 344,
+   "clave": "M323"
+  },
+  {
+   "nombre": "Sistemas Digitales I",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 308,
+   "bottom": 352,
+   "clave": "M325"
+  },
+  {
+   "nombre": "Fisiología y Biofísica I",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "M322"
+  },
+  {
+   "nombre": "Fisiología y Biofísica II",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 424,
+   "bottom": 468,
+   "clave": "M428"
+  },
+  {
+   "nombre": "Electroquímica II",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 432,
+   "bottom": 476,
+   "clave": "M427"
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 440,
+   "bottom": 484,
+   "clave": "M430"
+  },
+  {
+   "nombre": "Optativa I",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 548,
+   "bottom": 592,
+   "slot": "Optativa I",
+   "text": "Optativa I"
+  },
+  {
+   "nombre": "Fisiopatología I",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 556,
+   "bottom": 600,
+   "clave": "M538"
+  },
+  {
+   "nombre": "Fisiopatología II",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 500,
+   "bottom": 544,
+   "clave": "M539"
+  },
+  {
+   "nombre": "Biomateriales",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 508,
+   "bottom": 552,
+   "clave": "M536"
+  },
+  {
+   "nombre": "Sistemas Digitales II",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 416,
+   "bottom": 460,
+   "clave": "M432"
+  },
+  {
+   "nombre": "Instrumentación y Control",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 424,
+   "bottom": 468,
+   "clave": "M429"
+  },
+  {
+   "nombre": "Tecnología Clínica",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 432,
+   "bottom": 476,
+   "clave": "M434"
+  },
+  {
+   "nombre": "Sistemas de Calidad",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 440,
+   "bottom": 484,
+   "clave": "M431"
+  },
+  {
+   "nombre": "Sistemas Dinámicos",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 448,
+   "bottom": 492,
+   "clave": "M433"
+  },
+  {
+   "nombre": "Electrónica I",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 456,
+   "bottom": 500,
+   "clave": "M426"
+  },
+  {
+   "nombre": "Tecnología Clínica Ambiental",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 500,
+   "bottom": 544,
+   "clave": "M542"
+  },
+  {
+   "nombre": "Bioinstrumentación I",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 608,
+   "bottom": 652,
+   "clave": "M646"
+  },
+  {
+   "nombre": "Tópicos Selectos de Ingeniería Biomédica I",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 716,
+   "bottom": 760,
+   "clave": "M765"
+  },
+  {
+   "nombre": "Electrónica II",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 524,
+   "bottom": 568,
+   "clave": "M537"
+  },
+  {
+   "nombre": "Electrónica III",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 632,
+   "bottom": 676,
+   "clave": "M647"
+  },
+  {
+   "nombre": "Optativa II",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 640,
+   "bottom": 684,
+   "slot": "Optativa II",
+   "text": "Optativa II"
+  },
+  {
+   "nombre": "Proyecto Terminal I",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 648,
+   "bottom": 692,
+   "clave": "M652"
+  },
+  {
+   "nombre": "Procesamiento Digital de Bioseñales e Imágenes",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 556,
+   "bottom": 600,
+   "clave": "M540"
+  },
+  {
+   "nombre": "Bioinstrumentación II",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 700,
+   "bottom": 744,
+   "clave": "M759"
+  },
+  {
+   "nombre": "Bioinstrumentación III",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 708,
+   "bottom": 752,
+   "clave": "M760"
+  },
+  {
+   "nombre": "Bioinstrumentación IV",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 716,
+   "bottom": 760,
+   "clave": "M761"
+  },
+  {
+   "nombre": "Proyecto Terminal II",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 724,
+   "bottom": 768,
+   "clave": "M764"
+  },
+  {
+   "nombre": "Proyecto Terminal III",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 832,
+   "bottom": 876,
+   "clave": "M873"
+  },
+  {
+   "nombre": "Introducción a la Física Médica",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 640,
+   "bottom": 684,
+   "clave": "M650"
+  },
+  {
+   "nombre": "Procesos de Manufactura",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 648,
+   "bottom": 692,
+   "clave": "M651"
+  },
+  {
+   "nombre": "Tecnología Hospitalaria (Taller)",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 656,
+   "bottom": 700,
+   "clave": "M653"
+  },
+  {
+   "nombre": "Imagenología",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 700,
+   "bottom": 744,
+   "clave": "M763"
+  },
+  {
+   "nombre": "Optativa III",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 708,
+   "bottom": 752,
+   "slot": "Optativa III",
+   "text": "Optativa III"
+  },
+  {
+   "nombre": "Administración de la Conservación Hospitalaria (Taller)",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 716,
+   "bottom": 760,
+   "clave": "M758"
+  },
+  {
+   "nombre": "Electiva II",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 824,
+   "bottom": 868,
+   "clave": "M872"
+  },
+  {
+   "nombre": "Electiva I",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 732,
+   "bottom": 776,
+   "clave": "M762"
+  },
+  {
+   "nombre": "Administración de Tecnologías en Salud",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 540,
+   "bottom": 584,
+   "clave": "M535"
+  },
+  {
+   "nombre": "Formulación y Evaluación de Proyectos",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 648,
+   "bottom": 692,
+   "clave": "M648"
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 356,
+   "bottom": 400,
+   "clave": "M317"
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 300,
+   "bottom": 344,
+   "clave": "M319"
+  }
+ ],
+ "edges": [
+  {
+   "s": 1,
+   "d": 15,
+   "pts": []
+  },
+  {
+   "s": 2,
+   "d": 17,
+   "pts": []
+  },
+  {
+   "s": 3,
+   "d": 4,
+   "pts": []
+  },
+  {
+   "s": 4,
+   "d": 5,
+   "pts": []
+  },
+  {
+   "s": 4,
+   "d": 6,
+   "pts": []
+  },
+  {
+   "s": 5,
+   "d": 36,
+   "pts": []
+  },
+  {
+   "s": 6,
+   "d": 28,
+   "pts": []
+  },
+  {
+   "s": 7,
+   "d": 20,
+   "pts": []
+  },
+  {
+   "s": 8,
+   "d": 19,
+   "pts": []
+  },
+  {
+   "s": 9,
+   "d": 21,
+   "pts": []
+  },
+  {
+   "s": 9,
+   "d": 22,
+   "pts": []
+  },
+  {
+   "s": 10,
+   "d": 11,
+   "pts": []
+  },
+  {
+   "s": 14,
+   "d": 29,
+   "pts": []
+  },
+  {
+   "s": 15,
+   "d": 16,
+   "pts": []
+  },
+  {
+   "s": 17,
+   "d": 18,
+   "pts": []
+  },
+  {
+   "s": 18,
+   "d": 37,
+   "pts": []
+  },
+  {
+   "s": 19,
+   "d": 23,
+   "pts": []
+  },
+  {
+   "s": 19,
+   "d": 24,
+   "pts": []
+  },
+  {
+   "s": 19,
+   "d": 25,
+   "pts": []
+  },
+  {
+   "s": 20,
+   "d": 26,
+   "pts": []
+  },
+  {
+   "s": 21,
+   "d": 63,
+   "pts": []
+  },
+  {
+   "s": 22,
+   "d": 63,
+   "pts": []
+  },
+  {
+   "s": 23,
+   "d": 38,
+   "pts": []
+  },
+  {
+   "s": 23,
+   "d": 39,
+   "pts": []
+  },
+  {
+   "s": 25,
+   "d": 34,
+   "pts": []
+  },
+  {
+   "s": 25,
+   "d": 35,
+   "pts": []
+  },
+  {
+   "s": 26,
+   "d": 27,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 32,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 33,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 40,
+   "pts": []
+  },
+  {
+   "s": 27,
+   "d": 47,
+   "pts": []
+  },
+  {
+   "s": 29,
+   "d": 10,
+   "pts": []
+  },
+  {
+   "s": 31,
+   "d": 46,
+   "pts": []
+  },
+  {
+   "s": 32,
+   "d": 41,
+   "pts": []
+  },
+  {
+   "s": 32,
+   "d": 53,
+   "pts": []
+  },
+  {
+   "s": 33,
+   "d": 54,
+   "pts": []
+  },
+  {
+   "s": 34,
+   "d": 32,
+   "pts": []
+  },
+  {
+   "s": 34,
+   "d": 47,
+   "pts": []
+  },
+  {
+   "s": 36,
+   "d": 33,
+   "pts": []
+  },
+  {
+   "s": 36,
+   "d": 40,
+   "pts": []
+  },
+  {
+   "s": 37,
+   "d": 61,
+   "pts": []
+  },
+  {
+   "s": 38,
+   "d": 30,
+   "pts": []
+  },
+  {
+   "s": 39,
+   "d": 43,
+   "pts": []
+  },
+  {
+   "s": 40,
+   "d": 55,
+   "pts": []
+  },
+  {
+   "s": 41,
+   "d": 42,
+   "pts": []
+  },
+  {
+   "s": 41,
+   "d": 49,
+   "pts": []
+  },
+  {
+   "s": 42,
+   "d": 12,
+   "pts": []
+  },
+  {
+   "s": 43,
+   "d": 41,
+   "pts": []
+  },
+  {
+   "s": 43,
+   "d": 53,
+   "pts": []
+  },
+  {
+   "s": 46,
+   "d": 51,
+   "pts": []
+  },
+  {
+   "s": 47,
+   "d": 45,
+   "pts": []
+  },
+  {
+   "s": 48,
+   "d": 13,
+   "pts": []
+  },
+  {
+   "s": 49,
+   "d": 13,
+   "pts": []
+  },
+  {
+   "s": 51,
+   "d": 52,
+   "pts": []
+  },
+  {
+   "s": 54,
+   "d": 50,
+   "pts": []
+  },
+  {
+   "s": 55,
+   "d": 58,
+   "pts": []
+  },
+  {
+   "s": 58,
+   "d": 59,
+   "pts": []
+  },
+  {
+   "s": 61,
+   "d": 62,
+   "pts": []
+  },
+  {
+   "s": 62,
+   "d": 60,
+   "pts": []
+  },
+  {
+   "s": 64,
+   "d": 29,
+   "pts": []
+  }
+ ]
+}

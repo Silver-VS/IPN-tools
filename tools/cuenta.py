@@ -372,7 +372,9 @@ var IPNT=window.IPNT=(()=>{
   const NUEVO=!ls.get(BKEY)&&!ls.get('ipnt.cuenta')&&!ls.keys().some(k=>propia(k)&&!LOCAL.test(k));
   function bienvenida(o){
     const dl=$i('ipnt-hola'), sel=document.querySelector(o.select);
-    if(!NUEVO||!dl||!sel) return;
+    if(!dl||!sel||(!NUEVO&&!o.force)) return;
+    $i('ipnt-hola-h').textContent=o.force?'Cambiar unidad académica':'Bienvenida';
+    $i('ipnt-h-lead').textContent=o.force?'Elige la unidad académica que quieres consultar.':'Para empezar, dinos de qué unidad y carrera eres.';
     const UN=CFG.unidades||[], cars=[...sel.options].map(op=>[op.value,op.textContent.trim()]).filter(c=>c[0]);
     let uni=CFG.unidad;
     const listo=()=>{ls.set(BKEY,'1');if(dl.close)dl.close();else dl.removeAttribute('open')};
@@ -390,7 +392,8 @@ var IPNT=window.IPNT=(()=>{
       $i('ipnt-h-ms').hidden=!MS.disponible();$i('ipnt-h-go').hidden=!GO.disponible();pintar();
       $i('ipnt-h-login').hidden=!!cuenta||!(MS.disponible()||GO.disponible());
     };
-    dl.addEventListener('click',async e=>{
+    // Reabrir el selector reemplaza sus manejadores para evitar cambios duplicados.
+    dl.onclick=async e=>{
       const b=e.target.closest('button');if(!b)return;
       if(b.dataset.uni){uni=b.dataset.uni;pintarH();return}
       if(b.dataset.car){sel.value=b.dataset.car;sel.dispatchEvent(new Event('change',{bubbles:true}));listo();return}
@@ -400,8 +403,8 @@ var IPNT=window.IPNT=(()=>{
         if(cuenta){m.textContent='';ls.set(BKEY,'1')}else{m.className='ipnt-state bad';m.textContent=st.error||''}
         pintarH();return}
       if(b.hasAttribute('data-hola-x'))listo();
-    });
-    dl.addEventListener('cancel',()=>ls.set(BKEY,'1'));   // Esc: no se vuelve a mostrar
+    };
+    dl.oncancel=()=>ls.set(BKEY,'1');   // Esc: no se vuelve a mostrar
     if(MS.disponible())MS.listo().catch(()=>{});if(GO.disponible())GO.listo().catch(()=>{});   // listas para el clic
     pintarH();
     if(dl.showModal)dl.showModal();else dl.setAttribute('open','');

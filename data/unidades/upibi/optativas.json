@@ -1,0 +1,109 @@
+{
+ "lineas": {
+  "A": [
+   {
+    "area": "Optativas",
+    "linea": "Opciones del SAES",
+    "categoria": "Especialización",
+    "claves": [
+     "A543",
+     "A544",
+     "A545",
+     "A654",
+     "A655"
+    ]
+   }
+  ],
+  "B_06": [
+   {
+    "area": "Optativas",
+    "linea": "Opciones del SAES",
+    "categoria": "Especialización",
+    "claves": [
+     "B649",
+     "B650",
+     "B651",
+     "B652"
+    ]
+   }
+  ],
+  "B": [
+   {
+    "area": "Optativas",
+    "linea": "Opciones del SAES",
+    "categoria": "Especialización",
+    "claves": [
+     "P608",
+     "C609",
+     "G610",
+     "S611",
+     "P707",
+     "C708",
+     "G709",
+     "S710",
+     "P804",
+     "C805",
+     "G806",
+     "S807",
+     "P808",
+     "C809",
+     "G810",
+     "S811"
+    ]
+   }
+  ],
+  "F": [
+   {
+    "area": "Optativas",
+    "linea": "Opciones del SAES",
+    "categoria": "Especialización",
+    "claves": [
+     "F436",
+     "F437",
+     "F653",
+     "F654",
+     "F756",
+     "F757"
+    ]
+   }
+  ],
+  "L": [
+   {
+    "area": "Optativas",
+    "linea": "Opciones del SAES",
+    "categoria": "Especialización",
+    "claves": [
+     "L434",
+     "L435",
+     "L436",
+     "L437",
+     "L438",
+     "L549",
+     "L550",
+     "L551"
+    ]
+   }
+  ],
+  "M": [
+   {
+    "area": "Optativas",
+    "linea": "Opciones del SAES",
+    "categoria": "Especialización",
+    "claves": [
+     "M543",
+     "M544",
+     "M545",
+     "M654",
+     "M655",
+     "M656",
+     "M657",
+     "M766",
+     "M767",
+     "M768",
+     "M769",
+     "M770"
+    ]
+   }
+  ]
+ }
+}

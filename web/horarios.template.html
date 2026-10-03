@@ -48,6 +48,11 @@ h2{font-family:var(--f-display);font-stretch:87.5%;font-weight:600;font-size:1.3
 h3.sub{font-family:var(--f-display);font-weight:600;font-size:1.1rem;margin:0 0 6px}
 
 header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:20px 0;border-bottom:2px solid var(--accent)}
+.top>.brand{flex:1 1 100%;min-width:0}
+.brand .title-row{display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:12px}
+.header-actions{grid-column:4;display:flex;align-items:center;gap:12px}
+.top>.tabs{margin-left:auto}
+@media(max-width:640px){.brand .title-row{grid-template-columns:1fr auto;gap:10px}.header-actions{grid-column:2;grid-row:1;gap:8px}.unit-switch{grid-column:1 / -1;grid-row:2;justify-self:start}}
 .brand h1{font-family:var(--f-display);font-stretch:87.5%;font-weight:700;font-size:2.1rem;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
 .brand p{margin:4px 0 12px;color:var(--muted);font-size:.9rem}
 .tabs{display:flex;gap:2px;align-self:flex-end}
@@ -108,6 +113,7 @@ input[type=number]{width:5rem}
 .edge{fill:none;stroke:var(--edge);stroke-width:1.4}
 .edge.hot{stroke:var(--accent);stroke-width:2.6}
 .edge.dim{opacity:.15}
+.edge.past{opacity:.3}   /* con datos del SAES: llega a una materia ya acreditada */
 .box{position:absolute;font-stretch:75%;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:7px;border:1.5px solid var(--line);background:var(--st-rest);color:var(--fg);font-weight:600;line-height:1.08;padding:2px 4px 2px 8px;cursor:pointer;overflow:hidden;letter-spacing:.01em;transition:opacity .12s, box-shadow .12s}
 .box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--nv,transparent)}
 .box.done{opacity:.28;text-decoration:line-through;font-weight:500;border-style:dotted}
@@ -183,7 +189,7 @@ input[type=number]{width:5rem}
 .kpi b{font-size:1.65rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
 .kpi small{font-size:.78rem;color:var(--muted)}
 .kpi .up{color:var(--ok);font-weight:600}.kpi .down,.kpi b.down{color:var(--bad)}
-.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-top:12px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;margin-top:12px}
 .charts figure{margin:0;padding:12px 14px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
 .charts .ch-wide{grid-column:1/-1}
 .charts figure figure{border:0;padding:0;background:none;margin:0}   /* Plot envuelve en <figure> las gráficas con leyenda */
@@ -192,8 +198,10 @@ input[type=number]{width:5rem}
 .charts svg{max-width:100%;height:auto}
 .charts [aria-label="tip"] path{fill:var(--surface);stroke:var(--line)}
 .st-note{margin:8px 0 0;font-size:.8rem;color:var(--muted)}
+.meta-panel{margin:14px 0;padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.meta-panel h3{margin:0 0 8px;font-size:1rem}.meta-controls{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center}.meta-controls label{display:flex;gap:8px;align-items:center}.meta-controls input[type=number]{width:6rem;max-width:100%;font:inherit}.meta-panel p{margin:8px 0;font-size:.84rem}
 .kanal{margin-top:16px}.an-h{margin:0 0 8px;font-size:1.05rem}
-.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
 .an-grid section{padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
 .an-grid h4{margin:0;font-size:.92rem}.an-sub{margin:2px 0 8px;font-size:.78rem;color:var(--muted)}
 .an-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
@@ -487,7 +495,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <header class="top">
     <div class="brand">
       <!--__IPNT_HOME__-->
-      <div class="title-row"><h1>Horarios UPIITA</h1><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div>
+      <div class="title-row"><h1>Horarios UPIITA</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog">Cambiar unidad académica</button><div class="header-actions"><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
       <p>Consulta tu trayectoria académica, selecciona materias y organiza tu horario para la reinscripción.</p>
     </div>
     <nav class="tabs" role="tablist" aria-label="Pantallas">
@@ -671,7 +679,7 @@ const tactil=()=>PT!=='mouse';
 const TURNOS={M:'Matutino',V:'Vespertino'};
 const TIPO={O:'Obligatoria',P:'Optativa',T:'Taller'};
 // Carga en créditos confirmada en SAES (Cita de reinscripción). Las demás carreras se agregan cuando se capturen.
-const CARGA={B:{min:27,media:40,max:80}};
+const CARGA=UNIDAD==='upiita'?{B:{min:27,media:40,max:80}}:{};
 const LETRAS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const START=7*60, END=22*60, SLOT=30, SLOTPX=22, BLOCK=90;  // una clase dura 1:30
 const $=s=>document.querySelector(s);
@@ -709,7 +717,10 @@ const save=()=>store.set('w.'+S.per,ws());
 /*__SAES_JS__*/
 // v1: solo se eligen materias para explorar. v2: el alumno pega sus datos del SAES (Lector IPN-tools) y se activa la vista personal.
 let ALUMNO=SAES.load();
-const isPersonal=()=>!!ALUMNO&&ALUMNO.carrera===S.car;
+// El perfil conserva los ids del SAES; la vista distingue los planes que reutilizan claves.
+const carreraPerfil=d=>d?(Object.entries(DATA.opciones_plan||{}).find(([,v])=>v.carrera===d.carrera&&v.plan===d.plan)?.[0]||
+  (Object.values(DATA.opciones_plan||{}).some(v=>v.carrera===d.carrera)?null:d.carrera)):null;
+const isPersonal=()=>!!ALUMNO&&carreraPerfil(ALUMNO)===S.car;
 const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprobadas
 /* Simulación de fin de semestre (solo exploración, nunca toca los datos del SAES):
    las materias en curso se dan por aprobadas, salvo las que el alumno marque como reprobadas. */
@@ -718,7 +729,7 @@ const SIM=Object.assign({on:false,fail:[],res:{},rec:{}},store.get('sim',{}));  
 const tr=()=>{
   if(!T[S.car]){
     const t=store.get('t.'+S.car,{want:[]}), me=isPersonal();
-    const done0=me?ALUMNO.acreditadas.map(a=>a[0]):[];
+    const done0=me?[...new Set((ALUMNO.acreditadas||[]).filter(a=>a&&a[1]!=null&&String(a[1]).trim()!==''&&Number.isFinite(+a[1])&&+a[1]>=6&&+a[1]<=10).map(a=>a[0]))]:[];
     const enc=me?((ALUMNO.en_curso||[]).length?ALUMNO.en_curso:(ALUMNO.horario_inscrito||[]).map(h=>h[1])):[];
     const enCurso=enc.filter(k=>cur()[k]&&!done0.includes(k));
     const pendRep=me?[...new Set([...(ALUMNO.reprobadas_periodo||[]).map(r=>r[0]),...Object.keys(cur()).filter(k=>(ALUMNO.reprobadas||[]).some(r=>norm(r[0])===norm(cur()[k][0])))])]
@@ -899,8 +910,8 @@ function rowBands(L){
   if(L._bands) return L._bands;
   const cs=L.rows.map(()=>[]);
   L.boxes.forEach(b=>{const cy=b[1]+b[3]/2;let j=0;L.rows.forEach((r,i)=>{if(Math.abs(r[1]-cy)<Math.abs(L.rows[j][1]-cy))j=i});cs[j].push(cy)});
-  // mapas generados por nosotros (Energía, 2×2 por celda) ya tienen filas exactas
-  const ys=L.rows.map(([n,y],i)=>{const v=cs[i].sort((a,b)=>a-b);return v.length&&!L.propuesto?v[Math.floor(v.length/2)]:y});
+  // Los mapas por áreas tienen filas exactas; solo se ajustan los centros de los PDF.
+  const ys=L.rows.map(([n,y],i)=>{const v=cs[i].sort((a,b)=>a-b);return v.length&&!L.propuesto&&!L.filas_exactas?v[Math.floor(v.length/2)]:y});
   return L._bands=L.rows.map(([n],i)=>{const y=ys[i];
     const a=i?(ys[i-1]+y)/2:Math.max(0,y-(ys[1]!=null?(ys[1]-y)/2:L.pitch/2));
     const b=i<ys.length-1?(y+ys[i+1])/2:Math.min(L.h,y+(i?(y-ys[i-1])/2:L.pitch/2));
@@ -909,6 +920,16 @@ function rowBands(L){
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
 let MARK={avail:new Set(),sug:new Set()};
 let SHOWSUG=store.get('verSug',true);
+// trazo ortogonal con esquinas redondeadas (mapas por áreas: cada flecha lleva su propia pista)
+function rutaRedonda(P,r=7){
+  let d=`M${P[0][0]} ${P[0][1]}`;
+  for(let i=1;i<P.length-1;i++){const [a,b,c]=[P[i-1],P[i],P[i+1]];
+    const l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),k=Math.min(r,l1/2,l2/2);
+    if(k<.5){d+=` L${b[0]} ${b[1]}`;continue}
+    const p=[b[0]+(a[0]-b[0])*k/l1,b[1]+(a[1]-b[1])*k/l1],q=[b[0]+(c[0]-b[0])*k/l2,b[1]+(c[1]-b[1])*k/l2];
+    d+=` L${+p[0].toFixed(1)} ${+p[1].toFixed(1)} Q${b[0]} ${b[1]} ${+q[0].toFixed(1)} ${+q[1].toFixed(1)}`}
+  const z=P.at(-1);return d+` L${z[0]} ${z[1]}`;
+}
 function renderMap(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
@@ -999,8 +1020,9 @@ function renderMap(){
   L.edges.forEach(([s,d,p])=>{
     const bs=L.boxes[s];if(!kOf(bandOf(bs[1]+bs[3]/2)))return;   // sale de un semestre plegado: no se dibuja
     const a=L.boxes[s][4], b=L.boxes[d][4], on=hot&&hot.has(a)&&hot.has(b);
-    const pts=[];for(let i=0;i<p.length;i+=2)pts.push(p[i]+','+Y(p[i+1]));
-    svg+=`<polyline class="edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}" points="${pts.join(' ')}" marker-end="url(#${on?'ahh':'ah'})"/>`;
+    const pts=[];for(let i=0;i<p.length;i+=2)pts.push([p[i],Y(p[i+1])]);
+    const cls=`edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}${!hot&&isPersonal()&&done.has(b)?' past':''}`, mk=`marker-end="url(#${on?'ahh':'ah'})"`;
+    svg+=L.rutas?`<path class="${cls}" d="${rutaRedonda(pts)}" ${mk}/>`:`<polyline class="${cls}" points="${pts.map(q=>q.join(',')).join(' ')}" ${mk}/>`;
   });
   svg+='</svg>';
   let html=svg;
@@ -1021,6 +1043,7 @@ function renderMap(){
   $('#mapnote').textContent=L.nota?L.nota:L.propuesto?
     'Esta carrera aún no cuenta con una trayectoria recomendada. Las áreas y la seriación (líneas punteadas) constituyen una propuesta elaborada a partir del plan de estudios oficial, sujeta a validación por la academia.':
     'Trayectoria recomendada. Las flechas indican la seriación recomendada; '+(tactil()?'al tocar una materia':'al colocar el cursor sobre una materia')+' se resalta su cadena de requisitos. Se sombrean las materias que conviene acreditar antes de las seleccionadas; en cursiva, las que no tienen grupos en el periodo consultado.';
+  if(L.ocultas)$('#mapnote').textContent+=` Para no saturar el mapa se omiten ${L.ocultas} flechas redundantes (requisitos que ya llegan a través de otra materia de la cadena); al resaltar una materia se ve su cadena completa.`;
 }
 /* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
    mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
@@ -1046,7 +1069,7 @@ function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
   const st=statusOf(k);
   const el=isElec(k);
   const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${want.has(k)?' want':req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?' hot':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
-  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · se acredita por actividades (Electivas UPIITA)':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
   return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${want.has(k)}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}</div>`;
 }
 
@@ -1061,7 +1084,7 @@ function inspParts(k){
     ps=st==='done'?'Ya acreditada · ':st==='curso'?'En curso · ':st.includes('fail')?'Por recursar · ':
       st.includes('lock')?`<b>Requisitos pendientes: ${miss.map(nm).join(', ')}</b> · `:`<b>Puedes cursarla</b>${lv.ok?'':` (seriación recomendada por nivel: ${lv.miss.join(', ')})`} · `}
   if(isElec(k)){const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span> · ${fmtCr(cr)} créditos · nivel ${niv}`;
-    return {l1,l2:(statusOf(k)==='done'?'Ya acreditada · ':'')+'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.'}}
+    return {l1,l2:(statusOf(k)==='done'?'Ya acreditada · ':'')+(UNIDAD==='upiita'?'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.':'Consulta con Gestión Escolar de tu unidad los requisitos y actividades para acreditar esta electiva.')}}
   const l2=ps+`${pre.length?'Requisitos directos: '+pre.map(nm).join(', '):'Sin requisitos registrados'}${all.size>pre.length?` · ${all.size} en la cadena de requisitos`:''}${post.length?' · Es requisito de: '+post.map(nm).join(', '):''}`;
   const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span> · ${fmtCr(cr)} créditos · nivel ${niv}${sem?' · semestre propuesto '+sem:''}${off?'':' · <i>sin grupos este periodo</i>'}`;
   return {l1,l2};
@@ -1105,15 +1128,15 @@ function renderSide(){
     const nDes=fis.filter(f=>f.estado==='desfasada').length+dS.length, curso=tr().curso;
     const atraso=DESFASE_SEM.has(S.car)?Object.keys(c).filter(k=>statusOf(k)==='late'||statusOf(k)==='late lock').length:0;
     const tile=(lbl,val,sub='',cls='',tip='')=>`<div class="tile"${tip?` title="${esc(tip)}"`:''}><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
-    const simCr=[...tr().simOk,...tr().simRec].reduce((t,k)=>t+c[k][1],0), obt=(A.avance?.obtenidos??credDone)+simCr, tot=A.carga?.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
+    const D=statsDatos(), obt=D.obt, tot=D.total, aut=SAES.autorizada(A), autTipo=String(A.avance?.autorizada||'').split('(')[0].trim();
     const cm=String(A.cita?.inicio||'').match(/(\d+\/\d+\/\d{4})\s+(\d+):(\d+)(?::\d+)?\s*(.*)/);
     $('#status').innerHTML=
-      tile(tr().sim?'Promedio estimado':'Promedio',tr().sim&&A.promedio!=null?promEstimado().toFixed(2):A.promedio??'—',tr().sim?`actual ${A.promedio??'—'}`:'')+
-      tile(tr().sim?'Créditos al terminar':'Créditos',`${fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
-      tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${A.carga?.duracion?' de '+A.carga.duracion:''} periodos`:'','',
-        [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',A.carga?.duracion_max?`máximo ${A.carga.duracion_max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
+      tile('Promedio oficial',A.promedio??'—',tr().sim?'El escenario no modifica el promedio oficial':'')+
+      tile(tr().sim?'Créditos del escenario':'Créditos',`${obt==null?'—':fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot&&obt!=null?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
+      tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
+        [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',plazoReferencia(A).max?`${plazoReferencia(A).calculado?'referencia a carga mínima':'máximo'} ${plazoReferencia(A).max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
       tile('Carga autorizada',aut!=null?fmtCr(aut)+' cr':'—',autTipo?autTipo.charAt(0)+autTipo.slice(1).toLowerCase():'')+
-      tile('Desfase oficial',nDes?nDes+(nDes>1?' materias':' materia'):'Ninguno',meta!=null?'en '+perName(meta):'',nDes?'bad':'ok',A.desfase_saes?'Tu última cita: '+A.desfase_saes:'')+
+      tile(tr().sim?'Desfase del escenario':'Desfase reportado',nDes?nDes+(nDes>1?' materias':' materia'):A.reprobadas_periodo==null?'Sin confirmar':'Ninguno',meta!=null?'en '+perName(meta):'',nDes?'bad':A.reprobadas_periodo==null?'':'ok',A.desfase_saes?'Tu última cita: '+A.desfase_saes:'')+
       (DESFASE_SEM.has(S.car)?tile('Atrasadas',atraso,'según el semestre propuesto',atraso?'warn':''):'')+
       tile('Cita de reinscripción',cm?cm[1]:esc(A.cita?.inicio||'—'),citaPasada(A)?'vencida; aún no se publica la siguiente':cm?`${+cm[2]}:${cm[3]} ${cm[4]}`:'');
     $('#status').style.setProperty('--tiles',$('#status').children.length);
@@ -1590,6 +1613,7 @@ function renderList(){
 }
 /* ---------- estadísticas del kárdex (solo con datos del SAES; se calculan en el navegador) ----------
    Gráficas con Observable Plot (D3), que se carga solo al abrir esta sección. */
+const notaValida=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<6||+v>10?null:+v;
 const FORMAS={ORD:'Ordinario',REC:'Recurse',ETS:'ETS',EXT:'Extraordinario',EQV:'Equivalencia',REV:'Revalidación',DIC:'Dictamen'};
 const LIB_PLOT=[['https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js','sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i'],
   ['https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js','sha384-JUpn2GgRr0gxU0xOBd8D8P634jhRCwobtG8G2MMEkX1RnGJ7/FJNnuukpfT+H2w1']];
@@ -1604,52 +1628,163 @@ function catDe(){                                // clave -> categoría (columna
 /* kárdex con la simulación: materias en curso aprobadas y reprobadas acreditadas, con su calificación simulada,
    en el periodo que se cursa (el anterior al que se planea). Quinto campo = simulada. */
 function simKardex(){
-  const A=ALUMNO, base=(A.acreditadas||[]).filter(a=>a&&a[1]!=null);if(!isPersonal()||!tr().sim)return base;
-  const pm=perMeta(), p=pm!=null?perName(pm-1):null, rep=new Set((A.reprobadas_periodo||[]).map(r=>r[0]));
-  return [...base,...tr().simOk.map(k=>[k,SIM.res[k]?.cal??8,p,rep.has(k)?'REC':'ORD',1]),...tr().simRec.map(k=>[k,SIM.rec[k]?.cal??7,p,SIM.rec[k].forma,1])];
+  const A=ALUMNO, base=[...new Map((A.acreditadas||[]).filter(a=>a&&notaValida(a[1])!=null).map(a=>[a[0],a])).values()];
+  if(!isPersonal()||!tr().sim)return base;
+  const pm=perMeta(), p=pm!=null?perName(pm-1):null, rep=new Set((A.reprobadas_periodo||[]).map(r=>r[0])), done=new Set(base.map(a=>a[0]));
+  const add=[...tr().simOk.map(k=>[k,SIM.res[k]?.cal??8,p,rep.has(k)?'REC':'ORD',1]),...tr().simRec.map(k=>[k,SIM.rec[k]?.cal??7,p,SIM.rec[k]?.forma,1])];
+  return [...base,...add.filter(a=>{if(done.has(a[0])||notaValida(a[1])==null)return false;done.add(a[0]);return true})];
 }
-/* Promedio estimado con la simulación: se parte del promedio oficial (incluye reprobatorias, que el kárdex no
-   trae) y se agregan las calificaciones simuladas; una reprobada simulada cuenta como 5. */
-function promEstimado(){
-  const A=ALUMNO,P=A?.promedio,n=(A?.acreditadas||[]).length;if(P==null||!isPersonal()||!tr().sim||!n)return P;
-  const add=[...tr().simOk.map(k=>SIM.res[k]?.cal??8),...tr().simRec.map(k=>SIM.rec[k]?.cal??7),...tr().enCurso.filter(k=>SIM.res[k]?.ok===false).map(()=>5)];
-  return (P*n+add.reduce((a,b)=>a+b,0))/(n+add.length);
+// Sin el denominador oficial no es posible reconstruir el promedio del SAES desde sus acreditaciones.
+function promEstimado(){return ALUMNO?.promedio??null}
+const creditoValido=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<0?null:+v;
+// En UPIBI la duración capturada no concuerda con las cargas: usar una referencia explícita, no un plazo reglamentario.
+function plazoReferencia(A){
+  const c=A.carga||{}, calculado=UNIDAD==='upibi'&&c.total>0&&c.min>0;
+  return {dur:calculado?null:c.duracion,max:calculado?Math.ceil(c.total/c.min):c.duracion_max,calculado};
 }
+function proyeccionCreditos(D){
+  const ultimo=D.curva.at(-1), inicio=D.meta??(ultimo?.per+1);
+  if(!Number.isFinite(inicio)||D.fin==null||!(D.total>0)||D.obt==null||!(D.ritmo>0)||D.fin<inicio||D.obt>=D.total)return [];
+  const puntos=[{per:inicio-1,acum:D.obt}];
+  for(let per=inicio;per<=D.fin;per++){
+    puntos.push({per,acum:Math.min(D.total,D.obt+D.ritmo*(per-inicio+1))});
+    if(puntos.at(-1).acum>=D.total)break;
+  }
+  return puntos;
+}
+const ST_DIAG=new Set();
 function statsDatos(){
   const c=cur(), A=ALUMNO, cat=catDe();
-  const rows=simKardex().map(a=>{const f=String(a[3]||'—').toUpperCase();
-    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:+a[1],per:perIdx(a[2]),forma:FORMAS[f]||f,eqv:f==='EQV',sim:!!a[4],cat:cat[a[0]]||'Sin categoría',cr:c[a[0]]?.[1]||0}});
+  const rows=simKardex().map(a=>{const f=String(a[3]||'').trim().toUpperCase();
+    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:notaValida(a[1]),per:perIdx(a[2]),codigo:f,
+      forma:FORMAS[f]||'No identificada',eqv:['EQV','REV','DIC'].includes(f),sim:!!a[4],cat:cat[a[0]]||'Sin categoría',cr:creditoValido(c[a[0]]?.[1])}});
   const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
-  const reg=rows.filter(r=>!r.eqv&&r.per!=null), pers=[...new Set(reg.map(r=>r.per))].sort((a,b)=>a-b);
-  const porPer=pers.map(p=>{const v=reg.filter(r=>r.per===p).map(r=>r.cal);return {per:p,lbl:perName(p),prom:mean(v),min:Math.min(...v),max:Math.max(...v),n:v.length,cr:reg.filter(r=>r.per===p).reduce((s,r)=>s+r.cr,0)}});
-  const crEqv=rows.filter(r=>r.eqv).reduce((s,r)=>s+r.cr,0);
-  let acum=crEqv;const curva=porPer.map(d=>({...d,acum:(acum+=d.cr)}));
-  const cal=rows.map(r=>r.cal).sort((a,b)=>a-b), media=promEstimado()??mean(cal), mediana=cal.length?(cal[(cal.length-1)>>1]+cal[cal.length>>1])/2:null;
-  const sd=cal.length>1?Math.sqrt(cal.reduce((s,x)=>s+(x-mean(cal))**2,0)/(cal.length-1)):0;
-  const ritmo=mean(porPer.slice(-3).map(d=>d.cr)), total=A.carga?.total, obt=A.avance?.obtenidos??acum, falta=A.avance?.faltan??(total!=null?total-obt:null);
-  const nper=ritmo&&falta!=null?Math.ceil(falta/ritmo):null, meta=perMeta(), fin=nper!=null&&meta!=null?meta+nper-1:null;
-  return {rows,reg,porPer,curva,crEqv,media,mediana,sd,ritmo,total,obt,falta,nper,fin,mean,
-    ord:reg.length?reg.filter(r=>r.forma==='Ordinario').length/reg.length:null,
-    delta:porPer.length>1?porPer.at(-1).prom-porPer.at(-2).prom:null};
+  const sumCr=rs=>rs.every(r=>r.cr!=null)?rs.reduce((s,r)=>s+r.cr,0):null;
+  const reales=rows.filter(r=>!r.sim), reg=rows.filter(r=>!r.eqv&&r.per!=null);
+  const pers=[...new Set(reg.map(r=>r.per))].sort((a,b)=>a-b);
+  const porPer=pers.map(p=>{const rs=reg.filter(r=>r.per===p),v=rs.map(r=>r.cal);return {per:p,lbl:perName(p),prom:mean(v),min:Math.min(...v),max:Math.max(...v),n:v.length,cr:sumCr(rs),sim:rs.some(r=>r.sim)}});
+  // Solo una confirmación explícita puede distinguir cero acreditaciones de un periodo sin información.
+  (A.periodos_confirmados||[]).filter(p=>p.completo===true&&creditoValido(p.creditos)===0&&perIdx(p.periodo)!=null).forEach(p=>{
+    const per=perIdx(p.periodo);if(!porPer.some(d=>d.per===per))porPer.push({per,lbl:perName(per),prom:null,min:null,max:null,n:0,cr:0,sim:false});
+  });porPer.sort((a,b)=>a.per-b.per);
+  const eqv=rows.filter(r=>r.eqv), crEqv=sumCr(eqv), crHist=sumCr(reales);
+  const total=creditoValido(A.carga?.total), oficial=creditoValido(A.avance?.obtenidos), faltan=creditoValido(A.avance?.faltan);
+  const baseObt=oficial??(reales.length?crHist:null), simCr=sumCr(rows.filter(r=>r.sim));
+  const cursoDesconocido=[...new Set(A.en_curso??(A.horario_inscrito||[]).map(h=>h[1]))].filter(k=>!c[k]).length;
+  const simIncompleta=tr().sim&&cursoDesconocido>0;
+  const saldoInconsistente=total!=null&&oficial!=null&&faltan!=null&&Math.abs(total-oficial-faltan)>.01;
+  const excesoSim=simCr!=null&&faltan!=null&&simCr>faltan+.01;
+  const obt=baseObt!=null&&simCr!=null&&!excesoSim?baseObt+simCr:null;
+  const baseFalta=faltan??(total!=null&&baseObt!=null?Math.max(0,total-baseObt):null);
+  const falta=baseFalta!=null&&simCr!=null&&!saldoInconsistente&&!excesoSim&&!simIncompleta?Math.max(0,baseFalta-simCr):null;
+  const diferencia=oficial!=null&&crHist!=null?oficial-crHist:null;
+  const sinPeriodo=reales.filter(r=>!r.eqv&&r.per==null).length, desconocidas=rows.filter(r=>r.cr==null).length;
+  const curvaCompleta=crEqv!=null&&sinPeriodo===0&&!desconocidas&&(diferencia==null||Math.abs(diferencia)<.01)&&!saldoInconsistente&&!excesoSim;
+  let acum=crEqv;const curva=curvaCompleta?porPer.map(d=>({...d,acum:(acum+=d.cr)})):[];
+  const cal=rows.map(r=>r.cal).sort((a,b)=>a-b), media=mean(cal), mediana=cal.length?(cal[(cal.length-1)>>1]+cal[cal.length>>1])/2:null;
+  const sd=cal.length>1?Math.sqrt(cal.reduce((s,x)=>s+(x-media)**2,0)/(cal.length-1)):null;
+  const pm=perMeta(), actual=pm!=null?pm-1:null;
+  const historicos=porPer.filter(d=>!d.sim&&(actual==null||d.per<actual));
+  const ultimos=historicos.slice(-3), ritmo=ultimos.length&&ultimos.every(d=>d.cr!=null)?mean(ultimos.map(d=>d.cr)):null;
+  const huecos=historicos.length?historicos.at(-1).per-historicos[0].per+1-historicos.length:0;
+  const ultimo=porPer.at(-1)?.per, meta=tr().sim?pm:actual!=null?Math.max(actual,(ultimo??actual-1)+1):ultimo!=null?ultimo+1:null;
+  const nper=falta===0?0:ritmo>0&&falta!=null?Math.ceil(falta/ritmo):null, fin=nper>0&&meta!=null?meta+nper-1:null;
+  const formas=rows.filter(r=>!r.eqv&&['ORD','EXT','ETS','REC'].includes(r.codigo));
+  const avisos=[];
+  if(cursoDesconocido)avisos.push(`${cursoDesconocido} materias inscritas no tienen correspondencia en este plan.${simIncompleta?' El escenario es parcial y no se proyecta hasta resolver sus claves.':''}`);
+  if(desconocidas)avisos.push(`${desconocidas} acreditaciones tienen créditos desconocidos; revisa sus claves y equivalencias. No se reconstruye el avance histórico.`);
+  if(diferencia!=null&&Math.abs(diferencia)>.01)avisos.push(`Los créditos del historial reconocido difieren en ${fmtCr(Math.abs(diferencia))} del saldo oficial. No se asigna la diferencia a un periodo.`);
+  if(sinPeriodo)avisos.push(`${sinPeriodo} acreditaciones no tienen periodo identificable; el avance histórico es incompleto.`);
+  if(saldoInconsistente)avisos.push('Los créditos obtenidos y faltantes del SAES no concuerdan con el total. Actualiza tus datos antes de proyectar.');
+  if(excesoSim)avisos.push('Los créditos del escenario superan el saldo pendiente informado; revisa la correspondencia de materias.');
+  if(huecos)avisos.push(`${huecos} periodos intermedios no tienen información confirmada; no se cuentan como cero.`);
+  if(A.reprobadas_periodo==null)avisos.push('No se pudo confirmar el estado general; la ausencia de adeudos no está verificada.');
+  if(A.en_curso==null)avisos.push('No se pudo confirmar el horario inscrito.');
+  const duplicadas=(A.acreditadas||[]).filter(a=>a&&notaValida(a[1])!=null).length-reales.length;
+  if(duplicadas)avisos.push(`${duplicadas} registros duplicados de acreditación se cuentan una sola vez.`);
+  if(avisos.length){const diag={unidad:UNIDAD,carrera:S.car,desconocidas,cursoDesconocido,sinPeriodo,huecos,duplicadas,saldoInconsistente,excesoSim};
+    const key=JSON.stringify(diag);if(!ST_DIAG.has(key)){ST_DIAG.add(key);console.warn('Analítica: cobertura incompleta',diag)}}
+  return {rows,reg,porPer,curva,crEqv,media,mediana,sd,ritmo,total,obt,falta,nper,meta,fin,mean,oficial,simCr,avisos,actual,simulado:tr().sim,
+    ritmoN:ultimos.length,ritmoParcial:!historicos.length||huecos>0||!A.periodos_confirmados?.length,
+    ord:formas.length?formas.filter(r=>r.codigo==='ORD').length/formas.length:null,formasN:formas.length,
+    formasExcluidas:rows.length-formas.length,
+    delta:porPer.length>1&&porPer.at(-1).prom!=null&&porPer.at(-2).prom!=null?porPer.at(-1).prom-porPer.at(-2).prom:null};
 }
+function metaCreditos(D,H,incluyeActual){
+  const periodos=+H, valida=String(H??'').trim()!==''&&Number.isSafeInteger(periodos)&&periodos>0;
+  const autorizada=creditoValido(SAES.autorizada(ALUMNO)), min=creditoValido(ALUMNO.carga?.min);
+  const inicio=D.meta==null?null:D.meta+(!incluyeActual&&!D.simulado&&D.meta===D.actual?1:0);
+  if(!valida)return {valida:false};
+  if(D.falta==null)return {valida:true,pendientes:null};
+  const necesarios=D.falta/periodos;
+  return {valida:true,pendientes:D.falta,necesarios,periodos,inicio,
+    fin:D.falta===0||inicio==null?null:inicio+periodos-1,autorizada,min,
+    diferencia:D.ritmo>0?necesarios/D.ritmo-1:null,
+    supera:autorizada!=null&&necesarios>autorizada+.01,
+    bajoMin:min!=null&&D.falta>0&&necesarios<min-.01};
+}
+function metaResumen(D,H,incluyeActual){
+  const M=metaCreditos(D,H,incluyeActual);
+  if(!M.valida)return '<p class="muted">Introduce un número entero positivo de periodos.</p>';
+  if(M.pendientes==null)return '<p class="muted">Faltan créditos pendientes consistentes para calcular tu meta. Revisa los datos del SAES.</p>';
+  if(M.pendientes===0)return '<p><b>Créditos completos.</b> Revisa los demás requisitos de conclusión de estudios.</p>';
+  const comparar=M.diferencia==null?'No hay un ritmo histórico calculable para comparar.':
+    `${Math.abs(M.diferencia*100).toFixed(1)} % ${M.diferencia>=0?'más':'menos'} que el ritmo observado de ${fmtCr(D.ritmo)} créditos${D.ritmoParcial?' (cobertura parcial)':''}.`;
+  const carga=M.autorizada==null?'No se conoce la carga autorizada para comparar esta meta.':M.supera?
+    `Supera la carga autorizada actual de ${fmtCr(M.autorizada)} créditos si se mantiene en todos esos periodos.`:
+    `Cabe por créditos dentro de la carga autorizada actual de ${fmtCr(M.autorizada)}; falta comprobar seriación y oferta.`;
+  return `<p><b>${fmtCr(M.necesarios)} créditos a acreditar por periodo</b> para completar ${fmtCr(M.pendientes)} créditos en ${M.periodos} ${M.periodos===1?'periodo':'periodos'}${M.fin!=null?`, de ${perName(M.inicio)} a ${perName(M.fin)}`:''}.</p>
+    <p>${comparar}</p><p${M.supera?' class="warn"':''}>${carga}</p>
+    ${M.bajoMin?'<p class="muted">La media necesaria está por debajo de la carga mínima. Revisa las condiciones de inscripción; no implica una autorización para inscribir menos.</p>':''}
+    <p class="muted">Es una media de créditos que necesitas acreditar, no una combinación exacta de materias ni una evaluación de salud. La carga autorizada puede cambiar entre periodos.${M.inicio==null?' No se pudo identificar el periodo inicial.':' Los periodos se infieren de la cita y el historial; confírmalos.'}</p>`;
+}
+function metaPanel(D){
+  const cfg=store.get('meta.'+S.car,{periodos:4,actual:true}), incluye=D.simulado?false:cfg.actual!==false;
+  return `<section class="meta-panel" aria-labelledby="meta-h"><h3 id="meta-h">Tu meta de conclusión de créditos</h3>
+    <div class="meta-controls"><label for="meta-periodos">Periodos restantes <input id="meta-periodos" type="number" min="1" step="1" value="${esc(String(cfg.periodos??4))}" aria-describedby="meta-result"></label>
+    <label><input id="meta-actual" type="checkbox"${incluye?' checked':''}${D.simulado?' disabled':''}> Incluir el semestre en curso</label></div>
+    ${D.simulado?'<p class="muted">El saldo incluye el fin de semestre simulado; la meta comienza después de ese escenario.</p>':''}
+    <div id="meta-result" aria-live="polite">${metaResumen(D,cfg.periodos??4,incluye)}</div></section>`;
+}
+function montarGrafica(host,fig){
+  host.replaceChildren(fig);
+  const svg=fig.matches('svg')?fig:fig.querySelector('svg');if(!svg)return;
+  const nativa=svg.getScreenCTM.bind(svg);let avisado=false;
+  // Firefox puede omitir el zoom CSS de los ancestros en getScreenCTM. D3 usa su inversa para el cursor.
+  // Estos SVG de Plot conservan xMidYMid meet; sus límites visibles incluyen zoom, resize y scroll.
+  svg.getScreenCTM=()=>{
+    const r=svg.getBoundingClientRect(),v=svg.viewBox.baseVal,m=nativa();
+    if(!r.width||!r.height||!v.width||!v.height)return m;
+    const k=Math.min(r.width/v.width,r.height/v.height);
+    const x=r.left+(r.width-v.width*k)/2-v.x*k,y=r.top+(r.height-v.height*k)/2-v.y*k;
+    if(m&&Math.abs(m.a-k)<.01&&Math.abs(m.d-k)<.01&&Math.abs(m.e-x)<.1&&Math.abs(m.f-y)<.1)return m;
+    if(!avisado){console.debug('Gráfica: corregida matriz del cursor por escala CSS',{grafica:host.id,escala:k,ancho:r.width,alto:r.height});avisado=true}
+    return new DOMMatrix([k,0,0,k,x,y]);
+  };
+}
+let ST_RENDER=0;
 async function renderStats(){
+  const revision=++ST_RENDER;
   const box=$('#kstats'),btn=$('#stats-btn');if(!box||!btn)return;
   const on=isPersonal()&&store.get('stats',false);btn.hidden=!isPersonal();btn.textContent=on?'Ocultar estadísticas':'Ver estadísticas';box.hidden=!on;
   if(!on)return;
   const D=statsDatos(), A=ALUMNO;
-  if(!D.rows.length){box.innerHTML='<p class="muted">El kárdex no trae calificaciones.</p>';return}
+  
   const f2=v=>v==null||!isFinite(v)?'—':(+v).toFixed(2), sg=v=>v==null?'':(v>=0?'+':'')+v.toFixed(2);
-  const dur=A.carga?.duracion, cursados=A.avance?.cursados, totalPer=D.nper!=null&&cursados!=null?cursados+D.nper:null;
+  const plazo=plazoReferencia(A), dur=plazo.dur, cursados=A.avance?.cursados, totalPer=D.nper!=null&&cursados!=null?D.fin!=null&&D.actual!=null?cursados+D.fin-D.actual:cursados:null;
   const kpi=(lbl,val,sub='',cls='')=>`<div class="kpi"><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
-  box.innerHTML=`<div class="kpis">
-      ${kpi(D.rows.some(r=>r.sim)?'Promedio estimado':'Promedio',f2(D.media),D.delta!=null?`<span class="${D.delta>=0?'up':'down'}">${D.delta>=0?'▲':'▼'} ${sg(D.delta)}</span> vs. periodo anterior`:'')}
+  box.innerHTML=`${D.avisos.length?`<p class="st-note">${D.avisos.map(esc).join(' ')}</p>`:''}<div class="kpis">
+      ${kpi(D.rows.some(r=>r.sim)?'Media de acreditaciones del escenario':'Media de acreditaciones',f2(D.media),`${D.rows.length} acreditaciones${D.rows.some(r=>r.sim)?' · incluye notas simuladas':''}`)}
       ${kpi('Dispersión (σ)',f2(D.sd),`mediana ${f2(D.mediana)} · n = ${D.rows.length}`)}
-      ${kpi('En ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.reg.length} materias sin equivalencias`)}
-      ${kpi('Ritmo',D.ritmo?fmtCr(D.ritmo)+' cr':'—','por periodo (últimos 3)')}
-      ${kpi('Egreso estimado',D.fin!=null?perName(D.fin):'—',totalPer?`${totalPer} periodos${dur?` · plan ${dur}${A.carga?.duracion_max?`, máx. ${A.carga.duracion_max}`:''}`:''}`:'',totalPer&&A.carga?.duracion_max&&totalPer>A.carga.duracion_max?'down':'')}
+      ${kpi('Acreditaciones en ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.formasN} acreditaciones con forma identificada · ${D.formasExcluidas} excluidas; no es tasa sobre lo inscrito`)}
+      ${kpi('Ritmo',D.ritmo?fmtCr(D.ritmo)+' cr':'—',`últimos ${D.ritmoN} periodos con acreditaciones o cero confirmado${D.ritmoParcial?' · cobertura parcial':''}`)}
+      ${kpi('Conclusión de créditos proyectada',D.falta===0?'Créditos completos':D.fin!=null?perName(D.fin):'—',totalPer?`aprox. ${totalPer} periodos según conteo SAES${dur?` · plan ${dur}`:''}${plazo.max?` · ${plazo.calculado?'referencia a carga mínima':'máx.'} ${plazo.max}`:''}`:'',totalPer&&plazo.max&&totalPer>plazo.max?'down':'')}
     </div>
+    ${D.delta!=null?`<p class="st-note">Cambio entre las medias de los dos últimos periodos con acreditaciones: ${sg(D.delta)}. No es un cambio del promedio oficial.</p>`:''}
+    ${plazo.calculado?`<p class="st-note">Referencia a carga mínima: ${fmtCr(A.carga.total)} ÷ ${fmtCr(A.carga.min)} = ${fmtCr(A.carga.total/A.carga.min)} periodos (redondeados hacia arriba: ${plazo.max}). El SAES indica duración ${A.carga.duracion??'—'} y máxima ${A.carga.duracion_max??'—'}; el plazo reglamentario requiere confirmación con Gestión Escolar.</p>`:''}
+    ${metaPanel(D)}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>Créditos acumulados por periodo frente a la trayectoria del plan; la línea punteada proyecta tu ritmo actual.</span></figcaption><div id="ch-avance"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Avance acumulado</b><span>La línea punteada y sus puntos proyectan los créditos a tu ritmo actual.${totalPer!=null&&plazo.max&&totalPer>plazo.max?' Los puntos rojos superan la referencia indicada según el conteo SAES;':''} Consulta cada punto para ver sus créditos.${D.meta!=null?` Proyección desde ${perName(D.meta)}; mantiene el ritmo observado.`:''}</span></figcaption><div id="ch-avance"></div></figure>
       <figure><figcaption><b>Promedio por periodo</b><span>Media (línea) y rango mínimo–máximo de cada periodo.</span></figcaption><div id="ch-prom"></div></figure>
       <figure><figcaption><b>Distribución de calificaciones</b><span>Frecuencia; reglas de media (—) y mediana (┄).</span></figcaption><div id="ch-dist"></div></figure>
       <figure><figcaption><b>Calificaciones por categoría</b><span>Cada punto es una materia; la marca vertical es la media.</span></figcaption><div id="ch-cat"></div></figure>
@@ -1657,37 +1792,54 @@ async function renderStats(){
       <figure class="ch-wide"><figcaption><b>Mapa de calor: categoría × periodo</b><span>Promedio de cada área de conocimiento en cada periodo.</span></figcaption><div id="ch-heat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
-    ${D.crEqv?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} materias acreditadas por equivalencia (${fmtCr(D.crEqv)} créditos): cuentan en la distribución, las categorías y el avance inicial, pero no en el promedio por periodo ni en el ritmo.</p>`:''}`;
+    ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} materias acreditadas por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}): cuentan en la distribución, las categorías y el avance inicial, pero no en el promedio por periodo ni en el ritmo.</p>`:''}`;
+  if(!D.rows.length){box.querySelector('.charts').innerHTML='<p class="muted">Sin calificaciones acreditadas para graficar.</p>';renderAnalisis(D);return}
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
-  try{await cargarPlot()}catch(e){box.querySelector('.charts').innerHTML=`<p class="muted">${esc(e.message)}</p>`;renderAnalisis(D);return}
+  if(revision!==ST_RENDER)return;
+  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER)return;box.querySelector('.charts').innerHTML=`<p class="muted">${esc(e.message)}</p>`;renderAnalisis(D);return}
+  if(revision!==ST_RENDER)return;
   renderAnalisis(D);
   const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
   const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
   const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
-  const put=(id,fig)=>{const el=$(id);el.replaceChildren(fig)};
+  const put=(id,fig)=>montarGrafica($(id),fig);
   const tickPer=d=>perName(d);
   // 1) avance acumulado (burn-up)
-  const C=D.curva, x0=C.length?C[0].per:0, durP=A.carga?.duracion||10, tot=D.total;
-  const ideal=tot?d3.range(0,durP+1).map(i=>({per:x0-1+i,acum:tot*i/durP})):[];
-  const proy=D.fin!=null&&C.length&&tot?[{per:C.at(-1).per,acum:C.at(-1).acum},{per:D.fin,acum:tot}]:[];
-  put('#ch-avance',P.plot({...base('#ch-avance'),height:230,x:{label:'Periodo',tickFormat:tickPer,ticks:[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])]},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt)*1.05]},
+  const C=D.curva, x0=C[0]?.per??(D.meta!=null?D.meta-1:0), tot=D.total;
+  // Anclar el inicio al número de periodos cursados, incluyendo periodos sin acreditaciones.
+  const inicio=D.actual!=null&&cursados!=null?D.actual-cursados+1:x0;
+  const proy=proyeccionCreditos(D), fin=proy.at(-1);
+  const limite=plazo.max&&cursados!=null&&D.actual!=null?inicio+plazo.max-1:null;
+  const puntos=proy.slice(1), excede=d=>limite!=null&&d.per>limite, BAD=tok('--bad')||'#e66b83';
+  const ticks=[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])].sort((a,b)=>a-b);
+  const paso=Math.max(1,Math.ceil(ticks.length/Math.max(2,Math.floor($('#ch-avance').clientWidth/58))));
+  const tickVisibles=ticks.filter((d,i)=>i%paso===0||i===ticks.length-1);
+  put('#ch-avance',P.plot({...base('#ch-avance'),height:260,marginBottom:50,x:{label:'Periodo',tickFormat:tickPer,ticks:tickVisibles},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt||1)*1.12]},
     marks:[
       tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
       tot?P.text([tot],{y:d=>d,x:x0,text:()=>`total ${fmtCr(tot)}`,dy:-6,textAnchor:'start',fill:MUT}):null,
-      P.line(ideal,{x:'per',y:'acum',stroke:MUT,strokeOpacity:.6,curve:'linear'}),
-      P.areaY(C,{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
-      P.line(C,{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
+      limite!=null&&ticks.at(-1)>=limite?P.ruleX([limite],{stroke:BAD,strokeDasharray:'3 4'}):null,
+      limite!=null&&ticks.at(-1)>=limite?P.text([{per:limite,acum:0}],{x:'per',y:'acum',text:()=>plazo.calculado?`Referencia: ${plazo.max} periodos`:`Máximo: ${plazo.max} periodos`,dy:32,fill:BAD}):null,
+      P.areaY(C.filter(d=>!d.sim),{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
+      P.line(C.filter(d=>!d.sim),{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
+      C.some(d=>d.sim)?P.line(C.slice(-2),{x:'per',y:'acum',stroke:ACC,strokeDasharray:'2 3'}):null,
       P.line(proy,{x:'per',y:'acum',stroke:ACC,strokeDasharray:'5 4'}),
-      P.dot(C,{x:'per',y:'acum',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} en el periodo`}),
-      proy.length?P.dot([proy[1]],{x:'per',y:'acum',stroke:ACC,fill:'none',r:4}):null,
-      proy.length?P.text([proy[1]],{x:'per',y:'acum',text:d=>`egreso ${perName(d.per)}`,dy:-10,fill:ACC}):null,
+      P.dot(C,{x:'per',y:'acum',fill:d=>d.sim?'var(--bg)':ACC,stroke:ACC,r:3.5}),
+      P.dot(puntos,{x:'per',y:'acum',stroke:d=>excede(d)?BAD:ACC,fill:'var(--bg)',r:4}),
+      puntos.length&&ticks.length<=Math.floor($('#ch-avance').clientWidth/65)?P.text(puntos,{x:'per',y:'acum',text:d=>fmtCr(d.acum),dy:-12,fill:d=>excede(d)?BAD:ACC}):null,
+      fin?P.text([fin],{x:'per',y:'acum',text:d=>`conclusión ${perName(d.per)}`,dy:-30,fill:excede(fin)?BAD:ACC}):null,
+      // Una sola búsqueda de proximidad evita que cada serie muestre un punto distinto bajo el mismo cursor.
+      P.tip([...C.map(d=>({...d,detalle:`${d.lbl}${d.sim?' · escenario':''}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} en el periodo`})),
+        ...(proy.length&&!C.some(d=>d.per===proy[0].per)?[{...proy[0],detalle:`Saldo de partida${tr().sim?' del escenario':' del SAES'}\n${fmtCr(D.obt)} créditos; no es una acreditación por periodo`}]:[]),
+        ...puntos.map(d=>({...d,detalle:`${perName(d.per)} · periodo ${d.per-inicio+1}\n${fmtCr(d.acum)} créditos acumulados proyectados${excede(d)?'\nExcede '+(plazo.calculado?'la referencia a carga mínima':'el máximo indicado'):''}`}))],
+        P.pointer({x:'per',y:'acum',title:'detalle',maxRadius:$('#ch-avance').clientWidth/Math.max(1,ticks.length)/4})),
     ].filter(Boolean)}));
   // 2) promedio por periodo con rango
   put('#ch-prom',P.plot({...base('#ch-prom'),height:210,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
-    marks:[P.areaY(D.porPer,{x:'per',y1:'min',y2:'max',fill:ACC,fillOpacity:.15,curve:'monotone-x'}),
+    marks:[P.areaY(D.porPer.filter(d=>d.prom!=null),{x:'per',y1:'min',y2:'max',fill:ACC,fillOpacity:.15,curve:'monotone-x'}),
       D.media!=null?P.ruleY([D.media],{stroke:MUT,strokeDasharray:'4 3'}):null,
-      P.line(D.porPer,{x:'per',y:'prom',stroke:ACC,strokeWidth:2,curve:'monotone-x'}),
-      P.dot(D.porPer,{x:'per',y:'prom',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\npromedio ${f2(d.prom)}\nrango ${d.min}–${d.max} · ${d.n} materias`})].filter(Boolean)}));
+      P.line(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',stroke:ACC,strokeWidth:2,curve:'monotone-x'}),
+      P.dot(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\npromedio ${f2(d.prom)}\nrango ${d.min}–${d.max} · ${d.n} materias`})].filter(Boolean)}));
   // 3) distribución
   put('#ch-dist',P.plot({...base('#ch-dist'),height:210,x:{label:'Calificación',domain:[5.5,10.5]},y:{label:'Materias',grid:true},
     marks:[P.rectY(D.rows,P.binX({y:'count'},{x:'cal',thresholds:[5.5,6.5,7.5,8.5,9.5,10.5],fill:ACC,fillOpacity:.75,inset:2,tip:true})),
@@ -1697,98 +1849,86 @@ async function renderStats(){
   const jit=D.rows.map((r,i)=>({...r,j:((i*0.618)%1-.5)*0.5}));
   put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(170,cats.length*34+40),marginLeft:150,x:{label:'Calificación',domain:[5.5,10.5],grid:true},y:{label:null,domain:cats},
     color:{legend:false},
-    marks:[P.dot(jit,{x:d=>d.cal+d.j*.3,y:'cat',fill:d=>d.eqv?MUT:ACC,fillOpacity:.75,r:4,tip:true,title:d=>`${d.nombre}\n${d.cal} · ${d.forma}${d.per!=null?' · '+perName(d.per):''}`}),
+    marks:[P.dot(jit,{x:d=>d.cal+d.j*.3,y:'cat',fill:d=>d.eqv?MUT:ACC,fillOpacity:.75,r:4,tip:true,title:d=>`${d.nombre}${d.sim?' · escenario':''}\n${d.cal} · ${d.forma}${d.per!=null?' · '+perName(d.per):''}`}),
       P.tickX(D.rows,P.groupY({x:'mean'},{x:'cal',y:'cat',stroke:tok('--fg'),strokeWidth:2}))]}));
   // 5) forma de acreditación por periodo (barras apiladas)
   const fr=D.rows.map(r=>({...r,lbl:r.eqv?'Equiv.':perName(r.per)}));
-  const ordenLbl=[...(D.crEqv?['Equiv.']:[]),...D.porPer.map(d=>d.lbl)];
+  const ordenLbl=[...(D.rows.some(r=>r.eqv)?['Equiv.']:[]),...D.porPer.map(d=>d.lbl),...(D.rows.some(r=>!r.eqv&&r.per==null)?['—']:[])];
   put('#ch-forma',P.plot({...base('#ch-forma'),height:210,x:{label:null,domain:ordenLbl},y:{label:'Materias',grid:true},
-    color:{legend:true,domain:Object.values(FORMAS).filter(f=>D.rows.some(r=>r.forma===f)),range:[OK,tok('--warn'),tok('--bad'),ACC,tok('--n4'),tok('--n6'),tok('--n8')]},
+    color:{legend:true,domain:[...Object.values(FORMAS),'No identificada'].filter(f=>D.rows.some(r=>r.forma===f)),range:[OK,tok('--warn'),tok('--bad'),ACC,tok('--n4'),tok('--n6'),tok('--n8')]},
     marks:[P.barY(fr,P.groupX({y:'count'},{x:'lbl',fill:'forma',inset:1,tip:true})),P.ruleY([0])]}));
   // 6) mapa de calor categoría × periodo
   const hm=d3.flatRollup(D.reg,v=>({m:d3.mean(v,r=>r.cal),n:v.length}),r=>r.cat,r=>r.per).map(([cat,per,o])=>({cat,per,lbl:perName(per),...o}));
   put('#ch-heat',P.plot({...base('#ch-heat'),height:Math.max(150,cats.length*30+50),marginLeft:150,padding:.06,x:{label:null,domain:D.porPer.map(d=>d.lbl)},y:{label:null,domain:cats.filter(k=>hm.some(h=>h.cat===k))},
-    color:{type:'linear',domain:[6,10],scheme:'viridis',legend:true,label:'Promedio'},
-    marks:[P.cell(hm,{x:'lbl',y:'cat',fill:'m',inset:1,rx:3,tip:true,title:d=>`${d.cat} · ${d.lbl}\npromedio ${f2(d.m)} (${d.n})`}),
+    color:{type:'linear',domain:[6,10],scheme:'viridis',legend:true,label:'Media de acreditaciones'},
+    marks:[P.cell(hm,{x:'lbl',y:'cat',fill:'m',inset:1,rx:3,tip:true,title:d=>`${d.cat} · ${d.lbl}\nmedia ${f2(d.m)} (${d.n})`}),
       P.text(hm,{x:'lbl',y:'cat',text:d=>f2(d.m).replace(/\.00$/,''),fill:d=>d.m>8.4?'#111':'#fff'})]}));
 }
 
-/* ---------- análisis: materias a cuidar, afinidad con líneas, ruta crítica y carga vs. rendimiento ----------
-   Heurísticas transparentes (no un modelo entrenado): cada resultado muestra en qué se basa. */
+/* ---------- análisis descriptivo: hechos y antecedentes, sin pronosticar notas ---------- */
 function analisis(){
-  const c=cur(), pre=prereqs(), t=tr(), K=simKardex(), cal={}, forma={}, cat=catDe();
-  K.forEach(a=>{cal[a[0]]=+a[1];forma[a[0]]=String(a[3]||'').toUpperCase()});
-  const nm=k=>pretty(c[k]?.[0]||k), failed=new Set(t.fail), done=new Set(t.done), veces=t.veces||{};
-  const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
-  const porCat={};Object.keys(cal).forEach(k=>{if(cat[k])(porCat[cat[k]]=porCat[cat[k]]||[]).push(cal[k])});
-  // 1) materias que conviene cuidar
+  const c=cur(), pre=prereqs(), t=tr(), cat=catDe(), done=new Set(t.done), nm=k=>pretty(c[k]?.[0]||k);
+  const K=simKardex().filter(a=>notaValida(a[1])!=null), cal=new Map(K.map(a=>[a[0],notaValida(a[1])]));
   const pend=Object.keys(c).filter(k=>!done.has(k)&&!isElec(k)&&(c[k][3]==='O'||c[k][3]==='P'));
-  const riesgo=pend.map(k=>{
-    const dir=(pre[k]||[]).filter(x=>x in cal), lej=[...ancestors([k])].filter(x=>x in cal&&!dir.includes(x)), w=[], motivos=[];
-    dir.forEach(x=>w.push([cal[x],2]));lej.forEach(x=>w.push([cal[x],1]));
-    if(!w.length&&cat[k]&&porCat[cat[k]])porCat[cat[k]].forEach(v=>w.push([v,1]));
-    if(!w.length&&!failed.has(k))return null;
-    let pred=w.length?w.reduce((s,[v,p])=>s+v*p,0)/w.reduce((s,[,p])=>s+p,0):7;
-    dir.forEach(x=>{const f=forma[x];
-      if(f&&!['ORD','EQV'].includes(f)){pred-=.4;motivos.push(`su requisito ${nm(x)} se acreditó por ${(FORMAS[f]||f).toLowerCase()} con ${cal[x]}`)}
-      else if(cal[x]<=7)motivos.push(`su requisito ${nm(x)} se acreditó con ${cal[x]}`)});
-    [...ancestors([k])].filter(x=>failed.has(x)).forEach(x=>{pred-=.5;motivos.push(`${nm(x)}, en su cadena de requisitos, está reprobada`)});
-    if(failed.has(k)){pred-=.6;motivos.unshift(`ya la reprobaste${veces[k]?` (${veces[k]} ${veces[k]>1?'veces':'vez'})`:''}`)}
-    if(!dir.length&&!lej.length&&cat[k]&&porCat[cat[k]])motivos.push(`tu promedio en ${cat[k]} es ${mean(porCat[cat[k]]).toFixed(2)}`);
-    const nivel=pred<7.5||failed.has(k)?'alto':pred<8.5||motivos.length?'medio':'bajo';
-    return {k,pred:Math.max(5,pred),motivos,n:w.length,nivel,base:dir.length?'requisitos':lej.length?'cadena de requisitos':'área'};
-  }).filter(Boolean);
-  // relevantes: lo que puedes cursar pronto (disponibles, elegidas, sugeridas o reprobadas)
-  const sug=new Set(suggestions().list), want=new Set(t.want);
-  const cuidar=riesgo.filter(r=>r.nivel!=='bajo'&&(available(r.k)||want.has(r.k)||sug.has(r.k)||failed.has(r.k)))
-    .sort((a,b)=>({alto:0,medio:1}[a.nivel]-{alto:0,medio:1}[b.nivel])||a.pred-b.pred).slice(0,8);
-  // 2) afinidad con líneas de especialización
+  const depend=dependents(), want=new Set(t.want), fail=new Set(t.fail);
+  const cuidar=pend.filter(k=>fail.has(k)||want.has(k)).map(k=>{
+    const motivos=[];
+    if(fail.has(k))motivos.push('Pendiente de acreditar según el estado del escenario');
+    const req=(pre[k]||[]).filter(x=>!done.has(x));
+    if(req.length)motivos.push('Antecedentes pendientes en el mapa: '+req.map(nm).join(', '));
+    const desbloquea=(depend[k]||[]).filter(x=>!done.has(x)&&c[x]);
+    if(desbloquea.length)motivos.push('Precede en el mapa a: '+desbloquea.map(nm).join(', '));
+    return {k,motivos};
+  }).filter(r=>r.motivos.length);
+  // El promedio de una línea procede únicamente de sus materias propias acreditadas.
   const lineas=(MAP().lineas||[]).map(l=>{
-    const rel=new Set();
-    l.claves.forEach(k=>{ancestors([k]).forEach(x=>rel.add(x));if(cat[k])Object.keys(cal).filter(x=>cat[x]===cat[k]).forEach(x=>rel.add(x))});
-    // área de la línea: la indicada o la predominante entre sus requisitos (aunque estén pendientes)
-    let lc=l.categoria;if(!lc){const f={};l.claves.forEach(k=>ancestors([k]).forEach(x=>{if(cat[x])f[cat[x]]=(f[cat[x]]||0)+1}));lc=Object.keys(f).sort((a,b)=>f[b]-f[a])[0]}
-    if(lc)Object.keys(cal).filter(x=>cat[x]===lc).forEach(x=>rel.add(x));
-    const v=[...rel].filter(x=>x in cal).map(x=>cal[x]);
-    return {nombre:l.linea!==l.area?l.linea:l.area,area:l.area,cat:lc,prom:mean(v),n:v.length,hechas:l.claves.filter(k=>done.has(k)).length,total:l.claves.length};
-  }).filter(l=>l.n>=2).sort((a,b)=>b.prom-a.prom);
-  // 3) ruta crítica: cadena más larga de materias obligatorias pendientes (cada eslabón, al menos un periodo)
-  const memo={}, largo=k=>memo[k]??(memo[k]=1+Math.max(0,...(dependents()[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O').map(largo)));
-  const obligP=pend.filter(k=>c[k][3]==='O');
-  let cadena=[];if(obligP.length){let k=obligP.reduce((a,b)=>largo(b)>largo(a)?b:a);cadena=[k];
-    while(true){const nx=(dependents()[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O').sort((a,b)=>largo(b)-largo(a))[0];if(!nx)break;cadena.push(nx);k=nx}}
-  // 4) carga vs. rendimiento por periodo (sin equivalencias)
-  const pp={};K.forEach(a=>{const f=String(a[3]||'').toUpperCase(),i=perIdx(a[2]);if(f==='EQV'||i==null)return;(pp[i]=pp[i]||{cr:0,v:[]}).cr+=c[a[0]]?.[1]||0;pp[i].v.push(+a[1])});
-  const carga=Object.entries(pp).map(([i,o])=>({per:+i,lbl:perName(+i),cr:o.cr,prom:mean(o.v),n:o.v.length})).sort((a,b)=>a.per-b.per);
-  let r=null;if(carga.length>=3){const mx=mean(carga.map(d=>d.cr)),my=mean(carga.map(d=>d.prom));
-    const sxy=carga.reduce((s,d)=>s+(d.cr-mx)*(d.prom-my),0),sx=Math.sqrt(carga.reduce((s,d)=>s+(d.cr-mx)**2,0)),sy=Math.sqrt(carga.reduce((s,d)=>s+(d.prom-my)**2,0));r=sx&&sy?sxy/(sx*sy):null}
-  return {cuidar,lineas,cadena,carga,r,nm};
+    const claves=[...new Set(l.claves||[])].filter(k=>cal.has(k));
+    return {nombre:l.linea!==l.area?l.linea:l.area,claves,n:claves.length,
+      prom:claves.length?claves.reduce((s,k)=>s+cal.get(k),0)/claves.length:null,
+      total:new Set(l.claves||[]).size,sim:K.some(a=>claves.includes(a[0])&&a[4])};
+  }).filter(l=>l.n>0);
+  const memo={}, visitando=new Set();let ciclo=false;
+  const largo=k=>{
+    if(visitando.has(k)){ciclo=true;return []}
+    if(memo[k])return memo[k];visitando.add(k);
+    let cola=[];
+    for(const x of (depend[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O')){
+      const v=largo(x);if(v.length>cola.length)cola=v;
+    }
+    visitando.delete(k);return memo[k]=[k,...cola];
+  };
+  let cadena=[];
+  pend.filter(k=>c[k][3]==='O').forEach(k=>{const v=largo(k);if(v.length>cadena.length)cadena=v});
+  if(ciclo)cadena=[];
+  const pp={};K.forEach(a=>{
+    const f=String(a[3]||'').trim().toUpperCase(),i=perIdx(a[2]);
+    if(['EQV','REV','DIC'].includes(f)||i==null)return;
+    const o=pp[i]||(pp[i]={cr:0,v:[],completo:true});
+    const cr=c[a[0]]?.[1];if(cr==null||!Number.isFinite(+cr))o.completo=false;else o.cr+=+cr;
+    o.v.push(notaValida(a[1]));
+  });
+  const carga=Object.entries(pp).filter(([,o])=>o.completo).map(([i,o])=>({per:+i,lbl:perName(+i),cr:o.cr,prom:o.v.reduce((s,v)=>s+v,0)/o.v.length,n:o.v.length})).sort((a,b)=>a.per-b.per);
+  return {cuidar,lineas,cadena,ciclo,carga,nm};
 }
 function renderAnalisis(D){
   const el=$('#kanal');if(!el)return;
   const X=analisis(), f2=v=>v==null?'—':(+v).toFixed(2);
-  const lvl={alto:'Riesgo alto',medio:'Atención'};
-  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><span class="an-tag ${r.nivel}">${lvl[r.nivel]}</span><b>${esc(X.nm(r.k))}</b><span class="an-pred" title="Calificación esperada según ${r.base}">≈ ${r.pred.toFixed(1)}</span>
-      <small>${esc(r.motivos.length?r.motivos.join('; '):`calificación esperada según tus ${r.base}`)}.</small></li>`).join('')}</ul>`:'<p class="muted">Ninguna de las materias que puedes cursar pronto muestra señales de riesgo en tus requisitos.</p>';
-  const lin=X.lineas.length?`<ul class="an-bars">${X.lineas.slice(0,8).map((l,i)=>`<li><span class="an-ln">${esc(l.nombre)}${l.area&&l.area!==l.nombre&&l.area!=='Optativas'?`<small>${esc(l.area)}</small>`:''}</span>
-      <span class="an-bar"><i style="width:${Math.max(4,(l.prom-6)/4*100)}%"></i></span><b>${f2(l.prom)}</b><small>${l.n} materias${l.cat?` · área ${esc(l.cat)}`:''}${l.hechas?` · ${l.hechas} de ${l.total} cursadas`:''}</small></li>`).join('')}</ul>`:'<p class="muted">Aún no hay suficientes materias relacionadas para estimar la afinidad con las líneas.</p>';
-  const rc=X.cadena.length;
-  const ruta=rc?`<p>La cadena de seriación pendiente más larga tiene <b>${rc} ${rc>1?'materias':'materia'}</b>: necesitas al menos <b>${rc} ${rc>1?'periodos':'periodo'}</b> más, sin importar la carga${D.nper?` (por créditos, a tu ritmo, ${D.nper})`:''}.</p>
-      <ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:'<p class="muted">No quedan cadenas de seriación pendientes.</p>';
-  el.innerHTML=`<h3 class="an-h">Análisis y recomendaciones</h3>
-    <div class="an-grid">
-      <section><h4>Materias que conviene cuidar</h4><p class="an-sub">Calificación esperada a partir de tus requisitos y tu área; prioriza su planeación o tómalas con menos carga.</p>${cuid}</section>
-      <section><h4>Afinidad con líneas de especialización</h4><p class="an-sub">Tu promedio en las materias que preparan cada línea (requisitos y área). Orientativo: considera también tus intereses.</p>${lin}</section>
-      <section><h4>Ruta crítica</h4><p class="an-sub">El mínimo de periodos que impone la seriación.</p>${ruta}</section>
-      <section><h4>Carga vs. rendimiento</h4><p class="an-sub">Créditos acreditados y promedio de cada periodo${X.r!=null?`; correlación r = ${X.r.toFixed(2)} (${Math.abs(X.r)<.3?'sin relación clara':X.r<0?'te va mejor con menos carga':'te va mejor con más carga'}${X.carga.length<5?'; con pocos periodos es solo una tendencia':''})`:''}.</p><div id="ch-carga"></div></section>
-    </div>
-    <p class="st-note">Estas estimaciones son heurísticas transparentes basadas en tu kárdex, no predicciones garantizadas.</p>`;
+  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><b>${esc(X.nm(r.k))}</b><small>${esc(r.motivos.join('; '))}.</small></li>`).join('')}</ul>`:
+    '<p class="muted">No hay observaciones adicionales para tus materias elegidas o pendientes de acreditar. Esto no evalúa riesgo académico.</p>';
+  const lin=X.lineas.length?`<section><h4>Materias acreditadas por línea</h4><p class="an-sub">Media de materias propias de cada línea; no mide afinidad vocacional.</p><ul class="an-bars">${X.lineas.map(l=>`<li><span>${esc(l.nombre)}${l.sim?' · escenario':''}</span><b>${f2(l.prom)}</b><small>${l.n} de ${l.total} materias · ${esc(l.claves.map(X.nm).join(', '))}</small></li>`).join('')}</ul></section>`:'';
+  const ruta=X.ciclo?'<p class="muted">No se puede mostrar una secuencia: el mapa contiene un ciclo de relaciones.</p>':X.cadena.length?
+    `<p>Secuencia pendiente de ${X.cadena.length} materias en el mapa. Su duración depende de la seriación obligatoria y de la oferta; no constituye un mínimo de periodos verificado.</p><ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:
+    '<p class="muted">No se identificaron secuencias pendientes con los datos disponibles.</p>';
+  el.innerHTML=`<h3 class="an-h">Observaciones para planear</h3><div class="an-grid">
+    <section><h4>Materias y antecedentes pendientes</h4><p class="an-sub">Relaciones del mapa para las materias que elegiste y tus adeudos. Confirma qué relaciones son obligatorias.</p>${cuid}</section>
+    ${lin}<section><h4>Secuencia del mapa</h4>${ruta}</section>
+    ${X.carga.length?'<section><h4>Créditos acreditados y media de acreditaciones</h4><p class="an-sub">Resultados registrados por periodo. No representan carga inscrita ni permiten recomendar más o menos carga.</p><div id="ch-carga"></div></section>':''}
+    </div>`;
   if(window.Plot&&X.carga.length){const P=window.Plot,cs=getComputedStyle(document.documentElement),tok=n=>cs.getPropertyValue(n).trim(),host=$('#ch-carga');
-    host.replaceChildren(P.plot({width:Math.max(260,host.clientWidth),height:190,marginLeft:40,marginBottom:32,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
-      x:{label:'Créditos acreditados en el periodo',grid:true},y:{label:'Promedio',domain:[5.5,10.2],grid:true},
-      marks:[X.carga.length>=3?P.linearRegressionY(X.carga,{x:'cr',y:'prom',stroke:tok('--muted'),fill:tok('--muted'),fillOpacity:.08}):null,
-        P.dot(X.carga,{x:'cr',y:'prom',fill:tok('--accent'),r:5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos · promedio ${d.prom.toFixed(2)} (${d.n})`}),
-        P.text(X.carga,{x:'cr',y:'prom',text:'lbl',dy:-10,fill:tok('--muted')})].filter(Boolean)}))}
+    montarGrafica(host,P.plot({width:Math.max(260,host.clientWidth),height:190,marginLeft:40,marginBottom:32,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
+      x:{label:'Créditos acreditados en el periodo',grid:true},y:{label:'Media de acreditaciones',domain:[5.5,10.2],grid:true},
+      marks:[P.dot(X.carga,{x:'cr',y:'prom',fill:tok('--accent'),r:5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos · media ${d.prom.toFixed(2)} (${d.n})`}),
+        P.text(X.carga,{x:'cr',y:'prom',text:'lbl',dy:-10,fill:tok('--muted')})]}))}
 }
 
 function renderTray(){renderMap();renderList();renderSide();renderStats()}
@@ -1798,7 +1938,7 @@ function render(){
   const gen=!!MAP()?.generico;$('#t-tray').hidden=gen;if(gen&&S.tab==='tray')S.tab='hor';
   renderTop();renderAviso();if(S.tab==='tray')renderTray();else renderHor()}
 // perfil del SAES de otra carrera: se avisa y se ofrece volver; nada del perfil se aplica aquí
-function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()})}
+function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()},carreraPerfil)}
 function refresh(){save();renderOffer();renderPlans();renderCal()}
 function addClass(c){const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
 function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1);else{const c=byKey(k);addClass(c);
@@ -1864,6 +2004,14 @@ $('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;c
 $('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
 $('#lineas').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
 $('#map').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
+const cambiarMeta=e=>{
+  if(!['meta-periodos','meta-actual'].includes(e.target.id))return;
+  const cfg={periodos:$('#meta-periodos').value,actual:$('#meta-actual').checked};
+  store.set('meta.'+S.car,cfg);
+  const D=statsDatos();$('#meta-result').innerHTML=metaResumen(D,cfg.periodos,D.simulado?false:cfg.actual);
+  $('#meta-periodos').setAttribute('aria-invalid',String(!metaCreditos(D,cfg.periodos,cfg.actual).valida));
+};
+$('#kstats').addEventListener('input',cambiarMeta);
 $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stats',false));renderStats()});
 $('#mapcut-btn').addEventListener('click',()=>{store.set('mapFull',!store.get('mapFull',false));renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapFull',!store.get('mapFull',false));renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
@@ -2111,7 +2259,7 @@ async function loadExcelJS(){if(window.ExcelJS)return window.ExcelJS;await new P
 async function exportXlsx(){
   if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
   const ExcelJS=await loadExcelJS(), wb=new ExcelJS.Workbook(), {rows,days,cells,D}=weekGrid();
-  wb.title=`Horario ${ws().plan} UPIITA`;
+  wb.title=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`;
   const NAMES=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'], argb=h=>'FF'+String(h).replace('#','').toUpperCase();
   const FONT={name:'Arial',size:10}, CENTER={horizontal:'center',vertical:'middle',wrapText:true};
   const T='thin', K='medium';
@@ -2169,7 +2317,7 @@ async function exportPdf(){
   if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
   const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
   await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
-  doc.setTitle(`Horario ${ws().plan} UPIITA`);
+  doc.setTitle(`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`);
   return saveFile(`horario-${ws().plan}-upiita.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
 }
 // todos los horarios con contenido en un solo PDF (una hoja por horario, en orden A, B, C…)
@@ -2216,7 +2364,7 @@ for(const [id,fn] of [['#b-png',exportPng],['#b-pdf',exportPdf],['#b-pdfall',exp
 $('#b-copy').addEventListener('click',async()=>{
   const sel=selected();if(!sel.length&&!plan().own.length)return;
   const cr=sel.reduce((s,c)=>s+c[7],0);
-  const txt=`Horario ${ws().plan} UPIITA (${S.per==='proximo'?'próximo periodo':'periodo actual'}) · ${fmtCr(cr)} créditos\n`+
+  const txt=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()} (${S.per==='proximo'?'próximo periodo':'periodo actual'}) · ${fmtCr(cr)} créditos\n`+
     sel.map(c=>`${c[3]}  ${c[8]} ${name(c)} (${fmtCr(c[7])} cr)\n   ${profs(c)}\n   ${pattern(c).join('; ')}`).join('\n')+
     plan().own.map(o=>`\n—  ${o.n}\n   ${o.d.map(d=>DAYS[d]).join(' ')}  ${hm(o.a)}–${hm(o.b)}`).join('');
   const box=$('#copybox');box.value=txt;
@@ -2263,11 +2411,12 @@ $('#b-copy').addEventListener('click',async()=>{
 })();
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(S.tab==='tray'&&ZOOM==null)renderMap()},150)});
 $('#foot').textContent='Herramienta de consulta para que el alumno planee su reinscripción. Los datos del SAES se consultan en modo de solo lectura y se almacenan únicamente en este navegador, al igual que las materias seleccionadas, marcas, notas y horarios. La reinscripción oficial se realiza en el SAES, donde deben verificarse la cita, la carga autorizada y el cupo.';
-if(ALUMNO&&DATA.mapas[ALUMNO.carrera])S.car=ALUMNO.carrera;
+if(ALUMNO&&DATA.mapas[carreraPerfil(ALUMNO)])S.car=carreraPerfil(ALUMNO);
 const mobNote=()=>{$('#mobnote').hidden=!(MQ_PHONE.matches&&!store.get('mobnote',0))};
 mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
 render();
+$('#b-unidad').addEventListener('click',()=>IPNT.bienvenida({select:'#f-carrera',force:true}));
 IPNT.bienvenida({select:'#f-carrera'});   // primera visita: unidad, carrera o inicio de sesión
 SAES.status(ALUMNO);
-SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[d.carrera]){S.car=d.carrera;store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
+SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[carreraPerfil(d)]){S.car=carreraPerfil(d);store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
 </script>

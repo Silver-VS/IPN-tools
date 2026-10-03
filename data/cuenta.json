@@ -18,6 +18,13 @@
       "nombre": "Escuela Superior de Cómputo",
       "disponible": true,
       "url": "horarios-escom.html"
+    },
+    {
+      "id": "upibi",
+      "siglas": "UPIBI",
+      "nombre": "Unidad Profesional Interdisciplinaria de Biotecnología",
+      "disponible": true,
+      "url": "horarios-upibi.html"
     }
   ],
   "googlePrueba": true,

@@ -1,0 +1,18 @@
+{
+  "base_codigo": "3b6928a",
+  "rama": "codex/upibi",
+  "fecha": "2026-10-03",
+  "archivos": {
+    "HANDOFF-CLAUDE-UPIBI.md": "74e5b894f97962057823a3b472cc6f1a09a4ac41723940b8d484b9f7501f74ef",
+    "PLAN-ANALITICA-SAEs.md": "efc2c80e82b14da1bcd64deb8add33a6e4d29deb38d57d11c72feef50500a707",
+    "UPIBI-informe.md": "9c6f6f635ff7635e84006cd2d9ce0dbffd69280d93d6443854b200a07f7a84be",
+    "ANALISIS-EQUIVALENCIAS-UPIBI.md": "41c17a40be6a9284ef4c6de9e7516d92916badac71931847602d350c58fe5eb4",
+    "equivalencias-upibi-saes.json": "6b933158083761582fc8dae541edc2c9c0651da5395e2c19de6bddd673093d99",
+    "especialidades-upibi-saes.json": "4f85c4b4874cc0772fb66ae961d80b4cdf05c8efdf6e6968bdcd8796e92e97bb",
+    "equivalencias-upibi-filas.csv": "cc34c95a6e2777527cef87f54f1ab3e98a86b0fc7b5740dce651c1fb9ca39f89",
+    "equivalencias-upibi-analizadas.json": "9e582fd60dca546e3c56cb0a0498a57d8d73a6a28a7426c7c14768fed962bf64",
+    "equivalencia-saes-requiere-revision.png": "e5dbb3d19d3f8a76988207ce8b13575cce89dd5e06ff16f4e2b87c2948f4c808",
+    "cambios-pendientes-etapa-C.patch": "eb1cc75006fbf88c59dce233a011892d15b867c76643c96374e377f3a296c9a9",
+    "README.md": "1cc0e7a9e4dc2e4bcf687ce1d4ce9c5d3d46ba940b97d95c25a62763ba431443"
+  }
+}

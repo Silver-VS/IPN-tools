@@ -24,6 +24,12 @@ PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la
 OPTA = json.loads((UNI_DIR / "optativas.json").read_text(encoding="utf-8")) if (UNI_DIR / "optativas.json").exists() else {}
 
 
+def carrera_plan(c, p):
+    """Separa planes simultáneos que reutilizan claves; el primer plan conserva el id del SAES."""
+    planes = UCONF.get("planes", {}).get(c, [])
+    return f"{c}_{p}" if planes and p != planes[0] else c
+
+
 def nombre_vis(n):
     """Nombre para mostrar: «LÍNEA|MATERIA» del SAES (optativas de la ESCOM) -> «MATERIA (LÍNEA)»."""
     if "|" not in n:
@@ -67,6 +73,7 @@ def load_curriculum():
     m = json.loads(CUR.read_text(encoding="utf-8")) if CUR.exists() else {"rows": []}   # opcional fuera de la UPIITA
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
+        c = carrera_plan(c, p)
         if p == "98" or (PLANES.get(c) and p != PLANES[c]):
             continue
         cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), float(cred), tipo_letra(tipo)))
@@ -95,21 +102,24 @@ def build(rows, asig, prof, cur, salon=False):
     classes = {}
     for r in rows:
         key = (r["carrera"], r["turno"], r["Grupo"], clean(r["Asignatura"]))
-        c = classes.setdefault(key, {"n": r["nivel"], "p": [], "h": [], "r": ""})
+        c = classes.setdefault(key, {"n": r["nivel"], "p": [], "h": [], "r": {}})
         sa, ed = clean(r.get("Salón") or r.get("Salon") or ""), clean(r.get("Edificio") or "")
-        if salon and sa and not c["r"]:
-            c["r"] = f"Edif. {ed} · {sa}" if ed else sa
         p = idx(prof, clean(r["Profesor"]))
         if p not in c["p"]:
             c["p"].append(p)
         for b in blocks(r):
             if b not in c["h"]:
                 c["h"].append(b)
+            if salon and sa:
+                rooms = c["r"].setdefault(tuple(b), [])
+                room = f"Edif. {ed} · {sa}" if ed else sa
+                if room not in rooms:
+                    rooms.append(room)
     out = []
     for (car, tur, grp, a), c in classes.items():
         row = [car, tur, c["n"], grp, idx(asig, a), c["p"], sorted(c["h"]), *lookup(cur, car, a, c["n"])]
         if c["r"]:
-            row.append([c["r"]] * len(c["h"]))   # índice 10: salón por bloque
+            row.append([" / ".join(c["r"].get(tuple(b), [])) for b in row[6]])   # índice 10: salón por bloque
         out.append(row)
     return out
 
@@ -132,56 +142,285 @@ def energia_layout(cur):
 
 
 def layout_por_areas(cur, e):
-    """Mapa generado: columnas por área (categoría), filas por semestre, hasta 2 materias por renglón en cada celda.
+    """Mapa generado: columnas por área (categoría) y un renglón por semestre.
     `e["areas"]`: [{nombre, claves, espacios: [[nombre, semestre]]}]; seriación en `e["seriacion"]` (oficial) o
-    `e["seriacion_propuesta"]` (propuesta, líneas punteadas); «@Nombre» se refiere a un espacio (p. ej. «@Optativa A1»)."""
-    bw, bh, gap, top, left = 128, 44, 8, 40, 40
-    items = []  # (col, sem, clave, slot)
+    `e["seriacion_propuesta"]` (propuesta, líneas punteadas); «@Nombre» se refiere a un espacio (p. ej. «@Optativa A1»).
+
+    Para que las flechas no atraviesen materias ni se confundan entre sí:
+    - cada celda (área × semestre) es un solo renglón y sus materias se acomodan bajo sus requisitos (baricentro);
+    - cada flecha baja al canal entre semestres por su propio puerto y recorre su propia pista horizontal; el orden de
+      las pistas minimiza los cruces y el canal crece con el número de pistas;
+    - la seriación que salta semestres baja por un canal vertical entre columnas, con pista propia."""
+    bw, bh, sg = 120, 46, 10           # caja y separación entre cajas de una celda
+    TS, MG, MINGAP = 6, 9, 34          # separación entre pistas, margen del canal a las cajas, canal mínimo
+    left, top = 22, 30
+    items = []                         # [col, sem, clave, espacio]
     for ci, a in enumerate(e["areas"]):
         for k in a["claves"]:
             if k in cur:
-                items.append((ci, cur[k][2], k, ""))
+                items.append([ci, cur[k][2], k, ""])
         for name, sem in a.get("espacios", []):
-            items.append((ci, sem, "", name))
-    per = {}
-    for ci, sem, k, sl in items:
-        per.setdefault((ci, sem), []).append((k, sl))
-    ncols = len(e["areas"])
-    # hasta 2 materias por renglón dentro de cada celda (área × semestre)
-    widths = [min(2, max(len(v) for (c, _), v in per.items() if c == ci)) * (bw + gap) + 16 for ci in range(ncols)]
-    pitch = 2 * bh + 3 * gap + 10 if any(len(v) > 2 for v in per.values()) else bh + 26
-    top = pitch / 2 + 4  # centro de la primera fila: deja media banda arriba para que ningún bloque quede cortado
-    xs = [left + sum(widths[:i]) for i in range(ncols)]
-    nsem = max(s for _, s in per)
-    boxes, pos = [], {}
-    for (ci, sem), lst in sorted(per.items()):
-        for j, (k, sl) in enumerate(lst):
-            nrow = (len(lst) + 1) // 2
-            r, cc = divmod(j, 2)
-            x = xs[ci] + 8 + cc * (bw + gap)
-            y = top + (sem - 1) * pitch - (nrow * bh + (nrow - 1) * gap) / 2 + r * (bh + gap)
-            if k:
-                pos[k] = len(boxes)
-            boxes.append([x, y, bw, bh, k, sl, sem])
-    edges = []
-    for (ci, sem), lst in sorted(per.items()):   # posición de los espacios por nombre
-        pass
-    for i, bx in enumerate(boxes):
-        if not bx[4] and bx[5]:
-            pos.setdefault("@" + bx[5], i)
-    propuesta = "seriacion_propuesta" in e
+            items.append([ci, sem, "", name])
+    ncols, nsem = len(e["areas"]), max(it[1] for it in items)
+    cells = {}
+    for i, it in enumerate(items):
+        cells.setdefault((it[0], it[1]), []).append(i)
+    K = [max([len(v) for (c, _), v in cells.items() if c == ci] or [1]) for ci in range(ncols)]
+    ref = {}
+    for i, (ci, sem, k, sl) in enumerate(items):
+        ref.setdefault(k or "@" + sl, i)
+    pares = []
     for a, b in e.get("seriacion_propuesta", e.get("seriacion", [])):
-        if a not in pos or b not in pos:
+        if a in ref and b in ref and ref[a] != ref[b] and (ref[a], ref[b]) not in pares:
+            pares.append((ref[a], ref[b]))
+    # Reducción transitiva: si A → B → C, la flecha directa A → C no se dibuja (C ya depende de A a través de B).
+    # La seriación completa se conserva en `req` y al resaltar una materia se ve toda su cadena.
+    suc = {}
+    for a, b in pares:
+        suc.setdefault(a, set()).add(b)
+    def alcanza(x, meta, salto):   # ¿hay camino x → meta sin usar la arista directa (x, salto)?
+        pila, vis = [y for y in suc.get(x, ()) if y != salto], set()
+        while pila:
+            y = pila.pop()
+            if y == meta:
+                return True
+            if y not in vis:
+                vis.add(y)
+                pila.extend(suc.get(y, ()))
+        return False
+    redundantes = [(a, b) for a, b in pares if alcanza(a, b, b)]
+    pares = [f for f in pares if f not in redundantes]
+    pre, post = {}, {}
+    for a, b in pares:
+        pre.setdefault(b, []).append(a)
+        post.setdefault(a, []).append(b)
+
+    # 1) orden dentro de cada celda: barridos hacia abajo (requisitos) y hacia arriba (dependientes)
+    ustart = [sum(K[:ci]) + ci + 1 for ci in range(ncols)]          # coordenada en «casillas» (con canal entre columnas)
+    slot = {}
+    for (ci, sem), lst in cells.items():
+        s0 = (K[ci] - len(lst)) // 2
+        for j, i in enumerate(lst):
+            slot[i] = s0 + j
+    ux = lambda i: ustart[items[i][0]] + slot[i] + .5
+
+    def acomoda(lst, kk, want):
+        """Asigna casillas crecientes 0..kk-1 a `lst` (ya ordenada) minimizando la distancia a `want`."""
+        n, INF = len(lst), float("inf")
+        best = [[INF] * kk for _ in range(n)]
+        prev = [[-1] * kk for _ in range(n)]
+        for s in range(kk):
+            best[0][s] = abs(s - want[0])
+        for j in range(1, n):
+            m, ms = INF, -1
+            for s in range(kk):
+                if s and best[j - 1][s - 1] < m:
+                    m, ms = best[j - 1][s - 1], s - 1
+                if ms >= 0:
+                    best[j][s], prev[j][s] = m + abs(s - want[j]), ms
+        s = min(range(kk), key=lambda s: best[n - 1][s])
+        for j in range(n - 1, -1, -1):
+            slot[lst[j]] = s
+            s = prev[j][s]
+
+    for it in range(6):
+        sems = range(1, nsem + 1) if it % 2 == 0 else range(nsem, 0, -1)
+        vec = pre if it % 2 == 0 else post
+        for sem in sems:
+            for ci in range(ncols):
+                lst = cells.get((ci, sem))
+                if not lst:
+                    continue
+                d = {i: (sum(ux(x) for x in vec[i]) / len(vec[i]) if vec.get(i) else ux(i)) for i in lst}
+                lst.sort(key=lambda i: (d[i], slot[i]))
+                acomoda(lst, K[ci], [d[i] - ustart[ci] - .5 for i in lst])
+
+    # 2) topología de cada flecha: canales horizontales (entre semestres) y vertical (entre columnas) si salta semestres
+    sem_of = lambda i: items[i][1]
+    via = {}                                                          # flecha -> canal vertical
+    for a, b in pares:
+        if abs(sem_of(b) - sem_of(a)) > 1 or sem_of(b) <= sem_of(a):
+            if sem_of(b) == sem_of(a):
+                continue
+            sx, dx = ux(a), ux(b)
+            via[(a, b)] = min(range(ncols + 1), key=lambda g: (abs(ustart[g] - .5 - sx if g < ncols else sum(K) + ncols + .5 - sx)
+                                                              + abs((ustart[g] - .5 if g < ncols else sum(K) + ncols + .5) - dx), g))
+    def gap_rango(a, b):     # canales horizontales que usa la vertical: del canal bajo el origen al canal sobre el destino
+        sa, sb = sem_of(a), sem_of(b)
+        return (sa, sb - 1) if sb > sa else (sb, sa)
+    gtracks = {}
+    for (a, b), g in sorted(via.items(), key=lambda kv: gap_rango(*kv[0])):
+        lo, hi = gap_rango(a, b)
+        usados = {t for (a2, b2), t in gtracks.items() if via[(a2, b2)] == g and not (gap_rango(a2, b2)[1] < lo or gap_rango(a2, b2)[0] > hi)}
+        gtracks[(a, b)] = min(t for t in range(len(usados) + 1) if t not in usados)
+    nG = [1 + max([t for f, t in gtracks.items() if via[f] == g] or [-1]) for g in range(ncols + 1)]
+    GW = [max(22, nG[g] * TS + 16) for g in range(ncols + 1)]
+
+    # 3) coordenadas x de columnas, cajas y canales verticales
+    xc, x = [], left
+    for ci in range(ncols):
+        x += GW[ci]
+        xc.append(x)
+        x += K[ci] * bw + (K[ci] - 1) * sg
+    W = x + GW[ncols] + left
+    gx0 = [xc[g] - GW[g] if g < ncols else W - left - GW[ncols] for g in range(ncols + 1)]
+    gtx = lambda f: gx0[via[f]] + GW[via[f]] / 2 + (gtracks[f] - (nG[via[f]] - 1) / 2) * TS
+    bx = {i: xc[items[i][0]] + slot[i] * (bw + sg) for i in range(len(items))}
+
+    # 4) puertos: salida por abajo; llegada por arriba (o por abajo si el destino no está más abajo); repartidos
+    #    según la posición del otro extremo para que las flechas de una misma caja no se crucen al salir
+    def otro(f, lado):
+        a, b = f
+        if f in via:
+            return gtx(f)
+        return bx[b] + bw / 2 if lado == "out" else bx[a] + bw / 2
+    ports = {}
+    lados = {}
+    for f in pares:
+        a, b = f
+        lados.setdefault((a, "bot"), []).append((f, "out"))
+        lados.setdefault((b, "top" if sem_of(b) > sem_of(a) else "bot"), []).append((f, "in"))
+    for (i, side), lst in lados.items():
+        lst.sort(key=lambda fl: otro(*fl))
+        n = len(lst)
+        for j, fl in enumerate(lst):
+            ports[fl] = bx[i] + bw / 2 if n == 1 else bx[i] + bw * (.2 + .6 * j / (n - 1))
+    # flecha corta entre cajas que se enciman en x y sin más flechas en esos lados: recta
+    for f in pares:
+        a, b = f
+        if f in via or sem_of(b) != sem_of(a) + 1:
             continue
-        A, B = boxes[pos[a]], boxes[pos[b]]
-        sx, sy, dx, dy = A[0] + A[2] / 2, A[1] + A[3], B[0] + B[2] / 2, B[1]
-        mid = dy - 10
-        edges.append([pos[a], pos[b], [round(v, 1) for v in (sx, sy, sx, mid, dx, mid, dx, dy)]])
+        if len(lados[(a, "bot")]) == 1 and len(lados[(b, "top")]) == 1:
+            lo, hi = max(bx[a], bx[b]), min(bx[a], bx[b]) + bw
+            if hi - lo > 16:
+                ports[(f, "out")] = ports[(f, "in")] = (lo + hi) / 2
+        elif len(lados[(a, "bot")]) == 1 and bx[b] + 8 < ports[(f, "in")] < bx[b] + bw - 8 and bx[a] + 8 < ports[(f, "in")] < bx[a] + bw - 8:
+            ports[(f, "out")] = ports[(f, "in")]
+        elif len(lados[(b, "top")]) == 1 and bx[b] + 8 < ports[(f, "out")] < bx[b] + bw - 8:
+            ports[(f, "in")] = ports[(f, "out")]
+
+    # una llegada no comparte x con una salida de otra flecha en el mismo canal (se encimarían sus tramos verticales)
+    for f in pares:
+        a, b = f
+        if sem_of(b) != sem_of(a) + 1 or f in via:
+            continue
+        salidas = [ports[(g, "out")] for g in pares if g != f and sem_of(g[0]) == sem_of(a)]
+        x = ports[(f, "in")]
+        for paso in (6, -6, 12, -12, 18, -18):
+            if all(abs(x - s) >= 4 for s in salidas):
+                break
+            if bx[b] + 6 < ports[(f, "in")] + paso < bx[b] + bw - 6:
+                x = ports[(f, "in")] + paso
+        ports[(f, "in")] = x
+
+    # 5) tramos horizontales por canal; cada tramo: (flecha, parte, [(x, lado)]) con lado 'up' = viene/va arriba
+    canal = {}
+    for f in pares:
+        a, b = f
+        sa, sb = sem_of(a), sem_of(b)
+        po, pi = ports[(f, "out")], ports[(f, "in")]
+        if sb == sa + 1:
+            canal.setdefault(sa, []).append((f, 0, [(po, "up"), (pi, "down")]))
+        elif sb == sa:
+            canal.setdefault(sa, []).append((f, 0, [(po, "up"), (pi, "up")]))
+        elif sb > sa:
+            g = gtx(f)
+            canal.setdefault(sa, []).append((f, 0, [(po, "up"), (g, "down")]))
+            canal.setdefault(sb - 1, []).append((f, 1, [(g, "up"), (pi, "down")]))
+        else:
+            g = gtx(f)
+            canal.setdefault(sa, []).append((f, 0, [(po, "up"), (g, "up")]))
+            canal.setdefault(sb, []).append((f, 1, [(g, "down"), (pi, "up")]))
+    pista = {}
+    ntr = {}
+    for s, segs in canal.items():
+        span = [(min(x for x, _ in st), max(x for x, _ in st)) for _, _, st in segs]
+        hor = [j for j in range(len(segs)) if span[j][1] - span[j][0] > .5]
+
+        def costo(i, j):   # cruces si el tramo i va por encima del j
+            c = 0
+            (i0, i1), (j0, j1) = span[i], span[j]
+            for x, ld in segs[i][2]:
+                if ld == "down" and j0 + .5 < x < j1 - .5:
+                    c += 1
+            for x, ld in segs[j][2]:
+                if ld == "up" and i0 + .5 < x < i1 - .5:
+                    c += 1
+            for x, ld in segs[i][2]:
+                for y, l2 in segs[j][2]:
+                    if ld == "down" and l2 == "up" and abs(x - y) < 1:
+                        c += 5   # tramos verticales encimados
+            return c
+        C = {(i, j): costo(i, j) for i in hor for j in hor if i != j}
+        orden = []
+        for j in sorted(hor, key=lambda j: span[j][0]):
+            best = min(range(len(orden) + 1), key=lambda p: sum(C[(o, j)] for o in orden[:p]) + sum(C[(j, o)] for o in orden[p:]))
+            orden.insert(best, j)
+        mejora = True
+        while mejora:
+            mejora = False
+            for p in range(len(orden) - 1):
+                u, v = orden[p], orden[p + 1]
+                if C[(v, u)] < C[(u, v)]:
+                    orden[p], orden[p + 1] = v, u
+                    mejora = True
+        tr = {}
+        for p, j in enumerate(orden):
+            enc = [tr[o] for o in orden[:p] if not (span[o][1] + 6 < span[j][0] or span[j][1] + 6 < span[o][0])]
+            tr[j] = 1 + max(enc) if enc else 0
+        ntr[s] = 1 + max(tr.values()) if tr else 0
+        for j, (f, parte, _) in enumerate(segs):
+            pista[(f, parte)] = (s, tr.get(j))
+
+    # 6) coordenadas y: el canal entre semestres crece con sus pistas
+    gapH = {s: max(MINGAP, (ntr.get(s, 0) - 1) * TS + 2 * MG + 4) for s in range(1, nsem + 1)}
+    rtop = {1: top}
+    for s in range(1, nsem):
+        rtop[s + 1] = rtop[s] + bh + gapH[s]
+    def ty(s, t):
+        g0, n = rtop[s] + bh, ntr.get(s, 1)
+        return g0 + gapH[s] / 2 + (t - (n - 1) / 2) * TS if t is not None else g0 + gapH[s] / 2
+    H = rtop[nsem] + bh + (gapH[nsem] if ntr.get(nsem) else MINGAP / 2) + 4
+
+    boxes, idx = [], {}
+    for i, (ci, sem, k, sl) in enumerate(items):
+        idx[i] = len(boxes)
+        boxes.append([bx[i], rtop[sem], bw, bh, k, sl, sem])
+    edges = []
+    r1 = lambda v: round(v, 1)
+    for f in pares:
+        a, b = f
+        sa, sb = sem_of(a), sem_of(b)
+        po, pi = ports[(f, "out")], ports[(f, "in")]
+        y0 = rtop[sa] + bh
+        y1 = rtop[sb] if sb > sa else rtop[sb] + bh
+        s0, t0 = pista[(f, 0)]
+        pts = [(po, y0), (po, ty(s0, t0))]
+        if (f, 1) in pista:
+            s1, t1 = pista[(f, 1)]
+            g = gtx(f)
+            pts += [(g, ty(s0, t0)), (g, ty(s1, t1)), (pi, ty(s1, t1))]
+        else:
+            pts.append((pi, ty(s0, t0)))
+        pts.append((pi, y1))
+        limpio = []
+        for p in pts:   # sin puntos repetidos ni colineales
+            if limpio and abs(p[0] - limpio[-1][0]) < .05 and abs(p[1] - limpio[-1][1]) < .05:
+                continue
+            if len(limpio) >= 2 and ((abs(limpio[-2][0] - limpio[-1][0]) < .05 and abs(limpio[-1][0] - p[0]) < .05) or
+                                     (abs(limpio[-2][1] - limpio[-1][1]) < .05 and abs(limpio[-1][1] - p[1]) < .05)):
+                limpio[-1] = p
+                continue
+            limpio.append(p)
+        edges.append([idx[a], idx[b], [r1(v) for p in limpio for v in p]])
+    centros = [[s, rtop[s] + bh / 2] for s in range(1, nsem + 1)]
     out = {
-        "w": xs[-1] + widths[-1] + 20, "h": top + (nsem - 1) * pitch + pitch / 2 + 4, "pitch": pitch,
-        "rows": [[s, top + (s - 1) * pitch] for s in range(1, nsem + 1)],
-        "boxes": boxes, "edges": edges, "propuesto": propuesta,
-        "cols": [[a["nombre"], xs[i], xs[i] + widths[i]] for i, a in enumerate(e["areas"])],
+        "w": r1(W), "h": r1(H),
+        "pitch": r1(min([centros[i + 1][1] - centros[i][1] for i in range(nsem - 1)] or [bh + MINGAP])),
+        "rows": [[s, r1(y)] for s, y in centros],
+        "boxes": [[r1(v) if isinstance(v, float) else v for v in b] for b in boxes], "edges": edges,
+        "propuesto": "seriacion_propuesta" in e, "filas_exactas": True, "rutas": True, "ocultas": len(redundantes),
+        "cols": [[a["nombre"], r1(gx0[i] + GW[i] / 2), r1(gx0[i + 1] + GW[i + 1] / 2)] for i, a in enumerate(e["areas"])],
     }
     if e.get("nota"):
         out["nota"] = e["nota"]
@@ -267,6 +506,7 @@ def load_maps(offer, upiita=True, extra=None):
         plan.update({"B": "09", "M": "09", "T": "09", "E": "18", "S": "08"})
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
+        c = carrera_plan(c, p)
         if plan.get(c) == p:
             cur.setdefault(c, {})[clave.upper()] = [nom, float(cred), int(niv), tipo_letra(tipo)]
     for c, extra_c in (extra or {}).items():
@@ -291,14 +531,14 @@ def load_maps(offer, upiita=True, extra=None):
                     fa = UNI_DIR / f"areas_{c}.json"
                     if fa.exists():   # columnas por categoría (data/categorias.json); seriación del mapa oficial
                         ea = json.loads(fa.read_text(encoding="utf-8"))
-                        ea["nota"] = (f"Mapa curricular {UCONF['siglas']} organizado por áreas de conocimiento (clasificación propuesta, "
+                        ea.setdefault("nota", (f"Mapa curricular {UCONF['siglas']} organizado por áreas de conocimiento (clasificación propuesta, "
                                       "sujeta a revisión). Las flechas indican la seriación del mapa oficial; al colocar el cursor sobre una "
-                                      "materia se resalta su cadena de requisitos.")
+                                      "materia se resalta su cadena de requisitos."))
                         entry["layout"], entry["generico"] = layout_por_areas(cur[c], ea), False
                     else:
                         entry["layout"], entry["generico"] = layout_de(t), False
-                    if UCONF.get("modelo"):   # el modelo de la unidad aplica a los planes con mapa (ESCOM: planes 2020)
-                        entry["modelo"] = UCONF["modelo"]
+                    if t.get("modelo") or UCONF.get("modelo"):   # el modelo de la unidad aplica a los planes con mapa (ESCOM: planes 2020)
+                        entry["modelo"] = t.get("modelo", UCONF.get("modelo"))
                     req = {}
                     for e in t["edges"]:
                         a_, b_ = t["boxes"][e["s"]].get("clave"), t["boxes"][e["d"]].get("clave")
@@ -335,6 +575,16 @@ def main():
     import sys
     sys.path.insert(0, str(ROOT / "tools"))
     d = json.loads(SRC.read_text(encoding="utf-8"))
+    opciones = {}
+    for c, planes in UCONF.get("planes", {}).items():
+        nombre = d["carreras"].pop(c)
+        for p in planes:
+            ident = carrera_plan(c, p)
+            d["carreras"][ident] = f"{nombre} (plan 20{p})"
+            opciones[ident] = {"carrera": c, "plan": p}
+    for per in ("actual", "proximo"):
+        for row in d[per]:
+            row["carrera"] = carrera_plan(row["carrera"], row["plan"])
     if UNIDAD != "upiita":   # plan vigente por carrera
         from collections import Counter
         for (c_, pl), _ in Counter((r["carrera"], r.get("plan")) for k in ("actual", "proximo") for r in d.get(k, [])).most_common():
@@ -347,6 +597,8 @@ def main():
         "prof": prof,
         "periodos": {k: build(d[k], asig, prof, cur, salon=UNIDAD != "upiita") for k in ("proximo", "actual")},
         "unidad": UNIDAD,
+        "siglas": UCONF["siglas"],
+        "opciones_plan": opciones,
     }
     # materias sin mapa curricular (otra escuela o materia nueva): clave interna estable por carrera y nombre,
     # para que el armado de horario funcione aunque no haya trayectoria ni créditos

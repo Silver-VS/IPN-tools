@@ -1,0 +1,442 @@
+[
+  {
+    "lado": "origen",
+    "carrera": "A",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "A",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "A",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "origen",
+    "carrera": "A",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "B",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "B",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "B",
+    "plan": "24",
+    "opciones": [
+      {
+        "texto": "TRONCO COMÚN",
+        "valor": "0"
+      },
+      {
+        "texto": "GESTIÓN DE RECURSOS MATERIALES Y HUMANOS",
+        "valor": "G"
+      },
+      {
+        "texto": "PRODUCCIÓN DE PRODUCTOS BIOLÓGICOS",
+        "valor": "P"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "B",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      },
+      {
+        "texto": "TECNOLOGIA ENZIMATICA",
+        "valor": "E"
+      },
+      {
+        "texto": "BIOTECNOLOGIA AGROPECUARIA",
+        "valor": "G"
+      },
+      {
+        "texto": "PRODUCCION DE BIOLOGICOS",
+        "valor": "P"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "F",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "F",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "F",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "origen",
+    "carrera": "F",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "L",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "L",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "L",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "origen",
+    "carrera": "L",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "M",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "M",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "origen",
+    "carrera": "M",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "origen",
+    "carrera": "M",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "A",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "A",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "A",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "destino",
+    "carrera": "A",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "B",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "B",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "B",
+    "plan": "24",
+    "opciones": [
+      {
+        "texto": "TRONCO COMÚN",
+        "valor": "0"
+      },
+      {
+        "texto": "GESTIÓN DE RECURSOS MATERIALES Y HUMANOS",
+        "valor": "G"
+      },
+      {
+        "texto": "PRODUCCIÓN DE PRODUCTOS BIOLÓGICOS",
+        "valor": "P"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "B",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      },
+      {
+        "texto": "TECNOLOGIA ENZIMATICA",
+        "valor": "E"
+      },
+      {
+        "texto": "BIOTECNOLOGIA AGROPECUARIA",
+        "valor": "G"
+      },
+      {
+        "texto": "PRODUCCION DE BIOLOGICOS",
+        "valor": "P"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "F",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "F",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "F",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "destino",
+    "carrera": "F",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "L",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "L",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "L",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "destino",
+    "carrera": "L",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "M",
+    "plan": "06",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "M",
+    "plan": "14",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  },
+  {
+    "lado": "destino",
+    "carrera": "M",
+    "plan": "24",
+    "opciones": []
+  },
+  {
+    "lado": "destino",
+    "carrera": "M",
+    "plan": "99",
+    "opciones": [
+      {
+        "texto": "SIN ESPECIALIDAD",
+        "valor": "0"
+      }
+    ]
+  }
+]

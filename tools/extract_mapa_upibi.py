@@ -53,7 +53,7 @@ def extract(pdf_path):
             t = texto(p.chars, c, dup=0.4, limpia=False)   # letra pequeña: «ll» de «Taller» no es un duplicado
             m = re.search(r"HT\s*([\d.]+)\s*HP\s*([\d.]+)\s*CT\s*([\d.]+)?", t)
             nombre = re.sub(r"\s+", " ", re.split(r"\bHT\b", t)[0]).strip()
-            nombre = re.sub(r"\b(I)\s+(I{1,2})\b", r"", nombre)   # «I I» -> «II»
+            nombre = re.sub(r"\b(I)\s+(I{1,2})\b", r"\1\2", nombre)   # «I I» -> «II»
             if not nombre:
                 continue
             xc = (c["x0"] + c["x1"]) / 2
@@ -112,5 +112,150 @@ def main():
         print(f.stem, "|", titulo[:60], "|", len(boxes), "materias", len(pares), "seriaciones", dict(sorted(niv.items())))
 
 
+# Empates revisados contra las tablas del SAES; no se aceptan coincidencias difusas.
+ALIAS_SAES = {
+    "Comunicacion y Sistemas de Informacion (Taller)": "COMUNICA. Y SIST. DE INFORMACION (TALLER)",
+    "Biologia de Eucariontes": "BIOLOGIA DE EUCARIOTES",
+    "Remediacion de Suelos Acuiferos": "REMEDIACION DE SUELOS Y ACUIFEROS",
+    "Laboratorio de Bioingenieria": "LAB. DE BIOINGENIERIA",
+    "Laboratorio de Bioseparaciones": "LAB. DE BIOSEPARACIONES",
+    "Procesos de Transferencia de Calor": "PROC.DE TRANS.DE CALOR",
+    "Manejo Integral de la Calidad del Aire": "MANEJO INT.DE LA CAL.DEL AIRE",
+    "Formulacion y Evaluacion de Proyectos": "FOR.Y EVAL.DE PROYECTOS",
+    "Ingenieria de Reactores y Biorreactores": "ING.DE REACTORES Y BIORREACTORES",
+    "Dinamica de Bioprocesos del Medioambiente (Taller)": "DINAMICA DE BIOPROC.DEL MEDIO AMB. (TALLER)",
+    "Laboratorio de Tecnicas Microbiologicas": "LAB. TEC. MICROBIOLOGICAS",
+    "Laboratorio de Biorreactores": "LAB. DE BIORREACTORES",
+    "Laboratorio de Biotecnologia Molecular": "LAB. BIOTECNOLOGIA MOLECULAR",
+    "Tecnologias de Recombinacion Genetica": "TEC.DE RECOMBINACION GENETICA",
+    "Biotecnologia de la Respuesta Inmune": "BIOTECNOLOGIA DE LA RESP.INMUNE",
+    "Laboratorio de Bioconversiones": "LAB. DE BIOCONVERSIONES",
+    "Tecnologias de Produccion de Biomoleculas": "TEC.DE LA PROD.DE BIOMOLECULAS",
+    "Validacion de Procesos Farmaceuticos": "VALIDACION DE PROC.FARMACEUTICOS",
+    "Quimica y Funcionalidad de los Alimentos": "QUIMICA Y FUNC.DE LOS ALIMENTOS",
+    "Fisicoquimica de los Alimentos": "FISICOQUIMICA DE ALIMENTOS",
+    "Topicos Selectos de Ingenieria Biomedica I": "TOP.SELEC.DE ING.BIOMEDICA I",
+    "Topicos Selectos de Ingenieria Biomedica II": "TOP.SELEC.DE ING.BIOMEDICA II",
+    "Procesamiento Digital de Biosenales e Imagenes": "PROC.DIG.DE BIOSENALES E IMAGENES",
+    "Administracion de la Conservacion Hospitalaria (Taller)": "ADMON. DE LA CONSERV. HOSPITALARIA",
+    "Administracion de Tecnologias en Salud": "ADMON.DE LA TEC.EN SALUD",
+    "Balances de Materia y Energia": "BALANCE DE MATERIA Y ENERGIA",
+    "Project Management": "PROYECT MANAGEMENT",
+}
+
+
+def nombre_empate(s):
+    import unicodedata
+    s = unicodedata.normalize("NFD", s).encode("ascii", "ignore").decode().upper()
+    return re.sub(r"[^A-Z0-9]", "", re.sub(r"\s*\(TALLER\)$", "", s))
+
+
+def empatar_materia(materia, filas, carrera, plan):
+    n = nombre_empate(materia["nombre"])
+    nombres = {n}
+    nombres.update(nombre_empate(v) for k, v in ALIAS_SAES.items() if nombre_empate(k) == n)
+    if n == nombre_empate("Procesos de Transferencia de Calor") and carrera == "B" and plan == "06":
+        nombres.add(nombre_empate("PROCS. DE TRANSF.DE CALOR"))
+    if n == nombre_empate("Tecnologias de Produccion de Biomoleculas") and plan == "24":
+        nombres.add(nombre_empate("TECNOLOGIA Y PRODUCCION DE BIOMOLECULAS"))
+    cand = [r for r in filas if nombre_empate(r[4]) in nombres]
+    if len(cand) != 1:
+        raise ValueError(f"{carrera}/{plan}: empate ambiguo o ausente: {materia['nombre']!r}; claves={[r[3] for r in cand]}")
+    return cand[0]
+
+
+def categoria_upibi(nombre, formacion):
+    n = nombre_empate(nombre)
+    if n == "ETICA":
+        return "integral"
+    reglas = [
+        ("prof", r"ESTANCIAPROFESIONAL|PROYECTOTERMINAL|METODOLOGIADELAINVESTIGACION"),
+        ("fm", r"CALCULO|ALGEBRA|ECUACIONES|ESTADISTICA|FISICADEL|FISICADELA|METODOSNUMERICOS|METODOSCUANTITATIVOS"),
+        ("comp", r"PROGRAMACION"),
+        ("elec", r"ELECTRONICA|CIRCUITOS|SISTEMASDIGITALES|MICROPROCESADORES|PROCESAMIENTODIGITALDEBIOSENALES"),
+        ("ctrl", r"INSTRUMENTACION|CONTROL"),
+        ("integral", r"COMUNICA|INGLES|RELACIONESLABORALES|ADMINISTRACION|ADMON|GESTION|PLANEACION|ECONOMIA|QUALITY|MANAGEMENT|FORMULACION|FORYEVAL|LEGISLACION"),
+    ]
+    return next((c for c, pat in reglas if re.search(pat, n)), "propia")
+
+
+def integrar():
+    """Empata los seis PDF con el SAES y genera mapas por categorías reproducibles."""
+    uni = OUT.parent
+    filas = json.loads((uni / "mapa_curricular_saes.json").read_text(encoding="utf-8"))["rows"]
+    cat = json.loads((ROOT / "data" / "categorias.json").read_text(encoding="utf-8"))
+    nombres = {"A": "Ingeniería Ambiental", "B": "Ingeniería Biotecnológica", "F": "Ingeniería Farmacéutica",
+               "L": "Ingeniería en Alimentos", "M": "Ingeniería Biomédica"}
+    propias = {"A": "Ciencias ambientales y bioprocesos", "B": "Biotecnología y bioprocesos", "F": "Ciencias farmacéuticas",
+               "L": "Ciencia e ingeniería de alimentos", "M": "Ciencias e ingeniería biomédica"}
+    archivos = {"ambiental-2006": ("A", "06"), "biotecnologia-2006": ("B", "06"), "biotecnologia-2024": ("B", "24"),
+                "farmaceutica-2006": ("F", "06"), "alimentos-2006": ("L", "06"), "biomedica-2006": ("M", "06")}
+    doc = ["# Integración de UPIBI", "", "## 1. Fuentes y alcance", "",
+           "Tablas académicas del SAES y seis mapas oficiales PDF. Sin datos personales del alumnado. Captura inicial del 2 de octubre de 2026 de planes 2006 y 2024; los planes 1999 quedan fuera de esta integración. Oferta actual: 1,027 filas del SAES, fusionadas en 664 clases. El próximo periodo no tiene filas publicadas en la captura.",
+           "Clasificación por categorías propuesta, pendiente de revisión por las academias. Los planes 2006 son por niveles; Biotecnológica 2024 es semestral.", "",
+           "## 2. Empates y diferencias", "", "| Carrera y plan | Materias PDF | Espacios optativos | Diferencias PDF / SAES |", "|---|---:|---:|---|"]
+    opta = {"lineas": {}}
+    for archivo, (c, p) in archivos.items():
+        ident = "B_06" if c == "B" and p == "06" else c
+        m = json.loads((OUT / f"{archivo}.json").read_text(encoding="utf-8"))
+        rr = [r for r in filas if r[0] == c and r[1] == p]
+        areas = {k: {"nombre": propias[c] if k == "propia" else cat["categorias"][k]["nombre"], "claves": [], "espacios": []}
+                 for k in cat["orden"]}
+        boxes, diferencias, usados = [], [], set()
+        for i, b in enumerate(m["materias"]):
+            bx = {"nombre": b["nombre"], "sem": b["nivel"], "x0": 40, "x1": 168,
+                  "top": b["nivel"] * 100 + i % 8 * 8, "bottom": b["nivel"] * 100 + i % 8 * 8 + 44}
+            if re.match(r"^Optativa\b", b["nombre"], re.I):
+                bx.update(slot=b["nombre"], text=b["nombre"])
+                areas["esp"]["espacios"].append([b["nombre"], b["nivel"]])
+            else:
+                r = empatar_materia(b, rr, c, p)
+                if r[3] in usados:
+                    raise ValueError(f"{c}/{p}: clave duplicada {r[3]}")
+                usados.add(r[3]); bx["clave"] = r[3]
+                for campo, original, real in (("nivel", b["nivel"], int(r[2])), ("créditos", b["creditos"], float(r[6])),
+                                               ("HT", b["ht"], float(r[7])), ("HP", b["hp"], float(r[8]))):
+                    if original != real:
+                        diferencias.append(f"{r[3]} {campo}: PDF {original}, SAES {real}")
+                # Conserva el nivel del PDF en la trayectoria; créditos y horas proceden del SAES.
+                areas[categoria_upibi(b["nombre"], b["area_formacion"])]["claves"].append(r[3])
+            boxes.append(bx)
+        extra = [r for r in rr if r[3] not in usados and not r[5].startswith("OPT")]
+        for r in extra:
+            areas[categoria_upibi(r[4], "")]["claves"].append(r[3])
+            boxes.append({"nombre": r[4], "sem": int(r[2]), "clave": r[3], "x0": 40, "x1": 168,
+                          "top": int(r[2]) * 100, "bottom": int(r[2]) * 100 + 44})
+        opc = [r for r in rr if r[5].startswith("OPT")]
+        if opc:
+            opta["lineas"][ident] = [{"area": "Optativas", "linea": "Opciones del SAES", "categoria": "Especialización", "claves": [r[3] for r in opc]}]
+        ser = []
+        for a, d in m["seriacion"]:
+            ka = boxes[a].get("clave") or "@" + boxes[a]["slot"]
+            kd = boxes[d].get("clave") or "@" + boxes[d]["slot"]
+            ser.append([ka, kd])
+        t = {"fuente": m["fuente"], "plan": p, "modelo": "semestral" if p == "24" else "niveles",
+             "rows": [[n, n * 100 + 22] for n in range(1, 9)], "boxes": boxes,
+             "edges": [{"s": a, "d": d, "pts": []} for a, d in m["seriacion"]]}
+        nota = "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos."
+        if p == "24":
+            nota += " El PDF suma 354 créditos sin Electiva; con sus 18 créditos son 372. El SAES asigna 1.5 a Estancia Profesional I y el PDF 3; el total con las cuatro optativas es 370.5 según el SAES. Diferencia pendiente de aclaración."
+        ea = {"carrera": c, "plan": p, "estado": "Clasificación propuesta, pendiente de revisión por las academias.",
+              "fuente_seriacion": m["fuente"], "nota": nota,
+              "areas": [a for a in areas.values() if a["claves"] or a["espacios"]], "seriacion": ser}
+        for nombre, obj in ((f"trayectoria_{ident}.json", t), (f"areas_{ident}.json", ea)):
+            (uni / nombre).write_text(json.dumps(obj, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+        doc.append(f"| {nombres[c]} {p} | {len(m['materias'])} | {len(areas['esp']['espacios'])} | {'; '.join(diferencias) or 'Ninguna en las materias empatadas'} |")
+        print(f"UPIBI {c}/{p}: {len(usados)} empates, {len(opc)} opciones, {len(extra)} obligatorias adicionales, {len(ser)} seriaciones; diferencias={diferencias}")
+    (uni / "optativas.json").write_text(json.dumps(opta, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    doc += ["", "## 3. Créditos de Biotecnológica 2024", "",
+            "La extracción de 354 créditos omite Electiva (18 créditos, B612): 354 + 18 = 372, igual al encabezado del PDF.",
+            "Persiste una diferencia independiente: Estancia Profesional I tiene 3 créditos en el PDF y 1.5 en el SAES. El mapa usa los créditos del SAES y señala la discrepancia; no fuerza el total a 372.",
+            "", "## 4. Validación local", "", "Ejecutar `python tools/extract_mapa_upibi.py --integrar` y `UNIDAD=upibi python tools/build_horarios.py`.",
+            "Biotecnológica se ofrece por separado para 2024 y 2006. Las opciones optativas se consultan en el panel de optativas; las cajas del mapa representan los espacios del plan.",
+            "", "## 5. Pendientes de revisión", "", "Confirmar la diferencia de Estancia Profesional I con Gestión Escolar. Validar categorías y flechas extraídas con las academias.",
+            "No se infieren reglas de seriación entre optativas, equivalencias entre planes ni restricciones de inscripción ausentes en las fuentes."]
+    (ROOT / "docs" / "UPIBI.md").write_text("\n".join(doc) + "\n", encoding="utf-8")
+
+
 if __name__ == "__main__":
-    main()
+    integrar() if "--integrar" in sys.argv else main()

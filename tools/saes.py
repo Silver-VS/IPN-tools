@@ -68,17 +68,17 @@ const SAES={
       SAES.clear();msg.textContent='Tus datos del SAES se borraron de este navegador.';onLoad(null)});
   },
   /* aviso cuando se explora una carrera distinta a la del perfil cargado: nada del perfil se aplica ni se modifica */
-  mismatch(car,nameOf,onBack){
+  mismatch(car,nameOf,onBack,carOf=d=>d?.carrera){
     const el=document.getElementById('saes-mismatch');if(!el)return;
     const d=SAES.load(), cap=s=>String(s||'').toLowerCase().replace(/(^|\s)(\S)/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(En|De|Y)\b/g,w=>w.toLowerCase()).replace(/^Ingenieria\b/,'Ingeniería');
     let hid=null;try{hid=localStorage.getItem('saes.aviso')}catch(e){}
-    if(!d||!d.carrera||d.carrera===car||hid===d.leido){el.hidden=true;return}
-    const mine=cap(nameOf(d.carrera)||d.carrera_nombre), here=cap(nameOf(car));
+    if(!d||!d.carrera||carOf(d)===car||hid===d.leido){el.hidden=true;return}
+    const mine=cap(nameOf(carOf(d))||d.carrera_nombre), here=cap(nameOf(car));
     el.innerHTML=`<p><b>Consultando ${here||'otra carrera'}.</b> Tus datos del SAES corresponden a ${mine}; el avance y las sugerencias no se aplican en esta carrera.</p>`+
       `<div class="mm-act"><button class="btn" type="button" data-mm="back">Volver a ${mine}</button><button class="btn" type="button" data-mm="load">Usar datos de otra sesión</button><button class="x" type="button" data-mm="hide" aria-label="Ocultar este aviso" title="Ocultar este aviso">×</button></div>`;
     el.hidden=false;
     el.onclick=e=>{const a=e.target.closest('[data-mm]')?.dataset.mm;if(!a)return;
-      if(a==='back')onBack(d.carrera);else if(a==='load')SAES.open();
+      if(a==='back')onBack(carOf(d));else if(a==='load')SAES.open();
       else{try{localStorage.setItem('saes.aviso',d.leido)}catch(err){}el.hidden=true}};
   },
   status(d){

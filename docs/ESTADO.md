@@ -250,3 +250,7 @@ Contraste: `python tools/contraste.py` (debe dar "pares bajo el mínimo: 0").
 - Uso: Firefox (Android e iOS, confirmado) desde marcadores; Safari (iOS) confirmado (Compartir › Agregar marcador, editar la dirección; se ejecuta desde la barra de direcciones,
   sección de marcadores); Chrome (Android) escribiendo «Lector UPIITA» en la barra de
   direcciones (confirmado por el usuario el 2026-10-02 con la versión corta); Chrome (iOS) también funciona (confirmado: marcador editado y ejecutado con el SAES abierto). Con la versión corta, lo que corre en el SAES es el lector.js publicado.
+
+## Integración local UPIBI (2026-10-02, codex/upibi)
+
+Pendiente 1 implementado para revisión local: captura académica, seis mapas por categorías, cinco carreras con Biotecnológica separada por planes 2006 y 2024; `UNIDAD=upibi` genera `web/horarios-upibi.html` y `web/dist/horarios-upibi.html`. Detalles y discrepancias en `docs/UPIBI.md`. Siete pruebas automatizadas y regresión visual de UPIITA/ESCOM. Sin publicación. Quedan la aclaración de diferencias PDF/SAES y la validación académica de categorías y seriación.

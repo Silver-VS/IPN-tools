@@ -1,0 +1,856 @@
+{
+ "fuente": "biotecnologia-2006.pdf",
+ "plan": "06",
+ "modelo": "niveles",
+ "rows": [
+  [
+   1,
+   122
+  ],
+  [
+   2,
+   222
+  ],
+  [
+   3,
+   322
+  ],
+  [
+   4,
+   422
+  ],
+  [
+   5,
+   522
+  ],
+  [
+   6,
+   622
+  ],
+  [
+   7,
+   722
+  ],
+  [
+   8,
+   822
+  ]
+ ],
+ "boxes": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 100,
+   "bottom": 144,
+   "clave": "B104"
+  },
+  {
+   "nombre": "Inglés I",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 108,
+   "bottom": 152,
+   "clave": "B107"
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 116,
+   "bottom": 160,
+   "clave": "B102"
+  },
+  {
+   "nombre": "Química General",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 124,
+   "bottom": 168,
+   "clave": "B110"
+  },
+  {
+   "nombre": "Biología Celular",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 132,
+   "bottom": 176,
+   "clave": "B101"
+  },
+  {
+   "nombre": "Física del Movimiento",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 140,
+   "bottom": 184,
+   "clave": "B106"
+  },
+  {
+   "nombre": "Física de la Energía",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 148,
+   "bottom": 192,
+   "clave": "B105"
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 156,
+   "bottom": 200,
+   "clave": "B103"
+  },
+  {
+   "nombre": "Planeación",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 100,
+   "bottom": 144,
+   "clave": "B108"
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "sem": 1,
+   "x0": 40,
+   "x1": 168,
+   "top": 108,
+   "bottom": 152,
+   "clave": "B109"
+  },
+  {
+   "nombre": "Inglés II",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 216,
+   "bottom": 260,
+   "clave": "B213"
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 224,
+   "bottom": 268,
+   "clave": "B216"
+  },
+  {
+   "nombre": "Química Orgánica",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 232,
+   "bottom": 276,
+   "clave": "B215"
+  },
+  {
+   "nombre": "Laboratorio de Técnicas Microbiológicas",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 240,
+   "bottom": 284,
+   "clave": "B214"
+  },
+  {
+   "nombre": "Termodinámica I",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 248,
+   "bottom": 292,
+   "clave": "B217"
+  },
+  {
+   "nombre": "Estadística",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 256,
+   "bottom": 300,
+   "clave": "B212"
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "sem": 2,
+   "x0": 40,
+   "x1": 168,
+   "top": 200,
+   "bottom": 244,
+   "clave": "B211"
+  },
+  {
+   "nombre": "Inglés III",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 308,
+   "bottom": 352,
+   "clave": "B323"
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "B321"
+  },
+  {
+   "nombre": "Métodos Cuantitativos",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 324,
+   "bottom": 368,
+   "clave": "B326"
+  },
+  {
+   "nombre": "Fisiología Celular",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 332,
+   "bottom": 376,
+   "clave": "B322"
+  },
+  {
+   "nombre": "Laboratorio de Biorreactores",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 340,
+   "bottom": 384,
+   "clave": "B325"
+  },
+  {
+   "nombre": "Laboratorio de Bioingeniería",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 348,
+   "bottom": 392,
+   "clave": "B324"
+  },
+  {
+   "nombre": "Balance de Materia y Energía",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 356,
+   "bottom": 400,
+   "clave": "B319"
+  },
+  {
+   "nombre": "Laboratorio de Biotecnología Molecular",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 400,
+   "bottom": 444,
+   "clave": "B432"
+  },
+  {
+   "nombre": "Ingeniería Enzimática",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 408,
+   "bottom": 452,
+   "clave": "B431"
+  },
+  {
+   "nombre": "Electromecánica de Procesos",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 416,
+   "bottom": 460,
+   "clave": "B428"
+  },
+  {
+   "nombre": "Dinámica y Control de Bioprocesos",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 424,
+   "bottom": 468,
+   "clave": "B430"
+  },
+  {
+   "nombre": "Fenómenos de Transporte",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 432,
+   "bottom": 476,
+   "clave": "B429"
+  },
+  {
+   "nombre": "Laboratorio de Bioseparaciones",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 440,
+   "bottom": 484,
+   "clave": "B433"
+  },
+  {
+   "nombre": "Termodinámica II",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 348,
+   "bottom": 392,
+   "clave": "B327"
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "sem": 4,
+   "x0": 40,
+   "x1": 168,
+   "top": 456,
+   "bottom": 500,
+   "clave": "B434"
+  },
+  {
+   "nombre": "Tecnologías de Recombinación Genética",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 500,
+   "bottom": 544,
+   "clave": "B542"
+  },
+  {
+   "nombre": "Biotecnología de la Respuesta Inmune",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 508,
+   "bottom": 552,
+   "clave": "B536"
+  },
+  {
+   "nombre": "Laboratorio de Bioconversiones",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 516,
+   "bottom": 560,
+   "clave": "B537"
+  },
+  {
+   "nombre": "Procesos de Transferencia de Calor",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 524,
+   "bottom": 568,
+   "clave": "B539"
+  },
+  {
+   "nombre": "Mecánica de Fluidos y Sólidos",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 532,
+   "bottom": 576,
+   "clave": "B538"
+  },
+  {
+   "nombre": "Protección Ambiental",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 540,
+   "bottom": 584,
+   "clave": "B540"
+  },
+  {
+   "nombre": "Administración de la Producción",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 548,
+   "bottom": 592,
+   "clave": "B535"
+  },
+  {
+   "nombre": "Sistemas de Calidad",
+   "sem": 5,
+   "x0": 40,
+   "x1": 168,
+   "top": 556,
+   "bottom": 600,
+   "clave": "B541"
+  },
+  {
+   "nombre": "Ingeniería Celular",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 600,
+   "bottom": 644,
+   "clave": "B648"
+  },
+  {
+   "nombre": "Optativa I",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 608,
+   "bottom": 652,
+   "slot": "Optativa I",
+   "text": "Optativa I"
+  },
+  {
+   "nombre": "Ingeniería de Biorreactores",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 616,
+   "bottom": 660,
+   "clave": "B647"
+  },
+  {
+   "nombre": "Bioseparaciones Mecánicas",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 624,
+   "bottom": 668,
+   "clave": "B645"
+  },
+  {
+   "nombre": "Bioseparaciones Fluido-Fluido",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 632,
+   "bottom": 676,
+   "clave": "B644"
+  },
+  {
+   "nombre": "Bioseparaciones Sólido-Fluido",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 640,
+   "bottom": 684,
+   "clave": "B646"
+  },
+  {
+   "nombre": "Optativa II",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 648,
+   "bottom": 692,
+   "slot": "Optativa II",
+   "text": "Optativa II"
+  },
+  {
+   "nombre": "Tecnologías de Producción de Biomoléculas",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 756,
+   "bottom": 800,
+   "clave": "B758"
+  },
+  {
+   "nombre": "Electiva III",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 700,
+   "bottom": 744,
+   "clave": "B756"
+  },
+  {
+   "nombre": "Diseño de Procesos de Separación (Taller)",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 708,
+   "bottom": 752,
+   "clave": "B753"
+  },
+  {
+   "nombre": "Síntesis y Análisis de Bioprocesos",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 716,
+   "bottom": 760,
+   "clave": "B757"
+  },
+  {
+   "nombre": "Electiva I",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 724,
+   "bottom": 768,
+   "clave": "B754"
+  },
+  {
+   "nombre": "Formulación y Evaluación de Proyectos",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 832,
+   "bottom": 876,
+   "clave": "B861"
+  },
+  {
+   "nombre": "Diseño de Plantas (Taller)",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 840,
+   "bottom": 884,
+   "clave": "B859"
+  },
+  {
+   "nombre": "Estancia de Titulación",
+   "sem": 8,
+   "x0": 40,
+   "x1": 168,
+   "top": 848,
+   "bottom": 892,
+   "clave": "B860"
+  },
+  {
+   "nombre": "Electiva II",
+   "sem": 7,
+   "x0": 40,
+   "x1": 168,
+   "top": 756,
+   "bottom": 800,
+   "clave": "B755"
+  },
+  {
+   "nombre": "Administración de Proyectos",
+   "sem": 6,
+   "x0": 40,
+   "x1": 168,
+   "top": 600,
+   "bottom": 644,
+   "clave": "B643"
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 308,
+   "bottom": 352,
+   "clave": "B318"
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "sem": 3,
+   "x0": 40,
+   "x1": 168,
+   "top": 316,
+   "bottom": 360,
+   "clave": "B320"
+  }
+ ],
+ "edges": [
+  {
+   "s": 1,
+   "d": 10,
+   "pts": []
+  },
+  {
+   "s": 2,
+   "d": 11,
+   "pts": []
+  },
+  {
+   "s": 3,
+   "d": 12,
+   "pts": []
+  },
+  {
+   "s": 4,
+   "d": 13,
+   "pts": []
+  },
+  {
+   "s": 5,
+   "d": 14,
+   "pts": []
+  },
+  {
+   "s": 7,
+   "d": 15,
+   "pts": []
+  },
+  {
+   "s": 7,
+   "d": 16,
+   "pts": []
+  },
+  {
+   "s": 8,
+   "d": 15,
+   "pts": []
+  },
+  {
+   "s": 8,
+   "d": 16,
+   "pts": []
+  },
+  {
+   "s": 9,
+   "d": 15,
+   "pts": []
+  },
+  {
+   "s": 9,
+   "d": 16,
+   "pts": []
+  },
+  {
+   "s": 10,
+   "d": 17,
+   "pts": []
+  },
+  {
+   "s": 11,
+   "d": 18,
+   "pts": []
+  },
+  {
+   "s": 12,
+   "d": 19,
+   "pts": []
+  },
+  {
+   "s": 12,
+   "d": 20,
+   "pts": []
+  },
+  {
+   "s": 13,
+   "d": 19,
+   "pts": []
+  },
+  {
+   "s": 13,
+   "d": 20,
+   "pts": []
+  },
+  {
+   "s": 14,
+   "d": 21,
+   "pts": []
+  },
+  {
+   "s": 14,
+   "d": 22,
+   "pts": []
+  },
+  {
+   "s": 14,
+   "d": 23,
+   "pts": []
+  },
+  {
+   "s": 14,
+   "d": 30,
+   "pts": []
+  },
+  {
+   "s": 16,
+   "d": 58,
+   "pts": []
+  },
+  {
+   "s": 20,
+   "d": 24,
+   "pts": []
+  },
+  {
+   "s": 20,
+   "d": 25,
+   "pts": []
+  },
+  {
+   "s": 22,
+   "d": 26,
+   "pts": []
+  },
+  {
+   "s": 23,
+   "d": 28,
+   "pts": []
+  },
+  {
+   "s": 24,
+   "d": 32,
+   "pts": []
+  },
+  {
+   "s": 24,
+   "d": 33,
+   "pts": []
+  },
+  {
+   "s": 25,
+   "d": 34,
+   "pts": []
+  },
+  {
+   "s": 28,
+   "d": 35,
+   "pts": []
+  },
+  {
+   "s": 28,
+   "d": 36,
+   "pts": []
+  },
+  {
+   "s": 29,
+   "d": 37,
+   "pts": []
+  },
+  {
+   "s": 29,
+   "d": 38,
+   "pts": []
+  },
+  {
+   "s": 29,
+   "d": 39,
+   "pts": []
+  },
+  {
+   "s": 33,
+   "d": 40,
+   "pts": []
+  },
+  {
+   "s": 33,
+   "d": 41,
+   "pts": []
+  },
+  {
+   "s": 34,
+   "d": 40,
+   "pts": []
+  },
+  {
+   "s": 34,
+   "d": 42,
+   "pts": []
+  },
+  {
+   "s": 35,
+   "d": 43,
+   "pts": []
+  },
+  {
+   "s": 35,
+   "d": 44,
+   "pts": []
+  },
+  {
+   "s": 35,
+   "d": 45,
+   "pts": []
+  },
+  {
+   "s": 38,
+   "d": 46,
+   "pts": []
+  },
+  {
+   "s": 39,
+   "d": 56,
+   "pts": []
+  },
+  {
+   "s": 40,
+   "d": 47,
+   "pts": []
+  },
+  {
+   "s": 40,
+   "d": 48,
+   "pts": []
+  },
+  {
+   "s": 43,
+   "d": 49,
+   "pts": []
+  },
+  {
+   "s": 43,
+   "d": 51,
+   "pts": []
+  },
+  {
+   "s": 44,
+   "d": 50,
+   "pts": []
+  },
+  {
+   "s": 45,
+   "d": 49,
+   "pts": []
+  },
+  {
+   "s": 45,
+   "d": 51,
+   "pts": []
+  },
+  {
+   "s": 46,
+   "d": 55,
+   "pts": []
+  },
+  {
+   "s": 50,
+   "d": 52,
+   "pts": []
+  },
+  {
+   "s": 50,
+   "d": 53,
+   "pts": []
+  },
+  {
+   "s": 50,
+   "d": 54,
+   "pts": []
+  },
+  {
+   "s": 57,
+   "d": 29,
+   "pts": []
+  },
+  {
+   "s": 58,
+   "d": 31,
+   "pts": []
+  }
+ ]
+}

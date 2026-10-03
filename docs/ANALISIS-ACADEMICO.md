@@ -1,57 +1,37 @@
-# Estadísticas y análisis académico
+# Estadísticas y planificación académica
 
-Qué se puede calcular con los datos que entrega el Lector (kárdex, estado general, cita y horario) y el mapa
-curricular de cada carrera. Todo se calcula en el navegador del alumno; nada sale de su equipo.
+## 1. Datos y cobertura
 
-## Datos disponibles
+El lector conserva acreditaciones con nota >=6; no se dispone de todos los intentos históricos. El promedio oficial del SAES no se reconstruye con el número de acreditaciones. Las formas ORD, EXT, ETS y REC se muestran literalmente; EQV, REV y DIC se separan como equivalencias/revalidaciones/dictámenes. Los códigos desconocidos se identifican y excluyen del porcentaje de ordinarios junto con las equivalencias. El denominador es el conjunto de acreditaciones con forma aplicable conocida, no todas las inscripciones. No se agrega primera cursada sin comprobar por unidad que los recursamientos estén identificados aparte.
 
-| Fuente | Datos |
-|---|---|
-| Kárdex | Por materia acreditada: calificación, periodo y forma de evaluación (ORD ordinario, REC recurse, ETS, EXT extraordinario, EQV equivalencia por cambio de carrera; REV y DIC si aparecen) |
-| Estado general | Reprobadas (periodo y veces cursada), no cursadas y desfasadas (planes por semestre) |
-| Cita de reinscripción | Promedio oficial (incluye reprobatorias), créditos obtenidos y faltantes, periodos cursados, duración y carga |
-| Horario inscrito | Materias en curso |
-| Mapa curricular | Créditos, semestre o nivel, seriación, categoría (área de conocimiento), líneas de especialización |
+Notas ausentes, vacías, no finitas o fuera de6–10 se excluyen. Una clave acreditada se cuenta una vez; se conserva el último registro válido recibido. Sin notas propias no hay promedio de área o línea; no se hereda una nota de otra área. Los gráficos de categorías muestran únicamente observaciones existentes y sus conteos en tooltips.
 
-Limitación importante: el kárdex no trae las calificaciones reprobatorias ni los intentos fallidos. Por eso el
-promedio oficial (8.42 en un caso de prueba) es menor que la media del kárdex (9.06): cualquier promedio
-estimado parte del oficial.
+Créditos desconocidos se conservan como null. Se informa cobertura incompleta, equivalencias no resueltas, periodos desconocidos, duplicados y diferencias respecto al saldo oficial. Nunca se asigna la diferencia a un periodo. Una curva histórica se reconstruye solo con créditos/periodos reconocidos y saldo conciliado. El saldo oficial puede seguir utilizándose para un escenario aun si el detalle histórico es incompleto.
 
-## Implementado (sección «Ver estadísticas»)
+## 2. Estadísticas y escenario
 
-| Análisis | Qué responde | Cómo se calcula |
-|---|---|---|
-| Promedio y tendencia | ¿Voy mejorando? | Promedio oficial; diferencia entre la media del último periodo y la del anterior |
-| Dispersión (σ, mediana, n) | ¿Qué tan parejo es mi desempeño? | Desviación estándar muestral de las calificaciones del kárdex |
-| % en ordinario | ¿Cuánto paso a la primera? | Materias en ORD entre las no equivalentes |
-| Ritmo y egreso estimado | ¿Cuándo termino a este paso? | Media de créditos de los últimos 3 periodos; créditos faltantes ÷ ritmo |
-| Avance acumulado | ¿Voy al ritmo del plan? | Créditos acumulados vs. recta del plan (total ÷ duración), con proyección |
-| Promedio por periodo | Altibajos por periodo | Media y rango (mínimo–máximo) |
-| Distribución | ¿Dónde se concentran mis calificaciones? | Histograma 6–10 con media y mediana |
-| Por categoría | ¿En qué áreas me va mejor? | Puntos por materia y media por área de conocimiento |
-| Forma por periodo | ¿Cuándo recurrí a ETS/extra? | Barras apiladas por tipo de evaluación |
-| Mapa de calor | Área × periodo | Media por celda |
-| Materias que conviene cuidar | ¿Qué materia próxima me puede costar? | Calificación esperada = media ponderada de sus requisitos directos (×2), indirectos (×1) o su área; −0.4 por requisito acreditado fuera de ordinario, −0.5 por reprobada en la cadena, −0.6 si ya se reprobó. Cada resultado muestra sus motivos |
-| Afinidad con líneas | ¿Qué especialización encaja con mi desempeño? | Media en los requisitos de la línea y en su área (asignada o la predominante de sus requisitos) |
-| Ruta crítica | ¿Cuántos periodos me impone la seriación? | Cadena más larga de obligatorias pendientes en el grafo de seriación |
-| Carga vs. rendimiento | ¿Me va mejor con más o menos carga? | Créditos vs. promedio por periodo, regresión lineal y correlación r (aviso si hay menos de 5 periodos) |
+Media, mediana, dispersión e histograma comparten las mismas acreditaciones válidas. El promedio oficial se muestra aparte. El cambio entre medias de periodos es independiente del promedio oficial. La simulación añade materias nuevas una vez y usa el mismo saldo en tarjetas, curva y proyección. Créditos pendientes = pendientes oficiales menos nuevos créditos acreditados del escenario. Una inconsistencia del saldo oficial o exceso de créditos simulados impide proyectar hasta revisar los datos. Los originales no se modifican.
 
-La **simulación de fin de semestre** alimenta todo lo anterior: cada materia en curso se marca aprobada (con
-calificación) o reprobada, y cada reprobada pendiente puede acreditarse por ETS, recurse o extraordinario con
-calificación. El promedio estimado = (promedio oficial × materias del kárdex + calificaciones simuladas) ÷ total,
-con 5 por cada reprobada simulada.
+Ritmo = media de hasta tres periodos históricos con acreditaciones registradas o cero confirmado, excluyendo el periodo en curso inferido y los resultados simulados. Los huecos desconocidos no se rellenan con cero. El lector actual no confirma periodos completos vacíos; la cobertura se declara parcial. Se admite opcionalmente `periodos_confirmados: [{periodo:"25/2",creditos:0,completo:true}]` como confirmación explícita, nunca creada por ausencia de registros. Media0 es un dato válido, pero no permite dividir para proyectar.
 
-## Propuestas para siguientes versiones
+Proyección: pendientes/ritmo, redondeado hacia arriba. Origen = periodo actual inferido a partir de la planeación o siguiente al último registrado, el posterior de ambos; con simulación, comienza después del semestre simulado. Se identifica como conclusión de créditos, no titulación. Un saldo inicial oficial sin curva conciliada es un ancla de cálculo, no acreditación asignada a ese periodo. Los puntos futuros se cortan al completar créditos.
 
-- **Probabilidad de desfase:** con la regla de dos periodos, qué reprobadas se desfasan si no se acreditan en el
-  siguiente periodo y cuántos créditos retienen.
-- **Escenarios comparados:** guardar dos o tres simulaciones (p. ej. «ETS de Fisicoquímica» vs. «recursarla») y
-  compararlas lado a lado (promedio, créditos, egreso, ruta crítica).
-- **Carga recomendada por periodo:** a partir de la relación carga–rendimiento y de las materias a cuidar, sugerir
-  cuántos créditos inscribir y cuáles combinar o separar.
-- **Profesores:** con datos de varios alumnos (si algún día se agregan de forma voluntaria y anónima) se podrían
-  estimar tasas de aprobación por grupo; con datos de un solo alumno no es posible.
-- **Horario vs. rendimiento:** relacionar el turno o los huecos del horario inscrito con el promedio del periodo
-  (requiere guardar el horario de cada periodo, que hoy solo se lee el actual).
-- **Comparación con la cohorte:** percentil del alumno; requeriría estadísticas agregadas que el SAES no publica.
-- **Riesgo de baja por tiempo:** periodos disponibles vs. ruta crítica y créditos faltantes (alerta temprana).
+## 3. Observaciones académicas
+
+Se muestran hechos de adeudos, antecedentes pendientes y secuencias del mapa. No se pronostican notas ni se aplican penalizaciones por forma de acreditación. Las líneas muestran sus materias propias acreditadas, nombres y n; las vacías se ocultan. Las relaciones del mapa no constituyen un mínimo reglamentario de periodos hasta verificar su obligatoriedad. Los ciclos impiden presentar una secuencia. La dispersión de créditos acreditados y medias no representa carga inscrita ni produce recomendaciones causales.
+
+## 4. Referencias de plazo
+
+En UPIBI total/carga mínima es únicamente referencia aritmética. La duración del SAES se informa sin resolver su discrepancia. Los colores señalan la referencia indicada, no una determinación de baja. El conteo de periodos del SAES no prueba por sí mismo cómo se computan bajas autorizadas. Permanecen pendientes duración normativa, equivalencias entre claves y obligatoriedad de aristas.
+
+## 5. Validación
+
+Regresiones con perfiles ficticios en `tests/test_upibi.py`: notas ausentes, línea sin datos con antecedente10, ciclo, saldo del escenario, duplicados, desconocidas, formas, ceros explícitos y origen de proyección. Ejecutar construcciones de UPIITA/ESCOM/UPIBI, parseo de scripts, pruebas y revisión móvil/escritorio de los gráficos y sus tooltips. Los diagnósticos de consola contienen únicamente códigos, conteos agregados y banderas, nunca expedientes personales.
+
+## 6. Simulador de meta
+
+Elegir H periodos enteros positivos e incluir/excluir el actual. Con escenario activo, empieza después del semestre simulado. R es el saldo pendiente del mismo escenario; la media necesaria es R/H y la diferencia frente al ritmo es (R/H)/ritmo -1, calculada solo si ritmo>0. Comparar con carga autorizada actual de SAES, sin asumir que permanecerá igual. Bajo carga mínima se informa la necesidad de revisar condiciones, sin invalidar la meta. Si R=0 no se genera fecha futura; sin saldo consistente no se calcula. No estima probabilidades de aprobar, bienestar ni combinaciones exactas de materias.
+
+El origen se infiere de cita/historial y se declara. Preferencias de meta se guardan por carrera en `hu.<unidad>.meta.<carrera>` mediante el almacén existente. El simulador aparece también sin notas si se dispone de saldo oficial. Tests de metas2–6, carga desconocida, saldo0/null, ritmo0 y semestre incluido/excluido. El presupuesto de tiempo (etapa D) permanece fuera de esta entrega.
+
+El conteo proyectado es aproximado: el contador SAES se ancla al periodo actual inferido para mantener el mismo conteo ante escenarios con la misma fecha final. No resuelve la semántica administrativa del contador. Si hay materias inscritas sin correspondencia, se informa; con escenario activo no se proyecta un saldo final completo a partir de una simulación parcial. Los renderizados asíncronos obsoletos se descartan al cambiar carrera o escenario.
