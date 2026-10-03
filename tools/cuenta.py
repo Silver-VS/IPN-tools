@@ -366,7 +366,7 @@ var IPNT=window.IPNT=(()=>{
     const listo=()=>{ls.set('ipnt.bienvenida','1');if(dl.close)dl.close();else dl.removeAttribute('open')};
     const pintarH=()=>{
       $i('ipnt-h-uni').hidden=UN.length<2;
-      if(UN.length<2)$i('ipnt-h-lead').textContent='Para empezar, elige tu carrera. Puedes cambiarla después.';
+      if(UN.length<2)$i('ipnt-h-lead').textContent='Para empezar, elige tu carrera.';
       $i('ipnt-h-unis').innerHTML=UN.map(u=>`<button type="button" class="ipnt-uni" data-uni="${esc(u.id)}" aria-pressed="${u.id===uni}"><b>${esc(u.siglas)}</b><small>${esc(u.nombre)}</small>${u.disponible?'':'<em>En preparación</em>'}</button>`).join('');
       const u=UN.find(x=>x.id===uni)||{};
       $i('ipnt-h-cars').innerHTML=u.id===CFG.unidad?
@@ -470,7 +470,7 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
 </dialog>
 <dialog class="saes-dlg ipnt-dlg ipnt-hola" id="ipnt-hola" aria-labelledby="ipnt-hola-h">
   <div class="dl-head"><h2 id="ipnt-hola-h">Bienvenida</h2><button class="x" type="button" data-hola-x aria-label="Cerrar">×</button></div>
-  <p class="lead" id="ipnt-h-lead">Para empezar, dinos de qué unidad y carrera eres. Puedes cambiarlo después.</p>
+  <p class="lead" id="ipnt-h-lead">Para empezar, dinos de qué unidad y carrera eres.</p>
   <div id="ipnt-h-uni"><h3>1. Elige tu unidad académica</h3>
   <div class="ipnt-unis" id="ipnt-h-unis"></div></div>
   <div id="ipnt-h-cars"></div>
