@@ -134,12 +134,12 @@ UNIDAD='upiita';assert.deepStrictEqual(plazoReferencia(A),{dur:15,max:23,calcula
 const points=proyeccionCreditos({curva:[{per:53,acum:240}],fin:57,total:438,obt:240,ritmo:49.5});
 assert.deepStrictEqual(points.map(d=>d.acum),[240,289.5,339,388.5,438]);
 assert.deepStrictEqual(points.map(d=>d.per),[53,54,55,56,57]);
-// Kárdex hasta 26/2: 27/1 también se proyecta, aunque la planeación empiece en 27/2.
+// Un origen explícito prevalece: no se inventan acreditaciones en el periodo sin información.
 const gap=proyeccionCreditos({curva:[{per:53,acum:240}],meta:55,fin:58,total:438,obt:240,ritmo:49.5});
-assert.deepStrictEqual(gap.map(d=>d.per),[53,54,55,56,57]);
+assert.deepStrictEqual(gap.map(d=>d.per),[54,55,56,57,58]);
 assert.deepStrictEqual(gap.map(d=>d.acum),[240,289.5,339,388.5,438]);
 assert.strictEqual(gap.filter(d=>d.acum===438).length,1);
-assert.strictEqual(gap.at(-1).per,57);
+assert.strictEqual(gap.at(-1).per,58);
 
 assert.deepStrictEqual(proyeccionCreditos({curva:[],fin:57,total:438,ritmo:49.5}),[]);
 assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,total:300,obt:240,ritmo:40}).map(d=>d.acum),[240,280,300]);
@@ -240,6 +240,51 @@ pre={PEND:['PEND']};assert.strictEqual(analisis().ciclo,true);assert.deepStrictE
         section=html[html.index('function analisis('):html.index('function renderTray(')]
         for text in ('Riesgo alto','calificación esperada','te va mejor','linearRegressionY'):
             self.assertNotIn(text,section)
+
+
+
+    def test_estadisticas_saldo_cobertura_y_formas(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        nota=html[html.index('const notaValida='):html.index('const LIB_PLOT=')]
+        fn=html[html.index('function simKardex('):html.index('function montarGrafica(')]
+        script="""
+Array.prototype.at=function(i){return this[i<0?this.length+i:i]};const assert=require('assert');let UNIDAD='upibi',S={car:'DEMO'}, SIM={res:{},rec:{}};
+let t={sim:false,simOk:[],simRec:[]};
+const tr=()=>t,isPersonal=()=>true,pretty=x=>x,fmtCr=String,catDe=()=>({}),perMeta=()=>56;
+const perIdx=p=>{const m=String(p??'').match(/^(\\d+)\\/([12])$/);return m?+m[1]*2+(+m[2]-1):null};
+const perName=i=>`${Math.floor(i/2)}/${i%2+1}`;
+let c={},ALUMNO={acreditadas:[],avance:{obtenidos:240,faltan:198},carga:{total:438,min:36.5},reprobadas_periodo:[],en_curso:[]};
+const cur=()=>c;
+"""+nota+fn+"""
+for(let i=0;i<10;i++){const k='DEMO'+i;c[k]=['Materia ficticia',24,1,'O'];
+ ALUMNO.acreditadas.push([k,8,i%2?'26/1':'25/2',i<6?'ORD':i<8?'EXT':i===8?'ETS':'REC']);}
+c.NUEVA=['Simulada',12,1,'O'];
+let D=statsDatos();assert.strictEqual(D.ord,.6);assert.strictEqual(D.formasN,10);
+assert.strictEqual(D.media,8);assert.strictEqual(D.obt,240);assert.strictEqual(D.falta,198);
+assert.strictEqual(D.ritmoParcial,true);assert.ok(D.curva.length);
+t={sim:true,simOk:['NUEVA','DEMO0','NUEVA'],simRec:[]};SIM.res.NUEVA={cal:10};
+D=statsDatos();assert.strictEqual(D.obt,252);assert.strictEqual(D.falta,186);assert.strictEqual(D.simCr,12);
+assert.strictEqual(D.rows.length,11);assert.strictEqual(D.curva.at(-1).acum,252);
+assert.strictEqual(D.meta,56);assert.strictEqual(D.ritmo,120);
+t.sim=false;assert.strictEqual(statsDatos().falta,198);
+ALUMNO.acreditadas.push(['EXTERNA',9,null,'DESCONOCIDA']);
+D=statsDatos();assert.strictEqual(D.rows.at(-1).cr,null);assert.strictEqual(D.rows.at(-1).forma,'No identificada');
+assert.strictEqual(D.falta,198);assert.strictEqual(D.curva.length,0);assert.strictEqual(D.formasExcluidas,1);
+ALUMNO.acreditadas.pop();ALUMNO.acreditadas.push(['EQUIV',9,null,'REV']);c.EQUIV=['Equivalencia',0,1,'O'];
+D=statsDatos();assert.strictEqual(D.rows.at(-1).eqv,true);assert.strictEqual(D.formasExcluidas,1);
+ALUMNO.acreditadas.pop();ALUMNO.acreditadas.push(['DEMO0',8,'25/2','ORD']);
+D=statsDatos();assert.strictEqual(D.rows.length,10);assert.ok(D.avisos.some(x=>x.includes('duplicados')));
+ALUMNO.acreditadas=ALUMNO.acreditadas.slice(0,10);
+ALUMNO.acreditadas.forEach(a=>a[2]=a[0]==='DEMO0'?'25/1':'26/1');
+D=statsDatos();assert.ok(D.avisos.some(x=>x.includes('intermedios')));
+ALUMNO.periodos_confirmados=[{periodo:'25/2',creditos:0,completo:true}];
+D=statsDatos();assert.strictEqual(D.porPer.find(x=>x.per===51).cr,0);assert.strictEqual(D.ritmo,80);
+ALUMNO.reprobadas_periodo=null;assert.ok(statsDatos().avisos.some(x=>x.includes('estado general')));
+ALUMNO.avance.faltan=197;D=statsDatos();assert.strictEqual(D.falta,null);assert.strictEqual(D.obt,240);assert.strictEqual(D.fin,null);
+ALUMNO.acreditadas=[];ALUMNO.avance={};ALUMNO.carga={};D=statsDatos();assert.strictEqual(D.obt,null);assert.strictEqual(D.media,null);assert.strictEqual(D.fin,null);
+"""
+        result=subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
 
 
 if __name__ == '__main__': unittest.main(verbosity=2)
