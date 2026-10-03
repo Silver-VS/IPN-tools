@@ -658,7 +658,7 @@ const planNum=id=>[...id].reduce((n,ch)=>n*26+LETRAS.indexOf(ch)+1,0);
 const nextPlan=()=>{let n=Math.max(0,...planIds().map(planNum))+1, id='';while(n>0){n--;id=LETRAS[n%26]+id;n=Math.floor(n/26)}return id};
 const save=()=>store.set('w.'+S.per,ws());
 /*__SAES_JS__*/
-// v1: solo se eligen materias para explorar. v2: el alumno pega sus datos del SAES (Lector UPIITA) y se activa la vista personal.
+// v1: solo se eligen materias para explorar. v2: el alumno pega sus datos del SAES (Lector IPN-tools) y se activa la vista personal.
 let ALUMNO=SAES.load();
 const isPersonal=()=>!!ALUMNO&&ALUMNO.carrera===S.car;
 const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprobadas

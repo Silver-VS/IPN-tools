@@ -75,7 +75,7 @@ footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-si
     <li><b>Con datos del SAES</b> (opcional), incorporan el avance del alumno: acreditadas, reprobadas, desfase, materias en curso, carga autorizada y cita.</li>
     <li>Toda la información se procesa y almacena en el navegador de quien la usa; no se envía a ningún servidor.</li>
   </ul>
-  <p class="note ok">El marcador <b>Lector UPIITA</b> solo realiza consultas de lectura dentro del SAES (Kárdex, Estado general, Cita de reinscripción y horario actual). No captura contraseñas ni ejecuta trámites.</p>
+  <p class="note ok">El marcador <b>Lector IPN-tools</b> solo realiza consultas de lectura dentro del SAES (Kárdex, Estado general, Cita de reinscripción y horario actual). No captura contraseñas ni ejecuta trámites.</p>
 
   <h2 id="requisitos">2. Requisitos</h2>
   <ul>
@@ -94,7 +94,7 @@ footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-si
   </ol>
   <h3>3.2 Incorporar los datos del SAES</h3>
   <ol class="steps">
-    <li>Pulse <b>Usar mis datos del SAES</b> (parte superior). Arrastre el botón <b>Lector UPIITA</b> a la barra de marcadores; la ventana incluye instrucciones para mostrar la barra y para la instalación manual.</li>
+    <li>Pulse <b>Usar mis datos del SAES</b> (parte superior). Arrastre el botón <b>Lector IPN-tools</b> a la barra de marcadores; la ventana incluye instrucciones para mostrar la barra y para la instalación manual.</li>
     <li>Inicie sesión en el SAES y pulse el marcador. Revise el resumen y pulse <b>Copiar mis datos</b>.</li>
     <li>Regrese a Horarios, abra <b>Usar mis datos del SAES</b> y pegue con <kbd>Ctrl</kbd>+<kbd>V</kbd>. Aparece el panel <i>Estado general</i> sobre el mapa.</li>
     <li>Sin cuenta del SAES, pegue en el mismo recuadro el <a href="#demo">perfil de demostración</a>.</li>
@@ -153,7 +153,7 @@ footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--line);font-si
 const $=s=>document.querySelector(s);
 const store={get(k,d){try{const v=localStorage.getItem('rev.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('rev.'+k,JSON.stringify(v))}catch(e){}}};
 
-/* perfil de demostración (alumno ficticio) en el formato del Lector UPIITA */
+/* perfil de demostración (alumno ficticio) en el formato del Lector IPN-tools */
 const DEMO={upiita_saes:1,leido:"2026-10-01T12:00:00Z",boleta:"2099000000",nombre:"ALUMNO DE DEMOSTRACION PRUEBA UNO",carrera:"B",carrera_nombre:"INGENIERIA BIÓNICA",plan:"09",promedio:8.6,reprobadas_num:2,
   cita:{inicio:"10/02/2026 04:40:00 p. m.",fin:"11/02/2026 04:40:00 p. m."},
   carga:{total:399.5,max:80,media:40,min:27,duracion:10,duracion_max:15},
@@ -175,8 +175,8 @@ const T=[
  ['H-03','H','Mapa de Sistemas Automotrices',['Elegir «Ing. en Sistemas Automotrices».'],'Se muestran solo 7.º, 8.º y 9.º semestre (13 materias) y la nota de opción terminal.'],
  ['H-04','H','Mapa de Ingeniería en Energía',['Elegir Ingeniería en Energía.'],'El mapa muestra áreas, seriación punteada y la nota de propuesta sujeta a validación.'],
  ['H-05','H','Tema claro y oscuro',['Pulsar el botón junto al título.','Recargar la página.'],'Cambia entre claro y oscuro y conserva la elección al recargar.'],
- ['S-01','S','Instalación del marcador',['Pulsar «Usar mis datos del SAES».','Arrastrar «Lector UPIITA» a la barra de marcadores (o seguir la instalación manual).'],'El marcador queda guardado en el navegador.'],
- ['S-02','S','Lectura en el SAES',['Iniciar sesión en el SAES.','Pulsar el marcador «Lector UPIITA».'],'Aparece un resumen con boleta, carrera, promedio, materias acreditadas y en curso, y la cita; el botón «Copiar mis datos» copia la información.'],
+ ['S-01','S','Instalación del marcador',['Pulsar «Usar mis datos del SAES».','Arrastrar «Lector IPN-tools» a la barra de marcadores (o seguir la instalación manual).'],'El marcador queda guardado en el navegador.'],
+ ['S-02','S','Lectura en el SAES',['Iniciar sesión en el SAES.','Pulsar el marcador «Lector IPN-tools».'],'Aparece un resumen con boleta, carrera, promedio, materias acreditadas y en curso, y la cita; el botón «Copiar mis datos» copia la información.'],
  ['S-03','S','Carga de datos y Estado general',['Pegar los datos (reales o del perfil de demostración) en «Usar mis datos del SAES».'],'Sobre el mapa aparece «Estado general» con promedio, créditos, periodo que se planea, carga autorizada, desfase oficial y cita.'],
  ['S-04','S','Desfase con el perfil de demostración',['Cargar el perfil de demostración.'],'«Desfase oficial»: 1 materia (Teoría de los circuitos, desfasada en 27/1); Física moderna y óptica: debe acreditarse en 27/1.'],
  ['S-05','S','Colores del mapa con datos',['Con datos cargados, revisar el mapa y su simbología.','Apagar «Ver sugeridas».'],'Verde: puede cursarse; anillo: sugerida; gris con punto: en curso; rojo: reprobada o desfasada. Al apagar «Ver sugeridas» desaparece solo el anillo.'],

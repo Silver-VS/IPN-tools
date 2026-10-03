@@ -1,4 +1,4 @@
-"""Conexión con el SAES (v2) sin servidores: marcador "Lector UPIITA" + carga por pegado en las páginas.
+"""Conexión con el SAES (v2) sin servidores: marcador "Lector IPN-tools" + carga por pegado en las páginas.
 
 - bookmarklet(tool_url): convierte tools/lector_saes.js en un enlace javascript: (solo lectura en el SAES).
 - JS/CSS/HTML comunes que se inyectan en las plantillas:
@@ -15,7 +15,7 @@ SAES_URL = "https://www.saes.upiita.ipn.mx/"
 
 
 def lector_js(tool_url=""):
-    """Código del Lector UPIITA sin comentarios (para el marcador completo o para publicarlo como lector.js)."""
+    """Código del Lector IPN-tools sin comentarios (para el marcador completo o para publicarlo como lector.js)."""
     js = SRC.read_text(encoding="utf-8")
     js = re.sub(r"/\*.*?\*/", "", js, flags=re.S)          # el código no usa comentarios de línea
     js = "\n".join(l.strip() for l in js.splitlines() if l.strip())
@@ -51,7 +51,7 @@ const SAES={
     document.querySelectorAll('[data-saes-open]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();SAES.open()}));
     dl.querySelector('#saes-x').addEventListener('click',()=>SAES.close());
     dl.addEventListener('click',e=>{if(e.target===dl)SAES.close()});   // clic fuera de la ventana
-    const take=t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector UPIITA. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
+    const take=t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector IPN-tools. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
       if((d.unidad||'upiita')!==SAES.U()){msg.innerHTML='<span class="bad">Estos datos son del SAES de '+String(d.unidad||'upiita').toUpperCase()+'. Esta página es de la '+SAES.U().toUpperCase()+'.</span>';return}
       SAES.save(d);paste.value='';msg.innerHTML='<span class="ok">Datos del SAES cargados.</span>';onLoad(d);setTimeout(()=>SAES.close(),900)};
     paste.addEventListener('paste',e=>{e.preventDefault();take(e.clipboardData.getData('text'))});
@@ -138,9 +138,9 @@ def card(bm_href, page="horarios", short="", u=None):
     <p class="saes-note" style="margin:4px 0 0">Para actualizarlos, ejecuta de nuevo el marcador en el SAES y pega el resultado abajo. <button class="link" id="saes-again" type="button">Ver instrucciones</button></p></div>
   <div id="saes-steps">
     <ol>
-      <li><b>Guarda el Lector UPIITA en tu navegador</b> (solo la primera vez).
-        <p class="muted">Un <b>marcador</b> (favorito) es un acceso guardado en el navegador. El Lector UPIITA, en lugar de abrir una página, consulta tu información dentro del SAES.</p>
-        <p>Arrastra este botón a tu barra de marcadores: <a class="saes-bm" id="saes-bm" href="{bm_href}" draggable="true" onclick="event.preventDefault()">Lector UPIITA</a></p>
+      <li><b>Guarda el Lector IPN-tools en tu navegador</b> (solo la primera vez).
+        <p class="muted">Un <b>marcador</b> (favorito) es un acceso guardado en el navegador. El Lector IPN-tools, en lugar de abrir una página, consulta tu información dentro del SAES. Es el mismo para todas las unidades del IPN: detecta en qué SAES estás. Si ya tenías guardado el «Lector UPIITA», sigue funcionando.</p>
+        <p>Arrastra este botón a tu barra de marcadores: <a class="saes-bm" id="saes-bm" href="{bm_href}" draggable="true" onclick="event.preventDefault()">Lector IPN-tools</a></p>
         <details><summary>Mostrar la barra de marcadores</summary><ul>
           <li><b>Chrome, Edge, Brave u Opera:</b> pulsa <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (en Mac, <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>).</li>
           <li><b>Firefox:</b> clic derecho en la barra superior › Barra de marcadores › Mostrar siempre.</li>
@@ -153,16 +153,16 @@ def card(bm_href, page="horarios", short="", u=None):
                 <button class="btn primary" id="saes-copybm" type="button">Copiar</button></div>
               <small class="saes-note" id="saes-copymsg" aria-live="polite">Si el botón no copia, mantén presionado el recuadro y elige «Seleccionar todo» y después «Copiar».</small></li>
             <li>Guarda cualquier página como marcador (<kbd>Ctrl</kbd>+<kbd>D</kbd> o la estrella de la barra de direcciones).</li>
-            <li>Edita el marcador: asigna el nombre <b>Lector UPIITA</b> y sustituye la <b>dirección (URL)</b> por el código copiado.</li>
+            <li>Edita el marcador: asigna el nombre <b>Lector IPN-tools</b> y sustituye la <b>dirección (URL)</b> por el código copiado.</li>
           </ol>
           <p><b>Cómo usarlo según el navegador del teléfono:</b></p>
           <ul>
-            <li><b>Firefox (Android, iPhone o iPad):</b> con el SAES abierto, abre tus marcadores y elige <b>Lector UPIITA</b>.</li>
-            <li><b>Safari (iPhone o iPad):</b> en cualquier página, toca <b>Compartir</b> › <b>Agregar marcador</b> y guárdalo con el nombre <b>Lector UPIITA</b>. Abre <b>Marcadores</b> › <b>Editar</b>, toca ese marcador y sustituye su dirección por el código copiado. Con el SAES abierto, toca la barra de direcciones y elige <b>Lector UPIITA</b> en la sección de marcadores (aparece como guardado recientemente).</li>
-            <li><b>Chrome (Android):</b> abrirlo desde la lista de marcadores no funciona. Con el SAES abierto, toca la barra de direcciones, escribe <b>Lector UPIITA</b> y elige el marcador en las sugerencias.</li>
-            <li><b>Chrome (iPhone o iPad):</b> guarda cualquier página como marcador, edítalo con el nombre <b>Lector UPIITA</b> y sustituye su dirección por el código copiado. Con el SAES abierto, ejecuta el marcador.</li>
+            <li><b>Firefox (Android, iPhone o iPad):</b> con el SAES abierto, abre tus marcadores y elige <b>Lector IPN-tools</b>.</li>
+            <li><b>Safari (iPhone o iPad):</b> en cualquier página, toca <b>Compartir</b> › <b>Agregar marcador</b> y guárdalo con el nombre <b>Lector IPN-tools</b>. Abre <b>Marcadores</b> › <b>Editar</b>, toca ese marcador y sustituye su dirección por el código copiado. Con el SAES abierto, toca la barra de direcciones y elige <b>Lector IPN-tools</b> en la sección de marcadores (aparece como guardado recientemente).</li>
+            <li><b>Chrome (Android):</b> abrirlo desde la lista de marcadores no funciona. Con el SAES abierto, toca la barra de direcciones, escribe <b>Lector IPN-tools</b> y elige el marcador en las sugerencias.</li>
+            <li><b>Chrome (iPhone o iPad):</b> guarda cualquier página como marcador, edítalo con el nombre <b>Lector IPN-tools</b> y sustituye su dirección por el código copiado. Con el SAES abierto, ejecuta el marcador.</li>
           </ul></details></li>
-      <li><b>Entra al SAES</b> (<a href="{SAES_URL}" target="_blank" rel="noopener">saes.upiita.ipn.mx</a>), inicia sesión y pulsa el marcador <b>Lector UPIITA</b>. Revisa el resumen y pulsa <b>Copiar mis datos</b>.</li>
+      <li><b>Entra al SAES</b> (<a href="{SAES_URL}" target="_blank" rel="noopener">saes.upiita.ipn.mx</a>), inicia sesión y pulsa el marcador <b>Lector IPN-tools</b>. Revisa el resumen y pulsa <b>Copiar mis datos</b>.</li>
       <li><b>Regresa aquí y pega</b> (<kbd>Ctrl</kbd>+<kbd>V</kbd>) en este recuadro:</li>
     </ol>
   </div>
@@ -172,7 +172,7 @@ def card(bm_href, page="horarios", short="", u=None):
   <p class="saes-note" style="margin:6px 0 0">Versión de la página: {version}</p>
 </dialog>"""
     if u and u.get("id", "upiita") != "upiita":   # otra unidad: nombre del marcador y dirección de su SAES
-        out = out.replace("Lector UPIITA", f"Lector {u['siglas']}").replace(SAES_URL, u.get("saes", SAES_URL)) \
+        out = out.replace(SAES_URL, u.get("saes", SAES_URL)) \
                  .replace("saes.upiita.ipn.mx", u.get("saes", SAES_URL).split("//")[-1].strip("/").replace("www.", ""))
     return out
 
