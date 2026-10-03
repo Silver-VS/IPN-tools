@@ -844,7 +844,7 @@ def main():
     ico = ROOT / "web" / "dist" / "assets" / "icono"
     ico.mkdir(parents=True, exist_ok=True)
     for f in (ROOT / "docs" / "marca").glob("*"):
-        if f.suffix in (".png", ".ico", ".svg"):
+        if f.suffix in (".png", ".ico", ".svg") and (f.name.startswith("ipn-tools-icono") or f.name == "favicon.ico"):   # no los bocetos
             shutil.copy(f, ico / f.name)   # retorno del inicio de sesión (ventana emergente)
     if site:   # Lector publicado como archivo para el marcador corto (Chrome para Android corta los marcadores largos)
         (ROOT / "web" / "dist" / "lector.js").write_text(saes.lector_js(site + "horarios.html"), encoding="utf-8")
