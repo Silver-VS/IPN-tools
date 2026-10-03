@@ -29,6 +29,7 @@ def config():
     return {"clientId": os.environ.get("IPNT_CLIENT_ID", c.get("clientId", "")), "tenant": c.get("tenant", IPN_TENANT),
             "googleClientId": os.environ.get("IPNT_GOOGLE_CLIENT_ID", c.get("googleClientId", "")),
             "unidades": c.get("unidades", UNIDADES),
+            "googlePrueba": c.get("googlePrueba", False), "contacto": c.get("contacto", ""),
             "version": v, "unidad": c.get("unidad", "upiita"), "msal": MSAL[0], "sri": MSAL[1]}
 
 
@@ -274,7 +275,10 @@ var IPNT=window.IPNT=(()=>{
       if(prov&&prov!==p) await prov.salir();
       prov=p;cuenta=a;ls.set('ipnt.prov',id);ls.set('ipnt.cuenta',a.username);
       await sincronizar('login');
-    }catch(e){st.fase='error';st.error=texto(e);pintar()}
+    }catch(e){st.fase='error';st.error=texto(e);
+      if(id==='google'&&CFG.googlePrueba&&/cancelado|access_denied/i.test(st.error+String(e?.message)))
+        st.error='No se completó el inicio con Google. Si tu cuenta no está en la lista de prueba, Google la bloquea'+(CFG.contacto?`: pide tu alta a ${CFG.contacto}.`:'.');
+      pintar()}
   }
   async function salir(borrarLocal){
     if(prov) await prov.salir();
@@ -311,6 +315,8 @@ var IPNT=window.IPNT=(()=>{
     $i('ipnt-out').hidden=on;$i('ipnt-in').hidden=!on;
     $i('ipnt-login').disabled=!MS.disponible()||st.fase==='login';$i('ipnt-glogin').disabled=!GO.disponible()||st.fase==='login';
     $i('ipnt-glogin').hidden=!GO.disponible();$i('ipnt-gnote').hidden=!GO.disponible();
+    document.querySelectorAll('.ipnt-prueba').forEach(n=>n.hidden=!(GO.disponible()&&CFG.googlePrueba));
+    document.querySelectorAll('.ipnt-contacto').forEach(n=>{if(!n.firstChild&&CFG.contacto){const a=document.createElement('a');a.href='mailto:'+CFG.contacto;a.textContent=CFG.contacto;n.appendChild(a)}});
     $i('ipnt-soon').hidden=MS.disponible()||GO.disponible();
     if(on){$i('ipnt-who').textContent=nom+(cuenta.name?` · ${cuenta.username}`:'');$i('ipnt-where').textContent=nube}
     const s=$i('ipnt-state'), f=st.fase;
@@ -375,7 +381,7 @@ var IPNT=window.IPNT=(()=>{
         `<p class="saes-note">La versión para ${esc(u.siglas||'tu unidad')} se está preparando con alumnos de la unidad. Mientras tanto puedes explorar la de la ${esc((UN.find(x=>x.id===CFG.unidad)||{}).siglas||'')}.</p>`;
       $i('ipnt-h-yo').hidden=!cuenta;
       if(cuenta)$i('ipnt-h-yo').textContent=`Sesión iniciada: ${cuenta.name||cuenta.username}. Si ya tenías datos guardados, la página se actualizará sola; si no, elige tu carrera.`;
-      $i('ipnt-h-ms').hidden=!MS.disponible();$i('ipnt-h-go').hidden=!GO.disponible();
+      $i('ipnt-h-ms').hidden=!MS.disponible();$i('ipnt-h-go').hidden=!GO.disponible();pintar();
       $i('ipnt-h-login').hidden=!!cuenta||!(MS.disponible()||GO.disponible());
     };
     dl.addEventListener('click',async e=>{
@@ -419,6 +425,7 @@ CSS = r"""
 .ipnt-conf-op{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
 .ipnt-conf-op .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 14px;border-radius:10px;height:auto;white-space:normal}
 .ipnt-conf-op small{font-weight:400;font-size:.8rem;color:inherit;opacity:.85}
+.ipnt-prueba{margin:10px 0 0;font-size:.84rem;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
 .ipnt-hola{width:min(640px,calc(100vw / var(--ui-zoom,1) - 32px))}
 .ipnt-hola .lead{margin:0;font-size:.95rem;color:var(--muted)}
 .ipnt-unis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
@@ -443,6 +450,7 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
       <svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>
       Continuar con Google</button></div>
     <p class="saes-note" style="margin:8px 0 0">Microsoft: cuenta institucional (@alumno.ipn.mx, @ipn.mx) o personal; se guarda en tu OneDrive.<span id="ipnt-gnote" hidden> Google: se guarda en el espacio privado de la aplicación en tu Google Drive.</span></p>
+    <p class="ipnt-prueba"  hidden><b>Google en fase de prueba.</b> Por ahora solo pueden entrar las cuentas inscritas en la lista de prueba, como en TestFlight. Para unirte, escribe a <span class="ipnt-contacto"></span> desde tu cuenta de Gmail y pide tu alta.</p>
     <p class="saes-note" id="ipnt-soon" style="margin:8px 0 0">El inicio de sesión estará disponible próximamente. Mientras tanto, usa el respaldo en archivo.</p>
   </div>
   <div id="ipnt-in" hidden>
@@ -477,7 +485,7 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
   <div class="alt">
     <div id="ipnt-h-login"><p style="margin:0 0 8px;font-size:.92rem">¿Ya la usaste en otro dispositivo? Inicia sesión y se cargan tus datos.</p>
       <div class="row"><button class="btn ipnt-ms" id="ipnt-h-ms" type="button" data-prov="ms"><svg viewBox="0 0 21 21" width="16" height="16" aria-hidden="true"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>Continuar con Microsoft</button>
-      <button class="btn ipnt-ms" id="ipnt-h-go" type="button" data-prov="google"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</button></div></div>
+      <button class="btn ipnt-ms" id="ipnt-h-go" type="button" data-prov="google"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</button></div><p class="ipnt-prueba"  hidden><b>Google en fase de prueba.</b> Por ahora solo pueden entrar las cuentas inscritas en la lista de prueba, como en TestFlight. Para unirte, escribe a <span class="ipnt-contacto"></span> desde tu cuenta de Gmail y pide tu alta.</p></div>
     <p id="ipnt-h-yo" hidden style="margin:0;font-size:.92rem"></p>
     <p class="ipnt-state" id="ipnt-h-msg" aria-live="polite"></p>
     <p style="margin:6px 0 0"><button class="link" type="button" data-hola-x>Explorar sin elegir</button></p>
