@@ -1,0 +1,744 @@
+{
+ "fuente": "ambiental-2006.pdf",
+ "titulo": "2006",
+ "materias": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés I",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Química General Aplicada",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Química Orgánica Aplicada",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Biología de Eucariontes",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Física del Movimiento Aplicada",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Ecología",
+   "nivel": 2,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Microbiología Ambiental",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Química Ambiental I",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Química Ambiental II",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Biotecnología Ambiental",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Manejo Integral de Residuos I",
+   "nivel": 5,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Manejo Integral de Residuos II",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Remediación de Suelos Acuíferos",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Estancia de Titulación",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 1.5,
+   "creditos": 1.5
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés II",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés III",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Métodos Cuantitativos Aplicados",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Física de la Energía Aplicada",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Termodinámica",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Estadística",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Balance de Materia y Energía",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Fenómenos de Transporte",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Fisicoquímica Ambiental",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Instrumentación y Control",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Riesgo e Impacto Ambiental (Taller)",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Ingeniería Civil e Hidráulica",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ingeniería Electromecánica",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "nivel": 4,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Bioseparaciones Fluido-Fluido",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Legislación y Política Ambiental",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Bioseparaciones Sólido-Fluido",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Procesos de Transferencia de Calor",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Mecánica de Fluidos y Sólidos",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Bioingeniería",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Manejo Integral del Agua I",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Manejo Integral del Agua II",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Planificación y Economía Ambiental",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Sistemas de Calidad",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Seguridad e Higiene Industrial",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Bioseparaciones",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Bioseparaciones Mecánicas",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Manejo Integral de la Calidad del Aire",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Diseño de Plantas (Taller)",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 4.5,
+   "creditos": 4.5
+  },
+  {
+   "nombre": "Formulación y Evaluación de Proyectos",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ingeniería de Reactores y Biorreactores",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Dinámica de Bioprocesos del Medioambiente (Taller)",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 4.5,
+   "creditos": 4.5
+  },
+  {
+   "nombre": "Diseño de Procesos y Equipo (Taller)",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Energías Alternas",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Electiva",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Optativa I",
+   "nivel": 5,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Optativa II",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  }
+ ],
+ "seriacion": [
+  [
+   0,
+   20
+  ],
+  [
+   1,
+   18
+  ],
+  [
+   2,
+   20
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   4,
+   10
+  ],
+  [
+   4,
+   11
+  ],
+  [
+   5,
+   8
+  ],
+  [
+   6,
+   22
+  ],
+  [
+   6,
+   23
+  ],
+  [
+   7,
+   25
+  ],
+  [
+   7,
+   26
+  ],
+  [
+   8,
+   9
+  ],
+  [
+   9,
+   12
+  ],
+  [
+   10,
+   31
+  ],
+  [
+   11,
+   12
+  ],
+  [
+   12,
+   13
+  ],
+  [
+   12,
+   41
+  ],
+  [
+   12,
+   44
+  ],
+  [
+   13,
+   14
+  ],
+  [
+   14,
+   15
+  ],
+  [
+   17,
+   25
+  ],
+  [
+   17,
+   26
+  ],
+  [
+   18,
+   19
+  ],
+  [
+   20,
+   21
+  ],
+  [
+   22,
+   27
+  ],
+  [
+   22,
+   28
+  ],
+  [
+   23,
+   29
+  ],
+  [
+   23,
+   30
+  ],
+  [
+   24,
+   27
+  ],
+  [
+   24,
+   28
+  ],
+  [
+   26,
+   58
+  ],
+  [
+   26,
+   59
+  ],
+  [
+   27,
+   39
+  ],
+  [
+   28,
+   38
+  ],
+  [
+   29,
+   39
+  ],
+  [
+   30,
+   32
+  ],
+  [
+   30,
+   33
+  ],
+  [
+   31,
+   36
+  ],
+  [
+   31,
+   43
+  ],
+  [
+   33,
+   37
+  ],
+  [
+   34,
+   40
+  ],
+  [
+   35,
+   45
+  ],
+  [
+   35,
+   50
+  ],
+  [
+   36,
+   41
+  ],
+  [
+   36,
+   44
+  ],
+  [
+   37,
+   45
+  ],
+  [
+   37,
+   50
+  ],
+  [
+   38,
+   35
+  ],
+  [
+   38,
+   40
+  ],
+  [
+   39,
+   35
+  ],
+  [
+   40,
+   51
+  ],
+  [
+   40,
+   52
+  ],
+  [
+   41,
+   42
+  ],
+  [
+   41,
+   54
+  ],
+  [
+   44,
+   42
+  ],
+  [
+   44,
+   54
+  ],
+  [
+   45,
+   48
+  ],
+  [
+   47,
+   46
+  ],
+  [
+   50,
+   49
+  ],
+  [
+   51,
+   53
+  ],
+  [
+   52,
+   42
+  ],
+  [
+   52,
+   54
+  ],
+  [
+   58,
+   34
+  ],
+  [
+   59,
+   34
+  ]
+ ]
+}

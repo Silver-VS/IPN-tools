@@ -33,19 +33,21 @@ UNI = ROOT / "data" / "unidades" / "escom"
 FONDO = {"#ffffff", "#000000"}
 
 
-def texto(chars, box):
+def texto(chars, box, dup=1.6, limpia=True):
     """Texto de una caja en el orden del PDF (no por posición: la LCD trae caracteres duplicados y desplazados que,
     ordenados por x, se entrelazan). Se omiten duplicados contiguos y el renglón de horas y créditos («3/1.5  7.5»)."""
     out, prev = [], None
     for ch in chars:
         if not inside(ch, box):
             continue
-        if prev and ch["text"] == prev["text"] and abs(ch["x0"] - prev["x0"]) < 1.6 and abs(ch["top"] - prev["top"]) < 1.6:
+        if prev and ch["text"] == prev["text"] and abs(ch["x0"] - prev["x0"]) < dup and abs(ch["top"] - prev["top"]) < dup:
             continue
         if prev and (abs(ch["top"] - prev["top"]) > 0.5 * ch["size"] or ch["x0"] - prev["x1"] > 0.22 * ch["size"] or ch["x0"] < prev["x0"] - 1):
             out.append(" ")
         out.append(ch["text"]); prev = ch
     t = re.sub(r"\s+", " ", "".join(out)).strip()
+    if not limpia:
+        return t
     return re.sub(r"(\s*[\d.]+/[\d.]+\s+[\d.]+\s*)+$|\s+[\d./]+(\s+[\d./]+)*$", "", t).strip()
 
 

@@ -1,0 +1,704 @@
+{
+ "fuente": "biotecnologia-2006.pdf",
+ "titulo": "2006",
+ "materias": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés I",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Química General",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Biología Celular",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Física del Movimiento",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Física de la Energía",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Planeación",
+   "nivel": 1,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés II",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Química Orgánica",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Técnicas Microbiológicas",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Termodinámica I",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Estadística",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Inglés III",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Métodos Cuantitativos",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Fisiología Celular",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Laboratorio de Biorreactores",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Bioingeniería",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Balance de Materia y Energía",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Biotecnología Molecular",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ingeniería Enzimática",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Electromecánica de Procesos",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Dinámica y Control de Bioprocesos",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Fenómenos de Transporte",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Laboratorio de Bioseparaciones",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Termodinámica II",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "nivel": 4,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Tecnologías de Recombinación Genética",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Biotecnología de la Respuesta Inmune",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Bioconversiones",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Procesos de Transferencia de Calor",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Mecánica de Fluidos y Sólidos",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Protección Ambiental",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Administración de la Producción",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Sistemas de Calidad",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ingeniería Celular",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Optativa I",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Ingeniería de Biorreactores",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioseparaciones Mecánicas",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioseparaciones Fluido-Fluido",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Bioseparaciones Sólido-Fluido",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Optativa II",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Tecnologías de Producción de Biomoléculas",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Electiva III",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Diseño de Procesos de Separación (Taller)",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Síntesis y Análisis de Bioprocesos",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Electiva I",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Formulación y Evaluación de Proyectos",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Diseño de Plantas (Taller)",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 4.5,
+   "creditos": 4.5
+  },
+  {
+   "nombre": "Estancia de Titulación",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 1.5,
+   "creditos": 1.5
+  },
+  {
+   "nombre": "Electiva II",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Administración de Proyectos",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  }
+ ],
+ "seriacion": [
+  [
+   1,
+   10
+  ],
+  [
+   2,
+   11
+  ],
+  [
+   3,
+   12
+  ],
+  [
+   4,
+   13
+  ],
+  [
+   5,
+   14
+  ],
+  [
+   7,
+   15
+  ],
+  [
+   7,
+   16
+  ],
+  [
+   8,
+   15
+  ],
+  [
+   8,
+   16
+  ],
+  [
+   9,
+   15
+  ],
+  [
+   9,
+   16
+  ],
+  [
+   10,
+   17
+  ],
+  [
+   11,
+   18
+  ],
+  [
+   12,
+   19
+  ],
+  [
+   12,
+   20
+  ],
+  [
+   13,
+   19
+  ],
+  [
+   13,
+   20
+  ],
+  [
+   14,
+   21
+  ],
+  [
+   14,
+   22
+  ],
+  [
+   14,
+   23
+  ],
+  [
+   14,
+   30
+  ],
+  [
+   16,
+   58
+  ],
+  [
+   20,
+   24
+  ],
+  [
+   20,
+   25
+  ],
+  [
+   22,
+   26
+  ],
+  [
+   23,
+   28
+  ],
+  [
+   24,
+   32
+  ],
+  [
+   24,
+   33
+  ],
+  [
+   25,
+   34
+  ],
+  [
+   28,
+   35
+  ],
+  [
+   28,
+   36
+  ],
+  [
+   29,
+   37
+  ],
+  [
+   29,
+   38
+  ],
+  [
+   29,
+   39
+  ],
+  [
+   33,
+   40
+  ],
+  [
+   33,
+   41
+  ],
+  [
+   34,
+   40
+  ],
+  [
+   34,
+   42
+  ],
+  [
+   35,
+   43
+  ],
+  [
+   35,
+   44
+  ],
+  [
+   35,
+   45
+  ],
+  [
+   38,
+   46
+  ],
+  [
+   39,
+   56
+  ],
+  [
+   40,
+   47
+  ],
+  [
+   40,
+   48
+  ],
+  [
+   43,
+   49
+  ],
+  [
+   43,
+   51
+  ],
+  [
+   44,
+   50
+  ],
+  [
+   45,
+   49
+  ],
+  [
+   45,
+   51
+  ],
+  [
+   46,
+   55
+  ],
+  [
+   50,
+   52
+  ],
+  [
+   50,
+   53
+  ],
+  [
+   50,
+   54
+  ],
+  [
+   57,
+   29
+  ],
+  [
+   58,
+   31
+  ]
+ ]
+}

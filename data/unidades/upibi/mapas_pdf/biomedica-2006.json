@@ -1,0 +1,768 @@
+{
+ "fuente": "biomedica-2006.pdf",
+ "titulo": "2006",
+ "materias": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés I",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Química General Aplicada",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Química Orgánica Aplicada",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioquímica Clínica",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Electroquímica I",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Biología Celular",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Física del Movimiento Aplicada",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Redes y Telecomunicaciones",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Informática Médica (Taller)",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Tópicos Selectos de Ingeniería Biomédica II",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Bioinstrumentación V",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés II",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés III",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Física de la Energía Aplicada",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Morfología",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Estadística",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Análisis de Circuitos",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Ingeniería Eléctrica",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Sistemas Digitales I",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Fisiología y Biofísica I",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Fisiología y Biofísica II",
+   "nivel": 4,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Electroquímica II",
+   "nivel": 4,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "nivel": 4,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Optativa I",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Fisiopatología I",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Fisiopatología II",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Biomateriales",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Sistemas Digitales II",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Instrumentación y Control",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Tecnología Clínica",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Sistemas de Calidad",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Sistemas Dinámicos",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Electrónica I",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Tecnología Clínica Ambiental",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Bioinstrumentación I",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Tópicos Selectos de Ingeniería Biomédica I",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Electrónica II",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Electrónica III",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Optativa II",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Proyecto Terminal I",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 1.5,
+   "hp": 1.5,
+   "creditos": 4.5
+  },
+  {
+   "nombre": "Procesamiento Digital de Bioseñales e Imágenes",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioinstrumentación II",
+   "nivel": 7,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioinstrumentación III",
+   "nivel": 7,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioinstrumentación IV",
+   "nivel": 7,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Proyecto Terminal II",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 1.5,
+   "hp": 3.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Proyecto Terminal III",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 1.5,
+   "hp": 0.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Introducción a la Física Médica",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Procesos de Manufactura",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Tecnología Hospitalaria (Taller)",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Imagenología",
+   "nivel": 7,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Optativa III",
+   "nivel": 7,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Administración de la Conservación Hospitalaria (Taller)",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Electiva II",
+   "nivel": 8,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Electiva I",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Administración de Tecnologías en Salud",
+   "nivel": 5,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Formulación y Evaluación de Proyectos",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  }
+ ],
+ "seriacion": [
+  [
+   1,
+   15
+  ],
+  [
+   2,
+   17
+  ],
+  [
+   3,
+   4
+  ],
+  [
+   4,
+   5
+  ],
+  [
+   4,
+   6
+  ],
+  [
+   5,
+   36
+  ],
+  [
+   6,
+   28
+  ],
+  [
+   7,
+   20
+  ],
+  [
+   8,
+   19
+  ],
+  [
+   9,
+   21
+  ],
+  [
+   9,
+   22
+  ],
+  [
+   10,
+   11
+  ],
+  [
+   14,
+   29
+  ],
+  [
+   15,
+   16
+  ],
+  [
+   17,
+   18
+  ],
+  [
+   18,
+   37
+  ],
+  [
+   19,
+   23
+  ],
+  [
+   19,
+   24
+  ],
+  [
+   19,
+   25
+  ],
+  [
+   20,
+   26
+  ],
+  [
+   21,
+   63
+  ],
+  [
+   22,
+   63
+  ],
+  [
+   23,
+   38
+  ],
+  [
+   23,
+   39
+  ],
+  [
+   25,
+   34
+  ],
+  [
+   25,
+   35
+  ],
+  [
+   26,
+   27
+  ],
+  [
+   27,
+   32
+  ],
+  [
+   27,
+   33
+  ],
+  [
+   27,
+   40
+  ],
+  [
+   27,
+   47
+  ],
+  [
+   29,
+   10
+  ],
+  [
+   31,
+   46
+  ],
+  [
+   32,
+   41
+  ],
+  [
+   32,
+   53
+  ],
+  [
+   33,
+   54
+  ],
+  [
+   34,
+   32
+  ],
+  [
+   34,
+   47
+  ],
+  [
+   36,
+   33
+  ],
+  [
+   36,
+   40
+  ],
+  [
+   37,
+   61
+  ],
+  [
+   38,
+   30
+  ],
+  [
+   39,
+   43
+  ],
+  [
+   40,
+   55
+  ],
+  [
+   41,
+   42
+  ],
+  [
+   41,
+   49
+  ],
+  [
+   42,
+   12
+  ],
+  [
+   43,
+   41
+  ],
+  [
+   43,
+   53
+  ],
+  [
+   46,
+   51
+  ],
+  [
+   47,
+   45
+  ],
+  [
+   48,
+   13
+  ],
+  [
+   49,
+   13
+  ],
+  [
+   51,
+   52
+  ],
+  [
+   54,
+   50
+  ],
+  [
+   55,
+   58
+  ],
+  [
+   58,
+   59
+  ],
+  [
+   61,
+   62
+  ],
+  [
+   62,
+   60
+  ],
+  [
+   64,
+   29
+  ]
+ ]
+}

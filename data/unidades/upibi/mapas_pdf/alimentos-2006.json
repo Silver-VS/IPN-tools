@@ -1,0 +1,596 @@
+{
+ "fuente": "alimentos-2006.pdf",
+ "titulo": "2006",
+ "materias": [
+  {
+   "nombre": "Comunicación y Sistemas de Información (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés I",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Biotecnología y Sociedad",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Química General Aplicada",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Biología Celular",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Química Orgánica Aplicada",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Química y Funcionalidad de los Alimentos",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Fisicoquímica de los Alimentos",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Física del Movimiento Aplicada",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 1.5,
+   "creditos": 7.5
+  },
+  {
+   "nombre": "Cálculo Diferencial e Integral",
+   "nivel": 1,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Envases y Embalajes",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Diseño de Experimentos (Taller)",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 4.5,
+   "creditos": 4.5
+  },
+  {
+   "nombre": "Programación (Taller)",
+   "nivel": 1,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés II",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Inglés III",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Relaciones Laborales",
+   "nivel": 2,
+   "area_formacion": "Institucional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ética (Taller)",
+   "nivel": 3,
+   "area_formacion": "Institucional",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Métodos Cuantitativos",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Termodinámica I",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Termodinámica II",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Estadística",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Microbiología",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Álgebra Vectorial",
+   "nivel": 2,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Inocuidad Alimentaria",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Balance de Materia y Energía",
+   "nivel": 3,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Fisiología de la Nutrición",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Fenómenos de Transporte",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Ciencia y Tecnología de Alimentos IV",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Ciencia y Tecnología de Alimentos II",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Mecánica de Fluidos y Sólidos",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Procesos de Transferencia de Calor",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Dinámica y Control de Bioprocesos",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Electromecánica de Procesos",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Evaluación Sensorial de los Alimentos",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Ciencia y Tecnología de Alimentos I",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Laboratorio de Bioingeniería",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Desarrollo de Productos",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Ciencia y Tecnología de Alimentos III",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 3.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Biotecnología Alimentaria",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Tecnología Frigorífica",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Estancia de Titulación",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 1.5,
+   "creditos": 1.5
+  },
+  {
+   "nombre": "Simulación y Escalamiento de Procesos",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 3.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Síntesis y Análisis de Bioprocesos",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioseparaciones Mecánicas",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Bioseparaciones Fluido-Fluido",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Bioseparaciones Sólido-Fluido",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Laboratorio de Bioseparaciones",
+   "nivel": 6,
+   "area_formacion": "Profesional",
+   "ht": 0.0,
+   "hp": 6.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Diseño de Procesos de Separación (Taller)",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Diseño de Plantas (Taller)",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 4.5,
+   "creditos": 4.5
+  },
+  {
+   "nombre": "Formulación y Evaluación de Proyectos",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Electiva II",
+   "nivel": 7,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Planeación del Riesgo e Impacto Ambiental",
+   "nivel": 5,
+   "area_formacion": "Terminal y de integración",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  },
+  {
+   "nombre": "Ingeniería Industrial",
+   "nivel": 4,
+   "area_formacion": "Terminal y de integración",
+   "ht": 6.0,
+   "hp": 0.0,
+   "creditos": 12.0
+  },
+  {
+   "nombre": "Electiva I",
+   "nivel": 6,
+   "area_formacion": "Terminal y de integración",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Aplicaciones Matemáticas (Taller)",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Métodos Numéricos (Taller)",
+   "nivel": 4,
+   "area_formacion": "Científica básica",
+   "ht": 0.0,
+   "hp": 3.0,
+   "creditos": 3.0
+  },
+  {
+   "nombre": "Ecuaciones Diferenciales",
+   "nivel": 3,
+   "area_formacion": "Científica básica",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Optativa I",
+   "nivel": 4,
+   "area_formacion": "Profesional",
+   "ht": 4.5,
+   "hp": 0.0,
+   "creditos": 9.0
+  },
+  {
+   "nombre": "Optativa II",
+   "nivel": 5,
+   "area_formacion": "Profesional",
+   "ht": 3.0,
+   "hp": 0.0,
+   "creditos": 6.0
+  }
+ ],
+ "seriacion": [
+  [
+   1,
+   13
+  ],
+  [
+   3,
+   5
+  ],
+  [
+   3,
+   17
+  ],
+  [
+   4,
+   21
+  ],
+  [
+   5,
+   6
+  ],
+  [
+   6,
+   34
+  ],
+  [
+   7,
+   10
+  ],
+  [
+   7,
+   33
+  ],
+  [
+   8,
+   18
+  ],
+  [
+   9,
+   22
+  ],
+  [
+   12,
+   20
+  ],
+  [
+   13,
+   14
+  ],
+  [
+   17,
+   7
+  ],
+  [
+   18,
+   19
+  ],
+  [
+   19,
+   26
+  ],
+  [
+   19,
+   35
+  ],
+  [
+   20,
+   56
+  ],
+  [
+   21,
+   23
+  ],
+  [
+   22,
+   54
+  ],
+  [
+   23,
+   25
+  ],
+  [
+   24,
+   26
+  ],
+  [
+   24,
+   35
+  ],
+  [
+   43,
+   42
+  ],
+  [
+   44,
+   47
+  ],
+  [
+   45,
+   48
+  ],
+  [
+   46,
+   49
+  ],
+  [
+   54,
+   55
+  ],
+  [
+   55,
+   11
+  ],
+  [
+   56,
+   55
+  ]
+ ]
+}
