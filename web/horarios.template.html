@@ -170,6 +170,17 @@ input[type=number]{width:5rem}
 .box.slot{border-style:dashed;background:var(--sunken);color:var(--muted);font-weight:500}
 .box.req{background:var(--accent-soft)}
 .box.far{opacity:.5;filter:saturate(.35)}
+.stats{margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.st-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}
+.st-grid2 figure{margin:0;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
+.st-grid2 figcaption{font-weight:600;font-size:.9rem;margin-bottom:6px}
+.st-wide{grid-column:1/-1}
+.st-svg{width:100%;height:auto;display:block;overflow:visible}
+.st-t{font-size:11px;fill:var(--fg);font-variant-numeric:tabular-nums}.st-t.mut{fill:var(--muted)}.st-t.acc{fill:var(--accent);font-size:10px}
+.st-grid{stroke:var(--line);stroke-width:1}.st-gen{stroke:var(--accent);stroke-dasharray:4 4;stroke-width:1.2}
+.st-line{fill:none;stroke:var(--accent);stroke-width:2}.st-dot{fill:var(--accent)}.st-bar{fill:var(--accent);opacity:.85}
+.st-leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.82rem;color:var(--muted)}.st-leg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.st-note{margin:6px 0 0;font-size:.82rem;color:var(--muted)}
 .mapcut{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);font-size:.88rem;color:var(--muted)}
 .minimap{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:4px;cursor:pointer;line-height:0;flex:none}
 .minimap:hover{border-color:var(--accent)}
@@ -475,11 +486,12 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <section id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
     <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
     <section class="card estado" data-personal hidden aria-labelledby="h-estado">
-      <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
+      <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="link" type="button" id="stats-btn" hidden>Ver estadísticas</button><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
       <div class="est-sim" id="est-sim" hidden></div>
       <div class="est-tiles" id="status"></div>
       <div id="desf"></div>
       <p class="est-note" id="desf-note"></p>
+      <div class="stats" id="stats" hidden></div>
     </section>
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
@@ -1541,7 +1553,74 @@ function renderList(){
         `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${w?'✓':'+'}</button>`+
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
-function renderTray(){renderMap();renderList();renderSide()}
+/* ---------- estadísticas del kárdex (solo con datos del SAES; se calculan en el navegador) ---------- */
+const FORMAS={ORD:'Ordinario',REC:'Recurse',ETS:'ETS',EXT:'Extraordinario',EQV:'Equivalencia',REV:'Revalidación',DIC:'Dictamen'};
+const FCOL={ORD:'var(--ok)',REC:'var(--warn)',ETS:'var(--bad)',EXT:'var(--accent)',EQV:'var(--n4)',REV:'var(--n6)',DIC:'var(--n8)'};
+function catDe(){                                // clave -> categoría (columna del mapa)
+  const L=MAP().layout,out={};if(!L?.cols?.length)return out;
+  L.boxes.forEach(([x,y,w,h,k])=>{if(!k)return;const cx=x+w/2,c=L.cols.find(([n,a,b])=>cx>=a&&cx<b);if(c)out[k]=c[0]});
+  return out;
+}
+function renderStats(){
+  const box=$('#stats'),btn=$('#stats-btn');if(!box||!btn)return;
+  const on=isPersonal()&&store.get('stats',false);btn.hidden=!isPersonal();btn.textContent=on?'Ocultar estadísticas':'Ver estadísticas';box.hidden=!on;
+  if(!on)return;
+  const c=cur(), A=ALUMNO, ac=(A.acreditadas||[]).filter(a=>a&&a[1]!=null);
+  if(!ac.length){box.innerHTML='<p class="muted">El kárdex no trae calificaciones.</p>';return}
+  const W=360,H=170,P={l:30,r:10,t:14,b:30};
+  const svg=(inner,h=H,w=W)=>`<svg viewBox="0 0 ${w} ${h}" role="img" class="st-svg">${inner}</svg>`;
+  const t=(x,y,s,a='middle',cls='')=>`<text x="${x}" y="${y}" text-anchor="${a}" class="st-t ${cls}">${esc(String(s))}</text>`;
+  const prom=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null, f1=v=>v==null?'—':v.toFixed(2).replace(/\.?0+$/,'');
+  const eqv=a=>String(a[3]||'').toUpperCase()==='EQV';
+  // 1) promedio por periodo (sin equivalencias: son de otra carrera)
+  const porPer={};ac.filter(a=>!eqv(a)).forEach(a=>{const i=perIdx(a[2]);if(i!=null)(porPer[i]=porPer[i]||[]).push(+a[1])});
+  const pers=Object.keys(porPer).map(Number).sort((a,b)=>a-b), gen=A.promedio??prom(ac.map(a=>+a[1]));
+  let g1='';
+  if(pers.length){
+    const X=i=>P.l+(pers.length===1?(W-P.l-P.r)/2:i*(W-P.l-P.r)/(pers.length-1)), Y=v=>P.t+(10-v)/4*(H-P.t-P.b);
+    [6,7,8,9,10].forEach(v=>{g1+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(v)}" y2="${Y(v)}" class="st-grid"/>`+t(P.l-6,Y(v)+4,v,'end','mut')});
+    if(gen!=null)g1+=`<line x1="${P.l}" x2="${W-P.r}" y1="${Y(gen)}" y2="${Y(gen)}" class="st-gen"/>`+t(W-P.r,Y(gen)-4,'general '+f1(+gen),'end','acc');
+    g1+=`<polyline points="${pers.map((p,i)=>X(i)+','+Y(prom(porPer[p]))).join(' ')}" class="st-line"/>`;
+    pers.forEach((p,i)=>{const v=prom(porPer[p]);g1+=`<circle cx="${X(i)}" cy="${Y(v)}" r="3.5" class="st-dot"/>`+t(X(i),Y(v)-8,f1(v))+t(X(i),H-10,perName(p),'middle','mut')});
+  }
+  // 2) distribución de calificaciones
+  const dist={6:0,7:0,8:0,9:0,10:0};ac.forEach(a=>{const v=Math.round(+a[1]);if(v in dist)dist[v]++});
+  const dmax=Math.max(1,...Object.values(dist)), bw=(W-P.l-P.r)/5;
+  let g2='';Object.entries(dist).forEach(([v,n],i)=>{const h=n/dmax*(H-P.t-P.b),x=P.l+i*bw+bw*.18;
+    g2+=`<rect x="${x}" y="${H-P.b-h}" width="${bw*.64}" height="${h}" rx="3" class="st-bar"/>`+t(x+bw*.32,H-P.b-h-4,n)+t(x+bw*.32,H-12,v,'middle','mut')});
+  // 3) forma de acreditación
+  const fm={};ac.forEach(a=>{const k=String(a[3]||'—').toUpperCase();fm[k]=(fm[k]||0)+1});
+  const tot=ac.length;let x0=0, g3='';
+  const fs=Object.entries(fm).sort((a,b)=>b[1]-a[1]);
+  fs.forEach(([k,n])=>{const w=n/tot*(W-20);g3+=`<rect x="${10+x0}" y="20" width="${Math.max(w-2,1)}" height="26" rx="4" fill="${FCOL[k]||'var(--muted)'}"/>`;x0+=w});
+  const leg3=fs.map(([k,n])=>`<span><i style="background:${FCOL[k]||'var(--muted)'}"></i>${esc(FORMAS[k]||k)}: <b>${n}</b> (${Math.round(n/tot*100)} %)</span>`).join('');
+  // 4) promedio por categoría (columnas del mapa)
+  const cat=catDe(), pc={};ac.forEach(a=>{const k=cat[a[0]];if(k)(pc[k]=pc[k]||[]).push(+a[1])});
+  const cats=Object.entries(pc).map(([k,v])=>[k,prom(v),v.length]).sort((a,b)=>b[1]-a[1]);
+  const rowH=22, H4=Math.max(60,cats.length*rowH+16);let g4='';
+  cats.forEach(([k,v,n],i)=>{const y=8+i*rowH,w=(v-5)/5*(W-190);g4+=t(150,y+14,k,'end','mut')+`<rect x="156" y="${y+3}" width="${Math.max(w,2)}" height="14" rx="3" class="st-bar"/>`+t(160+Math.max(w,2),y+14,`${f1(v)} · ${n}`,'start')});
+  // 5) ritmo: créditos acreditados por periodo y proyección
+  const crPer={};ac.forEach(a=>{const i=eqv(a)?'EQV':perIdx(a[2]);if(i==null)return;crPer[i]=(crPer[i]||0)+(c[a[0]]?.[1]||0)});
+  const pk=Object.keys(crPer).filter(k=>k!=='EQV').map(Number).sort((a,b)=>a-b), cmax=Math.max(1,...Object.values(crPer));
+  const W5=780, cols5=[...(crPer.EQV?['EQV']:[]),...pk], bw5=Math.min(90,(W5-P.l-P.r)/Math.max(cols5.length,1));let g5='';   // gráfica ancha: proporción propia
+  cols5.forEach((p,i)=>{const v=crPer[p],h=v/cmax*(H-P.t-P.b),x=P.l+i*bw5+bw5*.15;
+    g5+=`<rect x="${x}" y="${H-P.b-h}" width="${bw5*.7}" height="${h}" rx="3" class="st-bar" ${p==='EQV'?'style="fill:var(--n4)"':''}/>`+t(x+bw5*.35,H-P.b-h-4,fmtCr(v))+t(x+bw5*.35,H-12,p==='EQV'?'equiv.':perName(p),'middle','mut')});
+  const ult=pk.slice(-3).map(p=>crPer[p]), ritmo=prom(ult), falta=A.avance?.faltan??null;
+  const nper=ritmo&&falta!=null?Math.ceil(falta/ritmo):null, meta=perMeta(), fin=nper!=null&&meta!=null?perName(meta+nper-1):null;
+  const dur=A.carga?.duracion, cursados=A.avance?.cursados, totalPer=nper!=null&&cursados!=null?cursados+nper:null;
+  const proy=ritmo?`A tu ritmo de los últimos periodos (<b>${fmtCr(ritmo)}</b> créditos por periodo), te faltan unos <b>${nper}</b> periodos${fin?`: terminarías en <b>${fin}</b>`:''}.`+
+    (totalPer&&dur?` Serían ${totalPer} periodos en total; el plan dura ${dur}${A.carga?.duracion_max?` y el máximo es ${A.carga.duracion_max}`:''}.`:''):'';
+  const nEqv=ac.filter(eqv).length;
+  box.innerHTML=`<div class="st-grid2">
+    <figure><figcaption>Promedio por periodo</figcaption>${pers.length?svg(g1):'<p class="muted">Sin periodos con calificación.</p>'}${nEqv?`<p class="st-note">No incluye ${nEqv} materias acreditadas por equivalencia.</p>`:''}</figure>
+    <figure><figcaption>Calificaciones</figcaption>${svg(g2)}</figure>
+    <figure><figcaption>Forma de acreditación</figcaption>${svg(g3,60)}<div class="st-leg">${leg3}</div></figure>
+    ${cats.length?`<figure><figcaption>Promedio por categoría</figcaption>${svg(g4,H4)}</figure>`:''}
+    <figure class="st-wide"><figcaption>Créditos acreditados por periodo</figcaption>${svg(g5,H,W5)}<p class="st-note">${proy}</p></figure>
+  </div>`;
+}
+
+function renderTray(){renderMap();renderList();renderSide();renderStats()}
 function renderHor(){renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen()}
 function render(){
   // carrera sin mapa curricular (otra escuela): solo planeación de horario
@@ -1614,6 +1693,7 @@ $('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;c
 $('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
 $('#lineas').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
 $('#map').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
+$('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stats',false));renderStats()});
 $('#mapcut-btn').addEventListener('click',()=>{store.set('mapFull',!store.get('mapFull',false));renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapFull',!store.get('mapFull',false));renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
 $('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;render()});
