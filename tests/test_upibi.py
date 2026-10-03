@@ -162,7 +162,7 @@ assert.strictEqual(legend(13,{}),'');
 
     def test_coordenadas_svg_con_zoom_scroll_y_resize(self):
         html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
-        fn=html[html.index('function montarGrafica('):html.index('async function renderStats(')]
+        fn=html[html.index('function montarGrafica('):html.index('let ST_RENDER=')]
         script="""
 const assert=require('assert');
 class DOMMatrix {constructor(a){[this.a,this.b,this.c,this.d,this.e,this.f]=a}}
@@ -279,9 +279,38 @@ ALUMNO.acreditadas.forEach(a=>a[2]=a[0]==='DEMO0'?'25/1':'26/1');
 D=statsDatos();assert.ok(D.avisos.some(x=>x.includes('intermedios')));
 ALUMNO.periodos_confirmados=[{periodo:'25/2',creditos:0,completo:true}];
 D=statsDatos();assert.strictEqual(D.porPer.find(x=>x.per===51).cr,0);assert.strictEqual(D.ritmo,80);
+ALUMNO.en_curso=['NO_CORRESPONDE'];t.sim=true;assert.strictEqual(statsDatos().falta,null);t.sim=false;ALUMNO.en_curso=[];
 ALUMNO.reprobadas_periodo=null;assert.ok(statsDatos().avisos.some(x=>x.includes('estado general')));
 ALUMNO.avance.faltan=197;D=statsDatos();assert.strictEqual(D.falta,null);assert.strictEqual(D.obt,240);assert.strictEqual(D.fin,null);
 ALUMNO.acreditadas=[];ALUMNO.avance={};ALUMNO.carga={};D=statsDatos();assert.strictEqual(D.obt,null);assert.strictEqual(D.media,null);assert.strictEqual(D.fin,null);
+"""
+        result=subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+
+
+    def test_simulador_de_meta_valida_saldo_y_periodos(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        fn=html[html.index('function metaCreditos('):html.index('function montarGrafica(')]
+        credito=re.search(r'const creditoValido=.*?;',html).group(0)
+        script="""
+const assert=require('assert');const ALUMNO={carga:{min:36.5}},SAES={autorizada:()=>73};
+const fmtCr=String,perName=i=>`${Math.floor(i/2)}/${i%2+1}`;
+const D={falta:198,ritmo:49.5,meta:54,actual:54,simulado:false,ritmoParcial:true};
+"""+credito+fn+"""
+for(const [h,v] of [[2,99],[3,66],[4,49.5],[5,39.6],[6,33]])assert.strictEqual(metaCreditos(D,h,true).necesarios,v);
+assert.strictEqual(metaCreditos(D,2,true).supera,true);assert.strictEqual(metaCreditos(D,3,true).supera,false);
+assert.ok(metaResumen(D,3,true).includes('falta comprobar seriación y oferta'));
+assert.ok(Math.abs(metaCreditos(D,3,true).diferencia-1/3)<1e-10);
+assert.strictEqual(metaCreditos(D,4,true).fin,57);assert.strictEqual(metaCreditos(D,4,false).fin,58);
+assert.strictEqual(metaCreditos({...D,simulado:true,meta:55},4,false).fin,58);
+for(const h of [0,-1,2.5,'','abc',Infinity])assert.strictEqual(metaCreditos(D,h,true).valida,false);
+assert.strictEqual(metaCreditos({...D,falta:0},4,true).fin,null);assert.ok(metaResumen({...D,falta:0},4,true).includes('Créditos completos'));
+assert.strictEqual(metaCreditos({...D,ritmo:0},4,true).diferencia,null);
+assert.strictEqual(metaCreditos({...D,meta:null},4,true).fin,null);
+assert.strictEqual(metaCreditos({...D,falta:null},4,true).pendientes,null);
+SAES.autorizada=()=>null;assert.ok(metaResumen(D,4,true).includes('No se conoce la carga autorizada'));
+assert.strictEqual(metaCreditos(D,6,true).bajoMin,true);
 """
         result=subprocess.run(['node','-e',script],text=True,capture_output=True)
         self.assertEqual(result.returncode,0,result.stderr)
