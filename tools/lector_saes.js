@@ -105,7 +105,7 @@
     } catch (e) { estado = null; secc = null; }
     try {
       var hor = await getRaw('/Alumnos/Informacion_semestral/Horario_Alumno.aspx');
-      hor.querySelectorAll('[id*="GV_Horario"] [id$="Lbl_Materia"]').forEach(function (s) {
+      hor.querySelectorAll('[id*="GV_Horario"] [id*="Lbl_Materia"]').forEach(function (s) {
         var m = clean(s.textContent).match(/^((?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6})\b/i);
         if (m) curso.push(m[1].toUpperCase());
       });

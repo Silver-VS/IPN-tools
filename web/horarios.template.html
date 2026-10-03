@@ -170,6 +170,8 @@ input[type=number]{width:5rem}
 .box.slot{border-style:dashed;background:var(--sunken);color:var(--muted);font-weight:500}
 .box.req{background:var(--accent-soft)}
 .box.far{opacity:.5;filter:saturate(.35)}
+.box.optfill{outline:1.5px dashed var(--muted);outline-offset:2px}
+.box.slot .slot-sig{display:block;font-size:.85em;opacity:.85;margin-top:2px;line-height:1.15}
 .box.want{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
 .box.want::after{content:"✓";position:absolute;top:1px;right:4px;font-size:.95em;color:inherit}
 .box.dim{opacity:.22}
@@ -669,7 +671,8 @@ const tr=()=>{
   if(!T[S.car]){
     const t=store.get('t.'+S.car,{want:[]}), me=isPersonal();
     const done0=me?ALUMNO.acreditadas.map(a=>a[0]):[];
-    const enCurso=me?(ALUMNO.en_curso||[]).filter(k=>cur()[k]&&!done0.includes(k)):[];
+    const enc=me?((ALUMNO.en_curso||[]).length?ALUMNO.en_curso:(ALUMNO.horario_inscrito||[]).map(h=>h[1])):[];
+    const enCurso=enc.filter(k=>cur()[k]&&!done0.includes(k));
     const sim=me&&SIM.on&&enCurso.length>0;
     const simOk=sim?enCurso.filter(k=>!SIM.fail.includes(k)):[], simFail=sim?enCurso.filter(k=>SIM.fail.includes(k)):[];
     const done=[...done0,...simOk], doneS=new Set(done);
@@ -828,7 +831,9 @@ function suggestions(){
   const ci=cargaInfo(0), failS=new Set(tr().fail), cost=k=>failS.has(k)?0:cur()[k][1];
   // meta de créditos nuevos: con adeudos, lo autorizado además de los retenidos; regular, la carga media
   const target=ci?(ci.adeudo?ci.libre:Math.min(ci.libre,ci.L.media)):40;
-  const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&cur()[k][3]==='O')
+  const pre=prereqs(), hecho=new Set([...tr().done,...tr().curso]);
+  const sigue=k=>cur()[k][3]==='P'&&(pre[k]||[]).some(x=>hecho.has(x)&&cur()[x]?.[3]==='P');   // optativa: continuación de su línea
+  const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&(cur()[k][3]==='O'||sigue(k)))
     .sort((a,b)=>{const ra=rank[statusOf(a).split(' ')[0]], rb=rank[statusOf(b).split(' ')[0]];
       return ra-rb||(ra===3?unlocks(b)-unlocks(a):0)||(sp[a]||99)-(sp[b]||99)||cur()[a][2]-cur()[b][2]});
   const out=[];let cr=0;
@@ -896,7 +901,11 @@ function renderMap(){
   });
   svg+='</svg>';
   let html=svg;
-  L.boxes.forEach(([x,y,w,h,k,slot,sem])=>{
+  const FILL=slotFill(L,want);
+  L.boxes.forEach(([x,y,w,h,k,slot,sem],i)=>{
+    const f=FILL.get(i);
+    if(!k&&f?.k){html+=boxHtml(f.k,x,y,w,h,sc,want,off,hot,sem,req).replace('class="box ','class="box optfill ');return}
+    if(!k&&f?.sigue){html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9*sc}px" title="${esc(slot)}: continúa tu línea con ${esc(cur()[f.sigue][0])}">${esc(slot)}<small class="slot-sig">sigue: ${esc(pretty(cur()[f.sigue][0]).replace(/\s*\(.*\)$/,''))}</small></div>`;return}
     if(k) html+=boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req);
     else html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?'se acredita con actividades validadas por horas (Electivas UPIITA), no con un grupo del horario':'cualquiera de las ofertadas'}">${esc(slot)}</div>`;
   });
@@ -906,6 +915,25 @@ function renderMap(){
   $('#mapnote').textContent=L.nota?L.nota:L.propuesto?
     'Esta carrera aún no cuenta con una trayectoria recomendada. Las áreas y la seriación (líneas punteadas) constituyen una propuesta elaborada a partir del plan de estudios oficial, sujeta a validación por la academia.':
     'Trayectoria recomendada. Las flechas indican la seriación recomendada; '+(tactil()?'al tocar una materia':'al colocar el cursor sobre una materia')+' se resalta su cadena de requisitos. Se sombrean las materias que conviene acreditar antes de las seleccionadas; en cursiva, las que no tienen grupos en el periodo consultado.';
+}
+/* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
+   mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
+   toma la continuación de esa línea (ESCOM ISC: optativa de 6.º -> 7.º) o la sugiere. */
+function slotFill(L,want){
+  const out=new Map(), c=cur(), t=isPersonal()?tr():{done:[],curso:[]};
+  const rank=k=>t.done.includes(k)?0:t.curso.includes(k)?1:want.has(k)?2:9;
+  const cands=Object.keys(c).filter(k=>c[k][3]==='P'&&!isElec(k)&&rank(k)<9).sort((a,b)=>rank(a)-rank(b)||c[a][2]-c[b][2]);
+  const slots=L.boxes.map((b,i)=>[i,b]).filter(([,b])=>!b[4]&&/^optativa/i.test(b[5])).sort((a,b)=>a[1][6]-b[1][6]||a[1][0]-b[1][0]);
+  const used=new Set(), dep=dependents(), next=i=>L.edges.filter(e=>e[0]===i).map(e=>e[1]);
+  const put=(i,k)=>{out.set(i,{k});used.add(k)};
+  for(const [i,b] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k)&&c[k][2]===b[6]);if(k)put(i,k)}
+  for(const [i] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k));if(k)put(i,k)}
+  // continuación de la línea en el espacio siguiente (flecha entre espacios)
+  for(const [i] of slots){const f=out.get(i);if(!f?.k)continue;
+    for(const j of next(i)){const sig=(dep[f.k]||[]).find(x=>c[x]?.[3]==='P');if(!sig)continue;
+      const cur_=out.get(j);if(cur_?.k===sig)continue;
+      if(!cur_||cur_.sigue){if(rank(sig)<9){if(cur_?.k)used.delete(cur_.k);put(j,sig)}else if(!cur_)out.set(j,{sigue:sig})}}}
+  return out;
 }
 function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
   const [n,cr,niv]=cur()[k]||[k,0,1];
