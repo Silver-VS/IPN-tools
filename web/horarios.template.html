@@ -478,7 +478,7 @@ details.box2>summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .bar .fill{position:absolute;inset:0 auto 0 0;background:var(--accent);border-radius:999px}
 .bar .tick{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg);opacity:.5}
 .ticks{position:relative;height:1rem;font-family:var(--f-mono);font-size:.66rem;color:var(--muted)}
-.ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}.ticks.dos{height:2rem}.ticks span.f2{top:1rem}
 .sel{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .sel>div{display:grid;grid-template-columns:.7rem 4.6rem minmax(0,1fr) auto auto;gap:10px;align-items:center;padding:6px 10px;border-top:1px solid var(--line);font-size:.86rem}
 .sel>div:first-child{border-top:0}
@@ -1553,7 +1553,11 @@ function renderCal(){
     const tag=t<L.min?'Menor a la mínima':t>ci.tope+0.01?(ci.aut!=null?'Excede la carga autorizada':ci.adeudo?'Excede la carga media (con adeudos)':'Mayor a la máxima'):t<=L.media?'Entre mínima y media':'Entre media y máxima';
     const bad=t<L.min||t>ci.tope+0.01;
     $('#load').innerHTML=`<span class="lbl${bad?' bad':''}">Carga total: ${fmtCr(t)} cr · ${tag}</span><div class="bar">${ci.ret?`<div class="fill ret" style="width:${pct(ci.ret)}%"></div>`:''}<div class="fill" style="left:${pct(ci.ret)}%;width:${Math.max(0,pct(t)-pct(ci.ret))}%"></div>${['min','media','max'].map(k=>`<div class="tick" style="left:${pct(L[k])}%"></div>`).join('')}${ci.tope!==L.max&&ci.tope!==L.media?`<div class="tick tope" style="left:${pct(ci.tope)}%"></div>`:''}</div>
-      <div class="ticks">${[['min','mínima'],['media','media'],['max','máxima']].map(([k,l])=>`<span style="left:${pct(L[k])}%">${l} ${L[k]}</span>`).join('')}${ci.tope!==L.max&&ci.tope!==L.media?`<span class="bad" style="left:${pct(ci.tope)}%">autorizada ${fmtCr(ci.tope)}</span>`:''}</div>`+
+      ${(()=>{   // etiquetas de la barra de carga: si dos quedan cerca, la segunda baja a otro renglón
+        const et=[['min','mínima'],['media','media'],['max','máxima']].map(([k,l])=>({p:pct(L[k]),t:`${l} ${L[k]}`,c:''}));
+        if(ci.tope!==L.max&&ci.tope!==L.media)et.push({p:pct(ci.tope),t:`autorizada ${fmtCr(ci.tope)}`,c:'bad'});
+        et.sort((x,y)=>x.p-y.p);let fila=0;et.forEach((e,i)=>{e.f=i&&e.p-et[i-1].p<14&&et[i-1].f===0?1:0});fila=Math.max(0,...et.map(e=>e.f));
+        return `<div class="ticks${fila?' dos':''}">${et.map(e=>`<span class="${e.c}${e.f?' f2':''}" style="left:${e.p}%">${e.t}</span>`).join('')}</div>`})()}`+
       (ci.ret?`<p class="load-note"><i class="sw-ret"></i>${fmtCr(ci.ret)} cr retenidos por reprobadas (cuentan aunque no las inscribas; recursarlas no suma de nuevo) · ${fmtCr(ci.nuevos)} cr de materias nuevas, de ${fmtCr(ci.libre)} permitidos (${ci.aut!=null?`carga autorizada de ${fmtCr(ci.aut)} cr`:'carga media'} menos los retenidos)${ci.faltaMin?` · faltan ${fmtCr(ci.faltaMin)} cr para la mínima`:''}.</p>`:'');
   }else $('#load').innerHTML='';
   $('#sel').hidden=!both.length;
