@@ -188,7 +188,7 @@ input[type=number]{width:5rem}
 .kpi b{font-size:1.65rem;font-weight:650;font-variant-numeric:tabular-nums;line-height:1.15}
 .kpi small{font-size:.78rem;color:var(--muted)}
 .kpi .up{color:var(--ok);font-weight:600}.kpi .down,.kpi b.down{color:var(--bad)}
-.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px;margin-top:12px}
+.charts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px;margin-top:12px}
 .charts figure{margin:0;padding:12px 14px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
 .charts .ch-wide{grid-column:1/-1}
 .charts figure figure{border:0;padding:0;background:none;margin:0}   /* Plot envuelve en <figure> las gráficas con leyenda */
@@ -198,7 +198,7 @@ input[type=number]{width:5rem}
 .charts [aria-label="tip"] path{fill:var(--surface);stroke:var(--line)}
 .st-note{margin:8px 0 0;font-size:.8rem;color:var(--muted)}
 .kanal{margin-top:16px}.an-h{margin:0 0 8px;font-size:1.05rem}
-.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:12px}
+.an-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
 .an-grid section{padding:12px 14px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
 .an-grid h4{margin:0;font-size:.92rem}.an-sub{margin:2px 0 8px;font-size:.78rem;color:var(--muted)}
 .an-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:7px}
@@ -1598,6 +1598,7 @@ function renderList(){
 }
 /* ---------- estadísticas del kárdex (solo con datos del SAES; se calculan en el navegador) ----------
    Gráficas con Observable Plot (D3), que se carga solo al abrir esta sección. */
+const notaValida=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<6||+v>10?null:+v;
 const FORMAS={ORD:'Ordinario',REC:'Recurse',ETS:'ETS',EXT:'Extraordinario',EQV:'Equivalencia',REV:'Revalidación',DIC:'Dictamen'};
 const LIB_PLOT=[['https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js','sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i'],
   ['https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6.17/dist/plot.umd.min.js','sha384-JUpn2GgRr0gxU0xOBd8D8P634jhRCwobtG8G2MMEkX1RnGJ7/FJNnuukpfT+H2w1']];
@@ -1612,7 +1613,7 @@ function catDe(){                                // clave -> categoría (columna
 /* kárdex con la simulación: materias en curso aprobadas y reprobadas acreditadas, con su calificación simulada,
    en el periodo que se cursa (el anterior al que se planea). Quinto campo = simulada. */
 function simKardex(){
-  const A=ALUMNO, base=(A.acreditadas||[]).filter(a=>a&&a[1]!=null);if(!isPersonal()||!tr().sim)return base;
+  const A=ALUMNO, base=(A.acreditadas||[]).filter(a=>a&&notaValida(a[1])!=null);if(!isPersonal()||!tr().sim)return base;
   const pm=perMeta(), p=pm!=null?perName(pm-1):null, rep=new Set((A.reprobadas_periodo||[]).map(r=>r[0]));
   return [...base,...tr().simOk.map(k=>[k,SIM.res[k]?.cal??8,p,rep.has(k)?'REC':'ORD',1]),...tr().simRec.map(k=>[k,SIM.rec[k]?.cal??7,p,SIM.rec[k].forma,1])];
 }
@@ -1641,8 +1642,8 @@ function proyeccionCreditos(D){
 }
 function statsDatos(){
   const c=cur(), A=ALUMNO, cat=catDe();
-  const rows=simKardex().map(a=>{const f=String(a[3]||'—').toUpperCase();
-    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:+a[1],per:perIdx(a[2]),forma:FORMAS[f]||f,eqv:f==='EQV',sim:!!a[4],cat:cat[a[0]]||'Sin categoría',cr:c[a[0]]?.[1]||0}});
+  const rows=simKardex().filter(a=>notaValida(a[1])!=null).map(a=>{const f=String(a[3]||'—').toUpperCase();
+    return {clave:a[0],nombre:pretty(c[a[0]]?.[0]||a[0]),cal:+a[1],per:perIdx(a[2]),forma:FORMAS[f]||'No identificada',eqv:['EQV','REV','DIC'].includes(f),sim:!!a[4],cat:cat[a[0]]||'Sin categoría',cr:c[a[0]]?.[1]||0}});
   const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
   const reg=rows.filter(r=>!r.eqv&&r.per!=null), pers=[...new Set(reg.map(r=>r.per))].sort((a,b)=>a-b);
   const porPer=pers.map(p=>{const v=reg.filter(r=>r.per===p).map(r=>r.cal);return {per:p,lbl:perName(p),prom:mean(v),min:Math.min(...v),max:Math.max(...v),n:v.length,cr:reg.filter(r=>r.per===p).reduce((s,r)=>s+r.cr,0)}});
@@ -1684,7 +1685,7 @@ async function renderStats(){
   box.innerHTML=`<div class="kpis">
       ${kpi(D.rows.some(r=>r.sim)?'Promedio estimado':'Promedio',f2(D.media),D.delta!=null?`<span class="${D.delta>=0?'up':'down'}">${D.delta>=0?'▲':'▼'} ${sg(D.delta)}</span> vs. periodo anterior`:'')}
       ${kpi('Dispersión (σ)',f2(D.sd),`mediana ${f2(D.mediana)} · n = ${D.rows.length}`)}
-      ${kpi('En ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.reg.length} materias sin equivalencias`)}
+      ${kpi('Acreditaciones en ordinario',D.ord!=null?Math.round(D.ord*100)+' %':'—',`${D.reg.length} acreditaciones con periodo; no es una tasa sobre lo inscrito`)}
       ${kpi('Ritmo',D.ritmo?fmtCr(D.ritmo)+' cr':'—','por periodo (últimos 3)')}
       ${kpi('Egreso estimado',D.fin!=null?perName(D.fin):'—',totalPer?`${totalPer} periodos${dur?` · plan ${dur}`:''}${plazo.max?` · ${plazo.calculado?'referencia a carga mínima':'máx.'} ${plazo.max}`:''}`:'',totalPer&&plazo.max&&totalPer>plazo.max?'down':'')}
     </div>
@@ -1756,7 +1757,7 @@ async function renderStats(){
   const fr=D.rows.map(r=>({...r,lbl:r.eqv?'Equiv.':perName(r.per)}));
   const ordenLbl=[...(D.crEqv?['Equiv.']:[]),...D.porPer.map(d=>d.lbl)];
   put('#ch-forma',P.plot({...base('#ch-forma'),height:210,x:{label:null,domain:ordenLbl},y:{label:'Materias',grid:true},
-    color:{legend:true,domain:Object.values(FORMAS).filter(f=>D.rows.some(r=>r.forma===f)),range:[OK,tok('--warn'),tok('--bad'),ACC,tok('--n4'),tok('--n6'),tok('--n8')]},
+    color:{legend:true,domain:[...Object.values(FORMAS),'No identificada'].filter(f=>D.rows.some(r=>r.forma===f)),range:[OK,tok('--warn'),tok('--bad'),ACC,tok('--n4'),tok('--n6'),tok('--n8')]},
     marks:[P.barY(fr,P.groupX({y:'count'},{x:'lbl',fill:'forma',inset:1,tip:true})),P.ruleY([0])]}));
   // 6) mapa de calor categoría × periodo
   const hm=d3.flatRollup(D.reg,v=>({m:d3.mean(v,r=>r.cal),n:v.length}),r=>r.cat,r=>r.per).map(([cat,per,o])=>({cat,per,lbl:perName(per),...o}));
@@ -1766,82 +1767,70 @@ async function renderStats(){
       P.text(hm,{x:'lbl',y:'cat',text:d=>f2(d.m).replace(/\.00$/,''),fill:d=>d.m>8.4?'#111':'#fff'})]}));
 }
 
-/* ---------- análisis: materias a cuidar, afinidad con líneas, ruta crítica y carga vs. rendimiento ----------
-   Heurísticas transparentes (no un modelo entrenado): cada resultado muestra en qué se basa. */
+/* ---------- análisis descriptivo: hechos y antecedentes, sin pronosticar notas ---------- */
 function analisis(){
-  const c=cur(), pre=prereqs(), t=tr(), K=simKardex(), cal={}, forma={}, cat=catDe();
-  K.forEach(a=>{cal[a[0]]=+a[1];forma[a[0]]=String(a[3]||'').toUpperCase()});
-  const nm=k=>pretty(c[k]?.[0]||k), failed=new Set(t.fail), done=new Set(t.done), veces=t.veces||{};
-  const mean=a=>a.length?a.reduce((s,x)=>s+x,0)/a.length:null;
-  const porCat={};Object.keys(cal).forEach(k=>{if(cat[k])(porCat[cat[k]]=porCat[cat[k]]||[]).push(cal[k])});
-  // 1) materias que conviene cuidar
+  const c=cur(), pre=prereqs(), t=tr(), cat=catDe(), done=new Set(t.done), nm=k=>pretty(c[k]?.[0]||k);
+  const K=simKardex().filter(a=>notaValida(a[1])!=null), cal=new Map(K.map(a=>[a[0],notaValida(a[1])]));
   const pend=Object.keys(c).filter(k=>!done.has(k)&&!isElec(k)&&(c[k][3]==='O'||c[k][3]==='P'));
-  const riesgo=pend.map(k=>{
-    const dir=(pre[k]||[]).filter(x=>x in cal), lej=[...ancestors([k])].filter(x=>x in cal&&!dir.includes(x)), w=[], motivos=[];
-    dir.forEach(x=>w.push([cal[x],2]));lej.forEach(x=>w.push([cal[x],1]));
-    if(!w.length&&cat[k]&&porCat[cat[k]])porCat[cat[k]].forEach(v=>w.push([v,1]));
-    if(!w.length&&!failed.has(k))return null;
-    let pred=w.length?w.reduce((s,[v,p])=>s+v*p,0)/w.reduce((s,[,p])=>s+p,0):7;
-    dir.forEach(x=>{const f=forma[x];
-      if(f&&!['ORD','EQV'].includes(f)){pred-=.4;motivos.push(`su requisito ${nm(x)} se acreditó por ${(FORMAS[f]||f).toLowerCase()} con ${cal[x]}`)}
-      else if(cal[x]<=7)motivos.push(`su requisito ${nm(x)} se acreditó con ${cal[x]}`)});
-    [...ancestors([k])].filter(x=>failed.has(x)).forEach(x=>{pred-=.5;motivos.push(`${nm(x)}, en su cadena de requisitos, está reprobada`)});
-    if(failed.has(k)){pred-=.6;motivos.unshift(`ya la reprobaste${veces[k]?` (${veces[k]} ${veces[k]>1?'veces':'vez'})`:''}`)}
-    if(!dir.length&&!lej.length&&cat[k]&&porCat[cat[k]])motivos.push(`tu promedio en ${cat[k]} es ${mean(porCat[cat[k]]).toFixed(2)}`);
-    const nivel=pred<7.5||failed.has(k)?'alto':pred<8.5||motivos.length?'medio':'bajo';
-    return {k,pred:Math.max(5,pred),motivos,n:w.length,nivel,base:dir.length?'requisitos':lej.length?'cadena de requisitos':'área'};
-  }).filter(Boolean);
-  // relevantes: lo que puedes cursar pronto (disponibles, elegidas, sugeridas o reprobadas)
-  const sug=new Set(suggestions().list), want=new Set(t.want);
-  const cuidar=riesgo.filter(r=>r.nivel!=='bajo'&&(available(r.k)||want.has(r.k)||sug.has(r.k)||failed.has(r.k)))
-    .sort((a,b)=>({alto:0,medio:1}[a.nivel]-{alto:0,medio:1}[b.nivel])||a.pred-b.pred).slice(0,8);
-  // 2) afinidad con líneas de especialización
+  const depend=dependents(), want=new Set(t.want), fail=new Set(t.fail);
+  const cuidar=pend.filter(k=>fail.has(k)||want.has(k)).map(k=>{
+    const motivos=[];
+    if(fail.has(k))motivos.push('Pendiente de acreditar según el estado del escenario');
+    const req=(pre[k]||[]).filter(x=>!done.has(x));
+    if(req.length)motivos.push('Antecedentes pendientes en el mapa: '+req.map(nm).join(', '));
+    const desbloquea=(depend[k]||[]).filter(x=>!done.has(x)&&c[x]);
+    if(desbloquea.length)motivos.push('Precede en el mapa a: '+desbloquea.map(nm).join(', '));
+    return {k,motivos};
+  }).filter(r=>r.motivos.length);
+  // El promedio de una línea procede únicamente de sus materias propias acreditadas.
   const lineas=(MAP().lineas||[]).map(l=>{
-    const rel=new Set();
-    l.claves.forEach(k=>{ancestors([k]).forEach(x=>rel.add(x));if(cat[k])Object.keys(cal).filter(x=>cat[x]===cat[k]).forEach(x=>rel.add(x))});
-    // área de la línea: la indicada o la predominante entre sus requisitos (aunque estén pendientes)
-    let lc=l.categoria;if(!lc){const f={};l.claves.forEach(k=>ancestors([k]).forEach(x=>{if(cat[x])f[cat[x]]=(f[cat[x]]||0)+1}));lc=Object.keys(f).sort((a,b)=>f[b]-f[a])[0]}
-    if(lc)Object.keys(cal).filter(x=>cat[x]===lc).forEach(x=>rel.add(x));
-    const v=[...rel].filter(x=>x in cal).map(x=>cal[x]);
-    return {nombre:l.linea!==l.area?l.linea:l.area,area:l.area,cat:lc,prom:mean(v),n:v.length,hechas:l.claves.filter(k=>done.has(k)).length,total:l.claves.length};
-  }).filter(l=>l.n>=2).sort((a,b)=>b.prom-a.prom);
-  // 3) ruta crítica: cadena más larga de materias obligatorias pendientes (cada eslabón, al menos un periodo)
-  const memo={}, largo=k=>memo[k]??(memo[k]=1+Math.max(0,...(dependents()[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O').map(largo)));
-  const obligP=pend.filter(k=>c[k][3]==='O');
-  let cadena=[];if(obligP.length){let k=obligP.reduce((a,b)=>largo(b)>largo(a)?b:a);cadena=[k];
-    while(true){const nx=(dependents()[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O').sort((a,b)=>largo(b)-largo(a))[0];if(!nx)break;cadena.push(nx);k=nx}}
-  // 4) carga vs. rendimiento por periodo (sin equivalencias)
-  const pp={};K.forEach(a=>{const f=String(a[3]||'').toUpperCase(),i=perIdx(a[2]);if(f==='EQV'||i==null)return;(pp[i]=pp[i]||{cr:0,v:[]}).cr+=c[a[0]]?.[1]||0;pp[i].v.push(+a[1])});
-  const carga=Object.entries(pp).map(([i,o])=>({per:+i,lbl:perName(+i),cr:o.cr,prom:mean(o.v),n:o.v.length})).sort((a,b)=>a.per-b.per);
-  let r=null;if(carga.length>=3){const mx=mean(carga.map(d=>d.cr)),my=mean(carga.map(d=>d.prom));
-    const sxy=carga.reduce((s,d)=>s+(d.cr-mx)*(d.prom-my),0),sx=Math.sqrt(carga.reduce((s,d)=>s+(d.cr-mx)**2,0)),sy=Math.sqrt(carga.reduce((s,d)=>s+(d.prom-my)**2,0));r=sx&&sy?sxy/(sx*sy):null}
-  return {cuidar,lineas,cadena,carga,r,nm};
+    const claves=[...new Set(l.claves||[])].filter(k=>cal.has(k));
+    return {nombre:l.linea!==l.area?l.linea:l.area,claves,n:claves.length,
+      prom:claves.length?claves.reduce((s,k)=>s+cal.get(k),0)/claves.length:null,
+      total:new Set(l.claves||[]).size,sim:K.some(a=>claves.includes(a[0])&&a[4])};
+  }).filter(l=>l.n>0);
+  const memo={}, visitando=new Set();let ciclo=false;
+  const largo=k=>{
+    if(visitando.has(k)){ciclo=true;return []}
+    if(memo[k])return memo[k];visitando.add(k);
+    let cola=[];
+    for(const x of (depend[k]||[]).filter(x=>!done.has(x)&&c[x]?.[3]==='O')){
+      const v=largo(x);if(v.length>cola.length)cola=v;
+    }
+    visitando.delete(k);return memo[k]=[k,...cola];
+  };
+  let cadena=[];
+  pend.filter(k=>c[k][3]==='O').forEach(k=>{const v=largo(k);if(v.length>cadena.length)cadena=v});
+  if(ciclo)cadena=[];
+  const pp={};K.forEach(a=>{
+    const f=String(a[3]||'').trim().toUpperCase(),i=perIdx(a[2]);
+    if(['EQV','REV','DIC'].includes(f)||i==null)return;
+    const o=pp[i]||(pp[i]={cr:0,v:[],completo:true});
+    const cr=c[a[0]]?.[1];if(cr==null||!Number.isFinite(+cr))o.completo=false;else o.cr+=+cr;
+    o.v.push(notaValida(a[1]));
+  });
+  const carga=Object.entries(pp).filter(([,o])=>o.completo).map(([i,o])=>({per:+i,lbl:perName(+i),cr:o.cr,prom:o.v.reduce((s,v)=>s+v,0)/o.v.length,n:o.v.length})).sort((a,b)=>a.per-b.per);
+  return {cuidar,lineas,cadena,ciclo,carga,nm};
 }
 function renderAnalisis(D){
   const el=$('#kanal');if(!el)return;
   const X=analisis(), f2=v=>v==null?'—':(+v).toFixed(2);
-  const lvl={alto:'Riesgo alto',medio:'Atención'};
-  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><span class="an-tag ${r.nivel}">${lvl[r.nivel]}</span><b>${esc(X.nm(r.k))}</b><span class="an-pred" title="Calificación esperada según ${r.base}">≈ ${r.pred.toFixed(1)}</span>
-      <small>${esc(r.motivos.length?r.motivos.join('; '):`calificación esperada según tus ${r.base}`)}.</small></li>`).join('')}</ul>`:'<p class="muted">Ninguna de las materias que puedes cursar pronto muestra señales de riesgo en tus requisitos.</p>';
-  const lin=X.lineas.length?`<ul class="an-bars">${X.lineas.slice(0,8).map((l,i)=>`<li><span class="an-ln">${esc(l.nombre)}${l.area&&l.area!==l.nombre&&l.area!=='Optativas'?`<small>${esc(l.area)}</small>`:''}</span>
-      <span class="an-bar"><i style="width:${Math.max(4,(l.prom-6)/4*100)}%"></i></span><b>${f2(l.prom)}</b><small>${l.n} materias${l.cat?` · área ${esc(l.cat)}`:''}${l.hechas?` · ${l.hechas} de ${l.total} cursadas`:''}</small></li>`).join('')}</ul>`:'<p class="muted">Aún no hay suficientes materias relacionadas para estimar la afinidad con las líneas.</p>';
-  const rc=X.cadena.length;
-  const ruta=rc?`<p>La cadena de seriación pendiente más larga tiene <b>${rc} ${rc>1?'materias':'materia'}</b>: necesitas al menos <b>${rc} ${rc>1?'periodos':'periodo'}</b> más, sin importar la carga${D.nper?` (por créditos, a tu ritmo, ${D.nper})`:''}.</p>
-      <ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:'<p class="muted">No quedan cadenas de seriación pendientes.</p>';
-  el.innerHTML=`<h3 class="an-h">Análisis y recomendaciones</h3>
-    <div class="an-grid">
-      <section><h4>Materias que conviene cuidar</h4><p class="an-sub">Calificación esperada a partir de tus requisitos y tu área; prioriza su planeación o tómalas con menos carga.</p>${cuid}</section>
-      <section><h4>Afinidad con líneas de especialización</h4><p class="an-sub">Tu promedio en las materias que preparan cada línea (requisitos y área). Orientativo: considera también tus intereses.</p>${lin}</section>
-      <section><h4>Ruta crítica</h4><p class="an-sub">El mínimo de periodos que impone la seriación.</p>${ruta}</section>
-      <section><h4>Carga vs. rendimiento</h4><p class="an-sub">Créditos acreditados y promedio de cada periodo${X.r!=null?`; correlación r = ${X.r.toFixed(2)} (${Math.abs(X.r)<.3?'sin relación clara':X.r<0?'te va mejor con menos carga':'te va mejor con más carga'}${X.carga.length<5?'; con pocos periodos es solo una tendencia':''})`:''}.</p><div id="ch-carga"></div></section>
-    </div>
-    <p class="st-note">Estas estimaciones son heurísticas transparentes basadas en tu kárdex, no predicciones garantizadas.</p>`;
+  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><b>${esc(X.nm(r.k))}</b><small>${esc(r.motivos.join('; '))}.</small></li>`).join('')}</ul>`:
+    '<p class="muted">No hay observaciones adicionales para tus materias elegidas o pendientes de acreditar. Esto no evalúa riesgo académico.</p>';
+  const lin=X.lineas.length?`<section><h4>Materias acreditadas por línea</h4><p class="an-sub">Media de materias propias de cada línea; no mide afinidad vocacional.</p><ul class="an-bars">${X.lineas.map(l=>`<li><span>${esc(l.nombre)}${l.sim?' · escenario':''}</span><b>${f2(l.prom)}</b><small>${l.n} de ${l.total} materias · ${esc(l.claves.map(X.nm).join(', '))}</small></li>`).join('')}</ul></section>`:'';
+  const ruta=X.ciclo?'<p class="muted">No se puede mostrar una secuencia: el mapa contiene un ciclo de relaciones.</p>':X.cadena.length?
+    `<p>Secuencia pendiente de ${X.cadena.length} materias en el mapa. Su duración depende de la seriación obligatoria y de la oferta; no constituye un mínimo de periodos verificado.</p><ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:
+    '<p class="muted">No se identificaron secuencias pendientes con los datos disponibles.</p>';
+  el.innerHTML=`<h3 class="an-h">Observaciones para planear</h3><div class="an-grid">
+    <section><h4>Materias y antecedentes pendientes</h4><p class="an-sub">Relaciones del mapa para las materias que elegiste y tus adeudos. Confirma qué relaciones son obligatorias.</p>${cuid}</section>
+    ${lin}<section><h4>Secuencia del mapa</h4>${ruta}</section>
+    ${X.carga.length?'<section><h4>Créditos acreditados y media de acreditaciones</h4><p class="an-sub">Resultados registrados por periodo. No representan carga inscrita ni permiten recomendar más o menos carga.</p><div id="ch-carga"></div></section>':''}
+    </div>`;
   if(window.Plot&&X.carga.length){const P=window.Plot,cs=getComputedStyle(document.documentElement),tok=n=>cs.getPropertyValue(n).trim(),host=$('#ch-carga');
     montarGrafica(host,P.plot({width:Math.max(260,host.clientWidth),height:190,marginLeft:40,marginBottom:32,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
-      x:{label:'Créditos acreditados en el periodo',grid:true},y:{label:'Promedio',domain:[5.5,10.2],grid:true},
-      marks:[X.carga.length>=3?P.linearRegressionY(X.carga,{x:'cr',y:'prom',stroke:tok('--muted'),fill:tok('--muted'),fillOpacity:.08}):null,
-        P.dot(X.carga,{x:'cr',y:'prom',fill:tok('--accent'),r:5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos · promedio ${d.prom.toFixed(2)} (${d.n})`}),
-        P.text(X.carga,{x:'cr',y:'prom',text:'lbl',dy:-10,fill:tok('--muted')})].filter(Boolean)}))}
+      x:{label:'Créditos acreditados en el periodo',grid:true},y:{label:'Media de acreditaciones',domain:[5.5,10.2],grid:true},
+      marks:[P.dot(X.carga,{x:'cr',y:'prom',fill:tok('--accent'),r:5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos · media ${d.prom.toFixed(2)} (${d.n})`}),
+        P.text(X.carga,{x:'cr',y:'prom',text:'lbl',dy:-10,fill:tok('--muted')})]}))}
 }
 
 function renderTray(){renderMap();renderList();renderSide();renderStats()}

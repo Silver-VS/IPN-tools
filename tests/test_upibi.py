@@ -209,4 +209,37 @@ DATA.opciones_plan={};assert.strictEqual(carreraPerfil({carrera:'B',plan:'09'}),
         self.assertEqual(result.returncode,0,result.stderr)
 
 
+
+    def test_analisis_sin_notas_inventadas_y_con_ciclos(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        fn=html[html.index('function analisis('):html.index('function renderAnalisis(')]
+        nota=html[html.index('const notaValida='):html.index('const FORMAS=')]
+        script="""
+const assert=require('assert');
+let K=[['ANT',10,'26/1','ORD']], lineas=[{linea:'Área vacía',area:'Área vacía',claves:['PEND']}];
+let pre={PEND:['ANT']};
+const c={ANT:['Antecedente',6,1,'O'],PEND:['Pendiente',6,2,'O']};
+const cur=()=>c,prereqs=()=>pre,catDe=()=>({ANT:'Otra área',PEND:'Área vacía'});
+const tr=()=>({done:['ANT'],want:['PEND'],fail:[]});
+const MAP=()=>({lineas}),simKardex=()=>K,pretty=x=>x,isElec=()=>false,perIdx=()=>52,perName=x=>String(x);
+const dependents=()=>{const out={};Object.entries(pre).forEach(([k,v])=>v.forEach(x=>(out[x]=out[x]||[]).push(k)));return out};
+"""+nota+fn+"""
+assert.strictEqual(analisis().lineas.length,0);
+assert.ok(!('pred' in (analisis().cuidar[0]||{})));
+for(const x of [null,'',' ',undefined,'abc',Infinity,5,11])assert.strictEqual(notaValida(x),null);
+assert.strictEqual(notaValida('10'),10);
+K.push(['PEND',10,'26/2','ORD']);
+assert.strictEqual(analisis().lineas[0].prom,10);assert.strictEqual(analisis().lineas[0].n,1);
+pre={PEND:['PEND']};assert.strictEqual(analisis().ciclo,true);assert.deepStrictEqual(analisis().cadena,[]);
+"""
+        result=subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
+    def test_analisis_no_presenta_predicciones_ni_consejos_por_correlacion(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        section=html[html.index('function analisis('):html.index('function renderTray(')]
+        for text in ('Riesgo alto','calificación esperada','te va mejor','linearRegressionY'):
+            self.assertNotIn(text,section)
+
+
 if __name__ == '__main__': unittest.main(verbosity=2)

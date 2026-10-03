@@ -1,3 +1,5 @@
+> Actualización 2026-10-03, etapa A: el análisis muestra hechos de pendientes y secuencias orientativas, sin notas pronosticadas ni etiquetas de riesgo. Las líneas usan únicamente materias propias acreditadas y se ocultan si no hay observaciones. Notas ausentes o inválidas se excluyen. La correlación no genera consejos de carga. Se conservan ORD/EXT/ETS/REC y se identifican formas desconocidas; ORD no incluye EXT. No se muestra un agregado de primera cursada hasta verificar que la forma distingue recursamientos por unidad. Las equivalencias EQV/REV/DIC se separan del ritmo. El resto del documento histórico queda pendiente de actualización en la etapa B.
+
 # Estadísticas y análisis académico
 
 Qué se puede calcular con los datos que entrega el Lector (kárdex, estado general, cita y horario) y el mapa
