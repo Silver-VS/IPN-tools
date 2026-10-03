@@ -221,7 +221,13 @@ input[type=number]{width:5rem}
 .pm-fila{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 0;border-top:1px solid var(--line)}
 .pm-fila>div{display:flex;flex-direction:column;gap:2px;min-width:0;font-size:.88rem}.pm-t{font-size:.72rem;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .pm-regla{flex:0 0 140px;max-width:140px}
-.pm #prom-sim{margin-top:8px}.mt-mat{display:inline-block;margin-left:6px;padding:1px 10px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-size:.82rem;font-weight:600}.mt-mat .info{color:inherit}
+.pm-sub{margin:2px 0 8px;font-size:.82rem;color:var(--muted)}
+.pm-mats{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:6px 12px}
+.pm-mat{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);font-size:.84rem;min-width:0}
+.pm-mat span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pm-mat select{font:inherit;padding:2px 4px}
+.pm-res{display:flex;flex-wrap:wrap;gap:4px 16px;align-items:baseline;margin:10px 0 6px;font-size:.88rem}
+.pm-estado.ok{color:var(--ok)}.pm-estado.no{color:var(--ch-alert)}
+.pm-acc{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding-bottom:6px}.mt-mat{display:inline-block;margin-left:6px;padding:1px 10px;border-radius:999px;background:var(--accent);color:var(--accent-fg);font-size:.82rem;font-weight:600}.mt-mat .info{color:inherit}
 .mt-regla{position:relative;height:10px;margin:30px 0 48px;border-radius:999px;background:var(--line)}
 .mt-zona{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--ok);opacity:.35}
 .mt-regla.supera .mt-zona{background:var(--line)}
@@ -1913,13 +1919,27 @@ function promMetaPanel(D){
 }
 const pmEst=x=>x==null?'':x<=6?'cualquier calificación aprobatoria te alcanza':x>10?'no alcanzable':`<b>${x.toFixed(2)}</b>`;
 const pmEscala=x=>x==null||x>10||x<6?'':`<span class="k-regla pm-regla" aria-hidden="true"><i style="left:${(x-6)/4*100}%"></i><em>6</em><em>10</em></span>`;
+// calificaciones enteras (6–10) que, repartidas en `ks`, promedian al menos x
+function pmReparto(ks,x){let falta=Math.max(6*ks.length,Math.min(10*ks.length,Math.ceil(x*ks.length-1e-9)));const out={};
+  ks.forEach((k,i)=>{const cal=Math.max(6,Math.min(10,Math.ceil(falta/(ks.length-i))));out[k]=cal;falta-=cal});return out}
+// combinación que el alumno arma para sus materias inscritas (se guarda por carrera)
+function pmCombinacion(M){const ec=tr().enCurso, g=store.get('pmCal.'+S.car,{}), base=pmReparto(ec,M.periodo!=null&&M.periodo<=10?Math.max(6,M.periodo):10);
+  return Object.fromEntries(ec.map(k=>[k,g[k]>=6&&g[k]<=10?g[k]:base[k]]))}
+function pmEstado(M){const comb=pmCombinacion(M), v=Object.values(comb);if(!v.length)return '';
+  const prom=v.reduce((a,b)=>a+b,0)/v.length, fin=(M.n*M.actual+prom*v.length)/(M.n+v.length), ok=M.periodo!=null&&prom>=M.periodo-1e-9;
+  return `<span class="pm-estado ${ok?'ok':'no'}">${ok?'✓':'✗'} Tu combinación promedia <b>${prom.toFixed(2)}</b>${ok?' y alcanza tu meta':M.periodo<=10?` · te faltan ${(M.periodo-prom).toFixed(2)} puntos de promedio`:''}</span><span class="muted">Promedio sin reprobadas al terminar el periodo: ${fin.toFixed(2)}</span>`}
 function promMetaHtml(M){
   const est=pmEst, escala=pmEscala;
   if(!M.n)return '<p class="muted">Aún no hay materias acreditadas para calcular.</p>';
-  const per=M.k?`<div class="pm-fila"><div><span class="pm-t">Este periodo</span><span>Necesitas promediar ${est(M.periodo)} en tus ${M.k} ${M.k===1?'materia':'materias'} en curso${M.periodo>10&&M.max!=null?`; aun con 10 en todas llegarías a ${M.max.toFixed(2)}`:''}.</span></div>${escala(M.periodo)}</div>`:'<p class="muted">No tienes materias en curso registradas.</p>';
+  let per='<p class="muted">No tienes materias inscritas registradas.</p>';
+  if(M.k){const c=cur(), comb=pmCombinacion(M);
+    per=`<div class="pm-fila"><div><span class="pm-t">Este periodo</span><span>${M.periodo>10?`No alcanzable este periodo: aun con 10 en tus ${M.k} materias inscritas llegarías a ${M.max.toFixed(2)}.`:`Necesitas promediar ${est(M.periodo)} en tus ${M.k} ${M.k===1?'materia inscrita':'materias inscritas'} para alcanzar ${(+store.get('promMeta.'+S.car,0)||0)?'tu meta':'esta meta'}.`}</span></div>${escala(M.periodo)}</div>`+
+      (M.periodo<=10?`<p class="pm-sub">Prueba otras combinaciones: puedes subir unas y bajar otras mientras el promedio alcance lo necesario.</p>
+      <div class="pm-mats">${tr().enCurso.map(k=>`<label class="pm-mat"><span>${esc(pretty(c[k][0]))}</span><select data-pmcal="${k}" aria-label="Calificación de ${esc(pretty(c[k][0]))}">${[10,9,8,7,6].map(n=>`<option${comb[k]===n?' selected':''}>${n}</option>`).join('')}</select></label>`).join('')}</div>
+      <div class="pm-res" id="pm-estado" aria-live="polite">${pmEstado(M)}</div>
+      <div class="pm-acc"><button class="btn" type="button" id="prom-sim">Usar en la simulación</button><button class="link" type="button" id="pm-reset">Repartir de nuevo</button></div>`:'')}
   const car=M.R?`<div class="pm-fila"><div><span class="pm-t">Al terminar la carrera</span><span>Necesitas promediar ${est(M.carrera)} en las ${M.R} materias obligatorias que te faltan.</span></div>${escala(M.carrera)}</div>`:'';
-  const boton=M.k&&M.periodo!=null&&M.periodo<=10?`<button class="btn" type="button" id="prom-sim">Probar en la simulación</button>`:'';
-  return per+car+boton;
+  return per+car;
 }
 // leyenda visual de una gráfica: [tipo, color, texto]; tipos: linea, punteada, guion, area, barra, punto, anillo, vertical, vertical-p
 function ley(items){
@@ -2209,14 +2229,17 @@ const cambiarMeta=e=>{
 };
 $('#kstats').addEventListener('input',cambiarMeta);
 $('#kstats').addEventListener('input',e=>{if(e.target.id!=='prom-meta')return;const v=+e.target.value;if(!(v>=6&&v<=10))return;
-  store.set('promMeta.'+S.car,v);const D=statsDatos(),M=promMeta(D,v);
+  store.set('promMeta.'+S.car,v);store.set('pmCal.'+S.car,{});const D=statsDatos(),M=promMeta(D,v);
   $('#pm-res').innerHTML=promMetaHtml(M)});
-// «Probar en la simulación»: calificaciones enteras en las materias en curso que suman lo necesario para la meta
-$('#kstats').addEventListener('click',e=>{if(e.target.id!=='prom-sim')return;
-  const v=store.get('promMeta.'+S.car,null)??+$('#prom-meta').value, M=promMeta(statsDatos(),v), ec=tr().enCurso;
-  if(!ec.length||M.periodo==null||M.periodo>10)return;
-  let falta=Math.max(6*ec.length,Math.min(10*ec.length,Math.ceil(M.periodo*ec.length-1e-9)));
-  ec.forEach((k,i)=>{const resto=ec.length-i, cal=Math.max(6,Math.min(10,Math.ceil(falta/resto)));SIM.res[k]={ok:true,cal};falta-=cal});
+// combinación por materia: actualiza solo el indicador; «Usar en la simulación» la lleva al simulador
+$('#kstats').addEventListener('change',e=>{const k=e.target.dataset?.pmcal;if(!k)return;
+  const g=store.get('pmCal.'+S.car,{});g[k]=+e.target.value;store.set('pmCal.'+S.car,g);
+  const v=store.get('promMeta.'+S.car,null)??+$('#prom-meta').value;$('#pm-estado').innerHTML=pmEstado(promMeta(statsDatos(),v))});
+$('#kstats').addEventListener('click',e=>{
+  if(e.target.id==='pm-reset'){store.set('pmCal.'+S.car,{});renderStats();return}
+  if(e.target.id!=='prom-sim')return;
+  const v=store.get('promMeta.'+S.car,null)??+$('#prom-meta').value, comb=pmCombinacion(promMeta(statsDatos(),v));
+  Object.entries(comb).forEach(([k,cal])=>{SIM.res[k]={ok:true,cal}});
   SIM.on=true;simSave();renderStats()});
 /* globo de ayuda inmediato (el «title» nativo tarda ~1 s): un solo elemento fijo, colocado junto al ⓘ sin salirse de la
    pantalla ni quedar recortado por recuadros con overflow; cursor, teclado y toque */
