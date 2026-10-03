@@ -39,16 +39,6 @@ class RutasMapa(unittest.TestCase):
                 n += 1
         self.assertGreater(n, 100)
 
-    def test_conectores_escalonados(self):
-        for f, car, L in self.mapas():
-            vistos = {}
-            for s, d, p, larga, *t in L['edges']:
-                if larga:
-                    self.assertEqual(len(t), 2, (f, car))
-                    for clave, largo in (((s, 'sal'), t[0]), ((d, 'lle'), t[1])):
-                        self.assertNotIn(largo, vistos.setdefault(clave, set()), (f, car, L['boxes'][s][4], L['boxes'][d][4]))
-                        vistos[clave].add(largo)
-
     def test_flechas_de_materias_distintas_no_se_enciman(self):
         for f, car, L in self.mapas():
             tramos = []

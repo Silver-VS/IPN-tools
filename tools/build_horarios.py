@@ -451,32 +451,10 @@ def layout_por_areas(cur, e):
 
     # 5) tramos horizontales por canal; cada tramo: (flecha, parte, [(x, lado)]) con lado 'up' = viene/va arriba
     # Flecha larga (salta filas o cruza más de dos columnas y media): se dibuja como conector, con un tramo de salida y uno
-    # de llegada y el nombre de la otra materia; completa solo al resaltar. No ocupa pista en los canales.
+    # de llegada; completa solo al resaltar. No ocupa pista en los canales.
     larga = {f: f not in recta and f not in ele and sem_of(f[1]) > sem_of(f[0]) and (sem_of(f[1]) - sem_of(f[0]) > 1 or
                                                 abs(ports[(f, "out")] - ports[(f, "in")]) > 2.3 * (bw + sg)) for f in pares}
-    # Largo de cada tramo, por fila: de derecha a izquierda, cada etiqueta toma el primer nivel donde no se encima con otra
-    # etiqueta ni la cruza un tramo más largo (las etiquetas se escriben a la derecha de su tramo).
-    def ancho(f, ext):
-        i = f[1] if ext == "out" else f[0]
-        k, sl = items[i][2], items[i][3]
-        n = re.sub(r"\s*\(.*\)$", "", cur[k][0]) if k else sl
-        return (6 + min(24, len(n))) * 4.7 + 6
-    tramo = {}
-    for ext, fila in (("out", lambda f: sem_of(f[0])), ("in", lambda f: sem_of(f[1]))):
-        grupos = {}
-        for f in pares:
-            if larga[f]:
-                grupos.setdefault(fila(f), []).append(f)
-        for lst in grupos.values():
-            nivel = {}
-            for f in sorted(lst, key=lambda f: -ports[(f, ext)]):
-                x0 = ports[(f, ext)]
-                x1 = x0 + ancho(f, ext)
-                m = 1 + max([nivel[g] for g in nivel if x0 + 1 < ports[(g, ext)] < x1] or [-1])
-                while any(nivel[g] == m and ports[(g, ext)] < x1 for g in nivel):
-                    m += 1
-                nivel[f] = m
-                tramo[(f, ext)] = 12 + 11 * m
+    tramo = {(f, ext): 12 for f in pares if larga[f] for ext in ("out", "in")}   # tramo corto de salida y de llegada
     canal = {}
     for f in pares:
         if larga[f] or f in recta or f in ele:
@@ -779,6 +757,25 @@ def main():
         "siglas": UCONF["siglas"],
         "opciones_plan": opciones,
     }
+    # Equivalencias entre carreras de la misma unidad (tabla del SAES), solo entre los planes que se ofrecen aquí.
+    # Se muestran como consulta en la planeación de horario; no modifican el avance ni la seriación.
+    fe = UNI_DIR / "equivalencias.json"
+    if fe.exists():
+        eq = json.loads(fe.read_text(encoding="utf-8"))
+        def ident(c_, p_):
+            i_ = carrera_plan(c_, p_)
+            ok = i_ in data["carreras"] and (opciones[i_]["plan"] == p_ if i_ in opciones else PLANES.get(c_) == p_)
+            return i_ if ok else None
+        rel = []
+        for r in eq["relaciones"]:
+            o, dd = r["origen"], r["destino"]
+            io, idd = ident(o[0], o[1]), ident(dd[0], dd[1])
+            if io and idd and io != idd:
+                rel.append([io, o[3], o[2], idd, dd[3], dd[2]])
+        mult = [[ident(*m["origen"][:2]), m["origen"][3], ident(*m["destino_contexto"][:2]), [x[3] for x in m["destinos"]]]
+                for m in eq.get("multiples", [])]
+        data["equiv"] = {"fuente": eq["fuente"], "consultado": eq["consultado"], "rel": rel,
+                         "multiples": [m for m in mult if m[0] and m[2]]}
     # materias sin mapa curricular (otra escuela o materia nueva): clave interna estable por carrera y nombre,
     # para que el armado de horario funcione aunque no haya trayectoria ni créditos
     upiita = UNIDAD == "upiita" and "saes.upiita" in d.get("fuente", "saes.upiita")
