@@ -6,7 +6,7 @@
  "nota": "Clasificación por áreas propuesta, pendiente de revisión. Seriación extraída del PDF oficial; consulta el SAES para confirmar requisitos. El PDF suma 354 créditos sin Electiva; con sus 18 créditos son 372. El SAES asigna 1.5 a Estancia Profesional I y el PDF 3; el total con las cuatro optativas es 370.5 según el SAES. Diferencia pendiente de aclaración.",
  "areas": [
   {
-   "nombre": "Físico-matemáticas",
+   "nombre": "Ciencias básicas",
    "claves": [
     "B104",
     "B105",
@@ -22,16 +22,59 @@
    "espacios": []
   },
   {
-   "nombre": "Informática y computación",
+   "nombre": "Computación",
    "claves": [
     "B108"
    ],
    "espacios": []
   },
   {
-   "nombre": "Sistemas y control",
+   "nombre": "Control y automatización",
    "claves": [
     "B704"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ciencias biológicas",
+   "claves": [
+    "B101",
+    "B205",
+    "B206",
+    "B305",
+    "B304",
+    "B402",
+    "B501"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Química",
+   "claves": [
+    "B107",
+    "B106",
+    "B207",
+    "B303",
+    "B302",
+    "B306"
+   ],
+   "espacios": []
+  },
+  {
+   "nombre": "Ingeniería de procesos",
+   "claves": [
+    "B307",
+    "B405",
+    "B208",
+    "B505",
+    "B406",
+    "B504",
+    "B503",
+    "B603",
+    "B604",
+    "B702",
+    "B602",
+    "B801"
    ],
    "espacios": []
   },
@@ -39,46 +82,21 @@
    "nombre": "Biotecnología y bioprocesos",
    "claves": [
     "B110",
-    "B107",
-    "B106",
-    "B101",
-    "B207",
-    "B205",
-    "B206",
-    "B305",
-    "B304",
-    "B303",
-    "B302",
-    "B306",
-    "B307",
     "B404",
     "B403",
-    "B402",
-    "B405",
     "B407",
-    "B208",
-    "B501",
     "B502",
     "B506",
-    "B505",
-    "B406",
-    "B504",
-    "B503",
     "B601",
     "B605",
-    "B603",
-    "B604",
-    "B702",
-    "B602",
     "B606",
     "B701",
-    "B801",
     "B612"
    ],
    "espacios": []
   },
   {
-   "nombre": "Formación integral",
+   "nombre": "Humanidades y gestión",
    "claves": [
     "B109",
     "B308",
@@ -95,7 +113,7 @@
    "espacios": []
   },
   {
-   "nombre": "Formación profesional",
+   "nombre": "Práctica profesional",
    "claves": [
     "B706",
     "B802"
@@ -103,7 +121,7 @@
    "espacios": []
   },
   {
-   "nombre": "Especialización",
+   "nombre": "Especialidad",
    "claves": [],
    "espacios": [
     [
