@@ -3,31 +3,48 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="assets/icono/favicon.ico">
-<title>Herramientas UPIITA</title>
+<title>IPN-tools · Herramientas para alumnos de la UPIITA</title>
+<meta name="description" content="IPN-tools: herramientas gratuitas para planear la reinscripción (trayectoria y horarios) y liberar electivas en la UPIITA del IPN.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap">
 <style>
 :root{--bg:#fafafa;--surface:#fff;--fg:#18181b;--muted:#52525b;--line:#d9d9de;--accent:#750946}
 @media (prefers-color-scheme:dark){:root{--bg:#09090b;--surface:#18181b;--fg:#e4e4e7;--muted:#a1a1aa;--line:#323237;--accent:#ec9cbf;color-scheme:dark}}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 "Noto Sans",system-ui,sans-serif;padding-inline:16px}
-main{max-width:760px;margin:0 auto;padding-block:56px 40px}
-h1{margin:0 0 6px;font-size:2rem;letter-spacing:-.02em}
-p{color:var(--muted);margin:0 0 28px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
-a.card{display:block;background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:12px;padding:18px 20px;color:inherit;text-decoration:none}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 "Noto Sans",system-ui,sans-serif;padding-inline:16px}
+main{max-width:760px;margin:0 auto;padding-block:48px 40px}
+.brand{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.brand img{width:56px;height:56px;flex:none}
+h1{margin:0;font-size:2.2rem;letter-spacing:-.02em}
+.lead{color:var(--muted);margin:6px 0 28px;font-size:1.05rem;max-width:62ch}
+h2{font-size:1.1rem;margin:36px 0 10px}
+p{margin:0 0 10px;max-width:68ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+a.card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 20px;color:inherit;text-decoration:none}
 a.card:hover{border-color:var(--accent)}
-a.card b{display:block;font-size:1.15rem;margin-bottom:4px}
+a.card b{display:block;font-size:1.1rem;margin-bottom:4px}
 a.card span{color:var(--muted);font-size:.92rem}
-small{display:block;margin-top:32px;color:var(--muted)}
+ul{padding-left:1.2rem;margin:0 0 10px} li{margin-bottom:6px}
+a{color:var(--accent)}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.9rem;display:flex;flex-wrap:wrap;gap:8px 18px}
 </style>
 <main>
-  <h1>Herramientas UPIITA</h1>
-  <p>Versión de prueba de las herramientas de apoyo a la reinscripción y a la gestión escolar. La información se almacena únicamente en el navegador.</p>
+  <div class="brand"><img src="assets/icono/ipn-tools-icono-192.png" alt="Ícono de IPN-tools"><h1>IPN-tools</h1></div>
+  <p class="lead">Herramientas gratuitas para que los alumnos de la UPIITA del IPN planeen su reinscripción y liberen sus electivas. Versión de prueba.</p>
+
   <div class="grid">
-    <a class="card" href="horarios.html"><b>Horarios UPIITA</b><span>Mapa curricular, oferta del SAES y armado de horario.</span></a>
-    <a class="card" href="electivas.html"><b>Electivas UPIITA</b><span>Liberación de electivas: créditos y formatos llenos.</span></a>
+    <a class="card" href="horarios.html"><b>Horarios</b><span>Mapa curricular y trayectoria, oferta del SAES, armado y generación de horarios.</span></a>
+    <a class="card" href="electivas.html"><b>Electivas</b><span>Actividades acreditables, créditos y formatos DIE-03 y formulario llenos.</span></a>
     <a class="card" href="revision.html"><b>Guía de revisión</b><span>Instructivo, perfil de demostración y casos de prueba.</span></a>
   </div>
-  <small>Herramienta independiente de consulta; la inscripción oficial se hace en el SAES. <a href="privacidad.html" style="color:inherit">Aviso de privacidad</a> · <a href="condiciones.html" style="color:inherit">Condiciones de uso</a></small>
+
+  <h2>Tus datos</h2>
+  <p>IPN-tools no tiene servidor ni base de datos: todo se procesa en tu navegador. Si quieres usar tus datos en varios dispositivos, puedes iniciar sesión con Microsoft o con Google. Tu información se guarda en tu propio OneDrive o Google Drive, en un espacio al que solo tiene acceso la aplicación.</p>
+  <ul>
+    <li>Con Microsoft: acceso a la carpeta Aplicaciones › IPN-tools de tu OneDrive.</li>
+    <li>Con Google: acceso al espacio privado de la aplicación en tu Google Drive (no ve tus demás archivos).</li>
+  </ul>
+  <p>Consulta el <a href="privacidad.html">aviso de privacidad</a> y las <a href="condiciones.html">condiciones de uso</a>.</p>
+
+  <footer><span>Herramienta independiente; la inscripción oficial se hace en el SAES.</span><a href="privacidad.html">Aviso de privacidad</a><a href="condiciones.html">Condiciones de uso</a><a href="https://github.com/Silver-VS/IPN-tools">Código fuente</a></footer>
 </main>
 </html>
