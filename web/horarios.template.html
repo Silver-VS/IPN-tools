@@ -86,7 +86,8 @@ input[type=number]{width:5rem}
 .wchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 8px;font-size:.84rem;background:var(--bg)}
 .wchip .grp{font-size:.76rem}
 .wchip .x{padding:0 6px}
-.below{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px;margin-top:14px}
+.below{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;margin-top:14px;align-items:start}
+@media (min-width:900px){.below{grid-template-columns:repeat(2,minmax(0,1fr))}}   /* sugeridas | seriación por nivel; optativas a todo el ancho */
 .below .wide{grid-column:1/-1}
 /* Altura fija de dos renglones: al pasar el cursor cambia el contenido, nunca el tamaño (sin saltos de la página) */
 .insp{height:calc(2 * 1.5em + 12px);font-size:.88rem;line-height:1.5;padding:6px 10px;border-left:3px solid var(--accent);background:var(--surface);border-radius:0 var(--r) var(--r) 0;margin-block:8px 10px;overflow:hidden;contain:layout}
