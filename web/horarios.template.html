@@ -170,6 +170,15 @@ input[type=number]{width:5rem}
 .box.slot{border-style:dashed;background:var(--sunken);color:var(--muted);font-weight:500}
 .box.req{background:var(--accent-soft)}
 .box.far{opacity:.5;filter:saturate(.35)}
+.mapcut{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px;margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);font-size:.88rem;color:var(--muted)}
+.minimap{border:1px solid var(--line);border-radius:6px;background:var(--bg);padding:4px;cursor:pointer;line-height:0;flex:none}
+.minimap:hover{border-color:var(--accent)}
+.minimap svg{display:block;width:min(300px,70vw);height:auto}
+.mapcut-info{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 220px}
+.mapcut-info b{color:var(--fg);font-size:.95rem}
+.mm-leg{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:.8rem}.mm-leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.mapcut-info .link{align-self:flex-start;font-size:.88rem}
+.box.compact{line-height:1.05;overflow:hidden}
 .box.optfill{outline:1.5px dashed var(--muted);outline-offset:2px}
 .box.slot .slot-sig{display:block;font-size:.85em;opacity:.85;margin-top:2px;line-height:1.15}
 .box.want{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
@@ -480,6 +489,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="legend" id="legend" aria-label="Simbología"></div>
       <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     </div>
+    <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance</b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><button class="link" type="button" id="mapcut-btn"></button></div></div>
     <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
     <div class="tlist" id="tlist" hidden></div>
     <div class="insp" id="insp" aria-live="polite"></div>
@@ -859,6 +869,7 @@ function rowBands(L){
 let MARK={avail:new Set(),sug:new Set()};
 let SHOWSUG=store.get('verSug',true);
 function renderMap(){
+  $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
   $('#mapwrap').hidden=mv==='lista';$('#zoomseg').hidden=mv==='lista';$('#tlist').hidden=mv!=='lista';
   const L=MAP().layout, wrap=$('#mapwrap'), el=$('#map');
@@ -892,24 +903,65 @@ function renderMap(){
     return;
   }
   const sc=ZOOM??Math.min(1.1,(wrap.clientWidth-2)/L.w);MAPSC=sc;
-  let svg=`<svg width="${L.w*sc}" height="${L.h*sc}" viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--edge)"/></marker><marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>`;
-  rowBands(L).forEach(([n,y,a,b],i)=>{if(i%2===0)svg+=`<rect class="band" x="0" y="${a}" width="${L.w}" height="${b-a}"/>`;svg+=`<text class="rowlbl" x="12" y="${y+6}" font-size="18">${n}</text>`});
+  const FILL=slotFill(L,want);
+  /* Con datos del SAES, lo que sigue va a la vista: los semestres ya completos al inicio del mapa se dibujan
+     compactos (menos alto, mismas materias y flechas) y el primero con algo pendiente queda a tamaño normal.
+     Nada se oculta; «Ver a tamaño normal» lo desactiva (preferencia hu.mapFull). */
+  const bands=rowBands(L);let nPend=0;
+  if(isPersonal()){
+    const pend=bands.findIndex(([n,y,a,b])=>L.boxes.some(([bx,by,bw,bh,k,slot],i)=>{const cy=by+bh/2;if(cy<a||cy>=b)return false;
+      if(k)return !done.has(k)&&!isElec(k);const f=FILL.get(i);return /^optativa/i.test(slot)&&!(f?.k&&done.has(f.k))}));
+    if(pend>0)nPend=pend;
+  }
+  const full=store.get('mapFull',false), KC=nPend&&!full?0:1;   // filas completadas: plegadas (se ven en el minimapa)
+  const mc=$('#mapcut');mc.hidden=!nPend;
+  if(nPend){
+    $('#mapcut-txt').textContent=(nPend>1?`Semestres ${bands[0][0]} a ${bands[nPend-1][0]} completados`:`Semestre ${bands[0][0]} completado`)+(full?'.':'; el mapa empieza en lo que sigue.');
+    $('#mapcut-btn').textContent=full?'Empezar en lo que sigue':'Ver mapa completo';
+  }
+  if(isPersonal()){
+    const col=st=>st==='done'?'var(--ok)':st.startsWith('curso')?'var(--accent)':/fail|late/.test(st)?'var(--bad)':st.includes('lock')||st.includes('far')?'var(--line)':'var(--warn)';
+    const cnt={done:0,curso:0,fail:0,late:0,pend:0};
+    let mm=`<svg viewBox="0 0 ${L.w} ${L.h}" role="img" aria-hidden="true">`;
+    bands.forEach(([n,y,a,b],i)=>{if(i%2===0)mm+=`<rect x="0" y="${a}" width="${L.w}" height="${b-a}" fill="var(--sunken)"/>`;if(i===nPend&&nPend)mm+=`<rect x="1" y="${a}" width="${L.w-2}" height="${L.h-a-1}" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="14 8" rx="8"/>`});
+    L.edges.forEach(([s0,d0,pp])=>{const pts=[];for(let i=0;i<pp.length;i+=2)pts.push(pp[i]+','+pp[i+1]);mm+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-width="3"/>`});
+    L.boxes.forEach(([x,y,w,h,k,slot],i)=>{const kk=k||FILL.get(i)?.k, cx=x+w/2, cy=y+h/2, r=Math.min(w,h)*.3;
+      if(!kk){if(/^optativa/i.test(slot)){mm+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--warn)" stroke-width="4" stroke-dasharray="6 5"/>`;cnt.pend++}return}
+      if(isElec(kk))return;const st=statusOf(kk);
+      cnt[st==='done'?'done':st.startsWith('curso')?'curso':st.includes('fail')?'fail':st.startsWith('late')?'late':'pend']++;
+      mm+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col(st)}"/>`});
+    mm+='</svg>';
+    $('#minimap').innerHTML=mm;$('#mapcut').hidden=false;
+    $('#mm-leg').innerHTML=`<span><i style="background:var(--ok)"></i>${cnt.done} acreditadas</span>`+(cnt.curso?`<span><i style="background:var(--accent)"></i>${cnt.curso} en curso</span>`:'')+
+      (cnt.fail?`<span><i style="background:var(--bad)"></i>${cnt.fail} por recursar</span>`:'')+(cnt.late?`<span><i style="background:var(--bad)"></i>${cnt.late} atrasadas</span>`:'')+`<span><i style="background:var(--warn)"></i>${cnt.pend} por cursar</span>`;
+    if(!nPend){$('#mapcut-txt').textContent='Mapa completo.';$('#mapcut-btn').hidden=true}else $('#mapcut-btn').hidden=false;
+  }
+  // y del PDF -> y dibujada: lineal por tramos (las bandas completadas se encogen)
+  const kOf=i=>i<nPend?KC:1, tops=[];let acc=bands.length?bands[0][2]:0;
+  bands.forEach(([n,y,a,b],i)=>{tops.push(acc);acc+=(b-a)*kOf(i)});
+  const bandOf=y=>{for(let i=0;i<bands.length;i++)if(y<bands[i][3])return i;return bands.length-1};
+  const Y=y=>{if(!bands.length||y<=bands[0][2])return y;const i=bandOf(y);const [,,a,b]=bands[i];return y>=b&&i===bands.length-1?tops[i]+(b-a)*kOf(i)+(y-b):tops[i]+(y-a)*kOf(i)};
+  const H=Y(L.h);
+  let svg=`<svg width="${L.w*sc}" height="${H*sc}" viewBox="0 0 ${L.w} ${H}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--edge)"/></marker><marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>`;
+  bands.forEach(([n,y,a,b],i)=>{const k=kOf(i);if(!k)return;if(i%2===0)svg+=`<rect class="band" x="0" y="${Y(a)}" width="${L.w}" height="${(b-a)*k}"/>`;svg+=`<text class="rowlbl" x="12" y="${Y(y)+6*k}" font-size="${18*Math.max(k,.7)}">${n}</text>`});
   L.edges.forEach(([s,d,p])=>{
     const a=L.boxes[s][4], b=L.boxes[d][4], on=hot&&hot.has(a)&&hot.has(b);
-    const pts=[];for(let i=0;i<p.length;i+=2)pts.push(p[i]+','+p[i+1]);
+    const pts=[];for(let i=0;i<p.length;i+=2)pts.push(p[i]+','+Y(p[i+1]));
     svg+=`<polyline class="edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}" points="${pts.join(' ')}" marker-end="url(#${on?'ahh':'ah'})"/>`;
   });
   svg+='</svg>';
   let html=svg;
-  const FILL=slotFill(L,want);
-  L.boxes.forEach(([x,y,w,h,k,slot,sem],i)=>{
-    const f=FILL.get(i);
-    if(!k&&f?.k){html+=boxHtml(f.k,x,y,w,h,sc,want,off,hot,sem,req).replace('class="box ','class="box optfill ');return}
+  // caja en fila compacta: misma posición relativa, menos alto y letra más chica
+  const compacta=(h0,y0,h)=>{const k=kOf(bandOf(y0+h/2));if(k===1)return h0;if(!k)return '';return h0.replace(/font-size:([\d.]+)px/,(m,v)=>`font-size:${(+v*Math.max(k,.62)).toFixed(2)}px`).replace('class="box ','class="box compact ')};
+  L.boxes.forEach(([x,y0,w,h0,k,slot,sem],i)=>{
+    const f=FILL.get(i), y=Y(y0), h=h0*kOf(bandOf(y0+h0/2));
+    if(!k&&f?.k){html+=compacta(boxHtml(f.k,x,y,w,h,sc,want,off,hot,sem,req).replace('class="box ','class="box optfill '),y0,h0);return}
+    if(!kOf(bandOf(y0+h0/2)))return;   // fila plegada
     if(!k&&f?.sigue){html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9*sc}px" title="${esc(slot)}: continúa tu línea con ${esc(cur()[f.sigue][0])}">${esc(slot)}<small class="slot-sig">sigue: ${esc(pretty(cur()[f.sigue][0]).replace(/\s*\(.*\)$/,''))}</small></div>`;return}
-    if(k) html+=boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req);
-    else html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?'se acredita con actividades validadas por horas (Electivas UPIITA), no con un grupo del horario':'cualquiera de las ofertadas'}">${esc(slot)}</div>`;
+    if(k) html+=compacta(boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req),y0,h0);
+    else html+=compacta(`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?'se acredita con actividades validadas por horas (Electivas UPIITA), no con un grupo del horario':'cualquiera de las ofertadas'}">${esc(slot)}</div>`,y0,h0);
   });
-  el.style.width=L.w*sc+'px';el.style.height=L.h*sc+'px';el.innerHTML=html;
+  el.style.width=L.w*sc+'px';el.style.height=H*sc+'px';el.innerHTML=html;
   const ar=$('#areas');ar.hidden=!L.cols;ar.style.width=L.w*sc+'px';
   ar.innerHTML=(L.cols||[]).map(([n,a,b])=>`<div style="left:${a*sc}px;width:${(b-a)*sc}px;font-size:${Math.max(9,Math.min(14,13*sc*1.4))}px" title="${esc(n)}">${esc(n)}</div>`).join('');
   $('#mapnote').textContent=L.nota?L.nota:L.propuesto?
@@ -1549,6 +1601,8 @@ $('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;c
 $('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
 $('#lineas').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
 $('#map').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
+$('#mapcut-btn').addEventListener('click',()=>{store.set('mapFull',!store.get('mapFull',false));renderMap()});
+$('#minimap').addEventListener('click',()=>{store.set('mapFull',!store.get('mapFull',false));renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
 $('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;render()});
 $('#b-all').addEventListener('click',()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&off.has(k))])];saveT();renderTray()});
 $('#b-sugg').addEventListener('click',()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT();renderTray()});
