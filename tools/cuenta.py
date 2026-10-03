@@ -206,6 +206,33 @@ var IPNT=window.IPNT=(()=>{
 
   /* modo: 'login' (gana la nube y se recarga), 'abrir' y 'volver' (al abrir la página o regresar a la pestaña: se
      recarga si llegaron cambios de otro dispositivo), 'auto' (tras un cambio propio: solo se avisa) */
+
+  /* ---- al iniciar sesión: si la cuenta y el navegador tienen datos distintos, el alumno elige ---- */
+  const ETQ=k=>/^hu\.w\./.test(k)?'planes de horario y marcas':/^hu\.t\./.test(k)?'materias elegidas en el mapa':/^ue\./.test(k)?'actividades de Electivas':
+    k==='saes.alumno'?'datos del SAES':'preferencias y filtros';
+  function diferencias(d){
+    const out=new Set();
+    for(const [k,e] of Object.entries(d.claves||{})){
+      if(!sincroniza(k)||!e||k==='perfil.opciones') continue;
+      const v=ls.get(k);if(v!=null&&v!==JSON.stringify(e.v)) out.add(ETQ(k));
+    }
+    return [...out];
+  }
+  function elegir(d,dif){return new Promise(ok=>{
+    const dl=$i('ipnt-conf');if(!dl){ok('nube');return}
+    const n=Object.keys(d.claves||{}).filter(k=>sincroniza(k)).length;
+    $i('ipnt-conf-txt').innerHTML=`Tu cuenta ya tiene datos guardados${d.guardado?' (última vez: <b>'+esc(hora(d.guardado))+'</b>)':''}, `+
+      `y este navegador tiene datos distintos en: <b>${dif.map(esc).join(', ')}</b>.`;
+    const fin=r=>{dl.onclick=null;if(dl.close)dl.close();else dl.removeAttribute('open');ok(r)};
+    dl.onclick=e=>{const b=e.target.closest('[data-conf]');if(b)fin(b.dataset.conf)};
+    dl.oncancel=e=>e.preventDefault();   // hay que elegir una opción
+    if(dl.showModal)dl.showModal();else dl.setAttribute('open','');
+  })}
+  // «conservar lo de este navegador»: sus valores se marcan como los más recientes y ganan la fusión
+  function ganaLocal(){const t=ls.obj('ipnt.t',{}),b=ls.obj('ipnt.b',{}),ahora=Date.now();
+    for(const k of ls.keys()) if(sincroniza(k)){t[k]=ahora;delete b[k]}
+    ls.put('ipnt.t',t);ls.put('ipnt.b',b)}
+
   function sincronizar(modo){
     if(!cuenta||!prov) return Promise.resolve(0);
     if(busy){programar();return busy}
@@ -214,7 +241,9 @@ var IPNT=window.IPNT=(()=>{
       let cambios=0;
       for(let i=0;i<3;i++){
         const {doc,ver}=await prov.bajar();
-        if(doc) cambios+=fusionar(doc,modo==='login'&&i===0);
+        let nube=modo==='login'&&i===0;
+        if(doc&&nube){const dif=diferencias(doc);if(dif.length&&(await elegir(doc,dif))==='local'){ganaLocal();nube=false}}
+        if(doc) cambios+=fusionar(doc,nube);
         const mio=documento(doc);
         if(doc&&firma(doc)===firma(mio)) return cambios;
         if(await prov.subir(mio,ver)) return cambios;
@@ -364,7 +393,7 @@ var IPNT=window.IPNT=(()=>{
     if(dl.showModal)dl.showModal();else dl.setAttribute('open','');
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',wire);else setTimeout(wire,0);
-  return {bienvenida,set,touch,borrar,documento,fusionar,validar,sincronizar,descargar,restaurar,get cuenta(){return cuenta},get proveedor(){return prov?.id||null}};
+  return {bienvenida,diferencias,elegir,set,touch,borrar,documento,fusionar,validar,sincronizar,descargar,restaurar,get cuenta(){return cuenta},get proveedor(){return prov?.id||null}};
 })();
 """
 
@@ -385,6 +414,9 @@ CSS = r"""
 .ipnt-file input{position:absolute;inset:0;opacity:0;cursor:pointer}
 .ipnt-ms{display:inline-flex;align-items:center;gap:8px}
 .ipnt-dlg button:disabled{opacity:.5;cursor:not-allowed}
+.ipnt-conf-op{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
+.ipnt-conf-op .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 14px;border-radius:10px;height:auto;white-space:normal}
+.ipnt-conf-op small{font-weight:400;font-size:.8rem;color:inherit;opacity:.85}
 .ipnt-hola{width:min(640px,calc(100vw / var(--ui-zoom,1) - 32px))}
 .ipnt-hola .lead{margin:0;font-size:.95rem;color:var(--muted)}
 .ipnt-unis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
@@ -423,6 +455,16 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
   <div class="row"><button class="btn" id="ipnt-down" type="button">Descargar respaldo</button><label class="btn ipnt-file">Restaurar desde archivo<input type="file" id="ipnt-file" accept=".json,application/json"></label></div>
   <p class="ipnt-state" id="ipnt-filemsg" aria-live="polite"></p>
   <p class="saes-note" style="margin:14px 0 0">Tus datos se guardan en tu propia nube: en OneDrive, en la carpeta <b>Aplicaciones › IPN-tools</b>; en Google Drive, en un espacio privado de la aplicación que no aparece entre tus archivos. La herramienta solo tiene acceso a ese espacio. No hay servidor intermedio: nadie más puede consultarlos.</p>
+</dialog>
+<dialog class="saes-dlg ipnt-dlg" id="ipnt-conf" aria-labelledby="ipnt-conf-h">
+  <div class="dl-head"><h2 id="ipnt-conf-h">Ya hay datos en tu cuenta</h2></div>
+  <p id="ipnt-conf-txt" style="margin:0;font-size:.95rem"></p>
+  <p style="margin:10px 0 0;font-size:.92rem">¿Cuáles quieres conservar?</p>
+  <div class="ipnt-conf-op">
+    <button class="btn primary" type="button" data-conf="nube"><b>Usar los datos de mi cuenta</b><small>Reemplazan lo que hay en este navegador.</small></button>
+    <button class="btn" type="button" data-conf="local"><b>Conservar los de este navegador</b><small>Reemplazan lo guardado en tu cuenta.</small></button>
+  </div>
+  <p class="saes-note" style="margin:10px 0 0">En ambos casos se suma lo que solo exista de un lado (por ejemplo, tus actividades de Electivas si aquí no las tienes).</p>
 </dialog>
 <dialog class="saes-dlg ipnt-dlg ipnt-hola" id="ipnt-hola" aria-labelledby="ipnt-hola-h">
   <div class="dl-head"><h2 id="ipnt-hola-h">Bienvenida</h2><button class="x" type="button" data-hola-x aria-label="Cerrar">×</button></div>
