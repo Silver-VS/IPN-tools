@@ -13,7 +13,6 @@ python tools/build_electivas.py
 
 mkdir -p "$SITE/upiita"
 cp -r web/dist/. "$SITE/upiita/"
-cp web/index.html web/revision.html "$SITE/upiita/"
 
 git -C "$SITE" add upiita
 git -C "$SITE" commit -m "$MSG"

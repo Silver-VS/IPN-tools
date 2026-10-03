@@ -70,6 +70,7 @@ def write_dist(name, html, title_suffix=" | UPIITA IPN"):
     if not html.lstrip().lower().startswith("<!doctype"):
         # las plantillas omiten <html>/<head>/<body> (el navegador los infiere); aquí se fija idioma y viewport
         html = '<!doctype html>\n<html lang="es">\n<meta name="viewport" content="width=device-width,initial-scale=1">\n' + html
+    html = html.replace("</title>", '</title>\n<link rel="icon" href="assets/icono/favicon.ico">', 1)   # ícono de la app (docs/marca)
     out = DIST / f"{name}.html"
     out.write_text(html, encoding="utf-8")
     return out

@@ -276,7 +276,15 @@ def main():
     import os
     site = os.environ.get("UPIITA_SITE", "")  # p. ej. https://silver-vs.github.io/upiita/ : el marcador abre esta dirección
     write_dist("horarios", saes.inject(html, "horarios", site + "horarios.html" if site else ""))
-    (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")   # retorno del inicio de sesión (ventana emergente)
+    (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")
+    import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
+    for f in ("index.html", "revision.html", "privacidad.html", "condiciones.html"):
+        shutil.copy(ROOT / "web" / f, ROOT / "web" / "dist" / f)
+    ico = ROOT / "web" / "dist" / "assets" / "icono"
+    ico.mkdir(parents=True, exist_ok=True)
+    for f in (ROOT / "docs" / "marca").glob("*"):
+        if f.suffix in (".png", ".ico", ".svg"):
+            shutil.copy(f, ico / f.name)   # retorno del inicio de sesión (ventana emergente)
     if site:   # Lector publicado como archivo para el marcador corto (Chrome para Android corta los marcadores largos)
         (ROOT / "web" / "dist" / "lector.js").write_text(saes.lector_js(site + "horarios.html"), encoding="utf-8")
         # capturador de la oferta del SAES (cualquier unidad) para el marcador corto
