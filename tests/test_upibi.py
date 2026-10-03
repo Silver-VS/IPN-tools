@@ -99,6 +99,31 @@ assert.deepStrictEqual(rowBands(L),[[1,104,4,204],[2,304,204,404]]);
                 self.assertNotIn('~',r[8], (per,r[0],r[3],data['asig'][r[4]]))
                 if len(r)>10: self.assertEqual(len(r[6]),len(r[10]))
 
+    def test_selector_unidad_se_reabre_sin_duplicar_cambios(self):
+        import cuenta
+        fn = re.search(r'  function bienvenida\(o\)\{.*?\n  \}\n  if\(document.readyState',cuenta.JS,re.S).group(0).rsplit('\n  if(',1)[0]
+        script = """
+const assert=require('assert'), NUEVO=false, BKEY='demo', CFG={unidad:'upibi',unidades:[{id:'upibi'},{id:'escom',url:'horarios-escom.html'}]};
+let changes=0, shows=0, cuenta=null;
+const nodes={};const $i=id=>nodes[id]||(nodes[id]={textContent:'',hidden:false});
+const dl=$i('ipnt-hola');dl.showModal=()=>{shows++;dl.open=true};dl.close=()=>dl.open=false;
+const sel={options:[{value:'B',textContent:'Carrera ficticia'}],dispatchEvent:()=>changes++};
+const document={querySelector:()=>sel},ls={set:()=>{}},esc=s=>s,pintar=()=>{};
+const MS={disponible:()=>false},GO=MS;
+""" + fn + """
+(async()=>{
+ bienvenida({select:'#demo'});assert.strictEqual(shows,0);
+ bienvenida({select:'#demo',force:true});dl.close();
+ bienvenida({select:'#demo',force:true});assert.strictEqual(shows,2);
+ const button={dataset:{car:'B'},hasAttribute:()=>false};
+ await dl.onclick({target:{closest:()=>button}});
+ assert.strictEqual(changes,1);assert.strictEqual(dl.open,false);
+ assert.strictEqual($i('ipnt-hola-h').textContent,'Cambiar unidad académica');
+})().catch(e=>{console.error(e);process.exitCode=1});
+"""
+        result = subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_scripts_compilados(self):
         for unit in ('horarios','horarios-escom','horarios-upibi'):
             html = (ROOT/f'web/dist/{unit}.html').read_text(encoding='utf8')

@@ -48,6 +48,11 @@ h2{font-family:var(--f-display);font-stretch:87.5%;font-weight:600;font-size:1.3
 h3.sub{font-family:var(--f-display);font-weight:600;font-size:1.1rem;margin:0 0 6px}
 
 header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:20px 0;border-bottom:2px solid var(--accent)}
+.top>.brand{flex:1 1 100%;min-width:0}
+.brand .title-row{display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:12px}
+.header-actions{grid-column:4;display:flex;align-items:center;gap:12px}
+.top>.tabs{margin-left:auto}
+@media(max-width:640px){.brand .title-row{grid-template-columns:1fr auto;gap:10px}.header-actions{grid-column:2;grid-row:1;gap:8px}.unit-switch{grid-column:1 / -1;grid-row:2;justify-self:start}}
 .brand h1{font-family:var(--f-display);font-stretch:87.5%;font-weight:700;font-size:2.1rem;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
 .brand p{margin:4px 0 12px;color:var(--muted);font-size:.9rem}
 .tabs{display:flex;gap:2px;align-self:flex-end}
@@ -487,7 +492,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <header class="top">
     <div class="brand">
       <!--__IPNT_HOME__-->
-      <div class="title-row"><h1>Horarios UPIITA</h1><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div>
+      <div class="title-row"><h1>Horarios UPIITA</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog">Cambiar unidad académica</button><div class="header-actions"><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
       <p>Consulta tu trayectoria académica, selecciona materias y organiza tu horario para la reinscripción.</p>
     </div>
     <nav class="tabs" role="tablist" aria-label="Pantallas">
@@ -2270,6 +2275,7 @@ if(ALUMNO&&DATA.mapas[carreraPerfil(ALUMNO)])S.car=carreraPerfil(ALUMNO);
 const mobNote=()=>{$('#mobnote').hidden=!(MQ_PHONE.matches&&!store.get('mobnote',0))};
 mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
 render();
+$('#b-unidad').addEventListener('click',()=>IPNT.bienvenida({select:'#f-carrera',force:true}));
 IPNT.bienvenida({select:'#f-carrera'});   // primera visita: unidad, carrera o inicio de sesión
 SAES.status(ALUMNO);
 SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[carreraPerfil(d)]){S.car=carreraPerfil(d);store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
