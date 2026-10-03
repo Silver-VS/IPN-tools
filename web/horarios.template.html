@@ -16,7 +16,7 @@
   --f-mono:"Noto Sans Mono",ui-monospace,Consolas,monospace;
   --blk-s:42%; --blk-l:90%; --blk-fg:#2b2427; --blk-edge:40%; --own:#e6e1e3;
   --st-done:#c9c3c5; --st-done-fg:#4d4447; --st-late:#b8473f; --st-late-fg:#ffffff; --st-now:#3f7d5a; --st-now-fg:#ffffff; --st-rest:#ffffff;
-  --band:#f3eff1; --edge:#8e8589; --rel-pre:#2f7fc1; --rel-post:#c7741a;
+  --band:#f3eff1; --edge:#8e8589; --rel-pre:#2f7fc1; --rel-post:#c7741a; --ch-alert:#d9480f;
   --n1:#8a98c7; --n2:#c48aa6; --n3:#73a183; --n4:#5b7f9e; --n5:#c9b07a; --n6:#9b86c4; --n7:#c99a7a; --n8:#6fa3a8;
   --r:6px;
 }
@@ -26,7 +26,7 @@
   --ok:#93c4a2; --ok-soft:#1f3327; --warn:#dcbd88; --warn-soft:#3a2f1c; --bad:#ee9fb7; --bad-soft:#3f1f2b;
   --blk-s:28%; --blk-l:30%; --blk-fg:#ece6e9; --blk-edge:65%; --own:#33292d;
   --st-done:#4a4144; --st-done-fg:#cfc5c8; --st-late:#c96a62; --st-late-fg:#ffffff; --st-now:#5f9d78; --st-now-fg:#ffffff; --st-rest:#2a2226;
-  --band:#211d20; --edge:#8d7f84; --rel-pre:#64aee8; --rel-post:#e8a050; color-scheme:dark;
+  --band:#211d20; --edge:#8d7f84; --rel-pre:#64aee8; --rel-post:#e8a050; --ch-alert:#ff8a50; color-scheme:dark;
 }}
 :root[data-theme="dark"]{
   --bg:#1c191b; --surface:#252124; --sunken:#211d20; --line:#3b3438;
@@ -34,7 +34,7 @@
   --ok:#93c4a2; --ok-soft:#1f3327; --warn:#dcbd88; --warn-soft:#3a2f1c; --bad:#ee9fb7; --bad-soft:#3f1f2b;
   --blk-s:28%; --blk-l:30%; --blk-fg:#ece6e9; --blk-edge:65%; --own:#33292d;
   --st-done:#4a4144; --st-done-fg:#cfc5c8; --st-late:#c96a62; --st-late-fg:#ffffff; --st-now:#5f9d78; --st-now-fg:#ffffff; --st-rest:#2a2226;
-  --band:#211d20; --edge:#8d7f84; --rel-pre:#64aee8; --rel-post:#e8a050; color-scheme:dark;
+  --band:#211d20; --edge:#8d7f84; --rel-pre:#64aee8; --rel-post:#e8a050; --ch-alert:#ff8a50; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{scrollbar-gutter:stable}
@@ -1833,6 +1833,7 @@ function ley(items){
     punteada:`<path d="M1 7H21" stroke="${c}" stroke-width="2" stroke-dasharray="4 3"/><circle cx="11" cy="7" r="2.8" fill="var(--bg)" stroke="${c}" stroke-width="1.5"/>`,
     guion:`<path d="M1 7H21" stroke="${c}" stroke-width="1.6" stroke-dasharray="2 3"/>`,
     area:`<rect x="1" y="2" width="20" height="10" rx="2" fill="${c}" fill-opacity=".2"/>`,
+    rango:`<path d="M11 2V12" stroke="${c}" stroke-opacity=".35" stroke-width="7" stroke-linecap="round"/>`,
     barra:`<rect x="4" y="3" width="6" height="10" fill="${c}" fill-opacity=".75"/><rect x="12" y="6" width="6" height="7" fill="${c}" fill-opacity=".75"/>`,
     punto:`<circle cx="11" cy="7" r="4" fill="${c}" fill-opacity=".8"/>`,
     anillo:`<circle cx="11" cy="7" r="4" fill="var(--bg)" stroke="${c}" stroke-width="1.8"/>`,
@@ -1863,8 +1864,8 @@ async function renderStats(){
     ${plazo.calculado?`<p class="st-note">Referencia de duración: ${fmtCr(A.carga.total)} créditos del plan ÷ ${fmtCr(A.carga.min)} de carga mínima = ${plazo.max} periodos. El SAES indica una duración de ${A.carga.duracion??'—'} y un máximo de ${A.carga.duracion_max??'—'} periodos; confirma tu plazo con Gestión Escolar.</p>`:''}
     ${metaPanel(D)}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Créditos acumulados</b>${ley([['linea','var(--accent)','Lo que llevas'],['punteada','var(--accent)','Estimado a tu ritmo'],['guion','var(--muted)','Total del plan'],...(limite0!=null?[['guion','var(--bad)','Plazo de referencia']]:[]),...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--bad)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-avance"></div></figure>
-      <figure><figcaption><b>Promedio por periodo</b>${ley([['linea','var(--accent)','Promedio del periodo'],['area','var(--accent)','De la más baja a la más alta'],['guion','var(--muted)','Tu promedio general']])}</figcaption><div id="ch-prom"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Créditos acumulados</b>${ley([['linea','var(--accent)','Lo que llevas'],['punteada','var(--accent)','Estimado a tu ritmo'],['guion','var(--muted)','Total del plan'],...(limite0!=null?[['guion','var(--ch-alert)','Plazo de referencia']]:[]),...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-avance"></div></figure>
+      <figure><figcaption><b>Promedio por periodo</b>${ley([['linea','var(--accent)','Promedio del periodo'],['rango','var(--accent)','De tu calificación más baja a la más alta'],['guion','var(--muted)','Tu promedio general']])}</figcaption><div id="ch-prom"></div></figure>
       <figure><figcaption><b>Tus calificaciones</b>${ley([['barra','var(--accent)','Materias'],['vertical','var(--fg)','Promedio'],['vertical-p','var(--fg)','Mediana']])}</figcaption><div id="ch-dist"></div></figure>
       <figure><figcaption><b>Calificaciones por área</b>${ley([['punto','var(--accent)','Una materia'],['vertical','var(--fg)','Promedio del área'],...(D.rows.some(r=>r.eqv)?[['punto','var(--muted)','Por equivalencia']]:[])])}</figcaption><div id="ch-cat"></div></figure>
       <figure><figcaption><b>Tipo de evaluación por periodo</b></figcaption><div id="ch-forma"></div></figure>
@@ -1889,7 +1890,7 @@ async function renderStats(){
   const inicio=D.actual!=null&&cursados!=null?D.actual-cursados+1:x0;
   const proy=proyeccionCreditos(D), fin=proy.at(-1);
   const limite=plazo.max&&cursados!=null&&D.actual!=null?inicio+plazo.max-1:null;
-  const puntos=proy.slice(1), excede=d=>limite!=null&&d.per>limite, BAD=tok('--bad')||'#e66b83';
+  const puntos=proy.slice(1), excede=d=>limite!=null&&d.per>limite, BAD=tok('--ch-alert')||'#d9480f';   // alerta de las gráficas: distinta del color de acento en ambos temas
   const ticks=[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])].sort((a,b)=>a-b);
   const paso=Math.max(1,Math.ceil(ticks.length/Math.max(2,Math.floor($('#ch-avance').clientWidth/58))));
   const tickVisibles=ticks.filter((d,i)=>i%paso===0||i===ticks.length-1);
@@ -1898,7 +1899,7 @@ async function renderStats(){
       tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
       tot?P.text([tot],{y:d=>d,x:x0,text:()=>`total ${fmtCr(tot)}`,dy:-6,textAnchor:'start',fill:MUT}):null,
       limite!=null&&ticks.at(-1)>=limite?P.ruleX([limite],{stroke:BAD,strokeDasharray:'3 4'}):null,
-      limite!=null&&ticks.at(-1)>=limite?P.text([{per:limite,acum:0}],{x:'per',y:'acum',text:()=>plazo.calculado?`Referencia: ${plazo.max} periodos`:`Máximo: ${plazo.max} periodos`,dy:32,fill:BAD}):null,
+      limite!=null&&ticks.at(-1)>=limite?P.text([{per:limite,acum:0}],{x:'per',y:'acum',text:()=>plazo.calculado?`Referencia: ${plazo.max} periodos`:`Máximo: ${plazo.max} periodos`,dy:32,dx:-4,textAnchor:'end',fill:BAD}):null,
       P.areaY(C.filter(d=>!d.sim),{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
       P.line(C.filter(d=>!d.sim),{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
       C.some(d=>d.sim)?P.line(C.slice(-2),{x:'per',y:'acum',stroke:ACC,strokeDasharray:'2 3'}):null,
@@ -1915,9 +1916,10 @@ async function renderStats(){
     ].filter(Boolean)}));
   // 2) promedio por periodo con rango
   put('#ch-prom',P.plot({...base('#ch-prom'),height:210,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
-    marks:[P.areaY(D.porPer.filter(d=>d.prom!=null),{x:'per',y1:'min',y2:'max',fill:ACC,fillOpacity:.15,curve:'monotone-x'}),
+    // rango de cada periodo como barra vertical propia (sin unir periodos con formas suavizadas)
+    marks:[P.ruleX(D.porPer.filter(d=>d.prom!=null),{x:'per',y1:'min',y2:'max',stroke:ACC,strokeOpacity:.28,strokeWidth:10,strokeLinecap:'round'}),
       D.media!=null?P.ruleY([D.media],{stroke:MUT,strokeDasharray:'4 3'}):null,
-      P.line(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',stroke:ACC,strokeWidth:2,curve:'monotone-x'}),
+      P.line(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',stroke:ACC,strokeWidth:2}),
       P.dot(D.porPer.filter(d=>d.prom!=null),{x:'per',y:'prom',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\npromedio ${f2(d.prom)}\nrango ${d.min}–${d.max} · ${d.n} materias`})].filter(Boolean)}));
   // 3) distribución
   put('#ch-dist',P.plot({...base('#ch-dist'),height:210,x:{label:'Calificación',domain:[5.5,10.5]},y:{label:'Materias',grid:true},
@@ -2125,6 +2127,10 @@ const cambiarMeta=e=>{
 };
 $('#kstats').addEventListener('input',cambiarMeta);
 $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stats',false));renderStats()});
+// las gráficas toman los colores del tema al dibujarse: se redibujan si cambia el tema (sistema o botón)
+{const redibuja=()=>{if(!$('#kstats')?.hidden)renderStats()};
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redibuja)}catch(e){}
+  new MutationObserver(redibuja).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-skin']})}
 $('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vista]');if(!b)return;store.set('mapVista',b.dataset.vista);renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapVista',mapVista()==='todo'?'sigue':'todo');renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
 $('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;render()});
