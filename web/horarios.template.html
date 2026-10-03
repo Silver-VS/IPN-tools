@@ -1712,8 +1712,8 @@ async function renderStats(){
       P.line(proy,{x:'per',y:'acum',stroke:ACC,strokeDasharray:'5 4'}),
       P.dot(C,{x:'per',y:'acum',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} en el periodo`}),
       P.dot(puntos,{x:'per',y:'acum',stroke:d=>excede(d)?BAD:ACC,fill:'var(--bg)',r:4,tip:true,title:d=>`${perName(d.per)} · periodo ${d.per-inicio+1}\n${fmtCr(d.acum)} créditos acumulados proyectados${excede(d)?'\nExcede '+(plazo.calculado?'la referencia a carga mínima':'el máximo indicado'):''}`}),
-      puntos.length&&ticks.length<=Math.floor($('#ch-avance').clientWidth/65)?P.text(puntos,{x:'per',y:'acum',text:d=>fmtCr(d.acum),dy:16,fill:d=>excede(d)?BAD:ACC}):null,
-      fin?P.text([fin],{x:'per',y:'acum',text:d=>`egreso ${perName(d.per)}`,dy:-12,fill:excede(fin)?BAD:ACC}):null,
+      puntos.length&&ticks.length<=Math.floor($('#ch-avance').clientWidth/65)?P.text(puntos,{x:'per',y:'acum',text:d=>fmtCr(d.acum),dy:-12,fill:d=>excede(d)?BAD:ACC,tip:true,title:d=>`${perName(d.per)} · periodo ${d.per-inicio+1}\n${fmtCr(d.acum)} créditos acumulados proyectados${excede(d)?'\nExcede '+(plazo.calculado?'la referencia a carga mínima':'el máximo indicado'):''}`}):null,
+      fin?P.text([fin],{x:'per',y:'acum',text:d=>`egreso ${perName(d.per)}`,dy:-30,fill:excede(fin)?BAD:ACC}):null,
     ].filter(Boolean)}));
   // 2) promedio por periodo con rango
   put('#ch-prom',P.plot({...base('#ch-prom'),height:210,x:{label:null,type:'point',tickFormat:tickPer},y:{label:'Calificación',domain:[5.5,10.2],grid:true},
