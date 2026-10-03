@@ -30,6 +30,7 @@ def config():
             "googleClientId": os.environ.get("IPNT_GOOGLE_CLIENT_ID", c.get("googleClientId", "")),
             "unidades": c.get("unidades", UNIDADES),
             "googlePrueba": c.get("googlePrueba", False), "contacto": c.get("contacto", ""),
+            "institucionalPendiente": c.get("institucionalPendiente", False),
             "version": v, "unidad": c.get("unidad", "upiita"), "msal": MSAL[0], "sri": MSAL[1]}
 
 
@@ -263,7 +264,7 @@ var IPNT=window.IPNT=(()=>{
     return busy;
   }
   const texto=e=>{const m=String(e?.errorMessage||e?.message||e||'');
-    if(/AADSTS65001|AADSTS90094|consent/i.test(m)) return 'El IPN aún no autoriza esta aplicación para las cuentas institucionales (se requiere la aprobación del administrador).';
+    if(/AADSTS65001|AADSTS90094|consent/i.test(m)) return 'Las cuentas institucionales del IPN aún no están disponibles: la aplicación está en proceso de autorización. Puedes usar una cuenta personal de Microsoft o tu cuenta de Google.';
     if(/user_cancelled|cancel|access_denied/i.test(m)) return 'Inicio de sesión cancelado.';
     if(/popup_window_error/i.test(m)) return 'El navegador bloqueó la ventana de inicio de sesión. Permite las ventanas emergentes para este sitio.';
     return m.split('\n')[0].slice(0,220)};
@@ -277,7 +278,7 @@ var IPNT=window.IPNT=(()=>{
       await sincronizar('login');
     }catch(e){st.fase='error';st.error=texto(e);
       if(id==='google'&&CFG.googlePrueba&&/cancelado|access_denied/i.test(st.error+String(e?.message)))
-        st.error='No se completó el inicio con Google. Si tu cuenta no está en la lista de prueba, Google la bloquea'+(CFG.contacto?`: pide tu alta a ${CFG.contacto}.`:'.');
+        st.error='No se completó el inicio de sesión con Google. Durante la fase de prueba solo pueden acceder las cuentas registradas'+(CFG.contacto?`; para solicitar acceso, escribe a ${CFG.contacto}.`:'.');
       pintar()}
   }
   async function salir(borrarLocal){
@@ -315,7 +316,8 @@ var IPNT=window.IPNT=(()=>{
     $i('ipnt-out').hidden=on;$i('ipnt-in').hidden=!on;
     $i('ipnt-login').disabled=!MS.disponible()||st.fase==='login';$i('ipnt-glogin').disabled=!GO.disponible()||st.fase==='login';
     $i('ipnt-glogin').hidden=!GO.disponible();$i('ipnt-gnote').hidden=!GO.disponible();
-    document.querySelectorAll('.ipnt-prueba').forEach(n=>n.hidden=!(GO.disponible()&&CFG.googlePrueba));
+    document.querySelectorAll('.ipnt-prueba:not(.ipnt-msprueba)').forEach(n=>n.hidden=!(GO.disponible()&&CFG.googlePrueba));
+    document.querySelectorAll('.ipnt-msprueba').forEach(n=>n.hidden=!(MS.disponible()&&CFG.institucionalPendiente));
     document.querySelectorAll('.ipnt-contacto').forEach(n=>{if(!n.firstChild&&CFG.contacto){const a=document.createElement('a');a.href='mailto:'+CFG.contacto;a.textContent=CFG.contacto;n.appendChild(a)}});
     $i('ipnt-soon').hidden=MS.disponible()||GO.disponible();
     if(on){$i('ipnt-who').textContent=nom+(cuenta.name?` · ${cuenta.username}`:'');$i('ipnt-where').textContent=nube}
@@ -449,8 +451,8 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
       <button class="btn ipnt-ms" id="ipnt-glogin" type="button" hidden>
       <svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>
       Continuar con Google</button></div>
-    <p class="saes-note" style="margin:8px 0 0">Microsoft: cuenta institucional (@alumno.ipn.mx, @ipn.mx) o personal; se guarda en tu OneDrive.<span id="ipnt-gnote" hidden> Google: se guarda en el espacio privado de la aplicación en tu Google Drive.</span></p>
-    <p class="ipnt-prueba"  hidden><b>Google en fase de prueba.</b> Por ahora solo pueden entrar las cuentas inscritas en la lista de prueba, como en TestFlight. Para unirte, escribe a <span class="ipnt-contacto"></span> desde tu cuenta de Gmail y pide tu alta.</p>
+    <p class="saes-note" style="margin:8px 0 0">Microsoft: se guarda en tu OneDrive.<span id="ipnt-gnote" hidden> Google: se guarda en el espacio privado de la aplicación en tu Google Drive.</span></p>
+    <p class="ipnt-prueba ipnt-msprueba" hidden><b>Cuentas institucionales en proceso de autorización.</b> El acceso con @alumno.ipn.mx e @ipn.mx estará disponible cuando la aplicación sea autorizada por el área de cómputo del IPN. Mientras tanto, puedes usar una cuenta personal de Microsoft (Outlook o Hotmail) o tu cuenta de Google.</p><p class="ipnt-prueba"  hidden><b>Acceso con Google en fase de prueba.</b> Durante esta etapa, el inicio de sesión con Google está disponible solo para las cuentas registradas como usuarios de prueba. Para solicitar acceso, escribe a <span class="ipnt-contacto"></span> desde la cuenta de Google que deseas usar.</p>
     <p class="saes-note" id="ipnt-soon" style="margin:8px 0 0">El inicio de sesión estará disponible próximamente. Mientras tanto, usa el respaldo en archivo.</p>
   </div>
   <div id="ipnt-in" hidden>
@@ -485,7 +487,7 @@ UI = """<button class="ipnt-btn" id="ipnt-open" type="button" aria-haspopup="dia
   <div class="alt">
     <div id="ipnt-h-login"><p style="margin:0 0 8px;font-size:.92rem">¿Ya la usaste en otro dispositivo? Inicia sesión y se cargan tus datos.</p>
       <div class="row"><button class="btn ipnt-ms" id="ipnt-h-ms" type="button" data-prov="ms"><svg viewBox="0 0 21 21" width="16" height="16" aria-hidden="true"><path fill="#f25022" d="M1 1h9v9H1z"/><path fill="#7fba00" d="M11 1h9v9h-9z"/><path fill="#00a4ef" d="M1 11h9v9H1z"/><path fill="#ffb900" d="M11 11h9v9h-9z"/></svg>Continuar con Microsoft</button>
-      <button class="btn ipnt-ms" id="ipnt-h-go" type="button" data-prov="google"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</button></div><p class="ipnt-prueba"  hidden><b>Google en fase de prueba.</b> Por ahora solo pueden entrar las cuentas inscritas en la lista de prueba, como en TestFlight. Para unirte, escribe a <span class="ipnt-contacto"></span> desde tu cuenta de Gmail y pide tu alta.</p></div>
+      <button class="btn ipnt-ms" id="ipnt-h-go" type="button" data-prov="google"><svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true"><path fill="#ea4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.2C12.5 13.6 17.8 9.5 24 9.5z"/><path fill="#4285f4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.5 5.8c4.4-4 6.8-10 6.8-17.2z"/><path fill="#fbbc05" d="M10.6 28.5c-.5-1.4-.8-2.9-.8-4.5s.3-3.1.8-4.5l-7.9-6.2C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.2z"/><path fill="#34a853" d="M24 48c6.5 0 11.9-2.1 15.8-5.8l-7.5-5.8c-2.1 1.4-4.9 2.3-8.3 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.2C6.6 42.6 14.6 48 24 48z"/></svg>Continuar con Google</button></div><p class="ipnt-prueba ipnt-msprueba" hidden><b>Cuentas institucionales en proceso de autorización.</b> El acceso con @alumno.ipn.mx e @ipn.mx estará disponible cuando la aplicación sea autorizada por el área de cómputo del IPN. Mientras tanto, puedes usar una cuenta personal de Microsoft (Outlook o Hotmail) o tu cuenta de Google.</p><p class="ipnt-prueba"  hidden><b>Acceso con Google en fase de prueba.</b> Durante esta etapa, el inicio de sesión con Google está disponible solo para las cuentas registradas como usuarios de prueba. Para solicitar acceso, escribe a <span class="ipnt-contacto"></span> desde la cuenta de Google que deseas usar.</p></div>
     <p id="ipnt-h-yo" hidden style="margin:0;font-size:.92rem"></p>
     <p class="ipnt-state" id="ipnt-h-msg" aria-live="polite"></p>
     <p style="margin:6px 0 0"><button class="link" type="button" data-hola-x>Explorar sin elegir</button></p>
