@@ -1025,7 +1025,7 @@ function renderLineas(){
     const byNiv={};g.forEach(x=>(byNiv[x.niv]=byNiv[x.niv]||[]).push(x));
     const rows=Object.keys(byNiv).sort((a,b)=>a-b).map(n=>`<div class="ol-row"><span class="ol-niv">Nivel ${n}</span><div class="ol-boxes">${byNiv[n].map(x=>{
       const k=x.keys.find(k=>off.has(k))||x.keys[0];
-      return `<button class="obox${x.want?' want':''}${x.done?' done':''}${x.off?'':' offno'}" data-obox="${k}" aria-pressed="${x.want}" title="${esc(x.n)} · ${fmtCr(x.cr)} créditos${x.off?'':' · sin grupos este periodo'}">${esc(x.n.toLowerCase())}</button>`}).join('')}</div></div>`).join('');
+      return `<button class="obox${x.want?' want':''}${x.done?' done':''}${x.off?'':' offno'}" data-obox="${k}" aria-pressed="${x.want}" title="${esc(x.n)} · ${fmtCr(x.cr)} créditos${x.off?'':' · sin grupos este periodo'}">${esc(x.n.replace(/\s*\(([^()]*)\)$/,(m,g)=>norm(g)===norm(l.linea)?'':m).toLowerCase())}</button>`}).join('')}</div></div>`).join('');
     return `<article class="ol-card" style="--area:${color}">
       <header><span class="ol-area">${esc(l.area)}</span><h4>${esc(l.linea!==l.area?l.linea:l.area)}</h4>
         <span class="ol-stat">${nOff} de ${g.length} con grupos${nWant?` · <b>${nWant} elegida${nWant>1?'s':''}</b>`:''}${best>0&&score[i]===best?' · <span class="tag good">línea con mayor avance</span>':''}</span></header>

@@ -1,0 +1,236 @@
+{
+ "nombres_linea": {
+  "BIG DATA": "Big Data",
+  "DES. DE APLIC": "Desarrollo de Aplicaciones",
+  "MINERIA DE DATOS": "Minería de Datos",
+  "INSTRUMENTAL VIRTUAL": "Instrumentación Virtual",
+  "INTERNET DE LAS COSAS": "Internet de las Cosas",
+  "GOBIERNO DE TI": "Gobierno de TI",
+  "CRIPTOGRAFIA": "Criptografía",
+  "PROC. DE LENG. NAT": "Procesamiento de Lenguaje Natural",
+  "PROC. DE LENG": "Procesamiento de Lenguaje Natural",
+  "ALGORITMOS BIOINSPIRADOS": "Algoritmos Bioinspirados",
+  "COMPUTACION GRAFICA": "Computación Gráfica",
+  "VISION POR COMPUTADORA": "Visión por Computadora",
+  "SISTEMAS COMPLEJOS": "Sistemas Complejos",
+  "GES. DE EMP. DE ALTA TEC": "Gestión de Empresas de Alta Tecnología",
+  "TOPICOS SEL. DE COM": "Tópicos Selectos de Computación"
+ },
+ "lineas": {
+  "C": [
+   {
+    "area": "Optativas",
+    "linea": "Algoritmos Bioinspirados",
+    "claves": [
+     "C612",
+     "C711"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Big Data",
+    "claves": [
+     "C604",
+     "C703"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Computación Gráfica",
+    "claves": [
+     "C613",
+     "C712"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Criptografía",
+    "claves": [
+     "C610",
+     "C709"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Desarrollo de Aplicaciones",
+    "claves": [
+     "C605",
+     "C704"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Gestión de Empresas de Alta Tecnología",
+    "claves": [
+     "C616",
+     "C715"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Gobierno de TI",
+    "claves": [
+     "C609",
+     "C708"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Instrumentación Virtual",
+    "claves": [
+     "C607",
+     "C706"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Internet de las Cosas",
+    "claves": [
+     "C608",
+     "C707"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Minería de Datos",
+    "claves": [
+     "C606",
+     "C705"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Procesamiento de Lenguaje Natural",
+    "claves": [
+     "C611",
+     "C710"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Sistemas Complejos",
+    "claves": [
+     "C615",
+     "C714"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Tópicos Selectos de Computación",
+    "claves": [
+     "C617",
+     "C716"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "Visión por Computadora",
+    "claves": [
+     "C614",
+     "C713"
+    ]
+   }
+  ],
+  "B": [
+   {
+    "area": "Optativas",
+    "linea": "6.º semestre",
+    "claves": [
+     "B642",
+     "B648",
+     "B650",
+     "B645",
+     "B651",
+     "B641",
+     "B643"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "7.º semestre",
+    "claves": [
+     "B747",
+     "B749",
+     "B753",
+     "B746",
+     "B752",
+     "B740",
+     "B744"
+    ]
+   }
+  ],
+  "A": [
+   {
+    "area": "Optativas",
+    "linea": "6.º semestre",
+    "claves": [
+     "A624",
+     "A627",
+     "A620",
+     "A630",
+     "A631",
+     "A626"
+    ]
+   },
+   {
+    "area": "Optativas",
+    "linea": "7.º semestre",
+    "claves": [
+     "A725",
+     "A728",
+     "A722",
+     "A729",
+     "A732",
+     "A721",
+     "A723"
+    ]
+   }
+  ]
+ },
+ "req": {
+  "C": {
+   "C703": [
+    "C604"
+   ],
+   "C704": [
+    "C605"
+   ],
+   "C705": [
+    "C606"
+   ],
+   "C706": [
+    "C607"
+   ],
+   "C707": [
+    "C608"
+   ],
+   "C708": [
+    "C609"
+   ],
+   "C709": [
+    "C610"
+   ],
+   "C710": [
+    "C611"
+   ],
+   "C711": [
+    "C612"
+   ],
+   "C712": [
+    "C613"
+   ],
+   "C713": [
+    "C614"
+   ],
+   "C714": [
+    "C615"
+   ],
+   "C715": [
+    "C616"
+   ],
+   "C716": [
+    "C617"
+   ]
+  }
+ }
+}

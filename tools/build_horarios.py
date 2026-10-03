@@ -21,6 +21,16 @@ UCONF = (json.loads((UNI_DIR / "unidad.json").read_text(encoding="utf-8")) if (U
 if UNIDAD != "upiita":
     SRC, CUR, OUT = UNI_DIR / "horarios_saes.json", UNI_DIR / "mapa_curricular_saes.json", ROOT / "web" / f"horarios-{UNIDAD}.html"
 PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la oferta)
+OPTA = json.loads((UNI_DIR / "optativas.json").read_text(encoding="utf-8")) if (UNI_DIR / "optativas.json").exists() else {}
+
+
+def nombre_vis(n):
+    """Nombre para mostrar: «LÍNEA|MATERIA» del SAES (optativas de la ESCOM) -> «MATERIA (LÍNEA)»."""
+    if "|" not in n:
+        return n
+    pre, post = (x.strip() for x in n.split("|", 1))
+    lin = OPTA.get("nombres_linea", {}).get(pre, pre).upper()
+    return post if norm(post) == norm(lin) else f"{post} ({lin})"
 
 
 def clean(s):
@@ -46,6 +56,12 @@ def norm(s):
     return re.sub(r"\s+", " ", s.upper()).strip()
 
 
+def tipo_letra(t):
+    """Tipo de materia del SAES: O obligatoria, P optativa, T taller (OBLIGATORIA y OPTATIVA empiezan igual)."""
+    t = (t or "").upper()
+    return "P" if t.startswith("OPT") else (t[:1] or "O")
+
+
 def load_curriculum():
     """(carrera, nombre normalizado) -> [(nivel, clave, creditos, tipo)] sin el plan 98."""
     m = json.loads(CUR.read_text(encoding="utf-8")) if CUR.exists() else {"rows": []}   # opcional fuera de la UPIITA
@@ -53,12 +69,15 @@ def load_curriculum():
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
         if p == "98" or (PLANES.get(c) and p != PLANES[c]):
             continue
-        cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), float(cred), tipo[0]))
+        cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), float(cred), tipo_letra(tipo)))
     return cur
 
 
 def lookup(cur, carrera, nombre, nivel):
     opts = cur.get((carrera, norm(nombre)))
+    if not opts:   # el mapa curricular del SAES recorta los nombres largos: se acepta un prefijo de 25+ caracteres
+        n = norm(nombre)
+        opts = next((v for (c, k), v in cur.items() if c == carrera and len(k) >= 25 and n.startswith(k)), None)
     if not opts:
         return [0, "", ""]
     # mismo nivel y, si el nombre se repite (p. ej. "Tópicos selectos" de varias opciones terminales), la clave de la carrera
@@ -208,7 +227,7 @@ def load_maps(offer, upiita=True, extra=None):
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
         if plan.get(c) == p:
-            cur.setdefault(c, {})[clave.upper()] = [nom, float(cred), int(niv), tipo[0]]
+            cur.setdefault(c, {})[clave.upper()] = [nom, float(cred), int(niv), tipo_letra(tipo)]
     for c, extra_c in (extra or {}).items():
         for k, v in extra_c.items():
             cur.setdefault(c, {}).setdefault(k, v)
@@ -221,6 +240,8 @@ def load_maps(offer, upiita=True, extra=None):
         if not upiita:
             # otra escuela: sin trayectorias propias; con mapa curricular del SAES se muestra la cuadrícula por nivel
             entry.update(lineas=[], reglas={}, generico=not any(v[1] for v in cur[c].values()))   # sin créditos: solo horarios
+            if OPTA.get("lineas", {}).get(c):
+                entry["lineas"] = OPTA["lineas"][c]
             ft = UNI_DIR / f"trayectoria_{c}.json"
             if ft.exists():
                 t = json.loads(ft.read_text(encoding="utf-8"))
@@ -233,6 +254,8 @@ def load_maps(offer, upiita=True, extra=None):
                         a_, b_ = t["boxes"][e["s"]].get("clave"), t["boxes"][e["d"]].get("clave")
                         if a_ and b_:
                             req.setdefault(b_, []).append(a_)
+                    for b_, as_ in OPTA.get("req", {}).get(c, {}).items():   # optativas: 6.º -> 7.º de la misma línea
+                        req.setdefault(b_, []).extend(as_)
                     entry["req"] = req
             maps[c] = entry
             continue
@@ -298,6 +321,17 @@ def main():
         if cob >= 0.7:
             data["salones"] = {"periodo": sd.get("ciclo") or sd["periodo"], "cobertura": round(cob, 3)}
         print("salones", sal[-1].name, f"cobertura {cob:.1%}", "aplicados" if cob >= 0.7 else "NO aplicados (otro periodo)")
+    if UNIDAD != "upiita":
+        full = {}   # clave -> nombre completo según la oferta (el mapa curricular los recorta)
+        for per in data["periodos"].values():
+            for c in per:
+                if c[8]:
+                    full.setdefault((c[0], c[8]), asig[c[4]])
+        for car, mp in data["mapas"].items():
+            for k, v in mp["cur"].items():
+                n = full.get((car, k), v[0])
+                v[0] = nombre_vis(n if norm(n).startswith(norm(v[0])) else v[0])
+        data["asig"] = [nombre_vis(a) for a in asig]
     nb = sum(len(c[6]) for per in data["periodos"].values() for c in per)
     con = sum(1 for per in data["periodos"].values() for c in per if len(c) > 10 for _ in c[6])
     if not upiita and con:
