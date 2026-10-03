@@ -945,6 +945,7 @@ function renderMap(){
   let svg=`<svg width="${L.w*sc}" height="${H*sc}" viewBox="0 0 ${L.w} ${H}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--edge)"/></marker><marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--accent)"/></marker></defs>`;
   bands.forEach(([n,y,a,b],i)=>{const k=kOf(i);if(!k)return;if(i%2===0)svg+=`<rect class="band" x="0" y="${Y(a)}" width="${L.w}" height="${(b-a)*k}"/>`;svg+=`<text class="rowlbl" x="12" y="${Y(y)+6*k}" font-size="${18*Math.max(k,.7)}">${n}</text>`});
   L.edges.forEach(([s,d,p])=>{
+    const bs=L.boxes[s];if(!kOf(bandOf(bs[1]+bs[3]/2)))return;   // sale de un semestre plegado: no se dibuja
     const a=L.boxes[s][4], b=L.boxes[d][4], on=hot&&hot.has(a)&&hot.has(b);
     const pts=[];for(let i=0;i<p.length;i+=2)pts.push(p[i]+','+Y(p[i+1]));
     svg+=`<polyline class="edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}" points="${pts.join(' ')}" marker-end="url(#${on?'ahh':'ah'})"/>`;
