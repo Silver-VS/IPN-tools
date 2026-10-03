@@ -159,7 +159,9 @@ def layout_por_areas(cur, e):
     ncols = len(e["areas"])
     # hasta 2 materias por renglón dentro de cada celda (área × semestre)
     widths = [min(2, max(len(v) for (c, _), v in per.items() if c == ci)) * (bw + gap) + 16 for ci in range(ncols)]
-    pitch = 2 * bh + 3 * gap + 10 if any(len(v) > 2 for v in per.values()) else bh + 26
+    # La celda más poblada fija la altura: no debe invadir el semestre vecino.
+    max_rows = max((len(v) + 1) // 2 for v in per.values())
+    pitch = max_rows * bh + (max_rows - 1) * gap + 26
     top = pitch / 2 + 4  # centro de la primera fila: deja media banda arriba para que ningún bloque quede cortado
     xs = [left + sum(widths[:i]) for i in range(ncols)]
     nsem = max(s for _, s in per)
@@ -190,7 +192,7 @@ def layout_por_areas(cur, e):
     out = {
         "w": xs[-1] + widths[-1] + 20, "h": top + (nsem - 1) * pitch + pitch / 2 + 4, "pitch": pitch,
         "rows": [[s, top + (s - 1) * pitch] for s in range(1, nsem + 1)],
-        "boxes": boxes, "edges": edges, "propuesto": propuesta,
+        "boxes": boxes, "edges": edges, "propuesto": propuesta, "filas_exactas": True,
         "cols": [[a["nombre"], xs[i], xs[i] + widths[i]] for i, a in enumerate(e["areas"])],
     }
     if e.get("nota"):

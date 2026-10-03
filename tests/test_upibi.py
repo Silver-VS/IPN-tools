@@ -9,6 +9,42 @@ import extract_mapa_upibi as extract
 
 
 class UPIBI(unittest.TestCase):
+    def test_celda_con_muchas_materias_cabe_en_su_semestre(self):
+        cur = {f'DEMO{i}': [f'Materia ficticia {i}', 6, 1 if i < 9 else 2, 'O'] for i in range(12)}
+        layout = build.layout_por_areas(cur, {'areas': [{'nombre': 'Área de prueba', 'claves': list(cur)}]})
+        self.assertTrue(layout['filas_exactas'])
+        for b in layout['boxes']:
+            center = dict(layout['rows'])[b[6]]
+            self.assertGreaterEqual(b[1], center - layout['pitch'] / 2)
+            self.assertLessEqual(b[1] + b[3], center + layout['pitch'] / 2)
+
+    def test_seis_mapas_sin_solapamientos_y_en_su_semestre(self):
+        html = (ROOT/'web/dist/horarios-upibi.html').read_text(encoding='utf8')
+        data = json.loads(re.search(r'const DATA=(.*?);\n',html).group(1))
+        for car, mp in data['mapas'].items():
+            layout = mp['layout']; rows = dict(layout['rows']); boxes = layout['boxes']
+            self.assertTrue(layout['filas_exactas'],car)
+            for i, b in enumerate(boxes):
+                center = rows[b[6]]
+                self.assertGreaterEqual(b[1],center-layout['pitch']/2,(car,b))
+                self.assertLessEqual(b[1]+b[3],center+layout['pitch']/2,(car,b))
+                if b[4]: self.assertEqual(b[6],mp['cur'][b[4]][2],(car,b))
+                for a in boxes[:i]:
+                    overlap = min(a[0]+a[2],b[0]+b[2]) > max(a[0],b[0]) and min(a[1]+a[3],b[1]+b[3]) > max(a[1],b[1])
+                    self.assertFalse(overlap,(car,a,b))
+
+    def test_navegador_conserva_centros_exactos_de_fila(self):
+        html = (ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        fn = re.search(r'function rowBands\(L\)\{.*?\n\}',html,re.S).group(0)
+        script = fn + """
+const assert=require('assert');
+const L={filas_exactas:true,propuesto:false,pitch:200,h:408,
+ rows:[[1,104],[2,304]],boxes:[[0,30,128,44],[0,82,128,44],[0,230,128,44]]};
+assert.deepStrictEqual(rowBands(L),[[1,104,4,204],[2,304,204,404]]);
+"""
+        result = subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_claves_reutilizadas_por_plan(self):
         cur = build.load_curriculum()
         self.assertEqual(build.lookup(cur, 'B', 'COMUNICACIÓN PROFESIONAL', 1), [4.5, 'B109', 'O'])
