@@ -10,7 +10,7 @@ Herramientas web estáticas de libre acceso para el alumnado del IPN (sin servid
 
 - **Horarios** (`web/horarios.template.html`): mapa curricular, trayectoria con datos del SAES, minimapa de avance,
   simulación de fin de semestre, estadísticas y análisis, oferta del SAES y armado/generación de horarios.
-  Unidades: UPIITA (`horarios.html`) y ESCOM (`horarios-escom.html`, `UNIDAD=escom`).
+  Unidades: UPIITA (`horarios.html`), ESCOM (`horarios-escom.html`, `UNIDAD=escom`) y UPIBI (`horarios-upibi.html`, `UNIDAD=upibi`).
 - **Electivas** (`web/electivas.template.html`): DIE-03 por modalidad y formulario (solo UPIITA).
 - **Lector** (`tools/lector_saes.js`): marcador que lee el SAES del alumno (solo lectura) en cualquier unidad.
 - **Capturador** (`tools/captura_saes.js`): oferta y mapa curricular del SAES de cualquier unidad.
@@ -54,12 +54,12 @@ caracteres de control; usa cadenas crudas (`r"..."`) o el editor.
 | Ruta | Contenido |
 |---|---|
 | `web/horarios.template.html` | Toda la lógica de Horarios (HTML+CSS+JS en un archivo). Datos inyectados en `const DATA=` |
-| `tools/build_horarios.py` | Compila Horarios; `UNIDAD` elige `data/unidades/<u>/`; `layout_de` (trazado del PDF) y `layout_por_areas` (columnas por categoría) |
+| `tools/build_horarios.py` | Compila Horarios; `UNIDAD` elige `data/unidades/<u>/`; `layout_de` (trazado del PDF) y `layout_por_areas` (columnas por categoría, un renglón por semestre, flechas con pistas propias y reducción transitiva; prueba en `tests/test_rutas_mapa.py`) |
 | `tools/cuenta.py`, `tools/saes.py`, `tools/skins.py`, `tools/institucional.py` | Módulos inyectados (cuenta, Lector, tema, encabezado) |
 | `data/` | UPIITA: oferta, mapa curricular, trayectorias, seriación, especialidades, salones, formatos DIE |
 | `data/categorias.json` | Catálogo común de categorías (áreas de conocimiento) para todas las carreras |
 | `data/unidades/escom/` | ESCOM: oferta, mapa curricular, trayectorias extraídas, `areas_<c>.json`, `optativas.json` |
-| `data/unidades/upibi/mapas_pdf/` | UPIBI: 6 trayectorias extraídas (sin claves aún) |
+| `data/unidades/upibi/` | UPIBI: oferta y mapa del SAES, 6 trayectorias por carrera/plan, áreas y optativas; contexto en `docs/handoff-upibi/` |
 | `tools/extract_mapa*.py`, `tools/categorias_escom.py`, `tools/optativas_escom.py` | Extracción de PDFs y clasificación |
 | `docs/` | ESTADO, AUTOHOSPEDAJE, FORMATO-PERFIL, CUENTA-ENTRA/GOOGLE, SAES-UNIDADES, CATEGORIAS-ESCOM, ANALISIS-ACADEMICO |
 
@@ -69,12 +69,12 @@ Almacenamiento del navegador: claves `hu.*` (UPIITA), `hu.<unidad>.*` (otras), `
 ## Estado (2026-10-03) y pendientes
 
 Publicado: v1.2.0 + cambios posteriores (categorías, minimapa y enfoque, estadísticas con Observable Plot,
-simulación ampliada, análisis). Pendientes, en orden sugerido:
+simulación ampliada, análisis) + rama `codex/upibi` (UPIBI, analítica etapas A–C, meta de créditos, nuevo trazado de
+flechas en mapas por áreas). Pendientes, en orden sugerido:
 
-1. **UPIBI:** cuando haya captura del SAES (`horarios_saes.json`, `mapa_curricular_saes.json` del capturador en
-   `data/unidades/upibi/`), empatar `mapas_pdf/*.json` con claves, crear `unidad.json`, `areas_<c>.json` (catálogo
-   común) y verificar `UNIDAD=upibi`. Planes 2006 por niveles; Biotecnología 2024 por semestres.
-   En Biotecnología 2024 la suma de créditos extraídos (354) no coincide con el encabezado (372): revisar.
+1. **UPIBI:** integrada y publicada (2026-10-03). Pendientes en `docs/handoff-upibi/HANDOFF-CLAUDE-UPIBI.md`:
+   equivalencias entre planes (sin integrar), etapa D de analítica, discrepancias PDF/SAES (B706) y aclaraciones
+   institucionales (E739/F101, duración normativa).
 2. **IIA y LCD (ESCOM):** confirmar si las filas de sus tablas de optativas son seriaciones 6.º → 7.º; si sí,
    agregarlas en `tools/optativas_escom.py` (`req`).
 3. **Propuestas de `docs/ANALISIS-ACADEMICO.md`:** probabilidad de desfase, comparar escenarios de simulación,

@@ -113,6 +113,7 @@ input[type=number]{width:5rem}
 .edge{fill:none;stroke:var(--edge);stroke-width:1.4}
 .edge.hot{stroke:var(--accent);stroke-width:2.6}
 .edge.dim{opacity:.15}
+.edge.past{opacity:.3}   /* con datos del SAES: llega a una materia ya acreditada */
 .box{position:absolute;font-stretch:75%;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:7px;border:1.5px solid var(--line);background:var(--st-rest);color:var(--fg);font-weight:600;line-height:1.08;padding:2px 4px 2px 8px;cursor:pointer;overflow:hidden;letter-spacing:.01em;transition:opacity .12s, box-shadow .12s}
 .box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--nv,transparent)}
 .box.done{opacity:.28;text-decoration:line-through;font-weight:500;border-style:dotted}
@@ -919,6 +920,16 @@ function rowBands(L){
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
 let MARK={avail:new Set(),sug:new Set()};
 let SHOWSUG=store.get('verSug',true);
+// trazo ortogonal con esquinas redondeadas (mapas por áreas: cada flecha lleva su propia pista)
+function rutaRedonda(P,r=7){
+  let d=`M${P[0][0]} ${P[0][1]}`;
+  for(let i=1;i<P.length-1;i++){const [a,b,c]=[P[i-1],P[i],P[i+1]];
+    const l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),k=Math.min(r,l1/2,l2/2);
+    if(k<.5){d+=` L${b[0]} ${b[1]}`;continue}
+    const p=[b[0]+(a[0]-b[0])*k/l1,b[1]+(a[1]-b[1])*k/l1],q=[b[0]+(c[0]-b[0])*k/l2,b[1]+(c[1]-b[1])*k/l2];
+    d+=` L${+p[0].toFixed(1)} ${+p[1].toFixed(1)} Q${b[0]} ${b[1]} ${+q[0].toFixed(1)} ${+q[1].toFixed(1)}`}
+  const z=P.at(-1);return d+` L${z[0]} ${z[1]}`;
+}
 function renderMap(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
@@ -1009,8 +1020,9 @@ function renderMap(){
   L.edges.forEach(([s,d,p])=>{
     const bs=L.boxes[s];if(!kOf(bandOf(bs[1]+bs[3]/2)))return;   // sale de un semestre plegado: no se dibuja
     const a=L.boxes[s][4], b=L.boxes[d][4], on=hot&&hot.has(a)&&hot.has(b);
-    const pts=[];for(let i=0;i<p.length;i+=2)pts.push(p[i]+','+Y(p[i+1]));
-    svg+=`<polyline class="edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}" points="${pts.join(' ')}" marker-end="url(#${on?'ahh':'ah'})"/>`;
+    const pts=[];for(let i=0;i<p.length;i+=2)pts.push([p[i],Y(p[i+1])]);
+    const cls=`edge${L.propuesto?' prop':''}${on?' hot':hot?' dim':''}${!hot&&isPersonal()&&done.has(b)?' past':''}`, mk=`marker-end="url(#${on?'ahh':'ah'})"`;
+    svg+=L.rutas?`<path class="${cls}" d="${rutaRedonda(pts)}" ${mk}/>`:`<polyline class="${cls}" points="${pts.map(q=>q.join(',')).join(' ')}" ${mk}/>`;
   });
   svg+='</svg>';
   let html=svg;
@@ -1031,6 +1043,7 @@ function renderMap(){
   $('#mapnote').textContent=L.nota?L.nota:L.propuesto?
     'Esta carrera aún no cuenta con una trayectoria recomendada. Las áreas y la seriación (líneas punteadas) constituyen una propuesta elaborada a partir del plan de estudios oficial, sujeta a validación por la academia.':
     'Trayectoria recomendada. Las flechas indican la seriación recomendada; '+(tactil()?'al tocar una materia':'al colocar el cursor sobre una materia')+' se resalta su cadena de requisitos. Se sombrean las materias que conviene acreditar antes de las seleccionadas; en cursiva, las que no tienen grupos en el periodo consultado.';
+  if(L.ocultas)$('#mapnote').textContent+=` Para no saturar el mapa se omiten ${L.ocultas} flechas redundantes (requisitos que ya llegan a través de otra materia de la cadena); al resaltar una materia se ve su cadena completa.`;
 }
 /* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
    mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
