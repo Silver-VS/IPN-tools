@@ -1656,6 +1656,22 @@ function statsDatos(){
     ord:reg.length?reg.filter(r=>r.forma==='Ordinario').length/reg.length:null,
     delta:porPer.length>1?porPer.at(-1).prom-porPer.at(-2).prom:null};
 }
+function montarGrafica(host,fig){
+  host.replaceChildren(fig);
+  const svg=fig.matches('svg')?fig:fig.querySelector('svg');if(!svg)return;
+  const nativa=svg.getScreenCTM.bind(svg);let avisado=false;
+  // Firefox puede omitir el zoom CSS de los ancestros en getScreenCTM. D3 usa su inversa para el cursor.
+  // Estos SVG de Plot conservan xMidYMid meet; sus límites visibles incluyen zoom, resize y scroll.
+  svg.getScreenCTM=()=>{
+    const r=svg.getBoundingClientRect(),v=svg.viewBox.baseVal,m=nativa();
+    if(!r.width||!r.height||!v.width||!v.height)return m;
+    const k=Math.min(r.width/v.width,r.height/v.height);
+    const x=r.left+(r.width-v.width*k)/2-v.x*k,y=r.top+(r.height-v.height*k)/2-v.y*k;
+    if(m&&Math.abs(m.a-k)<.01&&Math.abs(m.d-k)<.01&&Math.abs(m.e-x)<.1&&Math.abs(m.f-y)<.1)return m;
+    if(!avisado){console.debug('Gráfica: corregida matriz del cursor por escala CSS',{grafica:host.id,escala:k,ancho:r.width,alto:r.height});avisado=true}
+    return new DOMMatrix([k,0,0,k,x,y]);
+  };
+}
 async function renderStats(){
   const box=$('#kstats'),btn=$('#stats-btn');if(!box||!btn)return;
   const on=isPersonal()&&store.get('stats',false);btn.hidden=!isPersonal();btn.textContent=on?'Ocultar estadísticas':'Ver estadísticas';box.hidden=!on;
@@ -1689,7 +1705,7 @@ async function renderStats(){
   const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
   const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
   const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
-  const put=(id,fig)=>{const el=$(id);el.replaceChildren(fig)};
+  const put=(id,fig)=>montarGrafica($(id),fig);
   const tickPer=d=>perName(d);
   // 1) avance acumulado (burn-up)
   const C=D.curva, x0=C.length?C[0].per:0, tot=D.total;
@@ -1821,7 +1837,7 @@ function renderAnalisis(D){
     </div>
     <p class="st-note">Estas estimaciones son heurísticas transparentes basadas en tu kárdex, no predicciones garantizadas.</p>`;
   if(window.Plot&&X.carga.length){const P=window.Plot,cs=getComputedStyle(document.documentElement),tok=n=>cs.getPropertyValue(n).trim(),host=$('#ch-carga');
-    host.replaceChildren(P.plot({width:Math.max(260,host.clientWidth),height:190,marginLeft:40,marginBottom:32,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
+    montarGrafica(host,P.plot({width:Math.max(260,host.clientWidth),height:190,marginLeft:40,marginBottom:32,style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},
       x:{label:'Créditos acreditados en el periodo',grid:true},y:{label:'Promedio',domain:[5.5,10.2],grid:true},
       marks:[X.carga.length>=3?P.linearRegressionY(X.carga,{x:'cr',y:'prom',stroke:tok('--muted'),fill:tok('--muted'),fillOpacity:.08}):null,
         P.dot(X.carga,{x:'cr',y:'prom',fill:tok('--accent'),r:5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.cr)} créditos · promedio ${d.prom.toFixed(2)} (${d.n})`}),

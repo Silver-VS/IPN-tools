@@ -160,6 +160,30 @@ assert.strictEqual(legend(13,{}),'');
         result=subprocess.run(['node','-e',script],text=True,capture_output=True)
         self.assertEqual(result.returncode,0,result.stderr)
 
+    def test_coordenadas_svg_con_zoom_scroll_y_resize(self):
+        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        fn=html[html.index('function montarGrafica('):html.index('async function renderStats(')]
+        script="""
+const assert=require('assert');
+class DOMMatrix {constructor(a){[this.a,this.b,this.c,this.d,this.e,this.f]=a}}
+let rect={left:200,top:600,width:1350,height:351};
+const svg={matches:()=>true,viewBox:{baseVal:{x:0,y:0,width:1000,height:260}},getBoundingClientRect:()=>rect,
+getScreenCTM:()=>new DOMMatrix([1,0,0,1,200,600])};
+const host={id:'demo',replaceChildren:()=>{}};
+"""+fn+"""
+montarGrafica(host,svg);
+function check(x,y){const m=svg.getScreenCTM(),k=rect.width/1000;
+ const clientX=rect.left+x*k,clientY=rect.top+y*k;
+ assert.ok(Math.abs((clientX-m.e)/m.a-x)<1e-6);
+ assert.ok(Math.abs((clientY-m.f)/m.d-y)<1e-6);
+}
+for(const width of [350,1000,1350])for(const top of [600,20,-120]){
+ rect={left:200,top,width,height:width*.26};check(0,0);check(300,180);check(990,250);
+}
+"""
+        result=subprocess.run(['node','-e',script],text=True,capture_output=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+
     def test_scripts_compilados(self):
         for unit in ('horarios','horarios-escom','horarios-upibi'):
             html = (ROOT/f'web/dist/{unit}.html').read_text(encoding='utf8')
