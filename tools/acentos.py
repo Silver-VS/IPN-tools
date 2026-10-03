@@ -42,11 +42,42 @@ MAPA = dict(par.split(":") for par in PALABRAS.split())
 _PAL = re.compile(r"(?<![A-Za-zÁÉÍÓÚÑÜáéíóúñü])[A-ZÁÉÍÓÚÑÜ]{2,}(?![A-Za-zÁÉÍÓÚÑÜáéíóúñü])")
 
 
+_T = {"A": "Á", "E": "É", "I": "Í", "O": "Ó", "U": "Ú"}
+_NO = {"COMUNICA", "ABRICA"}   # abreviaturas del SAES («COMUNICA.», «F-ABRICA»)
+
+
+def regla(w: str):
+    """Tilde por regla ortográfica para palabras que no están en el diccionario: -CIÓN/-SIÓN, -LOGÍA/-GRAFÍA/-METRÍA/
+    -NOMÍA/-TOMÍA/-SOFÍA y esdrújulas en -ICO/-ICA (DINÁMICOS, FARMACÉUTICA). Solo para nombres de materias y carreras:
+    no se aplica a apellidos de profesores."""
+    if w in MAPA or w in _NO or len(w) < 5 or re.search("[ÁÉÍÓÚ]", w):
+        return None
+    m = re.match(r"^(.*)([CS])ION$", w)
+    if m:
+        return m.group(1) + m.group(2) + "IÓN"
+    m = re.match(r"^(.*(?:LOG|GRAF|METR|NOM|TOM|SOF))IA(S?)$", w)
+    if m:
+        return m.group(1) + "ÍA" + m.group(2)
+    m = re.match(r"^(.*?)([AEIOU])([^AEIOU]+)(IC[OA]S?)$", w)
+    if m:
+        pre, v, cons, suf = m.groups()
+        if v in "IU" and pre and pre[-1] in "AEO":   # diptongo: la tilde va en la vocal fuerte (FARMACÉUTICA)
+            return pre[:-1] + _T[pre[-1]] + v + cons + suf
+        return pre + _T[v] + cons + suf
+    return None
+
+
+def acentuar_nombre(texto: str) -> str:
+    """Diccionario y reglas ortográficas: para nombres de materias, carreras y líneas."""
+    return _PAL.sub(lambda m: MAPA.get(m.group(0)) or regla(m.group(0)) or m.group(0), texto)
+
+
 def acentuar(texto: str) -> str:
     """Pone las tildes a las palabras en mayúsculas del diccionario; lo demás queda igual."""
     return _PAL.sub(lambda m: MAPA.get(m.group(0), m.group(0)), texto)
 
 
 if __name__ == "__main__":
-    for t in ["TEORIA DE LOS CIRCUITOS", "FISICA MODERNA Y OPTICA", "PROCESAMIENTO DE IMAGENES", "INGLES II", "2BV2 B207"]:
-        print(t, "->", acentuar(t))
+    for t in ["TEORIA DE LOS CIRCUITOS", "FISICA MODERNA Y OPTICA", "PROCESAMIENTO DE IMAGENES", "INGLES II", "2BV2 B207",
+              "SISTEMAS DINAMICOS", "QUIMICA FARMACEUTICA", "MICROBIOLOGIA", "PLANEACION ESTRATEGICA", "COMUNICA. ORAL"]:
+        print(t, "->", acentuar_nombre(t))

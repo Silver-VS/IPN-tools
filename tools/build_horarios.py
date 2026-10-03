@@ -814,8 +814,17 @@ def main():
     con = sum(1 for per in data["periodos"].values() for c in per if len(c) > 10 for _ in c[6])
     if not upiita and con:
         data["salones"] = {"fuente": "saes", "periodo": "SAES", "cobertura": round(con / nb, 3)}
-    from acentos import acentuar  # el SAES publica los nombres sin tildes
-    payload = acentuar(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+    from acentos import acentuar, acentuar_nombre  # el SAES publica los nombres sin tildes
+    # reglas ortográficas en todo menos los nombres de profesores (apellidos como MUJICA no llevan tilde)
+    def tildes(v):
+        if isinstance(v, str):
+            return acentuar_nombre(v)
+        if isinstance(v, list):
+            return [tildes(x) for x in v]
+        if isinstance(v, dict):
+            return {k: (x if k == "prof" else tildes(x)) for k, x in v.items()}
+        return v
+    payload = acentuar(json.dumps(tildes(data), ensure_ascii=False, separators=(",", ":")))
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", payload)
     if UNIDAD != "upiita":   # nombre de la herramienta según la unidad
         html = html.replace("Horarios UPIITA", f"Horarios {UCONF['siglas']}")

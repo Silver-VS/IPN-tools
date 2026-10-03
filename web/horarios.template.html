@@ -1160,7 +1160,7 @@ function inspParts(k){
     (off?'':'<p class="muted"><i>Sin grupos en el periodo consultado.</i></p>');
   return {l1,l2};
 }
-/* Materias del horario inscrito que no son de este plan (movilidad académica, cambio de carrera u otra carrera de la
+/* Materias del horario inscrito que no son de este plan (movilidad/flexibilidad académica, cambio de carrera u otra carrera de la
    unidad): se muestran como equivalencia y, si la tabla del SAES la registra, con la materia de tu plan que les
    corresponde. No se cuentan en el avance ni en la simulación hasta que el SAES las reconozca en tu plan. */
 function renderEqvHorario(A){
@@ -1169,7 +1169,7 @@ function renderEqvHorario(A){
   const ext=[...new Map(H.map(h=>[h[1],h])).values()];
   box.hidden=!ext.length;if(!ext.length){box.innerHTML='';return}
   const eq=k=>{const out=new Set();(DATA.equiv?.rel||[]).forEach(([o,ko,,d,kd])=>{if(ko===k&&d===S.car&&c[kd])out.add(kd);if(kd===k&&o===S.car&&c[ko])out.add(ko)});return [...out]};
-  box.innerHTML=`<h3>Equivalencias en tu horario</h3><p class="muted">Materias inscritas de otra carrera o plan (por ejemplo, por movilidad académica o cambio de carrera). No se cuentan en tu avance ni en la simulación hasta que el SAES las reconozca en tu plan.</p><ul>`+
+  box.innerHTML=`<h3>Equivalencias en tu horario</h3><p class="muted">Materias inscritas de otra carrera o plan (por ejemplo, por movilidad/flexibilidad académica o cambio de carrera). No se cuentan en tu avance ni en la simulación hasta que el SAES las reconozca en tu plan.</p><ul>`+
     ext.map(h=>{const m=eq(h[1]);return `<li><b>${esc(pretty(h[2]||h[1]))}</b> <span class="mono">${esc(h[1])}</span>${h[0]?` · grupo ${esc(h[0])}`:''}<small>${m.length?
       `Equivale a ${m.map(k=>`<b>${esc(pretty(c[k][0]))}</b> <span class="mono">${esc(k)}</span>`).join(' o ')} de tu plan, según la tabla de Equivalencias del SAES.`:
       'Sin equivalencia registrada en la tabla del SAES para tu plan; confírmala con Gestión Escolar.'}</small></li>`}).join('')+'</ul>';
