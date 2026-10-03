@@ -1632,8 +1632,7 @@ function proyeccionCreditos(D){
   const ultimo=D.curva.at(-1), inicio=D.meta??(ultimo?.per+1);
   if(!ultimo||D.fin==null||!D.total||!(D.ritmo>0)||D.fin<inicio)return [];
   // El ritmo se aplica desde el periodo planeado; un hueco en el kárdex no acredita créditos futuros.
-  const puntos=[{per:ultimo.per,acum:D.obt}];
-  if(inicio-1>ultimo.per)puntos.push({per:inicio-1,acum:D.obt});
+  const puntos=[{per:inicio-1>ultimo.per?inicio-1:ultimo.per,acum:D.obt,pendiente:inicio-1>ultimo.per}];
   for(let per=inicio;per<=D.fin;per++){
     puntos.push({per,acum:Math.min(D.total,D.obt+D.ritmo*(per-inicio+1))});
     if(puntos.at(-1).acum>=D.total)break;
@@ -1700,10 +1699,10 @@ async function renderStats(){
   const limite=plazo.max&&cursados!=null?inicio+plazo.max-1:null;
   const finIdeal=Math.min(inicio+(durP||1)-1,fin?.per??C.at(-1)?.per??inicio);
   const ideal=tot&&durP? [{per:inicio-1,acum:0},{per:finIdeal,acum:tot*(finIdeal-inicio+1)/durP}]:[];
-  const puntos=proy.filter(d=>d.per>=(D.meta??C.at(-1)?.per+1)), excede=d=>limite!=null&&d.per>limite, BAD=tok('--bad')||'#e66b83';
-  const ticks=[...new Set([...C.map(d=>d.per),...puntos.map(d=>d.per)])].sort((a,b)=>a-b);
+  const pendientes=proy.filter(d=>d.pendiente), puntos=proy.filter(d=>d.per>=(D.meta??C.at(-1)?.per+1)), excede=d=>limite!=null&&d.per>limite, BAD=tok('--bad')||'#e66b83';
+  const ticks=[...new Set([...C.map(d=>d.per),...proy.map(d=>d.per)])].sort((a,b)=>a-b);
   const paso=Math.max(1,Math.ceil(ticks.length/Math.max(2,Math.floor($('#ch-avance').clientWidth/58))));
-  const tickVisibles=ticks.filter((d,i)=>i%paso===0||i===ticks.length-1);
+  const tickVisibles=ticks.filter((d,i)=>i%paso===0||i===ticks.length-1||pendientes.some(p=>p.per===d));
   put('#ch-avance',P.plot({...base('#ch-avance'),height:260,marginBottom:50,x:{label:'Periodo',tickFormat:tickPer,ticks:tickVisibles},y:{label:'Créditos acumulados',grid:true,domain:[0,(tot||D.obt)*1.12]},
     marks:[
       tot?P.ruleY([tot],{stroke:MUT,strokeDasharray:'2 3'}):null,
@@ -1714,6 +1713,8 @@ async function renderStats(){
       P.areaY(C,{x:'per',y:'acum',fill:ACC,fillOpacity:.12,curve:'monotone-x'}),
       P.line(C,{x:'per',y:'acum',stroke:ACC,strokeWidth:2.2,curve:'monotone-x'}),
       P.line(proy,{x:'per',y:'acum',stroke:ACC,strokeDasharray:'5 4'}),
+      P.dot(pendientes,{x:'per',y:'acum',stroke:MUT,fill:'var(--bg)',r:4,tip:true,title:d=>`${perName(d.per)} · sin resultados en el kárdex\nBase de proyección: ${fmtCr(d.acum)} créditos confirmados\nNo se asume una carga acreditada de cero`}),
+      P.text(pendientes,{x:'per',y:'acum',text:()=> 'Sin resultados',dy:16,fill:MUT}),
       P.dot(C,{x:'per',y:'acum',fill:ACC,r:3.5,tip:true,title:d=>`${d.lbl}\n${fmtCr(d.acum)} créditos acumulados\n+${fmtCr(d.cr)} en el periodo`}),
       P.dot(puntos,{x:'per',y:'acum',stroke:d=>excede(d)?BAD:ACC,fill:'var(--bg)',r:4,tip:true,title:d=>`${perName(d.per)} · periodo ${d.per-inicio+1}\n${fmtCr(d.acum)} créditos acumulados proyectados${excede(d)?'\nExcede '+(plazo.calculado?'la referencia a carga mínima':'el máximo indicado'):''}`}),
       puntos.length&&ticks.length<=Math.floor($('#ch-avance').clientWidth/65)?P.text(puntos,{x:'per',y:'acum',text:d=>fmtCr(d.acum),dy:16,fill:d=>excede(d)?BAD:ACC}):null,

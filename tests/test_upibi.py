@@ -136,9 +136,11 @@ assert.deepStrictEqual(points.map(d=>d.acum),[240,289.5,339,388.5,438]);
 assert.deepStrictEqual(points.map(d=>d.per),[53,54,55,56,57]);
 // Kárdex hasta 26/2, planeación desde 27/2: no adelantar créditos a 27/1.
 const gap=proyeccionCreditos({curva:[{per:53,acum:240}],meta:55,fin:58,total:438,obt:240,ritmo:49.5});
-assert.deepStrictEqual(gap.map(d=>d.per),[53,54,55,56,57,58]);
-assert.deepStrictEqual(gap.map(d=>d.acum),[240,240,289.5,339,388.5,438]);
+assert.deepStrictEqual(gap.map(d=>d.per),[54,55,56,57,58]);
+assert.deepStrictEqual(gap.map(d=>d.acum),[240,289.5,339,388.5,438]);
 assert.strictEqual(gap.filter(d=>d.acum===438).length,1);
+assert.strictEqual(gap[0].pendiente,true);
+assert.strictEqual(points[0].pendiente,false);
 
 assert.deepStrictEqual(proyeccionCreditos({curva:[],fin:57,total:438,ritmo:49.5}),[]);
 assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,total:300,obt:240,ritmo:40}).map(d=>d.acum),[240,280,300]);
