@@ -856,7 +856,7 @@ const tr=()=>{
 function avisoActualizar(A){
   const leido=new Date(A?.leido);if(isNaN(leido))return '';
   const m=String(A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/), cita=m?new Date(+m[3],+m[2]-1,+m[1]):null;
-  if(cita&&citaPasada(A)&&leido<cita)return 'Ya pasó tu cita de reinscripción y estos datos son de antes. Si ya te inscribiste, vuelve a usar el Lector para traer tu nuevo horario inscrito.';
+  if(cita&&citaPasada(A)&&leido<cita)return 'Ya pasó tu cita de reinscripción y estos datos son de antes. Si ya te inscribiste, vuelve a usar el Lector para traer tu horario definitivo.';
   const dias=Math.floor((Date.now()-leido)/864e5);
   if(dias>=21)return `Estos datos tienen ${dias} días y no se actualizan solos. Vuelve a usar el Lector después de inscribirte o cuando cierre el semestre y se publiquen tus calificaciones (tus materias pasan del horario a tu kárdex).`;
   return '';
