@@ -39,3 +39,10 @@ cambia. Una implementación nueva crea otra URL y habría que volver a publicar.
 ## Apagarla
 
 `"activa": false` en `data/encuesta.json`, compilar y publicar. El enlace del pie desaparece.
+
+## Implementación actual (fase de pruebas, octubre de 2026)
+
+- Hoja: «IPN-tools» en el Drive del responsable (pestaña «Respuestas»).
+- Proyecto de Apps Script vinculado: «IPN-tools · Encuesta» (`1MPpinMVMi6md5AcCQWLUzctxp_bFYCAfHrYrw_2XnLQ86Q4f8MBgapMY`).
+- Implementación web (versión 1): `AKfycbyk3lyUjzBE7W6HVyLn_BZqw-euTpjZpR4nVFM97j-2-ejy4_4vGTKDulfmYgrwPlfP`.
+- Se gestiona con clasp: `clasp push` y `clasp deploy -i <id de implementación>` conserva la URL.

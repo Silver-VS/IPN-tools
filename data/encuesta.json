@@ -1,7 +1,7 @@
 {
   "activa": true,
   "fase": "pruebas-2026-10",
-  "endpoint": "",
+  "endpoint": "https://script.google.com/macros/s/AKfycbyk3lyUjzBE7W6HVyLn_BZqw-euTpjZpR4nVFM97j-2-ejy4_4vGTKDulfmYgrwPlfP/exec",
   "cierre": null,
   "seguimientoDias": 4
 }
