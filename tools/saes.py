@@ -162,10 +162,11 @@ def card(bm_href, page="horarios", short="", u=None):
   <div class="dl-head"><h2 id="saes-h">Usa tus datos del SAES</h2><button class="x" id="saes-x" type="button" aria-label="Cerrar">×</button></div>
   <p style="margin:0;font-size:.92rem">Opcional. Incorpora {what}. La información se procesa en tu navegador y no se envía a ningún servidor.</p>
   <div id="saes-status" hidden><p style="margin:10px 0 0;font-size:.92rem"><b>Datos del SAES cargados.</b> <span class="muted" id="saes-who"></span></p>
-    <p class="saes-note" style="margin:4px 0 0">Para actualizarlos, ejecuta de nuevo el marcador en el SAES y pega el resultado abajo. <button class="link" id="saes-again" type="button">Ver instrucciones</button></p></div>
+    <p class="saes-note" style="margin:4px 0 0">Para actualizarlos usa el <b>mismo marcador Lector IPN-tools</b> que ya guardaste: entra al SAES, púlsalo, elige «Copiar mis datos» y pega el resultado abajo. No necesitas volver a instalarlo.</p>
+    <p class="saes-note" style="margin:4px 0 0">¿Perdiste el marcador o cambiaste de navegador? <button class="link" id="saes-again" type="button">Ver cómo instalarlo de nuevo</button></p></div>
   {aviso}
-  <div class="saes-videos" id="saes-videos"><span>¿Prefieres verlo? Video paso a paso:</span>{videos}<a class="saes-vlist" href="{VIDEOS_LISTA}" target="_blank" rel="noopener">Ver todos</a></div>
   <div id="saes-steps">
+  <div class="saes-videos" id="saes-videos"><span>¿Prefieres verlo? Video paso a paso:</span>{videos}<a class="saes-vlist" href="{VIDEOS_LISTA}" target="_blank" rel="noopener">Ver todos</a></div>
     <ol>
       <li><b>Guarda el Lector IPN-tools en tu navegador</b> (solo la primera vez).
         <p class="muted">Un <b>marcador</b> (favorito) es un acceso guardado en el navegador. El Lector IPN-tools, en lugar de abrir una página, consulta tu información dentro del SAES. Es el mismo para todas las unidades del IPN: detecta en qué SAES estás. Si ya tenías guardado el «Lector UPIITA», sigue funcionando.</p>
