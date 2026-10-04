@@ -152,7 +152,7 @@ def card(bm_href, page="horarios", short="", u=None):
     # los datos son una copia del SAES en el momento de la lectura: no se actualizan solos
     aviso = ('<div class="saes-aviso"><b>Tus datos no se actualizan solos.</b> Cada vez que usas el Lector se guarda una copia '
              'de tu SAES en ese momento. Vuelve a usarlo:<ul>'
-             '<li><b>Después de inscribirte</b>, para traer tu nuevo horario inscrito.</li>'
+             '<li><b>Después de inscribirte</b>, para traer tu horario definitivo.</li>'
              '<li><b>Cuando cierre el semestre</b> y se publiquen tus calificaciones: tus materias dejan de aparecer en tu '
              'horario del SAES y pasan a tu kárdex.</li></ul></div>') if page == "horarios" else ""
     play = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>'
