@@ -1,7 +1,7 @@
 """Encuesta de satisfacción de la fase de pruebas (Horarios, todas las unidades).
 
-Se inyecta al final de cada página de Horarios. Aparece sola cuando el alumno ya usó la herramienta (exportó o generó
-un horario, o lleva unos minutos activo), se puede posponer y deja de aparecer en cuanto se responde. Si al responder
+Se inyecta al final de cada página de Horarios. Aparece sola cuando el alumno ya usó la herramienta (exportó un horario,
+generó horarios y los siguió revisando unos minutos, o lleva media hora de uso activo), se puede posponer y deja de aparecer en cuanto se responde. Si al responder
 el alumno aún no se inscribe, después del cierre de la reinscripción (o unos días después) se le pregunta solo si se
 inscribió con el horario que planeó.
 
@@ -72,7 +72,8 @@ const activa=!!(C.activa&&C.endpoint);
 let mostrada=false;   // una vez por visita
 
 /* ---------- cuándo aparece ---------- */
-const usoSuficiente=()=>{const u=E.uso;return u.exp>=1||u.gen>=1&&u.min>=2||u.min>=5||u.ses>=2&&u.min>=2};
+// exportó un horario, generó horarios y siguió revisándolos 3 minutos, o lleva media hora de uso activo
+const usoSuficiente=()=>{const u=E.uso;return u.exp>=1||u.genAt!=null&&u.min-u.genAt>=3||u.min>=30};
 const fechaSeguimiento=()=>C.cierre?new Date(C.cierre+'T23:59:00').getTime():(E.resp?.t||0)+(C.seguimientoDias||4)*DIA;
 function pendiente(){
   if(!activa||E.no||ahora()<E.hasta)return null;
@@ -173,7 +174,7 @@ async function enviar(tipo,motivo,f){
 
 /* ---------- API para la página ---------- */
 window.ENCUESTA={
-  marcar(ev){if(ev==='exp')E.uso.exp++;else if(ev==='gen')E.uso.gen++;guardar();intentar(ev,ev==='exp'?1500:800)},
+  marcar(ev){if(ev==='exp')E.uso.exp++;else if(ev==='gen'){E.uso.gen++;if(E.uso.genAt==null)E.uso.genAt=E.uso.min}guardar();intentar(ev,1500)},
   abrir(){const t=manual();if(!t)return false;abrir(t,'manual');return true},
   get respondida(){return !!E.resp},
   get activa(){return activa}

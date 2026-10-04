@@ -6,8 +6,8 @@ reinscripción. Código: `tools/encuesta.py` (página) y `tools/encuesta_appscri
 
 ## Cuándo aparece
 
-- Después de exportar un horario, de generar horarios con 2 minutos de uso, de 5 minutos de uso activo o en una segunda
-  visita con 2 minutos. Nunca encima de otro diálogo y como máximo una vez por visita.
+- Al exportar un horario, cuando el alumno generó horarios y siguió revisándolos 3 minutos de uso activo, o tras media
+  hora de uso activo acumulado. Nunca encima de otro diálogo y como máximo una vez por visita.
 - «Ahora no» la pospone 1 día (las dos primeras veces) y después 3 días. Desde la segunda vez se ofrece «No volver a
   preguntar».
 - Al responder ya no vuelve a aparecer. Si el alumno contestó «Todavía no» me inscribo, después del cierre de la
