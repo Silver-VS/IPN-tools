@@ -53,6 +53,11 @@ CSS = r"""
 .enc-dlg .enc-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .enc-gracias{text-align:center;padding:18px 4px 6px}
 .enc-gracias b{display:block;font-size:1.15rem;margin-bottom:6px}
+.enc-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:4px 12px 4px 8px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.enc-btn:hover{border-color:var(--accent)}
+.enc-btn svg{flex:none;color:var(--accent)}
+.enc-btn[hidden]{display:none}
+@media (max-width:560px){.enc-btn{width:36px;height:36px;padding:0;justify-content:center}.enc-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}}
 .enc-link{border:0;background:none;color:var(--accent);text-decoration:underline;cursor:pointer;font:inherit;padding:0}
 @media (max-width:480px){.enc-esc.n11{grid-template-columns:repeat(6,1fr)}}
 """
@@ -98,6 +103,9 @@ const opciones=(nombre,tipo,ops,req)=>`<div class="enc-opc">${ops.map(([v,t],i)=
 const INSCRITO=[['igual','Sí, con el horario que planeé'],['parecido','Sí, con uno parecido'],['distinto','Sí, con uno distinto'],['aun','Todavía no']];
 const FUNCIONES=[['mapa','Mapa curricular'],['manual','Armar horario a mano'],['generador','Generador automático'],['exportar','Exportar horario'],['estado','Estado académico y simulación'],['metas','Metas de término y promedio'],['estadisticas','Estadísticas'],['equivalencias','Equivalencias']];
 function formulario(tipo){
+  if(tipo==='comentario') return `
+    <fieldset><legend>¿Sobre qué es tu comentario?</legend>${opciones('tema','radio',[['error','Un error o dato incorrecto'],['sugerencia','Una sugerencia'],['otro','Otro']],true)}</fieldset>
+    <fieldset><legend>Cuéntanos</legend><textarea name="comentario" maxlength="1000" required placeholder="Qué pasó o qué te gustaría que tuviera"></textarea></fieldset>`;
   if(tipo==='seguimiento') return `
     <fieldset><legend>¿Ya te inscribiste en el SAES?</legend>${opciones('inscrito','radio',[...INSCRITO.slice(0,3),['no','No me inscribí este periodo']],true)}</fieldset>
     <fieldset><legend>¿Qué tan útil fue IPN-tools para llegar a tu cita con el horario listo?</legend>${escala(5,'util_cita',['Nada útil','Muy útil'])}</fieldset>
@@ -117,14 +125,14 @@ function abrir(tipo,motivo){
   tipo=tipo||(E.resp?'seguimiento':'completa');
   dlg?.remove();
   dlg=document.createElement('dialog');dlg.className='saes-dlg enc-dlg';dlg.setAttribute('aria-labelledby','enc-h');
-  const seg=tipo==='seguimiento', otra=E.pos>=1&&motivo!=='manual';
-  dlg.innerHTML=`<div class="dl-head"><h2 id="enc-h">${seg?'Dos preguntas rápidas':'¿Te está sirviendo IPN-tools?'}</h2><button class="x" type="button" data-enc-cerrar aria-label="Cerrar">×</button></div>
-    <p class="enc-intro">${seg?'Nos ayuda a saber si la herramienta sirvió en tu reinscripción. Son 30 segundos.':'Estamos en fase de pruebas. Tus respuestas, anónimas, nos ayudan a saber si la herramienta te sirve y qué mejorar. Son 2 minutos.'}</p>
+  const seg=tipo==='seguimiento', com=tipo==='comentario', otra=E.pos>=1&&motivo!=='manual';
+  dlg.innerHTML=`<div class="dl-head"><h2 id="enc-h">${com?'Danos tu opinión':seg?'Dos preguntas rápidas':'¿Te está sirviendo IPN-tools?'}</h2><button class="x" type="button" data-enc-cerrar aria-label="Cerrar">×</button></div>
+    <p class="enc-intro">${com?'Ya contestaste la encuesta, ¡gracias! Aquí puedes reportar un error o dejarnos una sugerencia cuando quieras.':seg?'Nos ayuda a saber si la herramienta sirvió en tu reinscripción. Son 30 segundos.':'Estamos en fase de pruebas. Tus respuestas, anónimas, nos ayudan a saber si la herramienta te sirve y qué mejorar. Son 2 minutos.'}</p>
     <form novalidate>${formulario(tipo)}
       <div class="enc-hp" aria-hidden="true"><label>No llenar <input name="web" tabindex="-1" autocomplete="off"></label></div>
       <p class="enc-nota">No escribas tu nombre, boleta ni otros datos personales. Más información en el <a href="privacidad.html" target="_blank" rel="noopener">aviso de privacidad</a>.</p>
       <p class="enc-msg" role="status"></p>
-      <div class="enc-acc">${otra?'<button type="button" class="enc-no" data-enc-nunca>No volver a preguntar</button>':''}<button type="button" class="btn" data-enc-cerrar>Ahora no</button><button type="submit" class="btn primary">Enviar</button></div>
+      <div class="enc-acc">${otra?'<button type="button" class="enc-no" data-enc-nunca>No volver a preguntar</button>':''}<button type="button" class="btn" data-enc-cerrar>${motivo==='manual'?'Cancelar':'Ahora no'}</button><button type="submit" class="btn primary">Enviar</button></div>
     </form>`;
   document.body.appendChild(dlg);
   dlg.querySelectorAll('[data-enc-cerrar]').forEach(b=>b.addEventListener('click',()=>{posponer();dlg.close()}));
@@ -135,7 +143,7 @@ function abrir(tipo,motivo){
   dlg.showModal();
 }
 // lo que se puede responder a voluntad: la encuesta si no se ha contestado, o el seguimiento si se dijo «todavía no»
-function manual(){if(!activa)return null;if(!E.resp)return 'completa';return E.resp.inscrito==='aun'&&!E.seg?'seguimiento':null}
+function manual(){if(!activa)return null;if(!E.resp)return 'completa';return E.resp.inscrito==='aun'&&!E.seg?'seguimiento':'comentario'}
 let enviado=false;
 function posponer(){if(enviado)return;E.pos++;E.hasta=ahora()+(E.pos<=2?1:3)*DIA;guardar()}
 
@@ -156,7 +164,7 @@ async function mandar(datos){
 }
 async function enviar(tipo,motivo,f){
   const msg=f.querySelector('.enc-msg');msg.className='enc-msg';
-  const falta=[...f.querySelectorAll('fieldset')].find(fs=>fs.querySelector('[required]')&&!fs.querySelector('input:checked'));
+  const falta=[...f.querySelectorAll('fieldset')].find(fs=>fs.querySelector('input[required]')&&!fs.querySelector('input:checked')||fs.querySelector('textarea[required]')&&!fs.querySelector('textarea').value.trim());
   if(falta){msg.textContent='Falta responder: '+falta.querySelector('legend').firstChild.textContent.trim();msg.classList.add('bad');falta.scrollIntoView({block:'center',behavior:'smooth'});return}
   const fd=new FormData(f), r={};
   for(const [k,v] of fd.entries()){if(k==='funciones')(r[k]=r[k]||[]).push(v);else r[k]=String(v).trim().slice(0,1000)}
@@ -166,9 +174,9 @@ async function enviar(tipo,motivo,f){
   try{await mandar(datos)}
   catch(e){b.disabled=false;msg.classList.add('bad');msg.textContent=e.message==='sin conexión'?'No se pudo enviar. Revisa tu conexión e inténtalo de nuevo.':'No se pudo registrar la respuesta. Inténtalo más tarde.';return}
   enviado=true;
-  if(tipo==='seguimiento')E.seg=ahora();else E.resp={t:ahora(),inscrito:r.inscrito};
+  if(tipo==='seguimiento')E.seg=ahora();else if(tipo==='completa')E.resp={t:ahora(),inscrito:r.inscrito};
   E.hasta=0;guardar();enlaces();
-  f.outerHTML='<div class="enc-gracias"><b>¡Gracias por tu respuesta!</b>'+(r.inscrito==='aun'&&tipo!=='seguimiento'?'Cuando cierre la reinscripción te haremos una última pregunta.':'Nos ayuda a mejorar IPN-tools para todo el alumnado.')+'</div>';
+  f.outerHTML='<div class="enc-gracias"><b>¡Gracias por tu respuesta!</b>'+(r.inscrito==='aun'&&tipo==='completa'?'Cuando cierre la reinscripción te haremos una última pregunta.':'Nos ayuda a mejorar IPN-tools para todo el alumnado.')+'</div>';
   setTimeout(()=>dlg?.open&&dlg.close(),2600);
 }
 
@@ -180,8 +188,8 @@ window.ENCUESTA={
   get activa(){return activa}
 };
 document.addEventListener('click',e=>{const b=e.target.closest?.('[data-encuesta]');if(!b)return;e.preventDefault();window.ENCUESTA.abrir()});
-// enlace fijo: solo mientras haya algo que responder
-const enlaces=()=>document.querySelectorAll('[data-encuesta]').forEach(b=>{b.hidden=!manual()});
+// botón «Opinar» y enlace del pie: visibles mientras la encuesta esté activa
+const enlaces=()=>document.querySelectorAll('[data-encuesta]').forEach(b=>{b.hidden=!activa});
 enlaces();
 if(activa)setTimeout(()=>intentar('visita'),4000);
 })();

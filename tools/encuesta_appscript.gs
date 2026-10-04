@@ -16,11 +16,12 @@ const COLUMNAS = [
   'fecha', 'tipo', 'motivo', 'id',
   'unidad', 'carrera', 'demo', 'con_datos_saes', 'materias_elegidas', 'movil', 'minutos_uso', 'sesiones', 'exportaciones', 'generaciones',
   'satisfaccion', 'util_horario', 'funciones', 'tiempo', 'inscrito', 'recomendacion', 'util_cita',
-  'errores', 'mejoras', 'comentario', 'fase'
+  'errores', 'mejoras', 'comentario', 'fase', 'tema'
 ];
 // valores permitidos de cada pregunta cerrada (lo demás se descarta)
 const PERMITIDOS = {
-  tipo: ['completa', 'seguimiento'],
+  tipo: ['completa', 'seguimiento', 'comentario'],
+  tema: ['error', 'sugerencia', 'otro'],
   motivo: ['', 'exp', 'gen', 'tiempo', 'visita', 'manual'],
   satisfaccion: ['1', '2', '3', '4', '5'],
   util_horario: ['1', '2', '3', '4', '5', 'na'],
@@ -50,6 +51,8 @@ function doPost(e) {
       return json_({ ok: false, error: 'Respuesta inválida' });
     if (tipo === 'seguimiento' && !elegir_(r.inscrito, 'inscrito'))
       return json_({ ok: false, error: 'Respuesta inválida' });
+    if (tipo === 'comentario' && !(elegir_(r.tema, 'tema') && texto_(r.comentario)))
+      return json_({ ok: false, error: 'Respuesta inválida' });
 
     const fila = {
       fecha: new Date(), tipo, motivo: elegir_(d.motivo, 'motivo') || '', id,
@@ -63,7 +66,7 @@ function doPost(e) {
       recomendacion: numero_(elegir_(r.recomendacion, 'recomendacion')),
       util_cita: numero_(elegir_(r.util_cita, 'util_cita')),
       errores: texto_(r.errores), mejoras: texto_(r.mejoras), comentario: texto_(r.comentario),
-      fase: corto_(c.fase, 40),
+      fase: corto_(c.fase, 40), tema: elegir_(r.tema, 'tema') || '',
     };
 
     const lock = LockService.getScriptLock();
@@ -90,10 +93,10 @@ function hoja_() {
   const libro = SpreadsheetApp.getActiveSpreadsheet();
   let h = libro.getSheetByName(HOJA);
   if (!h) h = libro.insertSheet(HOJA);
-  if (h.getLastRow() === 0) {
-    h.appendRow(COLUMNAS);
+  // encabezados: se escriben si la hoja está vacía o si se agregaron columnas nuevas al final
+  if (h.getLastRow() === 0 || h.getLastColumn() < COLUMNAS.length) {
+    h.getRange(1, 1, 1, COLUMNAS.length).setValues([COLUMNAS]).setFontWeight('bold');
     h.setFrozenRows(1);
-    h.getRange(1, 1, 1, COLUMNAS.length).setFontWeight('bold');
   }
   return h;
 }
