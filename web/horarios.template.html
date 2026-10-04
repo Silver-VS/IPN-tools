@@ -168,6 +168,8 @@ input[type=number]{width:5rem}
 @media (max-width:900px){.est-tiles{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:480px){.est-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 .est-note{margin:0;font-size:.78rem;color:var(--muted)}
+.est-act{margin:8px 0 0;padding:8px 12px;border-radius:8px;background:var(--warn-soft);font-size:.86rem}
+.est-act .link{font-weight:600}
 /* simulación de fin de semestre: interruptor + una pastilla por materia en curso (Aprobada / Reprobada) */
 .est-sim{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;font-size:.88rem}
 .tgl{display:inline-flex;align-items:center;gap:8px;cursor:pointer;position:relative}
@@ -601,6 +603,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
     <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
     <section class="card estado" data-personal hidden aria-labelledby="h-estado">
       <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="stats-btn" type="button" id="stats-btn" aria-expanded="false" aria-controls="kstats" hidden>Ver estadísticas</button><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
+      <p class="est-act" id="est-act" hidden></p>
       <div class="est-sim" id="est-sim" hidden></div>
       <div class="est-tiles" id="status"></div>
       <div class="est-eqv" id="est-eqv" hidden></div>
@@ -849,6 +852,15 @@ const tr=()=>{
   return T[S.car];
 };
 /* "dd/mm/aaaa hh:mm:ss p. m." del SAES → ¿la cita (fin) ya pasó? */
+/* recordatorio para volver a usar el Lector: los datos son una copia del SAES y no se actualizan solos */
+function avisoActualizar(A){
+  const leido=new Date(A?.leido);if(isNaN(leido))return '';
+  const m=String(A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/), cita=m?new Date(+m[3],+m[2]-1,+m[1]):null;
+  if(cita&&citaPasada(A)&&leido<cita)return 'Ya pasó tu cita de reinscripción y estos datos son de antes. Si ya te inscribiste, vuelve a usar el Lector para traer tu nuevo horario inscrito.';
+  const dias=Math.floor((Date.now()-leido)/864e5);
+  if(dias>=21)return `Estos datos tienen ${dias} días y no se actualizan solos. Vuelve a usar el Lector después de inscribirte o cuando cierre el semestre y se publiquen tus calificaciones (tus materias pasan del horario a tu kárdex).`;
+  return '';
+}
 const citaPasada=A=>{const m=String(A?.cita?.fin||A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);return !!m&&new Date(+m[3],+m[2]-1,+m[1]+1)<new Date()};
 /* ---------- periodos escolares ("25/2" o "20252") como índice consecutivo ---------- */
 const perIdx=p=>{const m=String(p??'').trim().match(/^(?:20)?(\d{2})\/?([12])$/);return m?(+m[1])*2+(+m[2]-1):null};
@@ -1302,6 +1314,7 @@ function renderSide(){
     $('#desf').innerHTML=fis.length||dS.length?`<ul class="desf">${dS.map(k=>`<li class="desfasada" title="${esc(k)}"><b>${esc(pretty(c[k][0]))}</b> · <span class="bad">desfasada según el SAES</span>; debes inscribirla para reinscribirte</li>`).join('')}${fis.map(f=>`<li class="${f.estado}" title="${esc(`${f.k}${f.idx!=null?' · reprobada en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`)}"><b>${esc(pretty(c[f.k][0]))}</b> · ${msg(f)}${f.curso?' · en recursamiento':''}</li>`).join('')}</ul>`:'';
     $('#desf-note').textContent=fis.length?'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.':'';
     {const f=new Date(A.leido);$('#est-src').textContent=isNaN(f)?'Leído del SAES':'Leído del SAES el '+f.toLocaleDateString('es-MX',{dateStyle:'medium'})}
+    {const m=avisoActualizar(A),el=$('#est-act');el.hidden=!m;el.innerHTML=m?m+' <button class="link" type="button" data-saes-open>Actualizar mis datos</button>':''}
     renderEqvHorario(A);
     const ec=tr().enCurso, pr=tr().pendRep;$('#est-sim').hidden=!ec.length&&!pr.length;$('#sim-tag').hidden=!tr().sim;
     const calSel=(k,attr,v)=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${[10,9,8,7,6].map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
