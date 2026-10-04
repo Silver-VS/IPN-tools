@@ -832,6 +832,8 @@ def main():
     html = inject(html)
     import cuenta   # perfil IPN-tools: respaldo y sincronización con la cuenta institucional
     html = cuenta.inject(html, UNIDAD)
+    import encuesta   # encuesta de satisfacción de la fase de pruebas (data/encuesta.json)
+    html = encuesta.inject(html, UNIDAD)
     import saes
     # el marcador de la versión compartida abre esta herramienta; el de la versión institucional, la URL del servidor (pendiente)
     OUT.write_text(saes.inject(html, "horarios", "https://claude.ai/artifact/2ujcEF2YK8FZrYjoyPbKEk", UCONF), encoding="utf-8")
