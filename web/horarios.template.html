@@ -576,7 +576,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <header class="top">
     <div class="brand">
       <!--__IPNT_HOME__-->
-      <div class="title-row"><h1>Horarios UPIITA</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog">Cambiar unidad académica</button><div class="header-actions"><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
+      <div class="title-row"><h1>Horarios UPIITA</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog">Cambiar unidad académica</button><div class="header-actions"><button class="enc-btn" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
       <p>Consulta tu trayectoria académica, selecciona materias y organiza tu horario para la reinscripción.</p>
     </div>
     <nav class="tabs" role="tablist" aria-label="Pantallas">
@@ -2697,7 +2697,7 @@ $('#b-copy').addEventListener('click',async()=>{
 })();
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(S.tab==='tray'&&ZOOM==null)renderMap()},150)});
 $('#foot').textContent='Herramienta de consulta para que el alumno planee su reinscripción. Los datos del SAES se consultan en modo de solo lectura y se almacenan únicamente en este navegador, al igual que las materias seleccionadas, marcas, notas y horarios. La reinscripción oficial se realiza en el SAES, donde deben verificarse la cita, la carga autorizada y el cupo. ';
-{const b=document.createElement('button');b.type='button';b.className='enc-link';b.dataset.encuesta='';b.textContent='Responder la encuesta de la fase de pruebas';$('#foot').appendChild(b)}
+{const b=document.createElement('button');b.type='button';b.className='enc-link';b.dataset.encuesta='';b.textContent='Dar mi opinión sobre IPN-tools';$('#foot').appendChild(b)}
 // contexto anónimo para la encuesta (tools/encuesta.py): sin nombre, boleta ni calificaciones
 window.ENCUESTA_CTX=()=>({carrera:S.car,demo:DEMO,conDatos:isPersonal(),elegidas:tr().want.length});
 if(ALUMNO&&DATA.mapas[carreraPerfil(ALUMNO)])S.car=carreraPerfil(ALUMNO);

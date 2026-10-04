@@ -12,7 +12,9 @@ reinscripción. Código: `tools/encuesta.py` (página) y `tools/encuesta_appscri
   preguntar».
 - Al responder ya no vuelve a aparecer. Si el alumno contestó «Todavía no» me inscribo, después del cierre de la
   reinscripción (`cierre`) o `seguimientoDias` días después se le hace solo la pregunta de seguimiento.
-- Siempre puede responderse desde el enlace del pie de página mientras haya algo pendiente.
+- El botón «Opinar» del encabezado (y el enlace del pie) la abre en cualquier momento: la encuesta si no se ha
+  contestado, el seguimiento si está pendiente o, después, un comentario libre (error, sugerencia u otro; `tipo=comentario`,
+  columna `tema`), que se puede enviar las veces que se quiera.
 - El estado vive en `localStorage['ipnt.encuesta']` (no se sincroniza con la cuenta).
 
 ## Qué se envía
@@ -44,5 +46,5 @@ cambia. Una implementación nueva crea otra URL y habría que volver a publicar.
 
 - Hoja: «IPN-tools» en el Drive del responsable (pestaña «Respuestas»).
 - Proyecto de Apps Script vinculado: «IPN-tools · Encuesta» (`1MPpinMVMi6md5AcCQWLUzctxp_bFYCAfHrYrw_2XnLQ86Q4f8MBgapMY`).
-- Implementación web (versión 1): `AKfycbyk3lyUjzBE7W6HVyLn_BZqw-euTpjZpR4nVFM97j-2-ejy4_4vGTKDulfmYgrwPlfP`.
+- Implementación web (versión 2: comentarios): `AKfycbyk3lyUjzBE7W6HVyLn_BZqw-euTpjZpR4nVFM97j-2-ejy4_4vGTKDulfmYgrwPlfP`.
 - Se gestiona con clasp: `clasp push` y `clasp deploy -i <id de implementación>` conserva la URL.
