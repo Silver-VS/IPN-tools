@@ -48,7 +48,8 @@ const SAES={
   wire(onLoad){
     const dl=document.getElementById('saes-dlg');if(!dl)return;
     const paste=dl.querySelector('#saes-paste'), msg=dl.querySelector('#saes-msg');
-    document.querySelectorAll('[data-saes-open]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();SAES.open()}));
+    // delegado: también funciona con botones que se agregan después (p. ej. el recordatorio de Estado general)
+    document.addEventListener('click',e=>{if(!e.target.closest?.('[data-saes-open]'))return;e.preventDefault();SAES.open()});
     dl.querySelector('#saes-x').addEventListener('click',()=>SAES.close());
     dl.addEventListener('click',e=>{if(e.target===dl)SAES.close()});   // clic fuera de la ventana
     const take=t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector IPN-tools. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
@@ -95,6 +96,8 @@ const SAES={
 """
 
 CSS = r"""
+.saes-aviso{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--warn-soft,var(--surface));border:1px solid var(--line);font-size:.86rem}
+.saes-aviso ul{margin:6px 0 0;padding-left:1.1rem;display:flex;flex-direction:column;gap:3px}
 .saes-videos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0 2px;font-size:.88rem}
 .saes-videos>span{width:100%;font-weight:600}
 .saes-vid{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);font-weight:600;background:var(--surface)}
@@ -146,6 +149,12 @@ def card(bm_href, page="horarios", short="", u=None):
             if page == "horarios" else "tu nombre, boleta y carrera, así como las electivas liberadas")
     demo = ('<button class="link demo-open" type="button" data-demo-open title="Perfil de un alumno ficticio: '
             'conoce la herramienta sin usar tus datos del SAES">Probar con datos de ejemplo</button>') if page == "horarios" else ""
+    # los datos son una copia del SAES en el momento de la lectura: no se actualizan solos
+    aviso = ('<div class="saes-aviso"><b>Tus datos no se actualizan solos.</b> Cada vez que usas el Lector se guarda una copia '
+             'de tu SAES en ese momento. Vuelve a usarlo:<ul>'
+             '<li><b>Después de inscribirte</b>, para traer tu nuevo horario inscrito.</li>'
+             '<li><b>Cuando cierre el semestre</b> y se publiquen tus calificaciones: tus materias dejan de aparecer en tu '
+             'horario del SAES y pasan a tu kárdex.</li></ul></div>') if page == "horarios" else ""
     play = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>'
     videos = "".join(f'<a class="saes-vid" data-dev="{d}" href="{u}" target="_blank" rel="noopener">{play}{t}</a>' for d, t, u in VIDEOS)
     out = f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>{demo}
@@ -154,6 +163,7 @@ def card(bm_href, page="horarios", short="", u=None):
   <p style="margin:0;font-size:.92rem">Opcional. Incorpora {what}. La información se procesa en tu navegador y no se envía a ningún servidor.</p>
   <div id="saes-status" hidden><p style="margin:10px 0 0;font-size:.92rem"><b>Datos del SAES cargados.</b> <span class="muted" id="saes-who"></span></p>
     <p class="saes-note" style="margin:4px 0 0">Para actualizarlos, ejecuta de nuevo el marcador en el SAES y pega el resultado abajo. <button class="link" id="saes-again" type="button">Ver instrucciones</button></p></div>
+  {aviso}
   <div class="saes-videos" id="saes-videos"><span>¿Prefieres verlo? Video paso a paso:</span>{videos}<a class="saes-vlist" href="{VIDEOS_LISTA}" target="_blank" rel="noopener">Ver todos</a></div>
   <div id="saes-steps">
     <ol>
