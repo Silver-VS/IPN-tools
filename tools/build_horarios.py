@@ -849,18 +849,19 @@ def main():
     # horarios.html ya no es la UPIITA: lleva a la unidad que este navegador ya usa o muestra el selector de unidad
     # (los marcadores y enlaces anteriores apuntan aquí)
     unis = json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8")).get("unidades", [])
-    (ROOT / "web" / "dist" / "horarios.html").write_text(selector_horarios(unis), encoding="utf-8")
+    from vista_previa import aplicar
+    (ROOT / "web" / "dist" / "horarios.html").write_text(aplicar(selector_horarios(unis), "horarios"), encoding="utf-8")
     (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
     idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
     idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8")).get("unidades", []), ensure_ascii=False), 1)
-    (ROOT / "web" / "dist" / "index.html").write_text(idx, encoding="utf-8")   # página principal con inicio de sesión
+    (ROOT / "web" / "dist" / "index.html").write_text(aplicar(idx, "index"), encoding="utf-8")   # página principal con inicio de sesión
     for f in ("revision.html", "privacidad.html", "condiciones.html"):
         shutil.copy(ROOT / "web" / f, ROOT / "web" / "dist" / f)
     ico = ROOT / "web" / "dist" / "assets" / "icono"
     ico.mkdir(parents=True, exist_ok=True)
     for f in (ROOT / "docs" / "marca").glob("*"):
-        if f.suffix in (".png", ".ico", ".svg") and (f.name.startswith("ipn-tools-icono") or f.name == "favicon.ico"):   # no los bocetos
+        if f.suffix in (".png", ".ico", ".svg") and (f.name.startswith(("ipn-tools-icono", "ipn-tools-og")) or f.name == "favicon.ico"):   # no los bocetos
             shutil.copy(f, ico / f.name)   # retorno del inicio de sesión (ventana emergente)
     if site:   # Lector publicado como archivo para el marcador corto (Chrome para Android corta los marcadores largos)
         (ROOT / "web" / "dist" / "lector.js").write_text(saes.lector_js(site + "horarios-upiita.html"), encoding="utf-8")
