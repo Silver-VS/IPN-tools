@@ -95,6 +95,13 @@ const SAES={
 """
 
 CSS = r"""
+.saes-videos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0 2px;font-size:.88rem}
+.saes-videos>span{width:100%;font-weight:600}
+.saes-vid{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);font-weight:600;background:var(--surface)}
+.saes-vid:hover{border-color:var(--accent)}
+.saes-vlist{color:var(--accent);font-weight:600;margin-left:4px}
+.saes-vid svg{color:var(--accent)}
+.saes-vid.rec{border-color:var(--accent);background:var(--accent-soft,var(--surface));color:var(--accent)}
 .saes-open{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
 .saes-open::before{content:"";width:9px;height:9px;border-radius:50%;border:2px solid currentColor;flex:none}
 .saes-open.on::before{background:var(--ok);border-color:var(--ok)}
@@ -123,6 +130,13 @@ CSS = r"""
 """
 
 
+# videos de YouTube con el uso del Lector por dispositivo (canal del proyecto)
+VIDEOS = [("pc", "Computadora", "https://youtu.be/YQPi4SeE-qc"),
+          ("ios", "iPhone o iPad", "https://youtube.com/shorts/gLHEFATT9tA"),
+          ("android", "Android", "https://youtu.be/eoJX2uPvyqU")]
+VIDEOS_LISTA = "https://www.youtube.com/playlist?list=PLPZJV048DlEY"
+
+
 def card(bm_href, page="horarios", short="", u=None):
     # en el sitio publicado, el código para teléfono es el marcador corto (descarga lector.js)
     code_text = html.escape(short or bm_href)
@@ -132,12 +146,15 @@ def card(bm_href, page="horarios", short="", u=None):
             if page == "horarios" else "tu nombre, boleta y carrera, así como las electivas liberadas")
     demo = ('<button class="link demo-open" type="button" data-demo-open title="Perfil de un alumno ficticio: '
             'conoce la herramienta sin usar tus datos del SAES">Probar con datos de ejemplo</button>') if page == "horarios" else ""
+    play = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>'
+    videos = "".join(f'<a class="saes-vid" data-dev="{d}" href="{u}" target="_blank" rel="noopener">{play}{t}</a>' for d, t, u in VIDEOS)
     out = f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>{demo}
 <dialog class="saes-dlg" id="saes-dlg" aria-labelledby="saes-h">
   <div class="dl-head"><h2 id="saes-h">Usa tus datos del SAES</h2><button class="x" id="saes-x" type="button" aria-label="Cerrar">×</button></div>
   <p style="margin:0;font-size:.92rem">Opcional. Incorpora {what}. La información se procesa en tu navegador y no se envía a ningún servidor.</p>
   <div id="saes-status" hidden><p style="margin:10px 0 0;font-size:.92rem"><b>Datos del SAES cargados.</b> <span class="muted" id="saes-who"></span></p>
     <p class="saes-note" style="margin:4px 0 0">Para actualizarlos, ejecuta de nuevo el marcador en el SAES y pega el resultado abajo. <button class="link" id="saes-again" type="button">Ver instrucciones</button></p></div>
+  <div class="saes-videos" id="saes-videos"><span>¿Prefieres verlo? Video paso a paso:</span>{videos}<a class="saes-vlist" href="{VIDEOS_LISTA}" target="_blank" rel="noopener">Ver todos</a></div>
   <div id="saes-steps">
     <ol>
       <li><b>Guarda el Lector IPN-tools en tu navegador</b> (solo la primera vez).
@@ -170,9 +187,11 @@ def card(bm_href, page="horarios", short="", u=None):
   </div>
   <textarea class="saes-paste" id="saes-paste" placeholder="Pega aquí tus datos del SAES (Ctrl+V)" aria-label="Pegar datos del SAES"></textarea>
   <div class="actions" style="display:flex;gap:8px;align-items:center;margin-top:8px"><span id="saes-msg" aria-live="polite" style="font-size:.86rem"></span><button class="btn" id="saes-clear" type="button" style="margin-left:auto" hidden>Borrar mis datos</button></div>
-  <p class="saes-note" style="margin:10px 0 0">El marcador solo consulta tu Kárdex, tu Estado general, tu horario actual y tu Cita de reinscripción; no inscribe, no modifica ni envía nada. Los datos se guardan únicamente en este navegador.</p>
+  <p class="saes-note" style="margin:10px 0 0">El marcador solo consulta tu Kárdex, tu Estado general, tu horario inscrito y tu Cita de reinscripción; no inscribe, no modifica ni envía nada. Los datos se guardan únicamente en este navegador.</p>
   <p class="saes-note" style="margin:6px 0 0">Versión de la página: {version}</p>
-</dialog>"""
+</dialog>
+<script>(()=>{{const ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||/Macintosh/.test(ua)&&navigator.maxTouchPoints>1,d=ios?'ios':/Android/.test(ua)?'android':'pc';
+document.querySelector('#saes-videos [data-dev="'+d+'"]')?.classList.add('rec')}})()</script>"""
     if u and u.get("id", "upiita") != "upiita":   # otra unidad: nombre del marcador y dirección de su SAES
         out = out.replace(SAES_URL, u.get("saes", SAES_URL)) \
                  .replace("saes.upiita.ipn.mx", u.get("saes", SAES_URL).split("//")[-1].strip("/").replace("www.", ""))
