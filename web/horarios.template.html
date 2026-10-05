@@ -837,6 +837,12 @@ const T={}; // por carrera: elegidas y, con datos del SAES, acreditadas y reprob
    las materias en curso se dan por aprobadas, salvo las que el alumno marque como reprobadas. */
 const SIM=Object.assign({on:false,fail:[],res:{},rec:{}},store.get('sim',{}));   // res: {clave:{ok,cal}}; rec: {clave:{forma,cal}}
 (SIM.fail||[]).forEach(k=>{SIM.res[k]=SIM.res[k]||{ok:false}});SIM.fail=[];   // versión anterior: solo lista de reprobadas
+// cada bloque puede mostrar la simulación o los datos reales por separado; sin elección propia, sigue el interruptor general
+const SIMBLK=store.get('simBlk',{});
+const usaSim=blk=>SIMBLK[blk]??SIM.on;
+// calcula fn con la simulación encendida o apagada solo durante ese cálculo (la caché de la trayectoria se rehace)
+const conSim=(on,fn)=>{if(on===SIM.on)return fn();const prev=SIM.on;SIM.on=on;for(const k in T)delete T[k];
+  try{return fn()}finally{SIM.on=prev;for(const k in T)delete T[k]}};
 // materias de este plan equivalentes a una clave de otra carrera o plan, según la tabla de Equivalencias del SAES
 const eqvPlan=k=>{const c=cur(),out=new Set();(DATA.equiv?.rel||[]).forEach(([o,ko,,d,kd])=>{if(ko===k&&d===S.car&&c[kd])out.add(kd);if(kd===k&&o===S.car&&c[ko])out.add(ko)});return [...out]};
 const tr=()=>{
@@ -1085,7 +1091,8 @@ function rutaRedonda(P,r=7){
     d+=` L${+p[0].toFixed(1)} ${+p[1].toFixed(1)} Q${b[0]} ${b[1]} ${+q[0].toFixed(1)} ${+q[1].toFixed(1)}`}
   const z=P.at(-1);return d+` L${z[0]} ${z[1]}`;
 }
-function renderMap(){
+function renderMap(){return conSim(usaSim('mapa'),renderMap0)}
+function renderMap0(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
   $('#mapwrap').hidden=mv==='lista';$('#zoomseg').hidden=mv==='lista';$('#tlist').hidden=mv!=='lista';
@@ -1302,7 +1309,8 @@ function renderLegend(){
         (MARK.avail.size?'<span><i class="l-avail"></i>Puedes cursarla</span>':'');
     })():'');
 }
-function renderSide(){
+function renderSide(){return conSim(usaSim('sugg'),renderSide0)}
+function renderSide0(){
   const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
   const req=[...ancestors(want)].filter(k=>!want.includes(k)&&!tr().done.includes(k));
   $('#chosen-help').textContent=want.length?`${want.length} ${want.length>1?'materias':'materia'} · ${fmtCr(credWant)} créditos`:'Selecciona en el mapa las materias que deseas cursar; después consulta sus grupos para organizar tu horario.';
@@ -1322,7 +1330,9 @@ function renderSide(){
     $('#status').innerHTML=
       (()=>{const v=(A.acreditadas||[]).map(x=>+x?.[1]).filter(x=>Number.isFinite(x)&&x>=6&&x<=10);return v.length?tile('Promedio sin reprobadas',(v.reduce((t,x)=>t+x,0)/v.length).toFixed(2),`${v.length} materias acreditadas`,'','Promedio de tus materias acreditadas, sin contar reprobadas ni no acreditadas (incluye equivalencias y revalidaciones).'):''})()+
       (()=>{const po=promOficialSim();
-        if(po)return tile('Promedio oficial (estimado)',po.despues.toFixed(2),`hoy ${po.antes.toFixed(2)} · ${po.despues>=po.antes?'+':''}${(po.despues-po.antes).toFixed(2)} con tu simulación`,'',`Estimación del promedio del SAES y del kárdex, que también cuenta reprobadas. El SAES no publica cuántas reprobadas incluye; se deducen de tu promedio oficial y de tus calificaciones aprobadas, suponiendo ${REPROB_CAL} en cada reprobada. Las materias simuladas se suman con su calificación, y las reprobadas con ${REPROB_CAL}.`);
+        if(po)return tile(po.exacto?'Promedio oficial (simulación)':'Promedio oficial (estimado)',po.despues.toFixed(2),`hoy ${po.antes.toFixed(2)} · ${po.despues>=po.antes?'+':''}${(po.despues-po.antes).toFixed(2)} con tu simulación`,'',
+          po.exacto?`Promedio de todo tu kárdex (aprobadas y reprobadas), como lo calcula el SAES, más las materias de tu simulación. Las reprobadas simuladas cuentan con ${REPROB_CAL}.`
+          :`Estimación: con tus datos actuales no se conocen las reprobadas de tu kárdex, así que se deducen de tu promedio oficial suponiendo ${REPROB_CAL} en cada una. Vuelve a usar el Lector para calcularlo exacto. Las reprobadas simuladas cuentan con ${REPROB_CAL}.`);
         return tile('Promedio oficial',A.promedio??'—',A.promedio==null?'El SAES no lo mostró: suele aparecer con tu cita de reinscripción; actualiza tus datos cuando se publique':tr().sim?'La simulación no permite estimar tu promedio oficial con estos datos':'')})()+
       tile(tr().sim?'Créditos (simulación)':'Créditos',`${obt==null?'—':fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot&&obt!=null?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
       tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
@@ -1342,7 +1352,7 @@ function renderSide(){
     renderEqvHorario(A);
     const ec=tr().enCurso, pr=tr().pendRep;$('#est-sim').hidden=!ec.length&&!pr.length;$('#sim-tag').hidden=!tr().sim;
     const calSel=(k,attr,v)=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${[10,9,8,7,6].map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
-    $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+(SIM.on&&(Object.keys(SIM.res).length||Object.keys(SIM.rec).length)?`<button type="button" class="link sim-reset" id="sim-reset" title="Regresa todas las materias a su valor inicial: en curso aprobadas con 8 y reprobadas pendientes">Reiniciar simulación</button>`:'')+
+    $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+(SIM.on&&(Object.keys(SIM.res).length||Object.keys(SIM.rec).length||Object.keys(SIMBLK).length)?`<button type="button" class="link sim-reset" id="sim-reset" title="Regresa todas las materias a su valor inicial (en curso aprobadas con 8 y reprobadas pendientes) y todos los bloques a mostrar la simulación">Reiniciar simulación</button>`:'')+
       `<span class="sim-hint">${SIM.on?'El mapa, las sugeridas y las estadísticas se recalculan con tu simulación; tus datos del SAES no cambian.':'Prueba qué pasaría con tus materias en curso y tus reprobadas: aprobar con cierta calificación, reprobar o acreditar por ETS, recurse o extraordinario.'}</span>`+
       `<div class="simrows${SIM.on?'':' off'}">`+
       ec.map(k=>{const r=SIM.res[k]||{},ok=r.ok!==false;return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small>${tr().encEqv?.includes(k)?'En curso por equivalencia':'En curso'}</small></span>`+
@@ -1840,22 +1850,28 @@ function simKardex(){
 }
 // Sin el denominador oficial no es posible reconstruir el promedio del SAES desde sus acreditaciones.
 function promEstimado(){return ALUMNO?.promedio??null}
-/* Promedio oficial (el del SAES, que también cuenta reprobadas) al cerrar el semestre simulado. Es una estimación: el
-   SAES no publica cuántas evaluaciones reprobadas incluye, así que se deduce de tu promedio oficial y de tus calificaciones
-   aprobadas suponiendo REPROB_CAL en cada reprobada. Después se suman las materias simuladas: las aprobadas con su
-   calificación y las reprobadas con REPROB_CAL. Devuelve null si los datos no permiten estimarlo. */
+/* Promedio oficial (el del SAES): promedio de todo lo que aparece en el kárdex, aprobadas y reprobadas.
+   Exacto: si el Lector trajo los renglones reprobados del kárdex (kardex_reprobadas) y su promedio junto con las aprobadas
+   coincide con el promedio oficial, se suman las materias simuladas (aprobadas con su calificación, reprobadas con
+   REPROB_CAL). Estimado: con datos de un Lector anterior se deduce cuántas reprobadas pesan suponiendo REPROB_CAL.
+   Devuelve null si no se puede calcular. */
 const REPROB_CAL=5;
 function promOficialSim(){
   const A=ALUMNO, P=+A?.promedio;if(!tr().sim||A?.promedio==null||!Number.isFinite(P))return null;
-  const base=simKardex().filter(a=>!a[4]&&notaValida(a[1])!=null);if(!base.length)return null;
+  const base=simKardex().filter(a=>!a[4]&&notaValida(a[1])!=null);
+  const nuevas=simKardex().filter(a=>a[4]).map(a=>notaValida(a[1])).filter(v=>v!=null);
+  const reprob=tr().enCurso.filter(k=>SIM.res[k]?.ok===false).length, k=nuevas.length+reprob;if(!k)return null;
+  const extra=nuevas.reduce((t,x)=>t+x,0)+reprob*REPROB_CAL;
+  const rep=(A.kardex_reprobadas||[]).map(r=>+r?.[1]).filter(v=>Number.isFinite(v)&&v>=0&&v<6);
+  if(Array.isArray(A.kardex_reprobadas)){
+    const todas=[...base.map(a=>notaValida(a[1])),...rep], n=todas.length, S=todas.reduce((t,x)=>t+x,0);
+    if(n&&Math.abs(S/n-P)<=0.011)return {antes:P,despues:(S+extra)/(n+k),exacto:true};
+  }
+  if(!base.length)return null;
   const n=base.length, S=base.reduce((t,a)=>t+notaValida(a[1]),0);
   if(P>S/n+1e-6||P<=REPROB_CAL)return null;   // un promedio oficial mayor al de aprobadas no admite esta estimación
   const nf=(S-P*n)/(P-REPROB_CAL), W=n+nf;
-  const nuevas=simKardex().filter(a=>a[4]).map(a=>notaValida(a[1])).filter(v=>v!=null);
-  const reprob=tr().enCurso.filter(k=>SIM.res[k]?.ok===false).length;
-  const k=nuevas.length+reprob;if(!k)return null;
-  const v=(P*W+nuevas.reduce((t,x)=>t+x,0)+reprob*REPROB_CAL)/(W+k);
-  return {antes:P,despues:v,reprobadasEstimadas:nf};
+  return {antes:P,despues:(P*W+extra)/(W+k),exacto:false,reprobadasEstimadas:nf};
 }
 const creditoValido=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<0?null:+v;
 // En UPIBI la duración capturada no concuerda con las cargas: usar una referencia explícita, no un plazo reglamentario.
@@ -2066,6 +2082,7 @@ async function renderStats(){
   box.hidden=!on;
   if(!on)return;
   const D=statsDatos(), A=ALUMNO;
+  const Dde=blk=>usaSim(blk)===SIM.on?D:conSim(usaSim(blk),statsDatos), Dc=Dde('camino'), Dk=Dde('kardex'), Da=Dde('areas');
   
   const f2=v=>v==null||!isFinite(v)?'—':(+v).toFixed(2), sg=v=>v==null?'':(v>=0?'+':'')+v.toFixed(2);
   const plazo=plazoReferencia(A), dur=plazo.dur, cursados=A.avance?.cursados, limite0=plazo.max&&cursados!=null&&D.actual!=null?1:null, totalPer=D.nper!=null&&cursados!=null?D.fin!=null&&D.actual!=null?cursados+D.fin-D.actual:cursados:null;
@@ -2089,43 +2106,43 @@ async function renderStats(){
       ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([n,l])=>`<span class="k-chip">${n} ${l}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario, ETS o recurse${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
       ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
     </div>
-    ${promMetaPanel(D)}
+    ${conSim(usaSim('pm'),()=>promMetaPanel(statsDatos()))}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Tu camino en la carrera ${simTag('camino')}</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tu camino en la carrera ${simTag('camino')}</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',Dc.simulado?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
     </div>
-    ${metaPanel(D)}
+    ${conSim(usaSim('meta'),()=>metaPanel(statsDatos()))}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo ${simTag('kardex')}</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
-      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio ${simTag('areas')}</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo ${simTag('kardex')}</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>Dk.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(Dk.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio ${simTag('areas')}</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${Da.media!=null?Da.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
-  if(!D.rows.length){const cs=box.querySelectorAll('.charts');cs[0].innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';cs.forEach((x,j)=>{if(j)x.remove()});renderAnalisis(D);return}
+  if(!D.rows.length){const cs=box.querySelectorAll('.charts');cs[0].innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';cs.forEach((x,j)=>{if(j)x.remove()});conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
   if(revision!==ST_RENDER)return;
-  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER)return;{const cs=box.querySelectorAll('.charts');cs[0].innerHTML=`<p class="muted">${esc(e.message)}</p>`;cs.forEach((x,j)=>{if(j)x.remove()})}renderAnalisis(D);return}
+  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER)return;{const cs=box.querySelectorAll('.charts');cs[0].innerHTML=`<p class="muted">${esc(e.message)}</p>`;cs.forEach((x,j)=>{if(j)x.remove()})}conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
   if(revision!==ST_RENDER)return;
-  renderAnalisis(D);
+  conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));
   const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
   const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
   const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
   const put=(id,fig)=>montarGrafica($(id),fig);
   const tickPer=d=>perName(d);
   // 1) camino en la carrera: regla del plan completo con lo acreditado, lo que está en curso y la estimación por periodo
-  {const host=$('#ch-camino'), tot=D.total;
-    if(!(tot>0)||D.obt==null){host.innerHTML='<p class="muted">Faltan los créditos del plan para dibujar tu camino.</p>'}else{
-      const ec=tr().sim?0:[...new Set(tr().enCurso)].reduce((t,k)=>t+(cur()[k]?.[1]||0),0);
-      const hecho=Math.min(tot,D.obt-(D.simCr||0)), sim=Math.min(tot-hecho,D.simCr||0), curso=Math.min(tot-hecho-sim,ec);
+  {const host=$('#ch-camino'), tot=Dc.total;
+    if(!(tot>0)||Dc.obt==null){host.innerHTML='<p class="muted">Faltan los créditos del plan para dibujar tu camino.</p>'}else{
+      const ec=Dc.simulado?0:[...new Set(tr().enCurso)].reduce((t,k)=>t+(cur()[k]?.[1]||0),0);
+      const hecho=Math.min(tot,Dc.obt-(Dc.simCr||0)), sim=Math.min(tot-hecho,Dc.simCr||0), curso=Math.min(tot-hecho-sim,ec);
       const pc=v=>(v/tot*100).toFixed(2)+'%';
-      const proy=proyeccionCreditos(D).slice(1), cursados=A.avance?.cursados;
-      const inicio=D.actual!=null&&cursados!=null?D.actual-cursados+1:null, limite=plazo.max&&inicio!=null?inicio+plazo.max-1:null;
+      const proy=proyeccionCreditos(Dc).slice(1), cursados=A.avance?.cursados;
+      const inicio=Dc.actual!=null&&cursados!=null?Dc.actual-cursados+1:null, limite=plazo.max&&inicio!=null?inicio+plazo.max-1:null;
       const W=host.clientWidth||600;let ult=-1e9;
       const marcas=(lst,cls)=>lst.map(d=>{const x=d.acum/tot*W, ver=x-ult>=46;if(ver)ult=x;
         const pp=d.acum/tot*100;
         return `<span class="cm-m ${cls}${limite!=null&&d.per>limite?' fuera':''}${pp>94?' der':pp<6?' izq':''}" style="left:${pc(d.acum)}" title="${esc(perName(d.per))}: ${fmtCr(d.acum)} créditos${cls==='fut'?' (estimado)':''}">${ver?esc(perName(d.per)):''}</span>`}).join('');
-      ult=-1e9;const pasado=marcas(D.curva.filter(d=>!d.sim),'pas');ult=-1e9;const futuro=marcas(proy,'fut');
-      const fin=D.falta===0?'Créditos completos':D.fin!=null?`Terminarías en <b>${esc(perName(D.fin))}</b>${totalPer?` (unos ${totalPer} periodos en total)`:''}`:'';
-      host.innerHTML=`<p class="cm-h"><span class="cm-n"><b>${fmtCr(D.obt)}</b> de ${fmtCr(tot)} créditos · ${Math.round(D.obt/tot*100)} %${D.falta?` · te faltan ${fmtCr(D.falta)}`:''}</span><span>${fin}</span></p>`+
+      ult=-1e9;const pasado=marcas(Dc.curva.filter(d=>!d.sim),'pas');ult=-1e9;const futuro=marcas(proy,'fut');
+      const fin=Dc.falta===0?'Créditos completos':Dc.fin!=null?`Terminarías en <b>${esc(perName(Dc.fin))}</b>${totalPer?` (unos ${totalPer} periodos en total)`:''}`:'';
+      host.innerHTML=`<p class="cm-h"><span class="cm-n"><b>${fmtCr(Dc.obt)}</b> de ${fmtCr(tot)} créditos · ${Math.round(Dc.obt/tot*100)} %${Dc.falta?` · te faltan ${fmtCr(Dc.falta)}`:''}</span><span>${fin}</span></p>`+
         `<div class="cm-past">${pasado}</div><div class="cm-track"><i class="hecho" style="width:${pc(hecho)}"></i><i class="rayado" style="width:${pc(sim+curso)}"></i></div><div class="cm-fut">${futuro}</div>`+
         (limite!=null&&totalPer>plazo.max?`<p class="cm-alerta">A tu ritmo rebasarías el plazo de referencia de ${plazo.max} periodos (${esc(perName(limite))}).</p>`:'')+
         (plazo.max?`<p class="cm-ref">Plazo de referencia: ${plazo.max} periodos ${info(plazo.calculado?`${fmtCr(A.carga.total)} créditos del plan ÷ ${fmtCr(A.carga.min)} de carga mínima. El SAES indica una duración de ${A.carga.duracion??'—'} y un máximo de ${A.carga.duracion_max??'—'} periodos; confirma tu plazo con Gestión Escolar.`:'Plazo máximo indicado por el SAES.')}</p>`:'')}}
@@ -2134,14 +2151,14 @@ async function renderStats(){
     const col=(t,sub,rs)=>`<div class="kx-col"><div class="kx-h"><b>${esc(t)}</b><small>${sub}</small></div><div class="kx-cs">${rs.slice().sort((a,b)=>b.cal-a.cal).map(r=>{
       const l={EXT:'E',ETS:'T',REC:'R'}[r.codigo]||'';
       return `<span class="kx-c g${Math.round(r.cal)}${r.sim?' sim':''}" title="${esc(r.nombre)} · ${r.cal} · ${esc(r.forma)}${r.sim?' · simulada':''}">${r.cal}${l?`<i>${l}</i>`:''}</span>`}).join('')}</div></div>`;
-    const eq=D.rows.filter(r=>r.eqv), sinP=D.rows.filter(r=>!r.eqv&&r.per==null);
+    const eq=Dk.rows.filter(r=>r.eqv), sinP=Dk.rows.filter(r=>!r.eqv&&r.per==null);
     let prev=null;
     host.innerHTML=`<div class="kx">`+(eq.length?col('Equivalencias',`${eq.length} materias`,eq):'')+
-      D.porPer.filter(d=>d.n).map(d=>{const rs=D.rows.filter(r=>!r.eqv&&r.per===d.per), dif=prev!=null?d.prom-prev:null;prev=d.prom;
+      Dk.porPer.filter(d=>d.n).map(d=>{const rs=Dk.rows.filter(r=>!r.eqv&&r.per===d.per), dif=prev!=null?d.prom-prev:null;prev=d.prom;
         return col(d.lbl,`${f2(d.prom)}${dif!=null&&Math.abs(dif)>=.01?` <em class="${dif>0?'up':'down'}">${dif>0?'▲':'▼'}</em>`:''} · ${d.cr!=null?fmtCr(d.cr)+' cr':''}`,rs)}).join('')+
       (sinP.length?col('Sin periodo',`${sinP.length} materias`,sinP):'')+`</div>`}
   // 3) áreas frente a tu promedio: barras divergentes alrededor de tu promedio de aprobadas
-  const porArea=d3.groups(D.rows,r=>r.cat).map(([cat,v])=>({cat,media:d3.mean(v,r=>r.cal),n:v.length})).map(d=>({...d,dif:d.media-D.media})).sort((a,b)=>b.dif-a.dif);
+  const porArea=d3.groups(Da.rows,r=>r.cat).map(([cat,v])=>({cat,media:d3.mean(v,r=>r.cal),n:v.length})).map(d=>({...d,dif:d.media-Da.media})).sort((a,b)=>b.dif-a.dif);
   // escala fija de al menos ±2.5 puntos: diferencias pequeñas se ven pequeñas; ±0.25 se considera similar (gris)
   const lim=Math.max(2.5,...porArea.map(d=>Math.abs(d.dif)*1.2)), ALT=tok('--ch-alert')||'#d9480f', SIM_=Math.abs, col=d=>SIM_(d.dif)<.25?MUT:d.dif>0?OK:ALT;
   put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(150,porArea.length*28+50),marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
@@ -2374,17 +2391,19 @@ $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('v
 /* etiqueta en los bloques que cambian con la simulación de fin de semestre: alterna entre la simulación y los datos
    reales sin perder de vista el bloque (comparación rápida) */
 const simTag=blk=>{if(!isPersonal())return '';const hay=SIM.on||Object.keys(SIM.res).length||Object.keys(SIM.rec).length;
-  if(!hay||!(tr().enCurso.length||tr().pendRep.length))return '';
-  return SIM.on?`<button type="button" class="tag sim sim-tgl" data-simtgl="${blk}" title="Estás viendo tu simulación de fin de semestre. Pulsa para ver tus datos reales.">Simulación ⇄</button>`
-    :`<button type="button" class="tag sim-off sim-tgl" data-simtgl="${blk}" title="Estás viendo tus datos reales. Pulsa para ver tu simulación.">Datos reales ⇄</button>`};
+  if(!hay||!conSim(false,()=>tr().enCurso.length||tr().pendRep.length))return '';
+  return usaSim(blk)?`<button type="button" class="tag sim sim-tgl" data-simtgl="${blk}" title="Este bloque muestra tu simulación de fin de semestre. Pulsa para ver tus datos reales solo aquí.">Simulación ⇄</button>`
+    :`<button type="button" class="tag sim-off sim-tgl" data-simtgl="${blk}" title="Este bloque muestra tus datos reales. Pulsa para ver tu simulación solo aquí.">Datos reales ⇄</button>`};
 const simSave=()=>{store.set('sim',SIM);for(const k in T)delete T[k];renderTray()};
-$('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simSave()}});
+const simTodos=()=>{for(const k in SIMBLK)delete SIMBLK[k];store.set('simBlk',SIMBLK)};
+$('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simTodos();simSave()}});
 // interruptor desde cualquier bloque: conserva la posición del bloque en pantalla
 document.addEventListener('click',e=>{const b=e.target.closest?.('[data-simtgl]');if(!b)return;
-  const blk=b.dataset.simtgl, y0=b.getBoundingClientRect().top;SIM.on=!SIM.on;simSave();
+  const blk=b.dataset.simtgl, y0=b.getBoundingClientRect().top;SIMBLK[blk]=!usaSim(blk);store.set('simBlk',SIMBLK);
+  if(blk==='mapa')renderMap();else if(blk==='sugg')renderSide();else renderStats();
   const fija=()=>{const n=document.querySelector(`[data-simtgl="${blk}"]`);if(n)window.scrollBy(0,n.getBoundingClientRect().top-y0)};
   requestAnimationFrame(fija);setTimeout(fija,450);setTimeout(fija,1200)});
-$('#est-sim').addEventListener('click',e=>{if(e.target.closest('#sim-reset')){SIM.res={};SIM.rec={};simSave();return}
+$('#est-sim').addEventListener('click',e=>{if(e.target.closest('#sim-reset')){SIM.res={};SIM.rec={};SIM.on=true;simTodos();simSave();return}
   const b=e.target.closest('[data-simok],[data-simko]');if(!b||b.disabled)return;
   const k=b.dataset.simok||b.dataset.simko;SIM.res[k]={...(SIM.res[k]||{}),ok:!!b.dataset.simok};simSave()});
 $('#est-sim').addEventListener('change',e=>{const t=e.target,d=t.dataset;
