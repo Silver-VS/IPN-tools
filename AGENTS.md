@@ -87,3 +87,12 @@ flechas en mapas por áreas). Pendientes, en orden sugerido:
 
 Al terminar un trabajo: commits pequeños y descriptivos en tu rama, `git push`, y un resumen para el dueño con
 qué cambió, cómo se probó y qué falta. No modifiques `/upiita` del repositorio del sitio.
+
+### Pruebas aleatorias de perfiles (fuzz)
+
+`python -m unittest tests.test_fuzz_perfiles` (≈3 min, requiere Chrome y haber compilado las tres unidades) genera
+perfiles ficticios con trayectorias raras (cambio de carrera con revalidaciones altas, electivas revalidadas que suman
+créditos, reprobadas y recursamientos, historias largas, datos sucios, primer ingreso, egresado) y revisa invariantes en
+estadísticas, sugerencias y generador. Ajustes: `FUZZ_N`, `FUZZ_SEMILLAS`. Una falla se reproduce abriendo
+`web/dist/qa-fuzz-<unidad>.html?n=<N>&semilla=<S>` (los `qa-*` no se publican). Si agregas una regla de negocio, agrega
+su invariante en `tests/fuzz/fuzz_perfiles.js`.
