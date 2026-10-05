@@ -83,6 +83,7 @@ input[type=number]{width:5rem}
 .est-eqv small{display:block;color:var(--muted);font-size:.8rem}
 .demo-bar{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:8px 16px;background:var(--warn);color:#fff;font-size:.88rem}
 .demo-bar .btn{margin-left:auto;background:#fff;color:#222;border-color:#fff}
+@media (max-width:640px){.demo-bar{padding:6px 12px;font-size:.78rem;gap:4px 10px}.demo-bar>span{display:none}.demo-bar .btn{padding:3px 10px;font-size:.78rem}}
 .demo-open{font-size:.84rem}
 /* botón de estadísticas: relleno mientras están ocultas (invita a abrirlas), contorno cuando se muestran */
 .stats-btn{display:inline-flex;align-items:center;gap:8px;margin-left:auto;padding:8px 16px;border-radius:999px;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-fg);font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;box-shadow:0 1px 3px rgb(0 0 0 / .18);transition:transform .12s,box-shadow .12s}
@@ -194,12 +195,15 @@ input[type=number]{width:5rem}
 .simrow{display:flex;align-items:center;gap:8px;padding:5px 8px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface);min-width:0}
 .simrow .sim-n{flex:1;min-width:0;font-size:.84rem;line-height:1.2}.simrow .sim-n small{display:block;font-size:.72rem;color:var(--muted)}.simrow .sim-n small.bad{color:var(--bad)}
 .simrow select{font-size:.8rem;padding:2px 4px}.simrow .sim-x{font-size:.78rem;color:var(--bad)}
+.simrow{flex-wrap:wrap}.simrow .sim-n{flex:1 1 150px}
+@media (max-width:480px){.simrows{grid-template-columns:1fr}.simrow .sim-n{flex-basis:100%}}
 .seg.sm button{padding:2px 8px;font-size:.78rem}
 .simchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 11px;font-size:.84rem;cursor:pointer;color:var(--fg)}
 .simchip b{font-weight:600;color:var(--ok);margin-left:6px}
 .simchip .swap{margin-left:6px;color:var(--muted)}
 .simchip:not(:disabled):hover{border-color:var(--edge)}
 .sim-hint{font-size:.8rem;color:var(--muted)}
+.sim-reset{font-size:.82rem}
 .simchip.bad b{color:var(--bad)}
 .simchip:disabled{opacity:.45;cursor:default}
 .tag.sim{background:var(--warn-soft);color:var(--warn)}
@@ -447,7 +451,7 @@ details.box2>summary{cursor:pointer;font-weight:600;font-size:.92rem}
 .gbrk .x{border:0;background:none;color:var(--muted);font-size:1.2rem;cursor:pointer;padding:0 4px}
 .genres{display:flex;flex-direction:column;gap:8px;padding-top:10px}
 .gen{display:grid;grid-template-columns:minmax(0,1fr);gap:6px 12px;align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;font-size:.84rem}
-.gen .ls{font-family:var(--f-mono);font-size:.74rem;color:var(--muted)}
+.gen .ls{font-size:.8rem;color:var(--muted);line-height:1.5}.gen .ls .grp{font-family:var(--f-mono);font-size:.74rem;color:var(--fg)}
 .gen .acts{display:flex;gap:4px;flex-wrap:wrap}
 
 /* fijo al desplazar, con su propio scroll: nunca más alto que la ventana (aunque la columna de la oferta sea larga) */
@@ -1298,7 +1302,7 @@ function renderSide(){
   const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
   const req=[...ancestors(want)].filter(k=>!want.includes(k)&&!tr().done.includes(k));
   $('#chosen-help').textContent=want.length?`${want.length} ${want.length>1?'materias':'materia'} · ${fmtCr(credWant)} créditos`:'Selecciona en el mapa las materias que deseas cursar; después consulta sus grupos para organizar tu horario.';
-  $('#chosen').innerHTML=want.sort((a,b)=>(semOf()[a]||99)-(semOf()[b]||99)).map(k=>`<span class="wchip"><span class="dot" style="background:var(--n${c[k][2]})"></span><span class="grp">${k}</span>${esc(c[k][0])}${off.has(k)?'':' <small>(sin grupos)</small>'}${tr().oblig.includes(k)?'<span class="tag bad" title="Obligatoria: al estar desfasada, el SAES no permite la reinscripción sin ella">obligatoria</span>':`<button class="x" data-unwant="${k}" aria-label="Quitar ${esc(c[k][0])}">×</button>`}</span>`).join('');
+  $('#chosen').innerHTML=want.sort((a,b)=>(semOf()[a]||99)-(semOf()[b]||99)).map(k=>`<span class="wchip"><span class="dot" style="background:var(--n${c[k][2]})"></span><span class="grp">${k}</span>${esc(pretty(c[k][0]))}${off.has(k)?'':' <small>(sin grupos)</small>'}${tr().oblig.includes(k)?'<span class="tag bad" title="Obligatoria: al estar desfasada, el SAES no permite la reinscripción sin ella">obligatoria</span>':`<button class="x" data-unwant="${k}" aria-label="Quitar ${esc(c[k][0])}">×</button>`}</span>`).join('');
   $('#chosen-req').textContent=req.length&&!isPersonal()?`Según la seriación, conviene haber cursado antes: ${req.map(k=>c[k][0].toLowerCase()).join(', ')}.`:'';
   document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
   if(isPersonal()){
@@ -1332,7 +1336,7 @@ function renderSide(){
     renderEqvHorario(A);
     const ec=tr().enCurso, pr=tr().pendRep;$('#est-sim').hidden=!ec.length&&!pr.length;$('#sim-tag').hidden=!tr().sim;
     const calSel=(k,attr,v)=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${[10,9,8,7,6].map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
-    $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+
+    $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+(SIM.on&&(Object.keys(SIM.res).length||Object.keys(SIM.rec).length)?`<button type="button" class="link sim-reset" id="sim-reset" title="Regresa todas las materias a su valor inicial: en curso aprobadas con 8 y reprobadas pendientes">Reiniciar simulación</button>`:'')+
       `<span class="sim-hint">${SIM.on?'El mapa, las sugeridas y las estadísticas se recalculan con tu simulación; tus datos del SAES no cambian.':'Prueba qué pasaría con tus materias en curso y tus reprobadas: aprobar con cierta calificación, reprobar o acreditar por ETS, recurse o extraordinario.'}</span>`+
       `<div class="simrows${SIM.on?'':' off'}">`+
       ec.map(k=>{const r=SIM.res[k]||{},ok=r.ok!==false;return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small>${tr().encEqv?.includes(k)?'En curso por equivalencia':'En curso'}</small></span>`+
@@ -1351,7 +1355,7 @@ function renderSide(){
           return `<span class="${ok?'ok':'warn'}">${ok?'✓':'·'} Nivel ${k} al ${Math.round(f*100)} %${ok?'':` (llevas ${pct(k)} %)`}</span>`}).join(' ')}</div>`:'';
       return `<div class="lvl"><div class="lvl-top"><b>Nivel ${n}</b><span class="minibar"><i style="width:${s.ok/s.tot*100}%;background:var(--n${n})"></i></span><span class="lvl-num">${s.ok} de ${s.tot}</span></div>${req}</div>`}).join('');
     const sg=suggestions(), color={late:'var(--st-late)',fail:'var(--warn)',prev:'var(--line)',now:'var(--st-now)',rest:'var(--line)'};
-    $('#sugg').innerHTML=sg.list.map(k=>`<label><span class="dot" style="background:${color[statusOf(k).split(' ')[0]]}"></span><span class="grp">${k}</span><span>${esc(c[k][0])}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+
+    $('#sugg').innerHTML=sg.list.map(k=>`<label><span class="dot" style="background:${color[statusOf(k).split(' ')[0]]}"></span><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+
       `<small>${fmtCr(sg.cr)} de ${fmtCr(sg.target)} créditos nuevos${sg.ret?` (además de ${fmtCr(sg.ret)} retenidos por reprobadas, que no se vuelven a contar al recursarlas)`:''}; orden: desfasadas y reprobadas; después las que ya puedes cursar de cualquier semestre, primero las que desbloquean más materias.${curso.length?' No incluye las materias en curso.':''}</small>`;
   }
   renderLegend();renderLineas();
@@ -1588,7 +1592,7 @@ function renderCal(){
       (ci.ret?`<p class="load-note"><i class="sw-ret"></i>${fmtCr(ci.ret)} cr retenidos por reprobadas (cuentan aunque no las inscribas; recursarlas no suma de nuevo) · ${fmtCr(ci.nuevos)} cr de materias nuevas, de ${fmtCr(ci.libre)} permitidos (${ci.aut!=null?`carga autorizada de ${fmtCr(ci.aut)} cr`:'carga media'} menos los retenidos)${ci.faltaMin?` · faltan ${fmtCr(ci.faltaMin)} cr para la mínima`:''}.</p>`:'');
   }else $('#load').innerHTML='';
   $('#sel').hidden=!both.length;
-  $('#sel').innerHTML=sel.map(c=>`<div><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${c[3]}</span><span>${esc(name(c))}<br><small>${esc(profs(c))}</small></span><span class="cr">${fmtCr(c[7])} cr</span><button class="x" data-toggle="${keyOf(c)}" aria-label="Quitar ${esc(name(c))}">×</button></div>`).join('')+
+  $('#sel').innerHTML=sel.map(c=>`<div><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${c[3]}</span><span>${esc(pretty(name(c)))}<br><small>${esc(profs(c))}</small></span><span class="cr">${fmtCr(c[7])} cr</span><button class="x" data-toggle="${keyOf(c)}" aria-label="Quitar ${esc(name(c))}">×</button></div>`).join('')+
     own.map(o=>{const r=plan().own[o.i];return `<div><span class="sw own"></span><span class="grp">extra</span><span>${esc(o.n)}<br><small>${r.d.map(d=>DAYS[d]).join(' ')} ${hm(r.a)}–${hm(r.b)}</small></span><span></span><button class="x" data-unown="${o.i}" aria-label="Quitar ${esc(o.n)}">×</button></div>`}).join('');
 }
 function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="button" class="chip" data-oday="${i}" aria-pressed="${S.ownDays.includes(i)}">${d}</button>`).join('')}
@@ -1757,7 +1761,7 @@ function renderGen(){
   $('#genres').innerHTML=dmsg+omsg+
     (none.length?`<small class="warn">Sin grupos que cumplan los filtros: ${none.map(k=>esc(cur()[k]?.[0]||k)).join(', ')}.</small>`:'')+
     g.top.map((r,i)=>{const cr=r.cs.reduce((s,c)=>s+c[7],0);
-      return `<div class="gen"><div><b>Opción ${i+1}</b> · ${r.cs.length} ${r.cs.length>1?'materias':'materia'} · ${fmtCr(cr)} cr · ${r.days.length} ${r.days.length>1?'días':'día'}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?` · hasta ${(r.q.span/60).toFixed(1).replace('.0','')} h en la escuela · con espacio para comer`:''}${r.miss.length?` · <span class="warn">sin ${r.miss.length}: ${r.miss.map(k=>esc((cur()[k]?.[0]||k).toLowerCase())).join(', ')}</span>`:''}<div class="ls">${r.cs.map(c=>`${c[3]} ${esc(name(c).toLowerCase())}`).join(' · ')}</div></div>
+      return `<div class="gen"><div><b>Opción ${i+1}</b> · ${r.cs.length} ${r.cs.length>1?'materias':'materia'} · ${fmtCr(cr)} cr · ${r.days.length} ${r.days.length>1?'días':'día'}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?` · hasta ${(r.q.span/60).toFixed(1).replace('.0','')} h en la escuela · con espacio para comer`:''}${r.miss.length?` · <span class="warn">sin ${r.miss.length}: ${r.miss.map(k=>esc(pretty(cur()[k]?.[0]||k))).join(', ')}</span>`:''}<div class="ls">${r.cs.map(c=>`<span class="grp">${c[3]}</span> ${esc(pretty(name(c)))}`).join(' · ')}</div></div>
         <div class="acts"><button class="btn" data-useg="${i}" data-to="${ws().plan}">Usar en ${ws().plan}</button><button class="btn" data-useg="${i}" data-to="+">Usar en un horario nuevo</button><button class="btn" data-peekg="${i}">Ver</button></div></div>`}).join('')+
     (g.trunc?(g.bank?'<small>Se analizaron las combinaciones de mayor prioridad (desfasadas, reprobadas, atrasadas y sugeridas primero).</small>':'<small>Búsqueda limitada por el número de combinaciones; reduce las materias seleccionadas para un análisis completo.</small>'):'');
 }
@@ -2058,22 +2062,24 @@ async function renderStats(){
   const dTxt=D.delta!=null&&Math.abs(D.delta)>=.01?`<em class="${D.delta>0?'up':'down'}">${D.delta>0?'▲':'▼'} ${Math.abs(D.delta).toFixed(2)}</em> frente al periodo anterior`:`${D.rows.length} materias`;
   box.innerHTML=`${D.avisos.length?`<p class="st-note">${D.avisos.map(esc).join(' ')}</p>`:''}<div class="kpis">
       ${kpi(D.rows.some(r=>r.sim)?'Promedio sin reprobadas · simulado':'Promedio sin reprobadas',f2(D.media),regla(D.media),dTxt,`Promedio de tus ${D.rows.length} materias acreditadas (incluye equivalencias y revalidaciones). A diferencia del promedio oficial, no cuenta reprobadas ni no acreditadas: las que debes se acreditarán con calificación aprobatoria.`)}
-      ${kpi('Tus calificaciones',moda!=null&&D.rows.length?`La mayoría en ${moda}`:'—',hist,`mediana ${f2(D.mediana)}`,`Cuántas materias aprobaste con cada calificación, de 6 a 10. Desviación estándar: ${f2(D.sd)} (entre más baja, más parejas).`)}
+      ${kpi('Tus calificaciones',moda!=null&&D.rows.length?String(moda):'—',hist,moda!=null&&D.rows.length?`la más frecuente · mediana ${f2(D.mediana)}`:'',`Cuántas materias aprobaste con cada calificación, de 6 a 10. Desviación estándar: ${f2(D.sd)} (entre más baja, más parejas).`)}
       ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([n,l])=>`<span class="k-chip">${n} ${l}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario, ETS o recurse${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
       ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
     </div>
-    ${metaPanel(D)}${promMetaPanel(D)}
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu camino en la carrera</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
+    </div>
+    ${metaPanel(D)}${promMetaPanel(D)}
+    <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
       <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
-  if(!D.rows.length){box.querySelector('.charts').innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';renderAnalisis(D);return}
+  if(!D.rows.length){const cs=box.querySelectorAll('.charts');cs[0].innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';cs.forEach((x,j)=>{if(j)x.remove()});renderAnalisis(D);return}
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
   if(revision!==ST_RENDER)return;
-  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER)return;box.querySelector('.charts').innerHTML=`<p class="muted">${esc(e.message)}</p>`;renderAnalisis(D);return}
+  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER)return;{const cs=box.querySelectorAll('.charts');cs[0].innerHTML=`<p class="muted">${esc(e.message)}</p>`;cs.forEach((x,j)=>{if(j)x.remove()})}renderAnalisis(D);return}
   if(revision!==ST_RENDER)return;
   renderAnalisis(D);
   const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
@@ -2171,7 +2177,7 @@ function analisis(){
 function renderAnalisis(D){
   const el=$('#kanal');if(!el)return;
   const X=analisis(), f2=v=>v==null?'—':(+v).toFixed(2);
-  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><b>${esc(X.nm(r.k))}</b><small>${esc(r.motivos.join('; '))}.</small></li>`).join('')}</ul>`:
+  const cuid=X.cuidar.length?`<ul class="an-list">${X.cuidar.map(r=>`<li><b>${esc(X.nm(r.k))}</b><small>${esc(r.motivos.join('. '))}.</small></li>`).join('')}</ul>`:
     '<p class="muted">Sin requisitos pendientes.</p>';
   const lin=X.lineas.length?`<section><h4>Promedio por línea de especialización</h4><p class="an-sub">Tus materias aprobadas de cada línea.</p><ul class="an-bars">${X.lineas.map(l=>`<li><span>${esc(l.nombre)}${l.sim?' · simulado':''}</span><b>${f2(l.prom)}</b><small>${l.n} de ${l.total} materias · ${esc(l.claves.map(X.nm).join(', '))}</small></li>`).join('')}</ul></section>`:'';
   const ruta=X.ciclo?'<p class="muted">No se puede mostrar la cadena: el mapa tiene requisitos circulares.</p>':X.cadena.length?
@@ -2343,7 +2349,8 @@ $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('v
 // simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase
 const simSave=()=>{store.set('sim',SIM);for(const k in T)delete T[k];renderTray()};
 $('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simSave()}});
-$('#est-sim').addEventListener('click',e=>{const b=e.target.closest('[data-simok],[data-simko]');if(!b||b.disabled)return;
+$('#est-sim').addEventListener('click',e=>{if(e.target.closest('#sim-reset')){SIM.res={};SIM.rec={};simSave();return}
+  const b=e.target.closest('[data-simok],[data-simko]');if(!b||b.disabled)return;
   const k=b.dataset.simok||b.dataset.simko;SIM.res[k]={...(SIM.res[k]||{}),ok:!!b.dataset.simok};simSave()});
 $('#est-sim').addEventListener('change',e=>{const t=e.target,d=t.dataset;
   if(d.simcal){SIM.res[d.simcal]={...(SIM.res[d.simcal]||{ok:true}),cal:+t.value};simSave()}
