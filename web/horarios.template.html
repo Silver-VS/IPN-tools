@@ -89,7 +89,11 @@ input[type=number]{width:5rem}
 .stats-btn:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgb(0 0 0 / .22)}
 .stats-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .stats-btn[aria-expanded="true"]{background:transparent;color:var(--accent);box-shadow:none}
-.stats-btn .chev{transition:transform .15s}.stats-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.stats-btn .chev{transition:transform .15s}
+.stats-bar{display:flex;width:100%;margin:14px 0 4px;padding:12px 18px;border-radius:14px;text-align:left;font-size:.95rem}
+.stats-bar .sb-txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.stats-bar .sb-txt small{font-weight:500;font-size:.8rem;opacity:.85;color:inherit}
+.stats-bar[aria-expanded="true"]{border-style:dashed}.stats-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .btn:disabled{opacity:.5;cursor:default}
 .link{border:0;background:none;color:var(--accent);cursor:pointer;font-weight:600;font-size:.84rem;padding:0;white-space:nowrap}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
@@ -602,13 +606,14 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <section id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
     <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
     <section class="card estado" data-personal hidden aria-labelledby="h-estado">
-      <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="stats-btn" type="button" id="stats-btn" aria-expanded="false" aria-controls="kstats" hidden>Ver estadísticas</button><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
+      <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
       <p class="est-act" id="est-act" hidden></p>
       <div class="est-sim" id="est-sim" hidden></div>
       <div class="est-tiles" id="status"></div>
       <div class="est-eqv" id="est-eqv" hidden></div>
       <div id="desf"></div>
       <p class="est-note" id="desf-note"></p>
+      <button class="stats-btn stats-bar" type="button" id="stats-btn" aria-expanded="false" aria-controls="kstats" hidden></button>
       <div class="kstats" id="kstats" hidden></div>
     </section>
     <div class="maptools">
@@ -2023,7 +2028,7 @@ async function renderStats(){
   const revision=++ST_RENDER;
   const box=$('#kstats'),btn=$('#stats-btn');if(!box||!btn)return;
   const on=isPersonal()&&store.get('stats',false);btn.hidden=!isPersonal();btn.setAttribute('aria-expanded',String(on));
-  btn.innerHTML=`<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 17V9M8 17V4M13 17v-6M18 17V7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg><span>${on?'Ocultar estadísticas':'Ver estadísticas'}</span><svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;box.hidden=!on;
+  btn.innerHTML=`<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 17V9M8 17V4M13 17v-6M18 17V7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg><span class="sb-txt"><b>${on?'Ocultar mis estadísticas y metas':'Ver mis estadísticas y metas'}</b><small>Gráficas de tu avance, kárdex por periodo, tus áreas fuertes y cuándo terminarías</small></span><svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;box.hidden=!on;
   if(!on)return;
   const D=statsDatos(), A=ALUMNO;
   
