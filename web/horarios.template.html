@@ -857,6 +857,9 @@ function avisoActualizar(A){
   const leido=new Date(A?.leido);if(isNaN(leido))return '';
   const m=String(A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/), cita=m?new Date(+m[3],+m[2]-1,+m[1]):null;
   if(cita&&citaPasada(A)&&leido<cita)return 'Ya pasó tu cita de reinscripción y estos datos son de antes. Si ya te inscribiste, vuelve a usar el Lector para traer tu horario definitivo.';
+  // citas del nuevo periodo publicadas (calendario de Gestión Escolar) después de la última lectura
+  const pub=DATA.calendario?.citas?new Date(DATA.calendario.citas+'T00:00:00'):null;
+  if(pub&&Date.now()>=pub&&leido<pub)return `Las citas de reinscripción ${esc(DATA.calendario.periodo||'')} se publicaron en el SAES el ${pub.toLocaleDateString('es-MX',{day:'numeric',month:'long'})}. Vuelve a usar el Lector para traer tu nueva cita.`;
   const dias=Math.floor((Date.now()-leido)/864e5);
   if(dias>=21)return `Estos datos tienen ${dias} días y no se actualizan solos. Vuelve a usar el Lector después de inscribirte o cuando cierre el semestre y se publiquen tus calificaciones (tus materias pasan del horario a tu kárdex).`;
   return '';
@@ -1704,15 +1707,18 @@ function generateBank(subj,N,{marks,pscore}){
     const rec=i=>{if(++nodes>4000)return;
       if(i===ord.length){if(!breaksOk(pick))return;const days=daysOf(pick);if(maxD&&days.length>maxD)return;
         let s, q=null;
-        if(auto){q=qualityOf(pick);if(!q.ok)return;
+        if(auto){q=qualityOf(pick);if(!q.ok&&estricto)return;
           // la cantidad la decide la meta de créditos: la prioridad cuenta como promedio, no como suma
           const m=pick.reduce((t,c)=>{const mk=marks[keyOf(c)]?.s;return t+(mk==='si'?6:mk==='quiza'?2:0)+pscore(c)},0);
-          s=m+pick.reduce((t,c)=>t+prio(c[8]),0)/pick.length*2-q.pen*4}
+          s=m+pick.reduce((t,c)=>t+prio(c[8]),0)/pick.length*2-q.pen*4-(q.ok?0:200)}
         else s=score(pick);
         if(!best||s>best.s)best={cs:pick.slice(),s,days,miss:[],q};return}
       for(const c of ord[i].opts){if(pick.some(p=>overlaps(p,c)))continue;pick.push(c);rec(i+1);pick.pop()}};
     rec(0);return best};
   // subconjuntos de tamaño need en orden de prioridad (combinaciones lexicográficas sobre la lista ordenada)
+  // si ninguna combinación cumple los criterios de un horario saludable (p. ej. por profesores excluidos), se muestran
+  // las más cercanas en lugar de no mostrar nada
+  let estricto=true;
   const chosen=[];let need=0;
   const walk=start=>{if(subsets>=CAP){trunc=true;return}
     if(chosen.length===need){const set=[...must,...chosen], nuevos=nuevosDe(set);
@@ -1721,15 +1727,16 @@ function generateBank(subj,N,{marks,pscore}){
       subsets++;const b=bestFor(set);if(b){if(auto)b.s-=(nuevos<meta?(meta-nuevos)*8:(nuevos-meta)*3);res.push(b)}return}
     for(let i=start;i<=free.length-(need-chosen.length);i++){chosen.push(free[i]);walk(i+1);chosen.pop();if(subsets>=CAP){trunc=true;return}}};
   for(const n of sizes){need=n-must.length;subsets=0;walk(0)}
+  if(auto&&!res.length){estricto=false;for(const n of sizes){need=n-must.length;subsets=0;walk(0)}}
   const top=res.sort((a,b)=>b.s-a.s).slice(0,6);
   const best=top.length?Math.max(...top.map(r=>nuevosDe(r.cs.map(c=>({k:c[8]}))))):0;
-  return {top,subj,bank:{N,M:subj.length,tope:ci?.tope??null,auto,meta,best},trunc,minDays:null,maxD};
+  return {top,subj,bank:{N,M:subj.length,tope:ci?.tope??null,auto,meta,best,relajado:auto&&!estricto&&top.length>0},trunc,minDays:null,maxD};
 }
 function renderGen(){
   const g=S.gen;
   if(!g){$('#genres').innerHTML='';return}
   if(g.msg){$('#genres').innerHTML=`<p class="empty">${g.msg}</p>`;return}
-  const dmsg=g.bank?.auto?`<p class="gdays-msg">Selección automática entre tus <b>${g.bank.M}</b> materias: busca cerca de <b>${fmtCr(g.bank.meta)} créditos nuevos</b> (carga media${g.bank.tope!=null?`, sin rebasar ${fmtCr(g.bank.tope)} cr en total`:''}) con un horario saludable: hasta 8 h en la escuela (idealmente 6.5 h o menos), no más de 3 clases seguidas, al menos 1 h para comer entre 12:00 y 16:30, pocas horas libres y clases repartidas entre los días.</p>${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">Con la oferta actual, las combinaciones que cumplen estos criterios llegan a <b>${fmtCr(g.bank.best)} créditos nuevos</b>. Para una carga mayor elige un número de materias por horario; esas opciones pueden tener jornadas más largas.</p>`:''}`:g.bank?`<p class="gdays-msg">Horarios de <b>${g.bank.N} materias</b> elegidas entre tus <b>${g.bank.M}</b> seleccionadas${g.bank.tope!=null?`, sin rebasar tu carga permitida (${fmtCr(g.bank.tope)} cr en total)`:''}. Cada opción combina materias distintas.</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">Con todas las materias seleccionadas, el mínimo es de <b>${g.minDays} ${g.minDays>1?'días':'día'}</b> a la semana.${g.maxD&&g.minDays>g.maxD?` En ${g.maxD} días no es posible incluirlas todas; las opciones omiten al menos una materia.`:g.maxD?` Es posible en ${g.maxD} días o menos.`:''}</p>`:'';
+  const dmsg=g.bank?.auto?`<p class="gdays-msg">Selección automática entre tus <b>${g.bank.M}</b> materias: busca cerca de <b>${fmtCr(g.bank.meta)} créditos nuevos</b> (carga media${g.bank.tope!=null?`, sin rebasar ${fmtCr(g.bank.tope)} cr en total`:''}) con un horario saludable: hasta 8 h en la escuela (idealmente 6.5 h o menos), no más de 3 clases seguidas, al menos 1 h para comer entre 12:00 y 16:30, pocas horas libres y clases repartidas entre los días.</p>${g.bank.relajado?'<p class="gdays-msg warn">Con tus exclusiones y filtros ninguna combinación cumple todos estos criterios; se muestran las más cercanas. Revisa la permanencia y los descansos de cada opción, o reduce las exclusiones.</p>':''}${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">Con la oferta actual, las combinaciones que cumplen estos criterios llegan a <b>${fmtCr(g.bank.best)} créditos nuevos</b>. Para una carga mayor elige un número de materias por horario; esas opciones pueden tener jornadas más largas.</p>`:''}`:g.bank?`<p class="gdays-msg">Horarios de <b>${g.bank.N} materias</b> elegidas entre tus <b>${g.bank.M}</b> seleccionadas${g.bank.tope!=null?`, sin rebasar tu carga permitida (${fmtCr(g.bank.tope)} cr en total)`:''}. Cada opción combina materias distintas.</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">Con todas las materias seleccionadas, el mínimo es de <b>${g.minDays} ${g.minDays>1?'días':'día'}</b> a la semana.${g.maxD&&g.minDays>g.maxD?` En ${g.maxD} días no es posible incluirlas todas; las opciones omiten al menos una materia.`:g.maxD?` Es posible en ${g.maxD} días o menos.`:''}</p>`:'';
   const none=g.subj.filter(s=>!s.opts.length).map(s=>s.k), mustNone=g.subj.filter(s=>s.must&&!s.opts.length).map(s=>s.k);
   const must=g.subj.filter(s=>s.must&&s.opts.length).map(s=>s.k);
   const omsg=(mustNone.length?`<p class="gdays-msg warn"><b>${mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')}</b> es obligatoria por desfase y ningún grupo cumple los filtros actuales. Ajusta el turno, el horario, los descansos o los días.</p>`:'')+
