@@ -90,11 +90,15 @@ input[type=number]{width:5rem}
 .stats-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .stats-btn[aria-expanded="true"]{background:transparent;color:var(--accent);box-shadow:none}
 .stats-btn .chev{transition:transform .15s}
-.stats-bar{display:inline-flex;width:fit-content;align-self:flex-start;max-width:100%;margin:12px 0 2px;padding:8px 14px;border-radius:12px;text-align:left;font-size:.88rem;background:var(--accent-soft);color:var(--accent);border:1px solid var(--line);box-shadow:none}
-.stats-bar:hover{border-color:var(--accent);box-shadow:none}
-.stats-bar .sb-txt{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
-.stats-bar .sb-txt small{font-weight:400;font-size:.76rem;color:var(--muted)}
-.stats-bar[aria-expanded="true"]{background:transparent}.stats-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.stats-bar{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;width:fit-content;align-self:flex-start;max-width:100%;margin:10px 0 0;padding:4px 2px;border:0;border-radius:6px;background:none;color:var(--fg);box-shadow:none;font-size:.86rem;font-weight:400;text-align:left}
+.stats-bar:hover{transform:none;box-shadow:none}
+.stats-bar svg{color:var(--accent);flex:none}
+.stats-bar .sb-sep{color:var(--muted)}
+.stats-bar .sb-link{color:var(--accent);font-weight:600}
+.stats-bar:hover .sb-link{text-decoration:underline}
+.stats-bar[aria-expanded="true"]{background:none;color:var(--accent)}
+.stats-bar[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.stats-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
 .btn:disabled{opacity:.5;cursor:default}
 .link{border:0;background:none;color:var(--accent);cursor:pointer;font-weight:600;font-size:.84rem;padding:0;white-space:nowrap}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px}
@@ -2029,7 +2033,10 @@ async function renderStats(){
   const revision=++ST_RENDER;
   const box=$('#kstats'),btn=$('#stats-btn');if(!box||!btn)return;
   const on=isPersonal()&&store.get('stats',false);btn.hidden=!isPersonal();btn.setAttribute('aria-expanded',String(on));
-  btn.innerHTML=`<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M3 17V9M8 17V4M13 17v-6M18 17V7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg><span class="sb-txt"><b>${on?'Ocultar mis estadísticas y metas':'Ver mis estadísticas y metas'}</b><small>Gráficas de tu avance, kárdex por periodo, tus áreas fuertes y cuándo terminarías</small></span><svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`;box.hidden=!on;
+  {let gancho='';if(!on&&isPersonal()){try{const d=statsDatos();if(d.fin!=null)gancho=`A tu ritmo terminarías en <b>${perName(d.fin)}</b>`;else if(d.falta===0)gancho='Ya cubriste los créditos de tu plan'}catch(e){}}
+    btn.innerHTML=on?`<span class="sb-link">Ocultar análisis</span><svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2 4l4 4 4-4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      :`<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><path d="M3 17V9M8 17V4M13 17v-6M18 17V7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" fill="none"/></svg>${gancho?`<span class="sb-hook">${gancho}</span><span class="sb-sep" aria-hidden="true">·</span>`:''}<span class="sb-link">${gancho?'Ver mi análisis':'Ver mi análisis: avance, kárdex y metas'}</span><svg class="chev" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M4 2l4 4-4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`}
+  box.hidden=!on;
   if(!on)return;
   const D=statsDatos(), A=ALUMNO;
   
