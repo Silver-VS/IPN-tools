@@ -19,7 +19,10 @@ def lector_js(tool_url=""):
     js = SRC.read_text(encoding="utf-8")
     js = re.sub(r"/\*.*?\*/", "", js, flags=re.S)          # el código no usa comentarios de línea
     js = "\n".join(l.strip() for l in js.splitlines() if l.strip())
-    return js.replace("__TOOL_URL__", tool_url)
+    # versión = huella del código del Lector: cambia solo cuando cambia el Lector (se cruza con git log del archivo)
+    import hashlib
+    ver = hashlib.sha1(SRC.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:7]
+    return js.replace("__TOOL_URL__", tool_url).replace("__LECTOR_VERSION__", ver)
 
 
 def bookmarklet(tool_url=""):
@@ -213,4 +216,6 @@ def inject(html, page, tool_url="", u=None):
     bm = bookmarklet(tool_url)
     short = loader(tool_url.rsplit("/", 1)[0] + "/") if tool_url.startswith("https://") and "claude.ai" not in tool_url else ""
     html = html.replace("/*__SAES_JS__*/", JS, 1).replace("/*__SAES_CSS__*/", CSS, 1)
-    return html.replace("<!--__SAES_CARD__-->", card(bm, page, short, u), 1)
+    # en el sitio publicado, el botón para arrastrar también es el marcador corto: descarga la versión vigente del Lector
+    # cada vez, así las mejoras llegan sin volver a guardar el marcador (el completo queda para versiones sin sitio)
+    return html.replace("<!--__SAES_CARD__-->", card(short or bm, page, short, u), 1)

@@ -164,7 +164,8 @@
       en_curso: curso,
       horario_inscrito: horario,
       acreditadas: acred,
-      kardex_reprobadas: kxRep
+      kardex_reprobadas: kxRep,
+      lector: '__LECTOR_VERSION__'   /* versión del Lector (huella del código), para atribuir errores a una versión */
     };
     var json = JSON.stringify(data);
     var row = function (k, v) { return '<tr><td style="color:#52525b;padding:2px 12px 2px 0">' + k + '</td><td style="font-weight:600">' + (v == null || v === '' ? '—' : v) + '</td></tr>'; };
