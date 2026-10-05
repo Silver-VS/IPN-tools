@@ -86,6 +86,7 @@
       carga: chance(.05) ? null : { total, min: Math.round(total / 12), max: Math.round(total / 8) },
       cita: chance(.3) ? {} : { inicio: pick(['', '07/10/2026 10:00', '14/10/2026 18:30', '01/01/2020 08:00', 'basura']), fin: null },
     };
+    if (chance(.5)) p.kardex_reprobadas = rep.map(r => [r[0], pick([5, 4, 3, 0, 5]), r[1], 'ORD']);   // renglones reprobados del kárdex (Lector nuevo)
     if (esc === 'primer_ingreso') Object.assign(p, { acreditadas: [], reprobadas_periodo: [], reprobadas: [], en_curso: ob.slice(0, 6), avance: { obtenidos: 0, faltan: total, cursados: 1, autorizada: null } });
     p._extra = extraCr;   // créditos de electivas revalidadas (solo para las pruebas comparativas)
     return { p, car };

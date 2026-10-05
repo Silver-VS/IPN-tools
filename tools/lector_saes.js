@@ -67,12 +67,13 @@
     var kx = await get('/Alumnos/boleta/kardex.aspx');
     var gen = clean((byId(cita, 'Lbl_General') || {}).textContent);
     var p = pairs(cita);
-    var acred = [];
+    var acred = [], kxRep = [];
     kx.querySelectorAll('[id*="Lbl_Kardex"] table tr').forEach(function (tr) {
       var c = Array.prototype.map.call(tr.cells, function (x) { return clean(x.textContent); });
       if (c.length >= 6 && CLAVE.test(c[0])) {
         var cal = num(c[5]);
         if (cal !== null && cal >= 6) acred.push([c[0].toUpperCase(), cal, c[3], c[4]]);
+        else if (cal !== null && cal >= 0) kxRep.push([c[0].toUpperCase(), cal, c[3], c[4]]);   // reprobadas que aparecen en el kárdex (cuentan en el promedio oficial)
       }
     });
     /* materias reprobadas listadas en la cita (Descripción | créditos) */
@@ -162,7 +163,8 @@
       desfasadas_saes: secc ? secc.desfasadas : null,
       en_curso: curso,
       horario_inscrito: horario,
-      acreditadas: acred
+      acreditadas: acred,
+      kardex_reprobadas: kxRep
     };
     var json = JSON.stringify(data);
     var row = function (k, v) { return '<tr><td style="color:#52525b;padding:2px 12px 2px 0">' + k + '</td><td style="font-weight:600">' + (v == null || v === '' ? '—' : v) + '</td></tr>'; };
