@@ -846,7 +846,7 @@ const tr=()=>{
     const curso=sim?[]:enCurso;
     const desfS=me?(ALUMNO.desfasadas_saes||[]).map(r=>r[0]).filter(k=>cur()[k]&&!doneS.has(k)):[];
     // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
-    const pmeta=perMeta(), oblig=[...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS];
+    const pmeta=perMeta(), oblig=[...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS].filter(k=>!curso.includes(k));
     T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,encEqv,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
   }
   return T[S.car];
@@ -975,9 +975,10 @@ function statusOf(k){
   if(!isPersonal()) return 'rest';
   const done=new Set(tr().done);
   if(done.has(k)) return 'done';
+  // en curso primero: si recursa una reprobada este semestre, se planea suponiendo que la acredita (no se vuelve a proponer)
+  if(tr().curso.includes(k)) return 'curso';
   const fi=failInfo(k);
   if(fi) return fi.estado==='desfasada'?'late fail':'fail';
-  if(tr().curso.includes(k)) return 'curso';
   if((tr().desfS||[]).includes(k)) return 'late';   // desfasada según el SAES (plan por semestres)
   // las materias en curso cuentan como requisito cumplido (se planea suponiendo que se acreditan)
   const req=(prereqs()[k]||[]).filter(x=>!done.has(x)&&!tr().curso.includes(x));
@@ -1311,10 +1312,10 @@ function renderSide(){
       (DESFASE_SEM.has(S.car)?tile('Atrasadas',atraso,'según el semestre propuesto',atraso?'warn':''):'')+
       tile('Cita de reinscripción',cm?cm[1]:esc(A.cita?.inicio||'—'),citaPasada(A)?'vencida; aún no se publica la siguiente':cm?`${+cm[2]}:${cm[3]} ${cm[4]}`:'');
     $('#status').style.setProperty('--tiles',$('#status').children.length);
-    const msg=f=>f.estado==='desfasada'?`<span class="bad">desfasada en ${perName(meta)}</span>; debes inscribirla: el SAES no permite reinscribirse sin ella`:
+    const msg=f=>f.estado==='desfasada'?(f.curso?`<span class="bad">desfasada en ${perName(meta)}</span>; la estás recursando: acreditarla este semestre evita que el SAES te impida reinscribirte`:`<span class="bad">desfasada en ${perName(meta)}</span>; debes inscribirla: el SAES no permite reinscribirse sin ella`):
       f.estado==='riesgo'?`<span class="warn">debe acreditarse en ${perName(meta)}</span> para evitar el desfase en ${perName(meta+1)}`:
       f.estado==='reciente'?`acreditar a más tardar en ${perName(f.limite)}`:'actualiza tus datos del SAES para conocer el periodo de adeudo';
-    $('#desf').innerHTML=fis.length||dS.length?`<ul class="desf">${dS.map(k=>`<li class="desfasada" title="${esc(k)}"><b>${esc(pretty(c[k][0]))}</b> · <span class="bad">desfasada según el SAES</span>; debes inscribirla para reinscribirte</li>`).join('')}${fis.map(f=>`<li class="${f.estado}" title="${esc(`${f.k}${f.idx!=null?' · reprobada en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`)}"><b>${esc(pretty(c[f.k][0]))}</b> · ${msg(f)}${f.curso?' · en recursamiento':''}</li>`).join('')}</ul>`:'';
+    $('#desf').innerHTML=fis.length||dS.length?`<ul class="desf">${dS.map(k=>`<li class="desfasada" title="${esc(k)}"><b>${esc(pretty(c[k][0]))}</b> · <span class="bad">desfasada según el SAES</span>; debes inscribirla para reinscribirte</li>`).join('')}${fis.map(f=>`<li class="${f.estado}" title="${esc(`${f.k}${f.idx!=null?' · reprobada en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`)}"><b>${esc(pretty(c[f.k][0]))}</b> · ${msg(f)}${f.curso&&!(f.estado==='desfasada')?' · en recursamiento':''}</li>`).join('')}</ul>`:'';
     $('#desf-note').textContent=fis.length?'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.':'';
     {const f=new Date(A.leido);$('#est-src').textContent=isNaN(f)?'Leído del SAES':'Leído del SAES el '+f.toLocaleDateString('es-MX',{dateStyle:'medium'})}
     {const m=avisoActualizar(A),el=$('#est-act');el.hidden=!m;el.innerHTML=m?m+' <button class="link" type="button" data-saes-open>Actualizar mis datos</button>':''}
@@ -1621,6 +1622,7 @@ function generate(){
   let want=todo?(tr().want.length?tr().want.slice():[...new Set(S.chips.filter(x=>x.t==='m').map(x=>classes().find(c=>c[4]===x.v)?.[8]).filter(Boolean))]):[...new Set(pool.map(c=>c[8]))];
   if(!todo&&!S.onlyWant&&!S.chips.some(x=>x.t==='m')&&tr().want.length){const w=new Set(tr().want);want=want.filter(k=>w.has(k))}   // sin filtro de materias: las elegidas
   tr().oblig.forEach(k=>{if(!want.includes(k))want.unshift(k)});   // la desfasada siempre se considera
+  {const ya=new Set([...tr().done,...tr().curso]);want=want.filter(k=>!ya.has(k))}   // ni acreditadas ni en curso
   const marks=ws().marks, own=ownAsClasses();
   const pref=S.gpref.map(norm), avoid=S.gavoid.map(norm);
   const pscore=c=>c[5].reduce((s,i)=>s+(pref.some(p=>norm(DATA.prof[i]).includes(p))?4:0),0);
@@ -2719,7 +2721,7 @@ let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>
 $('#foot').textContent='Herramienta de consulta para que el alumno planee su reinscripción. Los datos del SAES se consultan en modo de solo lectura y se almacenan únicamente en este navegador, al igual que las materias seleccionadas, marcas, notas y horarios. La reinscripción oficial se realiza en el SAES, donde deben verificarse la cita, la carga autorizada y el cupo. ';
 {const b=document.createElement('button');b.type='button';b.className='enc-link';b.dataset.encuesta='';b.textContent='Dar mi opinión sobre IPN-tools';$('#foot').appendChild(b)}
 // contexto anónimo para la encuesta (tools/encuesta.py): sin nombre, boleta ni calificaciones
-window.ENCUESTA_CTX=()=>({carrera:S.car,demo:DEMO,conDatos:isPersonal(),elegidas:tr().want.length});
+window.ENCUESTA_CTX=()=>({carrera:S.car,demo:DEMO,conDatos:isPersonal(),elegidas:tr().want.length,enHorario:selected().length});
 if(ALUMNO&&DATA.mapas[carreraPerfil(ALUMNO)])S.car=carreraPerfil(ALUMNO);
 const mobNote=()=>{$('#mobnote').hidden=!(MQ_PHONE.matches&&!store.get('mobnote',0))};
 mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
