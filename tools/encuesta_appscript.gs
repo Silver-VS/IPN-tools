@@ -16,7 +16,7 @@ const COLUMNAS = [
   'fecha', 'tipo', 'motivo', 'id',
   'unidad', 'carrera', 'demo', 'con_datos_saes', 'materias_elegidas', 'movil', 'minutos_uso', 'sesiones', 'exportaciones', 'generaciones',
   'satisfaccion', 'util_horario', 'funciones', 'tiempo', 'inscrito', 'recomendacion', 'util_cita',
-  'errores', 'mejoras', 'comentario', 'fase', 'tema', 'materias_horario'
+  'errores', 'mejoras', 'comentario', 'fase', 'tema', 'materias_horario', 'lector', 'dias_datos_saes'
 ];
 // valores permitidos de cada pregunta cerrada (lo demás se descarta)
 const PERMITIDOS = {
@@ -66,7 +66,7 @@ function doPost(e) {
       recomendacion: numero_(elegir_(r.recomendacion, 'recomendacion')),
       util_cita: numero_(elegir_(r.util_cita, 'util_cita')),
       errores: texto_(r.errores), mejoras: texto_(r.mejoras), comentario: texto_(r.comentario),
-      fase: corto_(c.fase, 40), tema: elegir_(r.tema, 'tema') || '', materias_horario: numero_(c.enHorario),
+      fase: corto_(c.fase, 40), tema: elegir_(r.tema, 'tema') || '', materias_horario: numero_(c.enHorario), lector: corto_(c.lector, 12), dias_datos_saes: numero_(c.datosDias),
     };
 
     const lock = LockService.getScriptLock();

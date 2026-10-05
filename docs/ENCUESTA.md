@@ -48,3 +48,6 @@ cambia. Una implementación nueva crea otra URL y habría que volver a publicar.
 - Proyecto de Apps Script vinculado: «IPN-tools · Encuesta» (`1MPpinMVMi6md5AcCQWLUzctxp_bFYCAfHrYrw_2XnLQ86Q4f8MBgapMY`).
 - Implementación web (versión 2: comentarios): `AKfycbyk3lyUjzBE7W6HVyLn_BZqw-euTpjZpR4nVFM97j-2-ejy4_4vGTKDulfmYgrwPlfP`.
 - Se gestiona con clasp: `clasp push` y `clasp deploy -i <id de implementación>` conserva la URL.
+- Columna `lector`: versión del Lector con la que el alumno cargó sus datos (huella de 7 caracteres del código de
+  `tools/lector_saes.js`; `git log -p tools/lector_saes.js` permite ubicarla), `anterior` si usó un Lector previo a esta
+  columna y vacía sin datos del SAES. `dias_datos_saes`: antigüedad de esos datos al responder.
