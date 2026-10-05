@@ -207,6 +207,9 @@ input[type=number]{width:5rem}
 .simchip.bad b{color:var(--bad)}
 .simchip:disabled{opacity:.45;cursor:default}
 .tag.sim{background:var(--warn-soft);color:var(--warn)}
+.sim-tgl{border:0;cursor:pointer;font:inherit;font-size:.72rem;font-weight:600;padding:1px 8px;border-radius:999px;vertical-align:middle;margin-left:4px}
+.sim-tgl:hover{filter:brightness(.95);text-decoration:underline}
+.tag.sim-off{background:var(--sunken,var(--surface));color:var(--muted);border:1px solid var(--line)}
 .desf{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px 22px;font-size:.88rem;line-height:1.4}
 .desf li{border-left:3px solid var(--line);padding-left:9px}
 .desf li.desfasada{border-color:var(--bad)} .desf li.riesgo{border-color:var(--warn)}
@@ -633,7 +636,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="legend" id="legend" aria-label="Simbología"></div>
       <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     </div>
-    <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance</b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>
+    <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance <span id="mapcut-sim"></span></b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>
     <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
     <div class="tlist" id="tlist" hidden></div>
     <div class="insp" id="insp" aria-live="polite"></div>
@@ -1146,6 +1149,7 @@ function renderMap(){
   const mc=$('#mapcut');mc.hidden=!nPend;
   if(nPend){
     const fila=porNiveles()?['Nivel','Niveles']:['Semestre','Semestres'];
+    $('#mapcut-sim').innerHTML=simTag('mapa');
     $('#mapcut-txt').textContent=(nPend>1?`${fila[1]} ${bands[0][0]} a ${bands[nPend-1][0]} acreditados`:`${fila[0]} ${bands[0][0]} acreditado`)+'. '+
       (full?'Se muestra el mapa completo.':vista==='sigue'&&recom.size?'Se muestran primero las materias que puedes cursar el siguiente periodo.':'Se muestran primero las materias que te faltan.');
   }
@@ -1345,7 +1349,7 @@ function renderSide(){
       pr.map(k=>{const r=SIM.rec[k]||{};return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small class="bad">Reprobada</small></span>`+
         `<select data-simrec="${k}" aria-label="Cómo se acredita"${SIM.on?'':' disabled'}><option value="">Sigue pendiente</option>${['ETS','REC','EXT'].map(f=>`<option value="${f}"${r.forma===f?' selected':''}>Acreditada por ${FORMAS[f].toLowerCase()}</option>`).join('')}</select>`+
         (r.forma?calSel(k,'simreccal',r.cal??7):'')+`</div>`}).join('')+`</div>`:'';
-    $('#h-sugg').textContent=meta!=null?'Sugeridas para '+perName(meta):'Sugeridas';
+    $('#h-sugg').innerHTML=esc(meta!=null?'Sugeridas para '+perName(meta):'Sugeridas')+' '+simTag('sugg');
     const st=levelStats(), R=MAP().reglas;
     // por nivel: avance (barra de ancho fijo) y, debajo, el porcentaje recomendado de niveles previos frente al tuyo
     const pct=k=>st[k]?Math.round(st[k].ok/st[k].tot*100):0;
@@ -1949,7 +1953,7 @@ function metaResumen(D,H,incluyeActual){
 const info=t=>`<span class="info" tabindex="0" role="img" aria-label="${esc(t)}" data-tip="${esc(t)}">ⓘ</span>`;
 function metaPanel(D){
   const cfg=store.get('meta.'+S.car,{periodos:4,actual:true}), incluye=D.simulado?false:cfg.actual!==false;
-  return `<section class="meta-panel" aria-labelledby="meta-h"><h3 id="meta-h">¿En cuántos periodos quieres terminar?</h3>
+  return `<section class="meta-panel" aria-labelledby="meta-h"><h3 id="meta-h">¿En cuántos periodos quieres terminar? ${simTag('meta')}</h3>
     <div class="meta-controls"><label for="meta-periodos">Periodos <input id="meta-periodos" type="number" min="1" step="1" value="${esc(String(cfg.periodos??4))}" aria-describedby="meta-result"></label>
     <label><input id="meta-actual" type="checkbox"${incluye?' checked':''}${D.simulado?' disabled':''}> Contar el periodo actual</label>${D.simulado?info('Los créditos incluyen tu simulación de fin de semestre; la meta empieza después de ese periodo.'):''}</div>
     <div id="meta-result" aria-live="polite">${metaResumen(D,cfg.periodos??4,incluye)}</div></section>`;
@@ -1982,7 +1986,7 @@ function promMeta(D,T){
 }
 function promMetaPanel(D){
   const T=store.get('promMeta.'+S.car,null), v=T??(D.media!=null?Math.min(10,Math.ceil((D.media+.3)*10)/10):8.5), M=promMeta(D,v);
-  return `<section class="meta-panel pm" aria-labelledby="pm-h"><h3 id="pm-h">¿Qué promedio quieres alcanzar? ${info('Se calcula con tu promedio sin reprobadas (tus materias acreditadas). El promedio oficial del SAES también cuenta calificaciones reprobadas, así que para subirlo puede hacer falta un poco más.')}</h3>
+  return `<section class="meta-panel pm" aria-labelledby="pm-h"><h3 id="pm-h">¿Qué promedio quieres alcanzar? ${simTag('pm')}${info('Se calcula con tu promedio sin reprobadas (tus materias acreditadas). El promedio oficial del SAES también cuenta calificaciones reprobadas, así que para subirlo puede hacer falta un poco más.')}</h3>
     <div class="meta-controls"><label for="prom-meta">Promedio meta <input id="prom-meta" type="number" min="6" max="10" step="0.1" value="${v}"></label>
     <span class="muted">Hoy: ${M.actual!=null?M.actual.toFixed(2):'—'} (${M.n} materias)</span></div>
     <div id="pm-res">${promMetaHtml(M)}</div></section>`;
@@ -2066,13 +2070,14 @@ async function renderStats(){
       ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([n,l])=>`<span class="k-chip">${n} ${l}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario, ETS o recurse${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
       ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
     </div>
+    ${promMetaPanel(D)}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Tu camino en la carrera</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tu camino en la carrera ${simTag('camino')}</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',tr().sim?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
     </div>
-    ${metaPanel(D)}${promMetaPanel(D)}
+    ${metaPanel(D)}
     <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
-      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo ${simTag('kardex')}</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>D.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(D.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
+      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio ${simTag('areas')}</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${D.media!=null?D.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
@@ -2183,7 +2188,7 @@ function renderAnalisis(D){
   const ruta=X.ciclo?'<p class="muted">No se puede mostrar la cadena: el mapa tiene requisitos circulares.</p>':X.cadena.length?
     `<p class="an-sub">${X.cadena.length} materias seguidas: cada una abre la siguiente, así que se cursan en periodos distintos.</p><ol class="an-chain">${X.cadena.map(k=>`<li>${esc(X.nm(k))}</li>`).join('')}</ol>`:
     '<p class="muted">No tienes cadenas de materias seriadas pendientes.</p>';
-  el.innerHTML=`<h3 class="an-h">Observaciones para planear</h3><div class="an-grid">
+  el.innerHTML=`<h3 class="an-h">Observaciones para planear ${simTag('obs')}</h3><div class="an-grid">
     <section><h4>Tus materias elegidas y reprobadas</h4><p class="an-sub">Lo que les falta y lo que desbloquean.</p>${cuid}</section>
     ${lin}<section><h4>Cadena de seriación más larga</h4>${ruta}</section>
     </div>`;
@@ -2347,8 +2352,19 @@ $('#b-sugg').addEventListener('click',()=>{tr().want=[...new Set([...tr().want,.
 $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);
   if(SHOWSUG)store.set('mapVista','sigue');else if(mapVista()==='sigue')store.set('mapVista','pend');renderMap()});
 // simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase
+/* etiqueta en los bloques que cambian con la simulación de fin de semestre: alterna entre la simulación y los datos
+   reales sin perder de vista el bloque (comparación rápida) */
+const simTag=blk=>{if(!isPersonal())return '';const hay=SIM.on||Object.keys(SIM.res).length||Object.keys(SIM.rec).length;
+  if(!hay||!(tr().enCurso.length||tr().pendRep.length))return '';
+  return SIM.on?`<button type="button" class="tag sim sim-tgl" data-simtgl="${blk}" title="Estás viendo tu simulación de fin de semestre. Pulsa para ver tus datos reales.">Simulación ⇄</button>`
+    :`<button type="button" class="tag sim-off sim-tgl" data-simtgl="${blk}" title="Estás viendo tus datos reales. Pulsa para ver tu simulación.">Datos reales ⇄</button>`};
 const simSave=()=>{store.set('sim',SIM);for(const k in T)delete T[k];renderTray()};
 $('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simSave()}});
+// interruptor desde cualquier bloque: conserva la posición del bloque en pantalla
+document.addEventListener('click',e=>{const b=e.target.closest?.('[data-simtgl]');if(!b)return;
+  const blk=b.dataset.simtgl, y0=b.getBoundingClientRect().top;SIM.on=!SIM.on;simSave();
+  const fija=()=>{const n=document.querySelector(`[data-simtgl="${blk}"]`);if(n)window.scrollBy(0,n.getBoundingClientRect().top-y0)};
+  requestAnimationFrame(fija);setTimeout(fija,450);setTimeout(fija,1200)});
 $('#est-sim').addEventListener('click',e=>{if(e.target.closest('#sim-reset')){SIM.res={};SIM.rec={};simSave();return}
   const b=e.target.closest('[data-simok],[data-simko]');if(!b||b.disabled)return;
   const k=b.dataset.simok||b.dataset.simko;SIM.res[k]={...(SIM.res[k]||{}),ok:!!b.dataset.simok};simSave()});
