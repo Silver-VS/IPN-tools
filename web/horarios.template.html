@@ -1321,7 +1321,9 @@ function renderSide(){
     const cm=String(A.cita?.inicio||'').match(/(\d+\/\d+\/\d{4})\s+(\d+):(\d+)(?::\d+)?\s*(.*)/);
     $('#status').innerHTML=
       (()=>{const v=(A.acreditadas||[]).map(x=>+x?.[1]).filter(x=>Number.isFinite(x)&&x>=6&&x<=10);return v.length?tile('Promedio sin reprobadas',(v.reduce((t,x)=>t+x,0)/v.length).toFixed(2),`${v.length} materias acreditadas`,'','Promedio de tus materias acreditadas, sin contar reprobadas ni no acreditadas (incluye equivalencias y revalidaciones).'):''})()+
-      tile('Promedio oficial',A.promedio??'—',A.promedio==null?'El SAES no lo mostró: suele aparecer con tu cita de reinscripción; actualiza tus datos cuando se publique':tr().sim?'La simulación no cambia tu promedio oficial':'')+
+      (()=>{const po=promOficialSim();
+        if(po)return tile('Promedio oficial (estimado)',po.despues.toFixed(2),`hoy ${po.antes.toFixed(2)} · ${po.despues>=po.antes?'+':''}${(po.despues-po.antes).toFixed(2)} con tu simulación`,'',`Estimación del promedio del SAES y del kárdex, que también cuenta reprobadas. El SAES no publica cuántas reprobadas incluye; se deducen de tu promedio oficial y de tus calificaciones aprobadas, suponiendo ${REPROB_CAL} en cada reprobada. Las materias simuladas se suman con su calificación, y las reprobadas con ${REPROB_CAL}.`);
+        return tile('Promedio oficial',A.promedio??'—',A.promedio==null?'El SAES no lo mostró: suele aparecer con tu cita de reinscripción; actualiza tus datos cuando se publique':tr().sim?'La simulación no permite estimar tu promedio oficial con estos datos':'')})()+
       tile(tr().sim?'Créditos (simulación)':'Créditos',`${obt==null?'—':fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot&&obt!=null?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
       tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
         [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',plazoReferencia(A).max?`${plazoReferencia(A).calculado?'referencia a carga mínima':'máximo'} ${plazoReferencia(A).max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
@@ -1838,6 +1840,23 @@ function simKardex(){
 }
 // Sin el denominador oficial no es posible reconstruir el promedio del SAES desde sus acreditaciones.
 function promEstimado(){return ALUMNO?.promedio??null}
+/* Promedio oficial (el del SAES, que también cuenta reprobadas) al cerrar el semestre simulado. Es una estimación: el
+   SAES no publica cuántas evaluaciones reprobadas incluye, así que se deduce de tu promedio oficial y de tus calificaciones
+   aprobadas suponiendo REPROB_CAL en cada reprobada. Después se suman las materias simuladas: las aprobadas con su
+   calificación y las reprobadas con REPROB_CAL. Devuelve null si los datos no permiten estimarlo. */
+const REPROB_CAL=5;
+function promOficialSim(){
+  const A=ALUMNO, P=+A?.promedio;if(!tr().sim||A?.promedio==null||!Number.isFinite(P))return null;
+  const base=simKardex().filter(a=>!a[4]&&notaValida(a[1])!=null);if(!base.length)return null;
+  const n=base.length, S=base.reduce((t,a)=>t+notaValida(a[1]),0);
+  if(P>S/n+1e-6||P<=REPROB_CAL)return null;   // un promedio oficial mayor al de aprobadas no admite esta estimación
+  const nf=(S-P*n)/(P-REPROB_CAL), W=n+nf;
+  const nuevas=simKardex().filter(a=>a[4]).map(a=>notaValida(a[1])).filter(v=>v!=null);
+  const reprob=tr().enCurso.filter(k=>SIM.res[k]?.ok===false).length;
+  const k=nuevas.length+reprob;if(!k)return null;
+  const v=(P*W+nuevas.reduce((t,x)=>t+x,0)+reprob*REPROB_CAL)/(W+k);
+  return {antes:P,despues:v,reprobadasEstimadas:nf};
+}
 const creditoValido=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<0?null:+v;
 // En UPIBI la duración capturada no concuerda con las cargas: usar una referencia explícita, no un plazo reglamentario.
 function plazoReferencia(A){
