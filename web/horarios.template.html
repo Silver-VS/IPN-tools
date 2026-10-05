@@ -1331,8 +1331,8 @@ function renderSide0(){
       (()=>{const v=(A.acreditadas||[]).map(x=>+x?.[1]).filter(x=>Number.isFinite(x)&&x>=6&&x<=10);return v.length?tile('Promedio sin reprobadas',(v.reduce((t,x)=>t+x,0)/v.length).toFixed(2),`${v.length} materias acreditadas`,'','Promedio de tus materias acreditadas, sin contar reprobadas ni no acreditadas (incluye equivalencias y revalidaciones).'):''})()+
       (()=>{const po=promOficialSim();
         if(po)return tile(po.exacto?'Promedio oficial (simulación)':'Promedio oficial (estimado)',po.despues.toFixed(2),`hoy ${po.antes.toFixed(2)} · ${po.despues>=po.antes?'+':''}${(po.despues-po.antes).toFixed(2)} con tu simulación`,'',
-          po.exacto?`Promedio de todo tu kárdex (aprobadas y reprobadas), como lo calcula el SAES, más las materias de tu simulación. Las reprobadas simuladas cuentan con ${REPROB_CAL}.`
-          :`Estimación: con tus datos actuales no se conocen las reprobadas de tu kárdex, así que se deducen de tu promedio oficial suponiendo ${REPROB_CAL} en cada una. Vuelve a usar el Lector para calcularlo exacto. Las reprobadas simuladas cuentan con ${REPROB_CAL}.`);
+          po.exacto?`Promedio de todo tu kárdex (aprobadas y reprobadas), como lo calcula el SAES, más las materias de tu simulación. Las reprobadas simuladas cuentan con la calificación que elegiste (0 a 5).`
+          :`Estimación: con tus datos actuales no se conocen las reprobadas de tu kárdex, así que se deducen de tu promedio oficial suponiendo ${REPROB_CAL} en cada una. Vuelve a usar el Lector para calcularlo exacto. Las reprobadas simuladas cuentan con la calificación que elegiste (0 a 5).`);
         return tile('Promedio oficial',A.promedio??'—',A.promedio==null?'El SAES no lo mostró: suele aparecer con tu cita de reinscripción; actualiza tus datos cuando se publique':tr().sim?'La simulación no permite estimar tu promedio oficial con estos datos':'')})()+
       tile(tr().sim?'Créditos (simulación)':'Créditos',`${obt==null?'—':fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot&&obt!=null?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
       tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
@@ -1351,13 +1351,13 @@ function renderSide0(){
     {const m=avisoActualizar(A),el=$('#est-act');el.hidden=!m;el.innerHTML=m?m+' <button class="link" type="button" data-saes-open>Actualizar mis datos</button>':''}
     renderEqvHorario(A);
     const ec=tr().enCurso, pr=tr().pendRep;$('#est-sim').hidden=!ec.length&&!pr.length;$('#sim-tag').hidden=!tr().sim;
-    const calSel=(k,attr,v)=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${[10,9,8,7,6].map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
+    const calSel=(k,attr,v,esc_=[10,9,8,7,6])=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${esc_.map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
     $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+(SIM.on&&(Object.keys(SIM.res).length||Object.keys(SIM.rec).length||Object.keys(SIMBLK).length)?`<button type="button" class="link sim-reset" id="sim-reset" title="Regresa todas las materias a su valor inicial (en curso aprobadas con 8 y reprobadas pendientes) y todos los bloques a mostrar la simulación">Reiniciar simulación</button>`:'')+
       `<span class="sim-hint">${SIM.on?'El mapa, las sugeridas y las estadísticas se recalculan con tu simulación; tus datos del SAES no cambian.':'Prueba qué pasaría con tus materias en curso y tus reprobadas: aprobar con cierta calificación, reprobar o acreditar por ETS, recurse o extraordinario.'}</span>`+
       `<div class="simrows${SIM.on?'':' off'}">`+
       ec.map(k=>{const r=SIM.res[k]||{},ok=r.ok!==false;return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small>${tr().encEqv?.includes(k)?'En curso por equivalencia':'En curso'}</small></span>`+
         `<div class="seg sm" role="group"><button type="button" data-simok="${k}" aria-pressed="${ok}"${SIM.on?'':' disabled'}>Aprobada</button><button type="button" data-simko="${k}" aria-pressed="${!ok}"${SIM.on?'':' disabled'}>Reprobada</button></div>`+
-        (ok?calSel(k,'simcal',r.cal??8):'<span class="sim-x">pasa a recursar</span>')+`</div>`}).join('')+
+        (ok?calSel(k,'simcal',r.cal??8):calSel(k,'simcalr',r.calR??5,[5,4,3,2,1,0])+'<span class="sim-x">pasa a recursar</span>')+`</div>`}).join('')+
       pr.map(k=>{const r=SIM.rec[k]||{};return `<div class="simrow"><span class="sim-n">${esc(pretty(c[k][0]))}<small class="bad">Reprobada</small></span>`+
         `<select data-simrec="${k}" aria-label="Cómo se acredita"${SIM.on?'':' disabled'}><option value="">Sigue pendiente</option>${['ETS','REC','EXT'].map(f=>`<option value="${f}"${r.forma===f?' selected':''}>Acreditada por ${FORMAS[f].toLowerCase()}</option>`).join('')}</select>`+
         (r.forma?calSel(k,'simreccal',r.cal??7):'')+`</div>`}).join('')+`</div>`:'';
@@ -1860,8 +1860,9 @@ function promOficialSim(){
   const A=ALUMNO, P=+A?.promedio;if(!tr().sim||A?.promedio==null||!Number.isFinite(P))return null;
   const base=simKardex().filter(a=>!a[4]&&notaValida(a[1])!=null);
   const nuevas=simKardex().filter(a=>a[4]).map(a=>notaValida(a[1])).filter(v=>v!=null);
-  const reprob=tr().enCurso.filter(k=>SIM.res[k]?.ok===false).length, k=nuevas.length+reprob;if(!k)return null;
-  const extra=nuevas.reduce((t,x)=>t+x,0)+reprob*REPROB_CAL;
+  const reprobCal=tr().enCurso.filter(k=>SIM.res[k]?.ok===false).map(k=>{const v=+SIM.res[k].calR;return Number.isFinite(v)&&v>=0&&v<6?v:REPROB_CAL});
+  const k=nuevas.length+reprobCal.length;if(!k)return null;
+  const extra=nuevas.reduce((t,x)=>t+x,0)+reprobCal.reduce((t,x)=>t+x,0);
   const rep=(A.kardex_reprobadas||[]).map(r=>+r?.[1]).filter(v=>Number.isFinite(v)&&v>=0&&v<6);
   if(Array.isArray(A.kardex_reprobadas)){
     const todas=[...base.map(a=>notaValida(a[1])),...rep], n=todas.length, S=todas.reduce((t,x)=>t+x,0);
@@ -2408,6 +2409,7 @@ $('#est-sim').addEventListener('click',e=>{if(e.target.closest('#sim-reset')){SI
   const k=b.dataset.simok||b.dataset.simko;SIM.res[k]={...(SIM.res[k]||{}),ok:!!b.dataset.simok};simSave()});
 $('#est-sim').addEventListener('change',e=>{const t=e.target,d=t.dataset;
   if(d.simcal){SIM.res[d.simcal]={...(SIM.res[d.simcal]||{ok:true}),cal:+t.value};simSave()}
+  else if(d.simcalr){SIM.res[d.simcalr]={...(SIM.res[d.simcalr]||{ok:false}),calR:+t.value};simSave()}
   else if(d.simrec!==undefined){if(t.value)SIM.rec[d.simrec]={...(SIM.rec[d.simrec]||{}),forma:t.value};else delete SIM.rec[d.simrec];simSave()}
   else if(d.simreccal){SIM.rec[d.simreccal]={...(SIM.rec[d.simreccal]||{}),cal:+t.value};simSave()}});
 $('#b-none').addEventListener('click',()=>{tr().want=[...tr().oblig];saveT();renderTray()});
