@@ -53,6 +53,8 @@ def main():
     rows, curric, cap = offer()
     data = {"pdfs": pdfs, "oferta": rows, "curric": curric, "capturado": cap}
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", __import__("acentos").acentuar(json.dumps(data, ensure_ascii=False, separators=(",", ":"))))
+    import comun
+    html = comun.inyectar(html)   # tokens + alias de ipn-comun (antes del :root propio: lo actual gana)
     from skins import inject
     html = inject(html)
     import cuenta   # perfil IPN-tools: respaldo y sincronización con la cuenta institucional
