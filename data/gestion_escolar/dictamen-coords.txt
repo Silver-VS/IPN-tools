@@ -1,0 +1,75 @@
+Medicion: pdfplumber.extract_text_lines(), puntos PDF; origen superior izquierdo.
+Llenado: web/dictamen.template.html COORDS usa x, base superior, ancho; pdf-lib y=792-base.
+Originales carta de una pagina; no se modifican. El triangulo del interno ya viene impreso.
+
+=== dictamen-externo-cosie-01.pdf 612.12 x 792.12
+186.3 44.4 437.3 58.5 | INSTITUTO POLITÉCNICO NACIONAL
+248.8 60.0 374.9 70.0 | SECRETARÍA ACADÉMICA
+223.5 71.4 400.0 81.4 | COMISIÓN DE SITUACION ESCOLAR
+217.5 82.8 409.0 92.8 | DEL CONSEJO GENERAL CONSULTIVO
+395.8 102.4 526.4 111.4 | Formato de solicitud (COSIE-01)
+368.7 121.8 555.5 129.8 | Ciudad de México a____ de __________ de 201__
+236.9 140.3 374.9 147.3 | Favor de llenar el formulario con letra legible
+236.3 158.8 375.4 165.7 | DATOS PERSONALES DEL SOLICITANTE
+56.6 173.5 414.1 180.5 | APELLIDOS: NOMBRE(S)
+56.6 188.2 463.1 195.1 | No. BOLETA: UNIDAD ACADÉMICA: PROGRAMA ACADÉMICO:
+56.6 202.9 424.1 209.9 | FECHA DE NACIMIENTO: ESTADO CIVIL:
+56.6 217.7 141.4 224.7 | DOMICILIO PARTICULAR:
+204.8 232.2 407.2 239.2 | INFORMACIÓN SOLICITADA CON MOTIVOS ESTADÍSTICOS:
+56.6 247.1 526.7 254.1 | TIENE DEPENDIENTES ECONÓMICOS (Cónyuge): SI NO
+56.6 261.8 526.7 268.7 | TIENE DEPENDIENTES ECONÓMICOS MENORES DE EDAD (Hijos o Hijas): SI NO
+56.6 276.5 493.3 283.5 | TUVO EMBARAZO: PROPIO Ó DE LA PAREJA NO DESEO CONTESTAR:
+56.6 291.2 359.9 298.1 | TELÉFONO O CELULAR : CORREO ELECTRÓNICO:
+56.6 305.9 311.3 312.9 | FECHA DE INGRESO (Periodo Escolar en que ingreso al Nivel Educativo Actual):
+56.6 320.6 242.4 327.5 | ÚLTIMO SEMESTRE/NIVEL EN QUE ESTUVO INSCRITO:
+56.6 335.3 516.7 342.3 | FECHA DEL ÚLTIMO DICTAMEN DE SITUACIÓN ESCOLAR: COSIE del CTCE COSIE del CGC
+238.0 356.0 343.2 362.9 | SITUACIÓN ESCOLAR ACTUAL
+109.3 371.6 382.8 378.5 | 1. ADEUDOS DE UNIDADES DE APRENDIZAJE DESFASADAS (Art. 98 RI y 52 RGE):
+109.3 390.5 429.8 397.5 | 2. NO HABER SOLICTADO REINSCRIPCIÓN EN EL PERIODO ESCOLAR ANTERIOR (Art. 57 RGE):
+109.3 409.5 307.6 416.5 | 3. RECONOCIMIENTO DE CALIFICACIONES ACREDITADAS:
+109.3 428.6 376.5 435.6 | 4. AMPLIACIÓN DE TIEMPO PARA LA CONCLUSIÓN DE ESTUDIOS (Art. 49 RGE):
+109.3 447.6 355.2 454.5 | 5. INCUMPLIMIENTO DE DICTAMEN DE SITUACIÓN ESCOLAR ANTERIOR:
+109.3 465.6 430.3 472.5 | 6. OTRAS (ESPECIFIQUE):____________________________________________________________
+56.6 492.4 221.8 499.4 | EXPLIQUE DE FORMA CONCRETA SU PETICIÓN:
+56.6 500.6 551.1 507.6 | _______________________________________________________________________________________________________________________________
+56.6 508.6 551.1 515.6 | _______________________________________________________________________________________________________________________________
+56.6 516.7 551.1 523.6 | _______________________________________________________________________________________________________________________________
+56.6 524.8 551.1 531.8 | _______________________________________________________________________________________________________________________________
+56.6 540.9 441.8 547.9 | MARQUE CON UNA “X” LA(S) CAUSA(S) QUE ORIGINÓ QUE SE ENCUENTRE EN SU SITUACIÓN ESCOLAR ACTUAL:
+56.6 551.6 532.0 558.6 | SALUD ECONÓMICA FAMILIAR LEGAL LABORAL ADMINISTRATIVA
+78.0 570.8 493.0 577.8 | OTRAS: CUAL:_____________________________________________________________________________________
+56.6 587.4 366.0 594.3 | MARQUE LA DOCUMENTACIÓN QUE ANEXA PARA ANALIZAR SU SITUACIÓN ACADÉMICA:
+56.6 607.2 501.3 614.1 | BOLETA GLOBAL DE CALIFICACIONES CERTIFICADA DOCUMENTOS PROBATORIOS
+56.6 621.8 501.3 628.8 | CARTA DE EXPOSICIÓN DE MOTIVOS OTROS
+56.6 636.6 149.8 643.5 | DICTÁMENES ANTERIORES
+56.6 651.2 126.0 658.2 | BAJAS ANTERIORES
+59.9 670.9 468.5 677.9 | AUTORIZO A RECIBIR LAS COMINICACIONES RELATIVAS A ESTA SOLICITUD EN EL SIGUIENTE CORREO ELECTRÓNICO:
+59.9 685.6 555.3 692.6 | ________________________________________________________________________________________________________________________________
+335.0 704.4 511.3 710.4 | NOMBRE, FIRMA Y FECHA DE RECEPCIÓN DEL EXPEDIENTE
+129.1 707.9 220.9 713.9 | NOMBRE y FIRMA DEL ALUMNO
+382.1 711.4 466.0 717.4 | POR LA UNIDAD ACADÉMICA
+56.6 754.9 555.1 760.9 | Aviso de Privacidad. Los datos contenidos en esta solicitud están en posesión de la Comisión de Situación Escolar del Consejo General Consultivo del Instituto Politécnico Nacional,
+56.6 761.8 555.3 767.8 | tendrán el carácter de información confidencial en términos de lo dispuesto por los artículos 18 y 19 de la Ley Federal de Transparencia y Acceso a la Información Pública Gubernamental;
+56.6 768.8 555.4 774.8 | por lo cual, no podrán ser difundidos en forma alguna y deberá evitarse cualquier manejo de los mismos que contravenga lo dispuesto en los artículos 20, 21 y 24 de la citada ley, y en
+56.6 775.7 388.2 781.7 | caso de incumplimiento será sancionado conforme a lo establecido en la propia ley y en la normatividad institucional vigente.
+
+=== dictamen-interno-2026-1.pdf 612 x 792
+206.4 56.5 405.4 67.6 | INSTITUTO POLITÉCNICO NACIONAL
+119.7 70.3 492.1 81.4 | Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas
+79.8 120.1 532.0 130.1 | COMISIÓN DE SITUACIÓN ESCOLAR DEL CONSEJO TÉCNICO CONSULTIVO ESCOLAR
+227.8 144.6 477.2 154.6 | CDMX, a de del
+44.9 169.1 181.5 179.1 | Datos generales del solicitante:
+97.1 205.8 493.6 215.8 | Apellido paterno Apellido materno Nombre (s)
+188.9 242.6 498.2 252.5 | Carrera No. De boleta
+80.1 279.3 489.9 289.3 | Teléfono fijo Celular Correo electrónico
+236.9 303.8 375.0 313.7 | Escriba claramente su petición:
+69.0 414.0 541.9 423.9 | Plan de estudios: 98 2009 ¿Tienes dictaménes anteriores? Si No
+95.9 429.6 222.4 436.6 | Ciclo escolar en el que ingresaste al
+315.4 432.8 418.2 442.8 | Número(s) de oficio(s):
+112.6 438.5 222.4 445.5 | Instituto Politécnico Nacional:
+384.1 464.7 565.6 474.7 | Semestre Periodo en el Periodo en el que
+125.3 470.4 285.9 480.3 | Unidades de aprendizaje reprobadas
+389.0 476.8 552.3 487.2 | ó Nivel que la curso la recurso
+58.2 611.1 552.6 621.1 | Quedo enterado bajo protesta de decir la verdad, que lo asentado en esta solicitud y sus anexos son verdad, y que
+94.5 623.6 516.4 633.6 | conozco las sanciones reglamentarias a que me hago acreedor en caso de incurrir en alguna falta
+117.9 709.4 505.1 719.4 | Firma del alumno Vo. Bo. del profesor tutor
