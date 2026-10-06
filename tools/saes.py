@@ -44,7 +44,8 @@ const SAES={
   save(d){if(window.IPNT)IPNT.set(this.KEY,JSON.stringify(d));else try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
   clear(){try{localStorage.removeItem(this.KEY)}catch(e){}if(window.IPNT)IPNT.borrar(this.KEY)},
   parse(t){try{const d=JSON.parse(String(t||'').trim());if(d&&d.upiita_saes===1&&Array.isArray(d.acreditadas))return d}catch(e){}return null},
-  autorizada(d){const m=String(d?.avance?.autorizada||'').match(/(\d+(?:\.\d+)?)\s*CR/i)||String(d?.avance?.autorizada||'').match(/(\d+(?:\.\d+)?)/);return m?+m[1]:null},
+  autorizada(d){const s=String(d?.avance?.autorizada||'');   // «MEDIA-REPROBADAS = 40.00 - 22.50 CREDITOS»: el tope total es la media (incluye las reprobadas)
+    const m=s.match(/=\s*(\d+(?:\.\d+)?)\s*-\s*\d/)||s.match(/(\d+(?:\.\d+)?)\s*CR/i)||s.match(/(\d+(?:\.\d+)?)/);return m?+m[1]:null},
   open(){const dl=document.getElementById('saes-dlg');if(!dl)return;if(dl.showModal&&!dl.open)dl.showModal();else dl.setAttribute('open','')},
   close(){const dl=document.getElementById('saes-dlg');if(!dl)return;if(dl.close)dl.close();else dl.removeAttribute('open')},
   /* conecta el botón y la ventana: abrir, arrastrar el marcador, copiar su código y pegar los datos */
