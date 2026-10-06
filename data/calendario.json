@@ -9,7 +9,7 @@
       "periodosAtras": 3,
       "fecha": "2026-10-19"
     },
-    "notaDesfase": "Se desfasa la materia que pasa más de dos periodos sin acreditarse. El primer periodo de desfase se autoriza sin trámite; después se pide dictamen.",
+    "notaDesfase": "Se desfasa la materia que pasa más de dos periodos sin acreditarse. El primer periodo de desfase se autoriza sin trámite; después se necesita un dictamen, que se tramita con un periodo de anticipación.",
     "actividades": [
       {
         "desde": "2026-10-05",
@@ -46,7 +46,7 @@
         "titulo": "Reinscripción con dictamen",
         "donde": "ventanillas",
         "para": "dictamen",
-        "texto": "Lleva identificación y copia de tu dictamen. El SAES no genera cita."
+        "texto": "Solo si ya tienes un dictamen vigente. Lleva identificación y copia del dictamen; el SAES no genera cita."
       },
       {
         "desde": "2026-10-13",

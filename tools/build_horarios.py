@@ -826,6 +826,8 @@ def main():
         return v
     cal = json.loads((ROOT / "data" / "calendario.json").read_text(encoding="utf-8")) if (ROOT / "data" / "calendario.json").exists() else {}
     data["calendario"] = cal.get(UNIDAD)   # fechas de Gestión Escolar (publicación de citas, etc.)
+    sug = json.loads((ROOT / "data" / "sugerencias.json").read_text(encoding="utf-8")) if (ROOT / "data" / "sugerencias.json").exists() else {}
+    data["sugerencias"] = sug.get(UNIDAD) or {}   # ajustes a las sugeridas (p. ej., materias que se cursan cerca de otra)
     payload = acentuar(json.dumps(tildes(data), ensure_ascii=False, separators=(",", ":")))
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", payload)
     if UNIDAD != "upiita":   # nombre de la herramienta según la unidad

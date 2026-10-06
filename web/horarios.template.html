@@ -969,7 +969,7 @@ function semRef(){
 let CALAP=null, CALSEL=null;
 function renderCalendario(rd,nDes){
   const tipos=Object.values(rd?.por||{}), des=nDes>0;
-  CALAP={todos:true,adeudo:isPersonal()&&tr().fail.length>0,cita:!des,sincita:des,desfasada:des,dictamen:tipos.some(t=>t!=='oficio'),transitorio:!!rd?.ok};
+  CALAP={todos:true,adeudo:isPersonal()&&tr().fail.length>0,cita:!des,sincita:des,desfasada:des,dictamen:false,transitorio:!!rd?.ok};
   drawCals();
 }
 function calItems(){
@@ -1161,6 +1161,13 @@ if(DEMO){
 document.addEventListener('click',e=>{if(!e.target.closest?.('[data-demo-open]'))return;e.preventDefault();try{sessionStorage.setItem('ipnt.demo',UNIDAD)}catch(e){}location.reload()});
 function available(k){const s=statusOf(k);return !isElec(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')&&!s.includes('far')}
 
+/* data/sugerencias.json: una materia con «antesDe» se sugiere hasta tener acreditadas o en curso las demás que pide
+   esa otra materia (p. ej., Investigación y desarrollo de proyectos, el periodo previo a Metodología de la investigación) */
+function aunNo(k){
+  const r=DATA.sugerencias?.[S.car]?.[k];if(!r?.antesDe||!isPersonal())return false;
+  const hecho=new Set([...tr().done,...tr().curso]);
+  return (prereqs()[r.antesDe]||[]).some(x=>x!==k&&cur()[x]&&!hecho.has(x));
+}
 function suggestions(){
   // prioridad: desfasadas, reprobadas, atrasadas; después todo lo que ya puedes cursar (de cualquier semestre),
   // primero las que desbloquean más materias y luego por semestre propuesto
@@ -1171,7 +1178,7 @@ function suggestions(){
   const target=ci?(ci.adeudo?ci.libre:Math.min(ci.libre,ci.L.media)):40;
   const pre=prereqs(), hecho=new Set([...tr().done,...tr().curso]);
   const sigue=k=>cur()[k][3]==='P'&&(pre[k]||[]).some(x=>hecho.has(x)&&cur()[x]?.[3]==='P');   // optativa: continuación de su línea
-  const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&(cur()[k][3]==='O'||sigue(k)))
+  const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&(cur()[k][3]==='O'||sigue(k))&&!aunNo(k))
     .sort((a,b)=>{const ra=rank[statusOf(a).split(' ')[0]], rb=rank[statusOf(b).split(' ')[0]];
       return ra-rb||(ra===3?unlocks(b)-unlocks(a):0)||(sp[a]||99)-(sp[b]||99)||cur()[a][2]-cur()[b][2]});
   const out=[];let cr=0;
@@ -1481,8 +1488,8 @@ function renderSide0(){
     const veredicto=(()=>{if(!rd?.n)return '';
       const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
       if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}; tu tope es de ${fmtCr(rd.tope)} cr. ${etsTxt()}</p>`;
-      return `<p class="desf-v bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?'Necesitas dictamen para reinscribirte.':`Tienes más de ${rd.R.maxDesfasadas} desfasadas.`}</b> `+
-        `${sc?`Acude a ventanillas el ${fechaCal(sc.desde)}. `:''}${etsTxt()}</p>`;
+      return `<p class="desf-v bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?`Sin dictamen vigente no puedes reinscribirte en ${esc(DATA.calendario.periodo)}.`:`Tienes más de ${rd.R.maxDesfasadas} desfasadas.`}</b> `+
+        `${dict?'Tramítalo para el siguiente periodo y revisa':'Revisa'} tu situación en ventanillas${sc?' el '+fechaCal(sc.desde):''}. ${etsTxt()}</p>`;
     })();
     const items=[...dS.map(k=>({k,cls:'desfasada',p:['bad','Desfasada según el SAES','Debes inscribirla para reinscribirte'],tip:k})),
       ...fis.map(f=>({k:f.k,cls:f.estado,p:fila(f),tip:`${f.k}${f.idx!=null?' · reprobada por primera vez en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`}))];

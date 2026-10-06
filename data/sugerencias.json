@@ -1,0 +1,11 @@
+{
+  "_nota": "Ajustes a las materias sugeridas por unidad y carrera. 'antesDe': se sugiere hasta que el alumno tenga acreditadas o en curso las demás materias que pide esa otra (se cursa el periodo previo); 'motivo' se muestra como explicación.",
+  "upiita": {
+    "B": {
+      "B211": {
+        "antesDe": "B504",
+        "motivo": "Prepara para Metodología de la investigación y Trabajo terminal; conviene cursarla cerca de ellas, con bases del resto de la carrera."
+      }
+    }
+  }
+}
