@@ -838,6 +838,8 @@ def main():
     data["sugerencias"] = sug.get(UNIDAD) or {}   # ajustes a las sugeridas (p. ej., materias que se cursan cerca de otra)
     payload = acentuar(json.dumps(tildes(data), ensure_ascii=False, separators=(",", ":")))
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", payload)
+    import comun
+    html = comun.inyectar(html)   # tokens + alias de ipn-comun (antes del :root propio: lo actual gana)
     if UNIDAD != "upiita":   # nombre de la herramienta según la unidad
         html = html.replace("Horarios UPIITA", f"Horarios {UCONF['siglas']}")
     from skins import inject

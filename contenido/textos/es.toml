@@ -1,0 +1,47 @@
+# SPDX-License-Identifier: CC0-1.0
+# Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
+# Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
+# Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
+version = "2026.10.1"
+
+[sate]
+# Nombre completo de la plataforma (encabezado, título de la página, pie).
+nombre = "Sistema de Apoyo a la Trayectoria Escolar"
+# Siglas del nombre.
+siglas = "SATE"
+# Leyenda de fase de prueba bajo el encabezado; {unidad} son las siglas de la unidad académica (UPIITA, ESCOM, UPIBI).
+leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener errores: confirma siempre tu información en el SAES y en tu Gestión Escolar."
+
+# Pestañas. `titulo` va en escritorio; `corto` en la barra inferior del teléfono (una palabra).
+[sate.pestana.situacion]
+titulo = "Situación escolar"
+corto = "Situación"
+
+[sate.pestana.mapa]
+titulo = "Mapa curricular"
+corto = "Mapa"
+
+[sate.pestana.horarios]
+titulo = "Horarios"
+corto = "Horarios"
+
+[sate.pestana.desempeno]
+titulo = "Desempeño"
+corto = "Desempeño"
+
+[sate.pestana.tramites]
+titulo = "Trámites"
+corto = "Trámites"
+
+# Trámites de la pestaña Trámites (solo los que la unidad activa en data/sate.json).
+[sate.tramite.ets]
+titulo = "Examen a título de suficiencia"
+
+[sate.tramite.reinscripcion]
+titulo = "Reinscripción"
+
+[sate.tramite.dictamen]
+titulo = "Dictamen"
+
+[sate.tramite.electivas]
+titulo = "Electivas"
