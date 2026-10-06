@@ -217,10 +217,13 @@ input[type=number]{width:5rem}
 .dpill{font-size:.72rem;font-weight:700;padding:2px 9px;border-radius:999px;background:var(--surface);color:var(--muted);border:1px solid var(--line)}
 .dpill.bad{background:var(--bad-soft);color:var(--bad);border-color:transparent}
 .dpill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
-.desf-v{margin:0 0 8px;padding:10px 14px;border-radius:10px;font-size:.88rem;line-height:1.5;max-width:110ch}
-.desf-v.bad{background:var(--bad-soft)} .desf-v.ok{background:var(--ok-soft)}
-.desf-ets{margin:0 0 8px;padding:10px 14px;border-radius:10px;background:var(--ok-soft);font-size:.88rem;line-height:1.5;max-width:110ch}
-.desf-ets .link{font-weight:600}
+.avisos{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;margin:0 0 8px}
+.aviso{display:flex;flex-direction:column;gap:4px;padding:12px 14px;border-radius:10px;background:var(--sunken);font-size:.86rem;line-height:1.4;min-width:0}
+.aviso b{font-size:.92rem;line-height:1.3}
+.aviso small{margin-top:auto;padding-top:4px;font-size:.8rem;font-weight:600}
+.aviso.bad{background:var(--bad-soft)} .aviso.bad b{color:var(--bad)}
+.aviso.ok{background:var(--ok-soft)} .aviso.ok b{color:var(--ok)}
+.aviso .link{font-weight:600}
 .cal{display:grid;gap:10px;min-width:0}
 .cal-alerta{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);font-size:.9rem;line-height:1.45}
 .cal-alerta .link{font-weight:600;white-space:nowrap}
@@ -1488,17 +1491,17 @@ function renderSide0(){
     // ETS próximo del calendario (inscripción o aplicación): aviso propio, aparte del veredicto de desfase
     const etsB=(()=>{if(!tr().fail.length)return '';const hoy=new Date();hoy.setHours(0,0,0,0);
       const L=DATA.calendario?.actividades||[], i=L.findIndex(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);if(i<0)return '';const a=L[i];
-      return `<p class="desf-ets"><b>Puedes presentar ETS</b> <span class="muted">(examen a título de suficiencia: acreditas una materia con un examen de todo su temario, sin volver a cursarla)</span><br>`+
-        `${esc(a.titulo)}: ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)} · <button class="link" type="button" data-calver-ver="${i}">Ver cómo</button></p>`})();
+      return `<div class="aviso ok"><b>Puedes presentar ETS</b><span>Examen a título de suficiencia: acreditas la materia con un examen de todo su temario, sin volver a cursarla.</span>`+
+        `<small>${esc(a.titulo)}: ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)} · <button class="link" type="button" data-calver-ver="${i}">Ver cómo</button></small></div>`})();
     const veredicto=(()=>{if(!rd?.n)return '';
       const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
-      if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}; tu tope es de ${fmtCr(rd.tope)} cr.</p>`;
-      return `<p class="desf-v bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?`Sin dictamen vigente no puedes reinscribirte en ${esc(DATA.calendario.periodo)}.`:`Tienes más de ${rd.R.maxDesfasadas} desfasadas.`}</b> `+
-        `${dict?'Tramítalo para el siguiente periodo y revisa':'Revisa'} tu situación en ventanillas${sc?' el '+fechaCal(sc.desde):''}.</p>`;
+      if(rd.ok)return `<div class="aviso ok"><b>Puedes recursar sin dictamen</b><span>Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}.</span><small>Tope: ${fmtCr(rd.tope)} cr</small></div>`;
+      return `<div class="aviso bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?`Sin dictamen vigente no puedes reinscribirte en ${esc(DATA.calendario.periodo)}`:`Tienes más de ${rd.R.maxDesfasadas} desfasadas`}</b>`+
+        `<span>${dict?'Tramítalo para el siguiente periodo.':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+'.'}</span><small>Revisa tu situación en ventanillas${sc?' el '+fechaCal(sc.desde):''}</small></div>`;
     })();
     const items=[...dS.map(k=>({k,cls:'desfasada',p:['bad','Desfasada según el SAES','Debes inscribirla para reinscribirte'],tip:k})),
       ...fis.map(f=>({k:f.k,cls:f.estado,p:fila(f),tip:`${f.k}${f.idx!=null?' · reprobada por primera vez en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`}))];
-    $('#desf').innerHTML=items.length?veredicto+etsB+`<ul class="desf">${items.map(x=>`<li class="${x.cls}" title="${esc(x.tip)}"><b>${esc(pretty(c[x.k][0]))}</b><span class="dpill ${x.p[0]}">${x.p[1]}</span><small>${x.p[2]}</small></li>`).join('')}</ul>`:'';
+    $('#desf').innerHTML=items.length?(veredicto||etsB?`<div class="avisos">${veredicto}${etsB}</div>`:'')+`<ul class="desf">${items.map(x=>`<li class="${x.cls}" title="${esc(x.tip)}"><b>${esc(pretty(c[x.k][0]))}</b><span class="dpill ${x.p[0]}">${x.p[1]}</span><small>${x.p[2]}</small></li>`).join('')}</ul>`:'';
     $('#desf-note').textContent=fis.length?(DATA.calendario?.notaDesfase||'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.'):'';
     renderCalendario(rd,nDes);
     {const f=new Date(A.leido);$('#est-src').textContent=isNaN(f)?'Leído del SAES':'Leído del SAES el '+f.toLocaleDateString('es-MX',{dateStyle:'medium'})}
