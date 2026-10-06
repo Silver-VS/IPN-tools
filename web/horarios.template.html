@@ -816,7 +816,6 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <footer id="foot"></footer>
 </div>
 
-<!--__SKINUI__-->
 <script>
 const DATA=/*__DATA__*/null;
 const UNIDAD=DATA.unidad||'upiita';window.IPNT_UNIDAD=UNIDAD;   // la UPIITA conserva el prefijo hu.; otras unidades, hu.<unidad>.
@@ -2585,7 +2584,7 @@ $('#stats-btn').addEventListener('click',()=>{store.set('stats',!store.get('stat
 // las gráficas toman los colores del tema al dibujarse: se redibujan si cambia el tema (sistema o botón)
 {const redibuja=()=>{if(!$('#kstats')?.hidden)renderStats()};
   try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redibuja)}catch(e){}
-  new MutationObserver(redibuja).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','data-skin']})}
+  new MutationObserver(redibuja).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']})}
 $('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vista]');if(!b)return;store.set('mapVista',b.dataset.vista);
   if(b.dataset.vista==='sigue'&&!SHOWSUG){SHOWSUG=true;store.set('verSug',true)}renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapVista',mapVista()==='todo'?'sigue':'todo');renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
