@@ -65,9 +65,14 @@
       if (acr.length) acr.push(acr[0], acr[0]);   // duplicados
     }
     if (esc === 'egresado') { avanza(ob); }
+    // optativas: a veces acreditadas (varias del mismo nivel) o en curso, para probar el cupo por nivel
+    const opt = shuffle(todas.filter(k => c[k][3] === 'P' && !isElec(k)));
+    if (esc !== 'primer_ingreso' && chance(.6)) opt.slice(0, ri(1, 5)).forEach(k => { if (!acr.some(a => a[0] === k)) acr.push([k, cal(), per(0), 'ORD']) });
+    const optEnc = chance(.3) ? opt.slice(5, 5 + ri(1, 3)).filter(k => !acr.some(a => a[0] === k)) : [];
     // en curso: siguientes materias pendientes; a veces incluye un recursamiento o una materia ya acreditada (inconsistencia)
     const pend = ob.filter(k => !acr.some(a => a[0] === k));
     if (esc !== 'egresado') enc = pend.slice(0, ri(0, 7));
+    enc.push(...optEnc);
     if (esc === 'recursamiento' && rep.length) enc.push(...rep.slice(0, ri(1, rep.length)).map(r => r[0]));
     if (chance(.1) && acr.length) enc.push(acr[0][0]);
     if (chance(.1)) enc.push('Y' + ri(100, 999));
@@ -168,6 +173,18 @@
       if (malo(s.cr) || malo(s.target)) return 'créditos no numéricos';
       return true;
     }, ctx);
+    // optativas por nivel (mapas que indican el nivel de cada espacio): una acreditada o en curso cubre el espacio de su nivel
+    revisar('espacios de optativa por nivel', () => {
+      const q = optCupo(), L = MAP().layout; if (!q || !L) return true;
+      const F = slotFill(L, new Set()), cub = {}, t = tr(), c = cur();
+      for (const [i, f] of F) { if (!f.k) continue; const nv = L.boxes[i][7]; if (nv && c[f.k][2] !== nv) return `la optativa ${f.k} (nivel ${c[f.k][2]}) cubre un espacio de nivel ${nv}`; cub[nv] = (cub[nv] || 0) + 1 }
+      for (const nv in q) {
+        if ((cub[nv] || 0) !== Math.min(q[nv].total, q[nv].hechas)) return `nivel ${nv}: ${q[nv].hechas} optativas hechas o en curso, ${q[nv].total} espacios, pero ${cub[nv] || 0} cubiertos`;
+        if (q[nv].libre !== q[nv].total - Math.min(q[nv].total, q[nv].hechas)) return `nivel ${nv}: cupo libre incoherente`;
+      }
+      const ex = optExceso(suggestions().list, q); if (Object.keys(ex).length) return 'sugiere más optativas de un nivel que espacios libres: ' + JSON.stringify(ex);
+      return true;
+    }, ctx);
     revisar('aviso de actualizar', () => typeof avisoActualizar(ALUMNO) === 'string' || 'no devuelve texto', ctx);
     // generador: materias elegidas = sugeridas + algunas al azar (incluye a veces acreditadas o en curso a propósito)
     const t = tr(); t.want = [...new Set([...suggestions().list, ...shuffle(Object.keys(cur())).slice(0, ri(0, 4))])].filter(k => !isElec(k));
@@ -182,6 +199,7 @@
           const x = cs.find(c => ya.has(c[8])); if (x) return 'propone acreditada o en curso: ' + x[8];
           const e = cs.find(c => c[5].some(i => avoid.some(q => norm(DATA.prof[i]).includes(q)))); if (e) return 'usa un profesor excluido en ' + e[8];
           const f = cs.find(c => c[0] !== S.car); if (f) return 'grupo de otra carrera: ' + f[0];
+          const ex = optExceso(cs.map(c => c[8]), optCupo()); if (Object.keys(ex).length) return 'más optativas de un nivel que espacios libres: ' + JSON.stringify(ex);
         }
         return true;
       }, { ...ctx, modo: n || 'todas' });
