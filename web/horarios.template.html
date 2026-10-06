@@ -966,7 +966,7 @@ function semRef(){
 let CALAP=null, CALSEL=null;
 function renderCalendario(rd,nDes){
   const tipos=Object.values(rd?.por||{}), des=nDes>0;
-  CALAP={todos:true,cita:!des,sincita:des,desfasada:des,dictamen:tipos.some(t=>t!=='oficio'),transitorio:!!rd?.ok};
+  CALAP={todos:true,adeudo:isPersonal()&&tr().fail.length>0,cita:!des,sincita:des,desfasada:des,dictamen:tipos.some(t=>t!=='oficio'),transitorio:!!rd?.ok};
   drawCals();
 }
 function calItems(){
@@ -975,7 +975,7 @@ function calItems(){
   const hoy=new Date();hoy.setHours(0,0,0,0);const d=x=>new Date(x+'T00:00:00'), ap=isPersonal()?CALAP:null;
   const items=C.actividades.map((a,i)=>({...a,i,ini:d(a.desde),fin:d(a.hasta||a.desde),si:ap?!!ap[a.para]:false}));
   if(items.every(a=>a.fin<hoy-7*864e5))return null;   // una semana después de la última actividad deja de mostrarse
-  items.forEach(a=>{a.pasada=a.fin<hoy;a.hoy=a.ini<=hoy&&hoy<=a.fin});
+  items.forEach(a=>{a.pasada=a.fin<hoy;a.hoy=a.ini<=hoy&&hoy<=a.fin;a.hoyD=hoy});
   return {C,items};
 }
 function drawCals(){
@@ -990,7 +990,7 @@ function drawCals(){
       (pers?`<div class="seg sm" role="group" aria-label="Actividades del calendario"><button type="button" data-calver="mio" aria-pressed="${mio}">Lo que me aplica</button><button type="button" data-calver="todo" aria-pressed="${!mio}">Todas</button></div>`:'')+`</div>`+
       `<div class="cal-strip">${vis.map(a=>`<button type="button" class="cal-c${a.pasada?' pasada':''}${a.si&&a.para!=='todos'?' aplica':''}${a===prox?' prox':''}" data-calc="${a.i}" aria-pressed="${a===sel}">`+
         `<span class="cal-d"><b>${a.ini.getDate()}</b><span>${f(a.ini,{month:'short'})}${a.hasta?` – ${a.fin.getDate()}${a.fin.getMonth()!==a.ini.getMonth()?' '+f(a.fin,{month:'short'}):''}`:''}</span></span>`+
-        `<span class="cal-w">${a.hoy?'hoy':f(a.ini,{weekday:'long'})}${a.hasta?' a '+f(a.fin,{weekday:'long'}):''}</span>`+
+        `<span class="cal-w">${a.hoy?(!a.hasta?'hoy':+a.fin===+a.hoyD?'último día: hoy':'en curso, hasta el '+f(a.fin,{weekday:'long'})):f(a.ini,{weekday:'long'})+(a.hasta?' a '+f(a.fin,{weekday:'long'}):'')}</span>`+
         `<span class="cal-t">${esc(a.titulo||a.texto)}</span><span class="cal-l ${a.donde==='saes'?'saes':''}">${a.donde==='saes'?'En el SAES':'En ventanillas'}</span>`+
         `${a===prox?'<i class="cal-b">Siguiente</i>':a.si&&a.para!=='todos'&&!a.pasada?'<i class="cal-b si">Te aplica</i>':''}</button>`).join('')}</div>`+
       (sel?`<p class="cal-det"><b>${rango(sel)} · ${esc(sel.titulo||'')}.</b> ${esc(sel.texto)}</p>`:'')+
@@ -1458,12 +1458,15 @@ function renderSide0(){
       if(f.estado==='reciente')return ['',`Plazo: ${P(f.limite)}`,rc||'Recursar o ETS'];
       return ['','Sin periodo','Actualiza tus datos del SAES'];
     };
+    // ETS próximo del calendario (inscripción o aplicación) para mencionarlo en el veredicto
+    const etsTxt=()=>{const hoy=new Date();hoy.setHours(0,0,0,0);const a=(DATA.calendario?.actividades||[]).find(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);
+      return a?`Mientras tanto puedes acreditar tus adeudos por ETS (RGE, art. 48): ${esc(a.titulo.charAt(0).toLowerCase()+a.titulo.slice(1))} ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)}.`:'Mientras tanto puedes acreditar tus adeudos por ETS (RGE, art. 48).'};
     const veredicto=(()=>{if(!rd?.n)return '';
       const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
       if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Es tu primer periodo de desfase: inscríbete en ventanillas de Gestión Escolar el ${fechaCal(rd.R.fecha)}, con hasta ${fmtCr(rd.tope)} cr (carga media más la materia con más créditos de tu plan).</p>`;
       return `<p class="desf-v bad"><b>${dict?`Para reinscribirte en ${esc(DATA.calendario.periodo)} necesitas un dictamen de la Comisión de Situación Escolar.`:`Tienes más de ${rd.R.maxDesfasadas} materias desfasadas.`}</b> `+
         `${tipos.includes('oficio')?`La autorización sin dictamen cubre solo el primer periodo de desfase, con ${rd.R.maxDesfasadas} materias como máximo. `:''}`+
-        `${sc?`Revisa tu situación en ventanillas de Gestión Escolar desde el ${fechaCal(sc.desde)}. `:''}Mientras tanto puedes acreditar tus adeudos por ETS (RGE, art. 48).</p>`;
+        `${sc?`Revisa tu situación en ventanillas de Gestión Escolar desde el ${fechaCal(sc.desde)}. `:''}${etsTxt()}</p>`;
     })();
     const items=[...dS.map(k=>({k,cls:'desfasada',p:['bad','Desfasada según el SAES','Debes inscribirla para reinscribirte'],tip:k})),
       ...fis.map(f=>({k:f.k,cls:f.estado,p:fila(f),tip:`${f.k}${f.idx!=null?' · reprobada por primera vez en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`}))];

@@ -1,9 +1,9 @@
 {
-  "_nota": "Fechas del calendario de Gestión Escolar por unidad. 'periodo': periodo cuya reinscripción está en curso; 'citas': día en que se publican las citas en el SAES (AAAA-MM-DD). 'actividades[]': titulo corto, donde (saes o ventanillas), texto; 'para': a quién aplica (todos, cita, sincita, desfasada, dictamen, transitorio). 'transitorio': regla para alumnos con materias desfasadas en su primer periodo de desfase.",
+  "_nota": "Fechas del calendario de Gestión Escolar por unidad. 'periodo': periodo cuya reinscripción está en curso; 'citas': día en que se publican las citas en el SAES (AAAA-MM-DD). 'actividades[]': titulo corto, donde (saes o ventanillas), texto; 'para': a quién aplica (todos, adeudo, cita, sincita, desfasada, dictamen, transitorio). 'transitorio': regla para alumnos con materias desfasadas en su primer periodo de desfase.",
   "upiita": {
     "periodo": "27/1",
     "citas": "2026-10-07",
-    "fuente": "Calendario de actividades 2027/1, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)",
+    "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)",
     "transitorio": {
       "maxDesfasadas": 2,
       "periodosAtras": 3,
@@ -11,6 +11,22 @@
     },
     "notaDesfase": "Una materia reprobada se desfasa cuando transcurren más de dos periodos sin acreditarla. En la UPIITA, Gestión Escolar autoriza de oficio el primer periodo de desfase (materias cursadas por primera vez en los tres periodos anteriores); a partir del siguiente se solicita dictamen a la Comisión de Situación Escolar.",
     "actividades": [
+      {
+        "desde": "2026-10-05",
+        "hasta": "2026-10-06",
+        "titulo": "Inscripción a ETS 26/2",
+        "donde": "ventanillas",
+        "para": "adeudo",
+        "texto": "Paga $20 por materia con ficha de depósito y entrega original y copia en la caja (9:00 a 14:00 y 16:00 a 20:00). Después entrega en ventanillas de Gestión Escolar la copia sellada, tu credencial y, si aplica, copia de tu dictamen; ahí inscriben las materias en el SAES. Descarga tu comprobante de ETS del SAES: es la única evidencia de inscripción. Los datos bancarios están en el aviso de Gestión Escolar."
+      },
+      {
+        "desde": "2026-10-07",
+        "hasta": "2026-10-12",
+        "titulo": "Aplicación de ETS 26/2",
+        "donde": "ventanillas",
+        "para": "adeudo",
+        "texto": "Los horarios de aplicación se publican en la página de la unidad. Los profesores capturan la calificación dentro de las 72 horas posteriores a la aplicación."
+      },
       {
         "desde": "2026-10-07",
         "titulo": "Citas publicadas",
