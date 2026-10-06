@@ -227,6 +227,8 @@ input[type=number]{width:5rem}
 .cal{display:grid;gap:10px;min-width:0}
 .cal-alerta{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);font-size:.9rem;line-height:1.45}
 .cal-alerta .link{font-weight:600;white-space:nowrap}
+.opt-aviso{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;max-width:min(92vw,520px);margin:0;padding:10px 14px;border-radius:10px;background:var(--warn-soft);color:var(--fg);box-shadow:0 4px 18px rgba(0,0,0,.25);font-size:.88rem;line-height:1.45}
+.opt-aviso[hidden]{display:none}
 #est-cal{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 #hor-cal{margin-bottom:12px}
 .cal-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
@@ -1187,8 +1189,10 @@ function suggestions(){
   const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&(cur()[k][3]==='O'||sigue(k))&&!aunNo(k))
     .sort((a,b)=>{const ra=rank[statusOf(a).split(' ')[0]], rb=rank[statusOf(b).split(' ')[0]];
       return ra-rb||(ra===3?unlocks(b)-unlocks(a):0)||(sp[a]||99)-(sp[b]||99)||cur()[a][2]-cur()[b][2]});
-  const out=[];let cr=0;
-  for(const k of cands){if(cr+cost(k)>target+0.01)continue;out.push(k);cr+=cost(k)}
+  const out=[], oq=optCupo(), tomadas={};let cr=0;
+  for(const k of cands){if(cr+cost(k)>target+0.01)continue;
+    const nv=nivOpt(k,oq);if(nv){if((tomadas[nv]||0)>=oq[nv].libre)continue;tomadas[nv]=(tomadas[nv]||0)+1}   // el espacio del nivel ya está cubierto
+    out.push(k);cr+=cost(k)}
   return {list:out,cr,target,cands,ret:ci?.ret||0};
 }
 
@@ -1368,14 +1372,50 @@ function slotFill(L,want){
   const slots=L.boxes.map((b,i)=>[i,b]).filter(([,b])=>!b[4]&&/^optativa/i.test(b[5])).sort((a,b)=>a[1][6]-b[1][6]||a[1][0]-b[1][0]);
   const used=new Set(), dep=dependents(), next=i=>L.edges.filter(e=>e[0]===i).map(e=>e[1]);
   const put=(i,k)=>{out.set(i,{k});used.add(k)};
-  for(const [i,b] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k)&&c[k][2]===b[6]);if(k)put(i,k)}
-  for(const [i] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k));if(k)put(i,k)}
+  // el espacio con nivel conocido (b[7], UPIITA) solo lo cubre una optativa de ese nivel; N espacios del nivel, N optativas
+  for(const [i,b] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k)&&c[k][2]===(b[7]||b[6]));if(k)put(i,k)}
+  for(const [i,b] of slots){if(out.has(i)||b[7])continue;const k=cands.find(k=>!used.has(k));if(k)put(i,k)}
   // continuación de la línea en el espacio siguiente (flecha entre espacios)
   for(const [i] of slots){const f=out.get(i);if(!f?.k)continue;
     for(const j of next(i)){const sig=(dep[f.k]||[]).find(x=>c[x]?.[3]==='P');if(!sig)continue;
+      if(L.boxes[j][7]&&c[sig][2]!==L.boxes[j][7])continue;
       const cur_=out.get(j);if(cur_?.k===sig)continue;
       if(!cur_||cur_.sigue){if(rank(sig)<9){if(cur_?.k)used.delete(cur_.k);put(j,sig)}else if(!cur_)out.set(j,{sigue:sig})}}}
   return out;
+}
+/* Cupo de optativas por nivel (planes cuyo mapa indica el nivel de cada espacio, como la UPIITA): {nivel:{total,hechas,libre}}.
+   «hechas» son las acreditadas o en curso; «libre» = espacios del nivel aún sin cubrir. null si el plan no lo indica. */
+function optCupo(){
+  const L=MAP().layout;if(!L)return null;
+  const q={}, c=cur(), t=isPersonal()?tr():{done:[],curso:[]};
+  L.boxes.forEach(b=>{if(!b[4]&&/^optativa/i.test(b[5])&&b[7]>0)(q[b[7]]=q[b[7]]||{total:0,hechas:0}).total++});
+  if(!Object.keys(q).length)return null;
+  new Set([...t.done,...t.curso]).forEach(k=>{if(c[k]?.[3]==='P'&&!isElec(k)&&q[c[k][2]])q[c[k][2]].hechas++});
+  Object.values(q).forEach(v=>v.libre=Math.max(0,v.total-v.hechas));
+  return q;
+}
+// nivel de una optativa con espacios por nivel (o 0 si no aplica)
+const nivOpt=(k,q)=>{const v=cur()[k];return q&&v&&v[3]==='P'&&!isElec(k)&&q[v[2]]?v[2]:0};
+// ¿las materias `ks` caben en los espacios libres de optativa de su nivel? Devuelve los niveles que se pasan: {nivel:{n,libre}}
+function optExceso(ks,q){
+  if(!q)return {};
+  const n={};ks.forEach(k=>{const v=nivOpt(k,q);if(v)n[v]=(n[v]||0)+1});
+  const out={};Object.keys(n).forEach(v=>{if(n[v]>q[v].libre)out[v]={n:n[v],libre:q[v].libre,total:q[v].total}});
+  return out;
+}
+let AVISO_T=0;
+function avisoOpt(msg){
+  let el=document.getElementById('opt-aviso');
+  if(!el){el=document.createElement('p');el.id='opt-aviso';el.className='opt-aviso';el.setAttribute('role','status');document.body.appendChild(el)}
+  el.textContent=msg;el.hidden=false;clearTimeout(AVISO_T);AVISO_T=setTimeout(()=>{el.hidden=true},7000);
+}
+// texto breve cuando una optativa elegida no cubre un espacio (el alumno puede cursarla igual, como materia extra)
+function avisoOptativa(k,otras){
+  const q=optCupo(),v=nivOpt(k,q);if(!v)return;
+  const t=q[v], dup=otras.filter(x=>x!==k&&nivOpt(x,q)===v).length;
+  if(dup+1<=t.libre)return;
+  avisoOpt(t.libre<=0?`El plan pide ${t.total===1?'una optativa':t.total+' optativas'} de nivel ${v} y ya ${t.total===1?'cubriste ese espacio':'cubriste esos espacios'}: ${pretty(cur()[k][0])} no cubre otro espacio, solo suma como materia adicional.`:
+    `El plan solo deja ${t.libre===1?'un espacio libre':t.libre+' espacios libres'} de optativa de nivel ${v}: con ${pretty(cur()[k][0])} ya elegiste más de las que cubren ese nivel; las demás no cubren espacio.`);
 }
 function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
   const [n,cr,niv]=cur()[k]||[k,0,1];
@@ -1820,9 +1860,12 @@ function generate(){
   const subj=want.map(k=>{const all=classes().filter(c=>c[0]===S.car&&c[8]===k&&!bad(c)), f=all.filter(c=>inPool.has(keyOf(c)));
     return {k,must:tr().oblig.includes(k),opts:f.length||!tr().oblig.includes(k)?f:all}}).filter(s=>cur()[s.k]||s.opts.length);
   if(!subj.length) return {msg:'Selecciona materias en «Mi trayectoria» o mediante el buscador para generar horarios.'};
-  if(GT.n==='auto') return generateBank(subj,'auto',{marks,pscore});
+  // optativas por nivel: una opción no lleva más optativas de un nivel que espacios libres tenga el plan en ese nivel
+  const oq=optCupo(), oex=optExceso(subj.map(s=>s.k),oq);
+  const conAviso=r=>{if(Object.keys(oex).length)r.optExceso=oex;return r};
+  if(GT.n==='auto') return conAviso(generateBank(subj,'auto',{marks,pscore,oq}));
   const N=+GT.n||0;
-  if(N&&N<subj.length) return generateBank(subj,N,{marks,pscore});
+  if(N&&N<subj.length) return conAviso(generateBank(subj,N,{marks,pscore,oq}));
   subj.sort((a,b)=>a.opts.length-b.opts.length);
   const res=[];let nodes=0, minDays=Infinity;const maxD=+GT.days||0;
   const pick=[];
@@ -1840,13 +1883,14 @@ function generate(){
       if(subj.every((x,j)=>pick[j]||!x.opts.length))minDays=Math.min(minDays,nd);
       if(maxD&&nd>maxD)return;
       res.push({cs:cs.slice(),s:score(),miss:subj.filter((x,j)=>!pick[j]).map(x=>x.k),days:daysOf(cs)});return}
-    for(const c of subj[i].opts){if(pick.some(p=>p&&overlaps(p,c)))continue;pick[i]=c;rec(i+1)}
+    const nv=nivOpt(subj[i].k,oq), llena=nv&&pick.slice(0,i).filter((p,j)=>p&&nivOpt(subj[j].k,oq)===nv).length>=oq[nv].libre;   // espacio del nivel ya cubierto
+    if(!llena)for(const c of subj[i].opts){if(pick.some(p=>p&&overlaps(p,c)))continue;pick[i]=c;rec(i+1)}
     if(!subj[i].must||!subj[i].opts.length){pick[i]=null;rec(i+1)}   // una obligatoria con grupos no se puede omitir
   };
   rec(0);
   const seen=new Set();
   const top=res.sort((a,b)=>b.s-a.s).filter(r=>{const k=r.cs.map(keyOf).sort().join();if(seen.has(k))return false;seen.add(k);return true}).slice(0,6);
-  return {top,subj,trunc:nodes>250000,minDays:minDays===Infinity?null:minDays,maxD};
+  return conAviso({top,subj,trunc:nodes>250000,minDays:minDays===Infinity?null:minDays,maxD});
 }
 /* Banco de materias: horarios con exactamente N materias tomadas de las seleccionadas. Recorre subconjuntos en orden
    de prioridad (obligatoria por desfase siempre incluida; luego reprobadas, atrasadas, sugeridas y marcadas «Sí»),
@@ -1873,7 +1917,7 @@ function qualityOf(cs){
   if(per.length>1){const m=per.reduce((x,y)=>x+y,0)/per.length;pen+=per.reduce((x,y)=>x+(y-m)**2,0)/per.length*2}
   return {ok,pen,span,comida};
 }
-function generateBank(subj,N,{marks,pscore}){
+function generateBank(subj,N,{marks,pscore,oq}){
   const auto=N==='auto';
   const maxD=+GT.days||0, ci=cargaInfo(0), failS=new Set(tr().fail), sugS=new Set(MARK.sug);
   const cost=k=>failS.has(k)?0:(cur()[k]?.[1]||0);
@@ -1911,6 +1955,7 @@ function generateBank(subj,N,{marks,pscore}){
   const chosen=[];let need=0;
   const walk=start=>{if(subsets>=CAP){trunc=true;return}
     if(chosen.length===need){const set=[...must,...chosen], nuevos=nuevosDe(set);
+      if(Object.keys(optExceso(set.map(x=>x.k),oq)).length)return;   // más optativas de un nivel que espacios libres
       if(ci&&ci.ret+nuevos>ci.tope+0.01)return;
       if(auto&&(nuevos>meta+7.5||(ci&&ci.ret+nuevos<ci.L.min-0.01&&set.length<must.length+free.length)))return;   // cerca de la meta y al menos la mínima
       subsets++;const b=bestFor(set);if(b){if(auto)b.s-=(nuevos<meta?(meta-nuevos)*8:(nuevos-meta)*3);res.push(b)}return}
@@ -1926,12 +1971,14 @@ function renderGen(){
   if(!g){$('#genres').innerHTML='';return}
   if(g.msg){$('#genres').innerHTML=`<p class="empty">${g.msg}</p>`;return}
   const dmsg=g.bank?.auto?`<p class="gdays-msg">Selección automática entre tus <b>${g.bank.M}</b> materias: busca cerca de <b>${fmtCr(g.bank.meta)} créditos nuevos</b> (carga media${g.bank.tope!=null?`, sin rebasar ${fmtCr(g.bank.tope)} cr en total`:''}) con un horario saludable: hasta 8 h en la escuela (idealmente 6.5 h o menos), no más de 3 clases seguidas, al menos 1 h para comer entre 12:00 y 16:30, pocas horas libres y clases repartidas entre los días.</p>${g.bank.relajado?'<p class="gdays-msg warn">Con tus exclusiones y filtros ninguna combinación cumple todos estos criterios; se muestran las más cercanas. Revisa la permanencia y los descansos de cada opción, o reduce las exclusiones.</p>':''}${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">Con la oferta actual, las combinaciones que cumplen estos criterios llegan a <b>${fmtCr(g.bank.best)} créditos nuevos</b>. Para una carga mayor elige un número de materias por horario; esas opciones pueden tener jornadas más largas.</p>`:''}`:g.bank?`<p class="gdays-msg">Horarios de <b>${g.bank.N} materias</b> elegidas entre tus <b>${g.bank.M}</b> seleccionadas${g.bank.tope!=null?`, sin rebasar tu carga permitida (${fmtCr(g.bank.tope)} cr en total)`:''}. Cada opción combina materias distintas.</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">Con todas las materias seleccionadas, el mínimo es de <b>${g.minDays} ${g.minDays>1?'días':'día'}</b> a la semana.${g.maxD&&g.minDays>g.maxD?` En ${g.maxD} días no es posible incluirlas todas; las opciones omiten al menos una materia.`:g.maxD?` Es posible en ${g.maxD} días o menos.`:''}</p>`:'';
+  const oex=g.optExceso?Object.entries(g.optExceso).map(([v,x])=>x.libre<=0?`el plan ya tiene ${x.total===1?'cubierto su espacio':'cubiertos sus '+x.total+' espacios'} de optativa de nivel ${v}`:`el plan solo tiene ${x.libre===1?'un espacio libre':x.libre+' espacios libres'} de optativa de nivel ${v} y elegiste ${x.n}`):[];
+  const oexMsg=oex.length?`<p class="gdays-msg warn">Optativas de un mismo nivel: ${oex.join('; ')}. Ninguna opción lleva más optativas de ese nivel que espacios por cubrir; para cursar optativas adicionales agrégalas a mano.</p>`:'';
   const none=g.subj.filter(s=>!s.opts.length).map(s=>s.k), mustNone=g.subj.filter(s=>s.must&&!s.opts.length).map(s=>s.k);
   const must=g.subj.filter(s=>s.must&&s.opts.length).map(s=>s.k);
   const omsg=(mustNone.length?`<p class="gdays-msg warn"><b>${mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')}</b> es obligatoria por desfase y ningún grupo cumple los filtros actuales. Ajusta el turno, el horario, los descansos o los días.</p>`:'')+
     (must.length?`<p class="gdays-msg">Todas las opciones incluyen <b>${must.map(k=>esc(pretty(cur()[k][0]))).join(', ')}</b>, obligatoria por desfase.</p>`:'');
-  if(!g.top.length){$('#genres').innerHTML=dmsg+omsg+'<p class="empty">No hay combinaciones que cumplan los criterios. Reduce las preferencias o exclusiones, cambia el turno o amplía el horario y los descansos.</p>';return}
-  $('#genres').innerHTML=dmsg+omsg+
+  if(!g.top.length){$('#genres').innerHTML=dmsg+omsg+oexMsg+'<p class="empty">No hay combinaciones que cumplan los criterios. Reduce las preferencias o exclusiones, cambia el turno o amplía el horario y los descansos.</p>';return}
+  $('#genres').innerHTML=dmsg+omsg+oexMsg+
     (none.length?`<small class="warn">Sin grupos que cumplan los filtros: ${none.map(k=>esc(cur()[k]?.[0]||k)).join(', ')}.</small>`:'')+
     g.top.map((r,i)=>{const cr=r.cs.reduce((s,c)=>s+c[7],0);
       return `<div class="gen"><div><b>Opción ${i+1}</b> · ${r.cs.length} ${r.cs.length>1?'materias':'materia'} · ${fmtCr(cr)} cr · ${r.days.length} ${r.days.length>1?'días':'día'}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?` · hasta ${(r.q.span/60).toFixed(1).replace('.0','')} h en la escuela · con espacio para comer`:''}${r.miss.length?` · <span class="warn">sin ${r.miss.length}: ${r.miss.map(k=>esc(pretty(cur()[k]?.[0]||k))).join(', ')}</span>`:''}<div class="ls">${r.cs.map(c=>`<span class="grp">${c[3]}</span> ${esc(pretty(name(c)))}`).join(' · ')}</div></div>
@@ -2431,6 +2478,7 @@ function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carr
 function refresh(){save();renderOffer();renderPlans();renderCal()}
 function addClass(c){const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
 function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1);else{const c=byKey(k);addClass(c);
+    avisoOptativa(c[8],pl.sel.map(x=>byKey(x)?.[8]).filter(Boolean));
     // desde "llenar hueco": la materia pasa a las elegidas (para poder cambiar de grupo) y se suelta el hueco
     if(S.gap||S.fit){if(cur()[c[8]]&&!tr().want.includes(c[8])){tr().want.push(c[8]);saveT()}S.gap=null;renderActive()}}
   refresh()}
@@ -2438,7 +2486,7 @@ function toggleBox(k){
   if(isElec(k)){S.mapHover=k;S.mapFocus=true;renderMap();if(mview()==='lista'){S.lfocus=k;renderList()}return}   // se explica en el inspector
   const w=tr().want,i=w.indexOf(k);
   if(i>=0&&tr().oblig.includes(k)){$('#insp').innerHTML=`<span><b>${esc(cur()[k][0])} es obligatoria</b></span><span class="muted">Al estar desfasada, el SAES no permite la reinscripción sin ella.</span>`;return}
-  if(i>=0)w.splice(i,1);else w.push(k);saveT();renderTray()}
+  if(i>=0)w.splice(i,1);else{w.push(k);avisoOptativa(k,w)}saveT();renderTray()}
 
 /* ---------- eventos ---------- */
 $('#equiv').addEventListener('toggle',renderEquiv);

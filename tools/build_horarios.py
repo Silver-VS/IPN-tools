@@ -636,13 +636,21 @@ def layout_de(t, areas=()):
     x0 = min(b["x0"] for b in bx) - 40
     y0 = min(r[1] for r in t["rows"]) - 40
     r1 = lambda v: round(v, 1)
+    # nivel de cada espacio de optativa: el del color de relleno del PDF (el mismo de las materias de ese nivel); 0 si no se sabe
+    niv_por_color = {}
+    for b in bx:
+        if b.get("clave") and b.get("fill") and b.get("nivel_saes"):
+            niv_por_color.setdefault(b["fill"], set()).add(b["nivel_saes"])
+    def nivel_espacio(b):
+        n = niv_por_color.get(b.get("fill"), set()) if b.get("slot") and not b.get("clave") else set()
+        return next(iter(n)) if len(n) == 1 else 0
     return {
         "w": r1(max(b["x1"] for b in bx) - x0 + 20),
         "h": r1(max(r[1] for r in t["rows"]) - y0 + 40),
         "pitch": r1((t["rows"][-1][1] - t["rows"][0][1]) / (len(t["rows"]) - 1)),
         "rows": [[r[0], r1(r[1] - y0)] for r in t["rows"]],
         "boxes": [[r1(b["x0"] - x0), r1(b["top"] - y0), r1(b["x1"] - b["x0"]), r1(b["bottom"] - b["top"]),
-                   b.get("clave") or "", b.get("slot") or "", b["sem"]] for b in bx],
+                   b.get("clave") or "", b.get("slot") or "", b["sem"], nivel_espacio(b)] for b in bx],
         "edges": [[e["s"], e["d"], [r1(v - (x0 if i % 2 == 0 else y0)) for pt in e["pts"] for i, v in enumerate(pt)]] for e in t["edges"]],
         "cols": [[n, r1(a - x0), r1(b - x0)] for n, a, b in areas],
     }
