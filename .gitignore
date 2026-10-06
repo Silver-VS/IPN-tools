@@ -25,3 +25,6 @@ __pycache__/
 Thumbs.db
 /UPIBI/
 web/qa-*.html
+/qa-formatos/
+/web/dictamen.html
+/CODEX-INFORME.md
