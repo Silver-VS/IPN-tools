@@ -219,6 +219,8 @@ input[type=number]{width:5rem}
 .dpill.warn{background:var(--warn-soft);color:var(--warn);border-color:transparent}
 .desf-v{margin:0 0 8px;padding:10px 14px;border-radius:10px;font-size:.88rem;line-height:1.5;max-width:110ch}
 .desf-v.bad{background:var(--bad-soft)} .desf-v.ok{background:var(--ok-soft)}
+.desf-ets{margin:0 0 8px;padding:10px 14px;border-radius:10px;background:var(--ok-soft);font-size:.88rem;line-height:1.5;max-width:110ch}
+.desf-ets .link{font-weight:600}
 .cal{display:grid;gap:10px;min-width:0}
 .cal-alerta{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);font-size:.9rem;line-height:1.45}
 .cal-alerta .link{font-weight:600;white-space:nowrap}
@@ -1012,7 +1014,8 @@ function drawCals(){
   });
 }
 document.addEventListener('click',e=>{const v=e.target.closest('[data-calver-ver]');if(!v)return;
-  CALSEL=+v.dataset.calverVer;store.set('calVer','todo');drawCals();
+  CALSEL=+v.dataset.calverVer;drawCals();
+  if(!document.querySelector(`.cal [data-calc="${CALSEL}"]`)){store.set('calVer','todo');drawCals()}   // la actividad no está en «Lo que me aplica»
   const c=[...document.querySelectorAll('.cal')].find(x=>x.offsetParent);const card=c?.querySelector(`[data-calc="${CALSEL}"]`);
   if(c){c.scrollIntoView({behavior:'smooth',block:'start'});if(card)c.querySelector('.cal-strip').scrollLeft=Math.max(0,card.offsetLeft-8)}});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-calc],[data-calver]');if(!b)return;
@@ -1482,18 +1485,20 @@ function renderSide0(){
       if(f.estado==='reciente')return ['',`Plazo: ${P(f.limite)}`,rc||'Recursar o ETS'];
       return ['','Sin periodo','Actualiza tus datos del SAES'];
     };
-    // ETS próximo del calendario (inscripción o aplicación) para mencionarlo en el veredicto
-    const etsTxt=()=>{const hoy=new Date();hoy.setHours(0,0,0,0);const a=(DATA.calendario?.actividades||[]).find(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);
-      return a?`Puedes presentar ETS: ${esc(a.titulo.charAt(0).toLowerCase()+a.titulo.slice(1))} ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)}.`:'Puedes acreditar tus adeudos por ETS.'};
+    // ETS próximo del calendario (inscripción o aplicación): aviso propio, aparte del veredicto de desfase
+    const etsB=(()=>{if(!tr().fail.length)return '';const hoy=new Date();hoy.setHours(0,0,0,0);
+      const L=DATA.calendario?.actividades||[], i=L.findIndex(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);if(i<0)return '';const a=L[i];
+      return `<p class="desf-ets"><b>Puedes presentar ETS</b> <span class="muted">(examen a título de suficiencia: acreditas una materia con un examen de todo su temario, sin volver a cursarla)</span><br>`+
+        `${esc(a.titulo)}: ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)} · <button class="link" type="button" data-calver-ver="${i}">Ver cómo</button></p>`})();
     const veredicto=(()=>{if(!rd?.n)return '';
       const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
-      if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}; tu tope es de ${fmtCr(rd.tope)} cr. ${etsTxt()}</p>`;
+      if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}; tu tope es de ${fmtCr(rd.tope)} cr.</p>`;
       return `<p class="desf-v bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?`Sin dictamen vigente no puedes reinscribirte en ${esc(DATA.calendario.periodo)}.`:`Tienes más de ${rd.R.maxDesfasadas} desfasadas.`}</b> `+
-        `${dict?'Tramítalo para el siguiente periodo y revisa':'Revisa'} tu situación en ventanillas${sc?' el '+fechaCal(sc.desde):''}. ${etsTxt()}</p>`;
+        `${dict?'Tramítalo para el siguiente periodo y revisa':'Revisa'} tu situación en ventanillas${sc?' el '+fechaCal(sc.desde):''}.</p>`;
     })();
     const items=[...dS.map(k=>({k,cls:'desfasada',p:['bad','Desfasada según el SAES','Debes inscribirla para reinscribirte'],tip:k})),
       ...fis.map(f=>({k:f.k,cls:f.estado,p:fila(f),tip:`${f.k}${f.idx!=null?' · reprobada por primera vez en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`}))];
-    $('#desf').innerHTML=items.length?veredicto+`<ul class="desf">${items.map(x=>`<li class="${x.cls}" title="${esc(x.tip)}"><b>${esc(pretty(c[x.k][0]))}</b><span class="dpill ${x.p[0]}">${x.p[1]}</span><small>${x.p[2]}</small></li>`).join('')}</ul>`:'';
+    $('#desf').innerHTML=items.length?veredicto+etsB+`<ul class="desf">${items.map(x=>`<li class="${x.cls}" title="${esc(x.tip)}"><b>${esc(pretty(c[x.k][0]))}</b><span class="dpill ${x.p[0]}">${x.p[1]}</span><small>${x.p[2]}</small></li>`).join('')}</ul>`:'';
     $('#desf-note').textContent=fis.length?(DATA.calendario?.notaDesfase||'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.'):'';
     renderCalendario(rd,nDes);
     {const f=new Date(A.leido);$('#est-src').textContent=isNaN(f)?'Leído del SAES':'Leído del SAES el '+f.toLocaleDateString('es-MX',{dateStyle:'medium'})}
