@@ -1,0 +1,89 @@
+/* Componentes de SATE: solo variables --ipn-* (vendor/ipn-comun/dist/tokens.css). */
+.sate-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.sate-sin-scroll{overflow:hidden}
+:where(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary){font:inherit;color:inherit}
+:is(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+
+/* chips: el color indica el estado; la marca (✓ ! ✕ i) lo repite sin depender del color */
+.sate-chips{display:flex;gap:var(--ipn-esp-2);overflow-x:auto;padding:var(--ipn-esp-1);scrollbar-width:thin}
+.sate-chips__item{flex:none;display:inline-flex}
+.sate-chip{display:inline-flex;align-items:center;gap:var(--ipn-esp-2);min-height:2.25rem;padding:0 var(--ipn-esp-3);border:1px solid var(--chip-c);border-radius:999px;background:var(--chip-s);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);white-space:nowrap}
+.sate-chip[data-estado=ok]{--chip-c:var(--ipn-ok);--chip-s:var(--ipn-ok-suave)}
+.sate-chip[data-estado=aviso]{--chip-c:var(--ipn-aviso);--chip-s:var(--ipn-aviso-suave)}
+.sate-chip[data-estado=error]{--chip-c:var(--ipn-error);--chip-s:var(--ipn-error-suave)}
+.sate-chip[data-estado=info]{--chip-c:var(--ipn-info);--chip-s:var(--ipn-info-suave)}
+button.sate-chip{cursor:pointer}
+.sate-chip__marca{display:inline-grid;place-items:center;width:1.1rem;height:1.1rem;border-radius:50%;background:var(--chip-c);color:var(--chip-s);font-size:.7rem;font-weight:700;line-height:1}
+.sate-chip__texto{color:var(--ipn-texto)}
+
+/* avisos */
+.sate-avisos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:var(--ipn-esp-3)}
+.sate-aviso{position:relative;padding:var(--ipn-esp-3) var(--ipn-esp-4);border-left:4px solid var(--av-c);border-radius:var(--ipn-radio);background:var(--av-s);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
+.sate-aviso[data-estado=ok]{--av-c:var(--ipn-ok);--av-s:var(--ipn-ok-suave)}
+.sate-aviso[data-estado=aviso]{--av-c:var(--ipn-aviso);--av-s:var(--ipn-aviso-suave)}
+.sate-aviso[data-estado=error]{--av-c:var(--ipn-error);--av-s:var(--ipn-error-suave)}
+.sate-aviso[data-estado=info]{--av-c:var(--ipn-info);--av-s:var(--ipn-info-suave)}
+.sate-aviso p{margin:0}
+.sate-aviso__titulo{font-weight:600;color:var(--av-c)}
+.sate-aviso__cuerpo{margin-top:var(--ipn-esp-1)!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sate-aviso__x{position:absolute;top:var(--ipn-esp-1);right:var(--ipn-esp-1);width:2rem;height:2rem;border:0;background:none;cursor:pointer;border-radius:50%}
+.sate-enlace{display:inline-block;margin-top:var(--ipn-esp-2);padding:0;border:0;background:none;color:var(--ipn-acento);text-decoration:underline;cursor:pointer;font-size:var(--ipn-tamano-s)}
+
+/* botones */
+.sate-btn{min-height:2.5rem;padding:0 var(--ipn-esp-4);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);cursor:pointer;font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
+.sate-btn--primario{background:var(--ipn-acento);border-color:var(--ipn-acento);color:var(--ipn-sobre-acento)}
+
+/* modal */
+.sate-modal{box-sizing:border-box;width:min(36rem,calc(100vw - var(--ipn-esp-5)));max-height:calc(100dvh - var(--ipn-esp-6));padding:0;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);overflow:hidden}
+.sate-modal[open]{display:flex;flex-direction:column}
+.sate-modal::backdrop{background:color-mix(in srgb,var(--ipn-texto) 45%,transparent)}
+.sate-modal--pequeno{width:min(24rem,calc(100vw - var(--ipn-esp-5)))}
+.sate-modal__cab{display:flex;align-items:center;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
+.sate-modal__titulo{flex:1;margin:0;font-size:var(--ipn-tamano-m);font-weight:600}
+.sate-modal__x{flex:none;width:2.5rem;height:2.5rem;border:0;border-radius:50%;background:none;cursor:pointer}
+.sate-modal__cuerpo{flex:1;overflow:auto;padding:var(--ipn-esp-4);font-size:var(--ipn-tamano-s);line-height:1.5}
+.sate-modal__cuerpo p{margin:0 0 var(--ipn-esp-3)}
+.sate-modal__cuerpo a{color:var(--ipn-acento)}
+.sate-modal__pie{display:flex;justify-content:flex-end;gap:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-4);border-top:1px solid var(--ipn-linea)}
+.sate-modal__pie[hidden]{display:none}
+@media (max-width:720px){
+  .sate-modal,.sate-modal--pequeno{width:100%;max-width:100%;margin:auto 0 0;border-radius:var(--ipn-radio) var(--ipn-radio) 0 0;border-bottom:0;height:calc(100dvh - var(--ipn-esp-5));max-height:none;padding-bottom:env(safe-area-inset-bottom,0px)}
+  .sate-modal--pequeno{height:auto;max-height:calc(100dvh - var(--ipn-esp-5))}
+  .sate-modal[open]{animation:sate-sube var(--ipn-duracion-media) ease-out}
+}
+@keyframes sate-sube{from{transform:translateY(2rem);opacity:0}}
+@media (prefers-reduced-motion:reduce){.sate-modal[open]{animation:none}}
+
+/* ayuda */
+.sate-ayuda{display:inline-block;position:relative;vertical-align:middle}
+.sate-ayuda__btn{display:inline-grid;place-items:center;min-width:1.75rem;min-height:1.75rem;border:0;background:none;color:var(--ipn-tenue);cursor:pointer;border-radius:50%;font-size:var(--ipn-tamano-m);padding:0}
+.sate-ayuda__btn:hover{color:var(--ipn-acento)}
+.sate-globo{position:fixed;z-index:60;box-sizing:border-box;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);font-weight:400;line-height:1.45;text-align:left}
+.sate-globo[hidden]{display:none}
+.sate-globo a{color:var(--ipn-acento)}
+
+/* desplegable */
+.sate-desp{border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto)}
+.sate-desp summary{display:flex;align-items:center;gap:var(--ipn-esp-2);min-height:2.75rem;padding:0 var(--ipn-esp-4);cursor:pointer;font-weight:600;font-size:var(--ipn-tamano-s);list-style:none}
+.sate-desp summary::-webkit-details-marker{display:none}
+.sate-desp summary::before{content:"▸";color:var(--ipn-tenue);transition:transform var(--ipn-duracion-rapida)}
+.sate-desp[open] summary::before{transform:rotate(90deg)}
+.sate-desp__cuerpo{padding:0 var(--ipn-esp-4) var(--ipn-esp-3);font-size:var(--ipn-tamano-s)}
+.sate-desp__cuerpo p{margin:0}
+
+/* pestañas */
+.sate-pestanas{display:flex;gap:var(--ipn-esp-1);border-bottom:1px solid var(--ipn-linea);overflow-x:auto;font-family:var(--ipn-fuente-texto)}
+.sate-pestana{flex:none;min-height:2.75rem;padding:0 var(--ipn-esp-4);border:0;border-bottom:3px solid transparent;background:none;color:var(--ipn-tenue);cursor:pointer;font-size:var(--ipn-tamano-s)}
+.sate-pestana[aria-selected=true]{color:var(--ipn-acento);border-bottom-color:var(--ipn-acento);font-weight:600}
+.sate-pestanas--seg{display:inline-flex;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-1);background:var(--ipn-hundido)}
+.sate-pestanas--seg .sate-pestana{min-height:2.25rem;border:0;border-radius:calc(var(--ipn-radio) - 2px)}
+.sate-pestanas--seg .sate-pestana[aria-selected=true]{background:var(--ipn-superficie);box-shadow:0 0 0 1px var(--ipn-linea)}
+
+/* barra inferior: solo teléfono */
+.sate-barra{display:none}
+@media (max-width:720px){
+  .sate-barra{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:40;box-sizing:border-box;height:calc(48px + env(safe-area-inset-bottom,0px));padding-bottom:env(safe-area-inset-bottom,0px);border-top:1px solid var(--ipn-linea);background:var(--ipn-superficie);font-family:var(--ipn-fuente-texto)}
+  .sate-barra__btn{flex:1;min-width:0;border:0;background:none;color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);cursor:pointer;border-top:3px solid transparent;padding:0 2px}
+  .sate-barra__btn[aria-current=page]{color:var(--ipn-acento);border-top-color:var(--ipn-acento);font-weight:600}
+  body:has(.sate-barra){padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
+}

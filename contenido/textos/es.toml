@@ -30,10 +30,10 @@ titulo = "Desempeño"
 corto = "Desempeño"
 
 [sate.pestana.tramites]
-titulo = "Trámites"
-corto = "Trámites"
+titulo = "Ventanilla digital"
+corto = "Ventanilla"
 
-# Trámites de la pestaña Trámites (solo los que la unidad activa en data/sate.json).
+# Trámites de la pestaña Ventanilla digital (solo los que la unidad activa en data/sate.json).
 [sate.tramite.ets]
 titulo = "Examen a título de suficiencia"
 
@@ -45,3 +45,60 @@ titulo = "Dictamen"
 
 [sate.tramite.electivas]
 titulo = "Electivas"
+
+# Componentes comunes (web/sate/componentes.js).
+[componentes]
+cerrar = "Cerrar"
+descartar = "Descartar"
+barra.etiqueta = "Secciones"
+ayuda.boton = "Ayuda"
+ayuda.titulo = "Ayuda"
+estado.ok = "Todo en orden"
+estado.aviso = "Atención"
+estado.error = "Requiere acción"
+estado.info = "Información"
+
+# Textos de ejemplo de web/qa-componentes.html (no se muestran a las personas usuarias).
+[qa]
+titulo = "Componentes de SATE"
+tema.etiqueta = "Tema"
+tema.claro = "Claro"
+tema.oscuro = "Oscuro"
+seccion.chips = "Franja de chips"
+seccion.avisos = "Tarjetas de aviso"
+seccion.modal = "Modal"
+seccion.ayuda = "Ayuda"
+seccion.desplegable = "Desplegable"
+seccion.pestanas = "Pestañas"
+seccion.barra = "Barra inferior (teléfono)"
+chip.situacion = "Situación regular"
+chip.desfase = "Desfase de 1 periodo"
+chip.ets = "ETS pendiente"
+chip.cita = "Cita sin publicar"
+chip.dictamen = "Dictamen en trámite"
+chip.modal.titulo = "Qué hacer"
+chip.modal.cuerpo = "Revisa tu situación en el SAES y confirma con tu Gestión Escolar."
+aviso.ok.titulo = "Inscripción al corriente"
+aviso.ok.cuerpo = "Tus materias del periodo están inscritas."
+aviso.aviso.titulo = "Fecha próxima"
+aviso.aviso.cuerpo = "La reinscripción cierra en tres días. Consulta tu cita en el SAES."
+aviso.error.titulo = "Materia reprobada dos veces"
+aviso.error.cuerpo = "Necesitas dictamen para continuar. Acude a tu Gestión Escolar."
+aviso.info.titulo = "Dato de referencia"
+aviso.info.cuerpo = "Se calculó con el kárdex que cargaste."
+aviso.accion = "Ver detalle"
+modal.abrir = "Abrir modal"
+modal.titulo = "Ejemplo de modal"
+modal.cuerpo = "Esc, la X o tocar fuera lo cierran y el foco vuelve al botón."
+modal.aceptar = "Entendido"
+modal.cancelar = "Cancelar"
+ayuda.texto = "Carga media: créditos que cursas por periodo. <a href=\"#glosario\">Más información</a>."
+ayuda.etiqueta = "Carga media"
+desplegable.titulo = "Planeación"
+desplegable.cuerpo = "Contenido del desplegable. Su estado se recuerda."
+pestana.uno = "Resumen"
+pestana.dos = "Detalle"
+pestana.tres = "Historial"
+panel.uno = "Panel del resumen."
+panel.dos = "Panel del detalle."
+panel.tres = "Panel del historial."
