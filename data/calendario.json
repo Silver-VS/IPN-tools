@@ -9,7 +9,7 @@
       "periodosAtras": 3,
       "fecha": "2026-10-19"
     },
-    "notaDesfase": "Una materia reprobada se desfasa cuando transcurren más de dos periodos sin acreditarla. En la UPIITA, Gestión Escolar autoriza de oficio el primer periodo de desfase (materias cursadas por primera vez en los tres periodos anteriores); a partir del siguiente se solicita dictamen a la Comisión de Situación Escolar.",
+    "notaDesfase": "Se desfasa la materia que pasa más de dos periodos sin acreditarse. El primer periodo de desfase se autoriza sin trámite; después se pide dictamen.",
     "actividades": [
       {
         "desde": "2026-10-05",
@@ -17,7 +17,7 @@
         "titulo": "Inscripción a ETS 26/2",
         "donde": "ventanillas",
         "para": "adeudo",
-        "texto": "Paga $20 por materia con ficha de depósito y entrega original y copia en la caja (9:00 a 14:00 y 16:00 a 20:00). Después entrega en ventanillas de Gestión Escolar la copia sellada, tu credencial y, si aplica, copia de tu dictamen; ahí inscriben las materias en el SAES. Descarga tu comprobante de ETS del SAES: es la única evidencia de inscripción. Los datos bancarios están en el aviso de Gestión Escolar."
+        "texto": "Paga $20 por materia con ficha de depósito en la caja y entrega la copia sellada y tu credencial en ventanillas. Luego descarga tu comprobante del SAES."
       },
       {
         "desde": "2026-10-07",
@@ -25,28 +25,28 @@
         "titulo": "Aplicación de ETS 26/2",
         "donde": "ventanillas",
         "para": "adeudo",
-        "texto": "Los horarios de aplicación se publican en la página de la unidad. Los profesores capturan la calificación dentro de las 72 horas posteriores a la aplicación."
+        "texto": "Consulta los horarios en la página de la unidad."
       },
       {
         "desde": "2026-10-07",
         "titulo": "Citas publicadas",
         "donde": "saes",
         "para": "todos",
-        "texto": "Se publican las citas de reinscripción en tu sesión del SAES, según tu situación escolar al cierre de la evaluación extraordinaria de 26/2."
+        "texto": "Consulta tu cita de reinscripción en el SAES."
       },
       {
         "desde": "2026-10-07",
         "titulo": "Sin cita: revisa tu situación",
         "donde": "ventanillas",
         "para": "sincita",
-        "texto": "Sin cita (incluye materias desfasadas y reingreso de baja temporal): revisa tu situación en ventanillas de Gestión Escolar con tu credencial o una identificación con fotografía, de 9:00 a 14:00 y de 16:00 a 20:00, o al 55 5729 6000, ext. 56936, 56811, 56935, 56934 o 56920."
+        "texto": "Si no tienes cita (por ejemplo, por materias desfasadas), acude con tu credencial de 9:00 a 14:00 o de 16:00 a 20:00, o llama al 55 5729 6000, ext. 56936, 56811, 56935, 56934 o 56920."
       },
       {
         "desde": "2026-10-12",
         "titulo": "Reinscripción con dictamen",
         "donde": "ventanillas",
         "para": "dictamen",
-        "texto": "Con dictamen de la Comisión de Situación Escolar (H. CGC o CTCE): reinscripción presencial en ventanillas con identificación y copia del dictamen; el SAES no genera cita."
+        "texto": "Lleva identificación y copia de tu dictamen. El SAES no genera cita."
       },
       {
         "desde": "2026-10-13",
@@ -54,21 +54,21 @@
         "titulo": "Reinscripción por cita",
         "donde": "saes",
         "para": "cita",
-        "texto": "Reinscripción en el SAES según tu cita, emitida por avance y promedio global al cierre de 26/2 (sin contar materias aprobadas en ETS 26/2)."
+        "texto": "Las citas se asignan por avance y promedio al cierre de 26/2."
       },
       {
         "desde": "2026-10-16",
         "titulo": "Desfasada aprobada en ETS",
         "donde": "ventanillas",
         "para": "desfasada",
-        "texto": "Si aprobaste una materia desfasada en el ETS 26/2: reinscripción en ventanillas con tu credencial y opciones de horario, según el cupo."
+        "texto": "Si aprobaste una desfasada en el ETS 26/2, lleva tu credencial y opciones de horario."
       },
       {
         "desde": "2026-10-19",
         "titulo": "Desfasadas: primer periodo",
         "donde": "ventanillas",
         "para": "transitorio",
-        "texto": "Hasta dos materias desfasadas cursadas por primera vez en los tres periodos anteriores: recúrsalas e inscribe otras en ventanillas, con identificación y opciones de horario, sin rebasar la carga media más los créditos de la materia con más créditos de tu plan."
+        "texto": "Hasta dos desfasadas en su primer periodo de desfase. Lleva identificación y opciones de horario; tope: carga media más la materia con más créditos."
       },
       {
         "desde": "2026-10-19",
@@ -76,7 +76,7 @@
         "titulo": "Baja de materias",
         "donde": "ventanillas",
         "para": "todos",
-        "texto": "Baja de materias en ventanillas. No se dan de baja recursamientos ni puedes quedar con menos de la carga mínima (art. 54 del Reglamento General de Estudios)."
+        "texto": "No se dan de baja recursamientos ni puedes quedar con menos de la carga mínima."
       },
       {
         "desde": "2026-10-19",
@@ -84,25 +84,25 @@
         "titulo": "Saberes previamente adquiridos",
         "donde": "ventanillas",
         "para": "todos",
-        "texto": "Saberes previamente adquiridos: entrega del formato en ventanillas; aplicación del 27 al 30 de octubre."
+        "texto": "Entrega el formato en ventanillas; la aplicación es del 27 al 30 de octubre."
       },
       {
         "desde": "2026-10-23",
         "titulo": "Cita para altas",
         "donde": "saes",
         "para": "todos",
-        "texto": "Revisa en el SAES tu cita para agregar materias; se emiten de menor a mayor número de créditos inscritos en 27/1."
+        "texto": "Las citas van de menos a más créditos inscritos."
       },
       {
         "desde": "2026-10-26",
         "titulo": "Altas de materias",
         "donde": "saes",
         "para": "todos",
-        "texto": "Altas de materias desde tu sesión del SAES, según tu cita."
+        "texto": "Desde tu sesión del SAES, según tu cita."
       }
     ],
     "notas": [
-      "Si quieres cursar una optativa o elegible como electiva, no la inscribas en el SAES."
+      "¿Quieres cursar una optativa o elegible como electiva? No la inscribas en el SAES."
     ]
   }
 }

@@ -220,6 +220,8 @@ input[type=number]{width:5rem}
 .desf-v{margin:0 0 8px;padding:10px 14px;border-radius:10px;font-size:.88rem;line-height:1.5;max-width:110ch}
 .desf-v.bad{background:var(--bad-soft)} .desf-v.ok{background:var(--ok-soft)}
 .cal{display:grid;gap:10px;min-width:0}
+.cal-alerta{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);font-size:.9rem;line-height:1.45}
+.cal-alerta .link{font-weight:600;white-space:nowrap}
 #est-cal{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
 #hor-cal{margin-bottom:12px}
 .cal-head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
@@ -635,6 +637,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
     </nav>
   </header>
 
+  <p class="cal-alerta" id="cal-alerta" role="status" hidden></p>
   <div class="bar-top">
     <label class="field"><span>Carrera</span><select id="f-carrera"></select></label>
     <div class="field"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
@@ -978,8 +981,18 @@ function calItems(){
   items.forEach(a=>{a.pasada=a.fin<hoy;a.hoy=a.ini<=hoy&&hoy<=a.fin;a.hoyD=hoy});
   return {C,items};
 }
+function alertaCal(R){
+  const el=$('#cal-alerta');if(!el)return;
+  const hoy=new Date();hoy.setHours(0,0,0,0);
+  const a=R&&R.items.filter(x=>(isPersonal()&&CALAP?x.si:x.para==='todos')&&!x.pasada&&x.ini-hoy<=2*864e5).sort((x,y)=>x.fin-y.fin)[0];
+  el.hidden=!a;if(!a){el.innerHTML='';return}
+  const f=x=>x.toLocaleDateString('es-MX',{day:'numeric',month:'long'}), man=a.ini-hoy===864e5;
+  const cuando=a.hoy?(+a.fin===+hoy?'Hoy es el último día':`Hasta el ${f(a.fin)}`):man?'Mañana':`El ${f(a.ini)}`;
+  const mats=a.para==='adeudo'&&isPersonal()?tr().fail.filter(k=>cur()[k]).map(k=>pretty(cur()[k][0])):[];
+  el.innerHTML=`<b>${cuando}:</b> ${esc(a.titulo)}${mats.length?` <span class="muted">· ${esc(mats.join(', '))}</span>`:''} <button class="link" type="button" data-calver-ver="${a.i}">Ver qué hacer</button>`;
+}
 function drawCals(){
-  const R=calItems(), f=(x,o)=>x.toLocaleDateString('es-MX',o).replace('.','');
+  const R=calItems(), f=(x,o)=>x.toLocaleDateString('es-MX',o).replace('.','');alertaCal(R);
   document.querySelectorAll('.cal').forEach(el=>{
     el.hidden=!R;if(!R){el.innerHTML='';return}
     const {C,items}=R, pers=isPersonal()&&!!CALAP, mio=pers&&store.get('calVer','mio')==='mio';
@@ -998,6 +1011,10 @@ function drawCals(){
     if(CALSEL==null){const st=el.querySelector('.cal-strip'),pc=el.querySelector('.cal-c.prox');if(st&&pc)st.scrollLeft=Math.max(0,pc.offsetLeft-8)}
   });
 }
+document.addEventListener('click',e=>{const v=e.target.closest('[data-calver-ver]');if(!v)return;
+  CALSEL=+v.dataset.calverVer;store.set('calVer','todo');drawCals();
+  const c=[...document.querySelectorAll('.cal')].find(x=>x.offsetParent);const card=c?.querySelector(`[data-calc="${CALSEL}"]`);
+  if(c){c.scrollIntoView({behavior:'smooth',block:'start'});if(card)c.querySelector('.cal-strip').scrollLeft=Math.max(0,card.offsetLeft-8)}});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-calc],[data-calver]');if(!b)return;
   if(b.dataset.calver){store.set('calVer',b.dataset.calver);CALSEL=null}else CALSEL=+b.dataset.calc;
   const sc=[...document.querySelectorAll('.cal-strip')].map(x=>x.scrollLeft);drawCals();
@@ -1460,13 +1477,12 @@ function renderSide0(){
     };
     // ETS próximo del calendario (inscripción o aplicación) para mencionarlo en el veredicto
     const etsTxt=()=>{const hoy=new Date();hoy.setHours(0,0,0,0);const a=(DATA.calendario?.actividades||[]).find(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);
-      return a?`Mientras tanto puedes acreditar tus adeudos por ETS (RGE, art. 48): ${esc(a.titulo.charAt(0).toLowerCase()+a.titulo.slice(1))} ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)}.`:'Mientras tanto puedes acreditar tus adeudos por ETS (RGE, art. 48).'};
+      return a?`Puedes presentar ETS: ${esc(a.titulo.charAt(0).toLowerCase()+a.titulo.slice(1))} ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)}.`:'Puedes acreditar tus adeudos por ETS.'};
     const veredicto=(()=>{if(!rd?.n)return '';
       const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
-      if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Es tu primer periodo de desfase: inscríbete en ventanillas de Gestión Escolar el ${fechaCal(rd.R.fecha)}, con hasta ${fmtCr(rd.tope)} cr (carga media más la materia con más créditos de tu plan).</p>`;
-      return `<p class="desf-v bad"><b>${dict?`Para reinscribirte en ${esc(DATA.calendario.periodo)} necesitas un dictamen de la Comisión de Situación Escolar.`:`Tienes más de ${rd.R.maxDesfasadas} materias desfasadas.`}</b> `+
-        `${tipos.includes('oficio')?`La autorización sin dictamen cubre solo el primer periodo de desfase, con ${rd.R.maxDesfasadas} materias como máximo. `:''}`+
-        `${sc?`Revisa tu situación en ventanillas de Gestión Escolar desde el ${fechaCal(sc.desde)}. `:''}${etsTxt()}</p>`;
+      if(rd.ok)return `<p class="desf-v ok"><b>Puedes recursar sin dictamen.</b> Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}; tu tope es de ${fmtCr(rd.tope)} cr. ${etsTxt()}</p>`;
+      return `<p class="desf-v bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?'Necesitas dictamen para reinscribirte.':`Tienes más de ${rd.R.maxDesfasadas} desfasadas.`}</b> `+
+        `${sc?`Acude a ventanillas el ${fechaCal(sc.desde)}. `:''}${etsTxt()}</p>`;
     })();
     const items=[...dS.map(k=>({k,cls:'desfasada',p:['bad','Desfasada según el SAES','Debes inscribirla para reinscribirte'],tip:k})),
       ...fis.map(f=>({k:f.k,cls:f.estado,p:fila(f),tip:`${f.k}${f.idx!=null?' · reprobada por primera vez en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`}))];
