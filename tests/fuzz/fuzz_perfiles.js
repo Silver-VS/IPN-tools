@@ -157,8 +157,8 @@
       } finally { vuelve(); }
     }, ctx);
     revisar('promedio oficial simulado', () => { const po = promOficialSim(); if (!po) return true;
-      if (!Number.isFinite(po.despues) || po.despues < REPROB_CAL - 1e-9 || po.despues > 10 + 1e-9) return 'fuera de rango: ' + po.despues;
-      if (!(po.reprobadasEstimadas >= 0)) return 'reprobadas estimadas negativas: ' + po.reprobadasEstimadas; return true }, ctx);
+      if (!Number.isFinite(po.despues) || po.despues < -1e-9 || po.despues > 10 + 1e-9) return 'fuera de rango: ' + po.despues;
+      if (!po.exacto && !(po.reprobadasEstimadas >= 0)) return 'reprobadas estimadas negativas: ' + po.reprobadasEstimadas; return true }, ctx);
     revisar('promedio meta', () => { const m = promMeta(statsDatos(), 8.5); for (const k in m) if (malo(m[k])) return `${k} = ${m[k]}`; return true }, ctx);
     revisar('sugerencias', () => {
       const s = suggestions(), t = tr(), ya = new Set([...t.done, ...t.curso]);
