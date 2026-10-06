@@ -1,5 +1,5 @@
 {
-  "_nota": "Fechas del calendario de Gestión Escolar por unidad. 'periodo': periodo cuya reinscripción está en curso; 'citas': día en que se publican las citas en el SAES (AAAA-MM-DD). 'actividades[].para': a quién aplica (todos, cita, sincita, desfasada, dictamen, transitorio). 'transitorio': regla para alumnos con materias desfasadas en su primer periodo de desfase.",
+  "_nota": "Fechas del calendario de Gestión Escolar por unidad. 'periodo': periodo cuya reinscripción está en curso; 'citas': día en que se publican las citas en el SAES (AAAA-MM-DD). 'actividades[]': titulo corto, donde (saes o ventanillas), texto; 'para': a quién aplica (todos, cita, sincita, desfasada, dictamen, transitorio). 'transitorio': regla para alumnos con materias desfasadas en su primer periodo de desfase.",
   "upiita": {
     "periodo": "27/1",
     "citas": "2026-10-07",
@@ -13,54 +13,74 @@
     "actividades": [
       {
         "desde": "2026-10-07",
+        "titulo": "Citas publicadas",
+        "donde": "saes",
         "para": "todos",
         "texto": "Se publican las citas de reinscripción en tu sesión del SAES, según tu situación escolar al cierre de la evaluación extraordinaria de 26/2."
       },
       {
         "desde": "2026-10-07",
+        "titulo": "Sin cita: revisa tu situación",
+        "donde": "ventanillas",
         "para": "sincita",
         "texto": "Sin cita (incluye materias desfasadas y reingreso de baja temporal): revisa tu situación en ventanillas de Gestión Escolar con tu credencial o una identificación con fotografía, de 9:00 a 14:00 y de 16:00 a 20:00, o al 55 5729 6000, ext. 56936, 56811, 56935, 56934 o 56920."
       },
       {
         "desde": "2026-10-12",
+        "titulo": "Reinscripción con dictamen",
+        "donde": "ventanillas",
         "para": "dictamen",
         "texto": "Con dictamen de la Comisión de Situación Escolar (H. CGC o CTCE): reinscripción presencial en ventanillas con identificación y copia del dictamen; el SAES no genera cita."
       },
       {
         "desde": "2026-10-13",
         "hasta": "2026-10-15",
+        "titulo": "Reinscripción por cita",
+        "donde": "saes",
         "para": "cita",
         "texto": "Reinscripción en el SAES según tu cita, emitida por avance y promedio global al cierre de 26/2 (sin contar materias aprobadas en ETS 26/2)."
       },
       {
         "desde": "2026-10-16",
+        "titulo": "Desfasada aprobada en ETS",
+        "donde": "ventanillas",
         "para": "desfasada",
         "texto": "Si aprobaste una materia desfasada en el ETS 26/2: reinscripción en ventanillas con tu credencial y opciones de horario, según el cupo."
       },
       {
         "desde": "2026-10-19",
+        "titulo": "Desfasadas: primer periodo",
+        "donde": "ventanillas",
         "para": "transitorio",
         "texto": "Hasta dos materias desfasadas cursadas por primera vez en los tres periodos anteriores: recúrsalas e inscribe otras en ventanillas, con identificación y opciones de horario, sin rebasar la carga media más los créditos de la materia con más créditos de tu plan."
       },
       {
         "desde": "2026-10-19",
         "hasta": "2026-10-21",
+        "titulo": "Baja de materias",
+        "donde": "ventanillas",
         "para": "todos",
         "texto": "Baja de materias en ventanillas. No se dan de baja recursamientos ni puedes quedar con menos de la carga mínima (art. 54 del Reglamento General de Estudios)."
       },
       {
         "desde": "2026-10-19",
         "hasta": "2026-10-23",
+        "titulo": "Saberes previamente adquiridos",
+        "donde": "ventanillas",
         "para": "todos",
         "texto": "Saberes previamente adquiridos: entrega del formato en ventanillas; aplicación del 27 al 30 de octubre."
       },
       {
         "desde": "2026-10-23",
+        "titulo": "Cita para altas",
+        "donde": "saes",
         "para": "todos",
         "texto": "Revisa en el SAES tu cita para agregar materias; se emiten de menor a mayor número de créditos inscritos en 27/1."
       },
       {
         "desde": "2026-10-26",
+        "titulo": "Altas de materias",
+        "donde": "saes",
         "para": "todos",
         "texto": "Altas de materias desde tu sesión del SAES, según tu cita."
       }

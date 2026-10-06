@@ -129,6 +129,20 @@
         });
       }
     } catch (e) { curso = null; horario = null; }
+    /* opcional: Agenda escolar (inicio y fin de cada semestre); fechas «Oct 19 2026» -> «2026-10-19» */
+    var agenda = [];
+    try {
+      var MES = { ene: 0, jan: 0, feb: 1, mar: 2, abr: 3, apr: 3, may: 4, jun: 5, jul: 6, ago: 7, aug: 7, sep: 8, oct: 9, nov: 10, dic: 11, dec: 11 };
+      var fecha = function (s) {
+        var m = clean(s).toLowerCase().match(/^([a-z]{3})[a-z]*\.?\s+(\d{1,2}),?\s+(\d{4})/);
+        return m && MES[m[1]] != null ? m[3] + '-' + String(MES[m[1]] + 1).padStart(2, '0') + '-' + String(+m[2]).padStart(2, '0') : null;
+      };
+      var ag = byId(await getRaw('/Academica/agenda_escolar.aspx'), 'GVAgenda');
+      if (ag) Array.prototype.slice.call(ag.rows, 1).forEach(function (r) {
+        var c = Array.prototype.map.call(r.cells, function (x) { return clean(x.textContent); });
+        if (c[0]) agenda.push([c[0], fecha(c[1]), fecha(c[2])]);
+      });
+    } catch (e) { agenda = null; }
     var freq = {}; acred.forEach(function (a) { freq[a[0][0]] = (freq[a[0][0]] || 0) + 1; });
     var claveCar = Object.keys(freq).sort(function (a, b) { return freq[b] - freq[a]; })[0] || null;
     var data = {
@@ -165,6 +179,7 @@
       horario_inscrito: horario,
       acreditadas: acred,
       kardex_reprobadas: kxRep,
+      agenda: agenda,   /* [evento, inicio, fin] de la Agenda escolar: de aquí sale el periodo que sigue */
       lector: '__LECTOR_VERSION__'   /* versión del Lector (huella del código), para atribuir errores a una versión */
     };
     var json = JSON.stringify(data);
