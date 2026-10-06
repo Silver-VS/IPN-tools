@@ -1491,8 +1491,8 @@ function renderSide0(){
     // ETS próximo del calendario (inscripción o aplicación): aviso propio, aparte del veredicto de desfase
     const etsB=(()=>{if(!tr().fail.length)return '';const hoy=new Date();hoy.setHours(0,0,0,0);
       const L=DATA.calendario?.actividades||[], i=L.findIndex(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);if(i<0)return '';const a=L[i];
-      return `<div class="aviso ok"><b>Puedes presentar ETS</b><span>Examen a título de suficiencia: acreditas la materia con un examen de todo su temario, sin volver a cursarla.</span>`+
-        `<small>${esc(a.titulo)}: ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)} · <button class="link" type="button" data-calver-ver="${i}">Ver cómo</button></small></div>`})();
+      return `<div class="aviso ok"><b>Puedes presentar ETS ${info('Examen a título de suficiencia: acreditas la materia con un examen de todo su temario, sin volver a cursarla.')}</b><span>${esc(a.titulo)}: ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)}.</span>`+
+        `<small><button class="link" type="button" data-calver-ver="${i}">Ver cómo</button></small></div>`})();
     const veredicto=(()=>{if(!rd?.n)return '';
       const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
       if(rd.ok)return `<div class="aviso ok"><b>Puedes recursar sin dictamen</b><span>Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}.</span><small>Tope: ${fmtCr(rd.tope)} cr</small></div>`;
