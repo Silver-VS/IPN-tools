@@ -483,7 +483,10 @@ function minimapaCurricular(L=MAP().layout,FILL,op={}){
     svg+=`<circle data-estado="${st}" cx="${cx}" cy="${cy}" r="${r}" fill="${colores[st]}"/>`;
   });
   svg+='</svg>';
-  const leyenda=Object.keys(cnt).map(st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`).join('');
+  // leyenda en dos filas centradas: avance (acreditadas, en curso, por cursar) y alertas (reprobadas, desfasadas)
+  const pastilla=st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`;
+  const leyenda=[['done','curso','pend'],['fail','late']].map(fila=>fila.filter(st=>st in cnt)).filter(f=>f.length)
+    .map(f=>`<div class="mm-fila">${f.map(pastilla).join('')}</div>`).join('');
   return {svg,leyenda,cnt};
 }
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)

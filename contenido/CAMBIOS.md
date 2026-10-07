@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.18 · Claude
+
+| Clave | Antes | Después |
+|---|---|---|
+| `sate.minimapa.done/fail/late` | {n} acreditadas / reprobadas / desfasadas | con plural (1 acreditada, 1 reprobada, 1 desfasada) |
+
 ## 2026-10-07 · 2026.10.17 · Claude
 
 | Clave | Antes | Después |
