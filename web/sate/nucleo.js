@@ -948,7 +948,8 @@ function toggleBox(k){return conSim(usaSim('sugg'),()=>conPlan(()=>toggleBox0(k)
 function toggleBox0(k){
   if(isElec(k)){S.mapHover=k;S.mapFocus=true;renderMap();if(mview()==='lista'){S.lfocus=k;renderList()}return}   // se explica en el inspector
   const paso=PLAN_PASO, base=conPlan(()=>tr(),0), otro=planAsignado(k);
-  if(otro!=null&&conPlan(()=>tr().oblig.includes(k),otro)){$('#insp').innerHTML=`<span>${esc(cur()[k][0])}: ${esc(SATE.texto('sate.planeacion.obligatoria'))}</span>`;return}
+  // Una obligatoria no puede quitarse ni posponerse a un periodo posterior; sí adelantarse (N+1 → N), que evita el desfase.
+  if(otro!=null&&conPlan(()=>tr().oblig.includes(k),otro)&&!(otro===1&&paso===0)){$('#insp').innerHTML=`<span>${esc(cur()[k][0])}: ${esc(SATE.texto('sate.planeacion.obligatoria'))}</span>`;return}
   // Consultar el estado real de N permite mover una materia que N+1 proyecta acreditada.
   if(otro==null&&(base.done.includes(k)||base.curso.includes(k)))return;
   const siguientes=conPlan(()=>[...tr().want],1).filter(x=>x!==k);
