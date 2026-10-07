@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.17 · Claude
+
+| Clave | Antes | Después |
+|---|---|---|
+| `sate.minimapa.pend` | {n} pendientes | {n} por cursar |
+
 ## 2026-10-07 · 2026.10.16 · Claude
 
 | Clave | Antes | Después |
