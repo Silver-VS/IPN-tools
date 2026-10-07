@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.14"
+version = "2026.10.16"
 
 [proyecto]
 nombre = "HADES"
@@ -13,6 +13,8 @@ enlace = "Apoya el proyecto"
 ayuda = "Donar es voluntario; el proyecto es gratuito y lo mantiene un alumno del IPN."
 
 [sate]
+# Pie de página de SATE: qué es, privacidad y dónde se hace lo oficial.
+pie = "SATE te ayuda a entender tu situación escolar y a planear tu trayectoria. Tus datos del SAES se leen en modo de solo lectura y se guardan únicamente en este navegador, o en tu propia nube si inicias sesión, al igual que tu plan, marcas, notas y horarios. Los trámites oficiales se realizan en el SAES y en tu Gestión Escolar, donde deben confirmarse tu cita, tu carga autorizada y los cupos."
 # Nombre completo de la plataforma (encabezado, título de la página, pie).
 nombre = "Sistema de Apoyo a la Trayectoria Escolar"
 # Siglas del nombre.
@@ -131,16 +133,24 @@ te_aplica = "Te aplica"
 fuente = "Fuente: {fuente}."
 
 [sate.pestana.horarios]
-titulo = "Horarios"
+titulo = "Horarios de clase"
 corto = "Horarios"
 
 [sate.pestana.calendario]
-titulo = "Calendario"
+titulo = "Calendario escolar"
 corto = "Calendario"
 
 [sate.pestana.desempeno]
 titulo = "Desempeño"
 corto = "Desempeño"
+
+[sate.minimapa]
+abrir = "Avance del SAES en miniatura. Abrir Mapa curricular"
+done = "{n} acreditadas"
+curso = "{n} en curso"
+pend = "{n} pendientes"
+fail = "{n} reprobadas"
+late = "{n} desfasadas"
 
 [sate.pestana.tramites]
 titulo = "Ventanilla digital"

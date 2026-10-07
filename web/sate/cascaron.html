@@ -1,3 +1,6 @@
+<!doctype html>
+<html lang="es" data-pestanas="v3">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta charset="utf-8">
 <title>/*__SATE_TITULO__*/</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,6 +15,7 @@
   --bg:#fafafa; --surface:#ffffff; --sunken:#f4f4f5; --line:#d9d9de;
   --fg:#18181b; --muted:#52525b; --accent:#750946; --accent-strong:#5b1237; --accent-fg:#ffffff; --accent-soft:#f7eef2;
   --ok:#15803d; --ok-soft:#ecfdf3; --warn:#8a5a00; --warn-soft:#fdf6e3; --bad:#b42346; --bad-soft:#fdecf0;
+  --ipn-reprobada:#c2410c; --ipn-desfasada:#b91c1c;
   --f-display:"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-body:"Noto Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"Noto Sans Mono",ui-monospace,Consolas,monospace;
@@ -23,6 +27,7 @@
   --glow1:rgba(117,9,70,.10); --glow2:rgba(179,142,93,.12); --shadow:0 1px 2px rgba(24,24,27,.05),0 8px 24px -14px rgba(24,24,27,.18);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --ipn-reprobada:#fb923c; --ipn-desfasada:#f87171;
   --bg:#09090b; --surface:#18181b; --sunken:#111113; --line:#323237;
   --fg:#e4e4e7; --muted:#a1a1aa; --accent:#ec9cbf; --accent-strong:#f7c6db; --accent-fg:#1d0a13; --accent-soft:#2e1a24;
   --ok:#6ee7a0; --ok-soft:#0f2a1c; --warn:#f5c56b; --warn-soft:#2f230b; --bad:#fda4b8; --bad-soft:#3a1520;
@@ -32,6 +37,7 @@
   --glow1:rgba(236,156,191,.16); --glow2:rgba(212,176,106,.10); --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px -16px rgba(0,0,0,.6);
 }}
 :root[data-theme="dark"]{
+  --ipn-reprobada:#fb923c; --ipn-desfasada:#f87171;
   --bg:#09090b; --surface:#18181b; --sunken:#111113; --line:#323237;
   --fg:#e4e4e7; --muted:#a1a1aa; --accent:#ec9cbf; --accent-strong:#f7c6db; --accent-fg:#1d0a13; --accent-soft:#2e1a24;
   --ok:#6ee7a0; --ok-soft:#0f2a1c; --warn:#f5c56b; --warn-soft:#2f230b; --bad:#fda4b8; --bad-soft:#3a1520;
@@ -636,7 +642,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 /*__SAES_CSS__*/
 /*__COMPONENTES_CSS__*/
 /* Los componentes nuevos conservan el acento histórico de Horarios. */
-:root,:root[data-theme],:root:not([data-theme]){--ipn-acento:var(--accent);--ipn-texto:var(--fg);--ipn-tenue:var(--muted);--ipn-superficie:var(--surface);--ipn-linea:var(--line)}
+:root,:root[data-theme],:root:not([data-theme]){--ipn-acento:var(--accent);--ipn-texto:var(--fg);--ipn-tenue:var(--muted);--ipn-superficie:var(--surface);--ipn-linea:var(--line);--ipn-hundido:var(--sunken);--ipn-ok:var(--ok)}
 @media(max-width:720px){#sate-tabs{display:none}}
 /*__CUENTA_CSS__*/
 .map-plan{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
