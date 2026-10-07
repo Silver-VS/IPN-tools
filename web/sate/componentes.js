@@ -239,6 +239,11 @@
     var icono = iconoPestana(it.id);
     if (icono) b.appendChild(icono);
     b.appendChild(el('span', {class:'sate-pestana__texto', texto:it.texto}));
+    if (it.corto) {
+      b.appendChild(el('span', {class:'sate-pestana__texto sate-pestana__texto--corto', texto:it.corto}));
+      b.setAttribute('aria-label', it.texto);
+    }
+    if (it.titulo) b.setAttribute('aria-label', it.titulo);
   }
   function pestanas(o) {
     var lista = el('div', { class: 'sate-pestanas' + (o.segmentado ? ' sate-pestanas--seg' : ''), role: 'tablist', 'aria-label': o.etiqueta || null });
@@ -281,8 +286,8 @@
     return lista;
   }
 
-  /* ---------- Barra inferior (teléfono ≤ 720 px) ---------- */
-  /* barraInferior({items:[{id, texto}], activa, alElegir}) → <nav>; solo se ve en teléfono. */
+  /* ---------- Barra inferior (teléfono o pestañas sin espacio) ---------- */
+  /* barraInferior({items:[{id, texto, titulo}], activa, alElegir}) → <nav> */
   function barraInferior(o) {
     var nav = el('nav', { class: 'sate-barra', 'aria-label': traducir('componentes.barra.etiqueta') });
     var bs = o.items.map(function (it, i) {
