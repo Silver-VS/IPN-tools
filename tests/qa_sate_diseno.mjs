@@ -52,10 +52,20 @@ tabs.children[0].eventos.keydown({key:'ArrowLeft',preventDefault(){}});
 assert.equal(destino,'calendario');assert.equal(document.activeElement,tabs.children.at(-1));
 tabs.children.at(-1).eventos.keydown({key:'Home',preventDefault(){}});
 assert.equal(destino,'trayectoria');assert.equal(document.activeElement,tabs.children[0]);
-tabs.children[2].eventos.click();assert.equal(destino,'mapa');
-assert.equal(tabs.children[2].getAttribute('aria-selected'),'true');assert.equal(tabs.children[2].tabIndex,0);
-barra.children[3].eventos.click();assert.equal(destino,'horarios');
-assert.equal(barra.children[3].getAttribute('aria-current'),'page');
+const mapa=tabs.children.find(b=>b.getAttribute('data-id')==='mapa');
+mapa.eventos.click();assert.equal(destino,'mapa');
+assert.equal(mapa.getAttribute('aria-selected'),'true');assert.equal(mapa.tabIndex,0);
+const horarios=barra.children.find(b=>b.getAttribute('data-id')==='horarios');
+horarios.eventos.click();assert.equal(destino,'horarios');
+assert.equal(horarios.getAttribute('aria-current'),'page');
+assert.deepEqual(config.unidades.upiita.tramites,[]);
+for(const nav of [tabs,barra])assert.ok(!nav.children.some(b=>b.getAttribute('data-id')==='tramites'));
+vm.runInContext(leer('web/dist/sate/rutas.js'),c);
+for(const hash of ['#/upiita/tramites','#/upiita/tramites/ets','#/upiita/tramites/dictamen?origen=viejo']){
+  const ruta=c.SateRutas.ruta(hash,'upiita',config.unidades);
+  assert.equal(ruta.pestana,'trayectoria');assert.equal(ruta.tramite,null);
+  assert.equal(ruta.hash,'#/upiita/trayectoria'+(hash.includes('?')?'?origen=viejo':''));
+}
 const css=leer('web/sate/componentes.css');
 assert.match(css,/\[data-pestanas=v3\] \.sate-pestana__icono\{display:none/);
 assert.match(css,/\[data-pestanas\] \.sate-barra \.sate-pestana__icono\{display:inline-flex/);

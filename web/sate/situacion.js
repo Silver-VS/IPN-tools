@@ -30,7 +30,7 @@
   function abrirTramite(tarjeta) {
     if(tarjeta.id==='actualizacion'){SAES.open();return}
     if(config().tramites.includes(tarjeta.tramite))SATE.ir('tramites/'+tarjeta.tramite);
-    else SateUI.modal(tarjeta.titulo,tx('desfase_detalle'),{pequeno:true});
+    else SateUI.modal(tarjeta.titulo,tarjeta.cuerpo+' '+tarjeta.detalle,{pequeno:true});
   }
   function detalle(tarjeta) {
     SateUI.modal(tarjeta.titulo,tarjeta.cuerpo,{acciones:config().tramites.includes(tarjeta.tramite)?[{texto:tx('ventanilla'),primaria:true,onclick:()=>abrirTramite(tarjeta)}]:[],pequeno:true});
