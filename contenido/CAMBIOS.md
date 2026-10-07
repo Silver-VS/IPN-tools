@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.12 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.planeacion.leer_mapa`, `explorar_cursor`, `explorar_tactil`, `supuesto_titulo`, `pie`, `pie_tope`, `sin_trayectoria`, `propuesta`, `flechas`, `sombreado`, `niveles`, `flechas_lejanas`, `resaltar_tactil`, `resaltar_cursor`, `flechas_ocultas` | Ayuda fuera del flujo, supuesto contextual y resumen compacto de ambos periodos en el pie integrado del mapa. |
+
 ## 2026-10-07 · 2026.10.11 · Codex
 
 | Claves | Cambio |

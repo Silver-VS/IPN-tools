@@ -7,6 +7,9 @@ const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONF
 const html=leer('web/dist/sate/index.html');
 const mapaHTML=html.split('id="v-tray"')[1].split('<section id="v-hor"')[0];
 assert.ok(!mapaHTML.includes('plan-layout'),'A: sin cuadrícula lateral junto al mapa');
+assert.match(mapaHTML, /class="map-plan"[\s\S]*id="mapwrap"[\s\S]*id="plan-panel"/, 'mapa y pie comparten tarjeta');
+assert.ok(!mapaHTML.includes('id="plan-titulo"'), 'sin título intermedio');
+assert.match(mapaHTML, /id="mapnote" hidden/, 'notas fuera del flujo');
 const panelHTML=mapaHTML.split('<section class="plan-panel"')[1].split('<div class="below">')[0];
 assert.ok(mapaHTML.indexOf('id="mapcut"')<mapaHTML.indexOf('id="mapwrap"'),'minimapa arriba');
 assert.ok(mapaHTML.indexOf('id="mapwrap"')<mapaHTML.indexOf('id="plan-panel"'),'selector debajo del mapa');
@@ -57,7 +60,8 @@ for (const unidad of ['upiita','escom','upibi']) {
   const SATE={texto,modulos:{},actual:{pestana:'mapa'},pestana(id,m){this.modulos[id]=m},error:e=>{throw e},nucleoListo:async a=>{api=a},repintar(){},ir(){},identidadSaes(){},
     script(n){if(!pendientes.has(n)){cargados.push(n);vm.runInContext(leer('web/dist/sate/'+n),contexto,{filename:n});pendientes.set(n,Promise.resolve())}return pendientes.get(n)}};
   SATE.ir=id=>SATE.destino=id;
-  contexto=vm.createContext({console,document,SATE,SATE_DATA:datos,SATE_UNIDAD:unidad,URL,URLSearchParams,Blob,performance,
+  const ayudas=[];
+  contexto=vm.createContext({SateUI:{modal:(titulo,contenido)=>ayudas.push({titulo,contenido})},console,document,SATE,SATE_DATA:datos,SATE_UNIDAD:unidad,URL,URLSearchParams,Blob,performance,
     localStorage:almacen(),sessionStorage:almacen(),location:{hash:'#/'+unidad+'/mapa',search:'',pathname:'/sate/index.html'},history:{replaceState(){}},
     navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:s=>s==='(max-width:720px)'?movil:{matches:false,addEventListener(){}},addEventListener(){},setTimeout,clearTimeout,
     requestAnimationFrame:fn=>fn(),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:1280,innerHeight:800,
@@ -68,16 +72,23 @@ for (const unidad of ['upiita','escom','upibi']) {
   SATE.modulos.mapa.montar();
   movil.matches=true;
   api.renderTop(); api.renderTray(); await vm.runInContext('renderStats()',contexto);
-  assert.ok(nodos.get('#plan-titulo').textContent,'A: panel sin SAES renderizado');
+  assert.ok(nodos.get('#map-ayuda').textContent.includes('Cómo leer el mapa'),'ayuda del mapa disponible');
+  assert.equal(nodos.get('#insp').hidden,true,'sin bloque Explora entre mapa y pie');
+  assert.equal(nodos.get('#plan-supuesto').hidden,true,'supuesto oculto en N');
   assert.equal(nodos.get('#mapcut').hidden,true,'A: sin SAES la fila contiene solo planeación');
-  assert.match(nodos.get('#plan-resumen').textContent,/^0 materias · 0(?: de [\d.,]+)? créditos$/,'A: resumen vacío sin SAES, con referencia del plan si existe');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: 0 materias · 0(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 · [^:]+: 0 materias/,'A: resumen vacío sin SAES, con referencia del plan si existe');
   vm.runInContext(`const elegible=Object.keys(cur()).find(k=>!isElec(k));toggleBox(elegible)`,contexto);
-  assert.match(nodos.get('#plan-resumen').textContent,/^1 materia · [\d.,]+(?: de [\d.,]+)? créditos$/,'A: selección actualiza resumen al momento');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: 1 materia · [\d.,]+(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 · [^:]+: 0 materias/,'A: selección actualiza resumen al momento');
   assert.ok(nodos.get('#chosen').innerHTML.includes('wchip'),'A: selección actualiza elegidas');
   nodos.get('#b-none').eventos.click();
-  assert.match(nodos.get('#plan-resumen').textContent,/^0 materias · 0(?: de [\d.,]+)? créditos$/,'A: quitar actualiza resumen');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: 0 materias · 0(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 · [^:]+: 0 materias/,'A: quitar actualiza resumen');
   movil.matches=false;
   segmentos[1].focus();segmentos[1].eventos.click();
+  assert.equal(nodos.get('#plan-supuesto').hidden,false,'supuesto visible en N+1');
+  nodos.get('#plan-supuesto').eventos.click();
+  assert.match(ayudas.at(-1).contenido,/supone acreditadas/,'supuesto usa modal existente');
+  nodos.get('#map-ayuda').eventos.click();
+  assert.equal(ayudas.at(-1).titulo,'Cómo leer el mapa','ayuda usa modal existente');
   assert.equal(segmentos[1].atributos['aria-pressed'],'true','C: segundo segmento seleccionado');
   assert.equal(document.activeElement,segmentos[1],'C: cambiar periodo conserva foco');
   assert.equal(nodos.get('#b-go').hidden,false,'C: acceso a horarios de N también desde N+1');
@@ -149,8 +160,8 @@ for (const unidad of ['upiita','escom','upibi']) {
     for(const k in T)delete T[k];
     if(cargaInfo(0).ret!==cur()[requisitos[0]][1])throw new Error('C: retenidos de N incorrectos');
     renderTray();
-    const resumenCarga=$('#plan-resumen').textContent;
-    if(!resumenCarga.includes(' de '+fmtCr(cargaInfo(0).tope)+' créditos'))throw new Error('A: resumen no incluye tope vigente: '+resumenCarga);
+    const resumenCarga=$('#plan-resumen').innerHTML;
+    if(!resumenCarga.includes(' de '+fmtCr(cargaInfo(0).tope)+' cr'))throw new Error('A: resumen no incluye tope vigente: '+resumenCarga);
     conPlan(()=>{if(cargaInfo(0).ret!==0)throw new Error('C: N+1 retiene materia acreditada en N');},1);
     ALUMNO.reprobadas_periodo=[];
     for(const k in T)delete T[k];
@@ -168,7 +179,7 @@ for (const unidad of ['upiita','escom','upibi']) {
   vm.runInContext('ALUMNO=perfilDemo();for(const k in T)delete T[k]',contexto);
   api.renderTray(); await vm.runInContext('renderStats()',contexto);
   assert.equal(nodos.get('#mapcut').hidden,false,'A: perfil DEMO muestra minimapa');
-  assert.match(nodos.get('#plan-resumen').textContent,/^\d+ materias? · [\d.,]+(?: de [\d.,]+)? créditos$/,'A: resumen con SAES, incluso sin carga conocida');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: \d+ materias? · [\d.,]+(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 ·/,'A: resumen con SAES, incluso sin carga conocida');
   assert.deepEqual(cargados,['mapa.js'],'Mapa con/sin perfil no descarga Horarios ni Desempeño');
   await vm.runInContext('SAES.open()',contexto);
   await vm.runInContext('SAES.open()',contexto);

@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.11"
+version = "2026.10.12"
 
 [proyecto]
 nombre = "HADES"
@@ -337,6 +337,21 @@ pendiente = "Sigue pendiente"
 acreditada_por = "Acreditada por {forma}"
 
 [sate.planeacion]
+sin_trayectoria = "Esta carrera aún no tiene una trayectoria recomendada: se muestran sus materias por nivel según el SAES, sin seriación."
+propuesta = "Esta carrera aún no tiene una trayectoria recomendada: las áreas y la seriación (líneas punteadas) son una propuesta hecha a partir del plan de estudios oficial, sujeta a validación por la academia."
+flechas = "Trayectoria recomendada: las flechas indican la seriación recomendada."
+sombreado = "Se sombrean las materias que conviene aprobar antes de las que elegiste; en cursiva, las que no tienen grupos en el periodo consultado."
+niveles = "En este plan las materias se organizan por niveles (1, 2, 3…), no por semestres: el nivel indica el orden recomendado y en un mismo periodo puedes inscribir materias de distintos niveles si cumples sus requisitos y las reglas de inscripción de tu unidad académica."
+flechas_lejanas = "Para no saturar el mapa, las flechas entre materias muy alejadas no se dibujan; aparecen al resaltar una materia."
+resaltar_tactil = "Al tocar una materia se resaltan en azul sus requisitos (antes) y en naranja las materias que desbloquea (después)."
+resaltar_cursor = "Al colocar el cursor sobre una materia se resaltan en azul sus requisitos (antes) y en naranja las materias que desbloquea (después)."
+flechas_ocultas = "Se omiten {n} flechas redundantes (requisitos que ya llegan a través de otra materia de la cadena)."
+leer_mapa = "Cómo leer el mapa"
+explorar_cursor = "Coloca el cursor sobre una materia para ver sus requisitos (antes) y las materias que desbloquea (después). Selecciónala para agregarla a tu plan."
+explorar_tactil = "Toca una materia para ver sus requisitos (antes) y las materias que desbloquea (después). Tócala de nuevo o usa «Quiero cursarla» para agregarla a tu plan."
+supuesto_titulo = "Supuesto del periodo {periodo}"
+pie = "{marca} · {periodo}: {n, plural, one {# materia} other {# materias}} · {creditos}{carga} cr"
+pie_tope = " de {tope}"
 titulo = "Planear en el mapa"
 periodos = "Periodo de planeación"
 elegidas = "Materias que quieres cursar"

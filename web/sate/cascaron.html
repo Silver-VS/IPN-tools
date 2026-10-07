@@ -406,7 +406,9 @@ input[type=number]{width:5rem}
 .minibar i{display:block;height:100%;background:var(--accent)}
 .ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
 .sugg{display:flex;flex-direction:column;gap:4px;font-size:.86rem}
-.sugg label{display:grid;grid-template-columns:auto 3.4rem minmax(0,1fr) auto;gap:8px;align-items:center;cursor:pointer}
+.sugg label{display:grid;grid-template-columns:3.4rem minmax(0,1fr) auto;gap:8px;align-items:center;cursor:pointer}
+.sugg label:has(.dot){grid-template-columns:auto 3.4rem minmax(0,1fr) auto}
+.sugg label.ya{color:var(--muted)}.sugg .ya-marca{color:var(--ok);font-weight:700}
 .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
 textarea.paste{width:100%;min-height:5rem;font-family:var(--f-mono);font-size:.76rem}
 #lineas{display:flex;flex-direction:column;gap:12px}
@@ -637,7 +639,18 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 :root,:root[data-theme],:root:not([data-theme]){--ipn-acento:var(--accent);--ipn-texto:var(--fg);--ipn-tenue:var(--muted);--ipn-superficie:var(--surface);--ipn-linea:var(--line)}
 @media(max-width:720px){#sate-tabs{display:none}}
 /*__CUENTA_CSS__*/
-.plan-panel{margin-top:16px}
+.map-plan{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.plan-panel{margin:0;border-top:1px solid var(--line);padding:12px}
+.plan-head{display:flex;align-items:center;flex-wrap:wrap;gap:8px 16px}
+.plan-head .actions{display:flex;flex-wrap:wrap;gap:8px;margin-left:auto}
+.plan-resumen{display:flex;flex-wrap:wrap;gap:4px 12px;margin:0;font-size:.84rem}
+.plan-resumen span{white-space:nowrap;border-left:4px solid var(--accent);padding-left:6px}
+.plan-resumen .plan-2{border-color:var(--plan-segundo)}
+.plan-panel>.sate-desp__cuerpo{padding:12px 0 0}
+.insp[hidden],.mapnote[hidden]{display:none}
+.map-plan .mapwrap{border:0;border-radius:0}
+.map-plan .tlist{margin:0;padding:12px}
+@media(max-width:720px){.plan-resumen{display:grid;gap:4px;font-size:.78rem}.plan-head .actions{margin-left:0}}
 .plan-grupos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .plan-grupo{min-width:0;border-top:3px solid var(--accent);padding-top:8px}
 .plan-grupo.plan-2{border-color:var(--plan-segundo)}
@@ -695,28 +708,28 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
         <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
       </div>
-      <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button></div>
+      <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button><button class="link" type="button" id="plan-supuesto" hidden>ⓘ</button></div>
       <span id="plan-activo" role="status" aria-live="polite"></span>
       <div class="plan-leyenda" id="plan-leyenda"></div>
-      <div class="legend" id="legend" aria-label="Simbología"></div>
+      <div class="legend" id="legend" aria-label="Simbología"></div><button class="link" type="button" id="map-ayuda"></button>
       <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     </div>
     <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance <span id="mapcut-sim"></span></b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>
+    <div class="map-plan">
     <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
     <div class="tlist" id="tlist" hidden></div>
-    <div class="insp" id="insp" aria-live="polite"></div>
-    <ul class="mapnote" id="mapnote"></ul>
-    <section class="plan-panel" id="plan-panel" aria-labelledby="plan-titulo">
-      <h3 id="plan-titulo"></h3><p id="plan-resumen" role="status"></p>
+    <ul class="mapnote" id="mapnote" hidden></ul>
+    <section class="plan-panel" id="plan-panel">
+      <div class="plan-head"><p class="plan-resumen" id="plan-resumen" role="status" aria-live="polite"></p>
+        <div class="actions"><button class="btn" type="button" id="plan-simular"></button><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="b-none"></button></div>
+      </div>
+      <div class="insp" id="insp" aria-live="polite" hidden></div>
       <div class="sate-desp__cuerpo">
-      <p id="plan-supuesto"></p>
-      <button class="link" type="button" id="plan-simular"></button>
       <p id="plan-carga" role="status" hidden></p>
     <div class="card chosenbar" aria-labelledby="h-chosen">
       <div class="cb-head">
         <h3 class="sub" id="h-chosen">Materias que quieres cursar</h3>
         <span class="muted" id="chosen-help"></span>
-        <div class="actions"><button class="btn primary" id="b-go">Ver sus horarios</button><button class="btn" id="b-none">Quitar todas</button></div>
       </div>
       <div class="plan-grupos" id="chosen"></div>
       <small id="chosen-req"></small>
@@ -725,6 +738,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
         <div class="actions" style="margin-top:10px"><button class="btn" id="b-sugg">Elegir las sugeridas</button><button class="btn" id="b-all" title="Agrega al banco todas las materias que ya puedes cursar y tienen grupos; después indica en «Generar horarios» cuántas quieres llevar">Elegir todas las que puedes cursar</button></div></div>
       </div>
     </section>
+    </div>
     <div class="below">
       <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
       <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>

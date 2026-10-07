@@ -521,9 +521,8 @@ function renderEqvHorario(A){
 function renderInsp(){
   const k=S.mapHover, c=cur(), el=$('#insp');
   el.classList.toggle('act',!!(S.mapFocus&&k&&c[k]));
-  if(!k||!c[k]){el.innerHTML='<div class="insp-t"><b>Explora el mapa</b></div><p class="muted">'+(tactil()?
-    'Toca una materia para ver sus requisitos (antes) y las materias que desbloquea (después). Tócala de nuevo o usa «Quiero cursarla» para agregarla a tu plan.':
-    'Coloca el cursor sobre una materia para ver sus requisitos (antes) y las materias que desbloquea (después). Selecciónala para agregarla a tu plan.')+'</p>';return}
+  el.hidden=!k||!c[k];
+  if(el.hidden){el.innerHTML='';return}
   const {l1,l2}=inspParts(k), w=planAsignado(k)===S.planPaso, ob=tr().oblig.includes(k), done=statusOf(k)==='done';
   el.innerHTML=`<div class="insp-t">${l1}</div><div class="insp-b">${l2}</div>`+(S.mapFocus?`<div class="insp-act">${ob||done||isElec(k)?'':`<button class="btn primary" type="button" data-fwant="${k}">${w?'Quitar de mi plan':'Quiero cursarla'}</button>`}<button class="btn" type="button" data-fclose="1">Cerrar</button></div>`:'');
 }
@@ -546,16 +545,20 @@ function renderSide0(){
   const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
   const req=[...ancestors(want)].filter(k=>!want.includes(k)&&!tr().done.includes(k));
   const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v);
-  $('#plan-titulo').textContent=tx('titulo');$('#plan-periodos').setAttribute('aria-label',tx('periodos'));
+  $('#plan-panel').setAttribute('aria-label',tx('titulo'));$('#map-ayuda').textContent='ⓘ '+tx('leer_mapa');$('#plan-periodos').setAttribute('aria-label',tx('periodos'));
   document.querySelectorAll('[data-plan-paso]').forEach(b=>{const paso=+b.dataset.planPaso;b.textContent=planEtiqueta(paso);b.setAttribute('aria-pressed',String(paso===S.planPaso))});
-  $('#plan-supuesto').textContent=tx(PLAN_PASO?'supuesto':'horario_n');
+  $('#plan-supuesto').hidden=PLAN_PASO!==1;$('#plan-supuesto').setAttribute('aria-label',tx('supuesto_titulo',{periodo:planEtiqueta(1)}));
   $('#plan-simular').textContent=tx('simular');$('#h-chosen').textContent=tx('elegidas');
   $('#b-sugg').textContent=tx('agregar');$('#b-go').hidden=false;
   $('#b-go').textContent=tx('horarios',{periodo:planEtiqueta(0)});$('#b-none').textContent=tx('quitar_activo',{periodo:planEtiqueta(PLAN_PASO)});
   $('#plan-activo').textContent=tx('activo',{periodo:planEtiqueta(PLAN_PASO)});
   $('#plan-leyenda').innerHTML=[0,1].map(p=>`<span class="plan-${p+1}">${esc(tx('asignada',{marca:p+1,periodo:planEtiqueta(p)}))}</span>`).join('');
   const nuevos=want.filter(k=>!tr().fail.includes(k)).reduce((s,k)=>s+c[k][1],0), ci=cargaInfo(nuevos);
-  $('#plan-resumen').textContent=ci?tx('resumen',{n:want.length,creditos:fmtCr(ci.total),tope:fmtCr(ci.tope)}):tx('cuenta',{n:want.length,creditos:fmtCr(credWant)});
+  $('#plan-resumen').innerHTML=[0,1].map(paso=>conPlan(()=>{
+    const t=tr(), elegidas=t.want.filter(k=>c[k]), cr=elegidas.reduce((s,k)=>s+c[k][1],0);
+    const carga=cargaInfo(elegidas.filter(k=>!t.fail.includes(k)).reduce((s,k)=>s+c[k][1],0));
+    return `<span class="plan-${paso+1}">${esc(tx('pie',{marca:paso+1,periodo:planEtiqueta(paso),n:elegidas.length,creditos:fmtCr(carga?carga.total:cr),carga:carga?tx('pie_tope',{tope:fmtCr(carga.tope)}):''}))}</span>`;
+  },paso)).join('');
   $('#plan-carga').textContent=ci?tx('carga',{creditos:fmtCr(ci.total),tope:fmtCr(ci.tope),retenidos:fmtCr(ci.ret)}):tx('sin_carga',{creditos:fmtCr(credWant)});
   $('#chosen-help').textContent=want.length?tx('cuenta',{n:want.length,creditos:fmtCr(credWant)}):tx('vacio');
   $('#chosen').innerHTML=[0,1].map(paso=>conPlan(()=>{
@@ -570,7 +573,8 @@ function renderSide0(){
   $('#chosen-req').textContent=req.length?tx('requisitos',{materias:req.map(k=>c[k][0].toLowerCase()).join(', ')}):'';
   $('#h-sugg').innerHTML=esc(tx('sugeridas',{periodo:planEtiqueta(PLAN_PASO)}))+' '+simTag('sugg');
   const propuestas=suggestions();
-  $('#sugg').innerHTML=propuestas.list.map(k=>`<label><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
+  const yaElegidas=new Set(tr().want);   // las sugeridas que ya están en el plan del periodo activo llevan ✓
+  $('#sugg').innerHTML=propuestas.list.map(k=>`<label${yaElegidas.has(k)?' class="ya"':''}><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}${yaElegidas.has(k)?' <span class="ya-marca" aria-label="ya elegida">✓</span>':''}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
   document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
   if(isPersonal()){
     const situacion=situacionDatos();
@@ -990,6 +994,13 @@ document.addEventListener('click',e=>{const b=e.target.closest?.('[data-simtgl]'
   requestAnimationFrame(fija);setTimeout(fija,450);setTimeout(fija,1200)});
 $('#b-none').addEventListener('click',()=>{conSim(usaSim('sugg'),()=>conPlan(()=>{tr().want=[...tr().oblig];saveT()}));renderTray()});
 document.querySelectorAll('[data-plan-paso]').forEach(b=>b.addEventListener('click',()=>{S.planPaso=+b.dataset.planPaso;S.mapHover=null;S.mapFocus=false;renderTray()}));
+$('#map-ayuda').addEventListener('click',()=>{
+  const cuerpo=document.createElement('div'), intro=document.createElement('p'), notas=document.createElement('ul');
+  intro.textContent=SATE.texto('sate.planeacion.'+(tactil()?'explorar_tactil':'explorar_cursor'));
+  notas.innerHTML=$('#mapnote').innerHTML;cuerpo.appendChild(intro);cuerpo.appendChild(notas);
+  SateUI.modal(SATE.texto('sate.planeacion.leer_mapa'),cuerpo);
+});
+$('#plan-supuesto').addEventListener('click',()=>SateUI.modal(SATE.texto('sate.planeacion.supuesto_titulo',{periodo:planEtiqueta(1)}),SATE.texto('sate.planeacion.supuesto'),{pequeno:true}));
 $('#plan-simular').addEventListener('click',()=>{SATE.simAbrir=true;SATE.ir('desempeno')});
 $('#b-go').addEventListener('click',()=>{S.onlyWant=true;store.set('onlyWant',true);SATE.ir('horarios');window.scrollTo({top:0})});
 (()=>{
