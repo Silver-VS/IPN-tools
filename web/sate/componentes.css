@@ -52,24 +52,84 @@ body.sate-flotante #sate-tabs{display:none}
   .title-row .header-actions button{width:2rem;height:2rem;padding:0;justify-content:center}
   .header-actions .enc-btn span,.header-actions .ipnt-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
-.calendario-filtros,.calendario-nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-3)}
-.calendario-nav h3{flex:1;text-align:center;margin:0}
-.calendario-mes{width:100%;table-layout:fixed;border-collapse:collapse}
-.calendario-mes th{color:var(--ipn-texto);padding:var(--ipn-esp-2)}
-.calendario-mes td{vertical-align:top;border:1px solid var(--ipn-linea);padding:0}
-.calendario-dia{display:flex;flex-direction:column;gap:var(--ipn-esp-1);width:100%;min-height:7rem;padding:var(--ipn-esp-2);border:0;background:var(--ipn-superficie);color:var(--ipn-texto);text-align:left;cursor:pointer}
-.calendario-dia:focus-visible{outline:3px solid var(--ipn-acento);outline-offset:-3px}
-.calendario-dia[aria-current=date]{box-shadow:inset 0 0 0 2px var(--ipn-acento)}
-.calendario-feriado .calendario-dia{border:2px dashed var(--ipn-tenue)}
-.calendario-marca{--cal-color:var(--ipn-acento);border-left:4px solid var(--cal-color);padding:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto);background:var(--ipn-superficie);overflow-wrap:anywhere}
-.calendario-marca[data-categoria=gestion]{--cal-color:var(--ipn-info)}
-.calendario-marca[data-categoria=becas]{--cal-color:var(--ipn-ok)}
-.calendario-marca[data-categoria=servicios]{--cal-color:var(--ipn-tenue)}
-.calendario-marca[data-categoria=tt]{--cal-color:var(--ipn-aviso)}
-.calendario-marca[data-categoria=feriado]{--cal-color:var(--ipn-error)}
-.calendario-marca[data-continua=true]{width:100%;box-sizing:border-box;border-bottom:2px solid var(--cal-color)}
-.calendario-filtros button[aria-pressed=false]{border-left-style:dotted;text-decoration:line-through}
-@media(max-width:720px){.calendario-dia{min-height:3.75rem;padding:2px}.calendario-dia .calendario-marca{font-size:var(--ipn-tamano-xs);line-height:1.15;padding:1px;border-left-width:2px}.calendario-evento-titulo{display:none}.calendario-mes th{padding:2px;font-size:var(--ipn-tamano-xs)}.calendario-nav{gap:var(--ipn-esp-1)}.calendario-nav h3{flex-basis:100%;order:-1}}
+#sate-calendario{color:var(--ipn-texto);min-width:0}
+#sate-calendario *{box-sizing:border-box}
+.calendario-intro,.calendario-leyenda,.calendario-rango{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s);line-height:1.6}
+.calendario-controles,.calendario-nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-4)}
+.calendario-segmento{display:inline-flex;max-width:100%;gap:var(--ipn-esp-1);padding:var(--ipn-esp-1);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido)}
+.calendario-segmento .sate-btn{border:0;padding-inline:var(--ipn-esp-3);white-space:nowrap;background:transparent;color:var(--ipn-tenue)}
+.calendario-segmento .sate-btn[aria-pressed=true]{color:var(--ipn-acento);background:var(--ipn-superficie);box-shadow:0 0 0 1px var(--ipn-linea);font-weight:600}
+.calendario-selector{display:flex;align-items:center;gap:var(--ipn-esp-2);margin-left:auto;font-size:var(--ipn-tamano-s);min-width:0}
+.calendario-selector select{width:auto;min-width:0;max-width:100%;min-height:2.5rem;background:var(--ipn-superficie);color:var(--ipn-texto);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-2)}
+.calendario-filtros{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1) var(--ipn-esp-4);border:0;border-block:1px solid var(--ipn-linea);margin:var(--ipn-esp-4) 0;padding:var(--ipn-esp-2) 0}
+.calendario-filtros legend{padding-right:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
+.calendario-filtro{display:flex;align-items:center;gap:var(--ipn-esp-2);min-height:2.5rem;cursor:pointer;font-size:var(--ipn-tamano-s)}
+.calendario-filtro input{width:1rem;height:1rem;accent-color:currentColor;margin:0}
+.calendario-filtro span{border-bottom:2px solid currentColor}
+.calendario-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(14rem,.42fr);gap:var(--ipn-esp-5);align-items:start}
+.calendario-contenido{min-width:0}
+.calendario-detalle{min-width:0;position:sticky;top:var(--ipn-esp-4);padding:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido);font-size:var(--ipn-tamano-s);line-height:1.6;overflow-wrap:break-word}
+.calendario-detalle h3{margin-top:0;font-size:var(--ipn-tamano-l)}
+.calendario-detalle h4{margin:0;color:var(--ipn-texto);font-size:var(--ipn-tamano-m)}
+.calendario-detalle-evento{border-left:3px solid currentColor;padding-left:var(--ipn-esp-3);margin-top:var(--ipn-esp-4)}
+.calendario-detalle-evento p{color:var(--ipn-texto);margin-block:var(--ipn-esp-2)}
+.calendario-detalle-evento .calendario-fuente{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
+.calendario-detalle-evento .calendario-categoria{color:inherit;font-weight:600;font-size:var(--ipn-tamano-xs)}
+/* Guinda y zinc; la categoría también se expresa con texto y trazos, no solo color. */
+#sate-calendario [data-categoria=academico]{color:var(--ipn-acento)}
+#sate-calendario [data-categoria=gestion]{color:var(--ipn-acento-fuerte)}
+#sate-calendario [data-categoria=becas]{color:var(--ipn-tenue)}
+#sate-calendario [data-categoria=servicios]{color:var(--ipn-texto)}
+#sate-calendario [data-categoria=tt]{color:var(--ipn-acento);stroke-dasharray:4 3;border-left-style:dashed}
+#sate-calendario [data-categoria=feriado]{color:var(--ipn-tenue);stroke-dasharray:2 3;border-left-style:dotted}
+.calendario-anillo{display:block;width:100%;max-width:36rem;margin-inline:auto;height:auto}
+.calendario-banda{display:none;width:100%;height:auto}
+.calendario-pista{fill:none;stroke:var(--ipn-linea);stroke-width:10}
+.calendario-tick{stroke:var(--ipn-tenue);stroke-width:1}
+.calendario-arco{fill:none;stroke:currentColor;stroke-width:11;stroke-linecap:round;cursor:pointer}
+circle.calendario-arco{fill:currentColor;stroke-width:2}
+.calendario-arco:hover,.calendario-arco:focus-visible{stroke-width:15;outline:2px solid var(--ipn-acento);outline-offset:4px}
+.calendario-aguja{stroke:var(--ipn-texto);stroke-width:2;stroke-dasharray:3 3;pointer-events:none}
+.calendario-svg-mes{fill:var(--ipn-tenue);font-family:var(--ipn-fuente-texto);font-size:14px}
+.calendario-svg-periodo{fill:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:24px;font-weight:600}
+.calendario-svg-hoy{fill:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:14px;font-weight:600;pointer-events:none}
+.calendario-procesos{list-style:none;padding:0;margin:0;border-top:1px solid var(--ipn-linea)}
+.calendario-procesos li{border-bottom:1px solid var(--ipn-linea);padding-block:var(--ipn-esp-2)}
+.calendario-proceso{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);align-items:center;gap:var(--ipn-esp-3);width:100%;min-height:2.75rem;text-align:left;border:0;border-left:3px solid currentColor;padding:var(--ipn-esp-2) var(--ipn-esp-3);background:var(--ipn-superficie);font:inherit;cursor:pointer}
+.calendario-proceso span{color:var(--ipn-texto);line-height:1.5}
+.calendario-proceso small{color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);line-height:1.5}
+.calendario-nav h3{flex:1;margin:0;font-size:var(--ipn-tamano-l);white-space:nowrap}
+.calendario-nav .sate-btn{padding-inline:var(--ipn-esp-3);color:var(--ipn-texto)}
+.calendario-nav .sate-btn:disabled{opacity:.5;cursor:default}
+.calendario-mes{width:100%;min-width:0;margin-top:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);overflow:hidden;background:var(--ipn-superficie)}
+.calendario-dias-semana,.calendario-fechas,.calendario-barras,.calendario-mas{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.calendario-dias-semana{background:var(--ipn-hundido);text-align:center;font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue);padding-block:var(--ipn-esp-2)}
+.calendario-semana{position:relative;min-height:9rem;border-top:1px solid var(--ipn-linea);padding-bottom:var(--ipn-esp-1)}
+.calendario-fechas{position:relative}
+.calendario-celda{min-width:0;border-right:1px solid var(--ipn-linea);padding:var(--ipn-esp-1)}
+.calendario-celda:last-child{border-right:0}
+.calendario-dia{width:100%;min-height:2.75rem;border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-s);text-align:center;padding:0;cursor:pointer}
+.calendario-fuera .calendario-dia{color:var(--ipn-tenue)}
+.calendario-dia[aria-current=date]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);font-weight:700}
+.calendario-feriado .calendario-dia{border-bottom:2px dotted var(--ipn-tenue)}
+.calendario-barras{gap:var(--ipn-esp-1) 0;position:relative;grid-auto-rows:1.5rem;padding-top:var(--ipn-esp-1)}
+.calendario-pill{min-width:0;width:100%;min-height:1.5rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;border:0;border-left:3px solid currentColor;border-bottom:1px solid currentColor;border-radius:4px;padding:1px var(--ipn-esp-1);background:var(--ipn-hundido);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-xs);cursor:pointer}
+.calendario-mas{margin-top:var(--ipn-esp-1)}
+.calendario-mas .sate-btn{min-width:0;min-height:2rem;padding:0;font-size:var(--ipn-tamano-xs);color:var(--ipn-acento);border:0;background:transparent;white-space:nowrap}
+:is(.calendario-dia,.calendario-pill,.calendario-proceso,.calendario-filtro input,.calendario-selector select):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
+@media(max-width:720px){
+  .calendario-layout{grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
+  .calendario-detalle{position:static}
+  .calendario-anillo{display:none}
+  .calendario-banda{display:block}
+  .calendario-banda .calendario-svg-mes,.calendario-banda .calendario-svg-hoy{font-size:22px}
+  .calendario-controles{align-items:flex-start}
+  .calendario-selector{margin-left:0}
+  .calendario-nav h3{flex-basis:100%}
+  .calendario-celda{padding:2px}
+  .calendario-pill{padding-inline:2px}
+  .calendario-proceso{grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-1)}
+}
 .sate-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sate-sin-scroll{overflow:hidden}
 .situacion-cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--ipn-esp-3);margin:var(--ipn-esp-4) 0}
