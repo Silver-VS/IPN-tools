@@ -1,4 +1,4 @@
-function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0,0))}
+function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
 function renderMap0(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
@@ -140,10 +140,10 @@ function renderList(){
     return null};
   $('#tlist').innerHTML=Object.keys(by).sort((a,b)=>a-b).map(g=>`<section class="tl-sem"><h4>${useSem?'Semestre propuesto '+g:'Nivel '+g}</h4><div class="tl-rows">`+
     by[g].sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b)).map(k=>{const t=tag(k), paso=planAsignado(k), w=paso===S.planPaso, done=statusOf(k)==='done', ob=oblig.has(k), open=S.lfocus===k;
-      return `<div class="tl-row${done?' done':''}${paso!=null?' want plan-'+(paso+1):''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
+      return `<div class="tl-row${done?' done':''}${paso!=null?' want plan-'+(paso+1)+(PLAN_DOS_PERIODOS&&paso!==S.planPaso?' plan-otra':''):''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
         `<button type="button" class="tl-name" data-lfocus="${k}" aria-expanded="${open}"><b>${esc(pretty(c[k][0]))}</b><small>${k} · ${fmtCr(c[k][1])} cr${off.has(k)||isElec(k)?'':' · sin grupos'}${t?` <span class="tl-tag ${t[1]}">${t[0]}</span>`:''}${ob?' <span class="tl-tag bad">Obligatoria</span>':''}</small></button>`+
-        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?(PLAN_DOS_PERIODOS?paso+1:'✓'):'+'}</button>`+
-        (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
+        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${(done||ob)&&!(PLAN_DOS_PERIODOS&&paso!=null&&paso!==S.planPaso)||isElec(k)?' disabled':''} aria-label="${PLAN_DOS_PERIODOS&&paso!=null&&paso!==S.planPaso?'Ver acciones de':w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?(PLAN_DOS_PERIODOS?(paso===0&&S.planPaso===1?'en ':'')+esc(planEtiqueta(paso)):'✓'):'+'}</button>`+
+        (open?`<div class="tl-more">${inspParts(k).l2}${PLAN_DOS_PERIODOS?`<div class="insp-act">${planAcciones(k)}</div>`:''}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
 
 function renderAyudaPrimeraVisita(){
