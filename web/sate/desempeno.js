@@ -301,10 +301,13 @@ SATE.pestana('trayectoria',{
     $('#desempeno-sim-titulo').textContent=SATE.texto('sate.desempeno.sim_titulo');
     $('#desempeno-lector').textContent=SATE.texto('sate.desempeno.lector');
     $('#desempeno-lector').addEventListener('click',()=>SAES.open());
+    $('#desempeno-explorar').textContent=SATE.texto('sate.trayectoria.explorar');
+    $('#desempeno-explorar').addEventListener('click',()=>SATE.ir('mapa'));
   },
   mostrar(){
     SATE.presente?.mostrar();
     const personal=isPersonal();
+    $('#desempeno-lector').textContent=SATE.texto('sate.encabezado.'+(ALUMNO&&!ALUMNO.demo?'actualizar':'cargar'));
     $('#desempeno-vacio').hidden=personal;
     $('#desempeno-vacio-texto').textContent=SATE.texto('sate.trayectoria.sin_datos');
     $('#desempeno-simulacion').hidden=!personal;

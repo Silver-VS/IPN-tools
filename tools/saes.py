@@ -61,6 +61,19 @@ const SAES={
       SAES.save(d);paste.value='';msg.innerHTML='<span class="ok">Datos del SAES cargados.</span>';onLoad(d);setTimeout(()=>SAES.close(),900)};
     paste.addEventListener('paste',e=>{e.preventDefault();take(e.clipboardData.getData('text'))});
     paste.addEventListener('input',()=>{if(paste.value.trim().startsWith('{'))take(paste.value)});
+    dl.querySelector('#saes-paste-clip').addEventListener('click',async e=>{
+      const boton=e.currentTarget;
+      let texto;
+      try{
+        if(!navigator.clipboard?.readText)throw new Error('clipboard-unavailable');
+        texto=await navigator.clipboard.readText();
+      }catch(err){
+        // El permiso depende del navegador: conservar siempre el pegado manual.
+        msg.textContent=boton.dataset.fallback;paste.focus();return;
+      }
+      take(texto);
+    });
+    if(typeof matchMedia==='function'&&matchMedia('(hover:none)').matches)dl.querySelector('#saes-manual').open=true;
     // copiar el código: portapapeles moderno, luego execCommand; si ambos fallan, queda seleccionado para copiarlo a mano
     dl.querySelector('#saes-copybm').addEventListener('click',async e=>{const b=e.currentTarget,box=dl.querySelector('#saes-bmcode'),m=dl.querySelector('#saes-copymsg');
       let ok=false;try{await navigator.clipboard.writeText(box.value);ok=true}catch(err){}
@@ -100,6 +113,8 @@ const SAES={
 """
 
 CSS = r"""
+.saes-tactil{display:none}
+@media(hover:none){.saes-arrastre{display:none}.saes-tactil{display:block}}
 .saes-aviso{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--warn-soft,var(--surface));border:1px solid var(--line);font-size:.86rem}
 .saes-aviso ul{margin:6px 0 0;padding-left:1.1rem;display:flex;flex-direction:column;gap:3px}
 .saes-videos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0 2px;font-size:.88rem}
@@ -145,6 +160,8 @@ VIDEOS_LISTA = "https://www.youtube.com/playlist?list=PLPZJV048DlEY"
 
 
 def card(bm_href, page="horarios", short="", u=None):
+    import contenido
+    textos = contenido.objeto_t()
     # en el sitio publicado, el código para teléfono es el marcador corto (descarga lector.js)
     code_text = html.escape(short or bm_href)
     copy_note = " (versión corta: descarga el Lector desde este sitio)" if short else ""
@@ -174,13 +191,14 @@ def card(bm_href, page="horarios", short="", u=None):
     <ol>
       <li><b>Guarda el Lector IPN-tools en tu navegador</b> (solo la primera vez).
         <p class="muted">Un <b>marcador</b> (favorito) es un acceso guardado en el navegador. El Lector IPN-tools, en lugar de abrir una página, consulta tu información dentro del SAES. Es el mismo para todas las unidades del IPN: detecta en qué SAES estás. Si ya tenías guardado el «Lector UPIITA», sigue funcionando.</p>
-        <p>Arrastra este botón a tu barra de marcadores: <a class="saes-bm" id="saes-bm" href="{bm_href}" draggable="true" onclick="event.preventDefault()">Lector IPN-tools</a></p>
+        <p class="saes-arrastre">Arrastra este botón a tu barra de marcadores: <a class="saes-bm" id="saes-bm" href="{bm_href}" draggable="true" onclick="event.preventDefault()">Lector IPN-tools</a></p>
+        <p class="saes-tactil">{html.escape(textos['sate.lector.tactil'])}</p>
         <details><summary>Mostrar la barra de marcadores</summary><ul>
           <li><b>Chrome, Edge, Brave u Opera:</b> pulsa <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (en Mac, <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>).</li>
           <li><b>Firefox:</b> clic derecho en la barra superior › Barra de marcadores › Mostrar siempre.</li>
           <li><b>Safari:</b> menú Visualización › Mostrar barra de favoritos (<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>).</li>
         </ul></details>
-        <details><summary>Instalación manual o en teléfono</summary>
+        <details id="saes-manual"><summary>Instalación manual o en teléfono</summary>
           <ol>
             <li>Copia el código del marcador{copy_note}:
               <div class="saes-code"><textarea id="saes-bmcode" readonly rows="3" aria-label="Código del marcador" onfocus="this.select()">{code_text}</textarea>
@@ -201,6 +219,7 @@ def card(bm_href, page="horarios", short="", u=None):
     </ol>
   </div>
   <textarea class="saes-paste" id="saes-paste" placeholder="Pega aquí tus datos del SAES (Ctrl+V)" aria-label="Pegar datos del SAES"></textarea>
+  <button class="btn primary" id="saes-paste-clip" type="button" data-fallback="{html.escape(textos['sate.lector.pegado_manual'], quote=True)}">{html.escape(textos['sate.lector.pegar'])}</button>
   <div class="actions" style="display:flex;gap:8px;align-items:center;margin-top:8px"><span id="saes-msg" aria-live="polite" style="font-size:.86rem"></span><button class="btn" id="saes-clear" type="button" style="margin-left:auto" hidden>Borrar mis datos</button></div>
   <p class="saes-note" style="margin:10px 0 0">El marcador solo consulta tu Kárdex, tu Estado general, tu horario inscrito y tu Cita de reinscripción; no inscribe, no modifica ni envía nada. Los datos se guardan únicamente en este navegador.</p>
   <p class="saes-note" style="margin:6px 0 0">Versión de la página: {version}</p>
