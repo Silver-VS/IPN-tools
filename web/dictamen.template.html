@@ -2,6 +2,42 @@
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dictamen UPIITA</title>
 <style>/*__TOKENS__*/
+
+/* Paleta institucional local; los tokens fijados de ipn-comun se conservan. */
+:root{
+  --ipn-fondo:#fafafa; --ipn-superficie:#ffffff; --ipn-hundido:#f4f4f5; --ipn-linea:#d9d9de;
+  --ipn-texto:#18181b; --ipn-tenue:#52525b; --ipn-acento:#750946; --ipn-acento-fuerte:#5b1237;
+  --ipn-acento-suave:#f7eef2; --ipn-ok:#15803d;
+  --ipn-ok-suave:#ecfdf3; --ipn-aviso:#8a5a00; --ipn-aviso-suave:#fdf6e3; --ipn-error:#b42346;
+  --ipn-error-suave:#fdecf0;
+  --ipn-sobre-acento:#ffffff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-tema="claro"]){
+  --ipn-fondo:#09090b; --ipn-superficie:#18181b; --ipn-hundido:#111113; --ipn-linea:#323237;
+  --ipn-texto:#e4e4e7; --ipn-tenue:#a1a1aa; --ipn-acento:#ec9cbf; --ipn-acento-fuerte:#f7c6db;
+  --ipn-sobre-acento:#1d0a13; --ipn-acento-suave:#2e1a24;
+  --ipn-ok:#6ee7a0; --ipn-ok-suave:#0f2a1c; --ipn-aviso:#f5c56b; --ipn-aviso-suave:#2f230b;
+  --ipn-error:#fda4b8; --ipn-error-suave:#3a1520;
+  color-scheme:dark;
+}}
+:root[data-tema="oscuro"]{
+  --ipn-fondo:#09090b; --ipn-superficie:#18181b; --ipn-hundido:#111113; --ipn-linea:#323237;
+  --ipn-texto:#e4e4e7; --ipn-tenue:#a1a1aa; --ipn-acento:#ec9cbf; --ipn-acento-fuerte:#f7c6db;
+  --ipn-sobre-acento:#1d0a13; --ipn-acento-suave:#2e1a24;
+  --ipn-ok:#6ee7a0; --ipn-ok-suave:#0f2a1c; --ipn-aviso:#f5c56b; --ipn-aviso-suave:#2f230b;
+  --ipn-error:#fda4b8; --ipn-error-suave:#3a1520;
+  color-scheme:dark;
+}
+:root[data-tema="claro"]{
+  --ipn-fondo:#fafafa; --ipn-superficie:#ffffff; --ipn-hundido:#f4f4f5; --ipn-linea:#d9d9de;
+  --ipn-texto:#18181b; --ipn-tenue:#52525b; --ipn-acento:#750946; --ipn-acento-fuerte:#5b1237;
+  --ipn-acento-suave:#f7eef2; --ipn-ok:#15803d;
+  --ipn-ok-suave:#ecfdf3; --ipn-aviso:#8a5a00; --ipn-aviso-suave:#fdf6e3; --ipn-error:#b42346;
+  --ipn-error-suave:#fdecf0;
+  --ipn-sobre-acento:#ffffff;
+  color-scheme:light;
+}
 *{box-sizing:border-box}body{margin:0;background:var(--ipn-fondo);color:var(--ipn-texto);font:var(--ipn-tamano-m)/1.5 var(--ipn-fuente-texto)}
 main{max-width:64rem;margin:auto;padding:var(--ipn-esp-4)}h1{font-size:var(--ipn-tamano-xl)}h2{font-size:var(--ipn-tamano-l)}
 .campos{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-3)}label{display:block;font-size:var(--ipn-tamano-s)}
