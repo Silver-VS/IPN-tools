@@ -71,7 +71,10 @@ const medidas = {};
 for (const u of Object.keys(config)) {
   const nucleo=statSync('web/dist/sate/datos/'+u+'/nucleo.json').size;
   const oferta=statSync('web/dist/sate/datos/'+u+'/oferta.json').size;
-  medidas[u]={cascaronNucleo:base+nucleo,situacion:config[u].pestanas.includes('situacion')?base+nucleo+statSync('web/dist/sate/situacion.js').size:null,vistaInicial:base+nucleo+oferta+statSync('web/dist/sate/mapa.js').size,presupuesto:160000,
+  medidas[u]={cascaronNucleo:base+nucleo,situacion:config[u].pestanas.includes('situacion')?base+nucleo+statSync('web/dist/sate/situacion.js').size:null,vistaInicial:base+nucleo+oferta+statSync('web/dist/sate/mapa.js').size,
+    horarios:base+nucleo+oferta+statSync('web/dist/sate/horarios.js').size,
+    desempeno:base+nucleo+statSync('web/dist/sate/desempeno.js').size,
+    ventanilla:config[u].pestanas.includes('tramites')?base+nucleo+statSync('web/dist/sate/datos/'+u+'/tramites.json').size:null,presupuesto:160000,
     pendientes:{html:statSync('web/dist/sate/index.html').size,nucleoJS:statSync('web/dist/sate/nucleo.js').size,datosNucleo:nucleo,oferta}};
 }
 console.log(JSON.stringify({pruebas,scripts,bytes:medidas},null,2));

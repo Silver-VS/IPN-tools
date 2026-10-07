@@ -212,7 +212,7 @@ DATA.opciones_plan={};assert.strictEqual(carreraPerfil({carrera:'B',plan:'09'}),
 
     def test_analisis_sin_notas_inventadas_y_con_ciclos(self):
         html=(ROOT/'web/sate/nucleo.js').read_text(encoding='utf8')
-        fn=html[html.index('function analisis('):html.index('function renderAnalisis(')]
+        fn=html[html.index('function analisis('):html.index('function renderTray(')]
         nota=html[html.index('const notaValida='):html.index('const FORMAS=')]
         script="""
 const assert=require('assert');

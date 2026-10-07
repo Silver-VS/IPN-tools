@@ -43,7 +43,7 @@
     }).catch(e => { oferta = null; throw e; });
   }
   async function modulo(id) {
-    if (id === 'desempeno') await script('mapa.js');
+    if (id === 'desempeno') await script('desempeno.js');
     if (id === 'situacion') await script('situacion.js');
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
     if (id === 'tramites' && !cargas.has('tramites.json')) {
@@ -68,7 +68,7 @@
     if (r.unidad !== u) { IPNT.set('ipnt.unidad', r.unidad); location.reload(); return; }
     const v = ++version;
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
-    if (r.pestana !== 'situacion' && r.pestana !== 'tramites') await cargarOferta();
+    if (r.pestana === 'mapa' || r.pestana === 'horarios') await cargarOferta();
     const m = await modulo(r.pestana);
     if (v !== version) return;
     if (actual) modulos[actual.pestana]?.ocultar?.();
@@ -76,11 +76,12 @@
     api.estado.tab = r.pestana === 'horarios' ? 'hor' : 'tray';
     if (!montados.has(r.pestana)) { m.montar?.(); montados.add(r.pestana); }
     tabs.seleccionar(r.pestana); barra.marcar(r.pestana);
-    document.getElementById('v-tray').hidden = !['mapa','desempeno'].includes(r.pestana);
+    document.getElementById('v-tray').hidden = r.pestana !== 'mapa';
+    document.getElementById('sate-desempeno').hidden = r.pestana !== 'desempeno';
     document.getElementById('sate-situacion').hidden = r.pestana !== 'situacion';
     document.getElementById('v-hor').hidden = r.pestana !== 'horarios';
     document.getElementById('sate-tramites').hidden = r.pestana !== 'tramites';
-    const panel = document.getElementById(r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : r.pestana === 'situacion' ? 'sate-situacion' : 'v-tray');
+    const panel = document.getElementById(r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : r.pestana === 'situacion' ? 'sate-situacion' : r.pestana === 'desempeno' ? 'sate-desempeno' : 'v-tray');
     panel.setAttribute('role','tabpanel');
     panel.setAttribute('aria-labelledby',tabs.querySelector('[data-id="'+r.pestana+'"]').id);
     api.store.set('ruta', r.hash);
@@ -102,7 +103,6 @@
       const r = SateRutas.ruta(location.hash, u, config) ||
         SateRutas.ruta(api.store.get('ruta',''), u, config) ||
         SateRutas.ruta('#/' + u + '/' + (api.personal() && cfg.pestanas.includes('situacion') ? 'situacion' : 'mapa'), u, config);
-      modulos.desempeno = {mostrar(){api.renderTray()}};
       modulos.tramites = {mostrar(r) {
         const box = document.getElementById('sate-tramites'); box.replaceChildren();
         const p = document.createElement('p'); p.textContent = texto('sate.leyenda.prueba',{unidad:cfg.siglas}); box.appendChild(p);
@@ -124,7 +124,7 @@
       const items = cfg.pestanas.map(id => ({id,texto:texto('sate.pestana.'+id+'.titulo')}));
       tabs = SateUI.pestanas({items,activa:r.pestana,alCambiar:id=>{if(actual && actual.pestana!==id)ir(id)}});
       document.getElementById('sate-tabs').appendChild(tabs);
-      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='situacion'?'sate-situacion':'v-tray');
+      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='situacion'?'sate-situacion':id==='desempeno'?'sate-desempeno':'v-tray');
       barra = SateUI.barraInferior({items:cfg.pestanas.map(id=>({id,texto:texto('sate.pestana.'+id+'.corto')})),activa:r.pestana,alElegir:ir});
       document.body.appendChild(barra);
       addEventListener('hashchange',()=>{const r=SateRutas.ruta(location.hash,u,config);if(r)activar(r).catch(error)});
