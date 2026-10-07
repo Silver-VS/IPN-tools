@@ -31,7 +31,7 @@ function renderMap0(){
       html+=boxHtml(k,x,y,bw,bh,sc,want,off,hot,+n,req);
     }));
     el.style.width=w*sc+'px';el.style.height=h*sc+'px';el.innerHTML=html;$('#areas').hidden=true;
-    $('#mapnote').innerHTML='<li>Esta carrera aún no tiene una trayectoria recomendada: se muestran sus materias por nivel según el SAES, sin seriación.</li>';
+    $('#mapnote').innerHTML='<li>'+esc(SATE.texto('sate.planeacion.sin_trayectoria'))+'</li>';
     return;
   }
   let sc=ZOOM??Math.min(1.1,Math.max(.2,(wrap.clientWidth-2)/L.w));MAPSC=sc;
@@ -121,16 +121,16 @@ function renderMap0(){
   const ar=$('#areas');ar.hidden=!L.cols;ar.style.width=L.w*sc+'px';
   // columnas que agrupan áreas pequeñas («A · B»): un renglón por área y letra un poco menor
   ar.innerHTML=(L.cols||[]).map(([n,a,b])=>{const k=n.includes(' · ')?.82:1;return `<div style="left:${a*sc}px;width:${(b-a)*sc}px;font-size:${Math.max(8,Math.min(14,13*sc*1.4)*k)}px;white-space:pre-line" title="${esc(n)}">${esc(n.replaceAll(' · ','\n'))}</div>`}).join('');
-  // notas del mapa: una idea por renglón (no un párrafo de oraciones encadenadas)
-  const notas=[];
+  // La ayuda conserva las notas específicas del plan fuera del flujo del mapa.
+  const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v), notas=[];
   if(L.nota)notas.push(...L.nota.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ¿])/));
-  else if(L.propuesto)notas.push('Esta carrera aún no tiene una trayectoria recomendada: las áreas y la seriación (líneas punteadas) son una propuesta hecha a partir del plan de estudios oficial, sujeta a validación por la academia.');
-  else notas.push('Trayectoria recomendada: las flechas indican la seriación recomendada.',
-    'Se sombrean las materias que conviene aprobar antes de las que elegiste; en cursiva, las que no tienen grupos en el periodo consultado.');
-  notas.push(`${tactil()?'Al tocar':'Al colocar el cursor sobre'} una materia se resaltan en azul sus requisitos (antes) y en naranja las materias que desbloquea (después).`);
-  if(porNiveles())notas.push('En este plan las materias se organizan por niveles (1, 2, 3…), no por semestres: el nivel indica el orden recomendado y en un mismo periodo puedes inscribir materias de distintos niveles si cumples sus requisitos y las reglas de inscripción de tu unidad académica.');
-  if(L.rutas&&L.edges.some(e=>e[3]))notas.push('Para no saturar el mapa, las flechas entre materias muy alejadas no se dibujan; aparecen al resaltar una materia.');
-  if(L.ocultas)notas.push(`Se omiten ${L.ocultas} flechas redundantes (requisitos que ya llegan a través de otra materia de la cadena).`);
+  else if(L.propuesto)notas.push(tx('propuesta'));
+  else notas.push(tx('flechas'),
+    tx('sombreado'));
+  notas.push(tx(tactil()?'resaltar_tactil':'resaltar_cursor'));
+  if(porNiveles())notas.push(tx('niveles'));
+  if(L.rutas&&L.edges.some(e=>e[3]))notas.push(tx('flechas_lejanas'));
+  if(L.ocultas)notas.push(tx('flechas_ocultas',{n:L.ocultas}));
   $('#mapnote').innerHTML=notas.map(t=>`<li>${esc(t)}</li>`).join('');
 }
 /* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
