@@ -26,7 +26,8 @@
           "calendario"
         ]
       ],
-      "planDosPeriodos": false
+      "planDosPeriodos": false,
+      "miSemana": true
     },
     "escom": {
       "pestanas": [
@@ -45,7 +46,8 @@
           "horarios"
         ]
       ],
-      "planDosPeriodos": false
+      "planDosPeriodos": false,
+      "miSemana": true
     },
     "upibi": {
       "pestanas": [
@@ -64,7 +66,8 @@
           "horarios"
         ]
       ],
-      "planDosPeriodos": false
+      "planDosPeriodos": false,
+      "miSemana": true
     }
   }
 }

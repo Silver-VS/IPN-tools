@@ -943,7 +943,7 @@ function renderEquiv(){
 function render(){return SATE.repintar()}
 // perfil del SAES de otra carrera: se avisa y se ofrece volver; nada del perfil se aplica aquí
 function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()},carreraPerfil)}
-function refresh(){save();renderOffer();renderPlans();renderCal()}
+function refresh(){save();renderOffer();renderPlans();renderCal();if(S.gen&&typeof generate==='function'){S.gen=generate();renderGen()}}
 function addClass(c){const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
 function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1);else{const c=byKey(k);addClass(c);
     avisoOptativa(c[8],pl.sel.map(x=>byKey(x)?.[8]).filter(Boolean));
@@ -1036,7 +1036,7 @@ document.addEventListener('click',e=>{
   else if(d.gt){S.gt=d.gt;renderHFilters()}
   else if(d.ungp){S.gpref.splice(+d.ungp,1);renderGPrefs()}
   else if(d.unga){S.gavoid.splice(+d.unga,1);store.set('excl',S.gavoid);renderActive();renderOffer()}
-  else if(d.useg!==undefined){const r=S.gen.top[+d.useg], to=d.to==='+'?nextPlan():d.to;ws().plans[to]=ws().plans[to]||{sel:[],own:[]};ws().plans[to].sel=r.cs.map(keyOf);ws().plan=to;refresh();renderGen()}
+  else if(d.useg!==undefined){const r=S.gen.top[+d.useg], to=d.to==='+'?nextPlan():d.to;ws().plans[to]=ws().plans[to]||{sel:[],own:JSON.parse(JSON.stringify(plan().own))};ws().plans[to].sel=r.cs.map(keyOf);ws().plan=to;refresh();renderGen()}
   else if(d.peekg!==undefined){const r=S.gen.top[+d.peekg];S.hover=null;const keep=plan().sel;plan().sel=r.cs.map(keyOf);renderCal();plan().sel=keep;$('#stats').insertAdjacentHTML('afterbegin','<span class="warn">Vista previa, no guardada.</span>')}
 });
 document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const k=bx.dataset.box;toggleBox(k);document.querySelector(`[data-box="${CSS.escape(k)}"]`)?.focus()}});

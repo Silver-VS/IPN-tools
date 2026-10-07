@@ -801,6 +801,16 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
 
     <div class="hlayout">
       <section aria-labelledby="h-offer">
+        <details class="box2" id="mi-semana" hidden>
+          <summary data-htexto="semana_titulo"></summary>
+          <p data-htexto="semana_privacidad"></p>
+          <div id="semana-campos" class="semana-campos"></div>
+          <div id="semana-form"></div>
+          <div id="semana-bloques"></div>
+          <div id="semana-presupuesto" aria-live="polite"></div>
+          <button type="button" class="btn" id="semana-borrar" data-htexto="semana_borrar"></button>
+          <p data-htexto="semana_borrado_ayuda"></p>
+        </details>
         <details class="box2" id="gen" style="margin-bottom:12px">
           <summary>Generar horarios automáticamente</summary>
           <p style="font-size:.84rem;margin:8px 0 0">Genera combinaciones sin traslapes con los grupos de las materias seleccionadas. Prioriza los grupos marcados con «Sí» y los profesores indicados; omite los marcados con «No», los profesores excluidos y los grupos fuera del horario definido en los filtros.</p>

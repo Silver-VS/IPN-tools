@@ -59,7 +59,7 @@ $('#own-f').addEventListener('submit',e=>{
   e.preventDefault();const n=$('#own-n').value.trim(),a=toMin($('#own-a').value),b=toMin($('#own-b').value);
   const msg=!S.ownDays.length?txH('actividad_dias'):b<=a?txH('actividad_horas'):'';
   if(!n||msg){$('#own-n').setCustomValidity(msg);$('#own-n').reportValidity();$('#own-n').setCustomValidity('');return}
-  plan().own.push({n,d:[...S.ownDays].sort(),a,b});
+  plan().own.push({n,d:[...S.ownDays].sort(),a,b,...(SEMANA_ACTIVA?{tipo:$('#semana-tipo').value}:{})});
   if(S.ownDays.some(d=>d>=5)){S.weekend=true;store.set('weekend',true);$('#f-weekend').checked=true}
   $('#own-n').value='';S.ownDays=[];renderOwnForm();refresh();
 });
@@ -169,6 +169,81 @@ const GT=Object.assign({a:'',b:'',breaks:[],days:'',n:'',src:''},store.get('gtim
 const daysOf=cs=>[...new Set(cs.flatMap(c=>c[6].map(x=>x[0])))].sort((a,b)=>a-b);
 const tmin=t=>{const m=String(t||'').match(/^(\d{1,2}):(\d{2})/);return m?+m[1]*60+ +m[2]:null}; // '' -> null
 const gtSave=()=>store.set('gtime',GT);
+const SEMANA_ACTIVA=window.SATE_CONFIG?.unidades?.[UNIDAD]?.miSemana===true;
+const MS=store.get('miSemana',{})||{};
+const semanaValor=k=>SEMANA_ACTIVA?Math.max(0,Number(MS[k])||0):0;
+const semanaCampos=[['trabajo','number',168],['ida','number',1440],['vuelta','number',1440],['sueno','number',24],['estudio','number',168],['antes','time'],['dias','number',7],['comidaA','time'],['comidaB','time']];
+function montarSemana(){
+  if(!SEMANA_ACTIVA)return;
+  $('#mi-semana').hidden=false;
+  $('#semana-campos').innerHTML=semanaCampos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${k}`))}</span><input id="semana-${k}" data-semana="${k}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}"></label>`).join('')+`<p>${esc(txH('semana_trabajo_ayuda'))}</p>`;
+  // Se mueve el formulario existente: conserva días, calendario y persistencia por versión.
+  $('#semana-form').appendChild($('#ownform'));
+  $('#ownform summary').textContent=txH('semana_agregar');
+  $('#own-n').placeholder='';$('#own-a').value='';$('#own-b').value='';
+  $('#own-f').insertAdjacentHTML('afterbegin',`<label class="field"><span>${esc(txH('semana_tipo'))}</span><select id="semana-tipo"><option value="trabajo">${esc(txH('semana_trabajo_bloque'))}</option><option value="otras">${esc(txH('semana_otras'))}</option></select></label>`);
+  $('#semana-campos').addEventListener('change',e=>{
+    const k=e.target.dataset.semana;if(!k||!e.target.checkValidity())return;
+    const a=k==='comidaA'?e.target.value:MS.comidaA,b=k==='comidaB'?e.target.value:MS.comidaB;
+    if(a&&b&&tmin(b)<=tmin(a)){e.target.setCustomValidity(txH('actividad_horas'));e.target.reportValidity();e.target.setCustomValidity('');e.target.value=MS[k]||'';return}
+    MS[k]=e.target.value;store.set('miSemana',MS);semanaCambiar();
+  });
+  $('#semana-borrar').addEventListener('click',()=>{
+    for(const k of Object.keys(MS))delete MS[k];store.set('miSemana',MS);
+    // Solo los bloques de rutina nuevos; los extracurriculares anteriores y el SAES se conservan.
+    for(const p of Object.values(ws().plans))p.own=p.own.filter(o=>!o.tipo);
+    document.querySelectorAll('[data-semana]').forEach(el=>el.value='');refresh();semanaCambiar();
+  });
+}
+function semanaCambiar(){renderCal();if(S.gen){S.gen=generate();renderGen()}}
+function semanaTraslados(cs){
+  const clases=cs.flatMap(c=>c[6]||[]).concat(plan().own.filter(o=>o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b])));
+  return [...new Set(clases.map(b=>b[0]))].flatMap(d=>{
+    const bs=clases.filter(b=>b[0]===d),a=Math.min(...bs.map(b=>b[1])),b=Math.max(...bs.map(b=>b[2]));
+    return [[d,a-semanaValor('ida'),a],[d,b,b+semanaValor('vuelta')]].filter(x=>x[2]>x[1]);
+  });
+}
+function semanaOk(cs){
+  if(!SEMANA_ACTIVA)return true;
+  const clases=cs.flatMap(c=>c[6]||[]).concat(plan().own.filter(o=>o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b])));
+  if(semanaValor('dias')&&new Set(clases.map(b=>b[0])).size>semanaValor('dias'))return false;
+  const antes=tmin(MS.antes);if(antes!=null&&clases.some(b=>b[1]<antes))return false;
+  const viaje=semanaTraslados(cs),propios=plan().own.filter(o=>!o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b]));
+  if(viaje.some(([d,a,b])=>a<0||b>1440||propios.some(([e,x,y])=>d===e&&a<y&&x<b)))return false;
+  const a=tmin(MS.comidaA),b=tmin(MS.comidaB);
+  // Como los descansos, el rango registrado se reserva completo, sin relajación automática.
+  const dias=new Set(clases.map(x=>x[0]));
+  return a==null||b==null||![...clases,...viaje,...propios].some(x=>dias.has(x[0])&&x[1]<b&&a<x[2]);
+}
+function semanaPena(cs){return SEMANA_ACTIVA&&(semanaValor('ida')>=60||semanaValor('vuelta')>=60)?new Set(semanaTraslados(cs).map(x=>x[0])).size*12:0}
+function presupuestoSemana(cs){
+  const horas={sueno:semanaValor('sueno')*7,clases:0,traslados:0,trabajo:0,otras:0,estudio:semanaValor('estudio'),libre:0},ocupado=new Set();
+  // Unión de minutos: clases, traslados, trabajo y otras nunca descuentan el mismo minuto dos veces.
+  const sumar=(k,bs)=>{for(const [d,a,b] of bs)for(let m=Math.max(0,Math.floor(a));m<Math.min(1440,Math.ceil(b));m++){
+    const t=d*1440+m;if(!ocupado.has(t)){ocupado.add(t);horas[k]+=1/60}
+  }};
+  const propios=plan().own;
+  sumar('clases',cs.flatMap(c=>c[6]||[]).concat(propios.filter(o=>o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b]))));
+  sumar('traslados',semanaTraslados(cs));
+  for(const k of ['trabajo','otras'])sumar(k,propios.filter(o=>!o.saes&&(k==='trabajo'?o.tipo==='trabajo':o.tipo!=='trabajo')).flatMap(o=>o.d.map(d=>[d,o.a,o.b])));
+  if(!propios.some(o=>o.tipo==='trabajo'))horas.trabajo=semanaValor('trabajo');
+  const total=Object.values(horas).reduce((a,b)=>a+b,0);horas.libre=Math.max(0,168-total);
+  return {horas,total,disponible:168-total+horas.estudio,exceso:Math.max(0,total-168)};
+}
+function renderSemana(){
+  if(!SEMANA_ACTIVA)return;
+  $('#semana-bloques').innerHTML=plan().own.map((o,i)=>o.saes?'':`<p>${esc(o.n)} · ${o.d.map(d=>DAYS[d]).join(' ')} ${hm(o.a)}–${hm(o.b)} <button type="button" class="x" data-unown="${i}" aria-label="${esc(txH('quitar',{nombre:o.n}))}">×</button></p>`).join('');
+  const cs=selected(),p=presupuestoSemana(cs),avisos=[];
+  if(p.exceso>0.01)avisos.push(txH('semana_exceso',{n:fmtCr(p.exceso)}));
+  if(p.disponible<p.horas.estudio)avisos.push(txH('semana_sin_estudio'));
+  if(p.horas.trabajo>15&&p.horas.clases>=25)avisos.push(txH('semana_carga_aviso'));
+  if(p.horas.traslados>10)avisos.push(txH('semana_traslado_aviso'));
+  if(semanaValor('ida')>60&&cs.some(c=>c[6].some(b=>b[1]<480)))avisos.push(txH('semana_temprano_aviso'));
+  if(!semanaOk(cs))avisos.push(txH('semana_conflicto'));
+  if(cs.length&&!qualityOf(cs).comida)avisos.push(txH('semana_comida_aviso'));
+  const partes=Object.entries(p.horas),descripcion=partes.map(([k,v])=>txH(`semana_categoria_${k}`)+': '+fmtCr(v)+' h').join(' · ');
+  $('#semana-presupuesto').innerHTML=`<p>${esc(txH('semana_presupuesto'))}</p><div class="semana-barra" role="img" aria-label="${esc(descripcion)}">${partes.map(([k,v],i)=>`<span class="semana-parte semana-parte-${i}" style="width:${v/168*100}%"></span>`).join('')}</div><p>${esc(descripcion)}</p><p>${esc(txH('semana_supuestos'))}</p>${avisos.map(t=>`<p>${esc(t)}</p>`).join('')}`;
+}
 function renderGTime(){
   $('#g-from').value=GT.a;$('#g-to').value=GT.b;
   document.querySelectorAll('[data-gdays]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gdays===String(GT.days||''))));
@@ -226,11 +301,11 @@ function generate(){
     const cs=pick.filter(Boolean);let s=cs.length*100;
     cs.forEach(c=>{const m=marks[keyOf(c)]?.s;s+=m==='si'?6:m==='quiza'?2:0;s+=pscore(c)});
     if($('#g-compact').checked){for(let d=0;d<6;d++){const b=cs.flatMap(c=>c[6].filter(x=>x[0]===d)).sort((x,y)=>x[1]-y[1]);if(b.length)s-=2;for(let i=1;i<b.length;i++)s-=Math.max(0,b[i][1]-b[i-1][2])/30}}
-    return s;
+    return s-semanaPena(cs);
   };
   const rec=i=>{
     if(++nodes>250000) return;
-    if(i===subj.length){const cs=pick.filter(Boolean);if(!cs.length||!breaksOk(cs))return;
+    if(i===subj.length){const cs=pick.filter(Boolean);if(!cs.length||!breaksOk(cs)||!semanaOk(cs))return;
       const nd=daysOf(cs).length;
       // mínimo de días posible llevando todas las materias que tienen grupos (antes de aplicar el límite)
       if(subj.every((x,j)=>pick[j]||!x.opts.length))minDays=Math.min(minDays,nd);
@@ -287,16 +362,16 @@ function generateBank(subj,N,{marks,pscore,oq}){
   const res=[];let subsets=0,trunc=false;const CAP=auto?160:400;
   const score=cs=>{let s=0;cs.forEach(c=>{const m=marks[keyOf(c)]?.s;s+=m==='si'?6:m==='quiza'?2:0;s+=pscore(c)+prio(c[8])});
     if($('#g-compact').checked){for(let d=0;d<6;d++){const b=cs.flatMap(c=>c[6].filter(x=>x[0]===d)).sort((x,y)=>x[1]-y[1]);if(b.length)s-=2;for(let i=1;i<b.length;i++)s-=Math.max(0,b[i][1]-b[i-1][2])/30}}
-    return s};
+    return s-semanaPena(cs)};
   // mejor combinación de grupos para un subconjunto fijo de materias
   const bestFor=set=>{const ord=set.slice().sort((a,b)=>a.opts.length-b.opts.length), pick=[];let best=null,nodes=0;
     const rec=i=>{if(++nodes>4000)return;
-      if(i===ord.length){if(!breaksOk(pick))return;const days=daysOf(pick);if(maxD&&days.length>maxD)return;
+      if(i===ord.length){if(!breaksOk(pick)||!semanaOk(pick))return;const days=daysOf(pick);if(maxD&&days.length>maxD)return;
         let s, q=null;
         if(auto){q=qualityOf(pick);if(!q.ok&&estricto)return;
           // la cantidad la decide la meta de créditos: la prioridad cuenta como promedio, no como suma
           const m=pick.reduce((t,c)=>{const mk=marks[keyOf(c)]?.s;return t+(mk==='si'?6:mk==='quiza'?2:0)+pscore(c)},0);
-          s=m+pick.reduce((t,c)=>t+prio(c[8]),0)/pick.length*2-q.pen*4-(q.ok?0:200)}
+          s=m+pick.reduce((t,c)=>t+prio(c[8]),0)/pick.length*2-q.pen*4-(q.ok?0:200)-semanaPena(pick)}
         else s=score(pick);
         if(!best||s>best.s)best={cs:pick.slice(),s,days,miss:[],q};return}
       for(const c of ord[i].opts){if(pick.some(p=>overlaps(p,c)))continue;pick.push(c);rec(i+1);pick.pop()}};
@@ -407,9 +482,11 @@ function renderPlans(){
     `<button class="chip plan-new" data-newplan="1" title="${esc(txH('nuevo_ayuda'))}">${esc(txH('nuevo'))}</button><button class="link" data-dup style="margin-left:8px">${esc(txH('duplicar',{version:ws().plan}))}</button>`;
 }
 function renderCal(){
+  renderSemana();
   const sel=selected(), own=ownAsClasses();
   const ghost=S.hover&&!plan().sel.includes(S.hover)?byKey(S.hover):null;
-  const all=[...sel,...own,...(ghost?[ghost]:[])];
+  const viajes=SEMANA_ACTIVA?semanaTraslados(sel).map(([d,a,b])=>({own:true,n:txH('semana_categoria_traslados'),h:[[d,Math.max(0,a),Math.min(1440,b)]]})):[];
+  const all=[...sel,...own,...viajes,...(ghost?[ghost]:[])];
   const maxDay=Math.max(4,...all.flatMap(c=>slots(c).map(b=>b[0])));
   const days=S.weekend?7:maxDay+1;
   // bloques de 1:30 alineados a las 7:00 (si algo empieza antes, se agregan bloques completos hacia arriba)
@@ -476,7 +553,7 @@ function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="bu
    escala final. La respuesta es proporcional y amplificada (exponente GAIN): un pellizco amplio acerca mucho más que
    uno pequeño. Usa el mismo ZOOM que los botones +/−; desplazar con un dedo sigue siendo nativo. */
 
-SATE.pestana('horarios',{montar(){drawCals();renderGTime()},mostrar(){renderHor()},ocultar(){S.hover=null}});
+SATE.pestana('horarios',{montar(){montarSemana();drawCals();renderGTime()},mostrar(){renderHor()},ocultar(){S.hover=null}});
 
 $('#b-export').addEventListener('click', async () => {
   try { await SATE.script('exportacion.js'); abrirExportacion(); }
