@@ -884,6 +884,16 @@ def separar_datos(data):
     return nucleo, oferta, tramites
 
 
+def datos_dictamen():
+    import base64, contenido
+    mapa = json.loads((ROOT / 'data/mapa_curricular_saes.json').read_text(encoding='utf-8'))
+    return {
+        'materias': {f'{c}|{p}|{k.upper()}': [n, nivel] for c, p, nivel, k, n, *_ in mapa['rows']},
+        'pdfs': {tipo: base64.b64encode((ROOT / 'data/gestion_escolar' / archivo).read_bytes()).decode()
+                 for tipo, archivo in (('interno', 'dictamen-interno-2026-1.pdf'), ('externo', 'dictamen-externo-cosie-01.pdf'))},
+        'textos': {k: v for k, v in contenido.objeto_t().items() if k.startswith('dictamen.')}}
+
+
 def escribir_sate(data):
     import shutil, cuenta, saes, comun, contenido, skins, encuesta
     from institucional import write_dist
@@ -892,11 +902,13 @@ def escribir_sate(data):
     datos = destino / "datos" / UNIDAD
     datos.mkdir(parents=True, exist_ok=True)
     for nombre, d in zip(("nucleo", "oferta", "tramites"), separar_datos(data)):
+        if UNIDAD == 'upiita' and nombre == 'tramites':
+            d['dictamen'] = datos_dictamen()
         (datos / (nombre + ".json")).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
-    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))

@@ -52,7 +52,7 @@
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
-    if (id === 'tramites') { await cargas.get('tramites.json'); await script('tramites.js'); }
+    if (id === 'tramites') { await cargas.get('tramites.json'); await script('tramites.js'); if(u==='upiita')await script('dictamen.js'); }
     if (!modulos[id]) throw new Error('Módulo sin registrar: ' + id);
     return modulos[id];
   }
