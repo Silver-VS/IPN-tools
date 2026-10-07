@@ -637,9 +637,17 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 :root,:root[data-theme],:root:not([data-theme]){--ipn-acento:var(--accent);--ipn-texto:var(--fg);--ipn-tenue:var(--muted);--ipn-superficie:var(--surface);--ipn-linea:var(--line)}
 @media(max-width:720px){#sate-tabs{display:none}}
 /*__CUENTA_CSS__*/
-.plan-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:16px;align-items:start}
-.plan-mapa,.plan-panel{min-width:0}.plan-panel .card{padding:12px 0;border:0;box-shadow:none}.plan-panel .wchips{overflow-wrap:anywhere}
-@media(max-width:900px){.plan-layout{grid-template-columns:minmax(0,1fr)}}
+.plan-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:12px}
+.plan-top .mapcut{flex:0 1 340px;min-width:0;flex-direction:column;align-items:stretch;margin:0}
+.plan-top .mapcut-info{flex:auto;min-width:0}
+.plan-top .minimap svg{width:100%;max-height:180px}
+.plan-panel{flex:1;min-width:0}.plan-panel summary{flex-wrap:wrap}
+#plan-resumen{font-weight:400;font-variant-numeric:tabular-nums}
+.plan-panel .sate-desp__cuerpo{max-height:260px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
+.plan-panel .card{padding:8px 0;margin:0;border:0;box-shadow:none}.plan-panel .wchips{overflow-wrap:anywhere}
+.plan-panel #plan-carga,.plan-panel #plan-supuesto{margin:6px 0}
+.plan-panel .actions{gap:6px}.plan-panel .btn{padding:6px 10px}
+@media(max-width:720px){.plan-top{flex-direction:column;gap:10px}.plan-top .mapcut,.plan-panel{width:100%;flex:auto}.plan-panel summary{flex-wrap:nowrap}.plan-panel #plan-titulo{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}#plan-resumen{white-space:nowrap;font-size:.8rem}.plan-panel .sate-desp__cuerpo{max-height:300px}}
 </style>
 
 <!--__INST_HEADER__-->
@@ -674,8 +682,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   </section>
   <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
-    <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
-    <div class="plan-layout"><div class="plan-mapa">
+    <!-- La planeación comparte solo la fila del minimapa; el mapa conserva todo el ancho. -->
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
@@ -684,13 +691,11 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="legend" id="legend" aria-label="Simbología"></div>
       <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     </div>
+    <div class="plan-top">
     <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance <span id="mapcut-sim"></span></b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>
-    <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
-    <div class="tlist" id="tlist" hidden></div>
-    <div class="insp" id="insp" aria-live="polite"></div>
-    </div>
-    <aside class="plan-panel card" aria-labelledby="plan-titulo">
-      <h2 id="plan-titulo"></h2>
+    <details class="plan-panel sate-desp" id="plan-panel" open>
+      <summary><span id="plan-titulo"></span><span id="plan-resumen" role="status"></span></summary>
+      <div class="sate-desp__cuerpo">
       <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button></div>
       <p id="plan-supuesto"></p>
       <button class="link" type="button" id="plan-simular"></button>
@@ -706,8 +711,12 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
     </div>
       <div class="card"><h3 class="sub" id="h-sugg">Sugeridas</h3><div class="sugg" id="sugg"></div>
         <div class="actions" style="margin-top:10px"><button class="btn" id="b-sugg">Elegir las sugeridas</button><button class="btn" id="b-all" title="Agrega al banco todas las materias que ya puedes cursar y tienen grupos; después indica en «Generar horarios» cuántas quieres llevar">Elegir todas las que puedes cursar</button></div></div>
-    </aside>
+      </div>
+    </details>
     </div>
+    <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
+    <div class="tlist" id="tlist" hidden></div>
+    <div class="insp" id="insp" aria-live="polite"></div>
     <ul class="mapnote" id="mapnote"></ul>
     <div class="below">
       <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
