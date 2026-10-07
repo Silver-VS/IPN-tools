@@ -103,4 +103,58 @@ assert.match(ctx.minimapaCurricular(null).svg,/<circle/,'También hay minimapa s
 personal=false;assert.equal(ctx.minimapaCurricular(),null);
 assert.ok(!leer('web/sate/mapa.js').includes('function slotFill('),'Optativas se resuelven una sola vez en núcleo');
 assert.ok(!leer('web/sate/mapa.js').includes('<circle'),'Mapa reutiliza los puntos del núcleo');
+// Horarios: oferta ficticia, controles y persistencia sin navegador ni red.
+const hor=leer('web/sate/horarios.js'), shell=leer('web/sate/cascaron.html');
+const extra=shell.match(/<details id="f-more">([\s\S]*?)<\/details>/)[1];
+for(const id of ['f-hide','f-fit','g-from','g-to','g-avoid','f-done','b-reset'])assert.ok(extra.includes('id="'+id+'"'),id+' dentro de Más filtros');
+for(const id of ['f-q','f-turno','f-nivel','f-want'])assert.ok(!extra.includes('id="'+id+'"'),id+' visible');
+assert.match(nucleo,/hideDone:store.get\('hideDone',true\)/);
+assert.ok(nucleo.includes('IPNT.set(HU+k,JSON.stringify(v))'));
+const controles=new Map(), guardado=new Map();
+const control=id=>{if(!controles.has(id))controles.set(id,{textContent:'',open:false,addEventListener(tipo,fn){this[tipo]=fn}});return controles.get(id)};
+let personalHor=true;
+const estado={car:'B',tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,fit:false,gap:null,onlyWant:false,gavoid:[]};
+const trayectoria={done:['A'],want:['B']}, oferta=['A','B','C','D'].map((k,i)=>['B','M',1,'DEMO'+i,i,[],[[0,480,540]],4.5,k]);
+const traduccion=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}');
+const hc=vm.createContext({S:estado,GT:{a:'',b:''},$:control,SATE:{texto:traduccion},store:{set:(k,v)=>guardado.set(k,v)},norm:s=>s.toLowerCase(),
+  ws:()=>({marks:{}}),tr:()=>trayectoria,plan:()=>({sel:[]}),selected:()=>[],ownAsClasses:()=>[],classes:()=>oferta,
+  isPersonal:()=>personalHor,keyOf:c=>c[8],outWin:()=>false,isExcl:()=>false,overlaps:()=>false,name:c=>c[8],profs:()=>'',
+  cur:()=>({A:[],B:[],C:[],D:[]}),statusOf:k=>({A:'done',B:'rest',C:'fail',D:'late'}[k]),renderOffer(){}});
+vm.runInContext(hor.slice(0,hor.indexOf("$('#offer').addEventListener"))+
+  hor.slice(hor.indexOf('function base()'),hor.indexOf('function suggest('))+
+  hor.slice(hor.indexOf('function renderMasFiltros()'),hor.indexOf('/* Salones'))+
+  hor.match(/const prio=k=>[^\n]+/)[0],hc);
+assert.deepEqual(Array.from(hc.filtered(),c=>c[8]),['B','C','D'],'Acreditada oculta por omisión');
+estado.hideDone=false;assert.equal(hc.filtered().length,4,'Se pueden consultar las acreditadas');
+estado.hideDone=true;personalHor=false;assert.equal(hc.filtered().length,4,'Sin SAES no se ocultan materias');
+personalHor=true;estado.onlyWant=true;assert.deepEqual(Array.from(hc.filtered(),c=>c[8]),['B']);estado.onlyWant=false;
+assert.deepEqual(vm.runInContext("['A','B','C','D'].map(prio)",hc).join(','),'2,0,1,1','Elegidas, adeudos/desfase, resto');
+hc.renderMasFiltros();assert.equal(control('#f-more-title').textContent,'Más filtros (1)');assert.equal(control('#f-more').open,true);
+estado.hide=true;hc.renderMasFiltros();assert.equal(control('#f-more-title').textContent,'Más filtros (2)');
+estado.hide=false;estado.hideDone=false;control('#f-more').open=false;hc.renderMasFiltros();assert.equal(control('#f-more-title').textContent,'Más filtros');assert.equal(control('#f-more').open,false);
+vm.runInContext(hor.match(/\$\('#f-done'\)\.addEventListener[^\n]+/)[0],hc);
+control('#f-done').change({target:{checked:true}});assert.equal(guardado.get('hideDone'),true);
+control('#f-done').change({target:{checked:false}});assert.equal(guardado.get('hideDone'),false);
+for(const clave of [...hor.matchAll(/txH\('([^']+)'/g)].map(m=>m[1]))assert.ok(config.textos['sate.horarios.'+clave],clave+' existe en catálogo');
+for(const clave of ['recursar','acreditada','semestre','disponible','curso','desfasada','desfasada_dictamen','desfasada_recursar','generador_vacio','oferta_sin_resultados','profesor_excluido_ayuda','nota_placeholder','solo_opcion']){
+  const t=config.textos['sate.horarios.'+clave];assert.ok(t);
+  const codigo=hor.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,'');
+  assert.ok(!codigo.includes('>'+t+'<'),'Texto visible solo en catálogo: '+clave);
+  if(t.includes(' '))assert.ok(!codigo.includes("'"+t+"'"),'Literal solo en catálogo: '+clave);
+}
+assert.ok(!hor.includes('Mi trayectoria'));
+const sinComentarios=hor.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g,'');
+assert.ok(!/aria-label="[A-Za-zÁÉÍÓÚáéíóúñ]/.test(sinComentarios),'Etiquetas accesibles también usan claves');
+assert.ok(!/<(?:span|small|p|b|i|button)(?:\s+[\w-]+="[^"]*")*\s*>[A-Za-zÁÉÍÓÚáéíóúñ]/.test(sinComentarios),'Sin texto visible fijo entre etiquetas');
+assert.match(hor,/SateUI.ayuda\('sate.horarios.carga_ayuda'/);
+const carga=hor.slice(hor.indexOf('  const failS=new Set(tr().fail), ci=cargaInfo(sel.filter'),hor.indexOf("  $('#sel').hidden"));
+let ayuda;
+hc.SateUI={ayuda:(k,v)=>(ayuda={k,v})};hc.esc=s=>s;hc.fmtCr=String;hc.sel=[];trayectoria.fail=[];
+hc.cargaInfo=()=>({L:{min:27,media:40,max:80},ret:4.5,nuevos:0,total:4.5,tope:45,libre:40.5,faltaMin:22.5,aut:45});
+control('#load .load-note').appendChild=n=>n;
+vm.runInContext(carga,hc);
+assert.match(control('#load').innerHTML,/4.5 de 45 créditos · te faltan 22.5 para la carga mínima/);
+assert.ok(!control('#load').innerHTML.includes('retenidos por reprobadas'));
+assert.equal(ayuda.k,'sate.horarios.carga_ayuda');assert.equal(ayuda.v.ret,'4.5');
+console.log('Horarios: filtros agrupados, acreditadas, preferencia recordada, prioridad, carga y textos por clave. OK.');
 console.log('Diseño §1–§3a: nombres, variantes/URL, SVG, grupos, teclado, barra móvil, foco, contraste AA y cinco estados compartidos. OK.');

@@ -182,6 +182,8 @@
       return true;
     }, ctx);
     revisar('planeación N+1 sin materias de N ni acreditadas', () => {
+      // Las unidades con planeación de un periodo no tienen un contexto N+1.
+      if(!PLAN_DOS_PERIODOS)return true;
       return conPlan(() => {
         const base=tr(), original=base.want, clave=planClave(1), futuro=base.wantPorPeriodo[clave];
         base.want=[...new Set([...base.want,...suggestions().list.slice(0,2)])];
@@ -208,6 +210,11 @@
       return true;
     }, ctx);
     revisar('aviso de actualizar', () => typeof avisoActualizar(ALUMNO) === 'string' || 'no devuelve texto', ctx);
+    revisar('oferta sin acreditadas con el filtro activo', () => {
+      const anterior=S.hideDone;S.hideDone=true;
+      try{const done=new Set(tr().done), mal=filtered().filter(c=>done.has(c[8]));return !mal.length||'oferta incluye acreditadas: '+mal.map(c=>c[8]).join(',')}
+      finally{S.hideDone=anterior}
+    }, ctx);
     // generador: materias elegidas = sugeridas + algunas al azar (incluye a veces acreditadas o en curso a propósito)
     const t = tr(); t.want = [...new Set([...suggestions().list, ...shuffle(Object.keys(cur())).slice(0, ri(0, 4))])].filter(k => !isElec(k));
     for (const n of ['', 'auto', String(ri(2, 5))]) {

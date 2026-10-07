@@ -2,7 +2,7 @@
 const DL=window.claude?.use?window.claude.use('downloads'):Promise.resolve(null);
 async function saveFile(name,blob){
   const dl=window.claude?.use?await DL:null;
-  if(dl){try{await dl.save({filename:name,data:blob});return 'Listo: '+name}catch(e){return e?.code==='declined'?'Descarga cancelada.':'No se pudo guardar el archivo en esta vista.'}}
+  if(dl){try{await dl.save({filename:name,data:blob});return 'Listo: '+name}catch(e){return e?.code==='declined'?txH('descarga_cancelada'):txH('descarga_error')}}
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);return 'Listo: '+name;
 }
 function scheduleData(){
@@ -162,7 +162,7 @@ const drawFor=(part,k)=>EXP.style==='min'?drawTable(part,k):drawSchedule(part,k)
 /* ---------- Excel (.xlsx, también se abre en Google Sheets): mismo formato que la tabla minimalista ---------- */
 async function loadExcelJS(){if(window.ExcelJS)return window.ExcelJS;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de Excel.'));document.head.appendChild(s)});return window.ExcelJS}
 async function exportXlsx(){
-  if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
+  if(!selected().length&&!plan().own.length)return txH('exportacion_vacia');
   const ExcelJS=await loadExcelJS(), wb=new ExcelJS.Workbook(), {rows,days,cells,D}=weekGrid();
   wb.title=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`;
   const NAMES=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'], argb=h=>'FF'+String(h).replace('#','').toUpperCase();
@@ -206,7 +206,7 @@ async function exportXlsx(){
 }
 const toBlob=cv=>new Promise(r=>cv.toBlob(r,'image/png'));
 async function exportPng(){
-  if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
+  if(!selected().length&&!plan().own.length)return txH('exportacion_vacia');
   const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-upiita.png`,await toBlob(cv));
 }
 async function loadPdfLib(){if(window.PDFLib)return window.PDFLib;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de PDF.'));document.head.appendChild(s)});return window.PDFLib}
@@ -219,7 +219,7 @@ async function pdfPage(doc,rgb){
   pg.drawImage(png,{x:(PW-png.width*sc)/2,y:PH-m-png.height*sc,width:png.width*sc,height:png.height*sc});
 }
 async function exportPdf(){
-  if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
+  if(!selected().length&&!plan().own.length)return txH('exportacion_vacia');
   const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
   await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
   doc.setTitle(`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`);
@@ -229,7 +229,7 @@ async function exportPdf(){
 const plansConContenido=()=>planIds().filter(id=>{const p=ws().plans[id];return p.sel.length||(p.own||[]).length});
 async function exportPdfAll(){
   const ids=plansConContenido();
-  if(!ids.length)return 'Agrega materias a algún horario para exportarlo.';
+  if(!ids.length)return txH('exportacion_todos_vacia');
   const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create(), prev=ws().plan;
   // dos por hoja: carta horizontal con dos columnas (como «2 páginas por hoja» al imprimir); uno por hoja: tamaño completo
   const two=EXP.perPage===2, [PW,PH]=two||EXP.style!=='min'?[792,612]:[612,792], m=24, GAP=20, colW=two?(PW-2*m-GAP)/2:PW-2*m;
@@ -247,7 +247,7 @@ async function exportPdfAll(){
   return r.startsWith('Listo')?`${r} (${ids.length} ${ids.length>1?'horarios':'horario'} en ${n} ${n>1?'hojas':'hoja'})`:r;
 }
 // módulo de exportación (ventana)
-function abrirExportacion(){const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||plan().own.length?'':'Agrega materias a tu horario para exportarlo.';dl.showModal?dl.showModal():dl.setAttribute('open','')}
+function abrirExportacion(){const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||plan().own.length?'':txH('exportacion_vacia');dl.showModal?dl.showModal():dl.setAttribute('open','')}
 $('#exp-x').addEventListener('click',()=>$('#exp-dlg').close());
 $('#exp-dlg').addEventListener('click',e=>{if(e.target.id==='exp-dlg')e.target.close()});
 const renderExpStyle=()=>{document.querySelectorAll('[data-exps]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.exps===EXP.style)));
@@ -261,7 +261,7 @@ $('#exp-own').value=EXP.own;
 document.querySelectorAll('[data-exshow]').forEach(i=>{i.checked=!!EXP.show[i.dataset.exshow];i.addEventListener('change',()=>{const v=EXP.show;v[i.dataset.exshow]=i.checked;store.set('expShow',v)})});
 $('#exp-own').addEventListener('input',e=>store.set('expOwn',e.target.value));
 for(const [id,fn] of [['#b-png',exportPng],['#b-pdf',exportPdf],['#b-pdfall',exportPdfAll],['#b-xlsx',exportXlsx]]){
-  $(id).addEventListener('click',async e=>{const b=e.currentTarget,t=b.textContent;b.disabled=true;b.textContent='Generando…';
+  $(id).addEventListener('click',async e=>{const b=e.currentTarget,t=b.textContent;b.disabled=true;b.textContent=txH('exportacion_generando');
     let m,ok=false;try{m=await fn();ok=true}catch(err){m='No se pudo exportar: '+err.message}$('#exp-msg').textContent=m;$('#exp-dmsg').textContent=m;if(ok)window.ENCUESTA?.marcar('exp');
     b.disabled=false;b.textContent=t});
 }
@@ -273,6 +273,6 @@ $('#b-copy').addEventListener('click',async()=>{
     sel.map(c=>`${c[3]}  ${c[8]} ${name(c)} (${fmtCr(c[7])} cr)\n   ${profs(c)}\n   ${pattern(c).join('; ')}`).join('\n')+
     plan().own.map(o=>`\n—  ${o.n}\n   ${o.d.map(d=>DAYS[d]).join(' ')}  ${hm(o.a)}–${hm(o.b)}`).join('');
   const box=$('#copybox');box.value=txt;
-  try{await navigator.clipboard.writeText(txt);$('#b-copy').textContent='Copiado';setTimeout(()=>$('#b-copy').textContent='Copiar texto',1500)}
+  try{await navigator.clipboard.writeText(txt);$('#b-copy').textContent=txH('copiado');setTimeout(()=>$('#b-copy').textContent=txH('copiar'),1500)}
   catch(err){box.hidden=false;box.select()}
 });

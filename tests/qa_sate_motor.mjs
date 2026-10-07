@@ -5,7 +5,8 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 
 const leer = f => readFileSync(f,'utf8');
-const textos=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]).textos;
+const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
+const textos=config.textos;
 const texto=(k,v={})=>(textos[k]||k).replace(/\{(\w+),\s*plural,\s*((?:[^{}]*\{[^{}]*\})+)\s*\}/g,(m,k,c)=>{
   const n=Number(v[k]),op={};c.replace(/(=?\w+)\s*\{([^{}]*)\}/g,(_,k,t)=>{op[k]=t});
   return (op['='+n]??op[new Intl.PluralRules('es-MX').select(n)]??op.other??'').replace(/#/g,new Intl.NumberFormat('es-MX').format(n));
@@ -31,7 +32,7 @@ for (const unidad of ['upiita','escom','upibi']) {
     getElementById(id){return this.querySelector('#'+id)},
     querySelectorAll(){return []},createElement:()=>nodo(),body:nodo(),head:nodo(),documentElement:nodo()};
   const SATE = {texto,modulos:{},actual:{pestana:'mapa'},pestana(id,m){this.modulos[id]=m},error:e=>{throw e},nucleoListo:async a=>a.renderTop(),repintar(){},ir(){}};
-  const c = vm.createContext({console,URL,URLSearchParams,Blob,TextEncoder,structuredClone,performance,document,SATE,SATE_DATA:datos,SATE_UNIDAD:unidad,
+  const c = vm.createContext({console,URL,URLSearchParams,Blob,TextEncoder,structuredClone,performance,document,SATE,SATE_CONFIG:config,SATE_DATA:datos,SATE_UNIDAD:unidad,
     FUZZ_SIN_DOM:true,localStorage:almacen(),sessionStorage:almacen(),setTimeout,clearTimeout,
     location:{hash:'#/'+unidad+'/mapa',search:'?n='+N+'&semilla=1',pathname:'/sate/index.html',origin:'http://local'},history:{replaceState(){}},
     navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:()=>({matches:false,addEventListener(){}}),addEventListener(){},
