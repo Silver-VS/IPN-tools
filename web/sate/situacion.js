@@ -87,5 +87,11 @@
       }
     }
   }
-  SATE.presente={mostrar,avisos,tramite};
+  // Ventanilla consume la misma decisión presentada en Mi trayectoria.
+  function aplicaTramite(id){
+    if(!isPersonal())return null;
+    const {lista}=datos(),aviso=lista.find(x=>x.tramite===id);
+    return aviso?{aplica:true,motivo:aviso.cuerpo}:null;
+  }
+  SATE.presente={mostrar,avisos,tramite,aplicaTramite};
 })();

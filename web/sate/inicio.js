@@ -52,7 +52,7 @@
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
-    if (id === 'tramites') await cargas.get('tramites.json');
+    if (id === 'tramites') { await cargas.get('tramites.json'); await script('tramites.js'); }
     if (!modulos[id]) throw new Error('Módulo sin registrar: ' + id);
     return modulos[id];
   }
@@ -148,25 +148,6 @@
       api = a; await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta(location.hash, u, config) ||
         SateRutas.ruta('#/' + u + '/' + (api.personal() && cfg.pestanas.includes('trayectoria') ? 'trayectoria' : 'mapa'), u, config);
-      modulos.tramites = {mostrar(r) {
-        const box = document.getElementById('sate-tramites'); box.replaceChildren();
-        const p = document.createElement('p'); p.textContent = texto('sate.leyenda.prueba',{unidad:cfg.siglas}); box.appendChild(p);
-        for (const id of cfg.tramites) {
-          const a = document.createElement('a'); a.className = 'btn'; a.textContent = texto('sate.tramite.'+id+'.titulo');
-          a.href = '#/' + u + '/tramites/' + id; box.appendChild(a);
-        }
-        const id = r.tramite || cfg.tramites[0];
-        const h = document.createElement('h2'); h.textContent = texto('sate.tramite.'+id+'.titulo'); box.appendChild(h);
-        SATE.presente.tramite(box,id);
-        if (id === 'dictamen' || id === 'electivas') {
-          const a = document.createElement('a'); a.className = 'btn'; a.textContent = texto('sate.migracion.abrir',{tramite:h.textContent});
-          a.href = '../' + id + '.html'; box.appendChild(a);
-        } else if (id === 'reinscripcion') {
-          const c = document.createElement('div'); c.className = 'cal'; box.appendChild(c); const d=situacionDatos();renderCalendario(d?.rd,d?.nDes||0);
-        } else {
-          const p = document.createElement('p'); p.textContent = texto('sate.migracion.tramites'); box.appendChild(p);
-        }
-      }};
       const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
       tabs = SateUI.pestanas({items,activa:r.pestana,alCambiar:id=>{if(actual && actual.pestana!==id)ir(id)}});
       document.getElementById('sate-tabs').appendChild(tabs);

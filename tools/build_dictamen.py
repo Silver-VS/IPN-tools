@@ -26,6 +26,8 @@ def construir():
     data = {"pdfs": {k: base64.b64encode((ROOT / "data/gestion_escolar" / f).read_bytes()).decode()
                      for k, f in PDFS.items()}, "materias": materias}
     html = (ROOT / "web/dictamen.template.html").read_text(encoding="utf-8")
+    pdf = (ROOT / 'web/tramites/pdf-comun.js').read_text(encoding='utf-8') + '\n' + (ROOT / 'web/tramites/pdf-dictamen.js').read_text(encoding='utf-8')
+    html = html.replace('/*__PDF_DICTAMEN__*/', pdf)
     texto = re.sub(r"^export ", "", (comun.VENDOR / "js/texto.js").read_text(encoding="utf-8"), flags=re.M)
     texto = "var Texto=(function(){" + texto + "\nreturn {t:t,registrar:registrar};})();"
     for marca, valor in (("/*__DATA__*/null", json.dumps(data, ensure_ascii=False)),
