@@ -224,6 +224,22 @@
 
   /* ---------- Pestañas ---------- */
   /* pestanas({items:[{id, texto, panel:Element|id}], activa, etiqueta, segmentado, alCambiar}) → tablist con .seleccionar(id) */
+  function iconoPestana(ident) {
+    var trazos = {
+      trayectoria: '<path d="M4 18V6m0 12h16M8 14l4-4 4 2 4-6"/>',
+      tramites: '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16m-8 0v9"/>',
+      mapa: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16"/>',
+      horarios: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+      calendario: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 11h18m-14 4h3m4 0h3"/>'
+    };
+    if (!trazos[ident]) return null;
+    return el('span', {class:'sate-pestana__icono', 'aria-hidden':'true', html:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">'+trazos[ident]+'</svg>'});
+  }
+  function contenidoPestana(b, it) {
+    var icono = iconoPestana(it.id);
+    if (icono) b.appendChild(icono);
+    b.appendChild(el('span', {class:'sate-pestana__texto', texto:it.texto}));
+  }
   function pestanas(o) {
     var lista = el('div', { class: 'sate-pestanas' + (o.segmentado ? ' sate-pestanas--seg' : ''), role: 'tablist', 'aria-label': o.etiqueta || null });
     var base = id('tab'), botones = [];
@@ -239,7 +255,8 @@
       if (o.alCambiar) o.alCambiar(ident);
     }
     o.items.forEach(function (it, i) {
-      var b = el('button', { type: 'button', role: 'tab', class: 'sate-pestana', id: base + '-' + it.id, 'data-id': it.id, texto: it.texto });
+      var b = el('button', { type: 'button', role: 'tab', class: 'sate-pestana', id: base + '-' + it.id, 'data-id': it.id });
+      contenidoPestana(b, it);
       if (i && it.grupo != null && it.grupo !== o.items[i-1].grupo) b.className += ' sate-grupo-inicio';
       var p = panelDe(it);
       if (p) {
@@ -269,7 +286,8 @@
   function barraInferior(o) {
     var nav = el('nav', { class: 'sate-barra', 'aria-label': traducir('componentes.barra.etiqueta') });
     var bs = o.items.map(function (it, i) {
-      var b = el('button', { type: 'button', class: 'sate-barra__btn', 'data-id': it.id, texto: it.texto });
+      var b = el('button', { type: 'button', class: 'sate-barra__btn', 'data-id': it.id });
+      contenidoPestana(b, it);
       b.addEventListener('click', function () { marcar(it.id); if (o.alElegir) o.alElegir(it.id); });
       if (i && it.grupo != null && it.grupo !== o.items[i-1].grupo) b.className += ' sate-grupo-inicio';
       nav.appendChild(b); return b;

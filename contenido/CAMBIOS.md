@@ -1,6 +1,19 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.16 · Claude
+
+| Clave | Antes | Después |
+|---|---|---|
+| `sate.pie` | (en el código) Herramienta de consulta para que el alumno planee su reinscripción… | SATE te ayuda a entender tu situación escolar y a planear tu trayectoria… |
+
+## 2026-10-07 · 2026.10.15 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.pestana.horarios.titulo`, `sate.pestana.calendario.titulo` | Horarios de clase y Calendario escolar; ids, rutas y etiquetas cortas conservados. |
+| `sate.minimapa.*` | Acción accesible y leyenda de acreditadas, en curso, pendientes, reprobadas y desfasadas para el minimapa compartido. |
+
 ## 2026-10-07 · 2026.10.13 · Codex
 
 | Claves | Cambio |

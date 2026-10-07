@@ -433,6 +433,59 @@ function rowBands(L){
     const b=i<ys.length-1?(y+ys[i+1])/2:Math.min(L.h,y+(i?(y-ys[i-1])/2:L.pitch/2));
     return [n,y,a,b]});
 }
+/* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
+   mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
+   toma la continuación de esa línea (ESCOM ISC: optativa de 6.º -> 7.º) o la sugiere. */
+function slotFill(L,want){
+  const out=new Map(), c=cur(), t=isPersonal()?tr():{done:[],curso:[]};
+  const rank=k=>t.done.includes(k)?0:t.curso.includes(k)?1:want.has(k)?2:9;
+  const cands=Object.keys(c).filter(k=>c[k][3]==='P'&&!isElec(k)&&rank(k)<9).sort((a,b)=>rank(a)-rank(b)||c[a][2]-c[b][2]);
+  const slots=L.boxes.map((b,i)=>[i,b]).filter(([,b])=>!b[4]&&/^optativa/i.test(b[5])).sort((a,b)=>a[1][6]-b[1][6]||a[1][0]-b[1][0]);
+  const used=new Set(), dep=dependents(), next=i=>L.edges.filter(e=>e[0]===i).map(e=>e[1]);
+  const put=(i,k)=>{out.set(i,{k});used.add(k)};
+  // el espacio con nivel conocido (b[7], UPIITA) solo lo cubre una optativa de ese nivel; N espacios del nivel, N optativas
+  for(const [i,b] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k)&&c[k][2]===(b[7]||b[6]));if(k)put(i,k)}
+  for(const [i,b] of slots){if(out.has(i)||b[7])continue;const k=cands.find(k=>!used.has(k));if(k)put(i,k)}
+  // continuación de la línea en el espacio siguiente (flecha entre espacios)
+  for(const [i] of slots){const f=out.get(i);if(!f?.k)continue;
+    for(const j of next(i)){const sig=(dep[f.k]||[]).find(x=>c[x]?.[3]==='P');if(!sig)continue;
+      if(L.boxes[j][7]&&c[sig][2]!==L.boxes[j][7])continue;
+      const cur_=out.get(j);if(cur_?.k===sig)continue;
+      if(!cur_||cur_.sigue){if(rank(sig)<9){if(cur_?.k)used.delete(cur_.k);put(j,sig)}else if(!cur_)out.set(j,{sigue:sig})}}}
+  return out;
+}
+/* Una sola representación para Mapa y el presente. La prioridad de desfase evita
+   que «late fail» se cuente como una reprobada ordinaria. */
+function minimapaCurricular(L=MAP().layout,FILL,op={}){
+  if(!isPersonal())return null;
+  if(!L){
+    const niveles=[...new Set(Object.values(cur()).map(v=>v[2]))].sort((a,b)=>a-b),boxes=[];
+    let cols=1;
+    niveles.forEach((n,i)=>{const keys=Object.keys(cur()).filter(k=>cur()[k][2]===n);cols=Math.max(cols,keys.length);keys.forEach((k,j)=>boxes.push([j*50,i*50,40,40,k]))});
+    L={w:cols*50,h:Math.max(1,niveles.length)*50,boxes,edges:[],rows:niveles.map((n,i)=>[n,i*50+20]),pitch:50,filas_exactas:true};
+  }
+  FILL=FILL||slotFill(L,new Set());
+  const {nPend=0,FOCO=null}=op,bands=rowBands(L);
+  const colores={done:'var(--ipn-ok)',curso:'var(--ipn-acento)',pend:'var(--ipn-tenue)',fail:'var(--ipn-reprobada)',late:'var(--ipn-desfasada)'};
+  const cnt={done:0,curso:0,pend:0,fail:0,late:0};
+  const estado=st=>st==='done'?'done':st.startsWith('curso')?'curso':st.startsWith('late')?'late':st.includes('fail')?'fail':'pend';
+  let svg=`<svg viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true" focusable="false">`;
+  bands.forEach(([n,y,a,b],i)=>{
+    if(i%2===0)svg+=`<rect x="0" y="${a}" width="${L.w}" height="${b-a}" fill="var(--ipn-hundido)"/>`;
+    if(i===nPend&&nPend){const fx=FOCO?FOCO.x0:1,fw=FOCO?FOCO.x1-FOCO.x0:L.w-2;svg+=`<rect x="${fx}" y="${a}" width="${fw}" height="${L.h-a-1}" fill="none" stroke="var(--ipn-acento)" stroke-width="4" stroke-dasharray="14 8" rx="8"/>`}
+  });
+  L.edges.forEach(([s,d,pp])=>{const pts=[];for(let i=0;i<pp.length;i+=2)pts.push(pp[i]+','+pp[i+1]);svg+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ipn-tenue)" stroke-opacity=".35" stroke-width="3"/>`});
+  L.boxes.forEach(([x,y,w,h,k,slot],i)=>{
+    const kk=k||FILL.get(i)?.k,cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.3;
+    if(!kk){if(/^optativa/i.test(slot)){svg+=`<circle data-estado="pend" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colores.pend}" stroke-width="4" stroke-dasharray="6 5"/>`;cnt.pend++}return}
+    if(isElec(kk))return;
+    const st=estado(statusOf(kk));cnt[st]++;
+    svg+=`<circle data-estado="${st}" cx="${cx}" cy="${cy}" r="${r}" fill="${colores[st]}"/>`;
+  });
+  svg+='</svg>';
+  const leyenda=Object.keys(cnt).map(st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`).join('');
+  return {svg,leyenda,cnt};
+}
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
 let MARK={avail:new Set(),sug:new Set()};
 let SHOWSUG=store.get('verSug',false);   // apagadas por defecto: el alumno las activa a propósito
@@ -1044,7 +1097,7 @@ $('#b-go').addEventListener('click',()=>{S.onlyWant=true;store.set('onlyWant',tr
     if(!raf)raf=requestAnimationFrame(()=>{raf=0;const p=pend;pend=null;commit(p.z,p.cx,p.cy)})},{passive:false});
 })();
 let rt;window.addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(()=>{if(SATE.modulos.mapa&&S.tab==='tray'&&ZOOM==null)renderMap()},150)});
-$('#foot-info').textContent='Herramienta de consulta para que el alumno planee su reinscripción. Los datos del SAES se consultan en modo de solo lectura y se almacenan únicamente en este navegador, al igual que las materias seleccionadas, marcas, notas y horarios. La reinscripción oficial se realiza en el SAES, donde deben verificarse la cita, la carga autorizada y el cupo. ';
+$('#foot-info').textContent=SATE.texto('sate.pie')+' ';
 {const b=document.createElement('button');b.type='button';b.className='enc-link';b.dataset.encuesta='';b.textContent='Dar mi opinión sobre IPN-tools';$('#foot').appendChild(b)}
 // contexto anónimo para la encuesta (tools/encuesta.py): sin nombre, boleta ni calificaciones
 window.ENCUESTA_CTX=()=>({carrera:S.car,demo:DEMO,conDatos:isPersonal(),elegidas:tr().want.length,enHorario:selected().length,

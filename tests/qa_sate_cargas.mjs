@@ -179,6 +179,10 @@ for (const unidad of ['upiita','escom','upibi']) {
   vm.runInContext('ALUMNO=perfilDemo();for(const k in T)delete T[k]',contexto);
   api.renderTray(); await vm.runInContext('renderStats()',contexto);
   assert.equal(nodos.get('#mapcut').hidden,false,'A: perfil DEMO muestra minimapa');
+  const miniPresente=vm.runInContext('conPlan(()=>conSim(false,()=>minimapaCurricular()),0)',contexto);
+  assert.match(miniPresente.svg,/<circle data-estado=/,'§3: minimapa compartido con SAES en '+unidad);
+  assert.ok(Object.values(miniPresente.cnt).reduce((a,b)=>a+b,0)>0,'§3: puntos contados en '+unidad);
+  assert.match(miniPresente.leyenda,/desfasadas/,'§3: leyenda de cinco estados en '+unidad);
   assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: \d+ materias? · [\d.,]+(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 ·/,'A: resumen con SAES, incluso sin carga conocida');
   assert.deepEqual(cargados,['mapa.js'],'Mapa con/sin perfil no descarga Horarios ni Desempeño');
   await vm.runInContext('SAES.open()',contexto);

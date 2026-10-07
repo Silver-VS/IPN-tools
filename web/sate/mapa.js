@@ -68,20 +68,9 @@ function renderMap0(){
       (full?'Se muestra el mapa completo.':vista==='sigue'&&recom.size?'Se muestran primero las materias que puedes cursar el siguiente periodo.':'Se muestran primero las materias que te faltan.');
   }
   if(isPersonal()){
-    const col=st=>st==='done'?'var(--ok)':st.startsWith('curso')?'var(--accent)':/fail|late/.test(st)?'var(--bad)':st.includes('lock')||st.includes('far')?'var(--line)':'var(--warn)';
-    const cnt={done:0,curso:0,fail:0,late:0,pend:0};
-    let mm=`<svg viewBox="0 0 ${L.w} ${L.h}" role="img" aria-hidden="true">`;
-    bands.forEach(([n,y,a,b],i)=>{if(i%2===0)mm+=`<rect x="0" y="${a}" width="${L.w}" height="${b-a}" fill="var(--sunken)"/>`;if(i===nPend&&nPend){const fx=FOCO?FOCO.x0:1,fw=FOCO?FOCO.x1-FOCO.x0:L.w-2;mm+=`<rect x="${fx}" y="${a}" width="${fw}" height="${L.h-a-1}" fill="none" stroke="var(--accent)" stroke-width="4" stroke-dasharray="14 8" rx="8"/>`}});
-    L.edges.forEach(([s0,d0,pp])=>{const pts=[];for(let i=0;i<pp.length;i+=2)pts.push(pp[i]+','+pp[i+1]);mm+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-width="3"/>`});
-    L.boxes.forEach(([x,y,w,h,k,slot],i)=>{const kk=k||FILL.get(i)?.k, cx=x+w/2, cy=y+h/2, r=Math.min(w,h)*.3;
-      if(!kk){if(/^optativa/i.test(slot)){mm+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--warn)" stroke-width="4" stroke-dasharray="6 5"/>`;cnt.pend++}return}
-      if(isElec(kk))return;const st=statusOf(kk);
-      cnt[st==='done'?'done':st.startsWith('curso')?'curso':st.includes('fail')?'fail':st.startsWith('late')?'late':'pend']++;
-      mm+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col(st)}"/>`});
-    mm+='</svg>';
-    $('#minimap').innerHTML=mm;$('#mapcut').hidden=false;
-    $('#mm-leg').innerHTML=`<span><i style="background:var(--ok)"></i>${cnt.done} acreditadas</span>`+(cnt.curso?`<span><i style="background:var(--accent)"></i>${cnt.curso} en curso</span>`:'')+
-      (cnt.fail?`<span><i style="background:var(--bad)"></i>${cnt.fail} por recursar</span>`:'')+(cnt.late?`<span><i style="background:var(--bad)"></i>${cnt.late} atrasadas</span>`:'')+`<span><i style="background:var(--warn)"></i>${cnt.pend} por cursar</span>`;
+    const mini=minimapaCurricular(L,FILL,{nPend,FOCO});
+    $('#minimap').innerHTML=mini.svg;$('#mapcut').hidden=false;
+    $('#mm-leg').innerHTML=mini.leyenda;
     if(!nPend){$('#mapcut-txt').textContent='Aún no hay '+(porNiveles()?'niveles':'semestres')+' completos; se muestra el mapa completo.';$('#mapvista').hidden=true}else $('#mapvista').hidden=false;
     document.querySelectorAll('#mapvista [data-vista]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.vista===vista)));
   }
@@ -132,27 +121,6 @@ function renderMap0(){
   if(L.rutas&&L.edges.some(e=>e[3]))notas.push(tx('flechas_lejanas'));
   if(L.ocultas)notas.push(tx('flechas_ocultas',{n:L.ocultas}));
   $('#mapnote').innerHTML=notas.map(t=>`<li>${esc(t)}</li>`).join('');
-}
-/* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
-   mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
-   toma la continuación de esa línea (ESCOM ISC: optativa de 6.º -> 7.º) o la sugiere. */
-function slotFill(L,want){
-  const out=new Map(), c=cur(), t=isPersonal()?tr():{done:[],curso:[]};
-  const rank=k=>t.done.includes(k)?0:t.curso.includes(k)?1:want.has(k)?2:9;
-  const cands=Object.keys(c).filter(k=>c[k][3]==='P'&&!isElec(k)&&rank(k)<9).sort((a,b)=>rank(a)-rank(b)||c[a][2]-c[b][2]);
-  const slots=L.boxes.map((b,i)=>[i,b]).filter(([,b])=>!b[4]&&/^optativa/i.test(b[5])).sort((a,b)=>a[1][6]-b[1][6]||a[1][0]-b[1][0]);
-  const used=new Set(), dep=dependents(), next=i=>L.edges.filter(e=>e[0]===i).map(e=>e[1]);
-  const put=(i,k)=>{out.set(i,{k});used.add(k)};
-  // el espacio con nivel conocido (b[7], UPIITA) solo lo cubre una optativa de ese nivel; N espacios del nivel, N optativas
-  for(const [i,b] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k)&&c[k][2]===(b[7]||b[6]));if(k)put(i,k)}
-  for(const [i,b] of slots){if(out.has(i)||b[7])continue;const k=cands.find(k=>!used.has(k));if(k)put(i,k)}
-  // continuación de la línea en el espacio siguiente (flecha entre espacios)
-  for(const [i] of slots){const f=out.get(i);if(!f?.k)continue;
-    for(const j of next(i)){const sig=(dep[f.k]||[]).find(x=>c[x]?.[3]==='P');if(!sig)continue;
-      if(L.boxes[j][7]&&c[sig][2]!==L.boxes[j][7])continue;
-      const cur_=out.get(j);if(cur_?.k===sig)continue;
-      if(!cur_||cur_.sigue){if(rank(sig)<9){if(cur_?.k)used.delete(cur_.k);put(j,sig)}else if(!cur_)out.set(j,{sigue:sig})}}}
-  return out;
 }
 function renderList(){
   if(mview()!=='lista')return;

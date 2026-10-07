@@ -53,6 +53,14 @@
     const avance=d.D.obt!=null&&d.D.total>0?Math.round(d.D.obt/d.D.total*100)+' %':tt('sin_avance');
     const estado=d.nDes?tx('desfase_cuerpo',{n:d.nDes}):tx(ALUMNO.reprobadas_periodo==null?'sin_confirmar':'sin_desfase');
     box.appendChild(el('p',tt('resumen',{periodo:perName(d.D.actual??d.meta),avance,desfase:String(estado).replace(/[.\s]+$/,''),proximo:prox?tx('siguiente',{actividad:prox.titulo,fecha:fecha(prox.hasta||prox.desde)}):tx('calendario_sin_aviso')}),'trayectoria-resumen'));
+    // El presente muestra siempre el SAES real, aunque esté activo el escenario N+1.
+    const mini=conPlan(()=>conSim(false,()=>minimapaCurricular()),0);
+    if(mini){
+      const vista=el('div',null,'trayectoria-minimapa');
+      const boton=el('button');boton.type='button';boton.setAttribute('aria-label',SATE.texto('sate.minimapa.abrir'));
+      boton.innerHTML=mini.svg;boton.onclick=()=>SATE.ir('mapa');vista.appendChild(boton);
+      const leyenda=el('div',null,'mm-leg');leyenda.innerHTML=mini.leyenda;vista.appendChild(leyenda);box.appendChild(vista);
+    }
     const principal=lista[0];
     box.appendChild(SateUI.aviso({estado:principal.estado,titulo:tt('siguiente_paso'),cuerpo:principal.titulo+': '+principal.cuerpo,accion:{texto:tx(principal.id==='actualizacion'?'usar_lector':'que_hacer'),onclick:()=>abrirTramite(principal)}}));
     box.appendChild(el('h3',tx('pendientes')));

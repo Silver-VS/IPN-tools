@@ -2,6 +2,9 @@
    el mismo punto de entrada para no mezclar estado ni registrar eventos dos veces. */
 (function () {
   const config = SATE_CONFIG.unidades, cargas = new Map(), modulos = {}, montados = new Set();
+  const cascaron = document.querySelector('html[data-pestanas]');
+  const variante = new URLSearchParams(location.search).get('pestanas');
+  if (cascaron && ['v1','v3'].includes(variante)) cascaron.setAttribute('data-pestanas', variante);
   let api, actual, tabs, barra, version = 0;
   const leer = k => { try { return localStorage.getItem(k); } catch { return null; } };
   const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
