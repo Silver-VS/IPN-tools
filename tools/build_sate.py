@@ -989,8 +989,8 @@ document.addEventListener('click', e => {
 // v1: solo se eligen materias""", 1)
     core = core.replace("new URL('auth.html',location.href)", "new URL('../auth.html',location.href)")
     core = core.replace('href="privacidad.html"', 'href="../privacidad.html"').replace('href="condiciones.html"', 'href="../condiciones.html"')
-    # Electivas no forma parte del paquete SATE publicado en esta versión.
-    core = core.replace('Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.', 'Consulta con Gestión Escolar los requisitos para acreditar tus electivas.')
+    # tools/publicar.sh compila y publica electivas.html junto a SATE.
+    core = core.replace('href="electivas.html"', 'href="../electivas.html"')
     (destino / "nucleo.js").write_text(core, encoding="utf-8")
     print("datos SATE", UNIDAD, {p.name:p.stat().st_size for p in datos.glob("*.json")})
 
