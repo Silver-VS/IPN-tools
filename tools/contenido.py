@@ -7,7 +7,7 @@ Reglas (PRINCIPIOS-DE-CONSTRUCCION, seccion 2): claves a-z0-9_ con puntos, sin d
 formadas y las mismas que en el idioma base (es); plurales ICU {n, plural, one {...} other {...}}; sin `?` donde falta
 un acento (error tipico de codificacion); sin caracteres de reemplazo; HTML solo <b> <i> <code> <a>.
 """
-import json, pathlib, re, sys, tomllib
+import html, json, pathlib, re, sys, tomllib
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 TEXTOS = ROOT / "contenido" / "textos"
@@ -153,6 +153,31 @@ def js(idioma="es"):
     """Codigo inyectable: `const T=...;` (GENERADO; el formateador de plantillas es js/texto.js de ipn-comun)."""
     return "/* GENERADO desde contenido/textos/%s.toml; no editar */\nconst T=%s;" % (
         idioma, json.dumps(objeto_t(idioma), ensure_ascii=False, separators=(",", ":")))
+
+
+APOYO_CSS = """
+.ipnt-apoyo{display:block;width:100%;box-sizing:border-box;color:var(--muted);overflow-wrap:anywhere}
+.ipnt-apoyo a{display:inline-flex;align-items:center;gap:.4em;min-height:44px;max-width:100%;color:var(--accent);text-decoration:underline}
+.ipnt-apoyo a:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.ipnt-apoyo svg{flex:none}
+.ipnt-apoyo small{display:block;font-size:inherit}
+"""
+
+
+def html_apoyo():
+    """Un solo fragmento para mantener iguales el enlace y los textos en las tres pantallas."""
+    url = json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8"))["donativos"]
+    textos = objeto_t()
+    return ('<div class="ipnt-apoyo"><a href="' + html.escape(url, quote=True) + '" target="_blank" rel="noopener">'
+            '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" '
+            'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+            '<path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/>'
+            '</svg><span>' + html.escape(textos["proyecto.apoyo.enlace"]) + '</span></a><small>'
+            + html.escape(textos["proyecto.apoyo.ayuda"]) + '</small></div>')
+
+
+def inject_apoyo(pagina):
+    return pagina.replace("/*__APOYO_CSS__*/", APOYO_CSS, 1).replace("<!--__APOYO__-->", html_apoyo(), 1)
 
 
 if __name__ == "__main__":

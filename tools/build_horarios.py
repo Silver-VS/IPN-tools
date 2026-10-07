@@ -846,6 +846,8 @@ def main():
     html = inject(html)
     import cuenta   # perfil IPN-tools: respaldo y sincronización con la cuenta institucional
     html = cuenta.inject(html, UNIDAD)
+    import contenido
+    html = contenido.inject_apoyo(html)
     import encuesta   # encuesta de satisfacción de la fase de pruebas (data/encuesta.json)
     html = encuesta.inject(html, UNIDAD)
     import saes
@@ -868,6 +870,7 @@ def main():
     (ROOT / "web" / "dist" / "auth.html").write_text(cuenta.AUTH, encoding="utf-8")
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
     idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
+    idx = contenido.inject_apoyo(idx)
     idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8")).get("unidades", []), ensure_ascii=False), 1)
     (ROOT / "web" / "dist" / "index.html").write_text(aplicar(idx, "index"), encoding="utf-8")   # página principal con inicio de sesión
     for f in ("revision.html", "privacidad.html", "condiciones.html"):
