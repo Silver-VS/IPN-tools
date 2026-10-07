@@ -18,15 +18,21 @@ for(const [u,c] of Object.entries(data).filter(([k])=>!k.startsWith('_'))){
 assert.equal(data.upiita.eventos.length,22);
 assert.ok(!data.upiita.eventos.some(e=>/ETS|evaluacion/i.test(e.titulo)));
 class Nodo{
-  constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.style={}}
-  appendChild(n){this.children.push(n);return n}
+  constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.style={};this.listeners={}}
+  appendChild(n){this.children.push(n);n.parent=this;return n}
+  addEventListener(k,fn){this.listeners[k]=fn}
+  querySelector(s){return this.all().find(n=>n.className?.split(' ').includes(s.slice(1)))||null}
+  insertBefore(n,antes){this.children.splice(antes?this.children.indexOf(antes):0,0,n);n.parent=this;return n}
+  get firstChild(){return this.children[0]}
+  remove(){this.parent.children=this.parent.children.filter(n=>n!==this)}
   replaceChildren(){this.children=[];this.text=''}
   set textContent(t){this.text=String(t)}get textContent(){return (this.text||'')+this.children.map(n=>n.textContent).join(' ')}
   setAttribute(k,v){this.attrs[k]=String(v)}getAttribute(k){return this.attrs[k]}
   focus(){document.activeElement=this}
   all(){return this.children.flatMap(n=>[n,...n.all()])}
 }
-const box=new Nodo('section'), document={createElement:t=>new Nodo(t),createElementNS:(_,t)=>new Nodo(t),getElementById:id=>id==='sate-calendario'?box:box.all().find(n=>n.id===id)};
+const paneles=Object.fromEntries(['v-hor','v-tray','sate-trayectoria'].map(id=>[id,new Nodo('section')]));
+const box=new Nodo('section'), document={addEventListener(){},createElement:t=>new Nodo(t),createElementNS:(_,t)=>new Nodo(t),getElementById:id=>paneles[id]|| (id==='sate-calendario'?box:box.all().find(n=>n.id===id))};
 const SATE={modulos:{},texto:(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}'),pestana(id,m){this.modulos[id]=m}};
 const guardado={};
 const c=vm.createContext({SATE,DATA:{calendario:data.upiita},document,console,localStorage:{getItem:k=>guardado[k]??null},IPNT:{set:(k,v)=>guardado[k]=v},perMeta:()=>0,perName:i=>i===0?'27/1':'26/2',perIdx:()=>0});
@@ -147,4 +153,47 @@ nodos('calendario-pill')[0].onclick();assert.match(nodos('calendario-detalle')[0
 document.getElementById('cal-vista-periodo').onclick();const pistasFicticias=nodos('calendario-arco').map(n=>n.getAttribute('data-pista'));assert.equal(new Set(pistasFicticias).size,5);
 assert.ok(!box.textContent.includes('sate.calendario.'));
 assert.ok(!config.unidades.escom.pestanas.includes('calendario'));assert.ok(!config.unidades.upibi.pestanas.includes('calendario'));
+// Recortes: componentes y selección del calendario reales, sin navegador ni red.
+c.SATE_CONFIG=config;c.SATE_UNIDAD='upiita';c.isPersonal=()=>false;
+c.conSim=(_,fn)=>fn();c.tr=()=>({fail:[]});c.addEventListener=()=>{};
+vm.runInContext('window=globalThis',c);vm.runInContext(leer('web/dist/sate/componentes.js'),c);c.SateUI.usarTextos(SATE.texto);
+c.DATA.calendario=data.upiita;SATE.calendario.hoy=()=> '2026-10-07';c.perName=()=> '27/1';
+let destino;SATE.ir=id=>destino=id;
+const api=SATE.calendario;
+const ordenados=api.proximos(Infinity);assert.ok(ordenados.every((e,i)=>!i||ordenados[i-1].desde<=e.desde),'Orden por fecha civil');
+assert.equal(api.recorte('calendario').length,0);
+assert.equal(api.recorte('mapa')[0].titulo,'Inicio del periodo 27/1','Sin adeudos no propone ETS');
+assert.equal(api.recorte('horarios')[0].titulo,'Citas publicadas');
+assert.equal(api.recorte('horarios').length,2);
+assert.equal(api.recorte('trayectoria')[0].titulo,api.proximos(1)[0].titulo);
+for(const id of ['horarios','mapa','trayectoria']){
+  api.pintarRecorte(id);api.pintarRecorte(id);
+  const p=paneles[id==='horarios'?'v-hor':id==='mapa'?'v-tray':'sate-trayectoria'];
+  assert.equal(p.all().filter(n=>n.className==='sate-recorte-calendario').length,1,'No duplica al repintar');
+  assert.equal(p.firstChild.className,'sate-recorte-calendario');
+}
+api.pintarRecorte('calendario');assert.equal(nodos('sate-recorte-calendario').length,0);
+assert.equal(c.SateUI.recorteCalendario([]),null);
+assert.equal(c.SateUI.recorteCalendario(api.recorte('horarios')).children[1].textContent,'+1 más');
+assert.equal(c.SateUI.recorteCalendario(api.recorte('horarios').slice(0,1)).children.length,1);
+const b=paneles['v-hor'].firstChild;assert.match(b.getAttribute('aria-label'),/Citas publicadas, 7 de octubre de 2026/);
+b.listeners.click();assert.equal(destino,'calendario');mostrar();
+assert.match(nodos('calendario-detalle')[0].textContent,/Citas publicadas/);assert.equal(document.activeElement.id,'cal-detalle-titulo');
+assert.equal(nodos('calendario-proceso').filter(n=>n.getAttribute('aria-pressed')==='true').length,1);
+const siguiente=api.eventos().find(e=>e.periodo==='27/2');api.abrirProceso(siguiente);mostrar();
+assert.ok(nodos('calendario-detalle')[0].textContent.includes(siguiente.titulo),'Abre el periodo del proceso elegido');
+c.isPersonal=()=>true;c.tr=()=>({fail:['DEMO']});c.ALUMNO={cita:{}};
+assert.match(api.recorte('mapa')[0].titulo,/ETS/,'Con adeudos incluye ETS en curso');
+c.ALUMNO={cita:{inicio:'08/10/2026 10:00:00 a. m.',fin:'08/10/2026 10:30:00 a. m.'}};c.perDeFecha=()=>0;
+assert.equal(api.cita().desde,'2026-10-08');assert.equal(api.recorte('horarios')[1].personal,true);
+const cita=api.cita();api.abrirProceso(cita);mostrar();assert.match(nodos('calendario-detalle')[0].textContent,/Tu cita de reinscripción/);
+assert.match(nodos('calendario-detalle')[0].textContent,/10:00:00/);
+c.ALUMNO={cita:{}};assert.equal(api.cita(),null);
+SATE.calendario.hoy=()=> '2099-01-01';assert.equal(api.recorte('horarios').length,0);api.pintarRecorte('horarios');assert.equal(paneles['v-hor'].children.length,0);
+c.DATA.calendario=null;assert.equal(api.proximos(1).length,0);assert.equal(api.recorte('mapa').length,0);
+for(const u of ['escom','upibi']){c.SATE_UNIDAD=u;assert.equal(api.recorte('trayectoria').length,0)}
+const recorteCSS=css.slice(css.indexOf('.sate-recorte-calendario{'),css.indexOf('/* Dos filas'));
+assert.ok([...recorteCSS.matchAll(/var\((--[^),]+)/g)].every(m=>m[1].startsWith('--ipn-')));
+assert.match(recorteCSS,/height:28px/);assert.match(recorteCSS,/white-space:nowrap/);
+console.log('Recortes: orden, filtro por pestaña/adeudos, cita SAES ficticia, +1, ausencia, repintado y clic al detalle del proceso/periodo. OK.');
 console.log(`Calendario: ${checks} eventos válidos; pistas sin solapamientos, guía exterior, leyenda, resaltado por cursor/foco, detalle inicial y respaldos, paleta con contraste AA claro/oscuro, filtros, mes/semana, hoy, teclado, continuidad y +N. OK.`);

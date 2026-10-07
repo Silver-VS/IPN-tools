@@ -103,6 +103,10 @@ dlg.dispatchEvent({type:'cancel',preventDefault(){}});assert.equal(dlg.open,fals
 c.SateUI.cerrarModal();assert.equal(dlg.open,false);
 vm.runInContext("SATE.calendario.proximos=()=>[{titulo:'Aviso próximo ficticio',desde:'2099-01-01'}]",c);mostrar();
 assert.match(box.textContent,/Aviso próximo ficticio/);
+assert.equal(box.querySelectorAll('.sate-recorte-calendario').length,1,'Lo próximo se reutiliza en el resumen');
+assert.equal((box.textContent.match(/Lo próximo:/g)||[]).length,1);
+SATE.calendario.pintarRecorte('trayectoria');
+assert.equal(box.querySelectorAll('.sate-recorte-calendario').length,1,'El repintado conserva el recorte dentro del resumen');
 // La tarjeta más grave debe ser la que requiere revisar dictamen, aun con simulación activa.
 vm.runInContext(`{
   const m=perMeta(),k=tr().fail[0]||Object.keys(cur())[0];

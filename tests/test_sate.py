@@ -15,6 +15,13 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_recortes_del_calendario(self):
+        """API, filtros y clic al proceso con DOM en memoria y datos ficticios."""
+        resultado = subprocess.run(
+            [r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_calendario.mjs'], cwd=ROOT,
+            capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
     def test_primera_visita_sin_datos(self):
         """Salidas, ayuda recordada y pegado con permisos o respaldo manual."""
         resultado = subprocess.run(

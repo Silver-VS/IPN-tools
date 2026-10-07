@@ -49,10 +49,12 @@
   function mostrar() {
     const box=document.getElementById('sate-presente');box.replaceChildren();
     box.hidden=!isPersonal();if(box.hidden)return;
-    const {d,lista}=datos(),prox=SATE.calendario.proximos(1)[0];
+    const {d,lista}=datos();
     const avance=d.D.obt!=null&&d.D.total>0?Math.round(d.D.obt/d.D.total*100)+' %':tt('sin_avance');
     const estado=d.nDes?tx('desfase_cuerpo',{n:d.nDes}):tx(ALUMNO.reprobadas_periodo==null?'sin_confirmar':'sin_desfase');
-    box.appendChild(el('p',tt('resumen',{periodo:perName(d.D.actual??d.meta),avance,desfase:String(estado).replace(/[.\s]+$/,''),proximo:prox?tx('siguiente',{actividad:prox.titulo,fecha:fecha(prox.hasta||prox.desde)}):tx('calendario_sin_aviso')}),'trayectoria-resumen'));
+    const resumen=el('p',tt('resumen',{periodo:perName(d.D.actual??d.meta),avance,desfase:String(estado).replace(/[.\s]+$/,'')}),'trayectoria-resumen');
+    const recorte=SateUI.recorteCalendario(SATE.calendario.recorte('trayectoria'));
+    if(recorte)resumen.appendChild(recorte);box.appendChild(resumen);
     // El presente muestra siempre el SAES real, aunque esté activo el escenario N+1.
     const mini=conPlan(()=>conSim(false,()=>minimapaCurricular()),0);
     if(mini){

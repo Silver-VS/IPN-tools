@@ -134,6 +134,19 @@
     return fila;
   }
 
+  /* Una sola línea; el nombre accesible conserva el proceso y la fecha sin truncar. */
+  function recorteCalendario(eventos) {
+    if (!eventos.length) return null;
+    var e = eventos[0], fecha = new Date(e.desde + 'T00:00:00').toLocaleDateString('es-MX', {day:'numeric', month:'long', year:'numeric'});
+    var texto = traducir('sate.calendario.recorte', {proceso:e.titulo, fecha:fecha});
+    var b = el('button', {type:'button', class:'sate-recorte-calendario', 'aria-label':traducir('sate.calendario.recorte_abrir', {proceso:e.titulo, fecha:fecha}), title:texto}, [
+      el('span', {class:'sate-recorte-calendario__texto', texto:texto})
+    ]);
+    if (eventos.length > 1) b.appendChild(el('span', {class:'sate-recorte-calendario__mas', texto:traducir('sate.calendario.recorte_mas')}));
+    b.addEventListener('click', function () { raiz.SATE.calendario.abrirProceso(e); });
+    return b;
+  }
+
   /* ---------- Tarjeta de aviso ---------- */
   /* aviso({estado, titulo, cuerpo, accion:{texto, onclick|href}, descartable}) */
   function aviso(o) {
@@ -303,6 +316,6 @@
     return nav;
   }
 
-  raiz.SateUI = { usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
+  raiz.SateUI = { usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior };
 })(typeof window !== 'undefined' ? window : globalThis);
