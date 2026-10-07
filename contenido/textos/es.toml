@@ -1,8 +1,8 @@
 # SPDX-License-Identifier: CC0-1.0
-# Textos de SATE (Sistema de Administración de la Trayectoria Escolar) en español de México, tuteo.
+# Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.4"
+version = "2026.10.3"
 
 [proyecto.apoyo]
 # Enlace en el pie de Horarios, la portada y el agradecimiento de la encuesta.
@@ -11,7 +11,7 @@ ayuda = "Donar es voluntario; el proyecto es gratuito y lo mantiene un alumno de
 
 [sate]
 # Nombre completo de la plataforma (encabezado, título de la página, pie).
-nombre = "Sistema de Administración de la Trayectoria Escolar"
+nombre = "Sistema de Apoyo a la Trayectoria Escolar"
 # Siglas del nombre.
 siglas = "SATE"
 # Leyenda de fase de prueba bajo el encabezado; {unidad} son las siglas de la unidad académica (UPIITA, ESCOM, UPIBI).
