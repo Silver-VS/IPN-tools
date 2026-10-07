@@ -676,6 +676,15 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 .plan-leyenda .plan-2{border-color:var(--plan-segundo)}
 @media(max-width:720px){.plan-grupos{grid-template-columns:1fr}}
 
+.maptools{flex-wrap:nowrap;gap:8px}
+#map-ayuda{margin-left:auto;white-space:nowrap}
+#legend{flex-wrap:nowrap;margin-bottom:10px;white-space:nowrap}
+#plan-opciones[hidden],#plan-periodos [hidden],#plan-activo[hidden],#plan-leyenda[hidden]{display:none}
+.plan-grupos.un-periodo{grid-template-columns:1fr}
+.plan-bandeja{position:sticky;bottom:0;z-index:30;padding:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 -3px 12px #0001}
+.plan-bandeja .plan-resumen span{white-space:normal}
+body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+@media(max-width:720px){#legend{display:none}.maptools{gap:4px}.maptools .seg button{padding:7px 5px;font-size:.7rem}#map-ayuda{font-size:.7rem}.plan-bandeja{bottom:calc(96px + env(safe-area-inset-bottom,0px))}.plan-bandeja .actions{gap:4px}.plan-bandeja .btn{padding:6px;font-size:.75rem}}
 </style>
 
 <!--__INST_HEADER__-->
@@ -714,17 +723,20 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   </section>
   <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
-    <!-- El pincel cambia la asignación; ambos periodos permanecen visibles. -->
+    <!-- La planeación anual se activa por unidad desde los datos. -->
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
-        <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
+        <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0" aria-label="Mapa completo">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
       </div>
+      <button class="link" type="button" id="map-ayuda"></button>
+    </div>
+    <div class="legend" id="legend" aria-label="Simbología"></div>
+    <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
+    <div id="plan-opciones" hidden>
       <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button><button class="link" type="button" id="plan-supuesto" hidden>ⓘ</button></div>
       <span id="plan-activo" role="status" aria-live="polite"></span>
       <div class="plan-leyenda" id="plan-leyenda"></div>
-      <div class="legend" id="legend" aria-label="Simbología"></div><button class="link" type="button" id="map-ayuda"></button>
-      <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     </div>
     <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance <span id="mapcut-sim"></span></b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>
     <div class="map-plan">
@@ -732,9 +744,6 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
     <div class="tlist" id="tlist" hidden></div>
     <ul class="mapnote" id="mapnote" hidden></ul>
     <section class="plan-panel" id="plan-panel">
-      <div class="plan-head"><p class="plan-resumen" id="plan-resumen" role="status" aria-live="polite"></p>
-        <div class="actions"><button class="btn" type="button" id="plan-simular"></button><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="b-none"></button></div>
-      </div>
       <div class="insp" id="insp" aria-live="polite" hidden></div>
       <div class="sate-desp__cuerpo">
       <p id="plan-carga" role="status" hidden></p>
@@ -755,6 +764,10 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
       <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>
     </div>
+      <div class="plan-head plan-bandeja"><p class="plan-resumen" id="plan-resumen" role="status" aria-live="polite"></p>
+        <div class="actions"><button class="btn" type="button" id="plan-simular"></button><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="b-none"></button><button class="btn" type="button" id="plan-deshacer" hidden></button></div>
+        <span class="sate-sr" id="plan-anuncio" role="status" aria-live="polite" aria-atomic="true"></span>
+      </div>
   </section>
 
   <!-- ============ PANTALLA 2: HORARIO ============ -->

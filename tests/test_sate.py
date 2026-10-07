@@ -6,6 +6,7 @@ import json
 import re
 import sys
 import threading
+import subprocess
 import unittest
 import urllib.request
 
@@ -14,6 +15,19 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_planeacion_un_periodo_y_anual(self):
+        """Perfiles ficticios y DOM local: conserva datos, selección, carga y oferta."""
+        resultado = subprocess.run(
+            [r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_cargas.mjs'], cwd=ROOT,
+            capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
+    def test_avisos_por_pestana(self):
+        resultado = subprocess.run(
+            [r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_situacion.mjs'], cwd=ROOT,
+            capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
     def test_particion_conserva_campos_e_indices(self):
         from build_sate import separar_datos
         data = {'mapas': {'DEMO': {'cur': {}}}, 'periodos': {'actual': [[0, 1, 2]]},

@@ -15,10 +15,14 @@ assert.ok(mapaHTML.indexOf('id="mapcut"')<mapaHTML.indexOf('id="mapwrap"'),'mini
 assert.ok(mapaHTML.indexOf('id="mapwrap"')<mapaHTML.indexOf('id="plan-panel"'),'selector debajo del mapa');
 assert.ok(mapaHTML.indexOf('id="plan-periodos"')<mapaHTML.indexOf('id="mapwrap"'),'pincel junto a controles');
 assert.ok(!panelHTML.includes('<summary>'),'selector siempre abierto');
-for(const id of ['h-sugg','sugg','b-sugg','chosen','chosen-help','chosen-req','plan-simular','plan-resumen']) {
+for(const id of ['h-sugg','sugg','b-sugg','chosen','chosen-help','chosen-req']) {
   assert.equal([...html.matchAll(new RegExp('id="'+id+'"','g'))].length,1,'ID único '+id);
   assert.ok(panelHTML.includes('id="'+id+'"'),'bloque debajo del mapa '+id);
 }
+assert.match(mapaHTML,/class="plan-head plan-bandeja"[\s\S]*id="plan-resumen"[\s\S]*id="plan-deshacer"/);
+assert.match(html,/\.plan-bandeja\{position:sticky;bottom:0/);
+assert.ok(!Object.values(config.textos).some(t=>/pincel/i.test(t)));
+assert.ok(Object.values(config.unidades).every(c=>c.planDosPeriodos===false));
 assert.ok(!panelHTML.includes('data-personal'),'planeación disponible sin SAES');
 assert.ok(!/\.plan-panel[^{}]*\{[^}]*max-height/.test(html),'sin altura máxima');
 assert.match(html,/@media\(max-width:720px\)\{\.plan-grupos\{grid-template-columns:1fr/,'grupos apilados en teléfono');
@@ -42,9 +46,10 @@ const desempenoHTML=html.split('id="sate-trayectoria"')[1].split('id="v-tray"')[
 assert.ok(desempenoHTML.indexOf('id="sate-presente"')<desempenoHTML.indexOf('id="kstats"'),'B1: presente antes de estadísticas');
 assert.equal([...html.matchAll(/id="est-sim"/g)].length,1,'B: un solo simulador');
 const almacen = () => { const m=new Map(); return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i],get length(){return m.size}}; };
-for (const unidad of ['upiita','escom','upibi']) {
+for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','upibi']) {
+  const configModo=structuredClone(config);configModo.unidades[unidad].planDosPeriodos=dosPeriodos;
   const datos=Object.assign({},...['nucleo','oferta'].map(n=>JSON.parse(leer(`web/dist/sate/datos/${unidad}/${n}.json`))));
-  const nodos=new Map(), cargados=[], pendientes=new Map(); let api, contexto;
+  const nodos=new Map(), cargados=[], pendientes=new Map(); let api, contexto, ultimaEspera;
   const movil={matches:false,eventos:{},addEventListener(k,fn){this.eventos[k]=fn}};
   const horariosIDs=new Set([...leer('web/sate/cascaron.html').split('<section id="v-hor"')[1].split('<!-- módulo')[0].matchAll(/id="([^"]+)"/g)].map(m=>'#'+m[1]));
   function nodo(id='') { return {id,hidden:true,value:'',dataset:{},innerHTML:'',textContent:'',options:[],children:[],style:{setProperty(){},getPropertyValue(){return ''}},
@@ -61,9 +66,9 @@ for (const unidad of ['upiita','escom','upibi']) {
     script(n){if(!pendientes.has(n)){cargados.push(n);vm.runInContext(leer('web/dist/sate/'+n),contexto,{filename:n});pendientes.set(n,Promise.resolve())}return pendientes.get(n)}};
   SATE.ir=id=>SATE.destino=id;
   const ayudas=[];
-  contexto=vm.createContext({SateUI:{modal:(titulo,contenido)=>ayudas.push({titulo,contenido})},console,document,SATE,SATE_DATA:datos,SATE_UNIDAD:unidad,URL,URLSearchParams,Blob,performance,
+  contexto=vm.createContext({SateUI:{modal:(titulo,contenido)=>ayudas.push({titulo,contenido})},console:{...console,debug(){}},document,SATE,SATE_CONFIG:configModo,structuredClone,SATE_DATA:datos,SATE_UNIDAD:unidad,URL,URLSearchParams,Blob,performance,
     localStorage:almacen(),sessionStorage:almacen(),location:{hash:'#/'+unidad+'/mapa',search:'',pathname:'/sate/index.html'},history:{replaceState(){}},
-    navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:s=>s==='(max-width:720px)'?movil:{matches:false,addEventListener(){}},addEventListener(){},setTimeout,clearTimeout,
+    navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:s=>s==='(max-width:720px)'?movil:{matches:false,addEventListener(){}},addEventListener(){},setTimeout(fn,ms,...args){if(ms===6000)ultimaEspera={fn,ms};return setTimeout(fn,ms,...args)},clearTimeout,
     requestAnimationFrame:fn=>fn(),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:1280,innerHeight:800,
     fetch(){throw new Error('Red prohibida en QA de cargas')}});
   vm.runInContext('window=globalThis',contexto);
@@ -76,12 +81,75 @@ for (const unidad of ['upiita','escom','upibi']) {
   assert.equal(nodos.get('#insp').hidden,true,'sin bloque Explora entre mapa y pie');
   assert.equal(nodos.get('#plan-supuesto').hidden,true,'supuesto oculto en N');
   assert.equal(nodos.get('#mapcut').hidden,true,'A: sin SAES la fila contiene solo planeación');
-  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: 0 materias · 0(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 · [^:]+: 0 materias/,'A: resumen vacío sin SAES, con referencia del plan si existe');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/Elige en el mapa las materias que quieres cursar en/,'bandeja vacía orienta al alumno');
   vm.runInContext(`const elegible=Object.keys(cur()).find(k=>!isElec(k));toggleBox(elegible)`,contexto);
-  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: 1 materia · [\d.,]+(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 · [^:]+: 0 materias/,'A: selección actualiza resumen al momento');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/1 materia · [\d.,]+(?: de [\d.,]+)? créditos para/,'selección actualiza resumen');
   assert.ok(nodos.get('#chosen').innerHTML.includes('wchip'),'A: selección actualiza elegidas');
   nodos.get('#b-none').eventos.click();
-  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: 0 materias · 0(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 · [^:]+: 0 materias/,'A: quitar actualiza resumen');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/Elige en el mapa las materias que quieres cursar en/,'bandeja vacía orienta al alumno');
+  assert.equal(nodos.get('#plan-opciones').hidden,!dosPeriodos);
+  assert.equal(nodos.get('#plan-activo').hidden,!dosPeriodos);
+  assert.equal(nodos.get('#plan-leyenda').hidden,!dosPeriodos);
+  assert.equal(nodos.get('#b-go').disabled,true);
+  assert.equal(ultimaEspera.ms,6000,'Deshacer dura seis segundos');
+  ultimaEspera.fn();assert.equal(nodos.get('#plan-deshacer').hidden,true,'Deshacer desaparece al vencer');
+  if(!dosPeriodos){
+    vm.runInContext(`
+      DATA.calendario={...(DATA.calendario||{}),periodo:'27/1'};
+      const primero=Object.keys(cur()).find(k=>!isElec(k));
+      const segundo=Object.keys(cur()).find(k=>k!==primero&&!isElec(k));
+      const futuro=planClave(1);
+      store.set('t.'+S.car,{want:[],extra:'conservar',wantPorPeriodo:{[futuro]:[primero,segundo],siguiente:[segundo]}});
+      for(const k in T)delete T[k];
+      if(planAsignado(primero)!==null||planElegidas().size)throw new Error('Segundo periodo aparece en el mapa');
+      S.planPaso=1;renderTray();if(S.planPaso!==0)throw new Error('Periodo activo no es fijo');
+      toggleBox(primero);
+      if(tr().want.length!==1)throw new Error('No agrega al primer periodo');
+      if($('#b-go').disabled||$('#b-none').disabled)throw new Error('Acciones deshabilitadas con selección');
+      const caja=boxHtml(primero,0,0,100,50,1,planElegidas(),new Set(),null,1,new Set());
+      if(caja.includes('plan-marca'))throw new Error('Insignia en modo simple');
+      if($('#chosen').innerHTML.includes('plan-grupo-1'))throw new Error('Columna de segundo periodo');
+      if($('#plan-resumen').innerHTML.includes('plan-2'))throw new Error('Resumen del segundo periodo');
+      if(!$('#plan-anuncio').textContent.includes('agregada a '+planEtiqueta(0)))throw new Error('Sin anuncio de alta');
+      if($('#plan-deshacer').hidden)throw new Error('No ofrece deshacer');
+      $('#plan-deshacer').eventos.click();
+      if(tr().want.length)throw new Error('Deshacer no restaura selección');
+      toggleBox(primero);toggleBox(primero);
+      if(!$('#plan-anuncio').textContent.includes('quitada de '+planEtiqueta(0)))throw new Error('Sin anuncio de baja');
+      const guardado=store.get('t.'+S.car,{});
+      if(JSON.stringify(guardado.wantPorPeriodo[futuro])!==JSON.stringify([primero,segundo])||guardado.extra!=='conservar'||guardado.wantPorPeriodo.siguiente[0]!==segundo)throw new Error('Se alteró el segundo periodo guardado');
+      ALUMNO={...perfilDemo(),acreditadas:[],en_curso:[],reprobadas:[],reprobadas_periodo:[[primero,perName(planInicio()-1),1]],avance:{},cita:{},agenda:[]};
+      ALUMNO.carga={min:0,media:45,max:80};
+      for(const k in T)delete T[k];renderTray();
+      if(cargaInfo(0).ret!==cur()[primero][1])throw new Error('Adeudo no retiene créditos');
+      if(!$('#plan-resumen').innerHTML.includes('Elige en el mapa'))throw new Error('Créditos sin materias en bandeja');
+      ALUMNO.reprobadas_periodo=[[primero,perName(planInicio()-4),1]];
+      for(const k in T)delete T[k];renderTray();
+      if(!tr().want.includes(primero)||!$('#chosen').innerHTML.includes('wchip'))throw new Error('Obligatoria no se muestra como materia');
+      ALUMNO=null;store.set('t.'+S.car,{want:[]});for(const k in T)delete T[k];
+      clearTimeout(PLAN_UNDO_TIMER);PLAN_UNDO=null;
+    `,contexto,{filename:'un-periodo-'+unidad});
+    vm.runInContext("PT='touch'",contexto);
+    const claveToque=vm.runInContext('primero',contexto);
+    const cajaToque={dataset:{box:claveToque},closest:s=>s==='[data-box]'?cajaToque:null};
+    eventosDocumento.click.forEach(fn=>fn({target:cajaToque}));
+    assert.equal(vm.runInContext('tr().want.length',contexto),1,'Un toque agrega directamente');
+    eventosDocumento.click.forEach(fn=>fn({target:cajaToque}));
+    assert.equal(vm.runInContext('tr().want.length',contexto),0,'Otro toque quita directamente');
+    vm.runInContext("PT='mouse';planOlvidar()",contexto);
+    await SATE.script('horarios.js');
+    vm.runInContext('S.onlyWant=true;renderHFilters();renderOffer()',contexto);
+    assert.equal(nodos.get('#f-want').checked,true);
+    assert.equal(nodos.get('#f-want').disabled,false);
+    assert.match(nodos.get('#offer').innerHTML,/Aún no eliges materias en el mapa\./);
+    const pulsar=selector=>nodos.get('#offer').eventos.click({target:{closest:s=>s===selector?{}:null}});
+    pulsar('[data-oferta-mapa]');assert.equal(SATE.destino,'mapa');
+    pulsar('[data-oferta-toda]');assert.equal(vm.runInContext('S.onlyWant',contexto),false);
+    assert.equal(nodos.get('#f-want').checked,false);
+    assert.ok(!nodos.get('#offer').innerHTML.includes('data-oferta-toda'));
+    console.log(unidad+': OK: un periodo, perfil heredado intacto, créditos elegidos, obligatorias, anuncio, deshacer y oferta vacía.');
+    continue;
+  }
   movil.matches=false;
   segmentos[1].focus();segmentos[1].eventos.click();
   assert.equal(nodos.get('#plan-supuesto').hidden,false,'supuesto visible en N+1');
@@ -119,7 +187,7 @@ for (const unidad of ['upiita','escom','upibi']) {
     S.planPaso=1;toggleBox(otraPincel);S.planPaso=0;
     renderTray();
   `,contexto,{filename:'pincel-'+unidad});
-  assert.match(nodos.get('#plan-activo').textContent,/Pincel activo:/);
+  assert.match(nodos.get('#plan-activo').textContent,/Periodo activo:/);
   assert.match(nodos.get('#plan-leyenda').innerHTML,/plan-1[\s\S]*plan-2/);
   const claveTeclado=vm.runInContext('clavePincel',contexto);
   const cajaTeclado={dataset:{box:claveTeclado},closest:s=>s==='[data-box]'?cajaTeclado:null};
@@ -161,7 +229,7 @@ for (const unidad of ['upiita','escom','upibi']) {
     if(cargaInfo(0).ret!==cur()[requisitos[0]][1])throw new Error('C: retenidos de N incorrectos');
     renderTray();
     const resumenCarga=$('#plan-resumen').innerHTML;
-    if(!resumenCarga.includes(' de '+fmtCr(cargaInfo(0).tope)+' cr'))throw new Error('A: resumen no incluye tope vigente: '+resumenCarga);
+    if(!resumenCarga.includes(' de '+fmtCr(cargaInfo(0).tope)+' créditos'))throw new Error('A: resumen no incluye tope vigente: '+resumenCarga);
     conPlan(()=>{if(cargaInfo(0).ret!==0)throw new Error('C: N+1 retiene materia acreditada en N');},1);
     ALUMNO.reprobadas_periodo=[];
     for(const k in T)delete T[k];
@@ -183,7 +251,7 @@ for (const unidad of ['upiita','escom','upibi']) {
   assert.match(miniPresente.svg,/<circle data-estado=/,'§3: minimapa compartido con SAES en '+unidad);
   assert.ok(Object.values(miniPresente.cnt).reduce((a,b)=>a+b,0)>0,'§3: puntos contados en '+unidad);
   assert.match(miniPresente.leyenda,/desfasadas?/,'§3: leyenda de cinco estados en '+unidad);
-  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1">1 · [^:]+: \d+ materias? · [\d.,]+(?: de [\d.,]+)? cr<\/span><span class="plan-2">2 ·/,'A: resumen con SAES, incluso sin carga conocida');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/plan-1[\s\S]*plan-2/,'modo anual conserva ambos resúmenes');
   assert.deepEqual(cargados,['mapa.js'],'Mapa con/sin perfil no descarga Horarios ni Desempeño');
   await vm.runInContext('SAES.open()',contexto);
   await vm.runInContext('SAES.open()',contexto);
@@ -193,5 +261,6 @@ for (const unidad of ['upiita','escom','upibi']) {
   await document.querySelector('#b-export').eventos.click();
   await document.querySelector('#b-export').eventos.click();
   assert.equal(cargados.filter(n=>n==='exportacion.js').length,1);
+  vm.runInContext('clearTimeout(PLAN_UNDO_TIMER)',contexto);
   console.log(unidad+': OK: disposición, asignar, mover en ambos sentidos, quitar, marcas 1/2, selecciones simultáneas, cambio sin escritura, seriación, persistencia, horizonte, foco y cargas diferidas.');
 }

@@ -41,7 +41,7 @@
   }
   function avisos() {
     const box=document.getElementById('sate-avisos-globales');box.replaceChildren();
-    box.hidden=!isPersonal();if(box.hidden)return;
+    box.hidden=!isPersonal()||SATE.actual?.pestana==='trayectoria';if(box.hidden)return;
     const {d,lista}=datos();
     const importantes=lista.filter(x=>x.id==='adeudos'||x.id==='desfase'&&(d.nDes||x.estado==='aviso')||x.id==='cita'&&ALUMNO.cita?.inicio);
     box.appendChild(SateUI.chips(importantes.map(x=>({id:x.id,estado:x.estado,texto:x.titulo+' ⓘ',abre:()=>detalle(x)}))));

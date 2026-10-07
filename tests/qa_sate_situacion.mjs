@@ -53,6 +53,14 @@ const mostrar=()=>{SATE.presente.avisos();SATE.presente.mostrar()},box=document.
 mostrar();assert.equal(box.hidden,true);assert.equal(document.getElementById('sate-avisos-globales').hidden,true);
 assert.equal(box.querySelector('.trayectoria-minimapa'),null,'Sin SAES no hay minimapa');
 vm.runInContext('ALUMNO=perfilDemo();for(const k in T)delete T[k]',c);
+SATE.actual.pestana='trayectoria';mostrar();
+assert.equal(document.getElementById('sate-avisos-globales').hidden,true,'Trayectoria evita los chips duplicados');
+assert.equal(box.hidden,false,'Los avisos del cuerpo de Trayectoria permanecen');
+for(const pestana of ['mapa','horarios','calendario']){
+  SATE.actual.pestana=pestana;SATE.presente.avisos();
+  assert.equal(document.getElementById('sate-avisos-globales').hidden,false,'Avisos globales en '+pestana);
+}
+SATE.actual.pestana='situacion';
 // Calendario ficticio vigente, que pertenece exactamente al periodo planeado.
 vm.runInContext(`DATA.calendario={periodo:perName(perMeta()),actividades:[{titulo:'Actividad de ejemplo',texto:'Detalle de ejemplo',para:'todos',desde:new Date().toISOString().slice(0,10),hasta:'2099-12-31',donde:'saes'}],fuente:'Fuente ficticia'};`,c);
 mostrar();
