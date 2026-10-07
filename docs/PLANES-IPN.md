@@ -4,20 +4,23 @@
 Todo corre en local (PDF → PNG → OCR → análisis → validación → comparación) y **nada de lo que produce se sube al
 repositorio**: PDF, imágenes y JSON viven en `UPIITA_DEV/recursos/planes-ipn/` (`pdf/`, `img/`, `json/`).
 
-## Uso
+## 1. Uso
 
 ```bash
 D:/Tools/ai-venv/Scripts/python.exe tools/planes_ocr.py            # todos los PDF de recursos/planes-ipn/pdf/
 D:/Tools/ai-venv/Scripts/python.exe tools/planes_ocr.py ruta.pdf   # uno solo
 ... --solo-ocr    # solo renderizar y hacer OCR
 ... --sin-llm     # sin respaldo con qwen3.5:9b
+... --solo-analisis # regenera JSON exclusivamente desde img/*.ocr.txt; sin render, OCR ni Ollama
 ```
 
-Requiere Ollama en `127.0.0.1:11434` con `glm-ocr` (y `qwen3.5:9b` para el respaldo). Imprime una línea por paso
+El modo OCR requiere Ollama en `127.0.0.1:11434` con `glm-ocr` (y `qwen3.5:9b` para el respaldo).
+`--solo-analisis` descubre los PDF a partir de la caché, incluso sin los archivos PDF; una caché ausente
+se informa como error, sin intentar obtenerla. Es incompatible con `--solo-ocr`. Imprime una línea por paso
 (`[n/M] <pdf> pág <p> · ocr|análisis|validación`). Las páginas y el texto del OCR se guardan en caché
 (`img/<pdf>-p<N>.png`, `.ocr.txt`, `.ocr.json` con prompt y segundos); borra la caché de una página para repetirla.
 
-## Qué hace
+## 2. Qué hace
 
 1. **OCR** con `glm-ocr` a 2400 px, `Table Recognition:`; si no salen filas numéricas prueba `Text Recognition:` y
    conserva el resultado más completo. El modelo suele caer en bucle repitiendo encabezados: se lee en flujo y se
@@ -38,7 +41,19 @@ Salida `json/<pdf>.json`: `fuente, programa, unidades, plan, niveles[{nivel, mat
 horas, creditos_tepic, creditos_satca}], subtotal}], optativas, total, validacion, comparacion_repo,
 paginas_no_tabla, tiempos`.
 
-## Limitaciones
+`validacion.estado`: `ok` si cuadran los subtotales y las demás referencias disponibles; `solo_total` si solo
+existe TOTAL y cuadra; `sin_referencia` si no existe ninguna referencia (no es error); `discrepancia` si alguna
+referencia no cuadra, con nivel, campo y diferencia. `no_es_tabla` identifica documentos sin estructura curricular;
+una tabla cuyo OCR perdió nombres o cifras conserva la discrepancia. `json/_resumen.json` contiene conteos y
+estado/motivo de cada PDF. Las líneas no clasificadas quedan completas en `validacion.marcas`.
+
+Se admiten tablas HTML del OCR, encabezados PERÍODO, referencias y cifras partidas, guiones de carga cero,
+bloques de nombres seguidos de cifras, columnas solo de créditos y AA (aprendizaje autónomo). TOTAL repetido
+por semestre se trata como subtotal. Los catálogos de optativas se excluyen de la suma obligatoria; electivas
+de dos créditos sin horas se registran en el nivel 0. Los PDF con varios planes conservan `nivel.plan`,
+`totales_por_plan` y `validacion.por_plan`; las opciones/trayectorias explícitas se validan por separado.
+
+## 3. Limitaciones y pendientes
 
 - El OCR cambia letras («SIMULAGION», «MATEMATICAS DISCRETA»): la validación por sumas no detecta un error de
   letras, solo de cifras; por eso la comparación con el SAES sirve de segunda barrera.
@@ -48,3 +63,13 @@ paginas_no_tabla, tiempos`.
 - Una cifra mal leída que conserve la suma (dos errores que se compensan) pasa la validación. Las materias
   de respaldo con LLM siempre deben revisarse a mano.
 - Páginas distintas de tabla (portadas, textos normativos) se guardan en `paginas_no_tabla`.
+- Persisten filas desordenadas o truncadas, nombres concatenados sin delimitador, referencias no rotuladas y
+  catálogos/alternativas cuyo contexto se perdió. ENMH conserva nombres sin cifras individuales; IAM perdió
+  los nombres. No se reconstruyen cifras a partir de subtotales ni se corrige la caché para forzar coincidencias.
+
+## 4. Comprobación local (2026-10-06)
+
+`D:/Tools/ai-venv/Scripts/python.exe -m unittest tests.test_planes_ocr` ejecuta pruebas unitarias y de integración.
+Con el corpus y `json/_antes.json` disponibles también regenera los 82 JSON con red/OCR/LLM bloqueados por las
+pruebas y compara los 20 válidos originales: niveles, materias, cifras y TOTAL sin cambios. La línea base era
+20 válidos, 54 discrepancias y 8 vacíos; después son 35 `ok` y 47 `discrepancia` (los demás estados, 0).

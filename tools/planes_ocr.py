@@ -7,10 +7,12 @@ Los PDF y las salidas viven en UPIITA_DEV/recursos/planes-ipn/ (fuera del reposi
 Uso:  python tools/planes_ocr.py [pdf ...]      (por omisión, todos los de recursos/planes-ipn/pdf/)
       python tools/planes_ocr.py --solo-ocr     (sin análisis)
       python tools/planes_ocr.py --sin-llm      (sin respaldo con qwen3.5:9b)
+      python tools/planes_ocr.py --solo-analisis (solo .ocr.txt en caché; sin OCR, render ni Ollama)
 Salida: recursos/planes-ipn/json/<pdf>.json y caché img/<pdf>-p<N>.png / .ocr.txt
 Imprime una línea por paso: [n/M] <pdf> pág <p> · ocr|análisis|validación
 """
-import json, pathlib, re, sys, time, unicodedata, urllib.request, base64, io
+import json, pathlib, re, sys, time, unicodedata, urllib.request, base64, io, html
+from collections import Counter
 
 OLLAMA = "http://127.0.0.1:11434"
 LADO = 2400                       # px del lado largo
@@ -118,10 +120,10 @@ def norm(s):
     return " ".join(re.sub(r"[^A-Z0-9 ]", " ", s).split())
 
 
-ROMANOS = {"I": 1, "II": 2, "III": 3, "IV": 4, "V": 5, "VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10}
+ROMANOS = {"I": 1, "II": 2, "III": 3, "IV": 4, "V": 5, "VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10, 'XI': 11, 'XII': 12}
 ORDINAL = {"PRIMER": 1, "SEGUNDO": 2, "TERCER": 3, "CUARTO": 4, "QUINTO": 5, "SEXTO": 6, "SEPTIMO": 7, "OCTAVO": 8,
            "NOVENO": 9, "DECIMO": 10}
-RE_NIVEL = re.compile(r"^\W*(?:NIVEL|SEMESTRE)\s+([IVX]+|\d+)\W*$", re.I)
+RE_NIVEL = re.compile(r"^\W*(?:NIVEL|SEMESTRE|PER[IÍ]ODO)\s+([IVX]+|\d+)\W*$", re.I)
 RE_NIVEL2 = re.compile(r"^\W*(PRIMER|SEGUNDO|TERCER|CUARTO|QUINTO|SEXTO|S[EÉ]PTIMO|OCTAVO|NOVENO|D[EÉ]CIMO)\s+"
                        r"(?:NIVEL|SEMESTRE)\W*$", re.I)
 CAMPOS = ["teoria", "practica", "horas", "creditos_tepic", "creditos_satca"]
@@ -148,8 +150,14 @@ def nivel_de(l):
 def n_columnas(texto):
     """Columnas numéricas: T, P, T/H + una por cada tipo de crédito del encabezado (TEPIC, SATCA)."""
     tipos = {m.upper() for m in re.findall(r"CR[EÉ]DITOS\s+(TEPIC|SATCA)", texto, re.I)}
+    filas = [len(l.split()) for l in texto.split('\n') if RE_NUMS.fullmatch(l.strip()) and len(l.split()) >= 4]
+    comun = Counter(filas).most_common(1)[0][0] if filas else None
     if tipos:
-        return 3 + len(tipos)
+        return max(3 + len(tipos), comun or 0)
+    if re.search(r'C\.?\s*SATCA', texto, re.I):
+        return 5
+    if re.search(r'\bT\s+P\s+T/(?:H|II)\s+C\b', texto, re.I):
+        return 4
     filas = [len(l.split()) for l in texto.split("\n") if RE_NUMS.match(l.strip()) and len(l.split()) >= 4]
     return max(set(filas), key=filas.count) if filas else 5
 
@@ -157,6 +165,56 @@ def n_columnas(texto):
 def valores(v):
     d = {c: x for c, x in zip(CAMPOS, v)}
     return d if len(v) >= 4 else {"valores": v}
+
+
+def preparar_texto(texto):
+    """Conserva las fronteras de celdas HTML y reúne referencias partidas por el OCR."""
+    if re.search(r"<table\b", texto, re.I):
+        def fila(m):
+            celdas = [html.unescape(re.sub(r'<[^>]+>', '', c)).strip() for c in
+                      re.findall(r'<t[dh][^>]*>(.*?)</t[dh]>', m[0], re.I | re.S)]
+            celdas = [c for c in celdas if c]
+            if celdas and nivel_de(celdas[0]) is not None:
+                return '\n' + celdas[0] + '\n' + ' '.join(celdas[1:]) + '\n'
+            return '\n' + ' '.join(celdas) + '\n'
+        texto = re.sub(r'<tr\b[^>]*>.*?</tr>', fila, texto, flags=re.I | re.S)
+        texto = html.unescape(re.sub(r"<[^>]+>", "", texto))
+    # Los guiones en las columnas de horas indican ausencia de carga.
+    texto = re.sub(rf"(?<=[\d ])\s+[-–—]{{1,3}}\s+(?={NUM})", " 0.0 ", texto)
+    texto = re.sub(r'^\s*T\s+O\s+T\s+A\s+L\b', 'TOTAL', texto, flags=re.I | re.M)
+    lineas = [l.strip().replace('|', ' ') for l in texto.splitlines() if l.strip()]
+    salida = []
+    i = 0
+    while i < len(lineas):
+        l = lineas[i]
+        if re.fullmatch(r"SUB\s*TOTAL|TOTAL(?:ES)?", l, re.I):
+            v = []
+            j = i + 1
+            while j < len(lineas) and RE_NUMS.fullmatch(lineas[j]):
+                v.extend(lineas[j].split())
+                j += 1
+            if v:
+                l += ' ' + ' '.join(v)
+                i = j - 1
+        salida.append(l)
+        i += 1
+    return '\n'.join(salida)
+
+
+def columnas_de(texto):
+    """No atribuye teoría/práctica a una tabla que solamente declara créditos."""
+    cab = norm(texto)
+    if re.search(r'\bAA\b', cab) and 'TEORIA' in cab:
+        return ['teoria', 'practica', 'aprendizaje_autonomo', 'horas', 'creditos_tepic']
+    if 'TEORIA' not in cab and not re.search(r'\bT P\b', cab) and 'CREDITOS' in cab and 'T H' not in cab:
+        return [c for c, etiqueta in [('creditos_tepic', 'TEPIC'), ('creditos_satca', 'SATCA')]
+                if etiqueta in cab] or ['creditos_tepic']
+    nc = n_columnas(texto)
+    if nc == 4 and 'SATCA' in cab and 'TEPIC' not in cab:
+        return CAMPOS[:3] + ['creditos_satca']
+    if re.search(r'\bT P T H\b', cab) and not re.search(r'\bT P T H C\b', cab) and 'CREDITOS' not in cab:
+        return CAMPOS[:3]
+    return CAMPOS[:nc]
 
 
 def materia_de(nombre, v, etiqueta=None):
@@ -172,30 +230,73 @@ def analizar(texto):
     """Devuelve (niveles, optativas, total, resto). Tolera nombre y números en la misma línea o en líneas separadas,
     números partidos en varias líneas, nombres de varias líneas, 'NIVEL I'/'SEMESTRE 1', encabezados repetidos y
     bloques de optativas (por nivel o por trayectoria)."""
-    nc = n_columnas(texto)
+    texto = preparar_texto(texto)
+    campos = columnas_de(texto)
+    nc = len(campos)
     niveles, optativas, resto = [], [], []
     actual = grupo = None
     total = None
     pend, buf, etiqueta = [], [], None
+    referencia_general = False
+    catalogo = False
+    trayectoria = None
+    totales = len(re.findall(r'^TOTAL(?:\s|:|$)', texto, re.I | re.M))
 
     def emitir():
         nonlocal pend, buf, etiqueta
+        if len(pend) == 1 and len(buf) > nc:
+            nombres = re.split(r'\s{2,}|\s*;\s*', pend[0])
+            if len(nombres) * nc == len(buf):
+                pend = nombres
         while pend and len(buf) >= nc:
-            m = materia_de(" ".join(pend), [num(x) for x in buf[:nc]], etiqueta)
+            separadas = len(pend) > 1 and len(buf) == len(pend) * nc
+            nombre = pend[0] if separadas else " ".join(pend)
+            m = materia_de(nombre, [], etiqueta)
+            m.update(zip(campos, [num(x) for x in buf[:nc]]))
             if grupo is not None:
                 grupo["materias"].append(m)
             elif actual is not None:
                 actual["materias"].append(m)
             else:
                 resto.append(m["nombre"])
-            pend, buf, etiqueta = [], buf[nc:], None
+            pend, buf, etiqueta = pend[1:] if separadas else [], buf[nc:], None
 
-    for l in (x.strip() for x in texto.replace("|", " ").split("\n")):
+    lineas = texto.splitlines()
+    # En este formato las cifras preceden sistemáticamente al nombre y SUBTOTAL.
+    if 'aprendizaje_autonomo' in campos:
+        for i in range(len(lineas) - 1):
+            if RE_NUMS.fullmatch(lineas[i]) and len(lineas[i].split()) == nc and \
+                    not RE_NUMS.fullmatch(lineas[i + 1]):
+                lineas[i], lineas[i + 1] = lineas[i + 1], lineas[i]
+        lineas = preparar_texto('\n'.join(lineas)).splitlines()
+    for i, l in enumerate(lineas):
+        l = l.strip()
         if not l:
             continue
-        nv = nivel_de(l)
+        if re.match(r'^(?:TRAYECTORIA\s+["“]|OPCI[ÓO]N\s+)', l, re.I):
+            trayectoria = l
+            pend, buf, etiqueta = [], [], None
+            continue
+        if re.search(r'\b(?:UNIDADES|ASIGNATURAS)\s+DE\s+APRENDIZAJE\s+OPTATIVAS|^ASIGNATURAS OPTATIVAS|^MEN[ÚU] DE ASIGNATURAS OPTATIVAS', l, re.I) and \
+                not re.search(rf'(?:\s+{NUM}){{3,}}$', l):
+            catalogo = True
+            grupo = {'grupo': l, 'materias': []}
+            optativas.append(grupo)
+            pend, buf, etiqueta = [], [], None
+            continue
+        if re.search(r'\bTOTAL DE HORAS\b', l, re.I) and not re.match(r'^T/H', l, re.I):
+            referencia_general = True
+        mn = re.match(r'^(?:M[ÓO]DULO\s+)?((?:NIVEL|SEMESTRE|PER[IÍ]ODO)\s+(?:[IVX]+|\d+))\b(.*)$', l, re.I)
+        nv = nivel_de(mn.group(1) if mn else l)
         if nv is not None:
+            if catalogo:
+                grupo = {'grupo': f'Optativas · {l}', 'materias': []}
+                optativas.append(grupo)
+                pend, buf, etiqueta = [], [], None
+                continue
             actual = {"nivel": nv, "materias": [], "subtotal": None}
+            if trayectoria:
+                actual['trayectoria'] = trayectoria
             niveles.append(actual)
             grupo, pend, buf, etiqueta = None, [], [], None
             continue
@@ -207,12 +308,24 @@ def analizar(texto):
         ms = RE_SUB.match(l)
         if ms:
             v = [num(x) for x in ms.group(2).split()]
-            if ms.group(1).upper().startswith("SUBTOTAL"):
+            # TOTAL tras las materias de un semestre es su subtotal; el encabezado
+            # «TOTAL DE HORAS» distingue el resumen general de la carrera.
+            local = actual is not None and not referencia_general and grupo is None and \
+                not re.search(r'^SUBTOTAL\b', texto, re.I | re.M) and actual['subtotal'] is None and \
+                (totales > 1 or len(niveles) == 1)
+            if ms.group(1).upper().startswith("SUBTOTAL") or local:
                 if actual is not None:
-                    actual["subtotal"] = valores(v)
+                    actual["subtotal"] = dict(zip(campos, v)) if len(v) == nc else valores(v)
             else:
-                total = valores(v)
+                total = dict(zip(campos, v)) if len(v) == nc else valores(v)
+            if pend and not buf and local:
+                # Si el OCR conserva nombres pero pierde todas sus cifras, no usa
+                # el subtotal como si correspondiera a una materia.
+                for nombre in pend:
+                    actual['materias'].append(materia_de(nombre, []))
+                resto.append('materias sin cifras individuales: ' + ' / '.join(pend))
             pend, buf = [], []
+            referencia_general = False
             continue
         mt = RE_TITULO_ENCAB.match(l)
         if mt or RE_ENCAB.match(l):
@@ -223,16 +336,32 @@ def analizar(texto):
                 optativas.append(grupo)
                 pend, buf, etiqueta = [], [], None
             continue
-        if RE_PIE.match(l) or re.fullmatch(r"[\W_]*", l):
+        if RE_PIE.match(l) or re.fullmatch(r"[\W_]*", l) or \
+                re.fullmatch(r'T|P|C|AA|TEPIC|SATCA|(?:TIPO )?T P T/(?:H|II) C(?:\. Tepic C\. SATCA)?|TEOR[IÍ]A PR[AÁ]CTICA AA.*', l, re.I):
+            continue
+        if re.match(rf'^T\s+{NUM}', l):
+            resto.append('cifras en encabezado sin nombre: ' + l)
             continue
         if RE_ETIQ.match(l):
             etiqueta = l
             continue
         if RE_NUMS.match(l):
+            if referencia_general and len(l.split()) == nc:
+                total = dict(zip(campos, map(num, l.split())))
+                referencia_general = False
+                pend, buf = [], []
+                continue
             buf.extend(l.split())
-            emitir()
+            if i + 1 == len(lineas) or not RE_NUMS.fullmatch(lineas[i + 1]):
+                emitir()
             continue
-        m2 = re.match(rf"^(?P<nom>[^\d\W].*?)\s+(?P<n>(?:{NUM}\s*){{3,}})$", l)
+        me = re.fullmatch(rf'(ELECTIVA\s*\**)\s+({NUM})\s+({NUM})', l, re.I)
+        if me and nc == 5 and campos[-1] == 'creditos_satca':
+            extra = {'nivel': 0, 'materias': [materia_de(me[1], [])], 'subtotal': None}
+            extra['materias'][0].update(zip(campos[-2:], [num(me[2]), num(me[3])]))
+            niveles.append(extra)
+            continue
+        m2 = re.match(rf"^(?P<nom>[^\d\W].*?)\s+(?P<n>(?:{NUM}\s*){{{min(nc, 3)},}})$", l)
         if m2:
             pend.append(m2.group("nom"))
             buf.extend(m2.group("n").split())
@@ -241,6 +370,9 @@ def analizar(texto):
         if buf and pend:     # fila incompleta: se descarta y se avisa
             resto.append(f"fila incompleta: {' '.join(pend)} {' '.join(buf)}")
             pend, buf = [], []
+        elif buf:
+            resto.append('cifras sin nombre: ' + ' '.join(buf))
+            buf = []
         pend.append(l)
     resto.extend(pend)
     optativas = [g for g in optativas if g["materias"]]
@@ -252,7 +384,7 @@ def encabezado(texto):
     unidades = []
     for l in texto.split("\n")[:12]:
         u = l.upper()
-        m = re.search(r"PLAN DE ESTUDIOS\s*(\d{4})\s*(?:DE|DEL)?\s*(.*)", u)
+        m = re.search(r"PLAN(?: DE ESTUDIOS?)?\s*(\d{4})\s*(?:DE|DEL)?\s*(.*)", u)
         if m:
             plan, programa = m.group(1), m.group(2).strip().title()
         unidades += [x for x in re.findall(r"\(([A-Z]{3,8})\)", u.replace("UPIIТА", "UPIITA")) if x not in unidades]
@@ -261,35 +393,51 @@ def encabezado(texto):
 
 # ---------------------------------------------------------------- validación
 def _suma(materias, campo):
-    return round(sum(m[campo] or 0 for m in materias), 2)
+    return round(sum(m.get(campo) or 0 for m in materias), 2)
 
 
-def validar(niveles, total, optativas=()):
+def validar(niveles, total, optativas=(), por_trayectoria=True):
+    trayectorias = {n.get('trayectoria') for n in niveles} - {None}
+    if trayectorias and por_trayectoria:
+        informes = {tr: validar([n for n in niveles if not n.get('trayectoria') or n['trayectoria'] == tr],
+                                total, optativas, False) for tr in sorted(trayectorias)}
+        estados = {v['estado'] for v in informes.values()}
+        estado = next(e for e in ('discrepancia', 'ok', 'solo_total', 'sin_referencia') if e in estados)
+        return {'ok': estado != 'discrepancia', 'estado': estado,
+                'motivo': '; '.join(f"{tr}: {v['motivo']}" for tr, v in informes.items()),
+                'niveles': [dict(n, trayectoria=tr) for tr, v in informes.items() for n in v['niveles']],
+                'total': {'por_trayectoria': {tr: v['total'] for tr, v in informes.items()}},
+                'sospechosas': [dict(m, trayectoria=tr) for tr, v in informes.items() for m in v['sospechosas']],
+                'por_trayectoria': informes}
     informe = {"ok": True, "niveles": [], "total": None, "sospechosas": []}
 
     def sospecha_horas(ms, donde):
         for m in ms:
-            if m["horas"] is not None and m["teoria"] is not None and abs(m["teoria"] + m["practica"] - m["horas"]) > TOL:
+            if all(m.get(c) is not None for c in CAMPOS[:3]) and abs(m["teoria"] + m["practica"] + (m.get('aprendizaje_autonomo') or 0) - m["horas"]) > TOL:
                 informe["sospechosas"].append({"donde": donde, "materia": m["nombre"], "motivo": "T+P != T/H"})
 
     for n in niveles:
         sub = n["subtotal"]
         item = {"nivel": n["nivel"], "materias": len(n["materias"]), "ok": None, "diferencias": {}}
         sospecha_horas(n["materias"], f"nivel {n['nivel']}")
-        if sub and "teoria" in sub:
+        if sub and "valores" not in sub:
             item["ok"] = True
-            for c in CAMPOS:
+            for c in sub:
                 s = _suma(n["materias"], c)
                 if sub.get(c) is not None and abs(s - sub[c]) > TOL:
                     item["ok"] = False
                     item["diferencias"][c] = {"suma": s, "subtotal": sub[c], "dif": round(sub[c] - s, 2)}
                     for m in n["materias"]:   # materia cuyo valor explica la diferencia (sobra o falta una)
-                        if m[c] is not None and abs(m[c] - abs(sub[c] - s)) < TOL:
+                        if m.get(c) is not None and abs(m[c] - abs(sub[c] - s)) < TOL:
                             informe["sospechosas"].append({"donde": f"nivel {n['nivel']}", "materia": m["nombre"],
                                                            "motivo": f"{c} {m[c]} explica la diferencia {round(sub[c] - s, 2)}"})
-        elif sub is None:
-            item["ok"] = False
-            item["diferencias"]["subtotal"] = "no se encontró SUBTOTAL"
+        elif sub and 'valores' in sub:
+            sumas = {c: _suma(n['materias'], c) for c in CAMPOS}
+            faltan = [v for v in sub['valores'] if not any(abs(v - s) <= TOL for s in sumas.values())]
+            item['ok'] = not faltan
+            item['diferencias'] = {'referencia_parcial': faltan} if faltan else {}
+        else:
+            item['nota'] = 'no se encontró SUBTOTAL'
         informe["niveles"].append(item)
         if item["ok"] is False:
             informe["ok"] = False
@@ -297,13 +445,13 @@ def validar(niveles, total, optativas=()):
         sospecha_horas(g["materias"], g["grupo"])
     if total is None:
         informe["total"] = {"ok": None, "nota": "no se encontró TOTAL"}
-    elif "teoria" in total:
+    elif "valores" not in total:
         t = {"ok": True, "diferencias": {}}
-        for c in CAMPOS:
+        for c in total:
             s = round(sum(_suma(n["materias"], c) for n in niveles), 2)
             if total.get(c) is not None and abs(s - total[c]) > TOL:
                 t["ok"] = False
-                t["diferencias"][c] = {"suma": s, "total": total[c]}
+                t["diferencias"][c] = {"suma": s, "total": total[c], "dif": round(total[c] - s, 2)}
         informe["total"] = t
     else:   # el OCR perdió columnas del TOTAL: cada valor debe coincidir con alguna suma
         sumas = {c: round(sum(_suma(n["materias"], c) for n in niveles), 2) for c in CAMPOS}
@@ -311,6 +459,17 @@ def validar(niveles, total, optativas=()):
         informe["total"] = {"ok": all(enc.values()), "parcial": True, "coincide_con": enc, "sumas": sumas}
     if informe["total"]["ok"] is False:
         informe["ok"] = False
+    referencias = any(n['subtotal'] for n in niveles)
+    informe['estado'] = ('discrepancia' if not informe['ok'] else 'ok' if referencias
+                         else 'solo_total' if total else 'sin_referencia')
+    motivos = [f"nivel {n['nivel']}: {n['diferencias']}" for n in informe['niveles'] if n['ok'] is False]
+    if informe['total']['ok'] is False:
+        motivos.append(f"TOTAL: {informe['total']}")
+    informe['motivo'] = '; '.join(motivos) or {
+        'ok': 'Las referencias disponibles cuadran (SUBTOTAL y/o TOTAL).',
+        'solo_total': 'Sin subtotales; la suma general cuadra con TOTAL.',
+        'sin_referencia': 'Sin SUBTOTAL ni TOTAL; no hay referencia para comprobar las sumas.',
+    }.get(informe['estado'], '')
     return informe
 
 
@@ -380,58 +539,101 @@ def comparar(nombre_pdf, niveles, optativas=()):
 
 # ---------------------------------------------------------------- principal
 def procesar(pdf, k, total_pasos, opciones):
-    import pypdfium2 as pdfium
     nombre = pdf.stem
-    npag = len(pdfium.PdfDocument(str(pdf)))
+    if opciones.get('solo_analisis'):
+        caches = sorted((BASE / 'img').glob(f'{nombre}-p*.ocr.txt'),
+                        key=lambda f: int(re.search(r'-p(\d+)\.ocr\.txt$', f.name)[1]))
+        if not caches:
+            raise FileNotFoundError(f'{nombre}: no hay .ocr.txt en caché; no se ejecutará OCR')
+        paginas = [int(re.search(r'-p(\d+)\.ocr\.txt$', f.name)[1]) for f in caches]
+    else:
+        import pypdfium2 as pdfium
+        paginas = list(range(1, len(pdfium.PdfDocument(str(pdf))) + 1))
     (BASE / "img").mkdir(parents=True, exist_ok=True)
     textos, tiempos = {}, {}
-    for p in range(1, npag + 1):
+    for p in paginas:
         png = BASE / "img" / f"{nombre}-p{p}.png"
         t0 = time.time()
-        renderizar(pdf, p, png)
-        print(f"[{k[0]}/{total_pasos}] {nombre} pág {p} · ocr", flush=True)
-        k[0] += 1
-        textos[p], tiempos[p] = ocr_pagina(png)
+        if opciones.get('solo_analisis'):
+            textos[p] = png.with_suffix('.ocr.txt').read_text(encoding='utf-8')
+            meta = png.with_suffix('.ocr.json')
+            tiempos[p] = json.loads(meta.read_text(encoding='utf-8')) if meta.exists() else {}
+        else:
+            renderizar(pdf, p, png)
+            print(f"[{k[0]}/{total_pasos}] {nombre} pág {p} · ocr", flush=True)
+            k[0] += 1
+            textos[p], tiempos[p] = ocr_pagina(png)
     if opciones["solo_ocr"]:
         return None
     niveles, optativas, total, no_tabla, marcas = [], [], None, [], []
-    for p in range(1, npag + 1):
+    planes = {encabezado(t)[1] for t in textos.values()} - {None}
+    varios_planes = len(planes) > 1
+    plan_pagina, totales_plan = None, {}
+    for p in paginas:
         print(f"[{k[0]}/{total_pasos}] {nombre} pág {p} · análisis", flush=True)
         k[0] += 1
         nv, op, tot, resto = analizar(textos[p])
-        if not nv and not op and not opciones["sin_llm"] and n_filas_numericas(textos[p]) >= 3:
+        plan_pagina = encabezado(textos[p])[1] or plan_pagina
+        if varios_planes:
+            for n in nv:
+                n['plan'] = plan_pagina
+            for g in op:
+                g['plan'] = plan_pagina
+            if tot:
+                totales_plan[plan_pagina] = tot
+        if not nv and not op and not opciones.get('solo_analisis') and not opciones["sin_llm"] and n_filas_numericas(textos[p]) >= 3:
             try:   # respaldo: el analizador no encontró estructura
                 nv, tot = respaldo_llm(textos[p])
                 marcas.append(f"pág {p}: respaldo qwen3.5:9b (verificar a mano)")
             except Exception as e:
                 marcas.append(f"pág {p}: respaldo falló ({e})")
+        total = tot or total
         if nv or op:
             niveles.extend(nv)
             optativas.extend(op)
-            total = tot or total
             if resto:
-                marcas.append(f"pág {p}: líneas sin clasificar: {resto[:6]}")
+                marcas.append(f"pág {p}: líneas sin clasificar: {resto}")
         else:
             no_tabla.append({"pagina": p, "texto": textos[p]})
     # une niveles repetidos (un nivel partido en dos páginas) y grupos de optativas
     fus = {}
     for n in niveles:
-        if n["nivel"] in fus:
-            fus[n["nivel"]]["materias"].extend(n["materias"])
-            fus[n["nivel"]]["subtotal"] = n["subtotal"] or fus[n["nivel"]]["subtotal"]
+        clave = (n.get('plan') or '', n.get('trayectoria') or '', n['nivel'])
+        if clave in fus:
+            fus[clave]["materias"].extend(n["materias"])
+            fus[clave]["subtotal"] = n["subtotal"] or fus[clave]["subtotal"]
         else:
-            fus[n["nivel"]] = n
+            fus[clave] = n
     niveles = [fus[i] for i in sorted(fus)]
     gfus = {}
     for g in optativas:
-        if g["grupo"] in gfus:
-            gfus[g["grupo"]]["materias"].extend(g["materias"])
+        clave = (g.get('plan') or '', g['grupo'])
+        if clave in gfus:
+            gfus[clave]["materias"].extend(g["materias"])
         else:
-            gfus[g["grupo"]] = g
+            gfus[clave] = g
     optativas = list(gfus.values())
     print(f"[{k[0]}/{total_pasos}] {nombre} · validación", flush=True)
     k[0] += 1
     val = validar(niveles, total, optativas)
+    if varios_planes:
+        informes = {pl: validar([n for n in niveles if n.get('plan') == pl], totales_plan.get(pl),
+                               [g for g in optativas if g.get('plan') == pl]) for pl in sorted(planes)}
+        val['por_plan'] = informes
+        val['ok'] = all(v['ok'] for v in informes.values())
+        val['estado'] = 'discrepancia' if not val['ok'] else 'ok' if any(v['estado'] == 'ok' for v in informes.values()) else 'solo_total' if totales_plan else 'sin_referencia'
+        val['motivo'] = '; '.join(f"plan {pl}: {v['motivo']}" for pl, v in informes.items())
+        val['niveles'] = [dict(n, plan=pl) for pl, v in informes.items() for n in v['niveles']]
+        val['total'] = {'por_plan': {pl: v['total'] for pl, v in informes.items()}}
+        total = None
+    if not any(n['materias'] for n in niveles) and not optativas:
+        estructura = any(re.search(r'\b(?:SEMESTRE|NIVEL|PER[IÍ]ODO)\s+(?:[IVX]+|\d+)\b', t, re.I)
+                         or n_filas_numericas(preparar_texto(t)) >= 3
+                         or (re.search(r'CR[EÉ]DITOS|T/H', t, re.I) and len(re.findall(NUM, t)) >= 4)
+                         for t in textos.values())
+        val.update(estado='discrepancia' if estructura else 'no_es_tabla', ok=False if estructura else None,
+                   motivo='Tabla reconocible sin materias extraíbles; revisar la caché OCR.' if estructura
+                   else 'Sin estructura curricular ni filas de materias; portada o imagen sin tabla.')
     val["marcas"] = marcas
     programa = plan = None
     unidades = []
@@ -446,26 +648,50 @@ def procesar(pdf, k, total_pasos, opciones):
               "niveles": niveles, "optativas": optativas, "total": total, "validacion": val,
               "comparacion_repo": comparar(nombre, niveles, optativas),
               "paginas_no_tabla": no_tabla, "tiempos": tiempos}
+    if varios_planes:
+        salida['totales_por_plan'] = totales_plan
     (BASE / "json").mkdir(exist_ok=True)
     (BASE / "json" / f"{nombre}.json").write_text(json.dumps(salida, ensure_ascii=False, indent=1), encoding="utf-8")
     return salida
 
 
 def main():
-    sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stdout, 'reconfigure'):
+        sys.stdout.reconfigure(encoding="utf-8")
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
-    opciones = {"solo_ocr": "--solo-ocr" in sys.argv, "sin_llm": "--sin-llm" in sys.argv}
-    pdfs = [pathlib.Path(a) for a in args] or sorted((BASE / "pdf").glob("*.pdf"))
-    import pypdfium2 as pdfium
-    pasos = sum(len(pdfium.PdfDocument(str(p))) * (1 if opciones["solo_ocr"] else 2) + (0 if opciones["solo_ocr"] else 1)
-                for p in pdfs)
+    opciones = {"solo_ocr": "--solo-ocr" in sys.argv, "sin_llm": "--sin-llm" in sys.argv,
+                'solo_analisis': '--solo-analisis' in sys.argv}
+    if opciones['solo_analisis'] and opciones['solo_ocr']:
+        raise SystemExit('--solo-analisis y --solo-ocr son excluyentes')
+    if opciones['solo_analisis']:
+        pdfs = [pathlib.Path(a) for a in args] or [BASE / 'pdf' / (n + '.pdf') for n in sorted({
+            re.sub(r'-p\d+\.ocr\.txt$', '', f.name) for f in (BASE / 'img').glob('*-p*.ocr.txt')})]
+        pasos = sum(len(list((BASE / 'img').glob(f'{p.stem}-p*.ocr.txt'))) + 1 for p in pdfs)
+    else:
+        pdfs = [pathlib.Path(a) for a in args] or sorted((BASE / "pdf").glob("*.pdf"))
+        import pypdfium2 as pdfium
+        pasos = sum(len(pdfium.PdfDocument(str(p))) * (1 if opciones["solo_ocr"] else 2) + (0 if opciones["solo_ocr"] else 1)
+                    for p in pdfs)
     k = [1]
     for pdf in pdfs:
         s = procesar(pdf, k, pasos, opciones)
         if s:
             v = s["validacion"]
             print(f"  {pdf.stem}: niveles={len(s['niveles'])} materias={sum(len(n['materias']) for n in s['niveles'])} "
-                  f"validación={'OK' if v['ok'] else 'CON DISCREPANCIAS'}", flush=True)
+                  f"validación={v['estado']} · {v['motivo']}", flush=True)
+    if not opciones['solo_ocr']:
+        resumen = {}
+        for f in sorted((BASE / 'json').glob('*.json')):
+            if not f.name.startswith('_'):
+                d = json.loads(f.read_text(encoding='utf-8'))
+                v = d['validacion']
+                resumen[f.stem + '.pdf'] = {'estado': v.get('estado', 'pendiente'), 'motivo': v.get('motivo', ''),
+                                           'materias': sum(len(n['materias']) for n in d['niveles'])}
+        conteos = {e: sum(v['estado'] == e for v in resumen.values())
+                   for e in ('ok', 'solo_total', 'sin_referencia', 'discrepancia', 'no_es_tabla', 'pendiente')}
+        (BASE / 'json' / '_resumen.json').write_text(json.dumps(
+            {'conteos': conteos, 'pdfs': resumen}, ensure_ascii=False, indent=2), encoding='utf-8')
+        print(f'Resumen: {conteos}', flush=True)
 
 
 if __name__ == "__main__":
