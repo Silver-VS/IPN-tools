@@ -7,13 +7,13 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
  for(const personal of (hashInicial? [false]:[false,true])) {
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
   let cambioUnidad = 0;
-  function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},appendChild(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
+  function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
   const location = {hash:hashInicial,pathname:'/sate/index.html',search:'?x=1',reload(){cambioUnidad++}};
   let c;
   const api = {store:{get:(k,d)=>guardado[k]??d,set:(k,v)=>guardado[k]=v},personal:()=>personal,estado:{car:'B'},
     renderTop(){},renderAviso(){},renderTray(){vistos.push('tray')},renderHor(){vistos.push('hor')},ofertaLista(){}};
   const document = {getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
-    querySelector:()=>null,querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){
+    addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){
       archivos.push(s.src);
       setImmediate(()=>{
         if(s.src==='nucleo.js') c.SATE.nucleoListo(api).catch(e=>{throw e});
@@ -31,7 +31,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
     addEventListener:(n,f)=>eventos[n]=f,
     situacionDatos(){return null},renderCalendario(){vistos.push('calendario')},
     fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url.includes('nucleo')?{mapas:{B:{}},unidad:'upiita'}:{}}},
-    SateUI:{usarTextos(){},usarAlmacen(){},modal(){},cerrarModal(){},
+    SateUI:{usarTextos(){},usarAlmacen(){},modal(){},cerrarModal(){},ayuda(){return nodo()},
       pestanas(o){const n=nodo();n.seleccionar=id=>o.alCambiar(id);return n},barraInferior(){return {marcar(){}}}}
   });
   vm.runInContext('window=globalThis',c);
@@ -91,9 +91,9 @@ for (const unidad of unidades) {
   for(const u of unidades) Object.assign(cfg[u.id],{nombre:u.nombre,siglas:u.siglas});
   const c=vm.createContext({URLSearchParams,console,SATE_CONFIG:{unidades:cfg,textos:{}},
     location:{hash:'#/'+unidad.id+'/mapa',search:''},localStorage:{getItem:()=>null},
-    document:{getElementById:()=>({}),querySelector:s=>s==='.inst-name'?nombre:s==='.inst-in'?cabecera:null,
+    document:{getElementById:()=>({appendChild(){},addEventListener(){}}),addEventListener(){},querySelector:s=>s==='.inst-name'?nombre:s==='.inst-in'?cabecera:null,
       createElement:()=>({children:[],appendChild(n){this.children.push(n)}})},
-    SateUI:{usarTextos(){}},fetch:()=>new Promise(()=>{})});
+    SateUI:{usarTextos(){},ayuda(){return {querySelector:()=>({setAttribute(){}})}}},fetch:()=>new Promise(()=>{})});
   vm.runInContext('window=globalThis',c);
   vm.runInContext(readFileSync('web/sate/rutas.js','utf8'),c);
   vm.runInContext(readFileSync('web/sate/inicio.js','utf8'),c);

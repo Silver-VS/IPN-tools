@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="es" data-pestanas="v3">
+<html lang="es" data-pestanas="v1">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta charset="utf-8">
 <title>/*__SATE_TITULO__*/</title>
@@ -681,19 +681,22 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <header class="top">
     <div class="brand">
       <!--__IPNT_HOME__-->
-      <div class="title-row"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog">Cambiar unidad académica</button><div class="header-actions"><button class="enc-btn" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
-      <p id="sate-nombre">/*__SATE_NOMBRE__*/</p><p id="sate-leyenda"></p>
+      <div class="title-row"><div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/">▾</button><span id="sate-leyenda"></span></div><div class="header-actions"><button class="enc-btn" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
+      <p id="sate-nombre">/*__SATE_NOMBRE__*/</p>
       <div id="sate-avisos-globales"></div>
     </div>
-<div id="sate-tabs"></div><button id="t-tray" hidden></button>
+    <div class="sate-navegacion"><div id="sate-tabs"></div><button id="t-tray" hidden></button>
+      <div class="sate-controles">
+        <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
+        <div class="sate-datos"><!--__SAES_CARD__--><details id="sate-datos-menu"><summary aria-label="/*__SATE_DATOS_ACCIONES__*/" title="/*__SATE_DATOS_ACCIONES__*/">▾</summary><div class="sate-datos-opciones"><button class="btn" type="button" data-saes-open aria-haspopup="dialog">/*__SATE_ACTUALIZAR__*/</button><button class="btn demo-open" type="button" data-demo-open>/*__SATE_DEMO__*/</button></div></details></div>
+      </div>
+    </div>
   </header>
 
   <div class="bar-top">
-    <label class="field"><span>Carrera</span><select id="f-carrera"></select></label>
     <div class="field" id="sate-oferta-periodo"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
       <button data-per="proximo">Próximo</button><button data-per="actual">Actual</button>
     </div></div>
-    <div class="field saes-slot"><span>Tu avance (opcional)</span><!--__SAES_CARD__--></div>
     <div class="notice" id="notice"></div>
   </div>
   <div class="saes-mm" id="saes-mismatch" role="status" hidden></div>

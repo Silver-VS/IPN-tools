@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.17 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.encabezado.*` | Encabezado compacto: cambio de unidad, chip de fase de prueba, carrera accesible, Mis datos y opciones de actualización/demostración; estados del SAES conservados. |
+
 ## 2026-10-07 · 2026.10.16 · Claude
 
 | Clave | Antes | Después |
