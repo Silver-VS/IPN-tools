@@ -4,17 +4,11 @@
     "upiita": {
       "pestanas": [
         "trayectoria",
-        "tramites",
         "mapa",
         "horarios",
         "calendario"
       ],
-      "tramites": [
-        "ets",
-        "reinscripcion",
-        "dictamen",
-        "electivas"
-      ],
+      "tramites": [],
       "leyenda": "prueba",
       "logo": {
         "claro": "assets/logos/upiita-oro.webp",
@@ -24,8 +18,7 @@
       },
       "grupos": [
         [
-          "trayectoria",
-          "tramites"
+          "trayectoria"
         ],
         [
           "mapa",

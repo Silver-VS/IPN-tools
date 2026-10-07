@@ -114,7 +114,7 @@ completo=600;corto=400;mutacion();frame();assert.equal(tabs.dataset.escalon,'com
 assert.equal(medicion.inert,true);
 }
 let bloques = 0;
-const paginas = ['web/dist/horarios-upiita.html', ...readdirSync('web/dist/sate').filter(f=>f.endsWith('.html')).map(f=>'web/dist/sate/'+f)];
+const paginas = [...readdirSync('web/dist').filter(f=>/^horarios-.*\.html$/.test(f)).map(f=>'web/dist/'+f), ...readdirSync('web/dist/sate').filter(f=>f.endsWith('.html')).map(f=>'web/dist/sate/'+f)];
 for (const archivo of paginas) for (const m of leer(archivo).matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
   if (/\bsrc\s*=|application\/(?:ld\+)?json/i.test(m[1])) continue;
   try { new Function(m[2]); bloques++; } catch (e) { throw new Error(archivo+': '+e.message); }

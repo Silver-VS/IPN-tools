@@ -5,6 +5,11 @@
     const partes = hash.slice(2).split('?')[0].split('/');
     if (config[partes[0]]) unidad = partes.shift();
     let pestaña = partes.shift() || 'mapa';
+    // Los enlaces de Ventanilla previos a esta publicación siguen siendo navegables.
+    if (pestaña === 'tramites' && config[unidad]?.pestanas.includes('trayectoria') && !config[unidad].pestanas.includes('tramites')) {
+      pestaña = 'trayectoria';
+      partes.length = 0;
+    }
     if (['situacion','desempeno'].includes(pestaña)) pestaña = 'trayectoria';
     if (!config[unidad] || !config[unidad].pestanas.includes(pestaña)) return null;
     if (partes.length && (pestaña !== 'tramites' || partes.length !== 1 || !config[unidad].tramites.includes(partes[0]))) return null;

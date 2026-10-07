@@ -951,6 +951,8 @@ def escribir_sate(data):
     salida = write_dist("sate/index", html, " | IPN", {"id":"sate", "siglas":"SATE", "nombre":""})
     html = salida.read_text(encoding="utf-8").replace('src="assets/', 'src="../assets/').replace('href="assets/', 'href="../assets/')
     html = html.replace('href="./"', 'href="../index.html"')
+    # Los diálogos se inyectan antes del traslado al subdirectorio SATE.
+    html = html.replace('href="privacidad.html"', 'href="../privacidad.html"').replace('href="condiciones.html"', 'href="../condiciones.html"')
     # SATE ya reúne las herramientas de cada unidad: no lleva el enlace de regreso a la portada del proyecto (decisión del dueño)
     html = re.sub(r'<a class="ipnt-home"[^>]*>.*?</a>', '', html, count=1, flags=re.S)
     salida.write_text(html, encoding="utf-8")
@@ -987,7 +989,8 @@ document.addEventListener('click', e => {
 // v1: solo se eligen materias""", 1)
     core = core.replace("new URL('auth.html',location.href)", "new URL('../auth.html',location.href)")
     core = core.replace('href="privacidad.html"', 'href="../privacidad.html"').replace('href="condiciones.html"', 'href="../condiciones.html"')
-    core = core.replace('href="electivas.html"', 'href="../electivas.html"')
+    # Electivas no forma parte del paquete SATE publicado en esta versión.
+    core = core.replace('Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.', 'Consulta con Gestión Escolar los requisitos para acreditar tus electivas.')
     (destino / "nucleo.js").write_text(core, encoding="utf-8")
     print("datos SATE", UNIDAD, {p.name:p.stat().st_size for p in datos.glob("*.json")})
 
