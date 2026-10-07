@@ -27,16 +27,19 @@ class Nodo{
 document={createElement:tag=>new Nodo(tag),createTextNode:text=>({textContent:text}),getElementById(){return null},addEventListener(){}};
 const c=vm.createContext({document,addEventListener(){}});vm.runInContext('window=globalThis',c);
 vm.runInContext(leer('web/dist/sate/componentes.js'),c);
-const items=config.unidades.upiita.pestanas.map(id=>({id,texto:config.textos['sate.pestana.'+id+'.titulo'],grupo:config.unidades.upiita.grupos.findIndex(g=>g.includes(id))}));
+const items=config.unidades.upiita.pestanas.map(id=>({id,texto:config.textos['sate.pestana.'+id+'.titulo'],corto:config.textos['sate.pestana.'+id+'.corto'],grupo:config.unidades.upiita.grupos.findIndex(g=>g.includes(id))}));
 let destino;
 const tabs=c.SateUI.pestanas({items,activa:'trayectoria',alCambiar:id=>destino=id});
-const barra=c.SateUI.barraInferior({items,activa:'trayectoria',alElegir:id=>destino=id});
+const barra=c.SateUI.barraInferior({items:items.map(it=>({...it,corto:null,texto:it.corto,titulo:it.texto})),activa:'trayectoria',alElegir:id=>destino=id});
 for(const [i,b] of tabs.children.entries()){
   assert.equal(b.getAttribute('role'),'tab');assert.equal(b.getAttribute('type'),'button');
   assert.equal(b.getAttribute('data-id'),items[i].id);
   assert.equal(b.children[0].getAttribute('aria-hidden'),'true');
   assert.match(b.children[0].innerHTML,/<svg.*stroke="currentColor"/);
   assert.equal(b.children[1].textContent,items[i].texto);
+  assert.equal(b.children[2].textContent,items[i].corto);
+  assert.equal(b.getAttribute('aria-label'),items[i].texto);
+  assert.equal(barra.children[i].getAttribute('aria-label'),items[i].texto);
   assert.match(barra.children[i].children[0].innerHTML,/<svg/);
 }
 assert.equal(tabs.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,1);

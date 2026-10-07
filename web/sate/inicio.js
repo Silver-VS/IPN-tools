@@ -57,6 +57,45 @@
     return modulos[id];
   }
   function ir(id) { location.hash = '#/' + u + '/' + id; }
+  function adaptarPestanas() {
+    const contenedor = document.getElementById('sate-tabs'), navegacion = contenedor.closest('.sate-navegacion');
+    const controles = navegacion.querySelector('.sate-controles');
+    const medicion = document.createElement('div');
+    medicion.className = 'sate-medicion'; medicion.setAttribute('aria-hidden','true'); medicion.inert = true;
+    navegacion.appendChild(medicion);
+    let pendiente = false;
+    function calcular() {
+      pendiente = false;
+      // La copia conserva la tipografía y los grupos, sin depender del escalón visible.
+      // Todas las etiquetas se miden en negrita para que cambiar de pestaña no cambie el escalón.
+      const copia = tabs.cloneNode(true), carrera = controles.cloneNode(true);
+      for (const nodo of [copia, carrera, ...copia.querySelectorAll('[id]'), ...carrera.querySelectorAll('[id]')]) nodo.removeAttribute('id');
+      medicion.replaceChildren(copia, carrera);
+      copia.dataset.escalon = 'completo';
+      const completo = Math.max(copia.scrollWidth + copia.offsetWidth - copia.clientWidth, Math.ceil(copia.getBoundingClientRect().width));
+      copia.dataset.escalon = 'corto';
+      const corto = Math.max(copia.scrollWidth + copia.offsetWidth - copia.clientWidth, Math.ceil(copia.getBoundingClientRect().width));
+      const estilo = getComputedStyle(navegacion);
+      const disponible = navegacion.clientWidth - parseFloat(estilo.paddingLeft) - parseFloat(estilo.paddingRight);
+      const enFila = completo + carrera.getBoundingClientRect().width + (parseFloat(estilo.columnGap) || 0) <= disponible;
+      const escalon = completo <= disponible ? 'completo' : corto <= disponible ? 'corto' : 'flotante';
+      const separado = !enFila;
+      const foco = document.activeElement;
+      if (navegacion.dataset.controlesSeparados !== String(separado)) navegacion.dataset.controlesSeparados = String(separado);
+      if (tabs.dataset.escalon !== escalon) tabs.dataset.escalon = escalon;
+      document.body.classList.toggle('sate-flotante', escalon === 'flotante');
+      // Si el cambio oculta el botón enfocado, conservar el foco en la navegación equivalente.
+      if (escalon === 'flotante' && tabs.contains(foco)) barra.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
+      else if (escalon !== 'flotante' && !matchMedia('(max-width:720px)').matches && barra.contains(foco)) tabs.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
+    }
+    function programar() { if (!pendiente) { pendiente = true; requestAnimationFrame(calcular); } }
+    new ResizeObserver(programar).observe(navegacion);
+    new MutationObserver(programar).observe(tabs, {childList:true,subtree:true,characterData:true});
+    new MutationObserver(programar).observe(document.documentElement, {attributes:true,attributeFilter:['lang','class','style','data-pestanas']});
+    if (document.fonts) { document.fonts.ready.then(programar); document.fonts.addEventListener('loadingdone',programar); }
+    addEventListener('resize',programar);
+    programar();
+  }
   function elegirUnidad() {
     const caja = document.createElement('div');
     for (const [id, c] of Object.entries(config)) {
@@ -125,12 +164,13 @@
           const p = document.createElement('p'); p.textContent = texto('sate.migracion.tramites'); box.appendChild(p);
         }
       }};
-      const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo')}));
+      const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
       tabs = SateUI.pestanas({items,activa:r.pestana,alCambiar:id=>{if(actual && actual.pestana!==id)ir(id)}});
       document.getElementById('sate-tabs').appendChild(tabs);
       for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');
-      barra = SateUI.barraInferior({items:cfg.pestanas.map(id=>({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.corto')})),activa:r.pestana,alElegir:ir});
+      barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa:r.pestana,alElegir:ir});
       document.body.appendChild(barra);
+      adaptarPestanas();
       addEventListener('hashchange',()=>{const r=SateRutas.ruta(location.hash,u,config);if(r)activar(r).catch(error)});
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
