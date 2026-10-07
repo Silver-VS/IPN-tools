@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.7"
+version = "2026.10.8"
 
 [proyecto]
 nombre = "HADES"
@@ -310,3 +310,28 @@ llevar_interno = "Entrega original y copia del formato interno, carta de exposic
 plazo_interno = "Se recibe en las ventanas que anuncie Gestión Escolar. Las respuestas se recogen en ventanillas cinco días hábiles después de la sesión. Las rondas documentadas de 26/2 ya vencieron; confirma las de 27/1. Atención: lunes a viernes, 9:00–14:00 y 16:00–20:00."
 llevar_externo = "Entrega original y copia del COSIE-01, carta de motivos en formato electrónico y firmada con datos de contacto, copia de dictámenes anteriores si existen, documentos probatorios e identificación vigente con foto. Marca solo los anexos que entregues; el COSIE-01 también contempla bajas anteriores. Gestión Escolar integra la boleta global certificada y envía el expediente a la Dirección de Educación Superior."
 plazo_externo = "La recepción del externo está documentada durante todo el año. No hay plazo de respuesta confirmado; consulta Gestión Escolar. La instancia que resuelve una causal debe confirmarse en ventanillas. Atención: lunes a viernes, 9:00–14:00 y 16:00–20:00; 55 5729 6000, extensiones 56811, 56934, 56935 y 56936."
+
+[sate.desempeno]
+sim_activa = "Simulación activa"
+quitar = "Quitar"
+sim_titulo = "Simulación de fin de semestre"
+sin_datos = "Lee tus datos del SAES para consultar tus estadísticas, metas y simulación de fin de semestre."
+lector = "Usar el Lector del SAES"
+demo = "Probar con datos de ejemplo"
+materias = "{n, plural, one {# materia} other {# materias}}"
+error_graficas = "No se pudo cargar la biblioteca de gráficas."
+sim_aviso = "Simulación: no modifica tus datos del SAES"
+simular = "Simular fin de semestre"
+reiniciar = "Reiniciar simulación"
+reiniciar_ayuda = "Regresa todas las materias a su valor inicial (en curso aprobadas con 8 y reprobadas pendientes) y todos los bloques a mostrar la simulación"
+sim_efecto = "El mapa, las sugeridas y las estadísticas se recalculan con tu simulación; tus datos del SAES no cambian."
+sim_ayuda = "Prueba qué pasaría con tus materias en curso y tus reprobadas: aprobar con cierta calificación, reprobar o acreditar por ETS, recurse o extraordinario."
+calificacion = "Calificación"
+en_curso_eqv = "En curso por equivalencia"
+en_curso = "En curso"
+aprobada = "Aprobada"
+reprobada = "Reprobada"
+recursar = "pasa a recursar"
+como_acredita = "Cómo se acredita"
+pendiente = "Sigue pendiente"
+acreditada_por = "Acreditada por {forma}"

@@ -18,6 +18,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
         if(s.src==='nucleo.js') c.SATE.nucleoListo(api).catch(e=>{throw e});
         if(s.src==='mapa.js') c.SATE.pestana('mapa',{montar(){vistos.push('montar-mapa')},mostrar(){vistos.push('mapa')},ocultar(){vistos.push('ocultar-mapa')}});
         if(s.src==='situacion.js') c.SATE.pestana('situacion',{montar(){vistos.push('montar-situacion')},mostrar(){vistos.push('situacion')},ocultar(){vistos.push('ocultar-situacion')}});
+        if(s.src==='desempeno.js') c.SATE.pestana('desempeno',{montar(){vistos.push('montar-desempeno')},mostrar(){vistos.push('desempeno')},ocultar(){vistos.push('ocultar-desempeno')}});
         if(s.src==='horarios.js') c.SATE.pestana('horarios',{montar(){vistos.push('montar-hor')},mostrar(){vistos.push('hor')}});
         s.onload();
       });
@@ -41,6 +42,13 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   assert.equal(archivos.filter(a=>a==='mapa.js').length,hashInicial.endsWith('/situacion')?0:1);
   if(hashInicial.endsWith('/situacion'))assert.equal(fetches.some(u=>u.endsWith('oferta.json')),false);
   assert.equal(archivos.includes('horarios.js'),false,'saveData impide precarga');
+  const antes=fetches.length,mapas=archivos.filter(a=>a==='mapa.js').length;
+  location.hash='#/upiita/desempeno'; eventos.hashchange(); await vaciar();
+  assert.equal(c.SATE.actual.pestana,'desempeno');
+  assert.equal(fetches.length,antes,'Desempeño no descarga oferta');
+  assert.equal(archivos.filter(a=>a==='mapa.js').length,mapas,'Desempeño no descarga Mapa');
+  assert.equal(document.getElementById('v-tray').hidden,true);
+  assert.equal(document.getElementById('sate-desempeno').hidden,false);
   location.hash='#/upiita/horarios'; eventos.hashchange(); await vaciar();
   assert.equal(c.SATE.actual.pestana,'horarios');
   assert.equal(guardado.ruta,'#/upiita/horarios');

@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-06 · 2026.10.8 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.desempeno.*` | Panel independiente, invitación al Lector y DEMO, simulación plegada, chip global y acción Quitar; controles de simulación trasladados. Cuenta de materias con plural ICU. |
+
 ## 2026-10-06 · 2026.10.7 · Claude
 
 | Clave | Antes | Después |
