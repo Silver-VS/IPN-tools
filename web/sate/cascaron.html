@@ -650,10 +650,9 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 <div id="sate-tabs"></div><button id="t-tray" hidden></button>
   </header>
 
-  <p class="cal-alerta" id="cal-alerta" role="status" hidden></p>
   <div class="bar-top">
     <label class="field"><span>Carrera</span><select id="f-carrera"></select></label>
-    <div class="field"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
+    <div class="field" id="sate-oferta-periodo"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
       <button data-per="proximo">Próximo</button><button data-per="actual">Actual</button>
     </div></div>
     <div class="field saes-slot"><span>Tu avance (opcional)</span><!--__SAES_CARD__--></div>
@@ -662,18 +661,13 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <div class="saes-mm" id="saes-mismatch" role="status" hidden></div>
   <div class="mobnote" id="mobnote" role="note" hidden><span>Esta herramienta se aprovecha mejor en una <b>computadora</b> o tableta. En el teléfono, <b>gíralo a horizontal</b> para ver el mapa completo; en vertical se muestra una versión simplificada en lista.</span><button class="link" type="button" id="b-mobnote">Entendido</button></div>
 
+  <section id="sate-situacion" hidden></section>
   <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
     <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
     <section class="card estado" data-personal hidden aria-labelledby="h-estado">
       <div class="est-head"><h2 id="h-estado">Estado general</h2><span class="muted" id="est-src"></span><span class="tag sim" id="sim-tag" hidden>Simulación</span><button class="link" type="button" data-saes-open>Actualizar o borrar</button></div>
-      <p class="est-act" id="est-act" hidden></p>
       <div class="est-sim" id="est-sim" hidden></div>
-      <div class="est-tiles" id="status"></div>
-      <div class="est-eqv" id="est-eqv" hidden></div>
-      <div id="desf"></div>
-      <p class="est-note" id="desf-note"></p>
-      <div class="cal" id="est-cal" hidden></div>
       <button class="stats-btn stats-bar" type="button" id="stats-btn" aria-expanded="false" aria-controls="kstats" hidden></button>
       <div class="kstats" id="kstats" hidden></div>
     </section>
@@ -709,7 +703,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 
   <!-- ============ PANTALLA 2: HORARIO ============ -->
   <section id="v-hor" data-view-panel="hor" role="tabpanel" aria-labelledby="t-hor" hidden>
-    <section class="card cal" id="hor-cal" aria-label="Calendario de reinscripción" hidden></section>
+    <div class="est-eqv" id="est-eqv" hidden></div>
     <section class="filters" aria-label="Filtros">
       <button class="btn ftoggle" id="b-filt" type="button" aria-expanded="false" aria-controls="v-hor">Filtros</button>
       <div class="field"><span>Turno</span><div class="chips" id="f-turno"></div></div>

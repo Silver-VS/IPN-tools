@@ -105,12 +105,12 @@ const tr=()=>{
 function avisoActualizar(A){
   const leido=new Date(A?.leido);if(isNaN(leido))return '';
   const m=String(A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/), cita=m?new Date(+m[3],+m[2]-1,+m[1]):null;
-  if(cita&&citaPasada(A)&&leido<cita)return 'Ya pasó tu cita de reinscripción y estos datos son de antes. Si ya te inscribiste, vuelve a usar el Lector para traer tu horario definitivo.';
+  if(cita&&citaPasada(A)&&leido<cita)return SATE.texto('sate.situacion.actualizar_cita');
   // citas del nuevo periodo publicadas (calendario de Gestión Escolar) después de la última lectura
   const pub=DATA.calendario?.citas?new Date(DATA.calendario.citas+'T00:00:00'):null;
-  if(pub&&Date.now()>=pub&&leido<pub)return `Las citas de reinscripción ${esc(DATA.calendario.periodo||'')} se publicaron en el SAES el ${pub.toLocaleDateString('es-MX',{day:'numeric',month:'long'})}. Vuelve a usar el Lector para traer tu nueva cita.`;
+  if(pub&&Date.now()>=pub&&leido<pub)return SATE.texto('sate.situacion.actualizar_publicacion',{periodo:DATA.calendario.periodo||'',fecha:pub.toLocaleDateString('es-MX',{day:'numeric',month:'long'})});
   const dias=Math.floor((Date.now()-leido)/864e5);
-  if(dias>=21)return `Estos datos tienen ${dias} días y no se actualizan solos. Vuelve a usar el Lector después de inscribirte o cuando cierre el semestre y se publiquen tus calificaciones (tus materias pasan del horario a tu kárdex).`;
+  if(dias>=21)return SATE.texto('sate.situacion.actualizar_antiguedad',{dias});
   return '';
 }
 const citaPasada=A=>{const m=String(A?.cita?.fin||A?.cita?.inicio||'').match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);return !!m&&new Date(+m[3],+m[2]-1,+m[1]+1)<new Date()};
@@ -153,12 +153,11 @@ function semRef(){
   Object.entries(cur()).forEach(([k,v])=>{if(v[3]!=='O'||isElec(k)||hecho.has(k))return;const x=sp[k];if(x!=null&&(m==null||x<m))m=x});
   return m;
 }
-/* Calendario de reinscripción de Gestión Escolar (data/calendario.json): tarjetas por fecha en Estado general y en
-   Horarios. Con datos del SAES marca lo que aplica a la situación del alumno; al elegir una tarjeta se muestra su detalle. */
+/* Calendario de Gestión Escolar: Ventanilla y modal de Situación comparten render y selección. */
 let CALAP=null, CALSEL=null;
 function renderCalendario(rd,nDes){
-  const tipos=Object.values(rd?.por||{}), des=nDes>0;
-  CALAP={todos:true,adeudo:isPersonal()&&tr().fail.length>0,cita:!des,sincita:des,desfasada:des,dictamen:false,transitorio:!!rd?.ok};
+  const des=nDes>0;
+  CALAP={todos:true,adeudo:isPersonal()&&conSim(false,()=>tr().fail.length>0),cita:!des,sincita:des,desfasada:des,dictamen:!!rd?.n&&!rd.ok,transitorio:!!rd?.ok};
   drawCals();
 }
 function calItems(){
@@ -170,33 +169,24 @@ function calItems(){
   items.forEach(a=>{a.pasada=a.fin<hoy;a.hoy=a.ini<=hoy&&hoy<=a.fin;a.hoyD=hoy});
   return {C,items};
 }
-function alertaCal(R){
-  const el=$('#cal-alerta');if(!el)return;
-  const hoy=new Date();hoy.setHours(0,0,0,0);
-  const a=R&&R.items.filter(x=>(isPersonal()&&CALAP?x.si:x.para==='todos')&&!x.pasada&&x.ini-hoy<=2*864e5).sort((x,y)=>x.fin-y.fin)[0];
-  el.hidden=!a;if(!a){el.innerHTML='';return}
-  const f=x=>x.toLocaleDateString('es-MX',{day:'numeric',month:'long'}), man=a.ini-hoy===864e5;
-  const cuando=a.hoy?(+a.fin===+hoy?'Hoy es el último día':`Hasta el ${f(a.fin)}`):man?'Mañana':`El ${f(a.ini)}`;
-  const mats=a.para==='adeudo'&&isPersonal()?tr().fail.filter(k=>cur()[k]).map(k=>pretty(cur()[k][0])):[];
-  el.innerHTML=`<b>${cuando}:</b> ${esc(a.titulo)}${mats.length?` <span class="muted">· ${esc(mats.join(', '))}</span>`:''} <button class="link" type="button" data-calver-ver="${a.i}">Ver qué hacer</button>`;
-}
 function drawCals(){
-  const R=calItems(), f=(x,o)=>x.toLocaleDateString('es-MX',o).replace('.','');alertaCal(R);
+  const R=calItems(), f=(x,o)=>x.toLocaleDateString('es-MX',o).replace('.','');
   document.querySelectorAll('.cal').forEach(el=>{
     el.hidden=!R;if(!R){el.innerHTML='';return}
-    const {C,items}=R, pers=isPersonal()&&!!CALAP, mio=pers&&store.get('calVer','mio')==='mio';
+    const {C,items}=R, pers=isPersonal()&&!!CALAP, completo=el.classList.contains('cal-completo'), mio=pers&&!completo&&store.get('calVer','mio')==='mio';
     let vis=mio?items.filter(a=>a.si):items;if(!vis.length)vis=items;
     const prox=vis.find(a=>!a.pasada), sel=vis.find(a=>a.i===CALSEL)||prox||vis[vis.length-1];
-    const rango=a=>a.hasta?`${a.ini.getDate()} al ${f(a.fin,{day:'numeric',month:'long'})}`:f(a.ini,{day:'numeric',month:'long'});
-    el.innerHTML=`<div class="cal-head"><h3>Reinscripción ${esc(C.periodo)} <small>Calendario de Gestión Escolar</small></h3>`+
-      (pers?`<div class="seg sm" role="group" aria-label="Actividades del calendario"><button type="button" data-calver="mio" aria-pressed="${mio}">Lo que me aplica</button><button type="button" data-calver="todo" aria-pressed="${!mio}">Todas</button></div>`:'')+`</div>`+
+    const ct=(k,v)=>SATE.texto('sate.calendario.'+k,v);
+    const rango=a=>a.hasta?ct('rango',{desde:a.ini.getDate(),hasta:f(a.fin,{day:'numeric',month:'long'})}):f(a.ini,{day:'numeric',month:'long'});
+    el.innerHTML=`<div class="cal-head"><h3>${esc(ct('reinscripcion',{periodo:C.periodo}))} <small>${esc(ct('gestion'))}</small></h3>`+
+      (pers&&!completo?`<div class="seg sm" role="group" aria-label="${esc(ct('actividades'))}"><button type="button" data-calver="mio" aria-pressed="${mio}">${esc(ct('aplica'))}</button><button type="button" data-calver="todo" aria-pressed="${!mio}">${esc(ct('todas'))}</button></div>`:'')+`</div>`+
       `<div class="cal-strip">${vis.map(a=>`<button type="button" class="cal-c${a.pasada?' pasada':''}${a.si&&a.para!=='todos'?' aplica':''}${a===prox?' prox':''}" data-calc="${a.i}" aria-pressed="${a===sel}">`+
         `<span class="cal-d"><b>${a.ini.getDate()}</b><span>${f(a.ini,{month:'short'})}${a.hasta?` – ${a.fin.getDate()}${a.fin.getMonth()!==a.ini.getMonth()?' '+f(a.fin,{month:'short'}):''}`:''}</span></span>`+
-        `<span class="cal-w">${a.hoy?(!a.hasta?'hoy':+a.fin===+a.hoyD?'último día: hoy':'en curso, hasta el '+f(a.fin,{weekday:'long'})):f(a.ini,{weekday:'long'})+(a.hasta?' a '+f(a.fin,{weekday:'long'}):'')}</span>`+
-        `<span class="cal-t">${esc(a.titulo||a.texto)}</span><span class="cal-l ${a.donde==='saes'?'saes':''}">${a.donde==='saes'?'En el SAES':'En ventanillas'}</span>`+
-        `${a===prox?'<i class="cal-b">Siguiente</i>':a.si&&a.para!=='todos'&&!a.pasada?'<i class="cal-b si">Te aplica</i>':''}</button>`).join('')}</div>`+
+        `<span class="cal-w">${a.hoy?(!a.hasta?ct('hoy'):+a.fin===+a.hoyD?ct('ultimo'):ct('en_curso',{dia:f(a.fin,{weekday:'long'})})):a.hasta?ct('entre_dias',{desde:f(a.ini,{weekday:'long'}),hasta:f(a.fin,{weekday:'long'})}):f(a.ini,{weekday:'long'})}</span>`+
+        `<span class="cal-t">${esc(a.titulo||a.texto)}</span><span class="cal-l ${a.donde==='saes'?'saes':''}">${ct(a.donde==='saes'?'saes':'ventanillas')}</span>`+
+        `${a===prox?`<i class="cal-b">${esc(ct('siguiente'))}</i>`:a.si&&a.para!=='todos'&&!a.pasada?`<i class="cal-b si">${esc(ct('te_aplica'))}</i>`:''}</button>`).join('')}</div>`+
       (sel?`<p class="cal-det"><b>${rango(sel)} · ${esc(sel.titulo||'')}.</b> ${esc(sel.texto)}</p>`:'')+
-      `<p class="est-note">${esc([...(C.notas||[]),C.fuente?'Fuente: '+C.fuente+'.':''].filter(Boolean).join(' '))}</p>`;
+      `<p class="est-note">${esc([...(C.notas||[]),C.fuente?ct('fuente',{fuente:C.fuente}):''].filter(Boolean).join(' '))}</p>`;
     if(CALSEL==null){const st=el.querySelector('.cal-strip'),pc=el.querySelector('.cal-c.prox');if(st&&pc)st.scrollLeft=Math.max(0,pc.offsetLeft-8)}
   });
 }
@@ -228,6 +218,17 @@ function reglaDesfase(){
   const L=cargaDe(), mx=Math.max(0,...Object.entries(cur()).filter(([k])=>!isElec(k)).map(([,v])=>+v[1]||0));
   return {R,des,por,ok,n:des.length,mx,tope:ok&&L?.media!=null?L.media+mx:null};
 }
+/* Una sola proyección de las reglas existentes para tarjetas y calendario.
+   Situación usa datos reales, aunque el alumno tenga una simulación activa en Mapa. */
+function situacionDatos(){return conSim(false,()=>{
+  if(!isPersonal())return null;
+  const fis=tr().fail.map(failInfo).sort((a,b)=>(a.idx??99)-(b.idx??99));
+  const dS=(tr().desfS||[]).filter(k=>!fis.some(f=>f.k===k));
+  const nDes=fis.filter(f=>f.estado==='desfasada').length+dS.length;
+  const rd=reglaDesfase(), D=statsDatos();
+  return {fis,dS,nDes,rd,D,meta:perMeta(),aut:rd?.tope??SAES.autorizada(ALUMNO),
+    adeudos:[...new Set([...tr().fail,...dS])],ret:retenidos()};
+})}
 const cargaDe=()=>isPersonal()&&ALUMNO.carga?.media?{min:ALUMNO.carga.min,media:ALUMNO.carga.media,max:ALUMNO.carga.max}:CARGA[S.car];
 /* Carga en créditos (Reglamento General de Estudios, art. 52):
    - Las reprobadas pendientes retienen sus créditos de forma permanente hasta acreditarse; inscribirlas no suma de nuevo.
@@ -515,63 +516,9 @@ function renderSide0(){
   $('#chosen-req').textContent=req.length&&!isPersonal()?`Según la seriación, conviene haber cursado antes: ${req.map(k=>c[k][0].toLowerCase()).join(', ')}.`:'';
   document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
   if(isPersonal()){
-    const done=tr().done.filter(k=>c[k]), credDone=done.reduce((s,k)=>s+c[k][1],0);
-    const total=Object.values(c).filter(v=>v[3]==='O'&&!/^ELECTIVA/.test(v[0])).reduce((s,v)=>s+v[1],0);
-    const A=ALUMNO, meta=perMeta(), fis=tr().fail.map(failInfo).sort((a,b)=>(a.idx??99)-(b.idx??99));
-    const dS=(tr().desfS||[]).filter(k=>!fis.some(f=>f.k===k));   // desfasadas que reporta el SAES (planes por semestre)
-    const nDes=fis.filter(f=>f.estado==='desfasada').length+dS.length, curso=tr().curso;
-    const atraso=DESFASE_SEM.has(S.car)?Object.keys(c).filter(k=>statusOf(k)==='late'||statusOf(k)==='late lock').length:0;
-    const tile=(lbl,val,sub='',cls='',tip='')=>`<div class="tile"${tip?` title="${esc(tip)}"`:''}><span>${lbl}</span><b class="${cls}">${val}</b>${sub?`<small>${sub}</small>`:''}</div>`;
-    const D=statsDatos(), obt=D.obt, tot=D.total, rd=reglaDesfase(), aut=rd?.tope??SAES.autorizada(A), autTipo=rd?.tope!=null?'Regla para desfasadas '+DATA.calendario.periodo:String(A.avance?.autorizada||'').split(/[(=]/)[0].trim();
-    const cm=String(A.cita?.inicio||'').match(/(\d+\/\d+\/\d{4})\s+(\d+):(\d+)(?::\d+)?\s*(.*)/);
-    $('#status').innerHTML=
-      (()=>{const v=(A.acreditadas||[]).map(x=>+x?.[1]).filter(x=>Number.isFinite(x)&&x>=6&&x<=10);return v.length?tile('Promedio sin reprobadas',(v.reduce((t,x)=>t+x,0)/v.length).toFixed(2),`${v.length} materias acreditadas`,'','Promedio de tus materias acreditadas, sin contar reprobadas ni no acreditadas (incluye equivalencias y revalidaciones).'):''})()+
-      (()=>{const po=promOficialSim();
-        if(po)return tile(po.exacto?'Promedio oficial (simulación)':'Promedio oficial (estimado)',po.despues.toFixed(2),`hoy ${po.antes.toFixed(2)} · ${po.despues>=po.antes?'+':''}${(po.despues-po.antes).toFixed(2)} con tu simulación`,'',
-          po.exacto?`Promedio de todo tu kárdex (aprobadas y reprobadas), como lo calcula el SAES, más las materias de tu simulación. Las reprobadas simuladas cuentan con la calificación que elegiste (0 a 5).`
-          :`Estimación: con tus datos actuales no se conocen las reprobadas de tu kárdex, así que se deducen de tu promedio oficial suponiendo ${REPROB_CAL} en cada una. Vuelve a usar el Lector para calcularlo exacto. Las reprobadas simuladas cuentan con la calificación que elegiste (0 a 5).`);
-        return tile('Promedio oficial',A.promedio??'—',A.promedio==null?'El SAES no lo mostró: suele aparecer con tu cita de reinscripción; actualiza tus datos cuando se publique':tr().sim?'La simulación no permite estimar tu promedio oficial con estos datos':'')})()+
-      tile(tr().sim?'Créditos (simulación)':'Créditos',`${obt==null?'—':fmtCr(obt)}${tot?`<small> / ${fmtCr(tot)}</small>`:''}`,tot&&obt!=null?`<span class="minibar"><i style="width:${Math.min(100,obt/tot*100)}%"></i></span>`:'')+
-      tile('Periodo que planeas',meta!=null?perName(meta):'—',semNow()?`${semNow()}.º${plazoReferencia(A).dur?' de '+plazoReferencia(A).dur:''} periodos`:'','',
-        [A.avance?.cursados!=null?`Llevas ${A.avance.cursados} periodos escolares cursados`:'',plazoReferencia(A).max?`${plazoReferencia(A).calculado?'referencia a carga mínima':'máximo'} ${plazoReferencia(A).max}`:''].filter(Boolean).join('; ')+' (Cita de reinscripción del SAES)')+
-      tile('Carga autorizada',aut!=null?fmtCr(aut)+' cr':'—',autTipo?autTipo.charAt(0)+autTipo.slice(1).toLowerCase():'','',rd?.tope!=null?`Carga media (${fmtCr(cargaDe().media)} cr) más ${fmtCr(rd.mx)} cr de la materia con más créditos de tu plan; incluye las materias que recursas.`:'')+
-      tile(tr().sim?'Desfase (simulación)':'Desfase reportado',nDes?nDes+(nDes>1?' materias':' materia'):A.reprobadas_periodo==null?'Sin confirmar':'Ninguno',meta!=null?'en '+perName(meta):'',nDes?'bad':A.reprobadas_periodo==null?'':'ok',A.desfase_saes?'Tu última cita: '+A.desfase_saes:'')+
-      (DESFASE_SEM.has(S.car)?tile('Atrasadas',atraso,'según el semestre propuesto',atraso?'warn':''):'')+
-      tile('Cita de reinscripción',cm?cm[1]:esc(A.cita?.inicio||'—'),citaPasada(A)?'vencida; aún no se publica la siguiente':cm?`${+cm[2]}:${cm[3]} ${cm[4]}`:'');
-    $('#status').style.setProperty('--tiles',$('#status').children.length);
-    const fechaCal=x=>new Date(x+'T00:00:00').toLocaleDateString('es-MX',{day:'numeric',month:'long'});
-    // cada materia: estado corto y opciones; lo que procede se explica una sola vez arriba
-    const fila=f=>{const t=rd?.por[f.k], P=perName, rc=f.curso?'La estás recursando':'';
-      if(f.estado==='desfasada'){
-        if(f.curso)return ['bad','Desfasada · la recursas','Acreditarla este semestre regulariza tu situación; si no, necesitarás dictamen'];
-        if(t==='agotada')return ['bad',`Cursada ${f.veces} veces`,'ETS u otra modalidad (RGE, art. 48)'];
-        if(t==='dictamen')return ['bad',`Desfasada desde ${P(f.limite+1)}`,'Recursar con dictamen · ETS'];
-        if(t==='oficio')return ['warn','Primer periodo de desfase',rd.ok?'Recursar sin dictamen · ETS':'Recursar · ETS'];
-        return ['bad',`Desfasada en ${P(meta)}`,'Debes inscribirla para reinscribirte'];
-      }
-      if(f.estado==='riesgo')return ['warn',`Acredítala en ${P(meta)}`,rc||`o se desfasa en ${P(meta+1)}`];
-      if(f.estado==='reciente')return ['',`Plazo: ${P(f.limite)}`,rc||'Recursar o ETS'];
-      return ['','Sin periodo','Actualiza tus datos del SAES'];
-    };
-    // ETS próximo del calendario (inscripción o aplicación): aviso propio, aparte del veredicto de desfase
-    const etsB=(()=>{if(!tr().fail.length)return '';const hoy=new Date();hoy.setHours(0,0,0,0);
-      const L=DATA.calendario?.actividades||[], i=L.findIndex(x=>x.para==='adeudo'&&new Date((x.hasta||x.desde)+'T00:00:00')>=hoy);if(i<0)return '';const a=L[i];
-      return `<div class="aviso ok"><b>Puedes presentar ETS ${info('Examen a título de suficiencia: acreditas la materia con un examen de todo su temario, sin volver a cursarla.')}</b><span>${esc(a.titulo)}: ${a.hasta?'hasta el '+fechaCal(a.hasta):'el '+fechaCal(a.desde)}.</span>`+
-        `<small><button class="link" type="button" data-calver-ver="${i}">Ver cómo</button></small></div>`})();
-    const veredicto=(()=>{if(!rd?.n)return '';
-      const tipos=Object.values(rd.por), dict=tipos.some(t=>t!=='oficio'), sc=(DATA.calendario.actividades||[]).find(a=>a.para==='sincita');
-      if(rd.ok)return `<div class="aviso ok"><b>Puedes recursar sin dictamen</b><span>Inscríbete en ventanillas el ${fechaCal(rd.R.fecha)}.</span><small>Tope: ${fmtCr(rd.tope)} cr</small></div>`;
-      return `<div class="aviso bad" title="${dict?'':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+' materias en su primer periodo de desfase.'}"><b>${dict?`Sin dictamen vigente no puedes reinscribirte en ${esc(DATA.calendario.periodo)}`:`Tienes más de ${rd.R.maxDesfasadas} desfasadas`}</b>`+
-        `<span>${dict?'Tramítalo para el siguiente periodo.':'La autorización sin dictamen cubre hasta '+rd.R.maxDesfasadas+'.'}</span><small>Revisa tu situación en ventanillas${sc?' el '+fechaCal(sc.desde):''}</small></div>`;
-    })();
-    const items=[...dS.map(k=>({k,cls:'desfasada',p:['bad','Desfasada según el SAES','Debes inscribirla para reinscribirte'],tip:k})),
-      ...fis.map(f=>({k:f.k,cls:f.estado,p:fila(f),tip:`${f.k}${f.idx!=null?' · reprobada por primera vez en '+perName(f.idx):''}${f.veces?` · cursada ${f.veces} ${f.veces==1?'vez':'veces'}`:''}`}))];
-    $('#desf').innerHTML=items.length?(veredicto||etsB?`<div class="avisos">${veredicto}${etsB}</div>`:'')+`<ul class="desf">${items.map(x=>`<li class="${x.cls}" title="${esc(x.tip)}"><b>${esc(pretty(c[x.k][0]))}</b><span class="dpill ${x.p[0]}">${x.p[1]}</span><small>${x.p[2]}</small></li>`).join('')}</ul>`:'';
-    $('#desf-note').textContent=fis.length?(DATA.calendario?.notaDesfase||'Una materia reprobada se considera desfasada cuando transcurren más de dos periodos sin acreditarla.'):'';
-    renderCalendario(rd,nDes);
-    {const f=new Date(A.leido);$('#est-src').textContent=isNaN(f)?'Leído del SAES':'Leído del SAES el '+f.toLocaleDateString('es-MX',{dateStyle:'medium'})}
-    {const m=avisoActualizar(A),el=$('#est-act');el.hidden=!m;el.innerHTML=m?m+' <button class="link" type="button" data-saes-open>Actualizar mis datos</button>':''}
-    renderEqvHorario(A);
+    const A=ALUMNO, meta=perMeta(), curso=tr().curso;
+    const situacion=situacionDatos();
+    renderCalendario(situacion.rd,situacion.nDes);
     const ec=tr().enCurso, pr=tr().pendRep;$('#est-sim').hidden=!ec.length&&!pr.length;$('#sim-tag').hidden=!tr().sim;
     const calSel=(k,attr,v,esc_=[10,9,8,7,6])=>`<select data-${attr}="${k}" aria-label="Calificación"${SIM.on?'':' disabled'}>${esc_.map(n=>`<option${+v===n?' selected':''}>${n}</option>`).join('')}</select>`;
     $('#est-sim').innerHTML=ec.length||pr.length?`<label class="tgl" title="Simulación: no modifica tus datos del SAES"><input type="checkbox" id="sim-on"${SIM.on?' checked':''}><span class="tgl-ui" aria-hidden="true"></span><span>Simular fin de semestre</span></label>`+(SIM.on&&(Object.keys(SIM.res).length||Object.keys(SIM.rec).length||Object.keys(SIMBLK).length)?`<button type="button" class="link sim-reset" id="sim-reset" title="Regresa todas las materias a su valor inicial (en curso aprobadas con 8 y reprobadas pendientes) y todos los bloques a mostrar la simulación">Reiniciar simulación</button>`:'')+
@@ -966,8 +913,13 @@ function renderAnalisis(D){
     </div>`;
 }
 
-function renderTray(){if(SATE.modulos.mapa){renderMap();renderList()}renderSide();renderStats()}
-function renderHor(){renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv()}
+function renderTray(){
+  if(SATE.actual?.pestana==='situacion'){SATE.modulos.situacion?.mostrar();return}
+  if(SATE.modulos.mapa){renderMap();renderList()}renderSide();renderStats();
+  $('.estado').hidden=SATE.actual?.pestana!=='desempeno'||!isPersonal();
+  $('#stats-btn').hidden=SATE.actual?.pestana!=='desempeno'||!isPersonal();
+}
+function renderHor(){if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv()}
 /* Equivalencias con otras carreras de la misma unidad (tabla «Equivalencia de Materias» del SAES): solo consulta.
    Cada unidad decide cómo aplicarlas; no cambian el avance, la seriación ni el generador de horarios. */
 function renderEquiv(){

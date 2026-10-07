@@ -48,7 +48,7 @@ for (const f of archivos('web/sate').filter(f=>f.endsWith('.js')).concat(archivo
   new vm.Script(leer(f),{filename:f}); scripts++;
 }
 // Parsear también el ámbito global conjunto detecta declaraciones duplicadas entre módulos.
-new vm.Script(['nucleo.js','mapa.js','horarios.js','desempeno.js','exportacion.js'].map(n=>leer('web/dist/sate/'+n)).join('\n'));
+new vm.Script(['nucleo.js','situacion.js','mapa.js','horarios.js','desempeno.js','exportacion.js'].map(n=>leer('web/dist/sate/'+n)).join('\n'));
 const inicial = leer('web/dist/sate/index.html');
 assert.ok(!inicial.includes('class="ipnt-home"'));   // SATE no enlaza a la portada del proyecto
 assert.ok(!inicial.includes('id="saes-dlg"'));
@@ -71,7 +71,7 @@ const medidas = {};
 for (const u of Object.keys(config)) {
   const nucleo=statSync('web/dist/sate/datos/'+u+'/nucleo.json').size;
   const oferta=statSync('web/dist/sate/datos/'+u+'/oferta.json').size;
-  medidas[u]={cascaronNucleo:base+nucleo,vistaInicial:base+nucleo+oferta+statSync('web/dist/sate/mapa.js').size,presupuesto:160000,
+  medidas[u]={cascaronNucleo:base+nucleo,situacion:config[u].pestanas.includes('situacion')?base+nucleo+statSync('web/dist/sate/situacion.js').size:null,vistaInicial:base+nucleo+oferta+statSync('web/dist/sate/mapa.js').size,presupuesto:160000,
     pendientes:{html:statSync('web/dist/sate/index.html').size,nucleoJS:statSync('web/dist/sate/nucleo.js').size,datosNucleo:nucleo,oferta}};
 }
 console.log(JSON.stringify({pruebas,scripts,bytes:medidas},null,2));

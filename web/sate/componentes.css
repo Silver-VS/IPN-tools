@@ -1,6 +1,18 @@
 /* Componentes de SATE: solo variables --ipn-* (vendor/ipn-comun/dist/tokens.css). */
 .sate-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sate-sin-scroll{overflow:hidden}
+.situacion-cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--ipn-esp-3);margin:var(--ipn-esp-4) 0}
+.situacion-cifra{display:flex;flex-direction:column;gap:var(--ipn-esp-2);padding:var(--ipn-esp-3);background:var(--ipn-superficie);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);color:var(--ipn-texto)}
+.situacion-cifra b{font-size:var(--ipn-tamano-l)}
+.situacion-cifra progress{width:100%;accent-color:var(--ipn-acento)}
+.situacion-materias{padding:0;list-style:none}
+.situacion-materias li{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);padding:var(--ipn-esp-2) 0;border-bottom:1px solid var(--ipn-linea)}
+.situacion-materias li>span:first-child{flex:1;min-width:9rem}
+.situacion-pill{padding:var(--ipn-esp-1) var(--ipn-esp-2);border-radius:var(--ipn-radio);background:var(--ipn-aviso-suave);color:var(--ipn-aviso);font-size:var(--ipn-tamano-xs)}
+.situacion-fuente{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+#sate-situacion>.sate-chips{margin-bottom:var(--ipn-esp-3)}
+#sate-situacion .sate-globo{max-height:60dvh;overflow:auto}
+@media(max-width:720px){.situacion-cifras{grid-template-columns:repeat(2,minmax(0,1fr))}#sate-situacion .sate-avisos{grid-template-columns:1fr}body[data-sate-pestana=situacion] .bar-top{gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-2)}}
 :where(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary){font:inherit;color:inherit}
 :is(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 
