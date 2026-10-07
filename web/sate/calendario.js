@@ -14,6 +14,7 @@
   let vista='periodo';try{if(localStorage.getItem('hu.cal.vista')==='mes')vista='mes'}catch{}
   let mes=null, foco=null, modo='mes', semana=null, periodo=null, planeadoAnterior=null, detalleActual=null, panel;
   const seleccion=new Set(api.categorias);
+  let actualizarSeleccion=()=>{};
   function boton(texto,accion,id){const b=el('button',texto,'sate-btn');b.type='button';if(id)b.id=id;b.onclick=accion;return b}
   function redibujar(id){mostrar();if(id)document.getElementById(id)?.focus()}
   function segmento(opciones,actual,nombre,cambiar){
@@ -21,8 +22,9 @@
     opciones.forEach(([id,clave])=>{const b=boton(tx(clave),()=>{cambiar(id);redibujar('cal-'+nombre+'-'+id)},'cal-'+nombre+'-'+id);b.setAttribute('aria-pressed',id===actual);g.appendChild(b)});return g;
   }
   function pintarDetalle(){
+    actualizarSeleccion();
     panel.replaceChildren();const titulo=el('h3',detalleActual?.titulo||tx('detalle'));titulo.id='cal-detalle-titulo';titulo.tabIndex=-1;panel.appendChild(titulo);
-    if(!detalleActual){panel.appendChild(el('p',tx('elige_evento')));return}
+    if(!detalleActual){panel.appendChild(el('p',tx('sin_eventos')));return}
     if(!detalleActual.eventos.length)panel.appendChild(el('p',tx('sin_eventos')));
     detalleActual.eventos.forEach(e=>{const s=el('section',null,'calendario-detalle-evento');s.setAttribute('data-categoria',e.categoria);s.appendChild(el('h4',e.titulo));s.appendChild(el('p',tx('categoria_'+e.categoria),'calendario-categoria'));s.appendChild(el('p',rango(e)));if(e.nota||e.texto)s.appendChild(el('p',e.nota||e.texto));s.appendChild(el('p',tx('fuente',{fuente:e.fuente}),'calendario-fuente'));panel.appendChild(s)});
   }
@@ -47,7 +49,8 @@
     const anillo=svg('svg',{viewBox:`0 0 ${tam} ${tam}`,class:'calendario-anillo','aria-label':tx('grafico_periodo',{periodo}),role:'group'});
     const banda=svg('svg',{viewBox:`0 0 640 ${90+n*30}`,class:'calendario-banda','aria-label':tx('grafico_periodo',{periodo}),role:'group'});
     const x=s=>24+(numero(s)-numero(desde))/total*592;
-    for(let p=0;p<n;p++){anillo.appendChild(svg('circle',{cx:centro,cy:centro,r:exterior-p*18,class:'calendario-pista'}));banda.appendChild(svg('line',{x1:24,x2:616,y1:55+p*30,y2:55+p*30,class:'calendario-pista'}))}
+    if(items.length)anillo.appendChild(svg('circle',{cx:centro,cy:centro,r:exterior,class:'calendario-pista'}));
+    for(let p=0;p<n&&items.length;p++)banda.appendChild(svg('line',{x1:24,x2:616,y1:55+p*30,y2:55+p*30,class:'calendario-pista'}));
     for(let s=desde;s<=hasta;s=sumar(s,1)){
       if(date(s).getDay()===1){linea(anillo,ang(s),exterior+8,exterior+13,'calendario-tick');banda.appendChild(svg('line',{x1:x(s),x2:x(s),y1:34,y2:40,class:'calendario-tick'}))}
       if(s===desde||s.endsWith('-01')){
@@ -60,11 +63,14 @@
     }
     const t=svg('text',{x:centro,y:centro-10,'text-anchor':'middle',class:'calendario-svg-periodo'});t.textContent=tx('periodo_nombre',{periodo});anillo.appendChild(t);
     const subt=svg('text',{x:centro,y:centro+17,'text-anchor':'middle',class:'calendario-svg-mes'});subt.textContent=tx('semanas',{n:Math.ceil(total/7)});anillo.appendChild(subt);
+    const marcas=[], filas=[];let bajoMouse=null, bajoFoco=null;
+    const destacar=()=>{const activo=bajoMouse||bajoFoco;for(const {e,nodo} of [...marcas,...filas]){nodo.setAttribute('data-resaltado',e===activo);nodo.setAttribute('data-atenuado',!!activo&&e!==activo)}};
     items.forEach(({e,pista})=>{
       const r=exterior-pista*18, a=ang(e.desde), b=ang(sumar(e.hasta,1))-.008, puntual=e.desde===e.hasta;
       const p=punto(a+.004,r),q=punto(b,r), marca=puntual?svg('circle',{cx:p[0],cy:p[1],r:6}):svg('path',{d:`M ${p[0]} ${p[1]} A ${r} ${r} 0 ${b-a>Math.PI?1:0} 1 ${q[0]} ${q[1]}`});
       const y=55+pista*30, lineal=puntual?svg('circle',{cx:x(e.desde),cy:y,r:7}):svg('line',{x1:x(e.desde),x2:x(sumar(e.hasta,1)),y1:y,y2:y});
       for(const m of [marca,lineal]){m.setAttribute('class','calendario-arco');m.setAttribute('data-categoria',e.categoria);m.setAttribute('data-pista',pista);m.setAttribute('data-desde',e.desde);m.setAttribute('data-hasta',e.hasta);m.setAttribute('tabindex','0');m.setAttribute('role','button');m.setAttribute('aria-label',e.titulo+'. '+rango(e));const title=svg('title');title.textContent=e.titulo+'. '+rango(e);m.appendChild(title);m.onclick=()=>abrir([e],tx('detalle'));m.onkeydown=k=>{if(k.key==='Enter'||k.key===' '){k.preventDefault();m.onclick()}}}
+      for(const m of [marca,lineal]){marcas.push({e,nodo:m});m.onmouseenter=()=>{bajoMouse=e;destacar()};m.onmouseleave=()=>{bajoMouse=null;destacar()};m.onfocus=()=>{bajoFoco=e;destacar()};m.onblur=()=>{bajoFoco=null;destacar()}}
       anillo.appendChild(marca);banda.appendChild(lineal);
     });
     if(api.hoy()>=desde&&api.hoy()<=hasta){
@@ -72,8 +78,11 @@
       banda.appendChild(svg('line',{x1:x(api.hoy()),x2:x(api.hoy()),y1:30,y2:68+(n-1)*30,class:'calendario-aguja'}));const hb=svg('text',{x:Math.max(42,Math.min(595,x(api.hoy()))),y:90+(n-1)*30,'text-anchor':'middle',class:'calendario-svg-hoy'});hb.textContent=tx('hoy');banda.appendChild(hb);
     }
     contenido.appendChild(el('p',tx('rango',{desde:fecha(desde),hasta:fecha(hasta)}),'calendario-rango'));contenido.appendChild(anillo);contenido.appendChild(banda);
+    const leyenda=el('ul',null,'calendario-categorias');leyenda.setAttribute('aria-label',tx('categorias_presentes'));
+    api.categorias.filter(c=>eventos.some(e=>e.categoria===c)).forEach(c=>{const li=el('li',null);li.setAttribute('data-categoria',c);const muestra=el('span',null,'calendario-muestra');muestra.setAttribute('aria-hidden','true');li.appendChild(muestra);li.appendChild(el('span',tx('categoria_'+c)));leyenda.appendChild(li)});contenido.appendChild(leyenda);
     const procesos=el('section',null,'calendario-lista');procesos.appendChild(el('h3',tx('procesos')));const lista=el('ul',null,'calendario-procesos');
-    items.forEach(({e})=>{const li=el('li'), b=boton('',()=>abrir([e],tx('detalle')));b.className='calendario-proceso';b.setAttribute('data-categoria',e.categoria);b.appendChild(el('span',e.titulo));b.appendChild(el('small',rango(e)));li.appendChild(b);lista.appendChild(li)});procesos.appendChild(lista);
+    items.forEach(({e})=>{const li=el('li'), b=boton('',()=>abrir([e],tx('detalle')));b.className='calendario-proceso';b.setAttribute('data-categoria',e.categoria);b.appendChild(el('span',e.titulo));b.appendChild(el('small',rango(e)));filas.push({e,nodo:b});li.appendChild(b);lista.appendChild(li)});procesos.appendChild(lista);
+    actualizarSeleccion=()=>{for(const {e,nodo} of [...marcas,...filas])nodo.setAttribute('aria-pressed',!!detalleActual?.eventos.includes(e))};
     if(!eventos.length)procesos.appendChild(el('p',tx('sin_eventos')));return procesos;
   }
   function mesGrafico(contenido,todos,eventos){
@@ -104,7 +113,7 @@
     }contenido.appendChild(grid);if(!eventos.some(e=>e.desde<=fin&&e.hasta>=inicio))contenido.appendChild(el('p',tx('sin_eventos')));
   }
   function mostrar(){
-    const box=document.getElementById('sate-calendario'), eventos=api.eventos(), opciones=periodos(eventos);box.replaceChildren();box.appendChild(el('h2',SATE.texto('sate.pestana.calendario.titulo')));
+    const box=document.getElementById('sate-calendario'), eventos=api.eventos(), opciones=periodos(eventos);actualizarSeleccion=()=>{};box.replaceChildren();box.appendChild(el('h2',SATE.texto('sate.pestana.calendario.titulo')));
     if(!eventos.length){box.appendChild(el('p',tx('sin_eventos')));return}
     const planeado=typeof perMeta==='function'?perName(perMeta()):DATA.calendario?.periodo;
     if(planeado!==planeadoAnterior||!opciones.includes(periodo)){periodo=opciones.includes(planeado)?planeado:opciones.includes(DATA.calendario?.periodo)?DATA.calendario.periodo:opciones.at(-1);planeadoAnterior=planeado;mes=null;semana=null;detalleActual=null}
@@ -113,7 +122,14 @@
     const label=el('label',tx('periodo'),'calendario-selector'), select=el('select');select.id='cal-periodo';select.setAttribute('aria-label',tx('periodo'));opciones.forEach(p=>{const o=el('option',tx('periodo_nombre',{periodo:p}));o.value=p;o.selected=p===periodo;select.appendChild(o)});select.onchange=()=>{periodo=select.value;mes=null;semana=null;detalleActual=null;redibujar('cal-periodo')};label.appendChild(select);controles.appendChild(label);box.appendChild(controles);
     const filtros=el('fieldset',null,'calendario-filtros');filtros.appendChild(el('legend',tx('filtros')));api.categorias.forEach(c=>{const label=el('label',null,'calendario-filtro');label.setAttribute('data-categoria',c);const check=el('input');check.type='checkbox';check.id='cal-filtro-'+c;check.checked=seleccion.has(c);check.onchange=()=>{check.checked?seleccion.add(c):seleccion.delete(c);detalleActual=null;redibujar(check.id)};label.appendChild(check);label.appendChild(el('span',tx('categoria_'+c)));filtros.appendChild(label)});box.appendChild(filtros);
     const todos=eventos.filter(e=>e.periodo===periodo), visibles=todos.filter(e=>seleccion.has(e.categoria)), layout=el('div',null,'calendario-layout'), contenido=el('div',null,'calendario-contenido');panel=el('aside',null,'calendario-detalle');panel.setAttribute('aria-labelledby','cal-detalle-titulo');layout.appendChild(contenido);layout.appendChild(panel);box.appendChild(layout);
-    if(vista==='periodo')box.appendChild(periodoGrafico(contenido,todos,visibles));else mesGrafico(contenido,todos,visibles);pintarDetalle();box.appendChild(el('p',tx(vista==='periodo'?'leyenda_periodo':'leyenda_mes'),'calendario-leyenda'));
+    if(vista==='periodo')box.appendChild(periodoGrafico(contenido,todos,visibles));else mesGrafico(contenido,todos,visibles);
+    if(!detalleActual){
+      const ordenados=[...visibles].sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta));
+      // Si terminó el periodo, conservar un detalle útil sin inventar fechas futuras.
+      const proximo=ordenados.find(e=>e.desde>api.hoy())||ordenados.find(e=>e.hasta>=api.hoy())||ordenados.at(-1);
+      detalleActual={eventos:proximo?[proximo]:[],titulo:tx('detalle')};
+    }
+    pintarDetalle();box.appendChild(el('p',tx(vista==='periodo'?'leyenda_periodo':'leyenda_mes'),'calendario-leyenda'));
   }
   SATE.pestana('calendario',{montar(){},mostrar,ocultar(){}});
 })();

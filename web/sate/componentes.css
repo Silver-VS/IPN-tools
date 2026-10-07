@@ -52,7 +52,13 @@ body.sate-flotante #sate-tabs{display:none}
   .title-row .header-actions button{width:2rem;height:2rem;padding:0;justify-content:center}
   .header-actions .enc-btn span,.header-actions .ipnt-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
-#sate-calendario{color:var(--ipn-texto);min-width:0}
+/* Paleta local: los tokens comunes aún no ofrecen seis categorías ni data-theme. */
+#sate-calendario{--ipn-cal-academico:var(--ipn-acento);--ipn-cal-gestion:var(--ipn-info);--ipn-cal-becas:var(--ipn-ok);--ipn-cal-servicios:#086e79;--ipn-cal-tt:#7544a5;--ipn-cal-feriado:var(--ipn-aviso);color:var(--ipn-texto);min-width:0}
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme=light]) #sate-calendario{--ipn-cal-gestion:#8db6f5;--ipn-cal-servicios:#5dd8df;--ipn-cal-tt:#c6a0ee;--ipn-cal-feriado:#f5c56b}
+}
+[data-theme=dark] #sate-calendario{--ipn-cal-gestion:#8db6f5;--ipn-cal-servicios:#5dd8df;--ipn-cal-tt:#c6a0ee;--ipn-cal-feriado:#f5c56b}
+[data-theme=light] #sate-calendario{--ipn-cal-gestion:#1f5fad;--ipn-cal-feriado:#8a5a00}
 #sate-calendario *{box-sizing:border-box}
 .calendario-intro,.calendario-leyenda,.calendario-rango{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s);line-height:1.6}
 .calendario-controles,.calendario-nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-4)}
@@ -75,21 +81,29 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-detalle-evento p{color:var(--ipn-texto);margin-block:var(--ipn-esp-2)}
 .calendario-detalle-evento .calendario-fuente{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
 .calendario-detalle-evento .calendario-categoria{color:inherit;font-weight:600;font-size:var(--ipn-tamano-xs)}
-/* Guinda y zinc; la categoría también se expresa con texto y trazos, no solo color. */
-#sate-calendario [data-categoria=academico]{color:var(--ipn-acento)}
-#sate-calendario [data-categoria=gestion]{color:var(--ipn-acento-fuerte)}
-#sate-calendario [data-categoria=becas]{color:var(--ipn-tenue)}
-#sate-calendario [data-categoria=servicios]{color:var(--ipn-texto)}
-#sate-calendario [data-categoria=tt]{color:var(--ipn-acento);stroke-dasharray:4 3;border-left-style:dashed}
-#sate-calendario [data-categoria=feriado]{color:var(--ipn-tenue);stroke-dasharray:2 3;border-left-style:dotted}
+/* Texto y trazos conservan el significado al prescindir del color. */
+#sate-calendario [data-categoria=academico]{color:var(--ipn-cal-academico)}
+#sate-calendario [data-categoria=gestion]{color:var(--ipn-cal-gestion)}
+#sate-calendario [data-categoria=becas]{color:var(--ipn-cal-becas)}
+#sate-calendario [data-categoria=servicios]{color:var(--ipn-cal-servicios)}
+#sate-calendario [data-categoria=tt]{color:var(--ipn-cal-tt);stroke-dasharray:4 3;border-left-style:dashed}
+#sate-calendario [data-categoria=feriado]{color:var(--ipn-cal-feriado);stroke-dasharray:2 3;border-left-style:dotted}
+.calendario-categorias{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--ipn-esp-2) var(--ipn-esp-4);list-style:none;padding:0;margin-block:var(--ipn-esp-3);font-size:var(--ipn-tamano-xs)}
+.calendario-categorias li{display:flex;align-items:center;gap:var(--ipn-esp-2)}
+.calendario-muestra{width:1.25rem;border-top:4px solid currentColor;border-radius:2px}
+[data-categoria=tt] .calendario-muestra{border-top-style:dashed}
+[data-categoria=feriado] .calendario-muestra{border-top-style:dotted}
 .calendario-anillo{display:block;width:100%;max-width:36rem;margin-inline:auto;height:auto}
 .calendario-banda{display:none;width:100%;height:auto}
-.calendario-pista{fill:none;stroke:var(--ipn-linea);stroke-width:10}
-.calendario-tick{stroke:var(--ipn-tenue);stroke-width:1}
+.calendario-pista{fill:none;stroke:var(--ipn-linea);stroke-width:1;opacity:.45}
+.calendario-tick{stroke:var(--ipn-tenue);stroke-width:1;opacity:.55}
 .calendario-arco{fill:none;stroke:currentColor;stroke-width:11;stroke-linecap:round;cursor:pointer}
 circle.calendario-arco{fill:currentColor;stroke-width:2}
 .calendario-arco:hover,.calendario-arco:focus-visible{stroke-width:15;outline:2px solid var(--ipn-acento);outline-offset:4px}
-.calendario-aguja{stroke:var(--ipn-texto);stroke-width:2;stroke-dasharray:3 3;pointer-events:none}
+.calendario-arco[data-atenuado=true],.calendario-proceso[data-atenuado=true]{opacity:.35}
+.calendario-proceso[data-resaltado=true],.calendario-proceso[aria-pressed=true]{background:color-mix(in srgb,currentColor 10%,var(--ipn-superficie));box-shadow:inset 0 0 0 1px currentColor}
+.calendario-arco[aria-pressed=true]{stroke-width:14}
+.calendario-aguja{stroke:var(--ipn-acento);stroke-width:2;pointer-events:none}
 .calendario-svg-mes{fill:var(--ipn-tenue);font-family:var(--ipn-fuente-texto);font-size:14px}
 .calendario-svg-periodo{fill:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:24px;font-weight:600}
 .calendario-svg-hoy{fill:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:14px;font-weight:600;pointer-events:none}
@@ -110,10 +124,12 @@ circle.calendario-arco{fill:currentColor;stroke-width:2}
 .calendario-celda:last-child{border-right:0}
 .calendario-dia{width:100%;min-height:2.75rem;border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-s);text-align:center;padding:0;cursor:pointer}
 .calendario-fuera .calendario-dia{color:var(--ipn-tenue)}
-.calendario-dia[aria-current=date]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);font-weight:700}
-.calendario-feriado .calendario-dia{border-bottom:2px dotted var(--ipn-tenue)}
+.calendario-dia[aria-current=date]{width:2.75rem;max-width:100%;aspect-ratio:1;border:2px solid var(--ipn-acento);border-radius:50%;background:color-mix(in srgb,var(--ipn-acento) 10%,var(--ipn-superficie));color:var(--ipn-texto);font-weight:700}
+.calendario-celda:has([aria-current=date]){text-align:center}
+.calendario-feriado .calendario-dia{border-bottom:2px dotted var(--ipn-cal-feriado)}
 .calendario-barras{gap:var(--ipn-esp-1) 0;position:relative;grid-auto-rows:1.5rem;padding-top:var(--ipn-esp-1)}
-.calendario-pill{min-width:0;width:100%;min-height:1.5rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;border:0;border-left:3px solid currentColor;border-bottom:1px solid currentColor;border-radius:4px;padding:1px var(--ipn-esp-1);background:var(--ipn-hundido);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-xs);cursor:pointer}
+.calendario-pill{min-width:0;width:100%;min-height:1.5rem;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:left;border:0;border-left:3px solid currentColor;border-radius:4px;padding:1px var(--ipn-esp-1);background:color-mix(in srgb,currentColor 8%,var(--ipn-superficie));font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-xs);cursor:pointer}
+.calendario-pill[data-continua=false]{border-radius:999px;border-left-width:5px}
 .calendario-mas{margin-top:var(--ipn-esp-1)}
 .calendario-mas .sate-btn{min-width:0;min-height:2rem;padding:0;font-size:var(--ipn-tamano-xs);color:var(--ipn-acento);border:0;background:transparent;white-space:nowrap}
 :is(.calendario-dia,.calendario-pill,.calendario-proceso,.calendario-filtro input,.calendario-selector select):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
