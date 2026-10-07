@@ -792,7 +792,7 @@ function pmReparto(ks,x){let falta=Math.max(6*ks.length,Math.min(10*ks.length,Ma
 function pmCombinacion(M){const ec=tr().enCurso, g=store.get('pmCal.'+S.car,{}), base=pmReparto(ec,M.periodo!=null&&M.periodo<=10?Math.max(6,M.periodo):10);
   return Object.fromEntries(ec.map(k=>[k,g[k]>=6&&g[k]<=10?g[k]:base[k]]))}
 function renderStats(){
-  if(SATE.actual?.pestana==='desempeno')return SATE.modulos.desempeno?.mostrar();
+  if(SATE.actual?.pestana==='trayectoria')return SATE.modulos.trayectoria?.mostrar();
 }
 
 /* ---------- análisis descriptivo: hechos y antecedentes, sin pronosticar notas ---------- */
@@ -842,8 +842,7 @@ function analisis(){
 }
 function renderTray(){
   renderSimGlobal();
-  if(SATE.actual?.pestana==='situacion'){SATE.modulos.situacion?.mostrar();return}
-  if(SATE.actual?.pestana==='desempeno'){renderStats();return}
+  if(SATE.actual?.pestana==='trayectoria'){renderStats();return}
   if(SATE.modulos.mapa){renderMap();conSim(usaSim('mapa'),()=>conPlan(renderList,0))}renderSide();
 }
 function renderHor(){if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv()}
@@ -1008,7 +1007,7 @@ $('#map-ayuda').addEventListener('click',()=>{
   SateUI.modal(SATE.texto('sate.planeacion.leer_mapa'),cuerpo);
 });
 $('#plan-supuesto').addEventListener('click',()=>SateUI.modal(SATE.texto('sate.planeacion.supuesto_titulo',{periodo:planEtiqueta(1)}),SATE.texto('sate.planeacion.supuesto'),{pequeno:true}));
-$('#plan-simular').addEventListener('click',()=>{SATE.simAbrir=true;SATE.ir('desempeno')});
+$('#plan-simular').addEventListener('click',()=>{SATE.simAbrir=true;SATE.ir('trayectoria')});
 $('#b-go').addEventListener('click',()=>{S.onlyWant=true;store.set('onlyWant',true);SATE.ir('horarios');window.scrollTo({top:0})});
 (()=>{
   const wrap=$('#mapwrap'), map=$('#map'), areas=$('#areas'), HEAD=30, GAIN=1.8, ZMAX=2.5;

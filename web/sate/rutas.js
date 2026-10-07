@@ -4,7 +4,8 @@
     if (!hash.startsWith('#/')) return null;
     const partes = hash.slice(2).split('?')[0].split('/');
     if (config[partes[0]]) unidad = partes.shift();
-    const pestaña = partes.shift() || 'mapa';
+    let pestaña = partes.shift() || 'mapa';
+    if (['situacion','desempeno'].includes(pestaña)) pestaña = 'trayectoria';
     if (!config[unidad] || !config[unidad].pestanas.includes(pestaña)) return null;
     if (partes.length && (pestaña !== 'tramites' || partes.length !== 1 || !config[unidad].tramites.includes(partes[0]))) return null;
     return { unidad, pestana: pestaña, tramite: partes[0] || null,

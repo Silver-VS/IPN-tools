@@ -117,3 +117,13 @@ button.sate-chip{cursor:pointer}
   .sate-barra__btn[aria-current=page]{color:var(--ipn-acento);border-top-color:var(--ipn-acento);font-weight:600}
   body:has(.sate-barra){padding-bottom:calc(48px + env(safe-area-inset-bottom,0px))}
 }
+
+/* La separación sigue los grupos del catálogo, también en la navegación móvil. */
+.sate-pestana.sate-grupo-inicio{margin-left:1rem;border-left:2px solid var(--ipn-linea)}
+.sate-barra__btn.sate-grupo-inicio{border-left:2px solid var(--ipn-linea);margin-left:.35rem}
+.trayectoria-resumen{font-weight:600;line-height:1.6}
+#sate-presente{display:grid;gap:.65rem;margin-bottom:1.5rem}
+#sate-presente[hidden]{display:none}
+.trayectoria-escenario{padding:1rem 0;border-block:1px solid var(--ipn-linea);margin:1rem 0}
+#sate-avisos-globales{margin-block:.65rem}
+@media(max-width:720px){.sate-barra__btn{min-width:0;padding-inline:.3rem;font-size:.72rem;overflow-wrap:anywhere}}

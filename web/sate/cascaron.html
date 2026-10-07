@@ -677,6 +677,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <!--__IPNT_HOME__-->
       <div class="title-row"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog">Cambiar unidad académica</button><div class="header-actions"><button class="enc-btn" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
       <p id="sate-nombre">/*__SATE_NOMBRE__*/</p><p id="sate-leyenda"></p>
+      <div id="sate-avisos-globales"></div>
     </div>
 <div id="sate-tabs"></div><button id="t-tray" hidden></button>
   </header>
@@ -694,9 +695,9 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 
   <div id="sate-simulacion" class="tag sim" role="status" hidden><span id="sate-simulacion-texto"></span> <button class="link" type="button" id="sate-simulacion-quitar"></button></div>
   <section id="sate-calendario" class="card" hidden></section>
-  <section id="sate-situacion" hidden></section>
-  <section id="sate-desempeno" class="card" hidden>
+  <section id="sate-trayectoria" class="card" hidden>
     <h2 id="desempeno-titulo"></h2>
+    <div id="sate-presente"></div>
     <div id="desempeno-vacio" hidden><p id="desempeno-vacio-texto"></p><button class="btn" type="button" id="desempeno-lector"></button> <button class="link" type="button" id="desempeno-demo" data-demo-open></button></div>
     <details class="sate-desp" id="desempeno-simulacion" hidden><summary id="desempeno-sim-titulo"></summary><div class="sate-desp__cuerpo est-sim" id="est-sim"></div></details>
     <div class="kstats" id="kstats" hidden></div>

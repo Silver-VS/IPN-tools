@@ -63,3 +63,7 @@
 |---|---|---|
 | `proyecto.apoyo.enlace` | Sin texto | Apoya el proyecto |
 | `proyecto.apoyo.ayuda` | Sin texto | Donar es voluntario; el proyecto es gratuito y lo mantiene un alumno del IPN. |
+
+## 2026.10.14
+
+Mi trayectoria une el presente y el desempeño; resumen, siguiente paso, metas y estado vacío por clave. Pestañas agrupadas y compatibilidad de rutas anteriores.

@@ -38,8 +38,8 @@ const texto=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+),\s*plural,\s*((?:[^
   const opciones=Object.fromEntries([...c.matchAll(/(=?\w+)\s*\{([^{}]*)\}/g)].map(x=>[x[1],x[2]]));
   return (opciones['='+v[k]]||opciones[v[k]===1?'one':'other']||opciones.other).replaceAll('#',String(v[k]));
 }).replace(/\{(\w+)\}/g,(m,k)=>v[k]??m);
-const desempenoHTML=html.split('id="sate-desempeno"')[1].split('id="v-tray"')[0];
-assert.ok(desempenoHTML.indexOf('id="desempeno-simulacion"')<desempenoHTML.indexOf('id="kstats"'),'B: simulador antes de estadísticas');
+const desempenoHTML=html.split('id="sate-trayectoria"')[1].split('id="v-tray"')[0];
+assert.ok(desempenoHTML.indexOf('id="sate-presente"')<desempenoHTML.indexOf('id="kstats"'),'B1: presente antes de estadísticas');
 assert.equal([...html.matchAll(/id="est-sim"/g)].length,1,'B: un solo simulador');
 const almacen = () => { const m=new Map(); return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k),key:i=>[...m.keys()][i],get length(){return m.size}}; };
 for (const unidad of ['upiita','escom','upibi']) {
@@ -131,7 +131,7 @@ for (const unidad of ['upiita','escom','upibi']) {
   assert.equal(prevenido,2,'Enter y espacio activan sin desplazar');
   assert.equal(vm.runInContext('planAsignado(clavePincel)',contexto),null,'teclado asigna y quita');
   nodos.get('#plan-simular').eventos.click();
-  assert.equal(SATE.destino,'desempeno','B: enlace directo a Desempeño');
+  assert.equal(SATE.destino,'trayectoria','B: enlace directo a Desempeño');
   assert.equal(SATE.simAbrir,true,'B: enlace solicita abrir el simulador existente');
   vm.runInContext(`
     // Fixture ficticio con cadena real: acredita en N todos los requisitos de una sucesora.
