@@ -17,7 +17,7 @@
   --f-mono:"Noto Sans Mono",ui-monospace,Consolas,monospace;
   --blk-s:42%; --blk-l:90%; --blk-fg:#2b2427; --blk-edge:40%; --own:#e6e1e3;
   --st-done:#c9c3c5; --st-done-fg:#4d4447; --st-late:#b8473f; --st-late-fg:#ffffff; --st-now:#3f7d5a; --st-now-fg:#ffffff; --st-rest:#ffffff;
-  --band:#f7f7f8; --edge:#a1a1aa; --rel-pre:#2f7fc1; --rel-post:#c7741a; --ch-alert:#d9480f; --g10:#1f7a47; --g9:#3d8b4f; --g8:#5f8a2c; --g7:#a8761a; --g6:#bf4b2c;
+  --band:#f7f7f8; --edge:#a1a1aa; --plan-segundo:#245b78; --plan-segundo-fg:#ffffff; --rel-pre:#2f7fc1; --rel-post:#c7741a; --ch-alert:#d9480f; --g10:#1f7a47; --g9:#3d8b4f; --g8:#5f8a2c; --g7:#a8761a; --g6:#bf4b2c;
   --n1:#8a98c7; --n2:#c48aa6; --n3:#73a183; --n4:#5b7f9e; --n5:#c9b07a; --n6:#9b86c4; --n7:#c99a7a; --n8:#6fa3a8;
   --r:12px;
   --glow1:rgba(117,9,70,.10); --glow2:rgba(179,142,93,.12); --shadow:0 1px 2px rgba(24,24,27,.05),0 8px 24px -14px rgba(24,24,27,.18);
@@ -28,7 +28,7 @@
   --ok:#6ee7a0; --ok-soft:#0f2a1c; --warn:#f5c56b; --warn-soft:#2f230b; --bad:#fda4b8; --bad-soft:#3a1520;
   --blk-s:30%; --blk-l:24%; --blk-fg:#ece6e9; --blk-edge:65%; --own:#26262a;
   --st-done:#4a4144; --st-done-fg:#cfc5c8; --st-late:#c96a62; --st-late-fg:#ffffff; --st-now:#5f9d78; --st-now-fg:#ffffff; --st-rest:#1c1c1f;
-  --band:#0f0f11; --edge:#52525b; --rel-pre:#64aee8; --rel-post:#e8a050; --ch-alert:#ff8a50; color-scheme:dark;
+  --band:#0f0f11; --edge:#52525b; --plan-segundo:#91c5df; --plan-segundo-fg:#10212b; --rel-pre:#64aee8; --rel-post:#e8a050; --ch-alert:#ff8a50; color-scheme:dark;
   --glow1:rgba(236,156,191,.16); --glow2:rgba(212,176,106,.10); --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px -16px rgba(0,0,0,.6);
 }}
 :root[data-theme="dark"]{
@@ -37,7 +37,7 @@
   --ok:#6ee7a0; --ok-soft:#0f2a1c; --warn:#f5c56b; --warn-soft:#2f230b; --bad:#fda4b8; --bad-soft:#3a1520;
   --blk-s:30%; --blk-l:24%; --blk-fg:#ece6e9; --blk-edge:65%; --own:#26262a;
   --st-done:#4a4144; --st-done-fg:#cfc5c8; --st-late:#c96a62; --st-late-fg:#ffffff; --st-now:#5f9d78; --st-now-fg:#ffffff; --st-rest:#1c1c1f;
-  --band:#0f0f11; --edge:#52525b; --rel-pre:#64aee8; --rel-post:#e8a050; --ch-alert:#ff8a50; color-scheme:dark;
+  --band:#0f0f11; --edge:#52525b; --plan-segundo:#91c5df; --plan-segundo-fg:#10212b; --rel-pre:#64aee8; --rel-post:#e8a050; --ch-alert:#ff8a50; color-scheme:dark;
   --glow1:rgba(236,156,191,.16); --glow2:rgba(212,176,106,.10); --shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 30px -16px rgba(0,0,0,.6);
 }
 *{box-sizing:border-box}
@@ -637,17 +637,24 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 :root,:root[data-theme],:root:not([data-theme]){--ipn-acento:var(--accent);--ipn-texto:var(--fg);--ipn-tenue:var(--muted);--ipn-superficie:var(--surface);--ipn-linea:var(--line)}
 @media(max-width:720px){#sate-tabs{display:none}}
 /*__CUENTA_CSS__*/
-.plan-top{display:flex;gap:16px;align-items:flex-start;margin-bottom:12px}
-.plan-top .mapcut{flex:0 1 340px;min-width:0;flex-direction:column;align-items:stretch;margin:0}
-.plan-top .mapcut-info{flex:auto;min-width:0}
-.plan-top .minimap svg{width:100%;max-height:180px}
-.plan-panel{flex:1;min-width:0}.plan-panel summary{flex-wrap:wrap}
-#plan-resumen{font-weight:400;font-variant-numeric:tabular-nums}
-.plan-panel .sate-desp__cuerpo{max-height:260px;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
-.plan-panel .card{padding:8px 0;margin:0;border:0;box-shadow:none}.plan-panel .wchips{overflow-wrap:anywhere}
-.plan-panel #plan-carga,.plan-panel #plan-supuesto{margin:6px 0}
-.plan-panel .actions{gap:6px}.plan-panel .btn{padding:6px 10px}
-@media(max-width:720px){.plan-top{flex-direction:column;gap:10px}.plan-top .mapcut,.plan-panel{width:100%;flex:auto}.plan-panel summary{flex-wrap:nowrap}.plan-panel #plan-titulo{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}#plan-resumen{white-space:nowrap;font-size:.8rem}.plan-panel .sate-desp__cuerpo{max-height:300px}}
+.plan-panel{margin-top:16px}
+.plan-grupos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.plan-grupo{min-width:0;border-top:3px solid var(--accent);padding-top:8px}
+.plan-grupo.plan-2{border-color:var(--plan-segundo)}
+.tl-row.want{border-right:3px solid var(--accent)}
+.tl-row.want.plan-2{border-right-color:var(--plan-segundo)}
+.tl-row.plan-2 .tl-want{color:var(--plan-segundo)}
+.tl-row.plan-2 .tl-want[aria-pressed="true"]{background:var(--plan-segundo);color:var(--plan-segundo-fg)}
+.plan-panel .wchips{overflow-wrap:anywhere}
+.plan-marca{font-weight:700;margin-right:4px}
+.box.want.plan-2,.box.want.plan-2.offered-no{background:var(--plan-segundo);border-color:var(--plan-segundo);color:var(--plan-segundo-fg)}
+.box.want::after{content:none}
+.box .plan-marca{position:absolute;top:1px;right:3px;margin:0;font-size:.95em}
+.plan-leyenda{display:flex;gap:12px;flex-wrap:wrap}
+.plan-leyenda span{border-left:4px solid var(--accent);padding-left:6px}
+.plan-leyenda .plan-2{border-color:var(--plan-segundo)}
+@media(max-width:720px){.plan-grupos{grid-template-columns:1fr}}
+
 </style>
 
 <!--__INST_HEADER__-->
@@ -682,42 +689,42 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   </section>
   <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
-    <!-- La planeación comparte solo la fila del minimapa; el mapa conserva todo el ancho. -->
+    <!-- El pincel cambia la asignación; ambos periodos permanecen visibles. -->
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
         <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
       </div>
+      <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button></div>
+      <span id="plan-activo" role="status" aria-live="polite"></span>
+      <div class="plan-leyenda" id="plan-leyenda"></div>
       <div class="legend" id="legend" aria-label="Simbología"></div>
       <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     </div>
-    <div class="plan-top">
     <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance <span id="mapcut-sim"></span></b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>
-    <details class="plan-panel sate-desp" id="plan-panel" open>
-      <summary><span id="plan-titulo"></span><span id="plan-resumen" role="status"></span></summary>
+    <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
+    <div class="tlist" id="tlist" hidden></div>
+    <div class="insp" id="insp" aria-live="polite"></div>
+    <ul class="mapnote" id="mapnote"></ul>
+    <section class="plan-panel" id="plan-panel" aria-labelledby="plan-titulo">
+      <h3 id="plan-titulo"></h3><p id="plan-resumen" role="status"></p>
       <div class="sate-desp__cuerpo">
-      <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button></div>
       <p id="plan-supuesto"></p>
       <button class="link" type="button" id="plan-simular"></button>
-      <p id="plan-carga" role="status"></p>
+      <p id="plan-carga" role="status" hidden></p>
     <div class="card chosenbar" aria-labelledby="h-chosen">
       <div class="cb-head">
         <h3 class="sub" id="h-chosen">Materias que quieres cursar</h3>
         <span class="muted" id="chosen-help"></span>
         <div class="actions"><button class="btn primary" id="b-go">Ver sus horarios</button><button class="btn" id="b-none">Quitar todas</button></div>
       </div>
-      <div class="wchips" id="chosen"></div>
+      <div class="plan-grupos" id="chosen"></div>
       <small id="chosen-req"></small>
     </div>
       <div class="card"><h3 class="sub" id="h-sugg">Sugeridas</h3><div class="sugg" id="sugg"></div>
         <div class="actions" style="margin-top:10px"><button class="btn" id="b-sugg">Elegir las sugeridas</button><button class="btn" id="b-all" title="Agrega al banco todas las materias que ya puedes cursar y tienen grupos; después indica en «Generar horarios» cuántas quieres llevar">Elegir todas las que puedes cursar</button></div></div>
       </div>
-    </details>
-    </div>
-    <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
-    <div class="tlist" id="tlist" hidden></div>
-    <div class="insp" id="insp" aria-live="polite"></div>
-    <ul class="mapnote" id="mapnote"></ul>
+    </section>
     <div class="below">
       <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
       <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>

@@ -1,12 +1,12 @@
-function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
+function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0,0))}
 function renderMap0(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
   $('#mapwrap').hidden=mv==='lista';$('#zoomseg').hidden=mv==='lista';$('#tlist').hidden=mv!=='lista';
   const L=MAP().layout, wrap=$('#mapwrap'), el=$('#map');
-  MARK=isPersonal()?{avail:new Set(Object.keys(cur()).filter(k=>cur()[k][3]==='O'&&available(k)&&!statusOf(k).includes('fail'))),sug:new Set(SHOWSUG?suggestions().list:[])}:{avail:new Set(),sug:new Set()};
+  MARK=conPlan(()=>isPersonal()?{avail:new Set(Object.keys(cur()).filter(k=>cur()[k][3]==='O'&&available(k)&&!statusOf(k).includes('fail'))),sug:new Set(SHOWSUG?suggestions().list:[])}:{avail:new Set(),sug:new Set()},S.planPaso);
   $('#sug-tgl').hidden=!isPersonal();$('#sug-on').checked=SHOWSUG;
-  const want=new Set(tr().want), off=offeredClaves(), pre=prereqs();
+  const want=planElegidas(), off=offeredClaves(), pre=prereqs();
   const done=new Set(tr().done), req=new Set([...ancestors(want)].filter(k=>!want.has(k)&&!done.has(k)));
   // cadena de requisitos y dependientes de la materia bajo el cursor
   let hot=null;
@@ -156,7 +156,7 @@ function slotFill(L,want){
 }
 function renderList(){
   if(mview()!=='lista')return;
-  const c=cur(), want=new Set(tr().want), off=offeredClaves(), sp=semOf(), me=isPersonal(), oblig=new Set(tr().oblig);
+  const c=cur(), off=offeredClaves(), sp=semOf(), me=isPersonal(), oblig=new Set(tr().oblig);
   const useSem=!porNiveles()&&Object.keys(c).some(k=>sp[k]), by={};
   Object.keys(c).forEach(k=>{const g=(useSem?sp[k]:null)||c[k][2];(by[g]=by[g]||[]).push(k)});
   const tag=k=>{const st=statusOf(k);
@@ -170,16 +170,11 @@ function renderList(){
     if(me&&MARK.avail.has(k))return['Puedes cursarla','ok'];
     return null};
   $('#tlist').innerHTML=Object.keys(by).sort((a,b)=>a-b).map(g=>`<section class="tl-sem"><h4>${useSem?'Semestre propuesto '+g:'Nivel '+g}</h4><div class="tl-rows">`+
-    by[g].sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b)).map(k=>{const t=tag(k), w=want.has(k), done=statusOf(k)==='done', ob=oblig.has(k), open=S.lfocus===k;
-      return `<div class="tl-row${done?' done':''}${w?' want':''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
+    by[g].sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b)).map(k=>{const t=tag(k), paso=planAsignado(k), w=paso===S.planPaso, done=statusOf(k)==='done', ob=oblig.has(k), open=S.lfocus===k;
+      return `<div class="tl-row${done?' done':''}${paso!=null?' want plan-'+(paso+1):''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
         `<button type="button" class="tl-name" data-lfocus="${k}" aria-expanded="${open}"><b>${esc(pretty(c[k][0]))}</b><small>${k} · ${fmtCr(c[k][1])} cr${off.has(k)||isElec(k)?'':' · sin grupos'}${t?` <span class="tl-tag ${t[1]}">${t[0]}</span>`:''}${ob?' <span class="tl-tag bad">Obligatoria</span>':''}</small></button>`+
-        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${w?'✓':'+'}</button>`+
+        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?paso+1:'+'}</button>`+
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
 
-SATE.pestana('mapa',{montar(){
-  const movil=matchMedia('(max-width:720px)'), panel=$('#plan-panel');
-  // Cambiar de ancho restablece la presentación; repintar materias conserva el plegado elegido.
-  const ajustar=()=>{panel.open=!movil.matches};
-  ajustar();movil.addEventListener('change',ajustar);
-},mostrar(){renderTray()},ocultar(){tipOculta()}});
+SATE.pestana('mapa',{montar(){},mostrar(){renderTray()},ocultar(){tipOculta()}});
