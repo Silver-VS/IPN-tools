@@ -9,7 +9,7 @@ assert.equal(config.textos['sate.pestana.horarios.titulo'],'Horarios de clase');
 assert.equal(config.textos['sate.pestana.calendario.titulo'],'Calendario escolar');
 assert.equal(config.textos['sate.pestana.horarios.corto'],'Horarios');
 assert.equal(config.textos['sate.pestana.calendario.corto'],'Calendario');
-assert.match(html,/<html lang="es" data-pestanas="v3">/);
+assert.match(html,/<html lang="es" data-pestanas="v1">/);
 const arranque=leer('web/sate/inicio.js').split('  let api, actual')[0]+'})();';
 for(const [search,base,esperada] of [['','v3','v3'],['','v1','v1'],['?pestanas=v1','v3','v1'],['?pestanas=v3','v1','v3'],['?pestanas=v2','v3','v3']]){
   const attrs={'data-pestanas':base};

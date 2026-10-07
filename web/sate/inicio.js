@@ -139,7 +139,19 @@
     }
   };
   document.getElementById('sate-titulo').textContent = texto('sate.siglas') + ' ' + cfg.siglas;
-  document.getElementById('sate-leyenda').textContent = cfg.leyenda ? texto('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas}) : '';
+  if (cfg.leyenda) {
+    const ayuda = SateUI.ayuda('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas});
+    const boton = ayuda.querySelector('button');
+    boton.textContent = texto('sate.encabezado.prueba');
+    boton.setAttribute('aria-label', texto('sate.encabezado.prueba'));
+    document.getElementById('sate-leyenda').appendChild(ayuda);
+  }
+  const menuDatos = document.getElementById('sate-datos-menu');
+  menuDatos.addEventListener('click', e => { if (e.target.closest('button')) menuDatos.open = false; });
+  document.addEventListener('click', e => { if (!menuDatos.contains(e.target)) menuDatos.open = false; });
+  menuDatos.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && menuDatos.open) { menuDatos.open = false; menuDatos.querySelector('summary').focus(); }
+  });
   const nombreUnidad = document.querySelector('.inst-name');
   if (nombreUnidad) nombreUnidad.textContent = cfg.nombre;
   if (cfg.logo) {

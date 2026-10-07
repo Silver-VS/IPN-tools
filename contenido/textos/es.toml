@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.18"
+version = "2026.10.19"
 
 [proyecto]
 nombre = "HADES"
@@ -23,6 +23,18 @@ siglas = "SATE"
 leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener errores: confirma siempre tu información en el SAES y en tu Gestión Escolar."
 
 # Pestañas. `titulo` va en escritorio; `corto` en la barra inferior del teléfono (una palabra).
+[sate.encabezado]
+unidad = "Cambiar unidad académica"
+carrera = "Carrera"
+prueba = "Fase de prueba ⓘ"
+datos = "Mis datos del SAES"
+datos_movil = "Mis datos"
+datos_acciones = "Opciones de mis datos del SAES"
+actualizar = "Actualizar"
+demo = "Probar con datos de ejemplo"
+datos_cargados = "Datos del SAES cargados. Selecciona para actualizarlos o eliminarlos."
+datos_opcionales = "Incorpora tu avance desde el SAES (opcional)"
+
 [sate.pestana.situacion]
 titulo = "Situación escolar"
 corto = "Situación"
