@@ -117,10 +117,10 @@
     S.gavoid = chance(.3) ? shuffle(DATA.prof || []).slice(0, ri(1, 4)) : [];
     Object.assign(GT, { a: chance(.2) ? pick(['08:00', '10:00']) : '', b: chance(.2) ? pick(['15:00', '20:00']) : '', n: '', src: chance(.5) ? 'todo' : '' });
 
-    revisar('render', () => { render(); return true }, ctx);
+    if (!globalThis.FUZZ_SIN_DOM) revisar('render', () => { render(); return true }, ctx);
     const cob = out.cobertura; if (isPersonal()) cob.personal++; else out.fallas.push({ caso: ctx, prueba: 'perfil personal', detalle: 'el perfil no se reconoce como del alumno (isPersonal=false)' });
     try { if (statsDatos().fin != null) cob.conFin++; if (suggestions().list.length) cob.conSugerencias++; if (tr().fail.length) cob.conReprobadas++; if (tr().curso.length) cob.conEnCurso++; if (tr().sim) cob.simulacion++; } catch (e) {}
-    revisar('estado general sin NaN/undefined', () => { const t = ($('#status')?.innerText || '') + ($('#desf')?.innerText || '') + ($('#est-act')?.innerText || ''); return textoMalo(t) && 'texto: ' + t.match(/.{0,40}(NaN|undefined|Infinity|\[object Object\]).{0,40}/)?.[0] }, ctx);
+    if (!globalThis.FUZZ_SIN_DOM) revisar('estado general sin NaN/undefined', () => { const t = ($('#status')?.innerText || '') + ($('#desf')?.innerText || '') + ($('#est-act')?.innerText || ''); return textoMalo(t) && 'texto: ' + t.match(/.{0,40}(NaN|undefined|Infinity|\[object Object\]).{0,40}/)?.[0] }, ctx);
     revisar('trayectoria coherente', () => {
       const t = tr(), done = new Set(t.done);
       if (t.curso.some(k => done.has(k))) return 'una materia acreditada aparece en curso';

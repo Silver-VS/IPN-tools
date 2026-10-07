@@ -7,12 +7,12 @@
       "leyenda": "prueba"
     },
     "escom": {
-      "pestanas": ["situacion", "mapa", "horarios", "desempeno"],
+      "pestanas": ["mapa", "horarios", "desempeno"],
       "tramites": [],
       "leyenda": "prueba"
     },
     "upibi": {
-      "pestanas": ["situacion", "mapa", "horarios", "desempeno"],
+      "pestanas": ["mapa", "horarios", "desempeno"],
       "tramites": [],
       "leyenda": "prueba"
     }

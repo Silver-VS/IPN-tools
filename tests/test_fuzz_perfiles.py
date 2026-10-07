@@ -20,13 +20,25 @@ SEMILLAS = [int(s) for s in os.environ.get('FUZZ_SEMILLAS', '1,2,3').split(',')]
 
 
 def pagina(unidad):
-    src = DIST / f'horarios-{unidad}.html'
+    src = DIST / 'sate/index.html'
     if not src.exists():
         return None
     html = src.read_text(encoding='utf-8')
-    html += ('\n<script>localStorage.setItem("ipnt.bienvenida","1");</script>\n<script>'
+    datos = {}
+    for bloque in ('nucleo', 'oferta', 'tramites'):
+        datos.update(json.loads((DIST / f'sate/datos/{unidad}/{bloque}.json').read_text(encoding='utf-8')))
+    # Fixture autocontenido: no fetch desde file:// ni redirección al cascarón.
+    arranque = ('<script>window.SATE_UNIDAD=' + json.dumps(unidad) + ';window.SATE_DATA='
+                + json.dumps(datos, ensure_ascii=False).replace('<', '\\u003c') + ';'
+                + "localStorage.setItem('ipnt.bienvenida','1');let QA_API;"
+                + "window.SATE={modulos:{},actual:{pestana:'mapa'},pestana(id,m){this.modulos[id]=m},"
+                + "error(e){throw e},nucleoListo(a){QA_API=a;return Promise.resolve()},ir(){},"
+                + "repintar(){QA_API.renderTop();QA_API.renderAviso();if(QA_API.estado.tab==='hor')QA_API.renderHor();else QA_API.renderTray()}};"
+                + '</script><script src="nucleo.js"></script><script src="mapa.js"></script><script src="horarios.js"></script>')
+    html = html.replace('<script src="inicio.js"></script>', arranque)
+    html += ('\n<script>document.getElementById("v-tray").hidden=false;SATE.repintar();</script>\n<script>'
              + FUZZ.read_text(encoding='utf-8') + '</script>\n')
-    out = DIST / f'qa-fuzz-{unidad}.html'
+    out = DIST / 'sate' / f'qa-fuzz-{unidad}.html'
     out.write_text(html, encoding='utf-8')
     return out
 
