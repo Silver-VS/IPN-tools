@@ -1174,6 +1174,8 @@ $('#b-unidad').addEventListener('click',()=>SATE.elegirUnidad());   // primera v
 SAES.status(ALUMNO);
 SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[carreraPerfil(d)]){S.car=carreraPerfil(d);store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
 
+// Alumno activo (respeta el modo demostración): lo usan los trámites de Ventanilla.
+SATE.alumno=()=>ALUMNO;
 SATE.nucleoListo({store,personal:()=>!!ALUMNO,renderTop,renderAviso,renderTray,renderHor,estado:S,ofertaLista:actualizarOferta}).catch(SATE.error);
 
 // El chip global también contempla las comparaciones activadas por bloque.

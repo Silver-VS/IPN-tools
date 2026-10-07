@@ -138,7 +138,7 @@
     return {boleta:a.boleta||'',carrera:a.carrera_nombre||a.carrera||'',plan:a.plan||'',correo:a.correo_institucional||a.correo||'',celular:a.celular||'',telefono:a.telefono||''};
   }
   function misDatos(box,volver=()=>mostrarLista(box)){
-    box.replaceChildren();const previo=leer('datos'),a=(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})();
+    box.replaceChildren();const previo=leer('datos'),a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})());
     const datos={...prellenar(a),...(previo?.datos||{})},campos=['paterno','materno','nombres','boleta','carrera','plan','correo','celular','telefono'];
     box.appendChild(el('h2',tx('datos_titulo')));box.appendChild(el('p',tx('datos_ayuda')));
     const controles={},resumen=el('p','');resumen.setAttribute('aria-live','polite');

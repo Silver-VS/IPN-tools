@@ -47,7 +47,7 @@
       }};
   }
   function definir(){
-    const base=SATE_DATA.dictamen,a=leer('saes.alumno'),alumno=a?.upiita_saes===1&&(a.unidad||'upiita')==='upiita'?a:{};
+    const base=SATE_DATA.dictamen,a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})()),alumno=a?.upiita_saes===1&&(a.unidad||'upiita')==='upiita'?a:{};
     const compartido=()=>{const v=leer('hu.tramite.datos');return v?.confirmado?v.datos:null};
     const datos=compartido()||{},catalogo=base.materias;
     const carrera=Object.entries(SATE_DATA.carreras||{}).find(([k,n])=>k===datos.carrera||n===datos.carrera)?.[0]||alumno.carrera;

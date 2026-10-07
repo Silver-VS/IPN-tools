@@ -7,7 +7,7 @@
   const compartidos=()=>leer('hu.tramite.datos');
   const identidad=()=>compartidos()?.confirmado?compartidos().datos:null;
   const carrera=()=>{const d=identidad();return Object.keys(CARN).find(k=>k===d?.carrera||R.norm(CARN[k])===R.norm(d?.carrera||''))};
-  const alumno=()=>{const a=leer('saes.alumno');return a?.upiita_saes===1&&(a.unidad||'upiita')==='upiita'?a:null};
+  const alumno=()=>{const a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})());return a?.upiita_saes===1&&(a.unidad||'upiita')==='upiita'?a:null};
   let fuente,recursos,carga;
   async function preparar(){
     if(!carga)carga=(async()=>{
