@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.10 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.planeacion.resumen` | Resumen de materias y carga en una línea para el módulo plegable junto al minimapa. |
+
 ## 2026-10-06 · 2026.10.9 · Codex
 
 | Claves | Cambio |

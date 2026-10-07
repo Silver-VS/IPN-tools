@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.9"
+version = "2026.10.10"
 
 [proyecto]
 nombre = "HADES"
@@ -346,6 +346,7 @@ horario_n = "El armado de horario corresponde a este primer periodo."
 agregar = "Agregar sugeridas"
 sugeridas = "Sugeridas para {periodo}"
 cuenta = "{n, plural, one {# materia} other {# materias}} · {creditos} créditos"
+resumen = "{n, plural, one {# materia} other {# materias}} · {creditos} de {tope} créditos"
 vacio = "Selecciona en el mapa las materias que deseas cursar."
 requisitos = "Según la seriación, conviene haber cursado antes: {materias}."
 carga = "{creditos} de {tope} créditos de carga autorizada o de referencia; {retenidos} retenidos por adeudos."

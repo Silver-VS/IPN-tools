@@ -177,4 +177,9 @@ function renderList(){
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
 
-SATE.pestana('mapa',{montar(){},mostrar(){renderTray()},ocultar(){tipOculta()}});
+SATE.pestana('mapa',{montar(){
+  const movil=matchMedia('(max-width:720px)'), panel=$('#plan-panel');
+  // Cambiar de ancho restablece la presentación; repintar materias conserva el plegado elegido.
+  const ajustar=()=>{panel.open=!movil.matches};
+  ajustar();movil.addEventListener('change',ajustar);
+},mostrar(){renderTray()},ocultar(){tipOculta()}});

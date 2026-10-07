@@ -548,6 +548,7 @@ function renderSide0(){
   $('#plan-simular').textContent=tx('simular');$('#h-chosen').textContent=tx('elegidas');
   $('#b-sugg').textContent=tx('agregar');$('#b-go').hidden=!!PLAN_PASO;
   const nuevos=want.filter(k=>!tr().fail.includes(k)).reduce((s,k)=>s+c[k][1],0), ci=cargaInfo(nuevos);
+  $('#plan-resumen').textContent=ci?tx('resumen',{n:want.length,creditos:fmtCr(ci.total),tope:fmtCr(ci.tope)}):tx('cuenta',{n:want.length,creditos:fmtCr(credWant)});
   $('#plan-carga').textContent=ci?tx('carga',{creditos:fmtCr(ci.total),tope:fmtCr(ci.tope),retenidos:fmtCr(ci.ret)}):tx('sin_carga',{creditos:fmtCr(credWant)});
   $('#chosen-help').textContent=want.length?tx('cuenta',{n:want.length,creditos:fmtCr(credWant)}):tx('vacio');
   $('#chosen').innerHTML=want.sort((a,b)=>(semOf()[a]||99)-(semOf()[b]||99)).map(k=>`<span class="wchip"><span class="dot" style="background:var(--n${c[k][2]})"></span><span class="grp">${k}</span>${esc(pretty(c[k][0]))}${off.has(k)?'':' <small>(sin grupos)</small>'}${tr().oblig.includes(k)?'<span class="tag bad" title="Obligatoria: al estar desfasada, el SAES no permite la reinscripción sin ella">obligatoria</span>':`<button class="x" data-unwant="${k}" aria-label="Quitar ${esc(c[k][0])}">×</button>`}</span>`).join('');
