@@ -82,6 +82,14 @@ assert.ok(box.todos().some(n=>n.textContent==='¿Estuviste inscrito este semestr
 const primera=box.todos().find(n=>n.tagName==='section'&&n.children[0]?.textContent==='¿Te quedaron créditos sobrantes de un trámite anterior?');
 primera.todos().find(n=>n.textContent==='Sí').click();
 assert.ok(box.todos().some(n=>n.textContent==='¿Cuántos créditos te quedaron?'));
+const antesAtajo=T.modelo(E.def).datos.formulario;
+texto('Ninguna de las primeras cuatro me aplica').click();
+const despuesAtajo=T.modelo(E.def).datos.formulario;
+assert.deepEqual(['q1','q2','q3','q4'].map(k=>despuesAtajo[k]),['no','no','no','no']);
+assert.equal(despuesAtajo.q5,antesAtajo.q5);assert.equal(despuesAtajo.confirmada,antesAtajo.confirmada);
+assert.ok(texto('Confirmar mi respuesta'),'El atajo no confirma la quinta');
+box.todos().find(n=>n.tagName==='section'&&n.children[0]?.textContent==='¿Te quedaron créditos sobrantes de un trámite anterior?').todos().find(n=>n.textContent==='Sí').click();
+assert.equal(T.modelo(E.def).datos.formulario.q1,'si','Puede corregir una respuesta después del atajo');
 const form=T.modelo(E.def).datos.formulario;
 assert.ok(E.validarFormulario(form));form.sob='2';form.confirmada=true;assert.equal(E.validarFormulario(form),'');
 form.q3='si';assert.ok(E.validarFormulario(form));Object.assign(form,{q3n:'2',q3a:'1',q3r:'0',q3p:'26/2'});assert.match(E.validarFormulario(form),/sumar/);form.q3r='1';assert.equal(E.validarFormulario(form),'');

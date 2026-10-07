@@ -7,6 +7,11 @@
 .tramite-campo input,.tramite-campo textarea,.tramite-campo select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;padding:var(--ipn-esp-2);color:var(--ipn-texto);background:var(--ipn-superficie);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
 .tramite-campo [aria-invalid=true]{border-color:var(--ipn-error)}
 .tramite-pasos,.tramite-chips,.tramite-acciones{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+.tramite-compuesto,.tramite-chips>*{min-width:0;max-width:100%}
+#sate-tramites button{box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.tramite-acciones{position:sticky;bottom:calc(5rem + env(safe-area-inset-bottom,0px));z-index:2;background:var(--ipn-superficie);padding-block:var(--ipn-esp-2)}
+.tramite-acciones button{flex:1;min-width:0}
+@media(min-width:1024px){.tramite-acciones{bottom:0}}
 .tramite-pasos{padding-left:var(--ipn-esp-4)}
 .tramite-pasos li{margin-right:var(--ipn-esp-4);overflow-wrap:anywhere}
 .tramite-pasos [aria-current=step]{font-weight:700;color:var(--ipn-acento)}
@@ -23,7 +28,7 @@
 .tramite-campo input[type=checkbox]{width:auto;align-self:flex-start}
 :is(.tramite-campo input,.tramite-campo textarea,.tramite-chips button,.tramite-acciones button):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .tramite-chips [aria-pressed=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);border-color:var(--ipn-acento)}
-.electivas-actividad{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
+.electivas-actividad{box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
 .electivas-resumen{position:sticky;top:0;z-index:1;background:var(--ipn-superficie);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control)}
 .tramite-compuesto details button{display:block;text-align:left;max-width:100%;white-space:normal;margin-block:var(--ipn-esp-2)}
 @media(min-width:1024px){.tramite-asistente:has(.tramite-preview){grid-template-columns:minmax(0,3fr) minmax(0,2fr)}.tramite-preview{display:block}.tramite-ver{display:none}.tramite-revision>div{grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto}}

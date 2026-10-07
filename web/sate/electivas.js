@@ -149,6 +149,7 @@
   }
   function formulario(box,ctx){
     const f=ctx.datos.formulario;
+    box.appendChild(boton('Ninguna de las primeras cuatro me aplica',()=>{for(const [k] of preguntas.slice(0,4))f[k]='no';ctx.cambiar();ctx.repintar()}));
     for(const [k,t,seguimiento] of preguntas){
       const seccion=nodo('section');seccion.appendChild(nodo('h4',t));
       const opciones=nodo('div',null,'tramite-chips');opciones.setAttribute('role','group');opciones.setAttribute('aria-label',t);
