@@ -19,8 +19,7 @@ class UPIBI(unittest.TestCase):
             self.assertLessEqual(b[1] + b[3], center + layout['pitch'] / 2)
 
     def test_seis_mapas_sin_solapamientos_y_en_su_semestre(self):
-        html = (ROOT/'web/dist/horarios-upibi.html').read_text(encoding='utf8')
-        data = json.loads(re.search(r'const DATA=(.*?);\n',html).group(1))
+        data = json.loads((ROOT/'web/dist/sate/datos/upibi/nucleo.json').read_text(encoding='utf8'))
         for car, mp in data['mapas'].items():
             layout = mp['layout']; rows = dict(layout['rows']); boxes = layout['boxes']
             self.assertTrue(layout['filas_exactas'],car)
@@ -34,7 +33,7 @@ class UPIBI(unittest.TestCase):
                     self.assertFalse(overlap,(car,a,b))
 
     def test_navegador_conserva_centros_exactos_de_fila(self):
-        html = (ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        html = (ROOT/'web/sate/nucleo.js').read_text(encoding='utf8')
         fn = re.search(r'function rowBands\(L\)\{.*?\n\}',html,re.S).group(0)
         script = fn + """
 const assert=require('assert');
@@ -76,8 +75,9 @@ assert.deepStrictEqual(rowBands(L),[[1,104,4,204],[2,304,204,404]]);
         with self.assertRaises(ValueError): extract.empatar_materia(b,[row,row],'A','06')
 
     def test_integracion_sin_claves_huerfanas_o_planes_mezclados(self):
-        html = (ROOT/'web/dist/horarios-upibi.html').read_text(encoding='utf8')
-        data = json.loads(re.search(r'const DATA=(.*?);\n',html).group(1))
+        data = {}
+        for bloque in ('nucleo', 'oferta', 'tramites'):
+            data.update(json.loads((ROOT/f'web/dist/sate/datos/upibi/{bloque}.json').read_text(encoding='utf8')))
         self.assertEqual(set(data['mapas']), {'A','B','B_06','F','L','M'})
         self.assertEqual(data['mapas']['B']['modelo'], 'semestral')
         self.assertEqual(data['mapas']['B_06']['modelo'], 'niveles')
@@ -125,7 +125,7 @@ const MS={disponible:()=>false},GO=MS;
         self.assertEqual(result.returncode,0,result.stderr)
 
     def test_proyeccion_por_periodo_y_referencia_de_carga(self):
-        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        html=(ROOT/'web/sate/nucleo.js').read_text(encoding='utf8')
         fn=html[html.index('function plazoReferencia('):html.index('function statsDatos(')]
         script="const assert=require('assert');let UNIDAD='upibi';Array.prototype.at=function(i){return this[i<0?this.length+i:i]};"+fn+"""
 const A={carga:{total:438,min:36.5,duracion:15,duracion_max:23}};
@@ -148,7 +148,7 @@ assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,tota
         self.assertEqual(result.returncode,0,result.stderr)
 
     def test_leyenda_roja_solo_si_la_tendencia_excede_el_limite(self):
-        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        html=(ROOT/'web/sate/desempeno.js').read_text(encoding='utf8')
         expression=re.search(r"\.\.\.(\(totalPer!=null&&plazo\.max&&totalPer>plazo\.max\?\[\['anillo'.*?\]\]:\[\]\))",html).group(1)
         script="const assert=require('assert');const legend=(totalPer,plazo)=>"+expression+".map(x=>x[2]).join('');"+"""
 assert.strictEqual(legend(10,{max:12}),'');
@@ -161,7 +161,7 @@ assert.strictEqual(legend(13,{}),'');
         self.assertEqual(result.returncode,0,result.stderr)
 
     def test_coordenadas_svg_con_zoom_scroll_y_resize(self):
-        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        html=(ROOT/'web/sate/nucleo.js').read_text(encoding='utf8')
         fn=html[html.index('function montarGrafica('):html.index('let ST_RENDER=')]
         script="""
 const assert=require('assert');
@@ -211,7 +211,7 @@ DATA.opciones_plan={};assert.strictEqual(carreraPerfil({carrera:'B',plan:'09'}),
 
 
     def test_analisis_sin_notas_inventadas_y_con_ciclos(self):
-        html=(ROOT/'web/horarios.template.html').read_text(encoding='utf8')
+        html=(ROOT/'web/sate/nucleo.js').read_text(encoding='utf8')
         fn=html[html.index('function analisis('):html.index('function renderAnalisis(')]
         nota=html[html.index('const notaValida='):html.index('const FORMAS=')]
         script="""

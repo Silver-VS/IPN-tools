@@ -2,7 +2,10 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.3"
+version = "2026.10.5"
+
+[proyecto]
+nombre = "HADES"
 
 [proyecto.apoyo]
 # Enlace en el pie de Horarios, la portada y el agradecimiento de la encuesta.
@@ -50,6 +53,10 @@ titulo = "Dictamen"
 
 [sate.tramite.electivas]
 titulo = "Electivas"
+
+[sate.migracion]
+abrir = "Abrir {tramite}"
+tramites = "Esta sección está en preparación. Consulta el aviso vigente y realiza el trámite ante Gestión Escolar."
 
 # Componentes comunes (web/sate/componentes.js).
 [componentes]
