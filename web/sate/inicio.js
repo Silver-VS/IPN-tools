@@ -146,12 +146,6 @@
     boton.setAttribute('aria-label', texto('sate.encabezado.prueba'));
     document.getElementById('sate-leyenda').appendChild(ayuda);
   }
-  const menuDatos = document.getElementById('sate-datos-menu');
-  menuDatos.addEventListener('click', e => { if (e.target.closest('button')) menuDatos.open = false; });
-  document.addEventListener('click', e => { if (!menuDatos.contains(e.target)) menuDatos.open = false; });
-  menuDatos.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && menuDatos.open) { menuDatos.open = false; menuDatos.querySelector('summary').focus(); }
-  });
   const nombreUnidad = document.querySelector('.inst-name');
   if (nombreUnidad) nombreUnidad.textContent = cfg.nombre;
   if (cfg.logo) {

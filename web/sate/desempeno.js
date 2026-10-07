@@ -281,7 +281,6 @@ SATE.pestana('trayectoria',{
     $('#desempeno-titulo').textContent=SATE.texto('sate.pestana.trayectoria.titulo');
     $('#desempeno-sim-titulo').textContent=SATE.texto('sate.desempeno.sim_titulo');
     $('#desempeno-lector').textContent=SATE.texto('sate.desempeno.lector');
-    $('#desempeno-demo').textContent=SATE.texto('sate.desempeno.demo');
     $('#desempeno-lector').addEventListener('click',()=>SAES.open());
   },
   mostrar(){

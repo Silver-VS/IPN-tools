@@ -8,26 +8,28 @@ header.top{border-bottom:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0
 .title-row .header-actions{gap:var(--ipn-esp-2);flex:none}
 .brand #sate-nombre{font-size:var(--ipn-tamano-xs);margin:var(--ipn-esp-1) 0 0}
 #sate-leyenda .sate-ayuda__btn{width:auto;height:auto;min-height:2rem;border:1px solid var(--ipn-borde-control);border-radius:999px;padding:0 var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto);background:var(--ipn-superficie);white-space:nowrap}
-.sate-navegacion{display:flex;align-items:center;gap:var(--ipn-esp-3);width:100%;min-width:0;margin-bottom:var(--ipn-esp-3)}
+.sate-navegacion{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ipn-esp-3);width:100%;min-width:0;margin-bottom:var(--ipn-esp-3)}
 #sate-tabs{flex:1;min-width:0}
 #sate-tabs .sate-pestanas{width:100%;overflow:visible;border-radius:var(--ipn-radio);padding:var(--ipn-esp-1);gap:var(--ipn-esp-1)}
-#sate-tabs .sate-pestana{flex:1;min-width:0;min-height:2.5rem;padding-inline:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs)}
-#sate-tabs .sate-pestana__texto{overflow-wrap:anywhere}
+#sate-tabs .sate-pestana{flex:1;min-width:max-content;min-height:2.5rem;padding-inline:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);white-space:nowrap}
+#sate-tabs .sate-pestana__texto{white-space:nowrap;overflow-wrap:normal}
 #sate-tabs .sate-grupo-inicio{margin-left:var(--ipn-esp-2)}
-.sate-controles{display:flex;align-items:center;gap:var(--ipn-esp-2);min-width:0;flex:0 1 24rem}
+.sate-controles{display:flex;align-items:center;gap:var(--ipn-esp-2);min-width:0;flex:0 1 15rem}
 .sate-controles .field{flex:1;min-width:0}
 .sate-controles select{width:100%;min-width:0;font-size:var(--ipn-tamano-xs);min-height:2.5rem}
-.sate-datos{display:flex;align-items:center;flex:none;gap:var(--ipn-esp-1)}
+.sate-fila-avisos{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-2)}
+#sate-avisos-globales{min-width:0;flex:1 1 auto}
+.sate-datos{display:flex;align-items:center;flex:none;gap:var(--ipn-esp-2);margin-left:auto}
 .sate-datos .saes-open{font-size:var(--ipn-tamano-xs);min-height:2.5rem;padding-inline:var(--ipn-esp-2)}
-.sate-datos-movil{display:none}
-#sate-datos-menu{position:relative}
-#sate-datos-menu summary{display:grid;place-items:center;list-style:none;min-width:2rem;min-height:2.5rem;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);cursor:pointer}
-#sate-datos-menu summary::-webkit-details-marker{display:none}
-.sate-datos-opciones{position:absolute;right:0;top:calc(100% + var(--ipn-esp-1));z-index:30;display:grid;gap:var(--ipn-esp-2);width:min(17rem,calc(100vw - 2rem));box-sizing:border-box;padding:var(--ipn-esp-2);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
-.sate-datos-opciones .btn{text-align:left;white-space:normal;color:var(--ipn-texto)}
+.sate-datos .saes-open::before{content:none}
+#sate-saes-indicador{display:inline-flex;align-items:center;gap:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs);white-space:nowrap}
+#sate-saes-indicador::before{content:"";width:9px;height:9px;border:2px solid var(--ipn-tenue);border-radius:50%;flex:none}
+#sate-saes-indicador.on::before{background:var(--ipn-ok);border-color:var(--ipn-ok)}
 .bar-top{border-bottom:0;padding-block:0;align-items:center}
 .bar-top:has(>#sate-oferta-periodo[hidden]):has(>#notice[hidden]){display:none}
-:is(.unit-switch,.sate-controles select,.sate-datos .btn,#sate-datos-menu summary,.header-actions button):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+:is(.unit-switch,.sate-controles select,.sate-datos .btn,.header-actions button):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+/* La carrera baja antes de comprimir las etiquetas de las pestañas. */
+@media(min-width:721px) and (max-width:1280px){#sate-tabs{flex-basis:100%}.sate-controles{flex-basis:100%}.sate-controles .field{max-width:24rem}}
 @media(max-width:720px){
   .sate-navegacion{margin-top:var(--ipn-esp-1)}
   .sate-controles{flex:1;width:100%}
@@ -37,8 +39,7 @@ header.top{border-bottom:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0
   #sate-leyenda .sate-ayuda__btn{font-size:.65rem;padding-inline:var(--ipn-esp-1)}
   .title-row .header-actions{gap:var(--ipn-esp-1)}
   .title-row .header-actions button{width:2rem;height:2rem;padding:0;justify-content:center}
-  .header-actions .enc-btn span,.header-actions .ipnt-btn span,.sate-datos-texto{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .sate-datos-movil{display:inline;font-weight:500}
+  .header-actions .enc-btn span,.header-actions .ipnt-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
 .calendario-filtros,.calendario-nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-3)}
 .calendario-nav h3{flex:1;text-align:center;margin:0}

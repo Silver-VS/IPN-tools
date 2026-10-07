@@ -1,6 +1,13 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.20 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.encabezado.actualizar/indicador/usando_datos/sin_datos` | Actualizar datos e indicador accesible SAES en la fila de avisos, con fecha de lectura. |
+| `sate.trayectoria.sin_datos` | Invita solo al Lector; retiradas las claves de demostración y del menú SAES sin uso. |
+
 ## 2026-10-07 · 2026.10.19 · Codex
 
 | Claves | Cambio |
