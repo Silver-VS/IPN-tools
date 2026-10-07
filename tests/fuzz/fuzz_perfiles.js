@@ -181,6 +181,20 @@
       if (malo(s.cr) || malo(s.target)) return 'créditos no numéricos';
       return true;
     }, ctx);
+    revisar('planeación N+1 sin materias de N ni acreditadas', () => {
+      return conPlan(() => {
+        const base=tr(), original=base.want, clave=planClave(1), futuro=base.wantPorPeriodo[clave];
+        base.want=[...new Set([...base.want,...suggestions().list.slice(0,2)])];
+        const anteriores=[...base.want], done=[...base.done];
+        // Datos guardados deliberadamente solapados: la lectura debe excluirlos.
+        base.wantPorPeriodo[clave]=[...anteriores,...done,...Object.keys(cur()).slice(0,12)];PLAN_CACHE=null;
+        try{return conPlan(() => {
+          const t=tr(), ya=new Set([...anteriores,...done]);
+          const mal=[...t.want,...suggestions().list].filter(k=>ya.has(k));
+          return !mal.length || 'N+1 incluye materias de N o acreditadas: '+mal.join(',');
+        },1)}finally{base.want=original;if(futuro===undefined)delete base.wantPorPeriodo[clave];else base.wantPorPeriodo[clave]=futuro;PLAN_CACHE=null}
+      },0);
+    }, ctx);
     // optativas por nivel (mapas que indican el nivel de cada espacio): una acreditada o en curso cubre el espacio de su nivel
     revisar('espacios de optativa por nivel', () => {
       const q = optCupo(), L = MAP().layout; if (!q || !L) return true;

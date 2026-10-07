@@ -1,4 +1,4 @@
-function renderMap(){return conSim(usaSim('mapa'),renderMap0)}
+function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
 function renderMap0(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));

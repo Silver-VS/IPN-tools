@@ -280,6 +280,7 @@ SATE.pestana('desempeno',{
     $('#desempeno-vacio-texto').textContent=SATE.texto('sate.desempeno.sin_datos');
     $('#desempeno-simulacion').hidden=!personal;
     $('#kstats').hidden=!personal;
+    if(SATE.simAbrir){$('#desempeno-simulacion').open=true;$(personal?'#desempeno-sim-titulo':'#desempeno-lector').focus();SATE.simAbrir=false}
     if(!personal){++ST_RENDER;return}
     renderSimulacion();
     return renderStatsVista().catch(SATE.error);

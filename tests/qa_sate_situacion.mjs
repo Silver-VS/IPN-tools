@@ -68,6 +68,8 @@ const real=vm.runInContext('JSON.stringify(situacionDatos())',c);
 vm.runInContext("SIM.on=true;for(const k in T)delete T[k]",c);
 assert.equal(vm.runInContext('JSON.stringify(situacionDatos())',c),real);
 assert.equal(vm.runInContext('SIM.on',c),true);
+assert.equal(vm.runInContext('conPlan(()=>JSON.stringify(situacionDatos()),1)',c),real,'Situación conserva datos reales incluso desde el escenario N+1');
+assert.ok(box.textContent.includes(texto('sate.planeacion.titulo')),'A: Situación enlaza al mapa');
 const accion=avisos[0].querySelector('button');accion.click();
 const dlg=body.querySelector('.sate-modal');assert.equal(dlg.open,true);
 const focos=dlg.querySelectorAll('button'),primero=focos[0],ultimo=focos.at(-1);
