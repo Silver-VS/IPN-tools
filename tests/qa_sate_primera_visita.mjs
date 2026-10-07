@@ -38,6 +38,19 @@ c.ALUMNO=null;c.renderAyudaPrimeraVisita();assert.equal(box.hidden,false);
 const saes=leer('web/dist/sate/nucleo.js').match(/const SAES=\{[\s\S]*?\n\};/)[0];
 assert.match(leer('web/dist/sate/saes-dialogo.js'),/id=\\"saes-paste-clip\\"/);
 assert.match(html,/@media\(hover:none\)\{\.saes-arrastre\{display:none\}\.saes-tactil\{display:block\}/);
+let dialogo;
+vm.runInNewContext(leer('web/dist/sate/saes-dialogo.js'),{
+  document:{body:{insertAdjacentHTML(pos,texto){assert.equal(pos,'beforeend');dialogo=texto}},querySelector(){return null}},
+  navigator:{userAgent:'Android',maxTouchPoints:1}
+});
+assert.match(dialogo,/<h2 id="saes-h">Cargar datos del SAES<\/h2>/);
+assert.ok(dialogo.includes('Trae tu avance del SAES en 3 pasos. Solo se lee; nada se envía a ningún servidor.'));
+assert.doesNotMatch(dialogo,/saes-aviso/);
+assert.doesNotMatch(dialogo,/<details[^>]*\bopen\b/,'Las ayudas y los videos empiezan cerrados');
+assert.match(dialogo,/<details><summary>¿Prefieres verlo\? Video paso a paso<\/summary>/);
+for(const dispositivo of ['pc','ios','android'])assert.ok(dialogo.includes('data-dev="'+dispositivo+'"'));
+assert.match(dialogo,/<ol start="3"><li><b>Pega aquí<\/b> <button[^>]*id="saes-paste-clip"[^>]*>Pegar datos copiados<\/button><\/li><\/ol>/);
+assert.ok(dialogo.indexOf('id="saes-reminder"')>dialogo.indexOf('id="saes-paste"'),'Recordatorio discreto al final');
 for(const modo of ['ok','ausente','denegado','invalido','sin-contrato','otra-unidad']){
   const elementos=new Map();let cargado,guardadoSaes,cierres=0;
   const n=id=>{if(!elementos.has(id))elementos.set(id,{value:'',dataset:{fallback:texto('sate.lector.pegado_manual')},eventos:{},addEventListener(k,f){this.eventos[k]=f},focus(){this.enfocado=true}});return elementos.get(id)};
@@ -49,7 +62,8 @@ for(const modo of ['ok','ausente','denegado','invalido','sin-contrato','otra-uni
   ctx.saes.U=()=> 'upiita';
   ctx.saes.save=d=>guardadoSaes=d;ctx.saes.status=()=>{};
   ctx.saes.wire(d=>cargado=d);
-  assert.equal(n('#saes-manual').open,true);
+  assert.notEqual(n('#saes-manual').open,true,'También en teléfono, el detalle empieza cerrado');
+  n('#saes-install').eventos.click();assert.equal(n('#saes-manual').open,true);
   await n('#saes-paste-clip').eventos.click({currentTarget:n('#saes-paste-clip')});
   if(modo==='ok'){assert.equal(cargado.unidad,'upiita');assert.equal(guardadoSaes,cargado);assert.equal(cierres,1)}
   else {assert.equal(cargado,undefined);assert.equal(guardadoSaes,undefined)}
@@ -59,4 +73,22 @@ for(const modo of ['ok','ausente','denegado','invalido','sin-contrato','otra-uni
     assert.equal(cargado.unidad,'upiita');
   }
 }
+// Estado real con lecturas ficticias: límite estricto, fecha ausente y limpieza.
+const estados=new Map();
+const estado=id=>{if(!estados.has(id))estados.set(id,{querySelector:estado});return estados.get(id)};
+const ahora=Date.parse('2026-10-07T12:00:00Z');
+const ctxEstado=vm.createContext({document:{getElementById:id=>['saes-open','sate-saes-indicador'].includes(id)?null:estado(id)},Date:class extends Date{static now(){return ahora}}});
+vm.runInContext(saes+'\nglobalThis.saes=SAES;',ctxEstado);
+for(const dias of [0,30,30.01,31]){
+  ctxEstado.saes.status({leido:new Date(ahora-dias*86400000).toISOString(),carrera_nombre:'Carrera ficticia',boleta:'DEMO'});
+  assert.equal(estado('saes-stale').hidden,dias<=30,'Recordatorio arriba: '+dias+' días');
+  assert.equal(estado('saes-reminder').hidden,dias>30,'Sin duplicar el recordatorio');
+  assert.equal(estado('saes-steps').hidden,true);
+}
+for(const datos of [{leido:'fecha inválida'},{},null]){
+  ctxEstado.saes.status(datos);
+  assert.equal(estado('saes-stale').hidden,true);
+  assert.equal(estado('saes-reminder').hidden,false);
+}
+assert.equal(estado('saes-steps').hidden,false);
 console.log('Primera visita: salidas, ayuda persistente y portapapeles con respaldo OK');
