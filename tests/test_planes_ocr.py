@@ -92,6 +92,44 @@ class AnalizadorPlanes(unittest.TestCase):
         self.assertEqual(2, len(val['por_trayectoria']))
 
 
+class Relectura(unittest.TestCase):
+    def test_tolerancia_satca_025_y_tepic_005(self):
+        def val(campo, sub, mat):
+            nv = [{'nivel': 1, 'materias': [p.materia_de('M', [3, 1, 4, 7, mat])], 'subtotal': {campo: sub}}]
+            return p.validar(nv, None)['estado']
+        self.assertEqual('ok', val('creditos_satca', 6.0, 6.2))
+        self.assertEqual('discrepancia', val('creditos_satca', 6.0, 6.3))
+        self.assertEqual('discrepancia', val('creditos_tepic', 7.1, 7))
+
+    def test_cortes_con_traslape_y_borde_en_zona_blanca(self):
+        import numpy as np
+        osc = np.full(1000, 200.0)
+        osc[330:340] = 0.0            # zona blanca cerca del borde nominal
+        c = p.cortes(1000, 3, osc)
+        self.assertEqual(3, len(c))
+        self.assertEqual((0, 1000), (c[0][0], c[-1][1]))
+        for (a, b), (a2, b2) in zip(c, c[1:]):
+            self.assertGreater(b, a2)            # hay traslape
+        self.assertTrue(330 <= c[1][0] < 340 or 330 <= c[0][1] < 340)
+
+    def test_unir_quita_lineas_duplicadas_del_traslape(self):
+        a = 'Cálculo diferencial 3 1 4 7\nÁlgebra lineal 3 0 3 6\nFísica general 3 2 5 8'
+        b = 'Álgebra lineal 3 0 3 6\nFísica general 3 2 5 8\nProgramación 2 2 4 6'
+        self.assertEqual(a + '\nProgramación 2 2 4 6', p.unir([a, b]))
+        # filas solo numéricas iguales no son traslape si no son un bloque final/inicial idéntico más corto
+        self.assertEqual('X 1 2 3 4\nY 1 2 3 4', p.unir(['X 1 2 3 4', 'Y 1 2 3 4']))
+
+    def test_mejor_resultado_y_diferencia_total(self):
+        def plan(sub):
+            nv = [{'nivel': 1, 'materias': [p.materia_de('M', [3, 1, 4, 7])], 'subtotal': {'creditos_tepic': sub}}]
+            return {'niveles': nv, 'validacion': p.validar(nv, None)}
+        ok, cerca, lejos = plan(7), plan(8), plan(20)
+        self.assertEqual(1, p.dif_total(cerca))
+        self.assertLess(p.clave_mejor(ok), p.clave_mejor(cerca))
+        self.assertLess(p.clave_mejor(cerca), p.clave_mejor(lejos))
+        self.assertEqual(float('inf'), p.dif_total({'niveles': [], 'validacion': {}}))
+
+
 class SoloAnalisis(unittest.TestCase):
     def test_cache_sin_pdf_render_ocr_llm_ni_red(self):
         with tempfile.TemporaryDirectory(dir=ROOT) as carpeta:

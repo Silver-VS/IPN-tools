@@ -8,15 +8,19 @@ Uso:  python tools/planes_ocr.py [pdf ...]      (por omisión, todos los de recu
       python tools/planes_ocr.py --solo-ocr     (sin análisis)
       python tools/planes_ocr.py --sin-llm      (sin respaldo con qwen3.5:9b)
       python tools/planes_ocr.py --solo-analisis (solo .ocr.txt en caché; sin OCR, render ni Ollama)
+      python tools/planes_ocr.py --relectura [pdf ...] (PDF en 'discrepancia': franjas a 3600 px, OCR y mejor resultado)
 Salida: recursos/planes-ipn/json/<pdf>.json y caché img/<pdf>-p<N>.png / .ocr.txt
 Imprime una línea por paso: [n/M] <pdf> pág <p> · ocr|análisis|validación
 """
-import json, pathlib, re, sys, time, unicodedata, urllib.request, base64, io, html
+import json, pathlib, re, sys, time, unicodedata, urllib.request, base64, io, html, itertools
 from collections import Counter
 
 OLLAMA = "http://127.0.0.1:11434"
 LADO = 2400                       # px del lado largo
-TOL = 0.05
+TOL = 0.05                        # tolerancia de sumas (TEPIC, horas)
+TOL_SATCA = 0.25                  # los PDF redondean los créditos SATCA por nivel (p. ej. it-upiita difiere 0.2)
+LADO_HR = 3600                    # relectura: lado largo de la página renderizada
+TRASLAPE = 0.12                   # relectura: fracción de traslape entre franjas
 RAIZ = next(p for p in pathlib.Path(__file__).resolve().parents if (p / "recursos").is_dir())
 BASE = RAIZ / "recursos" / "planes-ipn"
 REPO = pathlib.Path(__file__).resolve().parents[1]
@@ -392,6 +396,10 @@ def encabezado(texto):
 
 
 # ---------------------------------------------------------------- validación
+def tol(campo):
+    return TOL_SATCA if campo == 'creditos_satca' else TOL
+
+
 def _suma(materias, campo):
     return round(sum(m.get(campo) or 0 for m in materias), 2)
 
@@ -424,16 +432,16 @@ def validar(niveles, total, optativas=(), por_trayectoria=True):
             item["ok"] = True
             for c in sub:
                 s = _suma(n["materias"], c)
-                if sub.get(c) is not None and abs(s - sub[c]) > TOL:
+                if sub.get(c) is not None and abs(s - sub[c]) > tol(c):
                     item["ok"] = False
                     item["diferencias"][c] = {"suma": s, "subtotal": sub[c], "dif": round(sub[c] - s, 2)}
                     for m in n["materias"]:   # materia cuyo valor explica la diferencia (sobra o falta una)
-                        if m.get(c) is not None and abs(m[c] - abs(sub[c] - s)) < TOL:
+                        if m.get(c) is not None and abs(m[c] - abs(sub[c] - s)) < tol(c):
                             informe["sospechosas"].append({"donde": f"nivel {n['nivel']}", "materia": m["nombre"],
                                                            "motivo": f"{c} {m[c]} explica la diferencia {round(sub[c] - s, 2)}"})
         elif sub and 'valores' in sub:
             sumas = {c: _suma(n['materias'], c) for c in CAMPOS}
-            faltan = [v for v in sub['valores'] if not any(abs(v - s) <= TOL for s in sumas.values())]
+            faltan = [v for v in sub['valores'] if not any(abs(v - s) <= tol(c) for c, s in sumas.items())]
             item['ok'] = not faltan
             item['diferencias'] = {'referencia_parcial': faltan} if faltan else {}
         else:
@@ -449,13 +457,13 @@ def validar(niveles, total, optativas=(), por_trayectoria=True):
         t = {"ok": True, "diferencias": {}}
         for c in total:
             s = round(sum(_suma(n["materias"], c) for n in niveles), 2)
-            if total.get(c) is not None and abs(s - total[c]) > TOL:
+            if total.get(c) is not None and abs(s - total[c]) > tol(c):
                 t["ok"] = False
                 t["diferencias"][c] = {"suma": s, "total": total[c], "dif": round(total[c] - s, 2)}
         informe["total"] = t
     else:   # el OCR perdió columnas del TOTAL: cada valor debe coincidir con alguna suma
         sumas = {c: round(sum(_suma(n["materias"], c) for n in niveles), 2) for c in CAMPOS}
-        enc = {str(v): next((c for c, s in sumas.items() if abs(s - v) <= TOL), None) for v in total["valores"]}
+        enc = {str(v): next((c for c, s in sumas.items() if abs(s - v) <= tol(c)), None) for v in total["valores"]}
         informe["total"] = {"ok": all(enc.values()), "parcial": True, "coincide_con": enc, "sumas": sumas}
     if informe["total"]["ok"] is False:
         informe["ok"] = False
@@ -537,6 +545,220 @@ def comparar(nombre_pdf, niveles, optativas=()):
     return res
 
 
+# ---------------------------------------------------------------- relectura (franjas a mayor resolución)
+def n_franjas(w, h):
+    """Páginas apaisadas: 3 franjas; verticales: 4."""
+    return 3 if w >= h else 4
+
+
+def tamanios(pdf):
+    import pypdfium2 as pdfium
+    doc = pdfium.PdfDocument(str(pdf))
+    return [doc[i].get_size() for i in range(len(doc))]
+
+
+def cortes(alto, n, oscuridad):
+    """[(ini, fin)] de n franjas con traslape TRASLAPE; cada borde se ajusta a la fila más blanca cercana
+    (la oscuridad media por fila está en `oscuridad`) para no partir texto."""
+    h = alto / (n - (n - 1) * TRASLAPE)         # alto nominal de cada franja
+    ov = h * TRASLAPE
+    avance = h - ov
+
+    def ajusta(y, ventana):
+        a, b = max(0, int(y - ventana)), min(alto - 1, int(y + ventana))
+        return min(range(a, b + 1), key=lambda i: (round(float(oscuridad[i]), 1), abs(i - y)))
+
+    res = []
+    for k in range(n):
+        ini = 0 if k == 0 else ajusta(k * avance, 0.4 * ov)
+        fin = alto if k == n - 1 else ajusta(k * avance + h, 0.4 * ov)
+        res.append((ini, max(fin, ini + 1)))
+    return res
+
+
+def franjas(pdf, pagina):
+    """Renderiza la página a LADO_HR y la corta; caché img/<pdf>-p<N>-hr-f<k>.png (k desde 1) y -hr.json."""
+    nombre = pdf.stem
+    meta = BASE / "img" / f"{nombre}-p{pagina}-hr.json"
+    destino = lambda k: BASE / "img" / f"{nombre}-p{pagina}-hr-f{k}.png"
+    if meta.exists():
+        return [destino(k) for k in range(1, json.loads(meta.read_text(encoding="utf-8"))["franjas"] + 1)]
+    import numpy as np
+    import pypdfium2 as pdfium
+    pg = pdfium.PdfDocument(str(pdf))[pagina - 1]
+    w, h = pg.get_size()
+    img = pg.render(scale=LADO_HR / max(w, h)).to_pil().convert("RGB")
+    n = n_franjas(w, h)
+    oscuridad = 255 - np.asarray(img.convert("L"), dtype=np.float32).mean(axis=1)
+    lista = cortes(img.height, n, oscuridad)
+    for k, (ini, fin) in enumerate(lista, 1):
+        img.crop((0, ini, img.width, fin)).save(destino(k))
+    meta.write_text(json.dumps({"franjas": n, "cortes": lista, "ancho": img.width, "alto": img.height}), encoding="utf-8")
+    return [destino(k) for k in range(1, n + 1)]
+
+
+def ocr_franja(png):
+    """OCR 'Table Recognition:' de una franja; caché <png>.ocr2.txt (+ .ocr2.json). Devuelve (texto, segundos, en_cache)."""
+    cache, meta = png.with_suffix(".ocr2.txt"), png.with_suffix(".ocr2.json")
+    if cache.exists():
+        m = json.loads(meta.read_text(encoding="utf-8")) if meta.exists() else {}
+        return cache.read_text(encoding="utf-8"), m.get("segundos", 0), True
+    t0 = time.time()
+    t = ocr(png, "Table Recognition:")
+    seg = round(time.time() - t0, 1)
+    cache.write_text(t, encoding="utf-8")
+    meta.write_text(json.dumps({"segundos": seg, "caracteres": len(t)}), encoding="utf-8")
+    return t, seg, False
+
+
+def quitar_bloques(lin, minimo=3):
+    """Quita los bloques de >= `minimo` líneas que repiten literalmente (normalizadas) otros anteriores y que traen al
+    menos dos líneas con texto: el OCR de una franja suele reiterar la tabla entre cercos ```markdown."""
+    claves = [norm(l) for l in lin]
+    vistos, salida, i = {}, [], 0
+    while i < len(lin):
+        k = tuple(claves[i:i + minimo])
+        j = vistos.get(k) if len(k) == minimo else None
+        if j is not None:
+            m = minimo
+            while i + m < len(lin) and j + m < len(lin) and claves[i + m] == claves[j + m]:
+                m += 1
+            if sum(1 for b in lin[i:i + m] if len(b) >= 12 and re.search(r"[A-Za-z]{3}", b)) >= 2:
+                i += m
+                continue
+        if len(k) == minimo:
+            vistos.setdefault(k, i)
+        salida.append(lin[i])
+        i += 1
+    return salida
+
+
+def unir(partes):
+    """Concatena el texto de franjas consecutivas quitando las líneas duplicadas por el traslape, los cercos de código
+    y los bloques que el OCR repite."""
+    acc = []
+    for t in partes:
+        lin = [l for l in t.split("\n") if l.strip() and not l.strip().startswith("```")]
+        if acc:
+            for m in range(min(30, len(lin), len(acc)), 0, -1):       # bloque inicial igual al final acumulado
+                if [norm(x) for x in acc[-m:]] == [norm(x) for x in lin[:m]]:
+                    lin = lin[m:]
+                    break
+            cola = {norm(x) for x in acc[-40:] if len(x) >= 12 and re.search(r"[A-Za-z]{3}", x)}
+            while lin and len(lin[0]) >= 12 and norm(lin[0]) in cola:   # filas sueltas repetidas
+                lin = lin[1:]
+        acc.extend(lin)
+    return "\n".join(quitar_bloques(acc))
+
+
+def _dif_ref(x):
+    if not isinstance(x, dict):
+        return 0
+    if "diferencias" in x:
+        return sum(abs(d["dif"]) for d in x["diferencias"].values())
+    if x.get("parcial") and x.get("ok") is False:
+        return sum(1 for c in x["coincide_con"].values() if c is None)
+    sub = x.get("por_plan") or x.get("por_trayectoria")
+    return sum(_dif_ref(y) for y in sub.values()) if sub else 0
+
+
+def dif_total(salida):
+    """Diferencia total de la validación: suma de |dif| de niveles y TOTAL (cada referencia parcial perdida vale 1);
+    infinita si no hay materias."""
+    if not any(n["materias"] for n in salida["niveles"]):
+        return float("inf")
+    v = salida["validacion"]
+    t = 0.0
+    for n in v.get("niveles", []):
+        for c, d in (n.get("diferencias") or {}).items():
+            t += len(d) if c == "referencia_parcial" else abs(d["dif"])
+    return round(t + _dif_ref(v.get("total")), 2)
+
+
+def clave_mejor(salida):
+    """Menor es mejor: ok > solo_total > discrepancia (otros estados no compiten); luego menor diferencia total."""
+    rango = {"ok": 0, "solo_total": 1, "discrepancia": 2}.get(salida["validacion"]["estado"], 9)
+    return (rango, dif_total(salida), -sum(len(n["materias"]) for n in salida["niveles"]))
+
+
+def textos_originales(nombre):
+    caches = sorted((BASE / "img").glob(f"{nombre}-p*.ocr.txt"),
+                    key=lambda f: int(re.search(r"-p(\d+)\.ocr\.txt$", f.name)[1]))
+    if not caches:
+        raise FileNotFoundError(f"{nombre}: no hay .ocr.txt original en caché")
+    paginas = [int(re.search(r"-p(\d+)\.ocr\.txt$", f.name)[1]) for f in caches]
+    return paginas, {p: c.read_text(encoding="utf-8") for p, c in zip(paginas, caches)}
+
+
+OPC_SILENCIO = {"callar": True, "sin_llm": True, "solo_ocr": False}
+
+
+def base_relectura(pdf):
+    """Re-análisis (sin OCR) del texto original con las reglas actuales: (paginas, textos, salida)."""
+    paginas, textos = textos_originales(pdf.stem)
+    previo = json.loads((BASE / "json" / f"{pdf.stem}.json").read_text(encoding="utf-8"))
+    return paginas, textos, armar(pdf, paginas, textos, previo.get("tiempos", {}), [1], 0, OPC_SILENCIO, escribir=False)
+
+
+def relectura(pdf, base, k, total_pasos):
+    """Relee el PDF en franjas a mayor resolución y conserva el mejor resultado (original o relectura)."""
+    nombre = pdf.stem
+    paginas, textos, orig = base
+    jf = BASE / "json" / f"{nombre}.json"
+    previo = json.loads(jf.read_text(encoding="utf-8"))
+    estado_antes = previo.get("relectura", {}).get("estado_antes") or previo["validacion"]["estado"]
+    dif_antes = dif_total(orig)
+    ganador, fuente, info = orig, "original", {}
+    if orig["validacion"]["estado"] != "ok":
+        nuevos, tiempos, nfr = {}, {}, {}
+        for p in paginas:
+            partes, seg_pag = [], 0.0
+            lista = franjas(pdf, p)
+            for i, png in enumerate(lista, 1):
+                t0 = time.time()
+                texto, seg, cache = ocr_franja(png)
+                seg_pag += seg
+                partes.append(texto)
+                print(f"[{k[0]}/{total_pasos}] {nombre} pág {p} franja {i} · ocr"
+                      f"{' (caché)' if cache else f' ({time.time() - t0:.0f} s)'}", flush=True)
+                k[0] += 1
+            nuevos[p] = unir(partes)
+            tiempos[p] = {"relectura_segundos": round(seg_pag, 1), "franjas": len(lista)}
+            nfr[p] = len(lista)
+        rel = armar(pdf, paginas, nuevos, tiempos, [1], 0, OPC_SILENCIO, escribir=False)
+        k[0] += 1
+        info = {"estado_relectura": rel["validacion"]["estado"], "dif_relectura": dif_total(rel),
+                "segundos_por_pagina": {str(p): tiempos[p]["relectura_segundos"] for p in paginas}}
+        if clave_mejor(rel) < clave_mejor(ganador):
+            ganador, fuente = rel, "relectura"
+        # combinaciones por página (original o relectura en cada una): hasta 6 páginas todas; más, solo cambios de una
+        n = len(paginas)
+        if 1 < n <= 6:
+            mascaras = [m for m in itertools.product((0, 1), repeat=n) if 0 < sum(m) < n]
+        elif n > 6:
+            mascaras = [tuple(int(i == j) for i in range(n)) for j in range(n)]
+        else:
+            mascaras = []
+        for m in mascaras:
+            mezcla = {p: (nuevos[p] if usa else textos[p]) for p, usa in zip(paginas, m)}
+            t_mezcla = {p: (tiempos[p] if usa else {}) for p, usa in zip(paginas, m)}
+            cand = armar(pdf, paginas, mezcla, t_mezcla, [1], 0, OPC_SILENCIO, escribir=False)
+            if clave_mejor(cand) < clave_mejor(ganador):
+                ganador = cand
+                fuente = "mixta (" + ", ".join(f"pág {p}: {'relectura' if usa else 'original'}"
+                                               for p, usa in zip(paginas, m)) + ")"
+    else:
+        k[0] += 1
+    despues = ganador["validacion"]["estado"]
+    ganador["relectura"] = dict(info, fuente_ganadora=fuente, estado_antes=estado_antes, estado_despues=despues,
+                                dif_original=dif_antes, dif_final=dif_total(ganador))
+    ganador["relectura"] = {c: (None if v == float("inf") else v) for c, v in ganador["relectura"].items()}
+    jf.write_text(json.dumps(ganador, ensure_ascii=False, indent=1), encoding="utf-8")
+    print(f"  {nombre}: {estado_antes} → {despues} (fuente: {fuente}; dif {ganador['relectura']['dif_original']} → "
+          f"{ganador['relectura']['dif_final']})", flush=True)
+    return ganador
+
+
 # ---------------------------------------------------------------- principal
 def procesar(pdf, k, total_pasos, opciones):
     nombre = pdf.stem
@@ -565,13 +787,24 @@ def procesar(pdf, k, total_pasos, opciones):
             textos[p], tiempos[p] = ocr_pagina(png)
     if opciones["solo_ocr"]:
         return None
+    return armar(pdf, paginas, textos, tiempos, k, total_pasos, opciones)
+
+
+def paso(k, total_pasos, texto, opciones):
+    if not opciones.get('callar'):
+        print(f"[{k[0]}/{total_pasos}] {texto}", flush=True)
+    k[0] += 1
+
+
+def armar(pdf, paginas, textos, tiempos, k, total_pasos, opciones, escribir=True):
+    """Analiza los textos por página, valida, compara con el repositorio y (si escribir) guarda el JSON."""
+    nombre = pdf.stem
     niveles, optativas, total, no_tabla, marcas = [], [], None, [], []
     planes = {encabezado(t)[1] for t in textos.values()} - {None}
     varios_planes = len(planes) > 1
     plan_pagina, totales_plan = None, {}
     for p in paginas:
-        print(f"[{k[0]}/{total_pasos}] {nombre} pág {p} · análisis", flush=True)
-        k[0] += 1
+        paso(k, total_pasos, f"{nombre} pág {p} · análisis", opciones)
         nv, op, tot, resto = analizar(textos[p])
         plan_pagina = encabezado(textos[p])[1] or plan_pagina
         if varios_planes:
@@ -613,8 +846,7 @@ def procesar(pdf, k, total_pasos, opciones):
         else:
             gfus[clave] = g
     optativas = list(gfus.values())
-    print(f"[{k[0]}/{total_pasos}] {nombre} · validación", flush=True)
-    k[0] += 1
+    paso(k, total_pasos, f"{nombre} · validación", opciones)
     val = validar(niveles, total, optativas)
     if varios_planes:
         informes = {pl: validar([n for n in niveles if n.get('plan') == pl], totales_plan.get(pl),
@@ -650,9 +882,41 @@ def procesar(pdf, k, total_pasos, opciones):
               "paginas_no_tabla": no_tabla, "tiempos": tiempos}
     if varios_planes:
         salida['totales_por_plan'] = totales_plan
-    (BASE / "json").mkdir(exist_ok=True)
-    (BASE / "json" / f"{nombre}.json").write_text(json.dumps(salida, ensure_ascii=False, indent=1), encoding="utf-8")
+    if escribir:
+        (BASE / "json").mkdir(exist_ok=True)
+        (BASE / "json" / f"{nombre}.json").write_text(json.dumps(salida, ensure_ascii=False, indent=1), encoding="utf-8")
     return salida
+
+
+def modo_relectura(args):
+    """--relectura: PDF con estado 'discrepancia' (o los indicados) se releen en franjas; reanudable por caché."""
+    estados = {}
+    for f in sorted((BASE / 'json').glob('*.json')):
+        if not f.name.startswith('_'):
+            d = json.loads(f.read_text(encoding='utf-8'))
+            estados[f.stem] = (d['validacion'].get('estado'), 'relectura' in d)
+    pdfs = [pathlib.Path(a) for a in args] or [BASE / 'pdf' / (n + '.pdf') for n, (e, _) in estados.items()
+                                               if e == 'discrepancia']
+    pdfs = [p for p in pdfs if p.stem in estados and estados[p.stem][0] == 'discrepancia']
+    bases = {p: base_relectura(p) for p in pdfs}
+    tam = {p: tamanios(p) for p in pdfs if bases[p][2]['validacion']['estado'] != 'ok'}
+    pasos = sum(sum(n_franjas(*tam[p][pg - 1]) for pg in bases[p][0]) + 1 for p in tam) + (len(pdfs) - len(tam))
+    k = [1]
+    for p in pdfs:
+        relectura(p, bases[p], k, pasos)
+    resumen = {}
+    for f in sorted((BASE / 'json').glob('*.json')):
+        if not f.name.startswith('_'):
+            d = json.loads(f.read_text(encoding='utf-8'))
+            v = d['validacion']
+            resumen[f.stem + '.pdf'] = {'estado': v.get('estado', 'pendiente'), 'motivo': v.get('motivo', ''),
+                                       'materias': sum(len(n['materias']) for n in d['niveles']),
+                                       **({'fuente': d['relectura']['fuente_ganadora']} if 'relectura' in d else {})}
+    conteos = {e: sum(v['estado'] == e for v in resumen.values())
+               for e in ('ok', 'solo_total', 'sin_referencia', 'discrepancia', 'no_es_tabla', 'pendiente')}
+    (BASE / 'json' / '_resumen.json').write_text(json.dumps(
+        {'conteos': conteos, 'pdfs': resumen}, ensure_ascii=False, indent=2), encoding='utf-8')
+    print(f'Resumen: {conteos}', flush=True)
 
 
 def main():
@@ -660,7 +924,12 @@ def main():
         sys.stdout.reconfigure(encoding="utf-8")
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     opciones = {"solo_ocr": "--solo-ocr" in sys.argv, "sin_llm": "--sin-llm" in sys.argv,
-                'solo_analisis': '--solo-analisis' in sys.argv}
+                'solo_analisis': '--solo-analisis' in sys.argv, 'relectura': '--relectura' in sys.argv}
+    if opciones['relectura']:
+        if opciones['solo_ocr'] or opciones['solo_analisis']:
+            raise SystemExit('--relectura es incompatible con --solo-ocr y --solo-analisis')
+        modo_relectura(args)
+        return
     if opciones['solo_analisis'] and opciones['solo_ocr']:
         raise SystemExit('--solo-analisis y --solo-ocr son excluyentes')
     if opciones['solo_analisis']:

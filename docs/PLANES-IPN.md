@@ -12,6 +12,7 @@ D:/Tools/ai-venv/Scripts/python.exe tools/planes_ocr.py ruta.pdf   # uno solo
 ... --solo-ocr    # solo renderizar y hacer OCR
 ... --sin-llm     # sin respaldo con qwen3.5:9b
 ... --solo-analisis # regenera JSON exclusivamente desde img/*.ocr.txt; sin render, OCR ni Ollama
+... --relectura [pdf ...] # relee en franjas a mayor resolución los PDF con estado 'discrepancia' (sección 2b)
 ```
 
 El modo OCR requiere Ollama en `127.0.0.1:11434` con `glm-ocr` (y `qwen3.5:9b` para el respaldo).
@@ -31,7 +32,8 @@ se informa como error, sin intentar obtenerla. Es incompatible con `--solo-ocr`.
    números en la misma línea o separados, números partidos en varias líneas, SUBTOTAL, TOTAL y bloques de optativas
    (por nivel o por trayectoria, con sus etiquetas «OPTATIVA A1 o B1»). Si una página no tiene estructura reconocible
    y sí filas numéricas, usa `qwen3.5:9b` (JSON, `num_ctx` 8192) y lo marca en `validacion.marcas`.
-3. **Validación**: suma por nivel contra SUBTOTAL y suma total contra TOTAL (tolerancia 0.05); lista materias
+3. **Validación**: suma por nivel contra SUBTOTAL y suma total contra TOTAL (tolerancia 0.05 en TEPIC y horas; **0.25 por nivel en créditos SATCA**, porque los PDF
+   redondean: p. ej. it-upiita difiere 0.2); lista materias
    sospechosas (T+P ≠ T/H, o cuyo valor explica la diferencia). Si el OCR perdió columnas del TOTAL, cada valor
    debe coincidir con alguna suma.
 4. **Comparación** con `data/` (sin modificarlo): materias que faltan o sobran por nombre normalizado, créditos
@@ -52,6 +54,29 @@ bloques de nombres seguidos de cifras, columnas solo de créditos y AA (aprendiz
 por semestre se trata como subtotal. Los catálogos de optativas se excluyen de la suma obligatoria; electivas
 de dos créditos sin horas se registran en el nivel 0. Los PDF con varios planes conservan `nivel.plan`,
 `totales_por_plan` y `validacion.por_plan`; las opciones/trayectorias explícitas se validan por separado.
+
+## 2b. Relectura en franjas (`--relectura`)
+
+Para los PDF cuyo `validacion.estado` es `discrepancia` (por omisión todos; o los que se indiquen):
+
+1. Re-analiza el `.ocr.txt` original con las reglas actuales (tolerancia SATCA 0.25). Si ya cuadra (`ok`), no gasta OCR.
+2. Si no, renderiza cada página a 3600 px de lado largo y la corta en franjas horizontales con 12 % de traslape
+   (3 franjas en páginas apaisadas, 4 en verticales); cada borde se ajusta a la fila más blanca cercana para no
+   partir texto. OCR de cada franja con `glm-ocr` «Table Recognition:» (misma protección contra bucles) y unión del
+   texto quitando las líneas duplicadas por el traslape.
+3. Re-analiza con el texto nuevo y conserva el mejor resultado: `ok` > `solo_total` > `discrepancia`; entre
+   discrepancias, la de menor diferencia total (suma de |dif| de niveles y TOTAL; cada referencia parcial perdida
+   vale 1; sin materias = infinita). También prueba combinaciones por página (original o relectura en cada una; `fuente_ganadora` = «mixta (…)»).
+   Antes de unir, se quitan cercos ```` ``` ```` y bloques repetidos (`quitar_bloques`). El JSON anota `relectura.fuente_ganadora` (`original`|`relectura`),
+   `estado_antes`, `estado_despues`, `dif_original`, `dif_final` y segundos por página; `_resumen.json` agrega `fuente`.
+4. Caché propia, sin tocar el OCR original: `img/<pdf>-p<N>-hr.json` (cortes), `-hr-f<k>.png`, `.ocr2.txt`
+   y `.ocr2.json`. Es **reanudable**: al repetir el comando se salta lo ya presente en caché. Borra los
+   `-p<N>-hr*` de un PDF para repetir su relectura.
+5. Prueba (2026-10-06, ienergia-upiita e ibm-upibi): ~11 s por franja, ~45 s por página; la relectura no mejoró
+   (conservó el original): `glm-ocr` en franjas estrechas inventa encabezados y mezcla semestres. Es una opción más, no
+   una garantía. Lote completo: 140 páginas / 560 franjas, ~1.5 a 2 h.
+6. Progreso: `[n/M] <pdf> pág <p> franja <k> · ocr (14 s)` por franja y, al final de cada PDF,
+   `<pdf>: estado antes → después (fuente: ...)`.
 
 ## 3. Limitaciones y pendientes
 
