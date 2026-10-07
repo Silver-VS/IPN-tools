@@ -11,6 +11,18 @@ const cargarPlot=()=>window.Plot?Promise.resolve():PLOT_P||(PLOT_P=LIB_PLOT.redu
   };document.head.appendChild(s)})),Promise.resolve()));
 
 let ST_RENDER=0;
+const trayectoriaAbierta=(id,inicial=false)=>store.get('trayectoria.seccion.'+id,!MQ_PHONE.matches&&inicial);
+function prepararSeccion(el,id,dibujar){
+  el.open=trayectoriaAbierta(id,id==='kardex'||id==='escenario');
+  let dibujada=false,turno=0;
+  const abrir=()=>{if(!el.open||dibujada)return;dibujada=true;const actual=++turno;return Promise.resolve(dibujar?.(()=>el.open&&actual===turno)).catch(e=>{
+    if(actual===turno)dibujada=false;console.error('SATE: fallo al abrir sección',{unidad:UNIDAD,carrera:S.car,seccion:id,error:e.message});
+  })};
+  // El primer toggle también se emite al montar: solo guardar cambios del usuario.
+  let anterior=el.open;
+  el.addEventListener('toggle',()=>{if(anterior!==el.open){anterior=el.open;store.set('trayectoria.seccion.'+id,el.open)}if(!el.open){dibujada=false;turno++}return abrir()});
+  return abrir();
+}
 function metaResumen(D,H,incluyeActual){
   const M=metaCreditos(D,H,incluyeActual);
   if(!M.valida)return '<p class="muted">Escribe un número entero de periodos (1 o más).</p>';
@@ -172,28 +184,24 @@ async function renderStatsVista(){
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu camino en la carrera ${simTag('camino')}</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',Dc.simulado?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
     </div>
-    <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo ${simTag('kardex')}</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>Dk.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(Dk.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
-    </div>
-    <section class="trayectoria-escenario" aria-labelledby="trayectoria-escenario-titulo"><h3 id="trayectoria-escenario-titulo">${esc(SATE.texto('sate.trayectoria.y_si'))}</h3>
+    <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}<small>${esc(SATE.texto('sate.trayectoria.kardex_resumen',{n:Dk.rows.length}))}</small></summary><div class="charts">
+      <figure class="ch-wide"><figcaption>${simTag('kardex')}${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>Dk.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(Dk.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
+    </div></details>
+    <details class="trayectoria-plegable" id="trayectoria-escenario"><summary id="trayectoria-escenario-titulo">${esc(SATE.texto('sate.trayectoria.y_si'))}</summary><div>
       ${conSim(usaSim('meta'),()=>metaPanel(statsDatos()))}
       ${conSim(usaSim('pm'),()=>promMetaPanel(statsDatos()))}
-      <div id="trayectoria-sim-slot"></div>
-    </section>
-    <div class="charts">
-      <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio ${simTag('areas')}</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${Da.media!=null?Da.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
-    </div>
-    <div class="kanal" id="kanal"></div>
+    </div></details>
+    <div id="trayectoria-sim-slot"></div>
+    <details class="trayectoria-plegable" id="trayectoria-areas"><summary>${esc(SATE.texto('sate.trayectoria.areas'))}<small id="trayectoria-areas-resumen"></small></summary><div class="charts">
+      <figure class="ch-wide"><figcaption>${simTag('areas')}${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${Da.media!=null?Da.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
+    </div></details>
+    <details class="trayectoria-plegable" id="trayectoria-observaciones"><summary>${esc(SATE.texto('sate.trayectoria.observaciones'))}</summary><div class="kanal" id="kanal"></div></details>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
   $('#trayectoria-sim-slot').appendChild($('#desempeno-simulacion'));
   if(focoSim)focoSim.focus();
-  if(!D.rows.length){const cs=box.querySelectorAll('.charts');cs[0].innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';cs.forEach((x,j)=>{if(j)x.remove()});conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
-  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
-  if(revision!==ST_RENDER||SATE.actual?.pestana!=='trayectoria')return;
-  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER||SATE.actual?.pestana!=='trayectoria')return;{const cs=box.querySelectorAll('.charts');cs[0].innerHTML=`<p class="muted">${esc(e.message)}</p>`;cs.forEach((x,j)=>{if(j)x.remove()})}conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
-  if(revision!==ST_RENDER||SATE.actual?.pestana!=='trayectoria')return;
-  conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));
-  const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
+  prepararSeccion($('#trayectoria-escenario'),'escenario');
+  prepararSeccion($('#trayectoria-observaciones'),'observaciones',()=>conSim(usaSim('obs'),()=>renderAnalisis(statsDatos())));
+  const cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
   const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
   const base=el=>({width:Math.max(260,$(el).clientWidth),style:{background:'transparent',color:tok('--fg'),fontSize:'11px',fontFamily:'inherit',overflow:'visible'},marginLeft:40,marginBottom:32});
   const put=(id,fig)=>montarGrafica($(id),fig);
@@ -217,7 +225,7 @@ async function renderStatsVista(){
         (limite!=null&&totalPer>plazo.max?`<p class="cm-alerta">A tu ritmo rebasarías el plazo de referencia de ${plazo.max} periodos (${esc(perName(limite))}).</p>`:'')+
         (plazo.max?`<p class="cm-ref">Plazo de referencia: ${plazo.max} periodos ${info(plazo.calculado?`${fmtCr(A.carga.total)} créditos del plan ÷ ${fmtCr(A.carga.min)} de carga mínima. El SAES indica una duración de ${A.carga.duracion??'—'} y un máximo de ${A.carga.duracion_max??'—'} periodos; confirma tu plazo con Gestión Escolar.`:'Plazo máximo indicado por el SAES.')}</p>`:'')}}
   // 2) kárdex por periodo: cada materia es un cuadro con su calificación; encabezado con promedio y créditos
-  {const host=$('#ch-kx');
+  prepararSeccion($('#trayectoria-kardex'),'kardex',()=>{const host=$('#ch-kx');
     const col=(t,sub,rs)=>`<div class="kx-col"><div class="kx-h"><b>${esc(t)}</b><small>${sub}</small></div><div class="kx-cs">${rs.slice().sort((a,b)=>b.cal-a.cal).map(r=>{
       const l={EXT:'E',ETS:'T',REC:'R'}[r.codigo]||'';
       return `<span class="kx-c g${Math.round(r.cal)}${r.sim?' sim':''}" title="${esc(r.nombre)} · ${r.cal} · ${esc(r.forma)}${r.sim?' · simulada':''}">${r.cal}${l?`<i>${l}</i>`:''}</span>`}).join('')}</div></div>`;
@@ -226,9 +234,18 @@ async function renderStatsVista(){
     host.innerHTML=`<div class="kx">`+(eq.length?col('Equivalencias',`${eq.length} materias`,eq):'')+
       Dk.porPer.filter(d=>d.n).map(d=>{const rs=Dk.rows.filter(r=>!r.eqv&&r.per===d.per), dif=prev!=null?d.prom-prev:null;prev=d.prom;
         return col(d.lbl,`${f2(d.prom)}${dif!=null&&Math.abs(dif)>=.01?` <em class="${dif>0?'up':'down'}">${dif>0?'▲':'▼'}</em>`:''} · ${d.cr!=null?fmtCr(d.cr)+' cr':''}`,rs)}).join('')+
-      (sinP.length?col('Sin periodo',`${sinP.length} materias`,sinP):'')+`</div>`}
+      (sinP.length?col('Sin periodo',`${sinP.length} materias`,sinP):'')+`</div>`});
   // 3) áreas frente a tu promedio: barras divergentes alrededor de tu promedio de aprobadas
-  const porArea=d3.groups(Da.rows,r=>r.cat).map(([cat,v])=>({cat,media:d3.mean(v,r=>r.cal),n:v.length})).map(d=>({...d,dif:d.media-Da.media})).sort((a,b)=>b.dif-a.dif);
+  const grupos=new Map();for(const r of Da.rows){if(!grupos.has(r.cat))grupos.set(r.cat,[]);grupos.get(r.cat).push(r.cal)}
+  const porArea=[...grupos].map(([cat,v])=>({cat,media:v.reduce((a,b)=>a+b,0)/v.length,n:v.length})).map(d=>({...d,dif:d.media-Da.media})).sort((a,b)=>b.dif-a.dif);
+  $('#trayectoria-areas-resumen').textContent=porArea.length?SATE.texto('sate.trayectoria.areas_resumen',{area:porArea[0].cat,promedio:porArea[0].media.toFixed(1)}):'';
+  return prepararSeccion($('#trayectoria-areas'),'areas',async(abierta)=>{
+  const vigente=()=>revision===ST_RENDER&&SATE.actual?.pestana==='trayectoria'&&abierta();
+  await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r))); // Medir después de abrir el details.
+  if(!vigente()||!porArea.length)return;
+  try{await cargarPlot()}catch(e){if(vigente())$('#ch-cat').innerHTML=`<p class="muted">${esc(e.message)}</p>`;throw e}
+  if(!vigente())return;
+  const P=window.Plot;
   // escala fija de al menos ±2.5 puntos: diferencias pequeñas se ven pequeñas; ±0.25 se considera similar (gris)
   const lim=Math.max(2.5,...porArea.map(d=>Math.abs(d.dif)*1.2)), ALT=tok('--ch-alert')||'#d9480f', SIM_=Math.abs, col=d=>SIM_(d.dif)<.25?MUT:d.dif>0?OK:ALT;
   put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(150,porArea.length*28+50),marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
@@ -237,7 +254,8 @@ async function renderStatsVista(){
       P.barX(porArea,{x:'dif',y:'cat',fill:col,fillOpacity:.6,rx:3,tip:true,title:d=>`${d.cat}\npromedio ${f2(d.media)} (${d.n} ${d.n>1?'materias':'materia'})\n${d.dif>=0?'+':''}${d.dif.toFixed(2)} frente a tu promedio`}),
       P.text(porArea.filter(d=>d.dif>=0),{x:'dif',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:6,textAnchor:'start',fill:tok('--fg'),fontWeight:600}),
       P.text(porArea.filter(d=>d.dif<0),{x:'dif',y:'cat',text:d=>`${d.media.toFixed(1)} (${d.n})`,dx:-6,textAnchor:'end',fill:tok('--fg'),fontWeight:600}),
-      P.ruleX([0],{stroke:tok('--fg'),strokeWidth:1.5})]}));
+       P.ruleX([0],{stroke:tok('--fg'),strokeWidth:1.5})]}));
+  });
 }
 
 
@@ -278,6 +296,7 @@ $('#est-sim').addEventListener('change',e=>{const t=e.target,d=t.dataset;
 
 SATE.pestana('trayectoria',{
   montar(){
+    prepararSeccion($('#desempeno-simulacion'),'simulacion');
     $('#desempeno-titulo').textContent=SATE.texto('sate.pestana.trayectoria.titulo');
     $('#desempeno-sim-titulo').textContent=SATE.texto('sate.desempeno.sim_titulo');
     $('#desempeno-lector').textContent=SATE.texto('sate.desempeno.lector');
