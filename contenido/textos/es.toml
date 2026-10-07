@@ -115,6 +115,11 @@ actualizar_publicacion = "Las citas de {periodo} se publicaron el {fecha}. Usa e
 actualizar_antiguedad = "Estos datos tienen {dias} días. Usa el Lector después de inscribirte o de que se publiquen tus calificaciones."
 
 [sate.calendario]
+recorte = "Lo próximo: {proceso} · {fecha}"
+recorte_abrir = "Ver en Calendario: {proceso}, {fecha}"
+recorte_mas = "+1 más"
+tu_cita = "Tu cita de reinscripción"
+fuente_saes = "SAES del alumno"
 anterior = "Mes anterior"
 proximo = "Mes siguiente"
 filtros = "Filtrar por categoría"
@@ -478,7 +483,7 @@ kardex_resumen = "{n, plural, one {# materia acreditada} other {# materias acred
 areas = "Tus áreas frente a tu promedio"
 areas_resumen = "Mejor: {area} {promedio}"
 observaciones = "Observaciones para planear"
-resumen = "Periodo {periodo} · {avance} de la carrera · {desfase}. Lo próximo: {proximo}"
+resumen = "Periodo {periodo} · {avance} de la carrera · {desfase}."
 siguiente_paso = "Tu siguiente paso"
 sin_avance = "avance por confirmar"
 y_si = "¿Y si…?"

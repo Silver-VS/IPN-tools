@@ -187,8 +187,29 @@ function semRef(){
 SATE.calendario={
   categorias:['academico','gestion','becas','servicios','tt','feriado'],
   hoy(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
-  eventos(){const c=DATA.calendario;return c?[...(c.actividades||[]).map(a=>({...a,hasta:a.hasta||a.desde,categoria:'gestion',fuente:a.fuente||c.fuente,periodo:c.periodo})),...(c.eventos||[])]:[]},
-  proximos(n=5,categorias=this.categorias){const hoy=this.hoy();return this.eventos().filter(a=>a.hasta>=hoy&&categorias.includes(a.categoria)).sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta)).slice(0,Math.max(0,n))}
+  cita(){
+    if(typeof isPersonal!=='function'||!isPersonal())return null;
+    const iso=s=>{const m=String(s||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);return m?m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'):null}, desde=iso(ALUMNO.cita?.inicio);
+    return desde?{desde,hasta:iso(ALUMNO.cita.fin)||desde,titulo:SATE.texto('sate.calendario.tu_cita'),categoria:'gestion',periodo:perName(perDeFecha(ALUMNO.cita.inicio)),fuente:SATE.texto('sate.calendario.fuente_saes'),nota:ALUMNO.cita.inicio,personal:true}:null;
+  },
+  eventos(){const c=DATA.calendario, cita=this.cita();return c?[...(c.actividades||[]).map(a=>({...a,hasta:a.hasta||a.desde,categoria:'gestion',fuente:a.fuente||c.fuente,periodo:c.periodo})),...(c.eventos||[]),...(cita?[cita]:[])]:[]},
+  proximos(n=5,categorias=this.categorias){const hoy=this.hoy();return this.eventos().filter(a=>a.hasta>=hoy&&categorias.includes(a.categoria)).sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta)).slice(0,Math.max(0,n))},
+  recorte(pestana){
+    if(!SATE_CONFIG.unidades[SATE_UNIDAD].pestanas.includes('calendario')||!['horarios','mapa','trayectoria'].includes(pestana))return [];
+    const todos=this.proximos(Infinity,pestana==='trayectoria'?this.categorias:['gestion','academico']);
+    const adeudos=pestana==='mapa'&&isPersonal()&&conSim(false,()=>tr().fail.length>0);
+    return todos.filter(e=>pestana==='trayectoria'||(pestana==='horarios'?(e.personal||/citas publicadas|inscripci[oó]n/i.test(e.titulo)&&!/ETS/i.test(e.titulo)):(/^Inicio del periodo/i.test(e.titulo)||adeudos&&/ETS/i.test(e.titulo)))).slice(0,2);
+  },
+  abrirProceso(evento){this.procesoPendiente=evento;SATE.ir('calendario')},
+  pintarRecorte(pestana){
+    // Mi trayectoria reutiliza el próximo proceso dentro de su resumen personal.
+    const panel=document.getElementById(pestana==='horarios'?'v-hor':pestana==='mapa'?'v-tray':'sate-trayectoria');
+    if(!panel||!['horarios','mapa','trayectoria'].includes(pestana))return;
+    Array.from(panel.children).find(n=>n.className==='sate-recorte-calendario')?.remove();
+    if(pestana==='trayectoria'&&isPersonal())return;
+    const recorte=SateUI.recorteCalendario(this.recorte(pestana));
+    if(recorte)panel.insertBefore(recorte,panel.firstChild);
+  }
 };
 let CALAP=null, CALSEL=null;
 function renderCalendario(rd,nDes){

@@ -1,4 +1,9 @@
 /* Componentes de SATE: solo variables --ipn-* (vendor/ipn-comun/dist/tokens.css). */
+.sate-recorte-calendario{display:flex;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:0;height:28px;margin:0 0 var(--ipn-esp-2);padding:0;color:var(--ipn-tenue);background:none;border:0;font:inherit;font-size:var(--ipn-tamano-xs);text-align:left;cursor:pointer}
+.sate-recorte-calendario__texto{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sate-recorte-calendario__mas{flex:none;white-space:nowrap}
+.sate-recorte-calendario:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.trayectoria-resumen .sate-recorte-calendario{margin:0}
 /* Dos filas, sin separadores heredados. min-width:0 permite carreras largas. */
 header.top{border-bottom:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0}
 .brand .title-row{display:flex;justify-content:space-between;gap:var(--ipn-esp-2)}

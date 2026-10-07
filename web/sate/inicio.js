@@ -137,6 +137,7 @@
     if (!actual) return;
     if (window.SATE_DATA.mapas[api.estado.car]?.generico && actual.pestana !== 'horarios') { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos(); modulos[actual.pestana].mostrar(actual);
+    SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
     document.getElementById('sate-oferta-periodo').hidden=actual.pestana!=='horarios';
     document.getElementById('notice').hidden=actual.pestana!=='horarios';

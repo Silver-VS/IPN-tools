@@ -82,7 +82,7 @@
     api.categorias.filter(c=>eventos.some(e=>e.categoria===c)).forEach(c=>{const li=el('li',null);li.setAttribute('data-categoria',c);const muestra=el('span',null,'calendario-muestra');muestra.setAttribute('aria-hidden','true');li.appendChild(muestra);li.appendChild(el('span',tx('categoria_'+c)));leyenda.appendChild(li)});contenido.appendChild(leyenda);
     const procesos=el('section',null,'calendario-lista');procesos.appendChild(el('h3',tx('procesos')));const lista=el('ul',null,'calendario-procesos');
     items.forEach(({e})=>{const li=el('li'), b=boton('',()=>abrir([e],tx('detalle')));b.className='calendario-proceso';b.setAttribute('data-categoria',e.categoria);b.appendChild(el('span',e.titulo));b.appendChild(el('small',rango(e)));filas.push({e,nodo:b});li.appendChild(b);lista.appendChild(li)});procesos.appendChild(lista);
-    actualizarSeleccion=()=>{for(const {e,nodo} of [...marcas,...filas])nodo.setAttribute('aria-pressed',!!detalleActual?.eventos.includes(e))};
+    actualizarSeleccion=()=>{for(const {e,nodo} of [...marcas,...filas])nodo.setAttribute('aria-pressed',!!detalleActual?.eventos.some(d=>d.titulo===e.titulo&&d.desde===e.desde&&d.hasta===e.hasta&&d.periodo===e.periodo))};
     if(!eventos.length)procesos.appendChild(el('p',tx('sin_eventos')));return procesos;
   }
   function mesGrafico(contenido,todos,eventos){
@@ -117,6 +117,11 @@
     if(!eventos.length){box.appendChild(el('p',tx('sin_eventos')));return}
     const planeado=typeof perMeta==='function'?perName(perMeta()):DATA.calendario?.periodo;
     if(planeado!==planeadoAnterior||!opciones.includes(periodo)){periodo=opciones.includes(planeado)?planeado:opciones.includes(DATA.calendario?.periodo)?DATA.calendario.periodo:opciones.at(-1);planeadoAnterior=planeado;mes=null;semana=null;detalleActual=null}
+    const solicitado=api.procesoPendiente;
+    if(solicitado){
+      periodo=solicitado.periodo;mes=solicitado.desde.slice(0,7);semana=solicitado.desde;foco=solicitado.desde;seleccion.add(solicitado.categoria);
+      detalleActual={eventos:[solicitado],titulo:tx('detalle')};api.procesoPendiente=null;
+    }
     box.appendChild(el('p',tx('instrucciones'),'calendario-intro'));
     const controles=el('div',null,'calendario-controles');controles.appendChild(segmento([['periodo','vista_periodo'],['mes','vista_mes']],vista,'vista',id=>{vista=id;IPNT.set('hu.cal.vista',id);detalleActual=null}));
     const label=el('label',tx('periodo'),'calendario-selector'), select=el('select');select.id='cal-periodo';select.setAttribute('aria-label',tx('periodo'));opciones.forEach(p=>{const o=el('option',tx('periodo_nombre',{periodo:p}));o.value=p;o.selected=p===periodo;select.appendChild(o)});select.onchange=()=>{periodo=select.value;mes=null;semana=null;detalleActual=null;redibujar('cal-periodo')};label.appendChild(select);controles.appendChild(label);box.appendChild(controles);
@@ -130,6 +135,7 @@
       detalleActual={eventos:proximo?[proximo]:[],titulo:tx('detalle')};
     }
     pintarDetalle();box.appendChild(el('p',tx(vista==='periodo'?'leyenda_periodo':'leyenda_mes'),'calendario-leyenda'));
+    if(solicitado)document.getElementById('cal-detalle-titulo').focus();
   }
   SATE.pestana('calendario',{montar(){},mostrar,ocultar(){}});
 })();
