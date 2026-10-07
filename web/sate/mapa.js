@@ -146,4 +146,10 @@ function renderList(){
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
 
-SATE.pestana('mapa',{montar(){},mostrar(){renderTray()},ocultar(){tipOculta()}});
+function renderAyudaPrimeraVisita(){
+  const box=$('#map-primera-visita');box.replaceChildren();
+  box.hidden=!!ALUMNO&&!ALUMNO.demo||store.get('mapAyudaDescartada',false);
+  if(!box.hidden)box.appendChild(SateUI.aviso({estado:'info',titulo:SATE.texto('sate.planeacion.primera_visita'),descartable:true,
+    alDescartar(){store.set('mapAyudaDescartada',true);box.hidden=true}}));
+}
+SATE.pestana('mapa',{montar(){},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta()}});

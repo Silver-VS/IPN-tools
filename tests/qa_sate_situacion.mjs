@@ -45,7 +45,7 @@ c=vm.createContext({console,document,SATE,SATE_CONFIG:config,SATE_DATA:{...datos
   requestAnimationFrame:fn=>fn(),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:375,innerHeight:800,
   Event:class{constructor(type){this.type=type}},fetch(){throw new Error('Red prohibida')}});
 vm.runInContext('window=globalThis',c);
-document.getElementById('saes-open').appendChild(new Nodo('span'));
+for(const clase of ['sate-texto-largo','sate-texto-corto']){const n=new Nodo('span');n.className=clase;document.getElementById('saes-open').appendChild(n)}
 const who=new Nodo('span');who.id='saes-who';document.getElementById('saes-status').appendChild(who);
 for(const n of ['componentes.js','nucleo.js','situacion.js'])vm.runInContext(leer('web/dist/sate/'+n),c,{filename:n});
 c.SateUI.usarTextos(texto);

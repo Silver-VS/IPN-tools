@@ -442,6 +442,8 @@ textarea.paste{width:100%;min-height:5rem;font-family:var(--f-mono);font-size:.7
 
 /* ---------- horario ---------- */
 .filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding-block:12px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+/* Con «Más filtros» abierto la franja crece: deja de ser fija para no tapar la oferta ni Mi semana. */
+.filters:has(details[open]){position:relative}
 .filters #f-more{flex-basis:100%;min-width:0}
 .filters #f-more summary{cursor:pointer;color:var(--accent);font-weight:600}
 .filters .more-filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding-top:10px}
@@ -720,12 +722,13 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
   <section id="sate-trayectoria" class="card" hidden>
     <h2 id="desempeno-titulo"></h2>
     <div id="sate-presente"></div>
-    <div id="desempeno-vacio" hidden><p id="desempeno-vacio-texto"></p><button class="btn" type="button" id="desempeno-lector"></button></div>
+    <div id="desempeno-vacio" hidden><p id="desempeno-vacio-texto"></p><div class="actions"><button class="btn primary" type="button" id="desempeno-lector"></button><button class="btn" type="button" id="desempeno-explorar"></button></div></div>
     <details class="sate-desp" id="desempeno-simulacion" hidden><summary id="desempeno-sim-titulo"></summary><div class="sate-desp__cuerpo est-sim" id="est-sim"></div></details>
     <div class="kstats" id="kstats" hidden></div>
   </section>
   <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
+    <div id="map-primera-visita" hidden></div>
     <!-- La planeación anual se activa por unidad desde los datos. -->
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
@@ -768,7 +771,7 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
       <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>
     </div>
       <div class="plan-head plan-bandeja"><p class="plan-resumen" id="plan-resumen" role="status" aria-live="polite"></p>
-        <div class="actions"><button class="btn" type="button" id="plan-simular"></button><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="b-none"></button><button class="btn" type="button" id="plan-deshacer" hidden></button></div>
+        <div class="actions"><details class="plan-menu" id="plan-menu"><summary></summary><div class="plan-menu-cuerpo"><button class="btn" type="button" id="plan-simular"></button><button class="btn" type="button" id="b-none"></button></div></details><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="plan-deshacer" hidden></button></div>
         <span class="sate-sr" id="plan-anuncio" role="status" aria-live="polite" aria-atomic="true"></span>
       </div>
   </section>

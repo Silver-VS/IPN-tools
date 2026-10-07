@@ -21,6 +21,11 @@ for(const id of ['h-sugg','sugg','b-sugg','chosen','chosen-help','chosen-req']) 
 }
 assert.match(mapaHTML,/class="plan-head plan-bandeja"[\s\S]*id="plan-resumen"[\s\S]*id="plan-deshacer"/);
 assert.match(html,/\.plan-bandeja\{position:sticky;bottom:0/);
+const css=leer('web/sate/componentes.css');
+assert.match(css,/@media\(max-width:720px\)\{[\s\S]*\.plan-bandeja\{position:fixed;[^}]*flex-wrap:nowrap/,'F: bandeja compacta solo en teléfono');
+assert.match(css,/#v-tray\{padding-bottom:calc\(160px \+ env\(safe-area-inset-bottom/,'F: espacio para bandeja y barra inferior');
+assert.match(css,/\.plan-menu\[open\]>\.plan-menu-cuerpo\{[^}]*position:absolute/,'F: menú fuera del flujo');
+assert.match(html,/<details class="plan-menu" id="plan-menu"><summary><\/summary>/);
 assert.ok(!Object.values(config.textos).some(t=>/pincel/i.test(t)));
 assert.ok(Object.values(config.unidades).every(c=>c.planDosPeriodos===false));
 assert.ok(!panelHTML.includes('data-personal'),'planeación disponible sin SAES');
@@ -84,6 +89,10 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
   assert.match(nodos.get('#plan-resumen').innerHTML,/Elige en el mapa las materias que quieres cursar en/,'bandeja vacía orienta al alumno');
   vm.runInContext(`const elegible=Object.keys(cur()).find(k=>!isElec(k));toggleBox(elegible)`,contexto);
   assert.match(nodos.get('#plan-resumen').innerHTML,/1 materia · [\d.,]+(?: de [\d.,]+)? créditos para/,'selección actualiza resumen');
+  assert.match(nodos.get('#plan-resumen').innerHTML,/class="sate-texto-corto">1 materia · [\d.,]+(?:\/[\d.,]+)? cr/,'F: resumen móvil abreviado');
+  assert.match(nodos.get('#b-go').innerHTML,/class="sate-texto-corto">Horarios/);
+  assert.match(nodos.get('#plan-simular').innerHTML,/class="sate-texto-corto">Simular fin de semestre/);
+  assert.match(nodos.get('#b-none').innerHTML,/class="sate-texto-corto">Quitar todas/);
   assert.ok(nodos.get('#chosen').innerHTML.includes('wchip'),'A: selección actualiza elegidas');
   nodos.get('#b-none').eventos.click();
   assert.match(nodos.get('#plan-resumen').innerHTML,/Elige en el mapa las materias que quieres cursar en/,'bandeja vacía orienta al alumno');
@@ -141,7 +150,7 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
     vm.runInContext('S.onlyWant=true;renderHFilters();renderOffer()',contexto);
     assert.equal(nodos.get('#f-want').checked,true);
     assert.equal(nodos.get('#f-want').disabled,false);
-    assert.match(nodos.get('#offer').innerHTML,/Aún no eliges materias en el mapa\./);
+    assert.match(nodos.get('#offer').innerHTML,/Aún no eliges materias en el Mapa curricular\. Elígelas allá o consulta toda la oferta\./);
     const pulsar=selector=>nodos.get('#offer').eventos.click({target:{closest:s=>s===selector?{}:null}});
     pulsar('[data-oferta-mapa]');assert.equal(SATE.destino,'mapa');
     pulsar('[data-oferta-toda]');assert.equal(vm.runInContext('S.onlyWant',contexto),false);

@@ -65,15 +65,14 @@ footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:v
 (function(){
   const UNIS=/*__UNIDADES__*/[];
   const EXTRA={upiita:[{t:'Electivas UPIITA',u:'electivas.html',d:'Actividades acreditables, créditos y formatos DIE-03 y formulario llenos.'}]};
-  const DESC={upiita:'Mapa curricular y trayectoria, oferta del SAES, estadísticas, armado y generación de horarios.',
-    escom:'Mapas curriculares 2020, trayectoria, oferta del SAES y armado de horarios.',
-    upibi:'Mapas por nivel, oferta del SAES, equivalencias entre carreras y armado de horarios.'};
+  const DESC={upiita:'Sistema de Apoyo a la Trayectoria Escolar: tu avance, mapa curricular, horarios de clase y calendario escolar.',
+    escom:'Sistema de Apoyo a la Trayectoria Escolar: tu avance, mapas curriculares 2020 y horarios de clase.',
+    upibi:'Sistema de Apoyo a la Trayectoria Escolar: tu avance, mapas por nivel y horarios de clase.'};
   const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   let sel=null;try{sel=localStorage.getItem('ipnt.unidad')}catch(e){}
   const box=document.getElementById('unis');
   const pinta=()=>{box.innerHTML=UNIS.filter(u=>u.disponible).map(u=>{const on=u.id===sel;
-    const tools=[{t:'Horarios '+u.siglas,u:u.url,d:DESC[u.id]||'Mapa curricular, oferta del SAES y armado de horarios.'},...(EXTRA[u.id]||[]),
-      {t:'Probar con datos de ejemplo',u:u.url+'#demo',d:'Conoce Horarios '+u.siglas+' con un alumno ficticio, sin usar tus datos del SAES.'}];
+    const tools=[{t:'SATE '+u.siglas,u:u.url,d:DESC[u.id]||'Mapa curricular, oferta del SAES y armado de horarios.'},...(EXTRA[u.id]||[])];  // la demostración solo se abre con #demo (decisión del dueño)
     return `<div class="uni"><button type="button" data-uni="${esc(u.id)}" aria-expanded="${on}" aria-controls="t-${esc(u.id)}"><b>${esc(u.siglas)}</b><span>${esc(u.nombre)}</span><i aria-hidden="true">›</i></button>`+
       `<div class="grid" id="t-${esc(u.id)}"${on?'':' hidden'}>${tools.map(x=>`<a class="card" href="${esc(x.u)}"><b>${esc(x.t)}</b><span>${esc(x.d)}</span></a>`).join('')}</div></div>`}).join('')};
   box.addEventListener('click',e=>{const b=e.target.closest('[data-uni]');if(!b)return;

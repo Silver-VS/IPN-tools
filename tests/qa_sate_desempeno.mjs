@@ -14,7 +14,7 @@ assert.doesNotMatch(html,/<details[^>]+id="desempeno-simulacion"[^>]*\bopen\b/,'
 const almacen=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)}};
 for(const unidad of ['upiita','escom','upibi']){
   assert.ok(config.unidades[unidad].pestanas.includes('trayectoria'));
-  const nodos=new Map(),solicitudes=[],cuadros=[];let c,api,fallar=false;
+  const nodos=new Map(),solicitudes=[],cuadros=[];let c,api,fallar=false,movil=true,trazados=0;
   const texto=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+),\s*plural,\s*((?:[^{}]*\{[^{}]*\})+)\s*\}/g,(m,k,c)=>{
     const n=Number(v[k]),op={};c.replace(/(=?\w+)\s*\{([^{}]*)\}/g,(_,k,t)=>{op[k]=t});
     return (op['='+n]??op[new Intl.PluralRules('es-MX').select(n)]??op.other??'').replace(/#/g,String(n));
@@ -29,14 +29,14 @@ for(const unidad of ['upiita','escom','upibi']){
     head:{appendChild(s){solicitudes.push(s);queueMicrotask(()=>{
       if(fallar){s.onerror();return}
       if(s.src.includes('d3@'))c.d3={groups(rows,fn){const m=new Map();for(const r of rows){const k=fn(r);if(!m.has(k))m.set(k,[]);m.get(k).push(r)}return [...m]},mean:(rs,fn)=>rs.reduce((s,r)=>s+fn(r),0)/rs.length};
-      if(s.src.includes('@observablehq'))c.Plot={plot:()=>nodo(),rectX(){},barX(){},text(){},ruleX(){}};
+      if(s.src.includes('@observablehq'))c.Plot={plot:()=>{trazados++;return nodo()},rectX(){},barX(){},text(){},ruleX(){}};
       s.onload();
     })}}};
   const SATE={texto,actual:{pestana:'mapa'},modulos:{},pestana(id,m){this.modulos[id]=m},error:e=>{throw e},nucleoListo:async a=>{api=a},
     repintar(){api.renderTop();return this.modulos[this.actual.pestana]?.mostrar()},ir(){},identidadSaes(){}};
   c=vm.createContext({console,document,SATE,SateUI:{cerrarModal(){}},SATE_DATA:{...JSON.parse(leer(`web/dist/sate/datos/${unidad}/nucleo.json`)),periodos:{actual:[],proximo:[]},asig:[],prof:[]},SATE_UNIDAD:unidad,
     URL,URLSearchParams,Blob,performance,localStorage:almacen(),sessionStorage:almacen(),location:{hash:'#/'+unidad+'/mapa',search:'',pathname:'/sate/index.html'},history:{replaceState(){}},
-    navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:()=>({matches:false,addEventListener(){}}),addEventListener(){},setTimeout,clearTimeout,
+    navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:q=>({get matches(){return q.includes('720px')&&movil},addEventListener(){}}),addEventListener(){},setTimeout,clearTimeout,
     requestAnimationFrame:fn=>cuadros.push(fn),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:375,innerHeight:800,
     fetch(){throw new Error('Red prohibida')}});
   vm.runInContext('window=globalThis',c);
@@ -71,8 +71,25 @@ for(const unidad of ['upiita','escom','upibi']){
   mod.ocultar();SATE.actual.pestana='mapa';vaciarCuadros();await pendiente;
   assert.equal(solicitudes.length,0);
   SATE.actual.pestana='trayectoria';pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.equal(solicitudes.length,0,'F: secciones cerradas no cargan Plot');
+  for(const id of ['kardex','escenario','areas','observaciones'])assert.equal(document.querySelector('#trayectoria-'+id).open,false,'F: teléfono cerrado '+id);
+  const areas=document.querySelector('#trayectoria-areas');
+  areas.open=true;pendiente=areas.eventos.toggle.at(-1)();
+  areas.open=false;areas.eventos.toggle.at(-1)();vaciarCuadros();await pendiente;
+  assert.equal(solicitudes.length,0,'F: cerrar antes de medir cancela descarga');
+  areas.open=true;pendiente=areas.eventos.toggle.at(-1)();vaciarCuadros();await pendiente;
   assert.equal(solicitudes.length,2);assert.match(solicitudes[0].src,/d3@/);assert.match(solicitudes[1].src,/@observablehq/);
   for(const s of solicitudes){assert.match(s.integrity,/^sha384-/);assert.equal(s.crossOrigin,'anonymous')}
+  assert.equal(trazados,1,'F: gráfica solo al abrir áreas');
+  areas.open=false;areas.eventos.toggle.at(-1)();
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.equal(areas.open,false,'F: cierre recordado');assert.equal(trazados,1,'F: no redibujar sección cerrada');
+  movil=false;pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.equal(document.querySelector('#trayectoria-kardex').open,true,'F: escritorio kárdex abierto por omisión');
+  assert.equal(document.querySelector('#trayectoria-escenario').open,true,'F: escritorio escenario abierto por omisión');
+  const kardex=document.querySelector('#trayectoria-kardex');kardex.open=false;kardex.eventos.toggle.at(-1)();
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.equal(kardex.open,false,'F: preferencia explícita prevalece');
   assert.match(document.querySelector('#kstats').innerHTML,/Tu camino|kpis/);
   const orden=document.querySelector('#kstats').innerHTML;
   const bloques=['class="kpis"','id="ch-camino"','id="ch-kx"','id="trayectoria-escenario-titulo"','id="meta-periodos"','id="prom-meta"','id="trayectoria-sim-slot"','id="ch-cat"'];
