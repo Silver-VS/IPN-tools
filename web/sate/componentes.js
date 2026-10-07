@@ -240,6 +240,7 @@
     }
     o.items.forEach(function (it, i) {
       var b = el('button', { type: 'button', role: 'tab', class: 'sate-pestana', id: base + '-' + it.id, 'data-id': it.id, texto: it.texto });
+      if (i && it.grupo != null && it.grupo !== o.items[i-1].grupo) b.className += ' sate-grupo-inicio';
       var p = panelDe(it);
       if (p) {
         if (!p.id) p.id = base + '-p-' + it.id;
@@ -267,9 +268,10 @@
   /* barraInferior({items:[{id, texto}], activa, alElegir}) → <nav>; solo se ve en teléfono. */
   function barraInferior(o) {
     var nav = el('nav', { class: 'sate-barra', 'aria-label': traducir('componentes.barra.etiqueta') });
-    var bs = o.items.map(function (it) {
+    var bs = o.items.map(function (it, i) {
       var b = el('button', { type: 'button', class: 'sate-barra__btn', 'data-id': it.id, texto: it.texto });
       b.addEventListener('click', function () { marcar(it.id); if (o.alElegir) o.alElegir(it.id); });
+      if (i && it.grupo != null && it.grupo !== o.items[i-1].grupo) b.className += ' sate-grupo-inicio';
       nav.appendChild(b); return b;
     });
     function marcar(ident) { bs.forEach(function (b) { if (b.dataset.id === ident) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }

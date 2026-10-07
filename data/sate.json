@@ -3,12 +3,11 @@
   "unidades": {
     "upiita": {
       "pestanas": [
-        "situacion",
+        "trayectoria",
+        "tramites",
         "mapa",
         "horarios",
-        "calendario",
-        "desempeno",
-        "tramites"
+        "calendario"
       ],
       "tramites": [
         "ets",
@@ -22,25 +21,54 @@
         "oscuro": "assets/logos/upiita-blanco.webp",
         "alt": "UPIITA, inicio del sitio de la unidad",
         "enlace": "https://www.upiita.ipn.mx/"
-      }
+      },
+      "grupos": [
+        [
+          "trayectoria",
+          "tramites"
+        ],
+        [
+          "mapa",
+          "horarios",
+          "calendario"
+        ]
+      ]
     },
     "escom": {
       "pestanas": [
+        "trayectoria",
         "mapa",
-        "horarios",
-        "desempeno"
+        "horarios"
       ],
       "tramites": [],
-      "leyenda": "prueba"
+      "leyenda": "prueba",
+      "grupos": [
+        [
+          "trayectoria"
+        ],
+        [
+          "mapa",
+          "horarios"
+        ]
+      ]
     },
     "upibi": {
       "pestanas": [
+        "trayectoria",
         "mapa",
-        "horarios",
-        "desempeno"
+        "horarios"
       ],
       "tramites": [],
-      "leyenda": "prueba"
+      "leyenda": "prueba",
+      "grupos": [
+        [
+          "trayectoria"
+        ],
+        [
+          "mapa",
+          "horarios"
+        ]
+      ]
     }
   }
 }

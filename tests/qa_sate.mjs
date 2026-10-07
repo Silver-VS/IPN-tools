@@ -11,6 +11,7 @@ vm.runInContext(leer('web/sate/rutas.js'),context);
 const {ruta,redireccion} = context.SateRutas;
 let pruebas = 0;
 for (const u of Object.keys(config)) {
+  assert.deepEqual(config[u].grupos.flat(),config[u].pestanas,'Orden y grupos del catálogo');
   for (const p of config[u].pestanas) {
     const h = '#/'+u+'/'+p;
     assert.equal(ruta(h,'upiita',config).hash,h); pruebas++;
@@ -25,7 +26,7 @@ for (const u of Object.keys(config)) {
   assert.equal(redireccion(u,'?x=1','#/horarios'),'sate/index.html?x=1#/'+u+'/horarios'); pruebas++;
   assert.equal(ruta('#/'+u+'/mapa/extra',u,config),null); pruebas++;
 }
-assert.equal(ruta('#/escom/situacion','upiita',config),null);
+for(const u of Object.keys(config))for(const anterior of ['situacion','desempeno']){assert.equal(ruta('#/'+u+'/'+anterior+'?x=1','upiita',config).hash,'#/'+u+'/trayectoria?x=1');pruebas++}
 assert.equal(ruta('#/upibi/tramites','upiita',config),null);
 assert.equal(ruta('#/upiita/tramites/electivas?desde=mapa','upiita',config).tramite,'electivas');
 assert.equal(ruta('#/upiita/tramites/inventado','upiita',config),null);
@@ -65,15 +66,15 @@ for (const unidad of Object.keys(config)) {
   for (const m of leer(f).matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)) vm.runInContext(m[1],c);
   assert.equal(destino,'sate/index.html?demo=1&sateUnidad='+unidad+'#code=x'); pruebas++;
 }
-const comunes = ['index.html','nucleo.js','inicio.js','rutas.js','componentes.js'];
+const comunes = ['index.html','nucleo.js','inicio.js','rutas.js','componentes.js','situacion.js'];
 const base = comunes.reduce((s,n)=>s+statSync('web/dist/sate/'+n).size,0);
 const medidas = {};
 for (const u of Object.keys(config)) {
   const nucleo=statSync('web/dist/sate/datos/'+u+'/nucleo.json').size;
   const oferta=statSync('web/dist/sate/datos/'+u+'/oferta.json').size;
-  medidas[u]={cascaronNucleo:base+nucleo,situacion:config[u].pestanas.includes('situacion')?base+nucleo+statSync('web/dist/sate/situacion.js').size:null,vistaInicial:base+nucleo+oferta+statSync('web/dist/sate/mapa.js').size,
+  medidas[u]={cascaronNucleo:base+nucleo,vistaInicial:base+nucleo+oferta+statSync('web/dist/sate/mapa.js').size,
     horarios:base+nucleo+oferta+statSync('web/dist/sate/horarios.js').size,
-    desempeno:base+nucleo+statSync('web/dist/sate/desempeno.js').size,
+    trayectoria:base+nucleo+statSync('web/dist/sate/desempeno.js').size,
     ventanilla:config[u].pestanas.includes('tramites')?base+nucleo+statSync('web/dist/sate/datos/'+u+'/tramites.json').size:null,presupuesto:160000,
     pendientes:{html:statSync('web/dist/sate/index.html').size,nucleoJS:statSync('web/dist/sate/nucleo.js').size,datosNucleo:nucleo,oferta}};
 }

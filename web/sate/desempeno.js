@@ -140,7 +140,7 @@ function renderSimulacion(){
 async function renderStatsVista(){
   const revision=++ST_RENDER;
   const box=$('#kstats');
-  if(!isPersonal()||SATE.actual?.pestana!=='desempeno')return;
+  if(!isPersonal()||SATE.actual?.pestana!=='trayectoria')return;
   const D=statsDatos(), A=ALUMNO;
   const Dde=blk=>usaSim(blk)===SIM.on?D:conSim(usaSim(blk),statsDatos), Dc=Dde('camino'), Dk=Dde('kardex'), Da=Dde('areas');
   
@@ -160,28 +160,38 @@ async function renderStatsVista(){
   const ult=D.porPer.filter(d=>d.cr!=null&&!d.sim).slice(-6), crmax=Math.max(1,...ult.map(d=>d.cr));
   const barras=ult.length?`<span class="k-bars" aria-hidden="true">${ult.map(d=>`<i style="height:${Math.max(4,d.cr/crmax*100)}%" title="${esc(d.lbl)}: ${fmtCr(d.cr)} créditos"></i>`).join('')}</span>`:'';
   const dTxt=D.delta!=null&&Math.abs(D.delta)>=.01?`<em class="${D.delta>0?'up':'down'}">${D.delta>0?'▲':'▼'} ${Math.abs(D.delta).toFixed(2)}</em> frente al periodo anterior`:SATE.texto('sate.desempeno.materias',{n:D.rows.length});
+  // Conserva el nodo y sus eventos al reconstruir las gráficas.
+  const focoSim=$('#desempeno-simulacion').contains(document.activeElement)?document.activeElement:null;
+  $('#sate-trayectoria').appendChild($('#desempeno-simulacion'));
   box.innerHTML=`${D.avisos.length?`<p class="st-note">${D.avisos.map(esc).join(' ')}</p>`:''}<div class="kpis">
       ${kpi(D.rows.some(r=>r.sim)?'Promedio sin reprobadas · simulado':'Promedio sin reprobadas',f2(D.media),regla(D.media),dTxt,`Promedio de tus ${D.rows.length} materias acreditadas (incluye equivalencias y revalidaciones). A diferencia del promedio oficial, no cuenta reprobadas ni no acreditadas: las que debes se acreditarán con calificación aprobatoria.`)}
       ${kpi('Tus calificaciones',moda!=null&&D.rows.length?String(moda):'—',hist,moda!=null&&D.rows.length?`la más frecuente · mediana ${f2(D.mediana)}`:'',`Cuántas materias aprobaste con cada calificación, de 6 a 10. Desviación estándar: ${f2(D.sd)} (entre más baja, más parejas).`)}
       ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([n,l])=>`<span class="k-chip">${n} ${l}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario, ETS o recurse${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
       ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
     </div>
-    ${conSim(usaSim('pm'),()=>promMetaPanel(statsDatos()))}
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu camino en la carrera ${simTag('camino')}</b>${ley([['cuadro','var(--accent)','Acreditado'],['rayado','var(--accent)',Dc.simulado?'Simulado':'En curso'],['cuadro','var(--line)','Te falta'],['marca','var(--accent)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
     </div>
-    ${conSim(usaSim('meta'),()=>metaPanel(statsDatos()))}
     <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tu kárdex por periodo ${simTag('kardex')}</b>${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>Dk.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(Dk.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
+    </div>
+    <section class="trayectoria-escenario" aria-labelledby="trayectoria-escenario-titulo"><h3 id="trayectoria-escenario-titulo">${esc(SATE.texto('sate.trayectoria.y_si'))}</h3>
+      ${conSim(usaSim('meta'),()=>metaPanel(statsDatos()))}
+      ${conSim(usaSim('pm'),()=>promMetaPanel(statsDatos()))}
+      <div id="trayectoria-sim-slot"></div>
+    </section>
+    <div class="charts">
       <figure class="ch-wide"><figcaption><b>Tus áreas frente a tu promedio ${simTag('areas')}</b>${ley([['vertical','var(--fg)',`Tu promedio sin reprobadas: ${Da.media!=null?Da.media.toFixed(2):'—'}`],['cuadro','var(--ok)','Por arriba'],['cuadro','var(--muted)','Similar (±0.25)'],['cuadro','var(--ch-alert)','Por debajo']])}</figcaption><div id="ch-cat"></div></figure>
     </div>
     <div class="kanal" id="kanal"></div>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
+  $('#trayectoria-sim-slot').appendChild($('#desempeno-simulacion'));
+  if(focoSim)focoSim.focus();
   if(!D.rows.length){const cs=box.querySelectorAll('.charts');cs[0].innerHTML='<p class="muted">Aún no hay calificaciones aprobadas para graficar.</p>';cs.forEach((x,j)=>{if(j)x.remove()});conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
   await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));   // ancho final de los contenedores
-  if(revision!==ST_RENDER||SATE.actual?.pestana!=='desempeno')return;
-  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER||SATE.actual?.pestana!=='desempeno')return;{const cs=box.querySelectorAll('.charts');cs[0].innerHTML=`<p class="muted">${esc(e.message)}</p>`;cs.forEach((x,j)=>{if(j)x.remove()})}conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
-  if(revision!==ST_RENDER||SATE.actual?.pestana!=='desempeno')return;
+  if(revision!==ST_RENDER||SATE.actual?.pestana!=='trayectoria')return;
+  try{await cargarPlot()}catch(e){if(revision!==ST_RENDER||SATE.actual?.pestana!=='trayectoria')return;{const cs=box.querySelectorAll('.charts');cs[0].innerHTML=`<p class="muted">${esc(e.message)}</p>`;cs.forEach((x,j)=>{if(j)x.remove()})}conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));return}
+  if(revision!==ST_RENDER||SATE.actual?.pestana!=='trayectoria')return;
   conSim(usaSim('obs'),()=>renderAnalisis(statsDatos()));
   const P=window.Plot, cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
   const ACC=tok('--accent'), OK=tok('--ok'), MUT=tok('--muted'), LINE=tok('--line');
@@ -266,24 +276,29 @@ $('#est-sim').addEventListener('change',e=>{const t=e.target,d=t.dataset;
   else if(d.simrec!==undefined){if(t.value)SIM.rec[d.simrec]={...(SIM.rec[d.simrec]||{}),forma:t.value};else delete SIM.rec[d.simrec];simSave()}
   else if(d.simreccal){SIM.rec[d.simreccal]={...(SIM.rec[d.simreccal]||{}),cal:+t.value};simSave()}});
 
-SATE.pestana('desempeno',{
+SATE.pestana('trayectoria',{
   montar(){
-    $('#desempeno-titulo').textContent=SATE.texto('sate.pestana.desempeno.titulo');
+    $('#desempeno-titulo').textContent=SATE.texto('sate.pestana.trayectoria.titulo');
     $('#desempeno-sim-titulo').textContent=SATE.texto('sate.desempeno.sim_titulo');
     $('#desempeno-lector').textContent=SATE.texto('sate.desempeno.lector');
     $('#desempeno-demo').textContent=SATE.texto('sate.desempeno.demo');
     $('#desempeno-lector').addEventListener('click',()=>SAES.open());
   },
   mostrar(){
+    SATE.presente?.mostrar();
     const personal=isPersonal();
     $('#desempeno-vacio').hidden=personal;
-    $('#desempeno-vacio-texto').textContent=SATE.texto('sate.desempeno.sin_datos');
+    $('#desempeno-vacio-texto').textContent=SATE.texto('sate.trayectoria.sin_datos');
     $('#desempeno-simulacion').hidden=!personal;
     $('#kstats').hidden=!personal;
-    if(SATE.simAbrir){$('#desempeno-simulacion').open=true;$(personal?'#desempeno-sim-titulo':'#desempeno-lector').focus();SATE.simAbrir=false}
+    const abrir=SATE.simAbrir;SATE.simAbrir=false;
+    if(abrir)$('#desempeno-simulacion').open=true;
+    if(abrir&&!personal)$('#desempeno-lector').focus();
     if(!personal){++ST_RENDER;return}
     renderSimulacion();
-    return renderStatsVista().catch(SATE.error);
+    const pendiente=renderStatsVista().catch(SATE.error);
+    if(abrir)$('#desempeno-sim-titulo').focus();
+    return pendiente;
   },
-  ocultar(){++ST_RENDER}
+  ocultar(){++ST_RENDER;SateUI.cerrarModal()}
 });

@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.13"
+version = "2026.10.14"
 
 [proyecto]
 nombre = "HADES"
@@ -393,3 +393,14 @@ quitar_activo = "Quitar todas de {periodo}"
 quitar = "Quitar {materia} del periodo {periodo}"
 sin_grupos = "(sin grupos)"
 obligatoria = "Obligatoria por desfase; debe permanecer en su periodo."
+
+[sate.pestana.trayectoria]
+titulo = "Mi trayectoria"
+corto = "Trayectoria"
+
+[sate.trayectoria]
+resumen = "Periodo {periodo} · {avance} de la carrera · {desfase}. Lo próximo: {proximo}"
+siguiente_paso = "Tu siguiente paso"
+sin_avance = "avance por confirmar"
+y_si = "¿Y si…?"
+sin_datos = "Aquí verás cómo vas en tu carrera, tus pendientes y tu desempeño, y podrás explorar metas y simular el fin de semestre. Lee tus datos del SAES con el Lector o prueba con datos de ejemplo."
