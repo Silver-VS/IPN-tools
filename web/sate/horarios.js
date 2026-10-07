@@ -1,3 +1,7 @@
+$('#offer').addEventListener('click',e=>{
+  if(e.target.closest('[data-oferta-mapa]'))SATE.ir('mapa');
+  if(e.target.closest('[data-oferta-toda]')){S.onlyWant=false;store.set('onlyWant',false);renderHFilters();renderOffer()}
+});
 $('#f-hide').addEventListener('change',e=>{S.hide=e.target.checked;store.set('hide',S.hide);renderOffer()});
 $('#f-fit').addEventListener('change',e=>{S.fit=e.target.checked;renderOffer()});
 $('#f-want').addEventListener('change',e=>{S.onlyWant=e.target.checked;store.set('onlyWant',S.onlyWant);renderOffer()});
@@ -71,7 +75,7 @@ function filtered(){
   const fits=c=>c[6].length&&!have.has(c[4])&&!done.has(c[8])&&![...sel,...own].some(x=>overlaps(x,c))&&
     (!S.gap||c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b));
   const mine=new Set(plan().sel);
-  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(hunt?fits(c):(!S.onlyWant||!want.size||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
+  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(hunt?fits(c):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
     (!S.hide||marks[keyOf(c)]?.s!=='no'||plan().sel.includes(keyOf(c)))&&
     (!q||norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(q)));
 }
@@ -109,8 +113,8 @@ function renderHFilters(){
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
   document.querySelectorAll('[data-gt]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gt===S.gt));
   $('#f-hide').checked=S.hide;$('#f-weekend').checked=S.weekend;
-  const n=tr().want.length;$('#f-want').checked=S.onlyWant&&n>0;$('#f-want').disabled=!n;
-  $('#f-want-l').textContent=n?(n>1?`Solo las ${n} elegidas en el mapa`:'Solo la elegida en el mapa'):'Solo las elegidas en el mapa (selecciónalas en «Mi trayectoria»)';
+  const n=tr().want.length;$('#f-want').checked=S.onlyWant;$('#f-want').disabled=false;
+  $('#f-want-l').textContent=n?(n>1?`Solo las ${n} elegidas en el mapa`:'Solo la elegida en el mapa'):SATE.texto('sate.planeacion.filtro_elegidas');
   const mine=classes().filter(c=>c[0]===S.car);
   const turs=[...new Set(mine.map(c=>c[1]))].sort();
   if(S.tur!=='*'&&!turs.includes(S.tur)) S.tur='*';
@@ -329,6 +333,10 @@ function renderGen(){
 
 
 function renderOffer(){
+  if(S.onlyWant&&!tr().want.length){
+    $('#offer-count').textContent='';
+    $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn primary" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;
+  }
   const list=filtered(), sel=selected();
   let html='';
   if(S.view==='materia'){

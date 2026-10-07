@@ -2,6 +2,7 @@ function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0,0))}
 function renderMap0(){
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
+  $('#zoomseg [data-zoom="0"]').textContent=SATE.texto('sate.planeacion.'+(MQ_PHONE.matches?'zoom_completo_corto':'zoom_completo'));
   $('#mapwrap').hidden=mv==='lista';$('#zoomseg').hidden=mv==='lista';$('#tlist').hidden=mv!=='lista';
   const L=MAP().layout, wrap=$('#mapwrap'), el=$('#map');
   MARK=conPlan(()=>isPersonal()?{avail:new Set(Object.keys(cur()).filter(k=>cur()[k][3]==='O'&&available(k)&&!statusOf(k).includes('fail'))),sug:new Set(SHOWSUG?suggestions().list:[])}:{avail:new Set(),sug:new Set()},S.planPaso);
@@ -141,7 +142,7 @@ function renderList(){
     by[g].sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b)).map(k=>{const t=tag(k), paso=planAsignado(k), w=paso===S.planPaso, done=statusOf(k)==='done', ob=oblig.has(k), open=S.lfocus===k;
       return `<div class="tl-row${done?' done':''}${paso!=null?' want plan-'+(paso+1):''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
         `<button type="button" class="tl-name" data-lfocus="${k}" aria-expanded="${open}"><b>${esc(pretty(c[k][0]))}</b><small>${k} · ${fmtCr(c[k][1])} cr${off.has(k)||isElec(k)?'':' · sin grupos'}${t?` <span class="tl-tag ${t[1]}">${t[0]}</span>`:''}${ob?' <span class="tl-tag bad">Obligatoria</span>':''}</small></button>`+
-        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?paso+1:'+'}</button>`+
+        `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?(PLAN_DOS_PERIODOS?paso+1:'✓'):'+'}</button>`+
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
 }
 

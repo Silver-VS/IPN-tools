@@ -25,7 +25,8 @@
           "horarios",
           "calendario"
         ]
-      ]
+      ],
+      "planDosPeriodos": false
     },
     "escom": {
       "pestanas": [
@@ -43,7 +44,8 @@
           "mapa",
           "horarios"
         ]
-      ]
+      ],
+      "planDosPeriodos": false
     },
     "upibi": {
       "pestanas": [
@@ -61,7 +63,8 @@
           "mapa",
           "horarios"
         ]
-      ]
+      ],
+      "planDosPeriodos": false
     }
   }
 }
