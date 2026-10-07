@@ -48,10 +48,25 @@ const periodoEventos=SATE.calendario.eventos().filter(e=>e.periodo==='27/1');
 assert.equal(nodos('calendario-anillo').length,1);assert.equal(nodos('calendario-banda').length,1);
 assert.equal(nodos('calendario-arco').length,periodoEventos.length*2);
 assert.equal(nodos('calendario-proceso').length,periodoEventos.length);
+const proximo=[...periodoEventos].sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta)).find(e=>e.desde>SATE.calendario.hoy());
+assert.equal(nodos('calendario-detalle-evento').length,1,'El detalle inicial no queda vacío');
+assert.ok(nodos('calendario-detalle')[0].textContent.includes(proximo.titulo));
+assert.equal(nodos('calendario-proceso').filter(n=>n.getAttribute('aria-pressed')==='true').length,1);
+const leyenda=nodos('calendario-categorias')[0];
+assert.equal(leyenda.children.length,new Set(periodoEventos.map(e=>e.categoria)).size);
+for(const item of leyenda.children)assert.equal(item.textContent.trim(),config.textos['sate.calendario.categoria_'+item.getAttribute('data-categoria')]);
+assert.equal(nodos('calendario-anillo')[0].all().filter(n=>n.getAttribute('class')==='calendario-pista').length,1,'Solo una guía exterior');
 assert.ok(box.children.indexOf(nodos('calendario-layout')[0])<box.children.indexOf(nodos('calendario-lista')[0]),'El detalle queda antes de la lista también en teléfono');
 assert.equal(nodos('calendario-aguja').length,2);
 const arcos=nodos('calendario-anillo')[0].all().filter(n=>n.getAttribute('class')==='calendario-arco');
 for(const arco of arcos){assert.equal(arco.getAttribute('role'),'button');assert.equal(arco.getAttribute('tabindex'),'0');assert.match(arco.getAttribute('aria-label'),/2026|2027/)}
+arcos[0].onmouseenter();
+assert.equal(nodos('calendario-proceso').filter(n=>n.getAttribute('data-resaltado')==='true').length,1);
+assert.equal(nodos('calendario-proceso').filter(n=>n.getAttribute('data-atenuado')==='true').length,periodoEventos.length-1);
+arcos[0].onfocus();arcos[0].onmouseleave();
+assert.equal(nodos('calendario-proceso').filter(n=>n.getAttribute('data-resaltado')==='true').length,1,'El foco conserva el resaltado al salir el cursor');
+arcos[0].onblur();assert.ok(nodos('calendario-proceso').every(n=>n.getAttribute('data-atenuado')==='false'));
+assert.ok(arcos.some(n=>n.tagName==='circle')&&arcos.some(n=>n.tagName==='path'),'Puntos y arcos distinguen fechas puntuales y rangos');
 for(const a of arcos)for(const b of arcos)if(a!==b&&a.getAttribute('data-pista')===b.getAttribute('data-pista'))assert.ok(a.getAttribute('data-hasta')<b.getAttribute('data-desde')||b.getAttribute('data-hasta')<a.getAttribute('data-desde'),'Las pistas no contienen procesos solapados');
 arcos.find(n=>n.getAttribute('aria-label').includes('registro de protocolo')).onkeydown({key:'Enter',preventDefault(){}});
 assert.match(nodos('calendario-detalle')[0].textContent,/Trabajo Terminal, UPIITA/);
@@ -83,20 +98,46 @@ c.DATA.calendario=null;mostrar();assert.equal(dias().length,0);assert.match(box.
 c.DATA.calendario=data.upiita;
 SATE.calendario.hoy=()=> '2099-01-01';assert.equal(SATE.calendario.proximos(5).length,0);
 mostrar();assert.equal(document.getElementById('cal-hoy').disabled,true);
+assert.equal(nodos('calendario-detalle-evento').length,1,'Un periodo terminado conserva detalle disponible');
 document.getElementById('cal-vista-periodo').onclick();assert.equal(guardado['hu.cal.vista'],'periodo');assert.equal(nodos('calendario-aguja').length,0);
 // La preferencia se lee al montar de nuevo el módulo; solo se escribe al elegir una vista.
 guardado['hu.cal.vista']='mes';vm.runInContext(leer('web/dist/sate/calendario.js'),c);mostrar();assert.ok(nodos('calendario-mes').length);
 for(const categoria of categorias){const check=document.getElementById('cal-filtro-'+categoria);check.checked=false;check.onchange()}
 assert.equal(nodos('calendario-pill').length,0);assert.match(box.textContent,/Sin eventos confirmados/);
+assert.equal(nodos('calendario-detalle-evento').length,0,'El detalle respeta los filtros');
 document.getElementById('cal-vista-periodo').onclick();assert.equal(nodos('calendario-arco').length,0);assert.equal(nodos('calendario-proceso').length,0);
+assert.equal(nodos('calendario-pista').length,0,'Sin procesos no se dibujan pistas vacías');
 const css=leer('web/sate/componentes.css'), bloque=css.slice(css.indexOf('#sate-calendario{'),css.indexOf('.situacion-cifras'));
 assert.ok([...bloque.matchAll(/var\((--[^),]+)/g)].every(m=>m[1].startsWith('--ipn-')),'Solo tokens institucionales');
 assert.match(bloque,/@media\(max-width:720px\)/);assert.match(bloque,/\.calendario-anillo\{display:none\}/);assert.match(bloque,/\.calendario-banda\{display:block\}/);
+for(const categoria of categorias)assert.ok(bloque.includes(`color:var(--ipn-cal-${categoria})`),'Token categórico compartido: '+categoria);
+assert.match(bloque,/\[data-theme=dark\] #sate-calendario/);assert.match(bloque,/prefers-color-scheme:dark/);
+assert.match(bloque,/\.calendario-pill\{[^}]*color-mix\(in srgb,currentColor 8%/);
+assert.match(bloque,/\.calendario-dia\[aria-current=date\]\{[^}]*border-radius:50%/);
+// Resolver los colores reales compartidos y locales, incluida la mezcla de las píldoras.
+const declaraciones=s=>Object.fromEntries([...s.matchAll(/(--[\w-]+):\s*([^;\n}]+)/g)].map(m=>[m[1],m[2].trim()]));
+const tokens=leer('vendor/ipn-comun/dist/tokens.css'), cascaron=leer('web/sate/cascaron.html');
+const rgb=s=>s.slice(1).match(/../g).map(n=>parseInt(n,16)/255);
+const luminancia=c=>c.map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
+const contraste=(a,b)=>{const x=luminancia(a),y=luminancia(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)};
+for(const oscuro of [false,true]){
+  const valores={...declaraciones(tokens.match(/:root \{([^}]+)\}/)[1]),...declaraciones(cascaron.match(/:root\{([^}]+)\}/)[1]),...declaraciones(bloque.match(/#sate-calendario\{([^}]+)\}/)[1])};
+  if(oscuro){Object.assign(valores,declaraciones(tokens.match(/:root\[data-tema="oscuro"\] \{([^}]+)\}/)[1]),declaraciones(cascaron.match(/:root\[data-theme="dark"\]\{([^}]+)\}/)[1]),declaraciones(bloque.match(/\[data-theme=dark\] #sate-calendario\{([^}]+)\}/)[1]))}
+  Object.assign(valores,{'--ipn-acento':'var(--accent)','--ipn-ok':'var(--ok)','--ipn-superficie':'var(--surface)'});
+  const resolver=k=>valores[k].startsWith('var(')?resolver(valores[k].slice(4,-1)):valores[k];
+  const superficie=rgb(resolver('--ipn-superficie')), colores=categorias.map(c=>resolver('--ipn-cal-'+c));
+  assert.equal(new Set(colores).size,6,'Seis colores distintos en '+(oscuro?'oscuro':'claro'));
+  for(const [i,color] of colores.entries()){
+    const c=rgb(color), fondo=c.map((v,j)=>v*.08+superficie[j]*.92), ratio=contraste(c,fondo);
+    assert.ok(ratio>=4.5,`${categorias[i]} en ${oscuro?'oscuro':'claro'}: contraste ${ratio.toFixed(2)} < 4.5`);
+  }
+}
 // Caso ficticio: mes bisiesto, barras que cruzan meses y cinco procesos simultáneos.
 c.DATA.calendario={periodo:'28/2',actividades:[],eventos:[...categorias.slice(0,4).map((categoria,i)=>({desde:'2028-02-01',hasta:'2028-03-10',titulo:'Proceso ficticio '+i,categoria,periodo:'28/2',fuente:'Fuente ficticia'})),{desde:'2028-02-29',hasta:'2028-02-29',titulo:'Fecha ficticia bisiesta',categoria:'feriado',periodo:'28/2',fuente:'Fuente ficticia'}]};
 c.perName=()=> '28/2';SATE.calendario.hoy=()=> '2028-02-29';guardado['hu.cal.vista']='mes';
 vm.runInContext(leer('web/dist/sate/calendario.js'),c);mostrar();
 assert.equal(dias().filter(n=>n.getAttribute('data-fecha').startsWith('2028-02')).length,29);
+assert.match(nodos('calendario-detalle')[0].textContent,/Proceso ficticio 0/,'Sin procesos futuros, selecciona uno vigente');
 assert.ok(nodos('calendario-pill').some(n=>n.style.gridColumn==='1 / 8'),'La barra ocupa la semana completa');
 for(const b of nodos('calendario-pill')){const [a,z]=b.style.gridColumn.split(' / ').map(Number);assert.ok(a>=1&&z<=8&&a<z)}
 const masBisiesto=nodos('calendario-mas').flatMap(n=>n.children).find(n=>n.getAttribute('aria-label').includes('29 de febrero'));
@@ -106,4 +147,4 @@ nodos('calendario-pill')[0].onclick();assert.match(nodos('calendario-detalle')[0
 document.getElementById('cal-vista-periodo').onclick();const pistasFicticias=nodos('calendario-arco').map(n=>n.getAttribute('data-pista'));assert.equal(new Set(pistasFicticias).size,5);
 assert.ok(!box.textContent.includes('sate.calendario.'));
 assert.ok(!config.unidades.escom.pestanas.includes('calendario'));assert.ok(!config.unidades.upibi.pestanas.includes('calendario'));
-console.log(`Calendario: ${checks} eventos válidos; pistas sin solapamientos, equivalencia textual, detalle sin modal, persistencia, filtros, mes/semana, hoy, teclado, continuidad y +N. OK.`);
+console.log(`Calendario: ${checks} eventos válidos; pistas sin solapamientos, guía exterior, leyenda, resaltado por cursor/foco, detalle inicial y respaldos, paleta con contraste AA claro/oscuro, filtros, mes/semana, hoy, teclado, continuidad y +N. OK.`);
