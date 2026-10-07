@@ -610,9 +610,13 @@ function renderSide0(){
   $('#plan-opciones').hidden=!PLAN_DOS_PERIODOS;
   document.querySelectorAll('[data-plan-paso]').forEach(b=>{b.hidden=!PLAN_DOS_PERIODOS;const paso=+b.dataset.planPaso;b.textContent=planEtiqueta(paso);b.setAttribute('aria-pressed',String(paso===S.planPaso))});
   $('#plan-supuesto').hidden=PLAN_PASO!==1;$('#plan-supuesto').setAttribute('aria-label',tx('supuesto_titulo',{periodo:planEtiqueta(1)}));
-  $('#plan-simular').textContent=tx('simular');$('#h-chosen').textContent=tx('elegidas');
+  const etiqueta=(id,largo,corto)=>{$(id).innerHTML=`<span class="sate-texto-largo">${esc(largo)}</span><span class="sate-texto-corto">${esc(corto)}</span>`};
+  etiqueta('#plan-simular',tx('simular'),tx('simular_corto'));$('#h-chosen').textContent=tx('elegidas');
+  const menu=$('#plan-menu');
+  if(menu.dataset.telefono!==String(MQ_PHONE.matches)){menu.dataset.telefono=String(MQ_PHONE.matches);menu.open=!MQ_PHONE.matches}
+  menu.querySelector('summary').textContent='⋯';menu.querySelector('summary').setAttribute('aria-label',tx('acciones'));
   $('#b-sugg').textContent=tx('agregar');$('#b-go').hidden=false;
-  $('#b-go').textContent=tx('horarios',{periodo:planEtiqueta(0)});$('#b-none').textContent=tx('quitar_activo',{periodo:planEtiqueta(PLAN_PASO)});
+  etiqueta('#b-go',tx('horarios',{periodo:planEtiqueta(0)}),tx('horarios_corto'));etiqueta('#b-none',tx('quitar_activo',{periodo:planEtiqueta(PLAN_PASO)}),tx('quitar_corto'));
   $('#plan-activo').hidden=$('#plan-leyenda').hidden=!PLAN_DOS_PERIODOS;
   $('#chosen').classList.toggle('un-periodo',!PLAN_DOS_PERIODOS);
   for(const id of ['#plan-simular','#b-go','#b-none'])$(id).disabled=!want.length;
@@ -626,7 +630,9 @@ function renderSide0(){
   $('#plan-resumen').innerHTML=planPasos().map(paso=>conPlan(()=>{
     const t=tr(), elegidas=t.want.filter(k=>c[k]), cr=elegidas.reduce((s,k)=>s+c[k][1],0);
     const carga=cargaInfo(elegidas.filter(k=>!t.fail.includes(k)).reduce((s,k)=>s+c[k][1],0));
-    return `<span class="plan-${paso+1}">${esc(elegidas.length?tx(carga?'bandeja':'bandeja_sin_tope',{periodo:planEtiqueta(paso),n:elegidas.length,creditos:fmtCr(cr),tope:carga?fmtCr(carga.tope):''}):tx('bandeja_vacia',{periodo:planEtiqueta(paso)}))}</span>`;
+    const v={periodo:planEtiqueta(paso),n:elegidas.length,creditos:fmtCr(cr),tope:carga?fmtCr(carga.tope):''};
+    return `<span class="plan-${paso+1} sate-texto-largo">${esc(elegidas.length?tx(carga?'bandeja':'bandeja_sin_tope',v):tx('bandeja_vacia',v))}</span>`+
+      (paso===PLAN_PASO?`<span class="sate-texto-corto">${esc(elegidas.length?tx(carga?'bandeja_corta':'bandeja_corta_sin_tope',v):tx('bandeja_corta_vacia'))}</span>`:'');
   },paso)).join('');
   $('#plan-carga').textContent=ci?tx('carga',{creditos:fmtCr(ci.total),tope:fmtCr(ci.tope),retenidos:fmtCr(ci.ret)}):tx('sin_carga',{creditos:fmtCr(credWant)});
   $('#chosen-help').textContent=want.length?tx('cuenta',{n:want.length,creditos:fmtCr(credWant)}):tx('vacio');
@@ -1097,6 +1103,8 @@ $('#map-ayuda').addEventListener('click',()=>{
 });
 $('#plan-supuesto').addEventListener('click',()=>SateUI.modal(SATE.texto('sate.planeacion.supuesto_titulo',{periodo:planEtiqueta(1)}),SATE.texto('sate.planeacion.supuesto'),{pequeno:true}));
 $('#plan-simular').addEventListener('click',()=>{SATE.simAbrir=true;SATE.ir('trayectoria')});
+$('#plan-menu').addEventListener('click',e=>{if(MQ_PHONE.matches&&e.target.closest('button'))$('#plan-menu').open=false});
+$('#plan-menu').addEventListener('keydown',e=>{if(MQ_PHONE.matches&&e.key==='Escape'){$('#plan-menu').open=false;$('#plan-menu').querySelector('summary').focus()}});
 $('#b-go').addEventListener('click',()=>{S.onlyWant=true;store.set('onlyWant',true);SATE.ir('horarios');window.scrollTo({top:0})});
 (()=>{
   const wrap=$('#mapwrap'), map=$('#map'), areas=$('#areas'), HEAD=30, GAIN=1.8, ZMAX=2.5;
