@@ -896,7 +896,7 @@ def escribir_sate(data):
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
-    for nombre in ("situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}

@@ -1,4 +1,22 @@
 /* Componentes de SATE: solo variables --ipn-* (vendor/ipn-comun/dist/tokens.css). */
+.calendario-filtros,.calendario-nav{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-3)}
+.calendario-nav h3{flex:1;text-align:center;margin:0}
+.calendario-mes{width:100%;table-layout:fixed;border-collapse:collapse}
+.calendario-mes th{color:var(--ipn-texto);padding:var(--ipn-esp-2)}
+.calendario-mes td{vertical-align:top;border:1px solid var(--ipn-linea);padding:0}
+.calendario-dia{display:flex;flex-direction:column;gap:var(--ipn-esp-1);width:100%;min-height:7rem;padding:var(--ipn-esp-2);border:0;background:var(--ipn-superficie);color:var(--ipn-texto);text-align:left;cursor:pointer}
+.calendario-dia:focus-visible{outline:3px solid var(--ipn-acento);outline-offset:-3px}
+.calendario-dia[aria-current=date]{box-shadow:inset 0 0 0 2px var(--ipn-acento)}
+.calendario-feriado .calendario-dia{border:2px dashed var(--ipn-tenue)}
+.calendario-marca{--cal-color:var(--ipn-acento);border-left:4px solid var(--cal-color);padding:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto);background:var(--ipn-superficie);overflow-wrap:anywhere}
+.calendario-marca[data-categoria=gestion]{--cal-color:var(--ipn-info)}
+.calendario-marca[data-categoria=becas]{--cal-color:var(--ipn-ok)}
+.calendario-marca[data-categoria=servicios]{--cal-color:var(--ipn-tenue)}
+.calendario-marca[data-categoria=tt]{--cal-color:var(--ipn-aviso)}
+.calendario-marca[data-categoria=feriado]{--cal-color:var(--ipn-error)}
+.calendario-marca[data-continua=true]{width:100%;box-sizing:border-box;border-bottom:2px solid var(--cal-color)}
+.calendario-filtros button[aria-pressed=false]{border-left-style:dotted;text-decoration:line-through}
+@media(max-width:720px){.calendario-dia{min-height:3.75rem;padding:2px}.calendario-dia .calendario-marca{font-size:var(--ipn-tamano-xs);line-height:1.15;padding:1px;border-left-width:2px}.calendario-evento-titulo{display:none}.calendario-mes th{padding:2px;font-size:var(--ipn-tamano-xs)}.calendario-nav{gap:var(--ipn-esp-1)}.calendario-nav h3{flex-basis:100%;order:-1}}
 .sate-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sate-sin-scroll{overflow:hidden}
 .situacion-cifras{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--ipn-esp-3);margin:var(--ipn-esp-4) 0}

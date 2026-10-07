@@ -181,6 +181,13 @@ function semRef(){
   return m;
 }
 /* Calendario de Gestión Escolar: Ventanilla y modal de Situación comparten render y selección. */
+// Las fechas civiles se comparan como ISO para evitar cambios de día por zona horaria.
+SATE.calendario={
+  categorias:['academico','gestion','becas','servicios','tt','feriado'],
+  hoy(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
+  eventos(){const c=DATA.calendario;return c?[...(c.actividades||[]).map(a=>({...a,hasta:a.hasta||a.desde,categoria:'gestion',fuente:a.fuente||c.fuente,periodo:c.periodo})),...(c.eventos||[])]:[]},
+  proximos(n=5,categorias=this.categorias){const hoy=this.hoy();return this.eventos().filter(a=>a.hasta>=hoy&&categorias.includes(a.categoria)).sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta)).slice(0,Math.max(0,n))}
+};
 let CALAP=null, CALSEL=null;
 function renderCalendario(rd,nDes){
   const des=nDes>0;
