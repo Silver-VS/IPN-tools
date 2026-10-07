@@ -2,7 +2,12 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.2"
+version = "2026.10.3"
+
+[proyecto.apoyo]
+# Enlace en el pie de Horarios, la portada y el agradecimiento de la encuesta.
+enlace = "Apoya el proyecto"
+ayuda = "Donar es voluntario; el proyecto es gratuito y lo mantiene un alumno del IPN."
 
 [sate]
 # Nombre completo de la plataforma (encabezado, título de la página, pie).

@@ -65,6 +65,7 @@ CSS = r"""
 JS = r"""
 (()=>{
 const C=/*__ENC_CFG__*/{};
+const APOYO=/*__APOYO__*/"";
 const K='ipnt.encuesta', DIA=864e5, ahora=()=>Date.now();
 const ls={get(){try{return JSON.parse(localStorage.getItem(K))||{}}catch(e){return {}}},set(v){try{localStorage.setItem(K,JSON.stringify(v))}catch(e){}}};
 let E=ls.get();
@@ -176,8 +177,8 @@ async function enviar(tipo,motivo,f){
   enviado=true;
   if(tipo==='seguimiento')E.seg=ahora();else if(tipo==='completa')E.resp={t:ahora(),inscrito:r.inscrito};
   E.hasta=0;guardar();enlaces();
-  f.outerHTML='<div class="enc-gracias"><b>¡Gracias por tu respuesta!</b>'+(r.inscrito==='aun'&&tipo==='completa'?'Cuando cierre la reinscripción te haremos una última pregunta.':'Nos ayuda a mejorar IPN-tools para todo el alumnado.')+'</div>';
-  setTimeout(()=>dlg?.open&&dlg.close(),2600);
+  f.outerHTML='<div class="enc-gracias"><b>¡Gracias por tu respuesta!</b>'+(r.inscrito==='aun'&&tipo==='completa'?'Cuando cierre la reinscripción te haremos una última pregunta.':'Nos ayuda a mejorar IPN-tools para todo el alumnado.')+APOYO+'</div>';
+  // Se conserva el cierre manual para dar tiempo a leer el aviso y usar el enlace.
 }
 
 /* ---------- API para la página ---------- */
@@ -197,9 +198,11 @@ if(activa)setTimeout(()=>intentar('visita'),4000);
 
 
 def inject(html, unidad=""):
+    import contenido
     cfg = config()
     cfg["unidad"] = unidad
     if not cfg.get("activa"):
         cfg["endpoint"] = ""
     js = JS.replace("/*__ENC_CFG__*/{}", json.dumps(cfg, ensure_ascii=False), 1)
+    js = js.replace('/*__APOYO__*/""', json.dumps(contenido.html_apoyo(), ensure_ascii=False), 1)
     return html + f"\n<style>{CSS}</style>\n<script>{js}</script>\n"

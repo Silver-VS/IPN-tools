@@ -1,8 +1,10 @@
 """Pruebas de tools/contenido.py (validador de textos TOML y data/sate.json)."""
-import pathlib, sys, tempfile, unittest
+import json, pathlib, sys, tempfile, unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "tools"))
 import contenido  # noqa: E402
+import encuesta  # noqa: E402
 
 
 def validar_texto(toml, extra=None):
@@ -23,6 +25,32 @@ class TestContenido(unittest.TestCase):
         self.assertEqual(t["sate.siglas"], "SATE")
         self.assertIn("{unidad}", t["sate.leyenda.prueba"])
         self.assertTrue(contenido.js().startswith("/* GENERADO"))
+
+    def test_apoyo_lee_datos_y_escapa_atributos_y_textos(self):
+        with tempfile.TemporaryDirectory() as d:
+            raiz = pathlib.Path(d)
+            (raiz / "data").mkdir()
+            url = 'https://example.invalid/?a=1&b="dos"'
+            (raiz / "data" / "cuenta.json").write_text(json.dumps({"donativos": url}), encoding="utf-8")
+            textos = {"proyecto.apoyo.enlace": "Apoya <el proyecto>", "proyecto.apoyo.ayuda": "Gratis & voluntario"}
+            with patch.object(contenido, "ROOT", raiz), patch.object(contenido, "objeto_t", return_value=textos):
+                fragmento = contenido.html_apoyo()
+        self.assertIn('href="https://example.invalid/?a=1&amp;b=&quot;dos&quot;"', fragmento)
+        self.assertIn('target="_blank" rel="noopener"', fragmento)
+        self.assertIn("Apoya &lt;el proyecto&gt;", fragmento)
+        self.assertIn("Gratis &amp; voluntario", fragmento)
+        self.assertNotIn("<iframe", fragmento)
+
+    def test_apoyo_compartido_en_pagina_y_encuesta(self):
+        fragmento = contenido.html_apoyo()
+        pagina = contenido.inject_apoyo('<style>/*__APOYO_CSS__*/</style><!--__APOYO__-->')
+        self.assertIn(fragmento, pagina)
+        self.assertIn(contenido.APOYO_CSS, pagina)
+        with patch.object(encuesta, "config", return_value={"activa": False}):
+            salida = encuesta.inject(pagina, "escom")
+        self.assertIn('const APOYO=' + json.dumps(fragmento, ensure_ascii=False) + ';', salida)
+        self.assertNotIn('/*__APOYO__*/', salida)
+        self.assertIn("+APOYO+'</div>'", salida)
 
     def test_clave_duplicada(self):
         e = validar_texto('[a]\nx = "uno"\n[a]\ny = "dos"\n')
