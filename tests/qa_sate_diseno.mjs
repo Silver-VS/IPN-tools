@@ -58,14 +58,15 @@ assert.equal(mapa.getAttribute('aria-selected'),'true');assert.equal(mapa.tabInd
 const horarios=barra.children.find(b=>b.getAttribute('data-id')==='horarios');
 horarios.eventos.click();assert.equal(destino,'horarios');
 assert.equal(horarios.getAttribute('aria-current'),'page');
-assert.deepEqual(config.unidades.upiita.tramites,[]);
-for(const nav of [tabs,barra])assert.ok(!nav.children.some(b=>b.getAttribute('data-id')==='tramites'));
+assert.deepEqual(config.unidades.upiita.tramites,['dictamen','electivas']);
+for(const nav of [tabs,barra])assert.ok(nav.children.some(b=>b.getAttribute('data-id')==='tramites'));
 vm.runInContext(leer('web/dist/sate/rutas.js'),c);
-for(const hash of ['#/upiita/tramites','#/upiita/tramites/ets','#/upiita/tramites/dictamen?origen=viejo']){
+for(const hash of ['#/upiita/tramites','#/upiita/tramites/dictamen?origen=viejo']){
   const ruta=c.SateRutas.ruta(hash,'upiita',config.unidades);
-  assert.equal(ruta.pestana,'trayectoria');assert.equal(ruta.tramite,null);
-  assert.equal(ruta.hash,'#/upiita/trayectoria'+(hash.includes('?')?'?origen=viejo':''));
+  assert.equal(ruta.pestana,'tramites');
+  assert.equal(ruta.hash,hash);
 }
+assert.equal(c.SateRutas.ruta('#/upiita/tramites/ets','upiita',config.unidades),null);
 const css=leer('web/sate/componentes.css');
 assert.match(css,/\[data-pestanas=v3\] \.sate-pestana__icono\{display:none/);
 assert.match(css,/\[data-pestanas\] \.sate-barra \.sate-pestana__icono\{display:inline-flex/);

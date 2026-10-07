@@ -6,7 +6,7 @@
     if (config[partes[0]]) unidad = partes.shift();
     let pestaña = partes.shift() || 'mapa';
     // Los enlaces de Ventanilla previos a esta publicación siguen siendo navegables.
-    if (pestaña === 'tramites' && config[unidad]?.pestanas.includes('trayectoria') && !config[unidad].pestanas.includes('tramites')) {
+    if (pestaña === 'tramites' && config[unidad]?.pestanas.includes('trayectoria') && (!config[unidad].pestanas.includes('tramites') || partes[0]==='reinscripcion')) {
       pestaña = 'trayectoria';
       partes.length = 0;
     }

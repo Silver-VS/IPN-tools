@@ -15,6 +15,13 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_ventanilla_y_pdf(self):
+        for archivo in ('qa_sate_ventanilla.mjs', 'qa_sate_pdf.mjs', 'qa_sate_electivas.mjs'):
+            with self.subTest(archivo=archivo):
+                resultado = subprocess.run([r'D:\Tools\nodejs\node.exe', 'tests/' + archivo], cwd=ROOT,
+                                           capture_output=True, text=True, encoding='utf-8')
+                self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
     def test_recortes_del_calendario(self):
         """API, filtros y clic al proceso con DOM en memoria y datos ficticios."""
         resultado = subprocess.run(
@@ -77,7 +84,8 @@ class SateBuild(unittest.TestCase):
                 rutas = set(re.findall(r'(?:src|href)="([^"#]+)"', html))
                 rutas = {r for r in rutas if not re.match(r'[a-z]+:', r)}
                 rutas.update(('nucleo.js', 'situacion.js', 'desempeno.js', 'mapa.js',
-                              'horarios.js', 'exportacion.js', 'saes-dialogo.js'))
+                              'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js',
+                              '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js'))
                 config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', html, re.S)[1])
                 for unidad, cfg in config['unidades'].items():
                     rutas.update(f'datos/{unidad}/{nombre}.json' for nombre in ('nucleo', 'oferta'))

@@ -8,12 +8,12 @@ Departamento de Gestión Escolar. Sin servidor propio: páginas estáticas gener
 | Página | Fuente | Salida compartida (sin logos) | Salida institucional (con logos) | Artefacto |
 |---|---|---|---|---|
 | Horarios UPIITA (mapa curricular + armador de horario) | `web/horarios.template.html` | `web/horarios.html` | `web/dist/horarios.html` | https://claude.ai/artifact/2ujcEF2YK8FZrYjoyPbKEk |
-| Electivas UPIITA (liberación de electivas, formatos DIE) | `web/electivas.template.html` | `web/electivas.html` | `web/dist/electivas.html` | https://claude.ai/artifact/DT1GkGs8Jzmu9D3CgiSTGg (capacidad `downloads`) |
+| Ventanilla (Dictamen y Electivas) | `web/sate/`, `web/tramites/` | SATE | `web/dist/sate/index.html` | Rutas `#/upiita/tramites/dictamen` y `#/upiita/tramites/electivas` |
 
-Construir: `python tools/build_horarios.py` y `python tools/build_electivas.py`.
+Construir: `python tools/build_horarios.py`.
 Sitio de prueba en vivo (versión con logos, autorizado por el equipo y TI): repositorio
 `Silver-VS/Silver-VS.github.io`, carpeta `upiita/` → https://silver-vs.github.io/upiita/ (índice, `horarios.html`,
-`electivas.html`, `revision.html`, `assets/logos/`). La **Guía de revisión** (fuente: `web/revision.html`)
+`sate/index.html`, `revision.html`, `assets/logos/`). La **Guía de revisión** (fuente: `web/revision.html`)
 incluye instructivo, perfil de demostración (alumno ficticio de Biónica) y 32 casos de prueba con exportación a CSV. Para que el marcador abra el sitio, construir con
 `UPIITA_SITE=https://silver-vs.github.io/upiita/` y copiar `web/dist/*` a `upiita/`.
 Vista local: servidor `web` en `.claude/launch.json` (python http.server 8080 sobre `web/`).

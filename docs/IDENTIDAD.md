@@ -60,7 +60,7 @@ Por eso hay dos salidas de cada página:
 
 | Salida | Logos | Uso |
 |---|---|---|
-| `web/horarios.html`, `web/electivas.html` | No | Compartir y probar fuera del servidor oficial; dice "herramienta independiente". |
+| `web/horarios.html` | No | Compartir y probar fuera del servidor oficial; dice "herramienta independiente". |
 | `web/dist/*.html` | Encabezado IPN + UPIITA (la pleca Educación (SEP) / IPN al pie se retiró a petición del equipo, 2026-10-01; `FOOTER` en `tools/institucional.py` si se vuelve a requerir) | Versión de trabajo de gestión escolar y la que se hospeda en el servidor de la UPIITA. Logos en `web/dist/assets/logos/` (fuentes en su README). |
 
 Fuentes de los logos: Coordinación de Imagen Institucional (logo IPN horizontal y plecas SEP/IPN) y

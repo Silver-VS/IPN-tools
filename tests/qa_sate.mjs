@@ -28,8 +28,8 @@ for (const u of Object.keys(config)) {
 }
 for(const u of Object.keys(config))for(const anterior of ['situacion','desempeno']){assert.equal(ruta('#/'+u+'/'+anterior+'?x=1','upiita',config).hash,'#/'+u+'/trayectoria?x=1');pruebas++}
 assert.equal(ruta('#/upibi/tramites','upiita',config).hash,'#/upibi/trayectoria');
-assert.equal(ruta('#/upiita/tramites/electivas?desde=mapa','upiita',config).hash,'#/upiita/trayectoria?desde=mapa');
-assert.equal(ruta('#/upiita/tramites/inventado','upiita',config).pestana,'trayectoria');
+assert.equal(ruta('#/upiita/tramites/electivas?desde=mapa','upiita',config).hash,'#/upiita/tramites/electivas?desde=mapa');
+assert.equal(ruta('#/upiita/tramites/inventado','upiita',config),null);
 assert.equal(redireccion(null,'?x=1','#demo'),'sate/index.html?x=1#demo');
 pruebas += 5;
 
