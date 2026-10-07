@@ -176,10 +176,17 @@ const semanaCampos=[['trabajo','number',168],['ida','number',1440],['vuelta','nu
 function montarSemana(){
   if(!SEMANA_ACTIVA)return;
   $('#mi-semana').hidden=false;
-  $('#semana-campos').innerHTML=semanaCampos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${k}`))}</span><input id="semana-${k}" data-semana="${k}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}"></label>`).join('')+`<p>${esc(txH('semana_trabajo_ayuda'))}</p>`;
+  const principales=['ida','vuelta','antes','dias'];
+  for(const [id,campos] of [['principales',semanaCampos.filter(c=>principales.includes(c[0]))],['secundarios',semanaCampos.filter(c=>!principales.includes(c[0]))]]){
+    $(`#semana-${id}`).innerHTML=campos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${k}`))}</span><input id="semana-${k}" data-semana="${k}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}"></label>`).join('');
+  }
   // Se mueve el formulario existente: conserva días, calendario y persistencia por versión.
   $('#semana-form').appendChild($('#ownform'));
   $('#ownform summary').textContent=txH('semana_agregar');
+  $('#ownform summary').appendChild(SateUI.ayuda('sate.horarios.semana_trabajo_ayuda'));
+  $('#semana-borrar-ayuda').appendChild(SateUI.ayuda('sate.horarios.semana_borrado_ayuda'));
+  $('#mi-semana').addEventListener('toggle',resumenSemana);
+  resumenSemana();
   $('#own-n').placeholder='';$('#own-a').value='';$('#own-b').value='';
   $('#own-f').insertAdjacentHTML('afterbegin',`<label class="field"><span>${esc(txH('semana_tipo'))}</span><select id="semana-tipo"><option value="trabajo">${esc(txH('semana_trabajo_bloque'))}</option><option value="otras">${esc(txH('semana_otras'))}</option></select></label>`);
   $('#semana-campos').addEventListener('change',e=>{
@@ -194,6 +201,20 @@ function montarSemana(){
     for(const p of Object.values(ws().plans))p.own=p.own.filter(o=>!o.tipo);
     document.querySelectorAll('[data-semana]').forEach(el=>el.value='');refresh();semanaCambiar();
   });
+}
+function resumenSemana(){
+  const partes=[txH('semana_titulo')];
+  if(!$('#mi-semana').open){
+    if(semanaValor('dias'))partes.push(txH('semana_resumen_dias',{n:fmtCr(semanaValor('dias'))}));
+    const traslado=semanaValor('ida')+semanaValor('vuelta');
+    if(traslado)partes.push(txH('semana_resumen_traslado',{n:fmtCr(traslado/60)}));
+    if(MS.antes)partes.push(txH('semana_resumen_antes',{hora:MS.antes.replace(/^0/,'')}));
+    for(const k of ['sueno','estudio','trabajo'])if(semanaValor(k))partes.push(txH(`semana_resumen_${k}`,{n:fmtCr(semanaValor(k))}));
+    if(MS.comidaA||MS.comidaB)partes.push(txH('semana_resumen_comida',{desde:MS.comidaA||'',hasta:MS.comidaB||''}));
+    const bloques=plan().own.filter(o=>!o.saes).length;
+    if(bloques)partes.push(txH(bloques===1?'semana_resumen_bloque':'semana_resumen_bloques',{n:bloques}));
+  }
+  $('#semana-resumen').textContent=partes.join(' · ');
 }
 function semanaCambiar(){renderCal();if(S.gen){S.gen=generate();renderGen()}}
 function semanaTraslados(cs){
@@ -232,8 +253,12 @@ function presupuestoSemana(cs){
 }
 function renderSemana(){
   if(!SEMANA_ACTIVA)return;
+  resumenSemana();
   $('#semana-bloques').innerHTML=plan().own.map((o,i)=>o.saes?'':`<p>${esc(o.n)} · ${o.d.map(d=>DAYS[d]).join(' ')} ${hm(o.a)}–${hm(o.b)} <button type="button" class="x" data-unown="${i}" aria-label="${esc(txH('quitar',{nombre:o.n}))}">×</button></p>`).join('');
-  const cs=selected(),p=presupuestoSemana(cs),avisos=[];
+  const cs=selected(),presupuesto=$('#semana-presupuesto');
+  presupuesto.hidden=!semanaCampos.some(([k])=>MS[k]!=null&&MS[k]!=='')&&!plan().own.length&&!cs.length;
+  if(presupuesto.hidden){presupuesto.innerHTML='';return}
+  const p=presupuestoSemana(cs),avisos=[];
   if(p.exceso>0.01)avisos.push(txH('semana_exceso',{n:fmtCr(p.exceso)}));
   if(p.disponible<p.horas.estudio)avisos.push(txH('semana_sin_estudio'));
   if(p.horas.trabajo>15&&p.horas.clases>=25)avisos.push(txH('semana_carga_aviso'));
@@ -241,8 +266,10 @@ function renderSemana(){
   if(semanaValor('ida')>60&&cs.some(c=>c[6].some(b=>b[1]<480)))avisos.push(txH('semana_temprano_aviso'));
   if(!semanaOk(cs))avisos.push(txH('semana_conflicto'));
   if(cs.length&&!qualityOf(cs).comida)avisos.push(txH('semana_comida_aviso'));
-  const partes=Object.entries(p.horas),descripcion=partes.map(([k,v])=>txH(`semana_categoria_${k}`)+': '+fmtCr(v)+' h').join(' · ');
-  $('#semana-presupuesto').innerHTML=`<p>${esc(txH('semana_presupuesto'))}</p><div class="semana-barra" role="img" aria-label="${esc(descripcion)}">${partes.map(([k,v],i)=>`<span class="semana-parte semana-parte-${i}" style="width:${v/168*100}%"></span>`).join('')}</div><p>${esc(descripcion)}</p><p>${esc(txH('semana_supuestos'))}</p>${avisos.map(t=>`<p>${esc(t)}</p>`).join('')}`;
+  const partes=Object.entries(p.horas),cifra=([k,v])=>txH(`semana_categoria_${k}`)+': '+fmtCr(v)+' h';
+  const descripcion=[['libre',p.horas.libre],...partes.filter(([k,v])=>k!=='libre'&&v>0)].map(cifra).join(' · ');
+  presupuesto.innerHTML=`<p id="semana-presupuesto-titulo">${esc(txH('semana_presupuesto'))}</p><div class="semana-barra" role="img" aria-label="${esc(descripcion)}">${partes.map(([k,v],i)=>`<span class="semana-parte semana-parte-${i}" style="width:${v/168*100}%"></span>`).join('')}</div><p>${esc(descripcion)}</p>${avisos.map(t=>`<p>${esc(t)}</p>`).join('')}`;
+  $('#semana-presupuesto-titulo').appendChild(SateUI.ayuda('sate.horarios.semana_supuestos'));
 }
 function renderGTime(){
   $('#g-from').value=GT.a;$('#g-to').value=GT.b;

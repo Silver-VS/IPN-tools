@@ -7,6 +7,9 @@ const shell=leer('web/sate/cascaron.html');
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 assert.ok(shell.indexOf('id="mi-semana"')<shell.indexOf('id="gen"'));
 assert.match(shell,/id="semana-presupuesto" aria-live="polite"/);
+assert.match(shell,/<details id="semana-opciones">[\s\S]*?semana_mas_opciones[\s\S]*?id="semana-secundarios"/);
+assert.ok(!shell.includes('data-htexto="semana_borrado_ayuda"'));
+assert.equal(config.textos['sate.horarios.semana_privacidad'],'Todo es opcional y se guarda solo en tu navegador o tu nube.');
 assert.match(leer('web/sate/nucleo.js'),/IPNT.set\(HU\+k,JSON.stringify\(v\)\)/);
 assert.match(leer('tools/cuenta.py'),/SYNC=/);
 const bloque=(d,a,b)=>['B','M',1,'DEMO-'+d+'-'+a,0,[],[[d,a,b]],4,'A'];
@@ -18,6 +21,7 @@ for(const unidad of ['upiita','escom','upibi'])for(const activa of [true,false])
   const cfg=structuredClone(config);cfg.unidades[unidad].miSemana=activa;
   let oferta=[bloque(0,540,600)],sel=oferta;
   const c=vm.createContext({window:{SATE_CONFIG:cfg},UNIDAD:unidad,S,$:nodo,document:{querySelectorAll:()=>[]},
+    SateUI:{ayuda:clave=>({ayuda:clave})},
     store:{get:(k,d)=>guardado.get(k)??d,set:(k,v)=>guardado.set(k,structuredClone(v))},
     txH:(k,v={})=>(config.textos['sate.horarios.'+k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??''),
     esc:String,DAYS:['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'],hm:String,fmtCr:n=>Number(n.toFixed(2)).toString(),
@@ -39,10 +43,40 @@ for(const unidad of ['upiita','escom','upibi'])for(const activa of [true,false])
     assert.equal(nodo('#mi-semana').hidden,!activa);
     if(activa){assert.equal(nodo('#semana-form').children[0],nodo('#ownform'));
       assert.equal(nodo('#own-a').value,'');assert.equal(nodo('#own-b').value,'');
-      for(const k of ['trabajo','ida','vuelta','sueno','estudio','antes','dias','comidaA','comidaB'])assert.ok(nodo('#semana-campos').innerHTML.includes('data-semana="'+k+'"'));
+      for(const k of ['ida','vuelta','antes','dias'])assert.ok(nodo('#semana-principales').innerHTML.includes('data-semana="'+k+'"'));
+      for(const k of ['trabajo','sueno','estudio','comidaA','comidaB']){
+        assert.ok(nodo('#semana-secundarios').innerHTML.includes('data-semana="'+k+'"'));
+        assert.ok(!nodo('#semana-principales').innerHTML.includes('data-semana="'+k+'"'));
+      }
+      assert.equal(nodo('#ownform summary').children[0].ayuda,'sate.horarios.semana_trabajo_ayuda');
+      assert.equal(nodo('#semana-borrar-ayuda').children[0].ayuda,'sate.horarios.semana_borrado_ayuda');
       nodo('#semana-campos').eventos.change({target:{dataset:{semana:'ida'},value:'60',checkValidity:()=>true}});
       assert.equal(guardado.get('miSemana').ida,'60');delete ms.ida;
     }
+  });
+  if(activa)check('presupuesto condicional y resumen cerrado',()=>{
+    sel=[];c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,true);
+    assert.equal(nodo('#semana-presupuesto').innerHTML,'');
+    assert.equal(nodo('#semana-resumen').textContent,'Mi semana');
+    ms.dias='2';ms.ida='30';ms.vuelta='30';ms.antes='08:00';
+    c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,false);
+    assert.equal(nodo('#semana-resumen').textContent,'Mi semana · 2 días máx. · traslado 1 h · no antes de 8:00');
+    assert.ok(nodo('#semana-presupuesto').innerHTML.includes('Libre: 168 h'));
+    assert.ok(!nodo('#semana-presupuesto').innerHTML.includes('Clases: 0 h'));
+    assert.ok(!nodo('#semana-presupuesto').innerHTML.includes(config.textos['sate.horarios.semana_supuestos']));
+    assert.equal(nodo('#semana-presupuesto-titulo').children.at(-1).ayuda,'sate.horarios.semana_supuestos');
+    nodo('#mi-semana').open=true;nodo('#mi-semana').eventos.toggle();
+    assert.equal(nodo('#semana-resumen').textContent,'Mi semana');
+    nodo('#mi-semana').open=false;nodo('#mi-semana').eventos.toggle();
+    assert.ok(nodo('#semana-resumen').textContent.includes('2 días máx.'));
+    for(const k of Object.keys(ms))delete ms[k];
+    ms.trabajo='0';c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,false,'Cero explícito cuenta como dato');
+    delete ms.trabajo;ms.sueno='8';c.renderSemana();assert.ok(nodo('#semana-resumen').textContent.includes('sueño 8 h/noche'));
+    delete ms.sueno;propios.push({n:'Trabajo ficticio',tipo:'trabajo',d:[0],a:600,b:660});
+    c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,false);
+    assert.ok(nodo('#semana-resumen').textContent.includes('1 bloque'));propios.length=0;
+    sel=oferta;c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,false,'Grupos elegidos sin preferencias');
+    assert.ok(nodo('#semana-presupuesto').innerHTML.includes('Libre: 167 h · Clases: 1 h'));
   });
   check('traslado y trabajo',()=>{
     propios.push({n:'Trabajo ficticio',tipo:'trabajo',d:[0],a:480,b:530});ms.ida='30';

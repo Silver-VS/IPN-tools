@@ -802,14 +802,19 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
     <div class="hlayout">
       <section aria-labelledby="h-offer">
         <details class="box2" id="mi-semana" hidden>
-          <summary data-htexto="semana_titulo"></summary>
+          <summary id="semana-resumen" data-htexto="semana_titulo"></summary>
           <p data-htexto="semana_privacidad"></p>
-          <div id="semana-campos" class="semana-campos"></div>
-          <div id="semana-form"></div>
+          <div id="semana-campos">
+            <div id="semana-principales" class="semana-campos"></div>
+            <div id="semana-form"></div>
+            <details id="semana-opciones">
+              <summary data-htexto="semana_mas_opciones"></summary>
+              <div id="semana-secundarios" class="semana-campos"></div>
+            </details>
+          </div>
           <div id="semana-bloques"></div>
           <div id="semana-presupuesto" aria-live="polite"></div>
-          <button type="button" class="btn" id="semana-borrar" data-htexto="semana_borrar"></button>
-          <p data-htexto="semana_borrado_ayuda"></p>
+          <div class="ownrow"><button type="button" class="btn" id="semana-borrar" data-htexto="semana_borrar"></button><span id="semana-borrar-ayuda"></span></div>
         </details>
         <details class="box2" id="gen" style="margin-bottom:12px">
           <summary>Generar horarios automáticamente</summary>
