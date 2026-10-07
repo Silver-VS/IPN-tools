@@ -78,7 +78,7 @@ const estados=['done','curso','rest lock','fail','late fail','late'];
 const L={w:300,h:60,boxes:estados.map((st,i)=>[i*40,0,30,40,String(i)]).concat([[240,0,30,40,null,'Optativa']]),edges:[]};
 let personal=true;
 const ctx=vm.createContext({MAP:()=>({layout:L}),isPersonal:()=>personal,slotFill:()=>new Map(),rowBands:()=>[[1,20,0,60]],statusOf:k=>estados[+k],isElec:()=>false,esc:s=>s,
-  cur:()=>({'0':['Materia',0,1,'O'],'1':['Otra',0,2,'O']}),SATE:{texto:(k,v)=>config.textos[k].replace('{n}',v.n)}});
+  cur:()=>({'0':['Materia',0,1,'O'],'1':['Otra',0,2,'O']}),SATE:{texto:(k,v)=>config.textos[k].replace(/\{n, plural, one \{([^{}]*)\} other \{([^{}]*)\}\}/,(m,uno,otros)=>(v.n===1?uno:otros).replaceAll('#',String(v.n))).replace('{n}',v.n)}});
 vm.runInContext(funcion,ctx);
 const mini=ctx.minimapaCurricular();
 assert.deepEqual(JSON.parse(JSON.stringify(mini.cnt)),{done:1,curso:1,pend:2,fail:1,late:2});

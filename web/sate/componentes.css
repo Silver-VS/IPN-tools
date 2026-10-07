@@ -76,7 +76,7 @@ header.top{border-bottom:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0
 :is(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 
 /* chips: el color indica el estado; la marca (✓ ! ✕ i) lo repite sin depender del color */
-.sate-chips{display:flex;gap:var(--ipn-esp-2);overflow-x:auto;padding:var(--ipn-esp-1);scrollbar-width:thin}
+.sate-chips{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2);padding:var(--ipn-esp-1)}   /* se acomodan en varias líneas, sin barra lateral */
 .sate-chips__item{flex:none;display:inline-flex}
 .sate-chip{display:inline-flex;align-items:center;gap:var(--ipn-esp-2);min-height:2.25rem;padding:0 var(--ipn-esp-3);border:1px solid var(--chip-c);border-radius:999px;background:var(--chip-s);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);white-space:nowrap}
 .sate-chip[data-estado=ok]{--chip-c:var(--ipn-ok);--chip-s:var(--ipn-ok-suave)}
@@ -182,9 +182,11 @@ button.sate-chip{cursor:pointer}
 .trayectoria-minimapa button{display:block;width:100%;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-2);background:var(--ipn-hundido);cursor:pointer}
 .trayectoria-minimapa button:hover{border-color:var(--ipn-acento)}
 .trayectoria-minimapa svg{display:block;width:100%;height:auto;max-height:260px}
-.trayectoria-minimapa .mm-leg{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1) var(--ipn-esp-2);margin-top:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto)}
+.trayectoria-minimapa .mm-leg{display:flex;flex-direction:column;align-items:center;gap:var(--ipn-esp-1);margin-top:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto)}
 @media(max-width:720px){#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr)}.trayectoria-minimapa{grid-column:1;grid-row:2;width:100%}}
 .trayectoria-escenario{padding:1rem 0;border-block:1px solid var(--ipn-linea);margin:1rem 0}
 #sate-avisos-globales{margin-block:.65rem}
 @media(max-width:720px){.sate-barra__btn{min-width:0;padding-inline:.3rem;font-size:.72rem;overflow-wrap:anywhere}}
 @media(prefers-reduced-motion:reduce){.sate-pestana,.sate-barra__btn{transition:none}}
+
+.mm-leg .mm-fila{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--ipn-esp-1) var(--ipn-esp-3)}

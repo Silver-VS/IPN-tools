@@ -1,11 +1,23 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
-## 2026-10-07 · 2026.10.17 · Codex
+## 2026-10-07 · 2026.10.19 · Codex
 
 | Claves | Cambio |
 |---|---|
 | `sate.encabezado.*` | Encabezado compacto: cambio de unidad, chip de fase de prueba, carrera accesible, Mis datos y opciones de actualización/demostración; estados del SAES conservados. |
+
+## 2026-10-07 · 2026.10.18 · Claude
+
+| Clave | Antes | Después |
+|---|---|---|
+| `sate.minimapa.done/fail/late` | {n} acreditadas / reprobadas / desfasadas | con plural (1 acreditada, 1 reprobada, 1 desfasada) |
+
+## 2026-10-07 · 2026.10.17 · Claude
+
+| Clave | Antes | Después |
+|---|---|---|
+| `sate.minimapa.pend` | {n} pendientes | {n} por cursar |
 
 ## 2026-10-07 · 2026.10.16 · Claude
 

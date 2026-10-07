@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.17"
+version = "2026.10.19"
 
 [proyecto]
 nombre = "HADES"
@@ -158,11 +158,11 @@ corto = "Desempeño"
 
 [sate.minimapa]
 abrir = "Avance del SAES en miniatura. Abrir Mapa curricular"
-done = "{n} acreditadas"
+done = "{n, plural, one {# acreditada} other {# acreditadas}}"
 curso = "{n} en curso"
-pend = "{n} pendientes"
-fail = "{n} reprobadas"
-late = "{n} desfasadas"
+pend = "{n} por cursar"
+fail = "{n, plural, one {# reprobada} other {# reprobadas}}"
+late = "{n, plural, one {# desfasada} other {# desfasadas}}"
 
 [sate.pestana.tramites]
 titulo = "Ventanilla digital"
