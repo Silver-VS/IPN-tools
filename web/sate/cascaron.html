@@ -94,7 +94,6 @@ input[type=number]{width:5rem}
 .demo-bar{position:sticky;top:0;z-index:40;display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:8px 16px;background:var(--warn);color:#fff;font-size:.88rem}
 .demo-bar .btn{margin-left:auto;background:#fff;color:#222;border-color:#fff}
 @media (max-width:640px){.demo-bar{padding:6px 12px;font-size:.78rem;gap:4px 10px}.demo-bar>span{display:none}.demo-bar .btn{padding:3px 10px;font-size:.78rem}}
-.demo-open{font-size:.84rem}
 /* botón de estadísticas: relleno mientras están ocultas (invita a abrirlas), contorno cuando se muestran */
 .stats-btn{display:inline-flex;align-items:center;gap:8px;margin-left:auto;padding:8px 16px;border-radius:999px;border:1.5px solid var(--accent);background:var(--accent);color:var(--accent-fg);font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;box-shadow:0 1px 3px rgb(0 0 0 / .18);transition:transform .12s,box-shadow .12s}
 .stats-btn:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgb(0 0 0 / .22)}
@@ -686,12 +685,11 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <!--__IPNT_HOME__-->
       <div class="title-row"><div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/">▾</button><span id="sate-leyenda"></span></div><div class="header-actions"><button class="enc-btn" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
       <p id="sate-nombre">/*__SATE_NOMBRE__*/</p>
-      <div id="sate-avisos-globales"></div>
+      <div class="sate-fila-avisos"><div id="sate-avisos-globales"></div><div class="sate-datos"><!--__SAES_CARD__--><span id="sate-saes-indicador" role="status" aria-label="/*__SATE_SIN_DATOS__*/" title="/*__SATE_SIN_DATOS__*/"><span aria-hidden="true">/*__SATE_INDICADOR__*/</span></span></div></div>
     </div>
     <div class="sate-navegacion"><div id="sate-tabs"></div><button id="t-tray" hidden></button>
       <div class="sate-controles">
         <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
-        <div class="sate-datos"><!--__SAES_CARD__--><details id="sate-datos-menu"><summary aria-label="/*__SATE_DATOS_ACCIONES__*/" title="/*__SATE_DATOS_ACCIONES__*/">▾</summary><div class="sate-datos-opciones"><button class="btn" type="button" data-saes-open aria-haspopup="dialog">/*__SATE_ACTUALIZAR__*/</button><button class="btn demo-open" type="button" data-demo-open>/*__SATE_DEMO__*/</button></div></details></div>
       </div>
     </div>
   </header>
@@ -710,7 +708,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <section id="sate-trayectoria" class="card" hidden>
     <h2 id="desempeno-titulo"></h2>
     <div id="sate-presente"></div>
-    <div id="desempeno-vacio" hidden><p id="desempeno-vacio-texto"></p><button class="btn" type="button" id="desempeno-lector"></button> <button class="link" type="button" id="desempeno-demo" data-demo-open></button></div>
+    <div id="desempeno-vacio" hidden><p id="desempeno-vacio-texto"></p><button class="btn" type="button" id="desempeno-lector"></button></div>
     <details class="sate-desp" id="desempeno-simulacion" hidden><summary id="desempeno-sim-titulo"></summary><div class="sate-desp__cuerpo est-sim" id="est-sim"></div></details>
     <div class="kstats" id="kstats" hidden></div>
   </section>

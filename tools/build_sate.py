@@ -928,16 +928,15 @@ def escribir_sate(data):
     html = html.replace("/*__COMPONENTES_CSS__*/", (fuente / "componentes.css").read_text(encoding="utf-8"))
     for marca, clave in (("TITULO", "sate.nombre"), ("NOMBRE", "sate.nombre"), ("SIGLAS", "sate.siglas")):
         html = html.replace("/*__SATE_" + marca + "__*/", textos[clave])
-    for marca in ("UNIDAD", "CARRERA", "DATOS_ACCIONES", "ACTUALIZAR", "DEMO"):
+    for marca in ("UNIDAD", "CARRERA", "SIN_DATOS", "INDICADOR"):
         html = html.replace("/*__SATE_" + marca + "__*/", textos["sate.encabezado." + marca.lower()])
     textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
     html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
-    # Solo SATE compacta la tarjeta compartida; sus acciones y diálogo siguen iguales.
+    # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.
     html = html.replace('<span>Usar mis datos del SAES</span>',
-        '<span class="sate-datos-texto">' + textos['sate.encabezado.datos'] + '</span>'
-        '<b class="sate-datos-movil" aria-hidden="true">' + textos['sate.encabezado.datos_movil'] + '</b>', 1)
+        '<span>' + textos['sate.encabezado.actualizar'] + '</span>', 1)
     html = re.sub(r'<button class="link demo-open"[^>]*>.*?</button>', '', html, count=1)
     # El marcador completo y las instrucciones del SAES solo se descargan al abrirlos.
     dialogo = re.search(r'<dialog[^>]*id="saes-dlg".*?</dialog>\s*<script>(.*?)</script>', html, re.S)
@@ -961,9 +960,15 @@ def escribir_sate(data):
     core = re.sub(r'("unidad"\s*:\s*)"[^"]*"', r'\1window.SATE_UNIDAD', core, count=1)
     core = core.replace('"url": "horarios-', '"url": "../horarios-')
     core = saes.inject(core, "horarios")
-    core = core.replace("d?'Actualizar mis datos del SAES':'Usar mis datos del SAES'", "SATE.texto('sate.encabezado.datos')")
-    core = core.replace("d?'Datos del SAES cargados. Selecciona para actualizarlos o eliminarlos.':'Incorpora tu avance desde el SAES (opcional)'",
-        "SATE.texto(d?'sate.encabezado.datos_cargados':'sate.encabezado.datos_opcionales')")
+    estado_original = saes.JS[saes.JS.index('    if(btn){'):saes.JS.index('    if(!st)return;')]
+    core = core.replace(estado_original, """    if(btn){btn.querySelector('span').textContent=SATE.texto('sate.encabezado.actualizar')}
+    const indicador=document.getElementById('sate-saes-indicador'), usando=!!d&&!d.demo;
+    if(indicador){
+      const fecha=usando?new Date(d.leido).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):'';
+      const texto=SATE.texto(usando?'sate.encabezado.usando_datos':'sate.encabezado.sin_datos',{fecha});
+      indicador.classList.toggle('on',usando);indicador.setAttribute('aria-label',texto);indicador.title=texto;
+    }
+""")
     # Mantener carga/estado y el callback originales; conectar el diálogo una sola vez.
     core = core.replace("// v1: solo se eligen materias", """const saesWire = SAES.wire.bind(SAES), saesOpen = SAES.open.bind(SAES);
 let saesOnLoad, saesConectado = false;

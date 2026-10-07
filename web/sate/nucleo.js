@@ -389,7 +389,6 @@ if(DEMO){
   document.body.insertAdjacentHTML('afterbegin',`<div class="demo-bar" role="status"><b>Modo demostración</b><span>Ves los datos de un alumno ficticio; nada se guarda en tu cuenta ni en tus datos del SAES.</span><button class="btn" type="button" id="demo-salir">Salir del modo demostración</button></div>`);
   $('#demo-salir').addEventListener('click',()=>{try{sessionStorage.removeItem('ipnt.demo')}catch(e){}location.reload()});
 }
-document.addEventListener('click',e=>{if(!e.target.closest?.('[data-demo-open]'))return;e.preventDefault();try{sessionStorage.setItem('ipnt.demo',UNIDAD)}catch(e){}location.reload()});
 function available(k){const s=statusOf(k);return !isElec(k)&&!tr().done.includes(k)&&!tr().curso.includes(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')&&!s.includes('far')}
 
 /* data/sugerencias.json: una materia con «antesDe» se sugiere hasta tener acreditadas o en curso las demás que pide

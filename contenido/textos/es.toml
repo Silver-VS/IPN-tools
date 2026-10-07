@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.19"
+version = "2026.10.20"
 
 [proyecto]
 nombre = "HADES"
@@ -27,13 +27,10 @@ leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener error
 unidad = "Cambiar unidad académica"
 carrera = "Carrera"
 prueba = "Fase de prueba ⓘ"
-datos = "Mis datos del SAES"
-datos_movil = "Mis datos"
-datos_acciones = "Opciones de mis datos del SAES"
-actualizar = "Actualizar"
-demo = "Probar con datos de ejemplo"
-datos_cargados = "Datos del SAES cargados. Selecciona para actualizarlos o eliminarlos."
-datos_opcionales = "Incorpora tu avance desde el SAES (opcional)"
+actualizar = "Actualizar datos del SAES"
+indicador = "SAES"
+usando_datos = "Usando tus datos del SAES leídos el {fecha}"
+sin_datos = "Sin datos del SAES"
 
 [sate.pestana.situacion]
 titulo = "Situación escolar"
@@ -50,7 +47,6 @@ entendido = "Entendido"
 sin_datos = "Conoce tu situación escolar"
 lector_invitacion = "Usa el Lector para traer tus datos del SAES y ver tus adeudos, carga y próximas actividades."
 usar_lector = "Usar el Lector"
-probar_demo = "Probar con datos de ejemplo"
 desfase = "Desfase"
 plazo_titulo = "Plazos por vencer"
 como_desfase = "Cómo funciona el desfase"
@@ -355,7 +351,6 @@ quitar = "Quitar"
 sim_titulo = "Simulación de fin de semestre"
 sin_datos = "Lee tus datos del SAES para consultar tus estadísticas, metas y simulación de fin de semestre."
 lector = "Usar el Lector del SAES"
-demo = "Probar con datos de ejemplo"
 materias = "{n, plural, one {# materia} other {# materias}}"
 error_graficas = "No se pudo cargar la biblioteca de gráficas."
 sim_aviso = "Simulación: no modifica tus datos del SAES"
@@ -425,4 +420,4 @@ resumen = "Periodo {periodo} · {avance} de la carrera · {desfase}. Lo próximo
 siguiente_paso = "Tu siguiente paso"
 sin_avance = "avance por confirmar"
 y_si = "¿Y si…?"
-sin_datos = "Aquí verás cómo vas en tu carrera, tus pendientes y tu desempeño, y podrás explorar metas y simular el fin de semestre. Lee tus datos del SAES con el Lector o prueba con datos de ejemplo."
+sin_datos = "Aquí verás cómo vas en tu carrera, tus pendientes y tu desempeño, y podrás explorar metas y simular el fin de semestre. Lee tus datos del SAES con el Lector."
