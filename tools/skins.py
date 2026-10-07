@@ -1,11 +1,18 @@
-"""Tema visual común de Horarios y Electivas: solo el institucional (paleta web IPN, base de las plantillas) con claro/oscuro.
+"""Tema visual común de Horarios y Electivas: solo el institucional (neutros zinc y acento guinda) con claro/oscuro.
 
 Las variantes lab/plano/aurora y su selector se retiraron (decisión del dueño, 2026-10-06). Aquí quedan: el script que aplica
-el tema antes de pintar y la escala en pantallas anchas, el botón claro/oscuro y unos ajustes comunes de CSS.
+el tema antes de pintar y la escala en pantallas anchas, el botón claro/oscuro y las reglas del aspecto antes llamado aurora.
 Se inyecta en las plantillas en /*__SKINS__*/ (CSS) y <!--__THEME_BTN__--> (botón).
 """
 
-CSS = """/* Ajustes comunes (tools/skins.py) */
+CSS = """/* Ajustes comunes del tema institucional (tools/skins.py) */
+body{background:radial-gradient(1100px 380px at 12% -120px,var(--glow1),transparent 70%),radial-gradient(900px 340px at 92% -140px,var(--glow2),transparent 70%),var(--bg) no-repeat}
+.card,.subj,section.step,.mapwrap,.calwrap,.insp{box-shadow:var(--shadow)}
+h1{letter-spacing:-.025em;font-weight:700}
+h2{letter-spacing:-.015em}
+.btn,.chip,.seg,input,select{border-radius:999px}
+.seg button{border-radius:999px}
+header.top{border-bottom:1px solid var(--line)}
 body{zoom:var(--ui-zoom,1)}
 /* algunos navegadores (Firefox con zoom) no repintan el texto de ejemplo al escribir: se oculta explícitamente */
 input:not(:placeholder-shown)::placeholder,textarea:not(:placeholder-shown)::placeholder{color:transparent;opacity:0}
