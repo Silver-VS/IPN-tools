@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.11 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.planeacion.activo`, `asignada`, `horarios`, `quitar_activo`, `quitar`, `sin_grupos`, `obligatoria` | Pincel de periodo anunciado, leyenda numerada y grupos simultáneos debajo del mapa; horario de N. |
+
 ## 2026-10-07 · 2026.10.10 · Codex
 
 | Claves | Cambio |

@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.10"
+version = "2026.10.11"
 
 [proyecto]
 nombre = "HADES"
@@ -354,3 +354,11 @@ sin_carga = "{creditos} créditos elegidos. Carga autorizada sin datos: confírm
 periodo_proximo = "Periodo N"
 periodo_siguiente = "Periodo N+1"
 meta = "{creditos} de {meta} créditos nuevos sugeridos; {retenidos} retenidos por adeudos."
+
+activo = "Pincel activo: {periodo}"
+asignada = "{marca} · Periodo {periodo}"
+horarios = "Ir a horarios de {periodo}"
+quitar_activo = "Quitar todas de {periodo}"
+quitar = "Quitar {materia} del periodo {periodo}"
+sin_grupos = "(sin grupos)"
+obligatoria = "Obligatoria por desfase; debe permanecer en su periodo."
