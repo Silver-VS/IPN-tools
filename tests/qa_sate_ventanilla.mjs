@@ -88,3 +88,75 @@ const css=readFileSync('web/sate/componentes.css','utf8');assert.match(css,/@med
 const cssVentanilla=css.slice(css.indexOf('.tramite-lista'),css.indexOf('.sate-recorte-calendario'));
 assert.ok(!/var\(--(?!ipn-)[\w-]+/.test(cssVentanilla));
 console.log('Ventanilla: estados, rutas, confirmación, apellidos compuestos, pasos, revisión, validación, memoria sensible y vista previa correctos.');
+
+// V2: captura académica contra los contratos compartidos, con perfil ficticio.
+c.SATE_DATA={...JSON.parse(readFileSync('web/dist/sate/datos/upiita/tramites.json','utf8')),carreras:{B:'Ingeniería Biónica'}};
+c.SATE.script=async()=>{};
+const estampados=[],uniones=[];
+c.PDFLib={StandardFonts:{Helvetica:'Helvetica'},PDFDocument:{create:async()=>({embedFont:async()=>({widthOfTextAtSize:(s,size)=>s.length*size*.5})})}};
+vm.runInContext(readFileSync('web/tramites/pdf-comun.js','utf8'),c);
+c.PdfTramites.unir=async(pdfs,op)=>{uniones.push({pdfs,op});return new Uint8Array([37,80,68,70])};
+c.PdfDictamen={generar:async d=>{estampados.push(d);return new Uint8Array([d.tipo==='carta'?2:1])}};
+c.situacionDatos=()=>({nDes:2});
+almacen.set('saes.alumno',JSON.stringify({upiita_saes:1,unidad:'upiita',carrera:'B',plan:'09',periodo_actual:'27/1',ultimo_semestre:'4',acreditadas:[['B102']],reprobadas_periodo:[['B101','26/2'],['B102','26/2']],kardex_reprobadas:[['B101',5,'20251'],['B101',5,'26/2']]}));
+almacen.set('hu.tramite.datos',JSON.stringify({confirmado:true,datos:{paterno:'PRUEBA',materno:'FICTICIA',nombres:'ALUMNA',boleta:'2099000000',carrera:'Ingeniería Biónica',plan:'2009',correo:'ficticio@example.test'}}));
+almacen.delete('hu.tramite.dictamen');
+vm.runInContext(readFileSync('web/sate/dictamen.js','utf8'),c);
+const dic=c.SateDictamen;await dic.cargar();
+assert.equal(dic.sugerir({nDes:1}).tipo,'interno');
+assert.equal(dic.sugerir({nDes:1,riesgoBajaDefinitiva:true}).tipo,'externo');
+assert.equal(dic.sugerir({revocacion:true}).tipo,'externo');assert.equal(dic.sugerir(null).tipo,'');
+const dd=dic.definir();assert.equal(dd.pasos.length+1,5);assert.equal(dd.datos.tipo,'interno');
+assert.equal(dd.datos.filas.length,1);assert.equal(dd.datos.filas[0].nivel,'1');
+assert.equal(dd.datos.filas[0].cursada,'25/1');assert.equal(dd.datos.filas[0].recursada,'26/2');
+assert.match(dic.plantilla('interno','27/1',dd.datos.filas),/BIOLOGIA CELULAR/);
+assert.match(dic.plantilla('externo','27/1',dd.datos.filas),/Consejo General Consultivo/);
+assert.match(dic.plantilla('interno','27/1',dd.datos.filas,'tiempo'),/ampliación/);
+const dm=t.modelo(dd,null);dm.datos.filas=Array.from({length:9},()=>dd.datos.filas[0]);
+assert.ok(dm.validar(dm.campos.find(f=>f.id==='filas')));dm.datos.filas=dd.datos.filas;
+for(const f of dd.pasos[2].campos.filter(f=>f.visible?.({tipo:'externo'})))assert.equal(f.sensible,true,f.id);
+dm.datos.tipo='externo';dm.datos.domicilio='DOMICILIO-SENSIBLE-FICTICIO';dm.datos.causas=['salud'];dm.guardar();
+assert.ok(!almacen.get('hu.tramite.dictamen').includes('SENSIBLE'));assert.ok(!almacen.get('hu.tramite.dictamen').includes('salud'));
+assert.equal(t.modelo(dd).datos.domicilio,'');
+const pet=dm.campos.find(f=>f.id==='peticion');dm.datos.peticion='a\nb\nc\nd\ne';
+assert.ok(dm.validar(pet));dm.datos.tipo='interno';assert.equal(dm.validar(pet),'');
+assert.equal(dic.medir('a\nb\nc\nd\ne','interno').renglones.length,5);
+assert.equal(dic.medir('W'.repeat(300),'interno').ok,false);
+almacen.delete('hu.tramite.dictamen');
+const asist=t.asistente(box,dd),ad=asist.modelo.datos;
+ad.anteriores='No';ad.ingreso='24/1';ad.peticion=dic.plantilla('interno','27/1',ad.filas);ad.motivos='Motivo ficticio para la prueba.';
+// Abrir revisión mediante los botones del asistente.
+for(let i=0;i<4;i++)box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+assert.equal(asist.modelo.paso,4);
+assert.equal(box.querySelector('[data-descargar]').textContent,'Descargar mi solicitud (PDF)');
+const antesDescarga=estampados.length;await asist.descargar();assert.equal(estampados.length,antesDescarga,'La confirmación es obligatoria');
+const confirmar=box.todos().find(n=>n.tagName==='input'&&n.type==='checkbox');confirmar.checked=true;confirmar.onchange();
+await asist.descargar();
+assert.equal(estampados.at(-2).tipo,'interno');assert.equal(estampados.at(-1).tipo,'carta');
+assert.equal(uniones.at(-1).pdfs.length,2);assert.equal(uniones.at(-1).op.vistoBueno,'tu tutor académico');
+assert.equal(dd.archivo(ad),'dictamen-interno-2099000000.pdf');
+assert.ok(!almacen.get('hu.tramite.dictamen').includes('Motivo ficticio'));
+asist.destruir();t.mostrarLista(box);assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));
+assert.equal(t.modelo(dd).datos.motivos,'Motivo ficticio para la prueba.','Listo conserva sensibles únicamente en memoria de esta página');
+const campoFilas=dd.pasos[1].campos[0],candidatas=Object.entries(c.SATE_DATA.dictamen.materias).filter(([k])=>k.startsWith('B|09|')).slice(0,9).map(([k,[nombre,nivel]])=>({clave:k.split('|')[2],nombre,nivel,cursada:'',recursada:''}));
+const contMaterias=new Nodo('div'),ctxMaterias={datos:{filas:candidatas.slice(0,8)},cambiar(v){this.datos.filas=v}};
+campoFilas.pintar(contMaterias,ctxMaterias);
+const novena=contMaterias.todos().find(n=>n.tagName==='input'&&n.type==='checkbox'&&!n.checked);novena.checked=true;novena.onchange();
+assert.equal(ctxMaterias.datos.filas.length,8);assert.equal(novena.checked,false);
+assert.ok(contMaterias.todos().some(n=>n.textContent.includes('Quita una materia')));
+const pasoMotivos=dd.pasos[3],ctxGuia={datos:{paso:'',acciones:'',compromiso:'',motivos:''}},contGuia=new Nodo('div');
+for(const id of ['paso','acciones','compromiso','motivos']){
+ const f=pasoMotivos.campos.find(c=>c.id===id);f.pintar(contGuia,{datos:ctxGuia.datos,cambiar(v){ctxGuia.datos[id]=v}});
+}
+contGuia.todos().find(n=>n.tagName==='textarea').value='Situación ficticia';contGuia.todos().find(n=>n.tagName==='textarea').oninput();
+assert.equal(contGuia.querySelector('#dictamen-motivos').value,'Situación ficticia');
+const ex=t.modelo({...dd,id:'dictamen-externo-prueba'},null);Object.assign(ex.datos,{tipo:'externo',filas:dd.datos.filas,periodo:'27/1',peticion:'Solicito revisión de mi situación escolar.',motivos:'Motivos ficticios.',organo:'cgc',dependientes:'no_contestar',embarazo:'no_contestar',situacion:['s5'],causas:['salud'],anexos:['carta_anexo']});
+await dd.generar(ex.datos);assert.equal(estampados.at(-2).tipo,'externo');assert.equal(estampados.at(-2).valores.organo[0],'cgc');
+assert.equal(uniones.at(-1).op.vistoBueno,undefined);assert.equal(uniones.at(-1).pdfs.length,2);
+ex.guardar();assert.ok(!almacen.get('hu.tramite.dictamen-externo-prueba').includes('salud'));
+assert.ok(!almacen.get('hu.tramite.dictamen-externo-prueba').includes('Motivos ficticios'));
+// Una recarga real crea otro contexto: no recupera la carta ni las respuestas sensibles.
+const recarga=vm.createContext({console,Date,document:{},localStorage:c.localStorage,IPNT:c.IPNT,SATE:{texto,pestana(){}}});
+vm.runInContext(readFileSync('web/sate/tramites.js','utf8'),recarga);
+assert.equal(recarga.SateTramites.modelo(dd).datos.motivos,'');
+console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad, plantillas, medidor, confirmación y PDF único correctos.');
