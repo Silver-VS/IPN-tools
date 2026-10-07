@@ -3,7 +3,7 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const config = JSON.parse(readFileSync('data/sate.json','utf8')).unidades;
-for (const hashInicial of ['#/upiita/mapa','#code=abc','#demo','#error=denied']) {
+for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#demo','#error=denied']) {
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
   let cambioUnidad = 0;
   function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},appendChild(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
@@ -17,6 +17,7 @@ for (const hashInicial of ['#/upiita/mapa','#code=abc','#demo','#error=denied'])
       setImmediate(()=>{
         if(s.src==='nucleo.js') c.SATE.nucleoListo(api).catch(e=>{throw e});
         if(s.src==='mapa.js') c.SATE.pestana('mapa',{montar(){vistos.push('montar-mapa')},mostrar(){vistos.push('mapa')},ocultar(){vistos.push('ocultar-mapa')}});
+        if(s.src==='situacion.js') c.SATE.pestana('situacion',{montar(){vistos.push('montar-situacion')},mostrar(){vistos.push('situacion')},ocultar(){vistos.push('ocultar-situacion')}});
         if(s.src==='horarios.js') c.SATE.pestana('horarios',{montar(){vistos.push('montar-hor')},mostrar(){vistos.push('hor')}});
         s.onload();
       });
@@ -25,7 +26,7 @@ for (const hashInicial of ['#/upiita/mapa','#code=abc','#demo','#error=denied'])
     navigator:{connection:{saveData:true}},localStorage:{getItem:()=>null},IPNT:{set:(k,v)=>guardado[k]=v},
     SATE_CONFIG:{unidades:config,textos:{}},history:{replaceState(a,b,url){location.hash=url.slice(url.indexOf('#'))}},
     addEventListener:(n,f)=>eventos[n]=f,
-    drawCals(){vistos.push('calendario')},
+    situacionDatos(){return null},renderCalendario(){vistos.push('calendario')},
     fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url.includes('nucleo')?{mapas:{B:{}},unidad:'upiita'}:{}}},
     SateUI:{usarTextos(){},usarAlmacen(){},modal(){},cerrarModal(){},
       pestanas(o){const n=nodo();n.seleccionar=id=>o.alCambiar(id);return n},barraInferior(){return {marcar(){}}}}
@@ -35,9 +36,10 @@ for (const hashInicial of ['#/upiita/mapa','#code=abc','#demo','#error=denied'])
   vm.runInContext(readFileSync('web/sate/inicio.js','utf8'),c);
   const vaciar = async()=>{for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r))};
   await vaciar();
-  assert.equal(c.SATE.actual.pestana,'mapa');
+  assert.equal(c.SATE.actual.pestana,hashInicial.endsWith('/situacion')?'situacion':'mapa');
   assert.equal(location.hash,hashInicial);
-  assert.equal(archivos.filter(a=>a==='mapa.js').length,1);
+  assert.equal(archivos.filter(a=>a==='mapa.js').length,hashInicial.endsWith('/situacion')?0:1);
+  if(hashInicial.endsWith('/situacion'))assert.equal(fetches.some(u=>u.endsWith('oferta.json')),false);
   assert.equal(archivos.includes('horarios.js'),false,'saveData impide precarga');
   location.hash='#/upiita/horarios'; eventos.hashchange(); await vaciar();
   assert.equal(c.SATE.actual.pestana,'horarios');

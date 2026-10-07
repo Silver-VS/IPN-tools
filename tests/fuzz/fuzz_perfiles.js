@@ -128,6 +128,14 @@
       if (t.oblig.some(k => t.curso.includes(k))) return 'una materia en curso aparece como obligatoria';
       return true;
     }, ctx);
+    revisar('situación real independiente de simulación', () => {
+      const on=SIM.on, d=situacionDatos();
+      if(SIM.on!==on)return 'Situación cambió la simulación';
+      if(d.D.simulado)return 'Situación muestra créditos simulados';
+      if(new Set(d.adeudos).size!==d.adeudos.length)return 'adeudos duplicados';
+      if(d.nDes!==d.fis.filter(f=>f.estado==='desfasada').length+d.dS.length)return 'desfase incoherente';
+      return conSim(false,()=>d.adeudos.some(k=>tr().done.includes(k))?'un adeudo ya está acreditado':true);
+    }, ctx);
     revisar('estadísticas', () => {
       const d = statsDatos();
       for (const k of ['obt', 'falta', 'nper', 'fin', 'media', 'ritmo', 'total', 'mediana', 'sd'])

@@ -9,7 +9,14 @@
   const unidad = inicial?.unidad || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || recordada || 'upiita';
   window.SATE_UNIDAD = config[unidad] ? unidad : Object.keys(config)[0];
   const u = window.SATE_UNIDAD, cfg = config[u];
-  const texto = (clave, vars = {}) => (SATE_CONFIG.textos[clave] || clave).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '{' + k + '}');
+  // plurales ICU mínimos del TOML: {n, plural, one {# materia} other {# materias}} (un nivel, «#» = el número)
+  const reglaPlural = new Intl.PluralRules('es-MX'), numero = new Intl.NumberFormat('es-MX');
+  const plurales = (s, vars) => s.replace(/\{(\w+),\s*plural,\s*((?:[^{}]*\{[^{}]*\})+)\s*\}/g, (m, k, cuerpo) => {
+    const n = Number(vars[k]); if (Number.isNaN(n)) return m;
+    const op = {}; cuerpo.replace(/(=?\w+)\s*\{([^{}]*)\}/g, (_, c, t) => { op[c] = t; });
+    return (op['=' + n] ?? op[reglaPlural.select(n)] ?? op.other ?? '').replace(/#/g, numero.format(n));
+  });
+  const texto = (clave, vars = {}) => plurales(SATE_CONFIG.textos[clave] || clave, vars).replace(/\{(\w+)\}/g, (_, k) => vars[k] ?? '{' + k + '}');
   SateUI.usarTextos(texto);
   function error(e) {
     console.error('SATE: carga fallida', {unidad:u, ruta:location.hash, mensaje:e.message, pila:e.stack});
@@ -36,7 +43,8 @@
     }).catch(e => { oferta = null; throw e; });
   }
   async function modulo(id) {
-    if (['situacion','desempeno'].includes(id)) await script('mapa.js');
+    if (id === 'desempeno') await script('mapa.js');
+    if (id === 'situacion') await script('situacion.js');
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
@@ -60,7 +68,7 @@
     if (r.unidad !== u) { IPNT.set('ipnt.unidad', r.unidad); location.reload(); return; }
     const v = ++version;
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
-    await cargarOferta();
+    if (r.pestana !== 'situacion' && r.pestana !== 'tramites') await cargarOferta();
     const m = await modulo(r.pestana);
     if (v !== version) return;
     if (actual) modulos[actual.pestana]?.ocultar?.();
@@ -68,10 +76,11 @@
     api.estado.tab = r.pestana === 'horarios' ? 'hor' : 'tray';
     if (!montados.has(r.pestana)) { m.montar?.(); montados.add(r.pestana); }
     tabs.seleccionar(r.pestana); barra.marcar(r.pestana);
-    document.getElementById('v-tray').hidden = !['mapa','situacion','desempeno'].includes(r.pestana);
+    document.getElementById('v-tray').hidden = !['mapa','desempeno'].includes(r.pestana);
+    document.getElementById('sate-situacion').hidden = r.pestana !== 'situacion';
     document.getElementById('v-hor').hidden = r.pestana !== 'horarios';
     document.getElementById('sate-tramites').hidden = r.pestana !== 'tramites';
-    const panel = document.getElementById(r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : 'v-tray');
+    const panel = document.getElementById(r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : r.pestana === 'situacion' ? 'sate-situacion' : 'v-tray');
     panel.setAttribute('role','tabpanel');
     panel.setAttribute('aria-labelledby',tabs.querySelector('[data-id="'+r.pestana+'"]').id);
     api.store.set('ruta', r.hash);
@@ -82,14 +91,17 @@
     if (!actual) return;
     if (window.SATE_DATA.mapas[api.estado.car]?.generico && actual.pestana !== 'horarios') { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); modulos[actual.pestana].mostrar(actual);
+    document.body.setAttribute('data-sate-pestana',actual.pestana);
+    document.getElementById('sate-oferta-periodo').hidden=actual.pestana!=='horarios';
+    document.getElementById('notice').hidden=actual.pestana!=='horarios';
+    document.getElementById('mobnote').hidden=true;
   }
-  window.SATE = {modulos, error, script, identidadSaes, get actual(){return actual}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
+  window.SATE = {texto, modulos, error, script, identidadSaes, get actual(){return actual}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
     async nucleoListo(a) {
       api = a; SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta(location.hash, u, config) ||
         SateRutas.ruta(api.store.get('ruta',''), u, config) ||
         SateRutas.ruta('#/' + u + '/' + (api.personal() && cfg.pestanas.includes('situacion') ? 'situacion' : 'mapa'), u, config);
-      modulos.situacion = {mostrar(){api.renderTray()}};
       modulos.desempeno = {mostrar(){api.renderTray()}};
       modulos.tramites = {mostrar(r) {
         const box = document.getElementById('sate-tramites'); box.replaceChildren();
@@ -104,7 +116,7 @@
           const a = document.createElement('a'); a.className = 'btn'; a.textContent = texto('sate.migracion.abrir',{tramite:h.textContent});
           a.href = '../' + id + '.html'; box.appendChild(a);
         } else if (id === 'reinscripcion') {
-          const c = document.createElement('div'); c.className = 'cal'; box.appendChild(c); drawCals();
+          const c = document.createElement('div'); c.className = 'cal'; box.appendChild(c); const d=situacionDatos();renderCalendario(d?.rd,d?.nDes||0);
         } else {
           const p = document.createElement('p'); p.textContent = texto('sate.migracion.tramites'); box.appendChild(p);
         }
@@ -112,7 +124,7 @@
       const items = cfg.pestanas.map(id => ({id,texto:texto('sate.pestana.'+id+'.titulo')}));
       tabs = SateUI.pestanas({items,activa:r.pestana,alCambiar:id=>{if(actual && actual.pestana!==id)ir(id)}});
       document.getElementById('sate-tabs').appendChild(tabs);
-      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':'v-tray');
+      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='situacion'?'sate-situacion':'v-tray');
       barra = SateUI.barraInferior({items:cfg.pestanas.map(id=>({id,texto:texto('sate.pestana.'+id+'.corto')})),activa:r.pestana,alElegir:ir});
       document.body.appendChild(barra);
       addEventListener('hashchange',()=>{const r=SateRutas.ruta(location.hash,u,config);if(r)activar(r).catch(error)});
