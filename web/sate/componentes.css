@@ -48,7 +48,7 @@ button.sate-chip{cursor:pointer}
 /* modal */
 .sate-modal{box-sizing:border-box;width:min(36rem,calc(100vw - var(--ipn-esp-5)));max-height:calc(100dvh - var(--ipn-esp-6));padding:0;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);overflow:hidden}
 .sate-modal[open]{display:flex;flex-direction:column}
-.sate-modal::backdrop{background:color-mix(in srgb,var(--ipn-texto) 45%,transparent)}
+.sate-modal::backdrop{background:rgba(9,9,11,.55)}   /* oscurece en claro y en oscuro (con --ipn-texto se aclaraba en oscuro) */
 .sate-modal--pequeno{width:min(24rem,calc(100vw - var(--ipn-esp-5)))}
 .sate-modal__cab{display:flex;align-items:center;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
 .sate-modal__titulo{flex:1;margin:0;font-size:var(--ipn-tamano-m);font-weight:600}
