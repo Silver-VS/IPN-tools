@@ -488,7 +488,7 @@ explorar = "Explorar el mapa"
 [sate.lector]
 pegar = "Pegar datos copiados"
 pegado_manual = "No se pudo leer el portapapeles. Pega los datos en el recuadro."
-tactil = "En pantalla táctil, usa las instrucciones de instalación manual o en teléfono."
+tactil = "Instalar en teléfono"
 
 [sate.horarios]
 priorizar = "priorizar"

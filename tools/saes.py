@@ -73,7 +73,6 @@ const SAES={
       }
       take(texto);
     });
-    if(typeof matchMedia==='function'&&matchMedia('(hover:none)').matches)dl.querySelector('#saes-manual').open=true;
     // copiar el código: portapapeles moderno, luego execCommand; si ambos fallan, queda seleccionado para copiarlo a mano
     dl.querySelector('#saes-copybm').addEventListener('click',async e=>{const b=e.currentTarget,box=dl.querySelector('#saes-bmcode'),m=dl.querySelector('#saes-copymsg');
       let ok=false;try{await navigator.clipboard.writeText(box.value);ok=true}catch(err){}
@@ -81,6 +80,7 @@ const SAES={
       b.textContent=ok?'Copiado ✓':'Copiar';m.textContent=ok?'Código copiado. Pégalo como dirección (URL) del marcador.':'El navegador no permitió copiar: el código ya está seleccionado; mantén presionado y elige «Copiar».';
       if(ok)setTimeout(()=>{b.textContent='Copiar'},2500)});
     dl.querySelector('#saes-again').addEventListener('click',()=>{dl.querySelector('#saes-steps').hidden=false});
+    dl.querySelector('#saes-install').addEventListener('click',()=>{dl.querySelector('#saes-manual').open=true});
     dl.querySelector('#saes-clear').addEventListener('click',e=>{
       if(!e.target.dataset.confirm){e.target.dataset.confirm='1';e.target.textContent='Confirmar: borrar mis datos';setTimeout(()=>{delete e.target.dataset.confirm;e.target.textContent='Borrar mis datos'},4000);return}
       SAES.clear();msg.textContent='Tus datos del SAES se borraron de este navegador.';onLoad(null)});
@@ -105,6 +105,10 @@ const SAES={
       btn.title=d?'Datos del SAES cargados. Selecciona para actualizarlos o eliminarlos.':'Incorpora tu avance desde el SAES (opcional)'}
     if(!st)return;
     st.hidden=!d;document.getElementById('saes-steps').hidden=!!d;document.getElementById('saes-clear').hidden=!d;
+    // El recordatorio arriba solo ayuda cuando la copia tiene más de 30 días.
+    const antiguo=!!d&&Date.now()-new Date(d.leido).getTime()>30*24*60*60*1000;
+    document.getElementById('saes-stale').hidden=!antiguo;
+    const aviso=document.getElementById('saes-reminder');if(aviso)aviso.hidden=antiguo;
     if(!d)return;
     const f=new Date(d.leido).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'});
     st.querySelector('#saes-who').textContent=`${d.carrera_nombre||''} · boleta ${d.boleta||'—'} · leídos el ${f}`;
@@ -115,10 +119,7 @@ const SAES={
 CSS = r"""
 .saes-tactil{display:none}
 @media(hover:none){.saes-arrastre{display:none}.saes-tactil{display:block}}
-.saes-aviso{margin:12px 0 0;padding:10px 14px;border-radius:10px;background:var(--warn-soft,var(--surface));border:1px solid var(--line);font-size:.86rem}
-.saes-aviso ul{margin:6px 0 0;padding-left:1.1rem;display:flex;flex-direction:column;gap:3px}
 .saes-videos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0 2px;font-size:.88rem}
-.saes-videos>span{width:100%;font-weight:600}
 .saes-vid{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);font-weight:600;background:var(--surface)}
 .saes-vid:hover{border-color:var(--accent)}
 .saes-vlist{color:var(--accent);font-weight:600;margin-left:4px}
@@ -166,34 +167,28 @@ def card(bm_href, page="horarios", short="", u=None):
     code_text = html.escape(short or bm_href)
     copy_note = " (versión corta: descarga el Lector desde este sitio)" if short else ""
     version = datetime.datetime.now().strftime("%d/%m/%Y %H:%M")   # para saber si el navegador ya cargó la última versión
-    what = ("tu avance académico: materias acreditadas, reprobadas y en curso, carga autorizada y fecha de cita"
-            if page == "horarios" else "tu nombre, boleta y carrera, así como las electivas liberadas")
     demo = ('<button class="link demo-open" type="button" data-demo-open title="Perfil de un alumno ficticio: '
             'conoce la herramienta sin usar tus datos del SAES">Probar con datos de ejemplo</button>') if page == "horarios" else ""
     # los datos son una copia del SAES en el momento de la lectura: no se actualizan solos
-    aviso = ('<div class="saes-aviso"><b>Tus datos no se actualizan solos.</b> Cada vez que usas el Lector se guarda una copia '
-             'de tu SAES en ese momento. Vuelve a usarlo:<ul>'
-             '<li><b>Después de inscribirte</b>, para traer tu horario definitivo.</li>'
-             '<li><b>Cuando cierre el semestre</b> y se publiquen tus calificaciones: tus materias dejan de aparecer en tu '
-             'horario del SAES y pasan a tu kárdex.</li></ul></div>') if page == "horarios" else ""
+    recordatorio = 'Tus datos no se actualizan solos: vuelve a cargarlos tras inscribirte o al recibir calificaciones.'
+    aviso = f'<p class="saes-note" id="saes-reminder" style="margin:10px 0 0">{recordatorio}</p>' if page == "horarios" else ""
     play = '<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"/></svg>'
     videos = "".join(f'<a class="saes-vid" data-dev="{d}" href="{u}" target="_blank" rel="noopener">{play}{t}</a>' for d, t, u in VIDEOS)
     out = f"""<button class="btn saes-open" id="saes-open" type="button" data-saes-open aria-haspopup="dialog"><span>Usar mis datos del SAES</span></button>{demo}
 <dialog class="saes-dlg" id="saes-dlg" aria-labelledby="saes-h">
-  <div class="dl-head"><h2 id="saes-h">Usa tus datos del SAES</h2><button class="x" id="saes-x" type="button" aria-label="Cerrar">×</button></div>
-  <p style="margin:0;font-size:.92rem">Opcional. Incorpora {what}. La información se procesa en tu navegador y no se envía a ningún servidor.</p>
+  <div class="dl-head"><h2 id="saes-h">Cargar datos del SAES</h2><button class="x" id="saes-x" type="button" aria-label="Cerrar">×</button></div>
+  <p style="margin:0;font-size:.92rem">Trae tu avance del SAES en 3 pasos. Solo se lee; nada se envía a ningún servidor.</p>
+  <p class="saes-note" id="saes-stale" style="margin:6px 0 0" hidden>{recordatorio}</p>
   <div id="saes-status" hidden><p style="margin:10px 0 0;font-size:.92rem"><b>Datos del SAES cargados.</b> <span class="muted" id="saes-who"></span></p>
-    <p class="saes-note" style="margin:4px 0 0">Para actualizarlos usa el <b>mismo marcador Lector IPN-tools</b> que ya guardaste: entra al SAES, púlsalo, elige «Copiar mis datos» y pega el resultado abajo. No necesitas volver a instalarlo.</p>
-    <p class="saes-note" style="margin:4px 0 0">¿Perdiste el marcador o cambiaste de navegador? <button class="link" id="saes-again" type="button">Ver cómo instalarlo de nuevo</button></p></div>
-  {aviso}
+    <p class="saes-note" style="margin:4px 0 0">En el SAES, usa tu Lector IPN-tools, elige «Copiar mis datos» y pega aquí.</p>
+    <p class="saes-note" style="margin:4px 0 0"><button class="link" id="saes-again" type="button">Ver los pasos de nuevo</button></p></div>
+  <details><summary>¿Prefieres verlo? Video paso a paso</summary><div class="saes-videos" id="saes-videos">{videos}<a class="saes-vlist" href="{VIDEOS_LISTA}" target="_blank" rel="noopener">Ver todos</a></div></details>
   <div id="saes-steps">
-  <div class="saes-videos" id="saes-videos"><span>¿Prefieres verlo? Video paso a paso:</span>{videos}<a class="saes-vlist" href="{VIDEOS_LISTA}" target="_blank" rel="noopener">Ver todos</a></div>
     <ol>
-      <li><b>Guarda el Lector IPN-tools en tu navegador</b> (solo la primera vez).
-        <p class="muted">Un <b>marcador</b> (favorito) es un acceso guardado en el navegador. El Lector IPN-tools, en lugar de abrir una página, consulta tu información dentro del SAES. Es el mismo para todas las unidades del IPN: detecta en qué SAES estás. Si ya tenías guardado el «Lector UPIITA», sigue funcionando.</p>
-        <p class="saes-arrastre">Arrastra este botón a tu barra de marcadores: <a class="saes-bm" id="saes-bm" href="{bm_href}" draggable="true" onclick="event.preventDefault()">Lector IPN-tools</a></p>
-        <p class="saes-tactil">{html.escape(textos['sate.lector.tactil'])}</p>
-        <details><summary>Mostrar la barra de marcadores</summary><ul>
+      <li><p class="saes-arrastre"><b>Arrastra a tu barra de marcadores:</b> <a class="saes-bm" id="saes-bm" href="{bm_href}" draggable="true" onclick="event.preventDefault()">Lector IPN-tools</a></p>
+        <p class="saes-tactil"><b>Guarda el Lector:</b> <button class="link" id="saes-install" type="button">{html.escape(textos['sate.lector.tactil'])}</button></p>
+        <details><summary>¿Qué es un marcador? ¿Cómo muestro la barra?</summary>
+        <p>Un marcador es un favorito guardado en tu navegador. Este lee tu SAES; guárdalo solo una vez. Sirve para todas las unidades del IPN; el «Lector UPIITA» también funciona.</p><ul>
           <li><b>Chrome, Edge, Brave u Opera:</b> pulsa <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd> (en Mac, <kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>).</li>
           <li><b>Firefox:</b> clic derecho en la barra superior › Barra de marcadores › Mostrar siempre.</li>
           <li><b>Safari:</b> menú Visualización › Mostrar barra de favoritos (<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>B</kbd>).</li>
@@ -214,14 +209,13 @@ def card(bm_href, page="horarios", short="", u=None):
             <li><b>Chrome (Android):</b> abrirlo desde la lista de marcadores no funciona. Con el SAES abierto, toca la barra de direcciones, escribe <b>Lector IPN-tools</b> y elige el marcador en las sugerencias.</li>
             <li><b>Chrome (iPhone o iPad):</b> guarda cualquier página como marcador, edítalo con el nombre <b>Lector IPN-tools</b> y sustituye su dirección por el código copiado. Con el SAES abierto, ejecuta el marcador.</li>
           </ul></details></li>
-      <li><b>Entra al SAES</b> (<a href="{SAES_URL}" target="_blank" rel="noopener">saes.upiita.ipn.mx</a>), inicia sesión y pulsa el marcador <b>Lector IPN-tools</b>. Revisa el resumen y pulsa <b>Copiar mis datos</b>.</li>
-      <li><b>Regresa aquí y pega</b> (<kbd>Ctrl</kbd>+<kbd>V</kbd>) en este recuadro:</li>
+      <li><a href="{SAES_URL}" target="_blank" rel="noopener">Entra al SAES</a>, usa el Lector y elige <b>Copiar mis datos</b>.</li>
     </ol>
   </div>
+  <ol start="3"><li><b>Pega aquí</b> <button class="btn primary" id="saes-paste-clip" type="button" data-fallback="{html.escape(textos['sate.lector.pegado_manual'], quote=True)}">{html.escape(textos['sate.lector.pegar'])}</button></li></ol>
   <textarea class="saes-paste" id="saes-paste" placeholder="Pega aquí tus datos del SAES (Ctrl+V)" aria-label="Pegar datos del SAES"></textarea>
-  <button class="btn primary" id="saes-paste-clip" type="button" data-fallback="{html.escape(textos['sate.lector.pegado_manual'], quote=True)}">{html.escape(textos['sate.lector.pegar'])}</button>
   <div class="actions" style="display:flex;gap:8px;align-items:center;margin-top:8px"><span id="saes-msg" aria-live="polite" style="font-size:.86rem"></span><button class="btn" id="saes-clear" type="button" style="margin-left:auto" hidden>Borrar mis datos</button></div>
-  <p class="saes-note" style="margin:10px 0 0">El marcador solo consulta tu Kárdex, tu Estado general, tu horario inscrito y tu Cita de reinscripción; no inscribe, no modifica ni envía nada. Los datos se guardan únicamente en este navegador.</p>
+  {aviso}
   <p class="saes-note" style="margin:6px 0 0">Versión de la página: {version}</p>
 </dialog>
 <script>(()=>{{const ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||/Macintosh/.test(ua)&&navigator.maxTouchPoints>1,d=ios?'ios':/Android/.test(ua)?'android':'pc';
