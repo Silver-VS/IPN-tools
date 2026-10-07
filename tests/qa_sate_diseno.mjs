@@ -59,7 +59,8 @@ assert.match(css,/\[data-pestanas\] \.sate-barra \.sate-pestana__icono\{display:
 assert.match(css,/aria-selected=true\]::after.*background:var\(--ipn-acento\)/);
 assert.match(css,/\.sate-grupo-inicio::before.*width:1px/);
 assert.match(css,/\.sate-pestana:focus-visible,\.sate-barra__btn:focus-visible,\.trayectoria-minimapa button:focus-visible/);
-assert.match(css,/\.trayectoria-minimapa\{grid-column:2;grid-row:1/);
+assert.ok(css.includes('.trayectoria-resumen{grid-column:1 / -1}'));   // resumen a todo el ancho
+assert.ok(css.includes('.trayectoria-minimapa{grid-column:2;grid-row:2 / span 4;align-self:stretch'));   // minimapa a la derecha, misma altura que el contenido
 assert.match(css,/@media\(max-width:720px\).*\.trayectoria-minimapa\{grid-column:1;grid-row:2/);
 // Contraste de texto AA y de puntos/foco ≥3:1 con los tokens efectivos de ambos temas.
 const fuente=leer('web/sate/cascaron.html');

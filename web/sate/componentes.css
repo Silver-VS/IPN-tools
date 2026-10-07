@@ -133,13 +133,16 @@ button.sate-chip{cursor:pointer}
 .trayectoria-resumen{font-weight:600;line-height:1.6}
 #sate-presente{display:grid;gap:.65rem;margin-bottom:1.5rem}
 #sate-presente[hidden]{display:none}
-.trayectoria-minimapa{grid-column:2;grid-row:1 / span 5;width:min(300px,30vw);align-self:start}
-#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr) auto;column-gap:var(--ipn-esp-5)}
+/* resumen a todo el ancho; debajo, contenido acotado a la izquierda y minimapa a la derecha con la misma altura */
+.trayectoria-resumen{grid-column:1 / -1}
+.trayectoria-minimapa{grid-column:2;grid-row:2 / span 4;align-self:stretch;display:flex;flex-direction:column}
+.trayectoria-minimapa button{flex:1;display:flex;align-items:center;justify-content:center}
+#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1.5fr) minmax(260px,1fr);column-gap:var(--ipn-esp-5)}
 .trayectoria-minimapa button{display:block;width:100%;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-2);background:var(--ipn-hundido);cursor:pointer}
 .trayectoria-minimapa button:hover{border-color:var(--ipn-acento)}
-.trayectoria-minimapa svg{display:block;width:100%;height:auto;max-height:180px}
+.trayectoria-minimapa svg{display:block;width:100%;height:auto;max-height:260px}
 .trayectoria-minimapa .mm-leg{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1) var(--ipn-esp-2);margin-top:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto)}
-@media(max-width:720px){#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr)}.trayectoria-minimapa{grid-column:1;grid-row:2;width:min(300px,100%)}}
+@media(max-width:720px){#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr)}.trayectoria-minimapa{grid-column:1;grid-row:2;width:100%}}
 .trayectoria-escenario{padding:1rem 0;border-block:1px solid var(--ipn-linea);margin:1rem 0}
 #sate-avisos-globales{margin-block:.65rem}
 @media(max-width:720px){.sate-barra__btn{min-width:0;padding-inline:.3rem;font-size:.72rem;overflow-wrap:anywhere}}
