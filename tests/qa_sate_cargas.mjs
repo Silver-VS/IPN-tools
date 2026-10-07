@@ -66,7 +66,7 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
     script(n){if(!pendientes.has(n)){cargados.push(n);vm.runInContext(leer('web/dist/sate/'+n),contexto,{filename:n});pendientes.set(n,Promise.resolve())}return pendientes.get(n)}};
   SATE.ir=id=>SATE.destino=id;
   const ayudas=[];
-  contexto=vm.createContext({SateUI:{modal:(titulo,contenido)=>ayudas.push({titulo,contenido})},console:{...console,debug(){}},document,SATE,SATE_CONFIG:configModo,structuredClone,SATE_DATA:datos,SATE_UNIDAD:unidad,URL,URLSearchParams,Blob,performance,
+  contexto=vm.createContext({SateUI:{modal:(titulo,contenido)=>ayudas.push({titulo,contenido}),ayuda:()=>nodo()},console:{...console,debug(){}},document,SATE,SATE_CONFIG:configModo,structuredClone,SATE_DATA:datos,SATE_UNIDAD:unidad,URL,URLSearchParams,Blob,performance,
     localStorage:almacen(),sessionStorage:almacen(),location:{hash:'#/'+unidad+'/mapa',search:'',pathname:'/sate/index.html'},history:{replaceState(){}},
     navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:s=>s==='(max-width:720px)'?movil:{matches:false,addEventListener(){}},addEventListener(){},setTimeout(fn,ms,...args){if(ms===6000)ultimaEspera={fn,ms};return setTimeout(fn,ms,...args)},clearTimeout,
     requestAnimationFrame:fn=>fn(),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:1280,innerHeight:800,

@@ -68,9 +68,10 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   assert.equal(vistos.filter(v=>v==='montar-mapa').length,1);
   assert.equal(fetches.filter(u=>u.endsWith('oferta.json')).length,1);
   location.hash='#/upiita/tramites/reinscripcion';eventos.hashchange();await vaciar();
-  assert.equal(c.SATE.actual.tramite,'reinscripcion');
-  assert.ok(vistos.includes('calendario'));
-  assert.equal(fetches.filter(u=>u.endsWith('tramites.json')).length,1);
+  assert.equal(c.SATE.actual.pestana,'trayectoria','El enlace legado abre Mi trayectoria');
+  assert.equal(c.SATE.actual.tramite,null);
+  assert.equal(location.hash,'#/upiita/trayectoria');
+  assert.equal(fetches.filter(u=>u.endsWith('tramites.json')).length,0,'Sin Ventanilla no se descargan trámites');
   location.hash='#/upiita/mapa';eventos.hashchange();await vaciar();
   location.hash='#error=oauth';eventos.hashchange();await vaciar();
   assert.equal(c.SATE.actual.pestana,'mapa');
@@ -78,7 +79,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   location.hash='#/escom/horarios';eventos.hashchange();await vaciar();
   assert.equal(cambioUnidad,1);assert.equal(guardado['ipnt.unidad'],'escom');
   assert.ok(vistos.filter(v=>v==='avisos').length>=8,'Los avisos se actualizan en todas las vistas');
-  assert.ok(vistos.includes('procedimiento'),'Los procedimientos se muestran en Ventanilla');
+  assert.ok(!vistos.includes('procedimiento'),'El catálogo vigente no muestra Ventanilla');
  }
 }
 console.log('Enrutador: carga única, ciclo montar/mostrar/ocultar, atrás/adelante, hashes ajenos y cambio de unidad correctos.');

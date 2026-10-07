@@ -58,8 +58,10 @@
   }
   function ir(id) { location.hash = '#/' + u + '/' + id; }
   function adaptarPestanas() {
-    const contenedor = document.getElementById('sate-tabs'), navegacion = contenedor.closest('.sate-navegacion');
-    const controles = navegacion.querySelector('.sate-controles');
+    const contenedor = document.getElementById('sate-tabs'), navegacion = contenedor?.closest?.('.sate-navegacion');
+    const controles = navegacion?.querySelector('.sate-controles');
+    // La navegación sigue funcionando en un contenedor sin medición responsiva.
+    if (!navegacion || !controles) return;
     const medicion = document.createElement('div');
     medicion.className = 'sate-medicion'; medicion.setAttribute('aria-hidden','true'); medicion.inert = true;
     navegacion.appendChild(medicion);

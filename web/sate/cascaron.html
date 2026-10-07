@@ -442,6 +442,11 @@ textarea.paste{width:100%;min-height:5rem;font-family:var(--f-mono);font-size:.7
 
 /* ---------- horario ---------- */
 .filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding-block:12px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;border-bottom:1px solid var(--line)}
+.filters #f-more{flex-basis:100%;min-width:0}
+.filters #f-more summary{cursor:pointer;color:var(--accent);font-weight:600}
+.filters .more-filters{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:flex-end;padding-top:10px}
+.filters .more-filters input[type=text]{max-width:100%}
+.load-note{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .search{position:relative;width:min(360px,100%)}
 .search input{width:100%}
 .ac{position:absolute;left:0;right:0;top:calc(100% + 4px);background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 8px 24px rgb(0 0 0 / .14);list-style:none;margin:0;padding:4px;max-height:320px;overflow:auto;z-index:20}
@@ -622,7 +627,6 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   .brand p{font-size:.88rem}
   .tabs button{padding:8px 10px;font-size:.92rem}
   .ftoggle{display:inline-flex}
-  .filters:not(.open)>*:not(.search):not(.ftoggle):not(.active){display:none}
   .calview{display:inline-flex}
   .colhead .actions{flex-wrap:wrap}
   /* tarjetas de la oferta: acciones en una fila propia para no comprimir profesor y horario */
@@ -633,7 +637,6 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   .brand p{display:none}
   .mapwrap{max-height:calc(100vh - 24px)}
   .ftoggle{display:inline-flex}
-  .filters:not(.open)>*:not(.search):not(.ftoggle):not(.active){display:none}
 }
 /* Los bloques fijos (filtros y panel del horario) solo se fijan si hay pantalla suficiente; en pantallas bajas o
    angostas ocupaban casi toda la altura y dejaban un espacio mínimo para desplazarse */
@@ -774,7 +777,6 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
   <section id="v-hor" data-view-panel="hor" role="tabpanel" aria-labelledby="t-hor" hidden>
     <div class="est-eqv" id="est-eqv" hidden></div>
     <section class="filters" aria-label="Filtros">
-      <button class="btn ftoggle" id="b-filt" type="button" aria-expanded="false" aria-controls="v-hor">Filtros</button>
       <div class="field"><span>Turno</span><div class="chips" id="f-turno"></div></div>
       <div class="field"><span>Nivel</span><div class="chips" id="f-nivel"></div></div>
       <div class="field search">
@@ -782,16 +784,19 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
         <input id="f-q" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac" aria-labelledby="q-lbl" placeholder="Materia, clave, profesor o grupo" autocomplete="off">
         <ul class="ac" id="ac" role="listbox" hidden></ul>
       </div>
+      <label class="check"><input type="checkbox" id="f-want"> <span id="f-want-l">Solo las elegidas en el Mapa curricular</span></label>
+      <details id="f-more"><summary id="f-more-title" data-htexto="mas_filtros">Más filtros</summary><div class="more-filters">
       <div class="field"><span>Ver por</span><div class="seg" role="group" aria-label="Agrupar oferta">
         <button data-view="materia">Materia</button><button data-view="grupo">Grupo</button>
       </div></div>
-      <label class="check"><input type="checkbox" id="f-want"> <span id="f-want-l">Solo las elegidas en el mapa</span></label>
       <label class="check"><input type="checkbox" id="f-hide"> Ocultar las marcadas como No</label>
+      <label class="check"><input type="checkbox" id="f-done" checked> <span data-htexto="ocultar_acreditadas">Ocultar las ya acreditadas</span></label>
       <label class="check" title="Muestra los grupos de la carrera compatibles con el horario actual"><input type="checkbox" id="f-fit"> Solo lo que cabe en mi horario</label>
       <div class="field"><span>En la escuela</span><div class="trange"><input type="time" id="g-from" step="1800" aria-label="Llegar desde"><span>a</span><input type="time" id="g-to" step="1800" aria-label="Salir a más tardar"></div></div>
       <label class="field"><span>Excluir profesores</span><input type="text" id="g-avoid" list="proflist" autocomplete="off"></label>
-      <div class="active" id="active"></div>
       <button type="button" class="btn" id="b-reset" title="Regresa a su valor inicial los filtros de la oferta, los profesores excluidos, el horario en la escuela y las preferencias del generador, y quita las marcas «Sí / Quizá / No». No borra tus horarios.">Restablecer filtros</button>
+      </div></details>
+      <div class="active" id="active"></div>
     </section>
 
     <div class="hlayout">

@@ -31,7 +31,7 @@ const ALM=DEMO?sessionStorage:localStorage;
 const store={get(k,d){try{const v=ALM.getItem(HU+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){if(DEMO){try{ALM.setItem(HU+k,JSON.stringify(v))}catch(e){}}else IPNT.set(HU+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
 
 const S={tab:store.get('tab','tray'),per:store.get('per','proximo'),car:store.get('car','B'),tur:store.get('tur','*'),niv:store.get('niv','*'),q:'',view:store.get('view','materia'),
-  hide:store.get('hide',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
+  hide:store.get('hide',false),hideDone:store.get('hideDone',true),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
   mode:'want',zoom:null,mapHover:null,gt:'*',gpref:[],gavoid:store.get('excl',[]),gen:null};
 if(!DATA.carreras[S.car]) S.car=Object.keys(DATA.carreras)[0];
 S.expand=new Set();S.mview=store.get('mview',null);S.cview=store.get('cview',null);S.mapFocus=false;S.lfocus=null;
