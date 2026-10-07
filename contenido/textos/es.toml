@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.12"
+version = "2026.10.13"
 
 [proyecto]
 nombre = "HADES"
@@ -102,6 +102,18 @@ actualizar_publicacion = "Las citas de {periodo} se publicaron el {fecha}. Usa e
 actualizar_antiguedad = "Estos datos tienen {dias} días. Usa el Lector después de inscribirte o de que se publiquen tus calificaciones."
 
 [sate.calendario]
+anterior = "Mes anterior"
+proximo = "Mes siguiente"
+filtros = "Filtrar por categoría"
+instrucciones = "Consulta los meses del periodo actual y del que planeas. Toca un día para ver fechas, notas y fuentes. Usa las flechas del teclado para recorrer los días."
+sin_eventos = "Sin eventos confirmados para esta selección."
+leyenda = "Cada marca incluye su categoría. Las marcas repetidas en días consecutivos indican un evento de varios días; los descansos se distinguen con borde discontinuo."
+categoria_academico = "Académico"
+categoria_gestion = "Gestión"
+categoria_becas = "Becas"
+categoria_servicios = "Servicios"
+categoria_tt = "TT"
+categoria_feriado = "Descanso"
 reinscripcion = "Reinscripción {periodo}"
 gestion = "Calendario de Gestión Escolar"
 actividades = "Actividades del calendario"
@@ -121,6 +133,10 @@ fuente = "Fuente: {fuente}."
 [sate.pestana.horarios]
 titulo = "Horarios"
 corto = "Horarios"
+
+[sate.pestana.calendario]
+titulo = "Calendario"
+corto = "Calendario"
 
 [sate.pestana.desempeno]
 titulo = "Desempeño"

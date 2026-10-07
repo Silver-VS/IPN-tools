@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-07 · 2026.10.13 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.pestana.calendario.*`, `sate.calendario.anterior`, `proximo`, `filtros`, `instrucciones`, `sin_eventos`, `leyenda`, `categoria_*` | Vista mensual, filtros, navegación por teclado y categorías del calendario compartido. |
+
 ## 2026-10-07 · 2026.10.12 · Codex
 
 | Claves | Cambio |

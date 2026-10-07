@@ -48,7 +48,7 @@ for (const f of archivos('web/sate').filter(f=>f.endsWith('.js')).concat(archivo
   new vm.Script(leer(f),{filename:f}); scripts++;
 }
 // Parsear también el ámbito global conjunto detecta declaraciones duplicadas entre módulos.
-new vm.Script(['nucleo.js','situacion.js','mapa.js','horarios.js','desempeno.js','exportacion.js'].map(n=>leer('web/dist/sate/'+n)).join('\n'));
+new vm.Script(['nucleo.js','calendario.js','situacion.js','mapa.js','horarios.js','desempeno.js','exportacion.js'].map(n=>leer('web/dist/sate/'+n)).join('\n'));
 const inicial = leer('web/dist/sate/index.html');
 assert.ok(!inicial.includes('class="ipnt-home"'));   // SATE no enlaza a la portada del proyecto
 assert.ok(!inicial.includes('id="saes-dlg"'));

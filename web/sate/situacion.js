@@ -10,9 +10,9 @@
     SateUI.modal(tx('que_hacer'),cuerpo,{acciones:[{texto:tx(tarjeta.id==='actualizacion'?'usar_lector':'ventanilla'),primaria:true,onclick:()=>tarjeta.id==='actualizacion'?SAES.open():SATE.ir('tramites/'+tarjeta.tramite)}]});
   }
   function calendario() {
-    if(!calItems()){SateUI.modal(tx('calendario'),tx('calendario_sin_aviso'));return}
+    if(!calItems()){SateUI.modal(tx('calendario'),tx('calendario_sin_aviso'),{acciones:[{texto:SATE.texto('sate.pestana.calendario.titulo'),onclick:()=>SATE.ir('calendario')}]});return}
     const cuerpo=el('div',null,'cal cal-completo');
-    SateUI.modal(tx('calendario'),cuerpo,{acciones:[{texto:tx('reinscripcion'),onclick:()=>SATE.ir('tramites/reinscripcion')}]});
+    SateUI.modal(tx('calendario'),cuerpo,{acciones:[{texto:SATE.texto('sate.pestana.calendario.titulo'),onclick:()=>SATE.ir('calendario')},{texto:tx('reinscripcion'),onclick:()=>SATE.ir('tramites/reinscripcion')}]});
     // El mismo render y selección se usan en Ventanilla; no se copia el calendario.
     drawCals();
   }
@@ -78,7 +78,7 @@
     const d=situacionDatos();renderCalendario(d.rd,d.nDes);
     const R=calItems(), lista=tarjetas(d,R);
     const chips=lista.filter(x=>!['adeudos','carga','actualizacion'].includes(x.id)).map(x=>({id:x.id,estado:x.estado,texto:x.titulo,abre:()=>detalle(x)}));
-    const prox=R?.items.filter(a=>a.si&&!a.pasada).sort((a,b)=>a.ini-b.ini)[0];
+    const prox=SATE.calendario.proximos(Infinity).find(a=>(a.categoria!=='gestion'||R)&&(!a.para||CALAP?.[a.para]));
     chips.push({id:'calendario',estado:'info',texto:tx('lo_que_sigue'),abre:calendario});
     box.appendChild(SateUI.chips(chips));
     box.appendChild(SateUI.avisos(lista.map(x=>({...x,accion:{texto:tx('que_hacer'),onclick:()=>detalle(x)}}))));

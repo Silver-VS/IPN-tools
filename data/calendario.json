@@ -1,5 +1,5 @@
 {
-  "_nota": "Fechas del calendario de Gestión Escolar por unidad. 'periodo': periodo cuya reinscripción está en curso; 'citas': día en que se publican las citas en el SAES (AAAA-MM-DD). 'actividades[]': titulo corto, donde (saes o ventanillas), texto; 'para': a quién aplica (todos, adeudo, cita, sincita, desfasada, dictamen, transitorio). 'transitorio': regla para alumnos con materias desfasadas en su primer periodo de desfase.",
+  "_nota": "Fechas del calendario de Gestión Escolar por unidad. 'periodo': periodo cuya reinscripción está en curso; 'citas': día en que se publican las citas en el SAES (AAAA-MM-DD). 'actividades[]': titulo corto, donde (saes o ventanillas), texto; 'para': a quién aplica (todos, adeudo, cita, sincita, desfasada, dictamen, transitorio). 'transitorio': regla para alumnos con materias desfasadas en su primer periodo de desfase. Las actividades son eventos de gestión; eventos añade las demás fuentes sin repetir actividades. periodo en cada evento identifica el semestre.",
   "upiita": {
     "periodo": "27/1",
     "citas": "2026-10-07",
@@ -17,7 +17,9 @@
         "titulo": "Inscripción a ETS 26/2",
         "donde": "ventanillas",
         "para": "adeudo",
-        "texto": "Paga $20 por materia con ficha de depósito en la caja y entrega la copia sellada y tu credencial en ventanillas. Luego descarga tu comprobante del SAES."
+        "texto": "Paga $20 por materia con ficha de depósito en la caja y entrega la copia sellada y tu credencial en ventanillas. Luego descarga tu comprobante del SAES.",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-07",
@@ -25,28 +27,39 @@
         "titulo": "Aplicación de ETS 26/2",
         "donde": "ventanillas",
         "para": "adeudo",
-        "texto": "Consulta los horarios en la página de la unidad."
+        "texto": "Consulta los horarios en la página de la unidad.",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-07",
         "titulo": "Citas publicadas",
         "donde": "saes",
         "para": "todos",
-        "texto": "Consulta tu cita de reinscripción en el SAES."
+        "texto": "Consulta tu cita de reinscripción en el SAES.",
+        "hasta": "2026-10-07",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-07",
         "titulo": "Sin cita: revisa tu situación",
         "donde": "ventanillas",
         "para": "sincita",
-        "texto": "Si no tienes cita (por ejemplo, por materias desfasadas), acude con tu credencial de 9:00 a 14:00 o de 16:00 a 20:00, o llama al 55 5729 6000, ext. 56936, 56811, 56935, 56934 o 56920."
+        "texto": "Si no tienes cita (por ejemplo, por materias desfasadas), acude con tu credencial de 9:00 a 14:00 o de 16:00 a 20:00, o llama al 55 5729 6000, ext. 56936, 56811, 56935, 56934 o 56920.",
+        "hasta": "2026-10-07",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-12",
         "titulo": "Reinscripción con dictamen",
         "donde": "ventanillas",
         "para": "dictamen",
-        "texto": "Solo si ya tienes un dictamen vigente. Lleva identificación y copia del dictamen; el SAES no genera cita."
+        "texto": "Solo si ya tienes un dictamen vigente. Lleva identificación y copia del dictamen; el SAES no genera cita.",
+        "hasta": "2026-10-12",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-13",
@@ -54,21 +67,29 @@
         "titulo": "Reinscripción por cita",
         "donde": "saes",
         "para": "cita",
-        "texto": "Las citas se asignan por avance y promedio al cierre de 26/2."
+        "texto": "Las citas se asignan por avance y promedio al cierre de 26/2.",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-16",
         "titulo": "Desfasada aprobada en ETS",
         "donde": "ventanillas",
         "para": "desfasada",
-        "texto": "Si aprobaste una desfasada en el ETS 26/2, lleva tu credencial y opciones de horario."
+        "texto": "Si aprobaste una desfasada en el ETS 26/2, lleva tu credencial y opciones de horario.",
+        "hasta": "2026-10-16",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-19",
         "titulo": "Desfasadas: primer periodo",
         "donde": "ventanillas",
         "para": "transitorio",
-        "texto": "Hasta dos desfasadas en su primer periodo de desfase. Lleva identificación y opciones de horario; tope: carga media más la materia con más créditos."
+        "texto": "Hasta dos desfasadas en su primer periodo de desfase. Lleva identificación y opciones de horario; tope: carga media más la materia con más créditos.",
+        "hasta": "2026-10-19",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-19",
@@ -76,7 +97,9 @@
         "titulo": "Baja de materias",
         "donde": "ventanillas",
         "para": "todos",
-        "texto": "No se dan de baja recursamientos ni puedes quedar con menos de la carga mínima."
+        "texto": "No se dan de baja recursamientos ni puedes quedar con menos de la carga mínima.",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-19",
@@ -84,25 +107,214 @@
         "titulo": "Saberes previamente adquiridos",
         "donde": "ventanillas",
         "para": "todos",
-        "texto": "Entrega el formato en ventanillas; la aplicación es del 27 al 30 de octubre."
+        "texto": "Entrega el formato en ventanillas; la aplicación es del 27 al 30 de octubre.",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-23",
         "titulo": "Cita para altas",
         "donde": "saes",
         "para": "todos",
-        "texto": "Las citas van de menos a más créditos inscritos."
+        "texto": "Las citas van de menos a más créditos inscritos.",
+        "hasta": "2026-10-23",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
         "desde": "2026-10-26",
         "titulo": "Altas de materias",
         "donde": "saes",
         "para": "todos",
-        "texto": "Desde tu sesión del SAES, según tu cita."
+        "texto": "Desde tu sesión del SAES, según tu cita.",
+        "hasta": "2026-10-26",
+        "categoria": "gestion",
+        "fuente": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       }
     ],
     "notas": [
       "¿Quieres cursar una optativa o elegible como electiva? No la inscribas en el SAES."
+    ],
+    "eventos": [
+      {
+        "desde": "2026-10-02",
+        "hasta": "2026-10-02",
+        "titulo": "Fin del periodo 26/2",
+        "categoria": "academico",
+        "periodo": "26/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2026-10-13",
+        "hasta": "2026-10-16",
+        "titulo": "Inscripción y reinscripción 27/1",
+        "categoria": "academico",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2026-10-19",
+        "hasta": "2026-10-19",
+        "titulo": "Inicio del periodo 27/1",
+        "categoria": "academico",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2026-11-16",
+        "hasta": "2026-11-16",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2026-12-25",
+        "hasta": "2026-12-25",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-01-01",
+        "hasta": "2027-01-01",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-02-01",
+        "hasta": "2027-02-01",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2026-11-02",
+        "hasta": "2026-11-02",
+        "titulo": "Descanso por acuerdo sindical",
+        "categoria": "feriado",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-02-12",
+        "hasta": "2027-02-12",
+        "titulo": "Fin del periodo 27/1",
+        "categoria": "academico",
+        "periodo": "27/1",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-02-25",
+        "hasta": "2027-02-26",
+        "titulo": "Inscripción y reinscripción 27/2",
+        "categoria": "academico",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-03-01",
+        "hasta": "2027-03-03",
+        "titulo": "Inscripción y reinscripción 27/2",
+        "categoria": "academico",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-03-04",
+        "hasta": "2027-03-04",
+        "titulo": "Inicio del periodo 27/2",
+        "categoria": "academico",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-03-15",
+        "hasta": "2027-03-15",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-05-01",
+        "hasta": "2027-05-01",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-05-05",
+        "hasta": "2027-05-05",
+        "titulo": "Descanso obligatorio",
+        "categoria": "feriado",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-05-15",
+        "hasta": "2027-05-15",
+        "titulo": "Descanso por acuerdo sindical",
+        "categoria": "feriado",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-05-21",
+        "hasta": "2027-05-21",
+        "titulo": "Día del Politécnico (celebración)",
+        "categoria": "academico",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2027-07-02",
+        "hasta": "2027-07-02",
+        "titulo": "Fin del periodo 27/2",
+        "categoria": "academico",
+        "periodo": "27/2",
+        "fuente": "Calendario académico 26/2, 27/1 y 27/2, IPN"
+      },
+      {
+        "desde": "2026-10-26",
+        "hasta": "2026-10-30",
+        "titulo": "Registro de solicitudes de becas",
+        "categoria": "becas",
+        "periodo": "27/1",
+        "fuente": "Fechas importantes ENCB y UPIITA, Dirección de Apoyos a Estudiantes, Secretaría de Servicios Educativos",
+        "nota": "Beca de Excelencia Telmex Telcel, Convocatoria General de Becas 27/1 y Bécalos."
+      },
+      {
+        "desde": "2026-11-03",
+        "hasta": "2026-11-20",
+        "titulo": "Validación de requisitos de becas",
+        "categoria": "becas",
+        "periodo": "27/1",
+        "fuente": "Fechas importantes ENCB y UPIITA, Dirección de Apoyos a Estudiantes, Secretaría de Servicios Educativos",
+        "nota": "Beca de Excelencia Telmex Telcel, Convocatoria General de Becas 27/1 y Bécalos."
+      },
+      {
+        "desde": "2026-11-27",
+        "hasta": "2026-11-27",
+        "titulo": "Publicación de resultados de becas",
+        "categoria": "becas",
+        "periodo": "27/1",
+        "fuente": "Fechas importantes ENCB y UPIITA, Dirección de Apoyos a Estudiantes, Secretaría de Servicios Educativos",
+        "nota": "Beca de Excelencia Telmex Telcel, Convocatoria General de Becas 27/1 y Bécalos."
+      },
+      {
+        "desde": "2026-10-19",
+        "hasta": "2026-10-23",
+        "titulo": "Entrega de constancias de registro de protocolo",
+        "categoria": "tt",
+        "periodo": "27/1",
+        "fuente": "Trabajo Terminal, UPIITA"
+      }
     ]
   }
 }
