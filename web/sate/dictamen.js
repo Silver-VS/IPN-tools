@@ -18,7 +18,9 @@
     const fuentes=delNucleo?situacion.adeudos.map(k=>[k]):[...a.reprobadas_periodo||[],...a.desfasadas_saes||[],...a.kardex_reprobadas||[],...antiguas];
     for(const r of fuentes){
       if(!r||aprobadas.has(r[0]))continue;
-      const [nombre,nivel]=catalogo[`${a.carrera}|${plan}|${r[0]}`]||[];
+      // Sin plan en los datos (p. ej. el perfil de demostración) se usa la clave de la carrera si es única.
+      const llave=`${a.carrera}|${plan}|${r[0]}`,alternas=plan?[]:Object.keys(catalogo).filter(k=>k.startsWith(`${a.carrera}|`)&&k.endsWith(`|${r[0]}`));
+      const [nombre,nivel]=catalogo[llave]||(alternas.length===1?catalogo[alternas[0]]:null)||[];
       if(!nombre)continue;
       const hist=[...new Set([...(a.kardex_reprobadas||[]).filter(h=>h[0]===r[0]).map(h=>periodo(h[2])),...[...a.reprobadas_periodo||[],...a.desfasadas_saes||[]].filter(h=>h[0]===r[0]).map(h=>periodo(h[1]))].filter(Boolean))].sort();
       filas.set(r[0],{clave:r[0],nombre,nivel,cursada:hist[0]||'',recursada:hist.slice(1).join(', ')});
