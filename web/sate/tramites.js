@@ -23,8 +23,9 @@
   }
   function modelo(def,borrador=leer(def.id)){
     const campos=def.pasos.flatMap(p=>p.campos||[]),permitidos=new Set(campos.filter(c=>!c.sensible).map(c=>c.id));
+    const inicial=typeof def.datos==='function'?def.datos():def.datos;
     const datos={};
-    for(const c of campos)datos[c.id]=c.sensible?'':borrador?.datos?.[c.id]??def.datos?.[c.id]??'';
+    for(const c of campos)datos[c.id]=c.sensible?'':borrador?.datos?.[c.id]??inicial?.[c.id]??'';
     let paso=Math.max(0,Math.min(borrador?.paso||0,def.pasos.length)),listo=false;
     const validar=c=>c.validar?.(datos[c.id],datos)||(c.requerido&&!String(datos[c.id]??'').trim()?tx('requerido'):'');
     function guardar(){
@@ -60,7 +61,7 @@
       try{
         const bytes=await def.generar({...m.datos});
         if(destruido)return;
-        bajar(bytes,def.archivo||def.id+'.pdf');
+        bajar(bytes,typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||def.id+'.pdf');
         m.listo=true;m.guardar();def.alTerminar?.(m.datos);
       }catch(e){console.error('Ventanilla: descarga fallida',{tramite:def.id,paso:m.paso,error:e.name});box.querySelector('[data-pdf-estado]').textContent=tx('pdf_error')}
       finally{if(!destruido)b.disabled=false}
@@ -73,8 +74,19 @@
       pantalla.appendChild(el('h3',m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo));
       if(m.paso===def.pasos.length){
         const resumen=el('dl',null,'tramite-revision');
-        def.pasos.forEach((p,i)=>(p.campos||[]).forEach(c=>{const fila=el('div');fila.appendChild(el('dt',c.texto));fila.appendChild(el('dd',String(m.datos[c.id]||tx('sin_dato'))));const b=boton(tx('cambiar'),()=>{m.cambiar(i);pintar()});b.setAttribute('aria-label',tx('cambiar_dato',{dato:c.texto}));fila.appendChild(b);resumen.appendChild(fila)}));pantalla.appendChild(resumen);
+        def.pasos.forEach((p,i)=>(p.campos||[]).forEach(c=>{
+          const filas=c.revision?c.revision(m.datos[c.id],m.datos):[{texto:c.texto,valor:c.resumen?c.resumen(m.datos[c.id],m.datos):String(m.datos[c.id]||tx('sin_dato'))}];
+          for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
+        }));pantalla.appendChild(resumen);
       }else for(const c of def.pasos[m.paso].campos||[]){
+        if(c.render){
+          const grupo=el('div',null,'tramite-compuesto'),error=el('p','');
+          grupo.id='tramite-'+def.id+'-'+c.id;grupo.tabIndex=-1;
+          error.id=grupo.id+'-error';error.setAttribute('aria-live','polite');grupo.setAttribute('aria-describedby',error.id);
+          grupo.onblur=()=>{const mensaje=m.validar(c);error.textContent=mensaje;grupo.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
+          c.render(grupo,{datos:m.datos,cambiar(){m.listo=false;m.guardar();programar()},repintar:pintar});
+          grupo.appendChild(error);pantalla.appendChild(grupo);continue;
+        }
         const l=el('label',null,'tramite-campo'),n=el(c.tipo==='textarea'?'textarea':'input'),ayuda=el('small',c.ayuda||''),error=el('span','');
         n.id='tramite-'+def.id+'-'+c.id;n.value=m.datos[c.id];if(c.tipo!=='textarea')n.type=c.tipo||'text';
         n.required=!!c.requerido;error.id=n.id+'-error';ayuda.id=n.id+'-ayuda';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',ayuda.id+' '+error.id);
@@ -85,10 +97,10 @@
       const acciones=el('div',null,'tramite-acciones');if(m.paso>0)acciones.appendChild(boton(tx('atras'),()=>{m.atras();pintar()}));
       if(m.paso<def.pasos.length)acciones.appendChild(boton(tx('continuar'),()=>{
         // Validar también al continuar; la escritura por sí sola no muestra errores.
-        for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);m.datos[c.id]=n.value;n.onblur()}
+        for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);if(!c.render)m.datos[c.id]=n.value;n.onblur()}
         if(m.avanzar())pintar();else box.querySelector('[aria-invalid="true"]')?.focus();
       }));
-      else if(def.generar){const b=boton(tx('descargar'),descargar);b.setAttribute('data-descargar','');acciones.appendChild(b)}
+      else if(def.generar){const b=boton(def.descargaTexto||tx('descargar'),descargar);b.setAttribute('data-descargar','');acciones.appendChild(b)}
       else if(def.alTerminar)acciones.appendChild(boton(tx('confirmar'),()=>{if(!m.campos.some(c=>m.validar(c))){m.listo=true;m.guardar();def.alTerminar(m.datos)}}));
       pantalla.appendChild(acciones);
       const aviso=el('p','');aviso.setAttribute('data-pdf-estado','');aviso.setAttribute('role','status');pantalla.appendChild(aviso);
@@ -104,7 +116,7 @@
     if(!a||a.upiita_saes!==1||(a.unidad||'upiita')!=='upiita')return {};
     return {boleta:a.boleta||'',carrera:a.carrera_nombre||a.carrera||'',plan:a.plan||'',correo:a.correo_institucional||a.correo||'',celular:a.celular||'',telefono:a.telefono||''};
   }
-  function misDatos(box){
+  function misDatos(box,alVolver=()=>mostrarLista(box)){
     box.replaceChildren();const previo=leer('datos'),a=(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})();
     const datos={...prellenar(a),...(previo?.datos||{})},campos=['paterno','materno','nombres','boleta','carrera','plan','correo','celular','telefono'];
     box.appendChild(el('h2',tx('datos_titulo')));box.appendChild(el('p',tx('datos_ayuda')));
@@ -132,9 +144,9 @@
     form.appendChild(resumen);actualizar();form.appendChild(el('p',tx('datos_validacion')));
     const confirmar=el('button',tx('confirmar'),'sate-btn');confirmar.type='submit';form.appendChild(confirmar);
     form.onsubmit=e=>{e.preventDefault();for(const n of Object.values(controles))n.onblur();const mal=Object.values(controles).find(n=>n.getAttribute('aria-invalid')==='true');if(mal){mal.focus();return}
-      const d=Object.fromEntries(campos.map(k=>[k,controles[k].value.trim()]));IPNT.set('hu.tramite.datos',JSON.stringify({datos:d,confirmado:true,actualizado:Date.now()}));mostrarLista(box);
+      const d=Object.fromEntries(campos.map(k=>[k,controles[k].value.trim()]));IPNT.set('hu.tramite.datos',JSON.stringify({datos:d,confirmado:true,actualizado:Date.now()}));alVolver();
     };
-    form.appendChild(boton(tx('atras'),()=>mostrarLista(box)));box.appendChild(form);
+    form.appendChild(boton(tx('atras'),alVolver));box.appendChild(form);
   }
   function validarDatos(k,v,requerido=false){
     if(requerido&&!v.trim())return tx('requerido');
@@ -155,10 +167,13 @@
         const accion=boton(tx(e.accion),async()=>{
           const def=definiciones.get(id);
           if(e.accion!=='descargar'||!def?.generar){SATE.ir('tramites/'+id);return}
-          const m=modelo(def);
-          if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
           accion.disabled=true;
-          try{bajar(await def.generar({...m.datos}),def.archivo||id+'.pdf')}
+          try{
+            await def.preparar?.();
+            const m=modelo(def);
+            if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
+            bajar(await def.generar({...m.datos}),typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||id+'.pdf');
+          }
           catch(error){console.error('Ventanilla: descarga guardada fallida',{tramite:id,error:error.name});aviso.textContent=tx('pdf_error')}
           finally{accion.disabled=false}
         });

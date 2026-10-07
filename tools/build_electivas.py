@@ -53,6 +53,7 @@ def main():
     rows, curric, cap = offer()
     data = {"pdfs": pdfs, "oferta": rows, "curric": curric, "capturado": cap}
     html = TPL.read_text(encoding="utf-8").replace("/*__DATA__*/null", __import__("acentos").acentuar(json.dumps(data, ensure_ascii=False, separators=(",", ":"))))
+    html = html.replace('/*__ELECTIVAS_REGLAS__*/', (ROOT / 'web/tramites/electivas-reglas.js').read_text(encoding='utf-8'))
     pdf = (ROOT / 'web/tramites/pdf-comun.js').read_text(encoding='utf-8') + '\n' + (ROOT / 'web/tramites/pdf-electivas.js').read_text(encoding='utf-8')
     html = html.replace('/*__PDF_ELECTIVAS__*/', pdf)
     import comun

@@ -4,7 +4,7 @@
 .tramite-asistente{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
 .tramite-pantalla,.tramite-datos{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .tramite-campo{display:flex;flex-direction:column;gap:var(--ipn-esp-1);margin-block:var(--ipn-esp-3)}
-.tramite-campo input,.tramite-campo textarea{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;padding:var(--ipn-esp-2);color:var(--ipn-texto);background:var(--ipn-superficie);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
+.tramite-campo input,.tramite-campo textarea,.tramite-campo select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;padding:var(--ipn-esp-2);color:var(--ipn-texto);background:var(--ipn-superficie);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
 .tramite-campo [aria-invalid=true]{border-color:var(--ipn-error)}
 .tramite-pasos,.tramite-chips,.tramite-acciones{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
 .tramite-pasos{padding-left:var(--ipn-esp-4)}
@@ -16,6 +16,10 @@
 .tramite-preview iframe{width:100%;height:70vh;border:1px solid var(--ipn-borde-control)}
 .tramite-ver{display:block;margin-top:var(--ipn-esp-4)}
 :is(.tramite-campo input,.tramite-campo textarea,.tramite-chips button,.tramite-acciones button):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.tramite-chips [aria-pressed=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);border-color:var(--ipn-acento)}
+.electivas-actividad{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
+.electivas-resumen{position:sticky;top:0;z-index:1;background:var(--ipn-superficie);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control)}
+.tramite-compuesto details button{display:block;text-align:left;max-width:100%;white-space:normal;margin-block:var(--ipn-esp-2)}
 @media(min-width:1024px){.tramite-asistente:has(.tramite-preview){grid-template-columns:minmax(0,3fr) minmax(0,2fr)}.tramite-preview{display:block}.tramite-ver{display:none}.tramite-revision>div{grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto}}
 .sate-recorte-calendario{display:flex;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:0;height:28px;margin:0 0 var(--ipn-esp-2);padding:0;color:var(--ipn-tenue);background:none;border:0;font:inherit;font-size:var(--ipn-tamano-xs);text-align:left;cursor:pointer}
 .sate-recorte-calendario__texto{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
