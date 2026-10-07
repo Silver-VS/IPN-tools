@@ -884,6 +884,38 @@ def separar_datos(data):
     return nucleo, oferta, tramites
 
 
+PDFS_ELECTIVAS = {
+    "die01": "FORMATO DIE-01 OTRO PROGRAMA_1.pdf",
+    "die02": "FORMATO DIE-02 MISMO PROGRAMA.pdf",
+    "die03": "FORMATO DIE-03 REPORTE DE LA ACTIVIDAD.pdf",
+    "form": "FORMULARIO ACTUALIZADO25-2.pdf",
+}
+
+def oferta_electivas():
+    """Oferta del próximo periodo por clase: carrera, turno, grupo, materia, profesores, horas/semana, clave, tipo."""
+    h = json.loads((ROOT / "data" / "horarios_upiita.json").read_text(encoding="utf-8"))
+    m = json.loads((ROOT / "data" / "mapa_curricular_saes.json").read_text(encoding="utf-8"))
+    plan = {"B": "09", "M": "09", "T": "09", "E": "18", "S": "08"}
+    cur = {}
+    for c, p, niv, clave, nom, tipo, cred, ht, hp in m["rows"]:
+        if plan.get(c) == p:
+            cur[(c, norm(nom))] = [clave.upper(), tipo[0], float(ht), float(hp), float(cred)]
+    out = {}
+    for r in h["proximo"]:
+        key = (r["carrera"], r["Grupo"], clean(r["Asignatura"]))
+        o = out.setdefault(key, {"t": r["turno"], "p": [], "m": 0})
+        prof = clean(r["Profesor"])
+        if prof not in o["p"]:
+            o["p"].append(prof)
+        o["m"] = max(o["m"], sum(b - a for _, a, b in blocks(r)))
+    rows = []
+    for (c, g, a), o in out.items():
+        info = cur.get((c, norm(a)), ["", "", 0, 0, 0])
+        rows.append([c, o["t"], g, a, " / ".join(o["p"]), round(o["m"] / 60, 2), info[0], info[1]])
+    curric = {f"{c}|{v[0]}": [n, v[2], v[3], v[4]] for (c, n), v in cur.items()}
+    return rows, curric, h["capturado"]
+
+
 def datos_dictamen():
     import base64, contenido
     mapa = json.loads((ROOT / 'data/mapa_curricular_saes.json').read_text(encoding='utf-8'))
@@ -905,10 +937,16 @@ def escribir_sate(data):
         if UNIDAD == 'upiita' and nombre == 'tramites':
             d['dictamen'] = datos_dictamen()
         (datos / (nombre + ".json")).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    if UNIDAD == 'upiita':
+        import base64
+        rows, curric, cap = oferta_electivas()
+        electivas = {'oferta': rows, 'curric': curric, 'capturado': cap,
+                     'pdfs': {k: base64.b64encode((ROOT / 'data/gestion_escolar' / f).read_bytes()).decode() for k, f in PDFS_ELECTIVAS.items()}}
+        (datos / 'electivas.json').write_text(json.dumps(electivas, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
-    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))
@@ -1004,8 +1042,7 @@ document.addEventListener('click', e => {
 // v1: solo se eligen materias""", 1)
     core = core.replace("new URL('auth.html',location.href)", "new URL('../auth.html',location.href)")
     core = core.replace('href="privacidad.html"', 'href="../privacidad.html"').replace('href="condiciones.html"', 'href="../condiciones.html"')
-    # tools/publicar.sh compila y publica electivas.html junto a SATE.
-    core = core.replace('href="electivas.html"', 'href="../electivas.html"')
+    core = core.replace('href="sate/index.html#/upiita/tramites/electivas"', 'href="#/upiita/tramites/electivas"')
     (destino / "nucleo.js").write_text(core, encoding="utf-8")
     print("datos SATE", UNIDAD, {p.name:p.stat().st_size for p in datos.glob("*.json")})
 

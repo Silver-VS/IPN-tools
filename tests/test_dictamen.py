@@ -1,32 +1,30 @@
-"""Contrato del build: originales intactos, salidas reproducibles y sin marcadores pendientes."""
+"""Datos oficiales y regresión del estampado de los módulos de Ventanilla."""
 import base64
 import pathlib
 import sys
+import subprocess
 import unittest
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "tools"))
-import build_dictamen
+sys.path.insert(0, str(ROOT / 'tools'))
+from build_sate import datos_dictamen
 
 
 class DictamenBuild(unittest.TestCase):
     def test_originales_embebidos_sin_cambios(self):
-        originales = {nombre: (ROOT / "data/gestion_escolar" / nombre).read_bytes()
-                      for nombre in build_dictamen.PDFS.values()}
-        html = build_dictamen.construir()
-        for nombre, original in originales.items():
-            self.assertIn(base64.b64encode(original).decode(), html)
-            self.assertEqual(original, (ROOT / "data/gestion_escolar" / nombre).read_bytes())
+        datos = datos_dictamen()
+        for tipo, nombre in [('interno', 'dictamen-interno-2026-1.pdf'),
+                             ('externo', 'dictamen-externo-cosie-01.pdf')]:
+            original = (ROOT / 'data/gestion_escolar' / nombre).read_bytes()
+            self.assertEqual(base64.b64decode(datos['pdfs'][tipo]), original)
 
-    def test_compilacion_reproducible_y_completa(self):
-        html = build_dictamen.construir()
-        self.assertEqual(html, build_dictamen.construir())
-        for marca in ["/*__DATA__*/", "/*__TEXTOS__*/", "/*__TOKENS__*/", "/*__COMPONENTES_JS__*/"]:
-            self.assertNotIn(marca, html)
-        self.assertNotIn("\ufffd", html)
-        self.assertIn("Fase de prueba", html)
-        self.assertNotIn("2099000000", html)  # El perfil de prueba no forma parte de la herramienta.
+    def test_datos_reproducibles_y_estampado(self):
+        self.assertEqual(datos_dictamen(), datos_dictamen())
+        self.assertTrue(datos_dictamen()['materias'])
+        resultado = subprocess.run([r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_pdf.mjs'],
+                                   cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

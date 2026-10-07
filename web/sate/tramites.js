@@ -7,6 +7,14 @@
     const u=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'})),a=el('a');
     a.href=u;a.download=archivo;a.click();setTimeout(()=>URL.revokeObjectURL(u),30000);
   }
+  function confirmarDescarga(){
+    return new Promise(resolve=>{
+      SateUI.modal(tx('descargar'),tx('entrega_firmados'),{pequeno:true,alCerrar:()=>resolve(false),acciones:[
+        {texto:tx('generar_pdf'),primaria:true,onclick:()=>resolve(true)},
+        {texto:tx('cancelar')}
+      ]});
+    });
+  }
   function leer(id){try{return JSON.parse(localStorage.getItem('hu.tramite.'+id)||'null')}catch{return null}}
   const completados=new Map();
   function estado(borrador,aplicacion,ahora=Date.now()){
@@ -25,8 +33,9 @@
   function modelo(def,borrador=leer(def.id)){
     const memoria=completados.get(def.id);
     const campos=def.pasos.flatMap(p=>p.campos||[]),permitidos=new Set(campos.filter(c=>!c.sensible).map(c=>c.id));
+    const inicial=typeof def.datos==='function'?def.datos():def.datos;
     const datos={};
-    for(const c of campos)datos[c.id]=memoria?.datos[c.id]??(c.sensible?'':borrador?.datos?.[c.id]??def.datos?.[c.id]??'');
+    for(const c of campos)datos[c.id]=memoria?.datos[c.id]??(c.sensible?'':borrador?.datos?.[c.id]??inicial?.[c.id]??'');
     let paso=Math.max(0,Math.min(borrador?.paso||0,def.pasos.length)),listo=false;
     const validar=c=>c.visible&&!c.visible(datos)?'':c.validar?.(datos[c.id],datos)||(c.requerido&&!String(datos[c.id]??'').trim()?tx('requerido'):'');
     function guardar(){
@@ -61,6 +70,7 @@
       if(def.confirmacion&&!confirmado){box.querySelector('[data-pdf-estado]').textContent=def.confirmacion;return}
       const invalidos=m.campos.filter(c=>m.validar(c));
       if(invalidos.length){m.cambiar(def.pasos.findIndex(p=>p.campos.includes(invalidos[0])));pintar();return}
+      if(!await confirmarDescarga()||destruido)return;
       const b=box.querySelector('[data-descargar]');b.disabled=true;
       try{
         const bytes=await def.generar({...m.datos});
@@ -81,12 +91,23 @@
       if(def.pasos[m.paso]?.ayuda){const ayuda=def.pasos[m.paso].ayuda;pantalla.appendChild(el('p',typeof ayuda==='function'?ayuda(m.datos):ayuda))}
       if(m.paso===def.pasos.length){
         const resumen=el('dl',null,'tramite-revision');
-        def.pasos.forEach((p,i)=>(p.campos||[]).filter(c=>!c.visible||c.visible(m.datos)).forEach(c=>{const fila=el('div');fila.appendChild(el('dt',c.texto));fila.appendChild(el('dd',c.resumen?c.resumen(m.datos[c.id]):String(m.datos[c.id]||tx('sin_dato'))));const b=boton(tx('cambiar'),()=>{m.cambiar(i);pintar()});b.setAttribute('aria-label',tx('cambiar_dato',{dato:c.texto}));fila.appendChild(b);resumen.appendChild(fila)}));pantalla.appendChild(resumen);
+        def.pasos.forEach((p,i)=>(p.campos||[]).filter(c=>!c.visible||c.visible(m.datos)).forEach(c=>{
+          const filas=c.revision?c.revision(m.datos[c.id],m.datos):[{texto:c.texto,valor:c.resumen?c.resumen(m.datos[c.id],m.datos):String(m.datos[c.id]||tx('sin_dato'))}];
+          for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
+        }));pantalla.appendChild(resumen);
         def.revisar?.(pantalla,m.datos);
         if(def.confirmacion){const l=el('label',null,'tramite-campo'),n=el('input');n.type='checkbox';n.onchange=()=>confirmado=n.checked;l.appendChild(n);l.appendChild(el('span',def.confirmacion));pantalla.appendChild(l)}
       }else for(const c of def.pasos[m.paso].campos||[]){
         if(c.visible&&!c.visible(m.datos))continue;
-        if(c.pintar){c.pintar(pantalla,{datos:m.datos,cambiar(valor,repintar=false){m.datos[c.id]=valor;m.listo=false;m.guardar();programar();if(repintar)pintar()},validar:()=>m.validar(c)});continue}
+        const render=c.pintar||c.render;
+        if(render){
+          const grupo=el('div',null,'tramite-compuesto'),error=el('p','');
+          grupo.id='tramite-'+def.id+'-'+c.id;grupo.tabIndex=-1;
+          error.id=grupo.id+'-error';error.setAttribute('aria-live','polite');grupo.setAttribute('aria-describedby',error.id);
+          grupo.onblur=()=>{const mensaje=m.validar(c);error.textContent=mensaje;grupo.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
+          render(grupo,{datos:m.datos,cambiar(valor,repintar=false){if(arguments.length)m.datos[c.id]=valor;m.listo=false;m.guardar();programar();if(repintar)pintar()},validar:()=>m.validar(c),repintar:pintar});
+          grupo.appendChild(error);pantalla.appendChild(grupo);continue;
+        }
         const l=el('label',null,'tramite-campo'),n=el(c.tipo==='textarea'?'textarea':'input'),ayuda=el('small',c.ayuda||''),error=el('span','');
         n.id='tramite-'+def.id+'-'+c.id;n.value=m.datos[c.id];if(c.tipo!=='textarea')n.type=c.tipo||'text';
         n.required=!!c.requerido;error.id=n.id+'-error';ayuda.id=n.id+'-ayuda';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',ayuda.id+' '+error.id);
@@ -97,7 +118,7 @@
       const acciones=el('div',null,'tramite-acciones');if(m.paso>0)acciones.appendChild(boton(tx('atras'),()=>{m.atras();pintar()}));
       if(m.paso<def.pasos.length)acciones.appendChild(boton(tx('continuar'),()=>{
         // Validar también al continuar; la escritura por sí sola no muestra errores.
-        for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);if(n){m.datos[c.id]=n.value;n.onblur()}}
+        for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);if(n){if(!c.pintar&&!c.render)m.datos[c.id]=n.value;n.onblur()}}
         if(m.avanzar())pintar();else{aviso.textContent=(def.pasos[m.paso].campos||[]).map(m.validar).filter(Boolean).join(' ');box.querySelector('[aria-invalid="true"]')?.focus()}
       }));
       else if(def.generar){const b=boton(def.descargaTexto||tx('descargar'),descargar);b.setAttribute('data-descargar','');acciones.appendChild(b)}
@@ -167,10 +188,14 @@
         const accion=boton(tx(e.accion),async()=>{
           const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada;
           if(e.accion!=='descargar'||!def?.generar){SATE.ir('tramites/'+id);return}
-          const m=modelo(def);
-          if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
+          if(!await confirmarDescarga())return;
           accion.disabled=true;
-          try{bajar(await def.generar({...m.datos}),typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||id+'.pdf')}
+          try{
+            const m=modelo(def);
+            await def.preparar?.(m.datos,m.paso);
+            if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
+            bajar(await def.generar({...m.datos}),typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||id+'.pdf');
+          }
           catch(error){console.error('Ventanilla: descarga guardada fallida',{tramite:id,error:error.name});aviso.textContent=tx('pdf_error')}
           finally{accion.disabled=false}
         });
@@ -184,8 +209,7 @@
     if(r.tramite){
       const entrada=definiciones.get(r.tramite),def=typeof entrada==='function'?entrada():entrada;
       if(def){activo=asistente(box,def);return}
-      // Hasta V2/V3, los enlaces profundos abren el formulario vigente sin un cuerpo de migración.
-      location.replace('../'+r.tramite+'.html');return;
+      mostrarLista(box);return;
     }mostrarLista(box);
   }
   raiz.SateTramites={estado,separarNombre,modelo,asistente,misDatos,prellenar,validarDatos,mostrarLista,registrar:(def,id)=>definiciones.set(id||def.id,def)};

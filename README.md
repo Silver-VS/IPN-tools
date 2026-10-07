@@ -7,7 +7,7 @@ Los datos del SAES solo se consultan (lectura) y se quedan en ese navegador.
 | Herramienta | Qué hace | Alcance |
 |---|---|---|
 | **Horarios** (`web/horarios.template.html`) | Mapa curricular y trayectoria, oferta del SAES, armado y generación de horarios, exportación a imagen, PDF y Excel | Trayectoria: UPIITA. Armado de horarios: **cualquier unidad** del IPN (ver [autohospedaje](docs/AUTOHOSPEDAJE.md)) |
-| **Electivas** (`web/electivas.template.html`) | Registro de actividades y generación de los formatos DIE-03 (uno por modalidad) y del formulario | UPIITA |
+| **Ventanilla** (`web/sate/`, `web/tramites/`) | Asistentes de Dictamen y Electivas, con generación de solicitudes PDF | UPIITA |
 | **Guía de revisión** (`web/revision.html`) | Instructivo, perfil de demostración y casos de prueba | UPIITA |
 
 Versión de prueba publicada: https://silver-vs.github.io/upiita/
@@ -18,10 +18,9 @@ Requisitos: Python 3.10+ (`pdfplumber` solo para `tools/salones.py` y los extrac
 
 ```bash
 python tools/build_horarios.py
-python tools/build_electivas.py
 ```
 
-- Salida para compartir sin logos: `web/horarios.html`, `web/electivas.html`.
+- Salida para compartir sin logos: `web/horarios.html`.
 - Salida institucional con logos: `web/dist/` (lo que se publica).
 - Con `UPIITA_SITE=https://<tu-sitio>/` se generan además `lector.js` (lector del SAES) y `captura.js`
   (capturador de la oferta), y los marcadores apuntan a ese sitio.

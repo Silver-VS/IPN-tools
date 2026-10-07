@@ -19,14 +19,14 @@ class Nodo {
   appendChild(n){this.children.push(n);n.parent=this;return n}replaceChildren(...ns){this.text='';this.children=[];ns.forEach(n=>this.appendChild(n))}
   addEventListener(k,fn){(this.eventos[k]??=[]).push(fn)}
   dispatchEvent(e){e.target??=this;(this.eventos[e.type]||[]).forEach(fn=>fn(e));return true}
-  click(){this.focus();if(this.onclick)this.onclick();this.dispatchEvent({type:'click',target:this})}
+  click(){if(this.tagName!=='a'||this.parent)this.focus();if(this.onclick)this.onclick();this.dispatchEvent({type:'click',target:this})}
   focus(){document.activeElement=this}
   showModal(){this.open=true}close(){this.open=false}
   insertAdjacentHTML(){}getBoundingClientRect(){return {left:10,top:100,bottom:130,width:30,height:30}}
   contains(n){return this===n||this.children.some(c=>c.contains(n))}
   all(){return this.children.flatMap(c=>[c,...c.all()])}
   querySelectorAll(s){return this.all().filter(n=>s.split(',').some(q=>{q=q.trim().split(' ').at(-1);return q.startsWith('.')?n.classList.contains(q.slice(1)):q.startsWith('#')?n.id===q.slice(1):q==='button'?n.tagName==='button':q==='a[href]'?n.tagName==='a'&&n.getAttribute('href'):q===n.tagName}))}
-  querySelector(s){return this.querySelectorAll(s)[0]||null}
+  querySelector(s){if(s.startsWith('['))return this.all().find(n=>n.getAttribute(s.slice(1,-1))!==null)||null;return this.querySelectorAll(s)[0]||null}
   closest(){return null}
 }
 const nodos=new Map(),body=new Nodo('body');
@@ -129,3 +129,28 @@ assert.match(tabs.querySelector('.sate-grupo-inicio').textContent,/mapa/);
 tabs.children[1].dispatchEvent({type:'keydown',key:'ArrowRight',preventDefault(){}});
 assert.equal(document.activeElement,tabs.children[2],'Flechas atraviesan grupos');
 console.log('Presente: sin datos/DEMO, una tarjeta, chips globales y pendientes accesibles, Ventanilla, próximos, datos reales con simulación y foco Tab/Shift+Tab/Esc. Sin red.');
+
+// Descarga con el componente modal real: cancelación, Esc, foco y aceptación.
+c.setTimeout=(fn,ms)=>{const h=setTimeout(fn,ms);h.unref();return h};
+c.IPNT={set:(k,v)=>c.localStorage.setItem(k,v)};
+vm.runInContext(leer('web/sate/tramites.js'),c);
+let pdfsGenerados=0;
+const tramite={id:'electivas',titulo:'Solicitud ficticia',pasos:[],generar:async()=>{pdfsGenerados++;return new Uint8Array([37,80,68,70])}};
+const panel=document.getElementById('sate-tramites'),asistente=c.SateTramites.asistente(panel,tramite);
+const descargar=panel.querySelectorAll('button').find(n=>n.textContent==='Descargar');
+descargar.focus();let pendiente=asistente.descargar();
+assert.equal(dlg.open,true);assert.equal(dlg.getAttribute('aria-labelledby'),'sate-modal-titulo');
+assert.match(dlg.textContent,/Entrega tus formatos firmados en las ventanillas de Gestión Escolar\./);
+assert.equal(document.activeElement.textContent,'Generar PDF');assert.equal(pdfsGenerados,0);
+dlg.querySelectorAll('button').find(n=>n.textContent==='Cancelar').click();await pendiente;
+assert.equal(pdfsGenerados,0);assert.equal(dlg.open,false);assert.equal(document.activeElement,descargar);
+pendiente=asistente.descargar();dlg.dispatchEvent({type:'cancel',preventDefault(){}});await pendiente;
+assert.equal(pdfsGenerados,0);assert.equal(document.activeElement,descargar);
+pendiente=asistente.descargar();dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
+assert.equal(pdfsGenerados,1);assert.equal(dlg.open,false);asistente.destruir();
+c.SateTramites.registrar(tramite);SATE.presente.aplicaTramite=()=>null;c.SateTramites.mostrarLista(panel);
+const desdeLista=panel.querySelectorAll('button').find(n=>n.textContent==='Descargar');desdeLista.focus();
+pendiente=desdeLista.onclick();assert.equal(dlg.open,true);assert.equal(pdfsGenerados,1);
+dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
+assert.equal(pdfsGenerados,2);assert.equal(document.activeElement,desdeLista);
+console.log('Descarga: modal real accesible, Cancelar/Esc sin generación, foco restaurado y aceptación desde asistente/lista.');

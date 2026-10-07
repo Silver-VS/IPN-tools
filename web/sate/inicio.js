@@ -52,7 +52,13 @@
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
-    if (id === 'tramites') { await cargas.get('tramites.json'); await script('tramites.js'); if(u==='upiita')await script('dictamen.js'); }
+    if (id === 'tramites') {
+      await cargas.get('tramites.json'); await script('tramites.js');
+      if (u === 'upiita') {
+        await script('dictamen.js');
+        await script('../tramites/electivas-reglas.js'); await script('electivas.js');
+      }
+    }
     if (!modulos[id]) throw new Error('Módulo sin registrar: ' + id);
     return modulos[id];
   }
@@ -114,6 +120,7 @@
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
     if (r.pestana === 'mapa' || r.pestana === 'horarios') await cargarOferta();
     const m = await modulo(r.pestana);
+    if (r.pestana === 'tramites' && r.tramite === 'electivas') await SateElectivas.preparar();
     if (v !== version) return;
     if (actual) modulos[actual.pestana]?.ocultar?.();
     actual = r;

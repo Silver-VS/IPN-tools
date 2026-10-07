@@ -12,13 +12,23 @@ class Nodo{
   querySelector(s){return this.todos().find(n=>s.startsWith('#')?n.id===s.slice(1):s.startsWith('[')?(()=>{const m=s.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);return m&&(m[2]==null?n.attrs[m[1]]!=null:n.attrs[m[1]]===m[2])})():n.tagName===s)||null}
   todos(){return this.children.flatMap(n=>[n,...n.todos()])}focus(){foco=this}click(){this.onclick?.()}
 }
-let foco,aplicacion=null,ir,modulo;const almacen=new Map(),urls=new Set(),revocados=[],abiertos=[],box=new Nodo('section');
-const c=vm.createContext({console,setTimeout:(fn,ms)=>{const h=setTimeout(fn,ms);if(ms>=30000)h.unref();return h},clearTimeout,Blob,Date,
+let dialogo, foco,aplicacion=null,ir,modulo;const almacen=new Map(),urls=new Set(),revocados=[],abiertos=[],box=new Nodo('section');
+const c=vm.createContext({SateUI:{modal(titulo,contenido,op){dialogo={titulo,contenido,...op}}},console,setTimeout:(fn,ms)=>{const h=setTimeout(fn,ms);if(ms>=30000)h.unref();return h},clearTimeout,Blob,Date,
   document:{createElement:t=>new Nodo(t),getElementById:()=>box},
   localStorage:{getItem:k=>almacen.get(k)||null},IPNT:{set:(k,v)=>almacen.set(k,v)},
   URL:{createObjectURL(){const u='blob:'+urls.size;urls.add(u);return u},revokeObjectURL(u){revocados.push(u)}},
   location:{assign:u=>abiertos.push(u),replace:u=>abiertos.push(u)},SATE_UNIDAD:'upiita',SATE_CONFIG:config,
   SATE:{texto,pestana:(id,m)=>modulo=m,presente:{aplicaTramite:()=>aplicacion},ir:r=>ir=r}});
+async function aceptar(accion){
+  dialogo=null;const pendiente=accion();
+  assert.ok(dialogo,'La descarga primero abre el modal');
+  assert.equal(dialogo.contenido,'Entrega tus formatos firmados en las ventanillas de Gestión Escolar.');
+  assert.deepEqual(Array.from(dialogo.acciones,a=>a.texto),['Generar PDF','Cancelar']);
+  dialogo.acciones[0].onclick();dialogo.alCerrar();await pendiente;
+}
+async function cancelar(accion){
+  const pendiente=accion();assert.ok(dialogo);dialogo.alCerrar();await pendiente;
+}
 vm.runInContext('window=globalThis;window.open=(u)=>location.assign(u)',c);
 vm.runInContext(readFileSync('web/sate/tramites.js','utf8'),c);
 const t=c.SateTramites,plano=v=>JSON.parse(JSON.stringify(v));
@@ -47,7 +57,7 @@ assert.ok(box.todos().some(n=>n.textContent.includes('Paso 2 de 4 · guardado ha
 aplicacion={aplica:false,motivo:'Motivo ficticio'};t.mostrarLista(box);
 assert.equal(box.todos().filter(n=>n.tagName==='section').length,2);assert.equal(box.todos().filter(n=>n.tagName==='button').length,1,'Solo Mis datos: ningún botón para un trámite que no aplica');
 aplicacion=null;
-modulo.mostrar({tramite:'dictamen'});assert.equal(abiertos.at(-1),'../dictamen.html');
+modulo.mostrar({tramite:'dictamen'});assert.equal(abiertos.length,0,'Sin definición se muestra la lista; no hay página antigua');
 almacen.set('saes.alumno',JSON.stringify({upiita_saes:1,unidad:'upiita',nombre:'DE LA CRUZ DEL RÍO ANA MARÍA',boleta:'2099000000',carrera_nombre:'Ingeniería Biónica',plan:'2009',correo:'ficticio@example.test'}));
 t.misDatos(box);
 box.todos().find(n=>n.tagName==='button'&&n.textContent==='ANA').click();
@@ -74,11 +84,11 @@ box.todos().find(n=>n.textContent==='Ver formato').click();assert.ok(abiertos.at
 a.destruir();assert.equal(a.modelo.datos.secreto,'');assert.ok(revocados.length);
 almacen.delete('hu.tramite.ejemplo-prueba');
 const defListo={id:'listo-prueba',titulo:'Listo',pasos:[{titulo:'Pregunta',campos:[{id:'dato',texto:'Dato',requerido:true}]}],generar:async()=>new Uint8Array([37,80,68,70])};
-const listo=t.asistente(box,defListo);box.querySelector('input').value='Ficticio';box.querySelector('input').oninput();box.todos().find(n=>n.textContent==='Continuar').click();await listo.descargar();
+const listo=t.asistente(box,defListo);box.querySelector('input').value='Ficticio';box.querySelector('input').oninput();box.todos().find(n=>n.textContent==='Continuar').click();await cancelar(()=>listo.descargar());assert.equal(JSON.parse(almacen.get('hu.tramite.listo-prueba')).listo,false);await aceptar(()=>listo.descargar());
 assert.equal(JSON.parse(almacen.get('hu.tramite.listo-prueba')).listo,true,'Listo solo tras generación correcta');listo.destruir();
 let generadoDesdeLista=0;t.registrar({...defListo,id:'electivas',generar:async()=>{generadoDesdeLista++;return new Uint8Array([37,80,68,70])}});
 almacen.set('hu.tramite.electivas',JSON.stringify({listo:true,paso:1,total:2,datos:{dato:'Ficticio'}}));t.mostrarLista(box);
-await box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar').onclick();assert.equal(generadoDesdeLista,1,'Descargar en la lista genera el PDF directamente');
+await cancelar(()=>box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar').onclick());assert.equal(generadoDesdeLista,0);await aceptar(()=>box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar').onclick());assert.equal(generadoDesdeLista,1,'Descargar en la lista genera el PDF directamente');
 const invalido=t.asistente(box,{...defListo,id:'preview-invalida',datos:{dato:'Ficticio'}});
 await new Promise(r=>setTimeout(r,350));assert.ok(box.querySelector('iframe').src);
 box.querySelector('input').value='';box.querySelector('input').oninput();await new Promise(r=>setTimeout(r,350));assert.equal(box.querySelector('iframe').src,undefined);assert.equal(box.querySelector('[data-ver-formato]').disabled,true);invalido.destruir();
@@ -103,6 +113,12 @@ almacen.set('hu.tramite.datos',JSON.stringify({confirmado:true,datos:{paterno:'P
 almacen.delete('hu.tramite.dictamen');
 vm.runInContext(readFileSync('web/sate/dictamen.js','utf8'),c);
 const dic=c.SateDictamen;await dic.cargar();
+c.SATE.repintar=()=>modulo.mostrar({tramite:'dictamen'});
+modulo.mostrar({tramite:'dictamen'});
+box.todos().find(n=>n.tagName==='button'&&n.textContent==='Mis datos para trámites').click();
+box.querySelector('form').onsubmit({preventDefault(){}});
+assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='¿Qué necesitas?'),'Mis datos vuelve al asistente de dictamen en la misma ruta');
+modulo.ocultar();
 assert.equal(dic.sugerir({nDes:1}).tipo,'interno');
 assert.equal(dic.sugerir({nDes:1,riesgoBajaDefinitiva:true}).tipo,'externo');
 assert.equal(dic.sugerir({revocacion:true}).tipo,'externo');assert.equal(dic.sugerir(null).tipo,'');
@@ -131,12 +147,17 @@ assert.equal(asist.modelo.paso,4);
 assert.equal(box.querySelector('[data-descargar]').textContent,'Descargar mi solicitud (PDF)');
 const antesDescarga=estampados.length;await asist.descargar();assert.equal(estampados.length,antesDescarga,'La confirmación es obligatoria');
 const confirmar=box.todos().find(n=>n.tagName==='input'&&n.type==='checkbox');confirmar.checked=true;confirmar.onchange();
-await asist.descargar();
+await cancelar(()=>asist.descargar());assert.equal(estampados.length,antesDescarga);
+await aceptar(()=>asist.descargar());
 assert.equal(estampados.at(-2).tipo,'interno');assert.equal(estampados.at(-1).tipo,'carta');
-assert.equal(uniones.at(-1).pdfs.length,2);assert.equal(uniones.at(-1).op.vistoBueno,'tu tutor académico');
+assert.equal(uniones.at(-1).pdfs.length,2);assert.equal(uniones.at(-1).op,undefined,'La unión no agrega instrucciones');
 assert.equal(dd.archivo(ad),'dictamen-interno-2099000000.pdf');
 assert.ok(!almacen.get('hu.tramite.dictamen').includes('Motivo ficticio'));
 asist.destruir();t.mostrarLista(box);assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));
+const antesLista=estampados.length;
+await aceptar(()=>box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar').onclick());
+assert.equal(estampados.length,antesLista+2,'Descargar desde la lista genera formato y carta otra vez');
+assert.equal(estampados.at(-1).valores.motivos,'Motivo ficticio para la prueba.','Descarga desde lista conserva sensibles en memoria');
 assert.equal(t.modelo(dd).datos.motivos,'Motivo ficticio para la prueba.','Listo conserva sensibles únicamente en memoria de esta página');
 const campoFilas=dd.pasos[1].campos[0],candidatas=Object.entries(c.SATE_DATA.dictamen.materias).filter(([k])=>k.startsWith('B|09|')).slice(0,9).map(([k,[nombre,nivel]])=>({clave:k.split('|')[2],nombre,nivel,cursada:'',recursada:''}));
 const contMaterias=new Nodo('div'),ctxMaterias={datos:{filas:candidatas.slice(0,8)},cambiar(v){this.datos.filas=v}};
@@ -152,7 +173,7 @@ contGuia.todos().find(n=>n.tagName==='textarea').value='Situación ficticia';con
 assert.equal(contGuia.querySelector('#dictamen-motivos').value,'Situación ficticia');
 const ex=t.modelo({...dd,id:'dictamen-externo-prueba'},null);Object.assign(ex.datos,{tipo:'externo',filas:dd.datos.filas,periodo:'27/1',peticion:'Solicito revisión de mi situación escolar.',motivos:'Motivos ficticios.',organo:'cgc',dependientes:'no_contestar',embarazo:'no_contestar',situacion:['s5'],causas:['salud'],anexos:['carta_anexo']});
 await dd.generar(ex.datos);assert.equal(estampados.at(-2).tipo,'externo');assert.equal(estampados.at(-2).valores.organo[0],'cgc');
-assert.equal(uniones.at(-1).op.vistoBueno,undefined);assert.equal(uniones.at(-1).pdfs.length,2);
+assert.equal(uniones.at(-1).op,undefined);assert.equal(uniones.at(-1).pdfs.length,2);
 ex.guardar();assert.ok(!almacen.get('hu.tramite.dictamen-externo-prueba').includes('salud'));
 assert.ok(!almacen.get('hu.tramite.dictamen-externo-prueba').includes('Motivos ficticios'));
 // Una recarga real crea otro contexto: no recupera la carta ni las respuestas sensibles.

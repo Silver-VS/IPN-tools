@@ -28,13 +28,13 @@ https://silver-vs.github.io/upiita/index.html
 https://silver-vs.github.io/upiita/horarios-upiita.html
 https://silver-vs.github.io/upiita/horarios-escom.html
 https://silver-vs.github.io/upiita/horarios-upibi.html
-https://silver-vs.github.io/upiita/electivas.html
+https://silver-vs.github.io/upiita/sate/index.html
 http://localhost:8080/dist/auth.html
 http://localhost:8080/dist/index.html
 http://localhost:8080/dist/horarios-upiita.html
 http://localhost:8080/dist/horarios-escom.html
 http://localhost:8080/dist/horarios-upibi.html
-http://localhost:8080/dist/electivas.html
+http://localhost:8080/dist/sate/index.html
 ```
 
 `auth.html` recibe el inicio de sesión en ventana emergente (computadora). Las páginas reciben el inicio de

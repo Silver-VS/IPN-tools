@@ -637,6 +637,9 @@ busqueda_prioridad = "Se analizaron las combinaciones de mayor prioridad (desfas
 busqueda_limitada = "Búsqueda limitada por el número de combinaciones; reduce las materias seleccionadas para un análisis completo."
 
 [sate.ventanilla]
+entrega_firmados = "Entrega tus formatos firmados en las ventanillas de Gestión Escolar."
+generar_pdf = "Generar PDF"
+cancelar = "Cancelar"
 titulo = "Tus trámites"
 mis_datos = "Mis datos ✎"
 datos_titulo = "Mis datos para trámites"
@@ -683,8 +686,3 @@ dato_celular = "Celular"
 dato_telefono = "Teléfono"
 boleta_error = "La boleta debe tener exactamente 10 dígitos."
 correo_error = "Escribe un correo como nombre@ejemplo.mx."
-instrucciones_titulo = "Antes de entregar tus formatos"
-instrucciones_firma = "Firma en los espacios marcados"
-instrucciones_visto_bueno = "Solicita el Vo. Bo. de {persona} en el espacio del formato que corresponda."
-instrucciones_entrega = "Entrega en Gestión Escolar de tu unidad dentro de las fechas del calendario"
-instrucciones_exceso = "Las instrucciones exceden el espacio de la hoja."

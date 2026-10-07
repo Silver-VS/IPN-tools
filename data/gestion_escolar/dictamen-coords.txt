@@ -1,5 +1,5 @@
 Medicion: pdfplumber.extract_text_lines(), puntos PDF; origen superior izquierdo.
-Llenado: web/dictamen.template.html COORDS usa x, base superior, ancho; pdf-lib y=792-base.
+Llenado: web/tramites/pdf-dictamen.js COORDS usa x, base superior, ancho; pdf-lib y=792-base.
 Originales carta de una pagina; no se modifican. El triangulo del interno ya viene impreso.
 
 === dictamen-externo-cosie-01.pdf 612.12 x 792.12

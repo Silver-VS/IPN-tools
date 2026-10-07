@@ -106,21 +106,21 @@
     // Los motivos también pueden contener salud, familia o trabajo: jamás se guardan.
     const valores=d=>({...compartido(),...d,unidad:'UPIITA-IPN',fecha:new Date().toLocaleDateString('en-CA'),oficios:d.anteriores==='Sí'?d.oficios:'',...Object.fromEntries(['dependientes','hijos','embarazo','organo'].map(k=>[k,typeof d[k]==='string'&&d[k]?[d[k]]:[]])),...Object.fromEntries(['situacion','causas','anexos'].map(k=>[k,Array.isArray(d[k])?d[k]:[]]))});
     async function generar(d,preview=false){
-      await cargar();if(!d.tipo)return PdfTramites.unir([],{texto:SATE.texto});
+      await cargar();if(!d.tipo)return PdfTramites.unir([]);
       if(!preview&&(!compartido()||!medir(d.peticion,d.tipo).ok||d.filas.length>8))throw new Error('Respuestas incompletas');
       const v=valores(d);if(preview){if(!medir(v.peticion,v.tipo).ok)v.peticion='';v.filas=v.filas.slice(0,8)}
       let etapa='formato';
       try{
         const formato=await PdfDictamen.generar({tipo:d.tipo,valores:v,pdfs:base.pdfs,texto});etapa='carta';
-        const carta=await PdfDictamen.generar({tipo:'carta',valores:{...v,motivos:v.motivos||''},pdfs:base.pdfs,texto});etapa='unión e instrucciones';
-        return await PdfTramites.unir([formato,carta],{texto:SATE.texto,vistoBueno:d.tipo==='interno'?'tu tutor académico':undefined});
+        const carta=await PdfDictamen.generar({tipo:'carta',valores:{...v,motivos:v.motivos||''},pdfs:base.pdfs,texto});etapa='unión de formatos';
+        return await PdfTramites.unir([formato,carta]);
       }catch(e){
         // La etapa y las cantidades permiten localizar la falla sin revelar las respuestas.
         console.error('Dictamen: generación fallida',{etapa,tipo:d.tipo,preview,materias:v.filas.length,renglones:medir(v.peticion,d.tipo).renglones.length,error:e.name});throw e;
       }
     }
     return {id:'dictamen',titulo:'Solicitud de dictamen',datos:{tipo:sugerencia.tipo,filas:pre.slice(0,8),periodo:periodo(alumno.periodo_actual||alumno.periodo||SATE_DATA.calendario?.periodo)},
-      pasos:[{titulo:'¿Qué necesitas?',campos:[{id:'datos',texto:'Mis datos para trámites',resumen:()=>Object.values(compartido()||{}).filter(Boolean).join(' · '),validar:()=>!compartido()?'Confirma primero Mis datos para trámites.':'',pintar(box){box.appendChild(el('p',compartido()?Object.values(compartido()).filter(Boolean).join(' · '):'Confirma tus datos antes de continuar.'));const b=el('button','Mis datos para trámites');b.type='button';b.onclick=()=>SateTramites.misDatos(document.getElementById('sate-tramites'),()=>SATE.ir('tramites'));box.appendChild(b)}},tipo]},
+      pasos:[{titulo:'¿Qué necesitas?',campos:[{id:'datos',texto:'Mis datos para trámites',resumen:()=>Object.values(compartido()||{}).filter(Boolean).join(' · '),validar:()=>!compartido()?'Confirma primero Mis datos para trámites.':'',pintar(box){box.appendChild(el('p',compartido()?Object.values(compartido()).filter(Boolean).join(' · '):'Confirma tus datos antes de continuar.'));const b=el('button','Mis datos para trámites');b.type='button';b.onclick=()=>SateTramites.misDatos(document.getElementById('sate-tramites'),()=>SATE.repintar());box.appendChild(b)}},tipo]},
         {titulo:'Tus materias',campos:[filas,{id:'periodo',texto:'Periodo que solicitas',requerido:true,validar:v=>!periodo(v)?'Escribe el periodo como YY/P, por ejemplo 27/1.':''}]},
         {titulo:'Tu situación',ayuda:d=>d.tipo==='externo'?'Estos datos no se guardan; si recargas la página tendrás que volver a llenarlos':'Revisa tus dictámenes anteriores y el ciclo en que ingresaste al IPN.',campos:camposSituacion},{titulo:'Tu petición y tus motivos',ayuda:'Las respuestas guía y la carta de motivos se mantienen solo en memoria.',campos:[peticion,{id:'propuesta',visible:()=>false},...guias,motivos]}],
       preparar(d,p){if(!inicializado){if(!d.ultimo)d.ultimo=alumno.ultimo_semestre||'';inicializado=true}if(p===3&&(!d.peticion||d.peticion===d.propuesta)){d.peticion=plantilla(d.tipo,d.periodo,d.filas);d.propuesta=d.peticion}},

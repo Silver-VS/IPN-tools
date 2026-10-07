@@ -584,7 +584,7 @@ function inspParts(k){
     st=s0==='done'?'Ya la acreditaste.':s0==='curso'?'La estás cursando.':s0.includes('fail')?'<b>Por recursar.</b>':
       s0.includes('lock')?`<b>Aún no puedes cursarla:</b> te falta ${miss.map(nm).join(', ')}.`:
       `<b>Puedes cursarla.</b>${lv.ok?'':` Seriación recomendada por nivel: ${lv.miss.join(', ')}.`}`}
-  if(isElec(k))return {l1,l2:(st?`<p class="insp-st">${st}</p>`:'')+`<p>${UNIDAD==='upiita'?'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="electivas.html">Electivas UPIITA</a>.':'Consulta con Gestión Escolar de tu unidad los requisitos y actividades para acreditar esta electiva.'}</p>`};
+  if(isElec(k))return {l1,l2:(st?`<p class="insp-st">${st}</p>`:'')+`<p>${UNIDAD==='upiita'?'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="sate/index.html#/upiita/tramites/electivas">Ventanilla de Electivas</a>.':'Consulta con Gestión Escolar de tu unidad los requisitos y actividades para acreditar esta electiva.'}</p>`};
   const l2=(st?`<p class="insp-st">${st}</p>`:'')+
     `<p><span class="tag-rel pre">Antes</span><b>Requisitos:</b> ${pre.length?pre.map(nm).join(', '):'ninguno registrado'}${all.size>pre.length?` <span class="muted">(${all.size} materias en toda su cadena)</span>`:''}</p>`+
     `<p><span class="tag-rel post">Después</span><b>Es requisito de:</b> ${post.length?post.map(nm).join(', '):'ninguna materia'}</p>`+

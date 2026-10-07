@@ -31,7 +31,7 @@ for (const nombre of readdirSync(dist).filter(n => n.endsWith('.html'))) {
   }
   console.log(`${nombre}: enlace del pie y marcadores correctos`);
 }
-for (const nombre of ['index.html', 'horarios-upiita.html', 'horarios-escom.html', 'electivas.html']) {
+for (const nombre of ['index.html', 'horarios-upiita.html', 'horarios-escom.html', 'sate/index.html']) {
   assert.ok(readdirSync(dist).includes(nombre), `Falta compilar ${nombre}`);
 }
 console.log(`${bloques} bloques de script parseados sin errores; sin navegador ni red.`);
