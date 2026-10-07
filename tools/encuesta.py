@@ -51,6 +51,7 @@ CSS = r"""
 .enc-dlg .enc-msg{min-height:1.2em;font-size:.86rem;color:var(--muted);margin:0}
 .enc-dlg .enc-msg.bad{color:var(--bad,#b42318)}
 .enc-dlg .enc-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.enc-apoyo-pie{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:center}
 .enc-gracias{text-align:center;padding:18px 4px 6px}
 .enc-gracias b{display:block;font-size:1.15rem;margin-bottom:6px}
 .enc-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:4px 12px 4px 8px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;white-space:nowrap}
@@ -134,7 +135,7 @@ function abrir(tipo,motivo){
       <p class="enc-nota">No escribas tu nombre, boleta ni otros datos personales. Más información en el <a href="privacidad.html" target="_blank" rel="noopener">aviso de privacidad</a>.</p>
       <p class="enc-msg" role="status"></p>
       <div class="enc-acc">${otra?'<button type="button" class="enc-no" data-enc-nunca>No volver a preguntar</button>':''}<button type="button" class="btn" data-enc-cerrar>${motivo==='manual'?'Cancelar':'Ahora no'}</button><button type="submit" class="btn primary">Enviar</button></div>
-    </form>`;
+    </form>${APOYO?'<div class="enc-apoyo-pie">'+APOYO+'</div>':''}`;
   document.body.appendChild(dlg);
   dlg.querySelectorAll('[data-enc-cerrar]').forEach(b=>b.addEventListener('click',()=>{posponer();dlg.close()}));
   dlg.addEventListener('cancel',()=>posponer());
@@ -177,6 +178,7 @@ async function enviar(tipo,motivo,f){
   enviado=true;
   if(tipo==='seguimiento')E.seg=ahora();else if(tipo==='completa')E.resp={t:ahora(),inscrito:r.inscrito};
   E.hasta=0;guardar();enlaces();
+  dlg.querySelector('.enc-apoyo-pie')?.remove();   // el agradecimiento ya trae el enlace
   f.outerHTML='<div class="enc-gracias"><b>¡Gracias por tu respuesta!</b>'+(r.inscrito==='aun'&&tipo==='completa'?'Cuando cierre la reinscripción te haremos una última pregunta.':'Nos ayuda a mejorar IPN-tools para todo el alumnado.')+APOYO+'</div>';
   // Se conserva el cierre manual para dar tiempo a leer el aviso y usar el enlace.
 }
