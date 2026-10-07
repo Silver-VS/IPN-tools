@@ -150,7 +150,7 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
     vm.runInContext('S.onlyWant=true;renderHFilters();renderOffer()',contexto);
     assert.equal(nodos.get('#f-want').checked,true);
     assert.equal(nodos.get('#f-want').disabled,false);
-    assert.match(nodos.get('#offer').innerHTML,/Aún no eliges materias en el mapa\./);
+    assert.match(nodos.get('#offer').innerHTML,/Aún no eliges materias en el Mapa curricular\. Elígelas allá o consulta toda la oferta\./);
     const pulsar=selector=>nodos.get('#offer').eventos.click({target:{closest:s=>s===selector?{}:null}});
     pulsar('[data-oferta-mapa]');assert.equal(SATE.destino,'mapa');
     pulsar('[data-oferta-toda]');assert.equal(vm.runInContext('S.onlyWant',contexto),false);

@@ -936,7 +936,7 @@ def escribir_sate(data):
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.
     html = html.replace('<span>Usar mis datos del SAES</span>',
-        '<span class="sate-texto-largo">' + textos['sate.encabezado.actualizar'] + '</span><span class="sate-texto-corto">' + textos['sate.encabezado.actualizar_corto'] + '</span>', 1)
+        '<span class="sate-texto-largo">' + textos['sate.encabezado.cargar'] + '</span><span class="sate-texto-corto">' + textos['sate.encabezado.cargar_corto'] + '</span>', 1)
     html = re.sub(r'<button class="link demo-open"[^>]*>.*?</button>', '', html, count=1)
     # El marcador completo y las instrucciones del SAES solo se descargan al abrirlos.
     dialogo = re.search(r'<dialog[^>]*id="saes-dlg".*?</dialog>\s*<script>(.*?)</script>', html, re.S)
@@ -963,8 +963,10 @@ def escribir_sate(data):
     core = core.replace('"url": "horarios-', '"url": "../horarios-')
     core = saes.inject(core, "horarios")
     estado_original = saes.JS[saes.JS.index('    if(btn){'):saes.JS.index('    if(!st)return;')]
-    core = core.replace(estado_original, """    if(btn){btn.querySelector('span').textContent=SATE.texto('sate.encabezado.actualizar')}
-    const indicador=document.getElementById('sate-saes-indicador'), usando=!!d&&!d.demo;
+    core = core.replace(estado_original, """    const indicador=document.getElementById('sate-saes-indicador'), usando=!!d&&!d.demo;
+    if(btn){const clave='sate.encabezado.'+(usando?'actualizar':'cargar');
+      btn.querySelector('.sate-texto-largo').textContent=SATE.texto(clave);
+      btn.querySelector('.sate-texto-corto').textContent=SATE.texto(clave+'_corto')}
     if(indicador){
       const fecha=usando?new Date(d.leido).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):'';
       const texto=SATE.texto(usando?'sate.encabezado.usando_datos':'sate.encabezado.sin_datos',{fecha});
