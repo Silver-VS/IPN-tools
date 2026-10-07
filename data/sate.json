@@ -2,17 +2,42 @@
   "_fuente": "Qué pestañas y trámites muestra SATE en cada unidad (plan de la plataforma, secciones 1.2 y 5). Los textos van por clave en contenido/textos/es.toml (sate.pestana.<id>, sate.tramite.<id>); lo valida tools/contenido.py.",
   "unidades": {
     "upiita": {
-      "pestanas": ["situacion", "mapa", "horarios", "desempeno", "tramites"],
-      "tramites": ["ets", "reinscripcion", "dictamen", "electivas"],
-      "leyenda": "prueba"
+      "pestanas": [
+        "situacion",
+        "mapa",
+        "horarios",
+        "desempeno",
+        "tramites"
+      ],
+      "tramites": [
+        "ets",
+        "reinscripcion",
+        "dictamen",
+        "electivas"
+      ],
+      "leyenda": "prueba",
+      "logo": {
+        "claro": "assets/logos/upiita-oro.webp",
+        "oscuro": "assets/logos/upiita-blanco.webp",
+        "alt": "UPIITA, inicio del sitio de la unidad",
+        "enlace": "https://www.upiita.ipn.mx/"
+      }
     },
     "escom": {
-      "pestanas": ["mapa", "horarios", "desempeno"],
+      "pestanas": [
+        "mapa",
+        "horarios",
+        "desempeno"
+      ],
       "tramites": [],
       "leyenda": "prueba"
     },
     "upibi": {
-      "pestanas": ["mapa", "horarios", "desempeno"],
+      "pestanas": [
+        "mapa",
+        "horarios",
+        "desempeno"
+      ],
       "tramites": [],
       "leyenda": "prueba"
     }

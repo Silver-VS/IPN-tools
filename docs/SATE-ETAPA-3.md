@@ -5,7 +5,7 @@
 `tools/build_sate.py` conserva la construcción de datos del compilador anterior;
 `tools/build_horarios.py` queda como envoltura compatible. La fuente activa es
 `web/sate/cascaron.html` y los scripts clásicos `nucleo.js`, `mapa.js`, `horarios.js`,
-`inicio.js` y `rutas.js`. `web/horarios.template.html` queda como referencia histórica;
+`inicio.js`, `rutas.js`, `desempeno.js` y `exportacion.js`. `web/horarios.template.html` queda como referencia histórica;
 las pruebas de funciones ahora leen el núcleo nuevo.
 
 La salida tiene una sola entrada, `web/dist/sate/index.html`, y datos en
@@ -31,6 +31,17 @@ Las pestañas y la barra inferior usan `SateUI`; el selector de unidad y la ayud
 de teléfono usan su modal. SAES, cuenta y exportación conservan sus diálogos con
 estado. Se conserva `data-theme`, los neutros y el acento histórico `#750946`.
 
+Revisión del 2026-10-06: la identidad usa el nombre de cada unidad del catálogo y
+el logo opcional de `data/sate.json` (claro/oscuro, alt y enlace). UPIITA tiene logo;
+ESCOM y UPIBI no pintan uno mientras no se configure. Las imágenes resuelven desde
+`sate/` a `../assets/`. El nombre completo de SATE aparece solo bajo el h1; las
+migas usan `proyecto.nombre = "SARES"`, versión de textos 2026.10.5.
+El diálogo SAES y su marcador se generan en `saes-dialogo.js` y se conectan al
+primer uso, conservando el callback y el estado. La vista, filtros y generador de
+Horarios se cargan al abrir esa pestaña. Exportación carga su diálogo y código al
+pulsar el botón. Desempeño difiere su render pesado hasta mostrarse; sus cálculos
+compartidos permanecen en núcleo. No se precargan las pestañas ocultas.
+
 ## 2. Compilación y pruebas sin navegador
 
 Desde la raíz del worktree:
@@ -39,6 +50,7 @@ Desde la raíz del worktree:
 python tools/compilar_sate.py
 D:\Tools\nodejs\node.exe tests/qa_sate.mjs
 D:\Tools\nodejs\node.exe tests/qa_sate_router.mjs
+D:\Tools\nodejs\node.exe tests/qa_sate_cargas.mjs
 D:\Tools\nodejs\node.exe tests/qa_sate_motor.mjs
 python -m unittest tests.test_contenido tests.test_rutas_mapa tests.test_sate tests.test_dictamen tests.test_upibi
 ```
@@ -47,10 +59,12 @@ El primer comando compila las tres unidades, Electivas y Dictamen. También se p
 usar `UNIDAD` para compilar una sola unidad con cualquiera de los dos compiladores.
 `UPIITA_SITE` conserva su función anterior para los marcadores publicados.
 
-Resultados: 35 pruebas de Python; 72 comprobaciones de rutas/redirecciones;
-31 bloques o archivos JavaScript parseados con `vm.Script`, incluido el ámbito
-conjunto de los tres módulos. La integración con dobles de DOM comprueba carga
+Resultados de la revisión: 35 pruebas de Python; 80 comprobaciones de rutas,
+redirecciones y cargas; 35 bloques o archivos JavaScript parseados con `vm.Script`, incluido el ámbito
+conjunto de los cinco módulos. La integración con dobles de DOM comprueba carga
 única, ciclo de pestañas, navegación, saveData, hashes ajenos y cambio de unidad.
+También verifica identidad en las tres unidades, render real de Mapa con/sin
+perfil sin descargar Horarios, y carga única del diálogo SAES y de exportación.
 El motor ejecutó 33 perfiles ficticios por unidad, semilla 1, con 246 generaciones
 que produjeron resultados, sin fallas de invariantes. Los avisos de cobertura
 incompleta corresponden a los escenarios deliberadamente sucios del fuzz.
@@ -65,22 +79,28 @@ el orquestador pueda ejecutar la prueba de navegador autorizada posteriormente.
 
 Medición en bytes UTF-8 sin comprimir, build local con `UPIITA_SITE` vacío:
 
-| Unidad | Cascarón + núcleo y dependencias + nucleo.json | Vista inicial completa |
-|---|---:|---:|
-| UPIITA | 457037 | 633781 |
-| ESCOM | 439237 | 559470 |
-| UPIBI | 496654 | 609195 |
+| Unidad | Base antes | Base después | Vista completa antes | Vista completa después |
+|---|---:|---:|---:|---:|
+| UPIITA | 457037 | 345356 | 633781 | 522100 |
+| ESCOM | 439237 | 327556 | 559470 | 447789 |
+| UPIBI | 496654 | 384973 | 609195 | 497514 |
 
-La primera columna suma `index.html`, `nucleo.js`, `inicio.js`, `rutas.js`,
-`componentes.js` y `nucleo.json`. La segunda añade `mapa.js` y `oferta.json`:
+La base suma `index.html`, `nucleo.js`, `inicio.js`, `rutas.js`,
+`componentes.js` y `nucleo.json`. La vista completa añade `mapa.js` y `oferta.json`:
 las sugeridas y los horarios guardados necesitan la oferta para conservar sus
 resultados. Se carga antes de mostrar la vista, no se cuenta la pantalla de carga
-como cumplimiento. **No se cumple el objetivo de 160000 bytes.** Falta separar
-más código del núcleo, cargar los diálogos y el marcador completo al solicitarlos,
-y preparar un índice mínimo de oferta que permita dibujar el mapa sin descargar
-todos los grupos. La precarga de módulos se programa después de mostrar la vista
-con requestIdleCallback o setTimeout, y se omite con saveData o conexión 2g.
-La medición es de archivos, no de tiempo de pintado en un navegador.
+como cumplimiento. **No se cumple el objetivo de 160000 bytes.** Se quitaron
+111681 bytes de cada base y vista completa. Queda separar cuenta/sincronización,
+CSS y render compartido, y preparar un índice mínimo de oferta que permita
+dibujar el mapa sin descargar todos los grupos, manteniendo sugerencias y horarios.
+El HTML todavía pesa 117152 bytes y `nucleo.js` 152548; los demás scripts iniciales
+suman 25105. Datos de núcleo: 50551 / 32751 / 90168 bytes; oferta:
+158953 / 102442 / 94750 bytes (UPIITA / ESCOM / UPIBI). Los archivos diferidos
+SAES / exportación / Horarios / render de Desempeño pesan
+47812 / 26834 / 55320 / 14218 bytes. Los diálogos de cuenta permanecen iniciales
+porque la recuperación de sesión y la sincronización los usan al arrancar.
+La medición es de archivos UTF-8 sin comprimir, no de tiempo en navegador; conserva
+el criterio del corte previo y no incluye imágenes ni fuentes externas.
 
 ## 4. Continuación y revisión del orquestador
 

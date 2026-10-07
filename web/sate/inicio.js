@@ -83,18 +83,7 @@
     if (window.SATE_DATA.mapas[api.estado.car]?.generico && actual.pestana !== 'horarios') { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); modulos[actual.pestana].mostrar(actual);
   }
-  function reposo() {
-    const c = navigator.connection;
-    if (c?.saveData || /(^|-)2g$/.test(c?.effectiveType || '')) return;
-    const cola = ['mapa','horarios','tramites','desempeno'].filter(id => cfg.pestanas.includes(id));
-    const paso = () => {
-      const id = cola.shift(); if (!id) return;
-      modulo(id).then(cargarOferta).catch(error).finally(() => esperar(paso));
-    };
-    const esperar = fn => window.requestIdleCallback ? requestIdleCallback(fn) : setTimeout(fn, 500);
-    esperar(paso);
-  }
-  window.SATE = {modulos, error, get actual(){return actual}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
+  window.SATE = {modulos, error, script, identidadSaes, get actual(){return actual}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
     async nucleoListo(a) {
       api = a; SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta(location.hash, u, config) ||
@@ -129,15 +118,27 @@
       addEventListener('hashchange',()=>{const r=SateRutas.ruta(location.hash,u,config);if(r)activar(r).catch(error)});
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
-      await activar(r); reposo();
+      await activar(r);
       if (!inicial && !recordada && !new URLSearchParams(location.search).has('sateUnidad')) elegirUnidad();
     }
   };
-  document.getElementById('sate-titulo').textContent = texto('sate.siglas') + ' · ' + cfg.siglas;
+  document.getElementById('sate-titulo').textContent = texto('sate.siglas') + ' ' + cfg.siglas;
   document.getElementById('sate-leyenda').textContent = cfg.leyenda ? texto('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas}) : '';
-  for (const a of document.querySelectorAll('#saes-dlg a')) {
-    if (a.href?.includes('saes.upiita.ipn.mx') && a.protocol !== 'javascript:') {
-      a.href = cfg.saes; a.textContent = cfg.saes.replace(/^https?:\/\//,'').replace(/\/$/,'');
+  const nombreUnidad = document.querySelector('.inst-name');
+  if (nombreUnidad) nombreUnidad.textContent = cfg.nombre;
+  if (cfg.logo) {
+    const enlace = document.createElement('a'); enlace.className = 'unit'; enlace.href = cfg.logo.enlace;
+    for (const [tema, clase] of [['claro','logo-lt'],['oscuro','logo-dk']]) {
+      const img = document.createElement('img'); img.className = clase; img.src = '../' + cfg.logo[tema];
+      img.alt = cfg.logo.alt; img.width = 91; img.height = 72; enlace.appendChild(img);
+    }
+    document.querySelector('.inst-in')?.appendChild(enlace);
+  }
+  function identidadSaes() {
+    for (const a of document.querySelectorAll('#saes-dlg a')) {
+      if (a.href?.includes('saes.upiita.ipn.mx') && a.protocol !== 'javascript:') {
+        a.href = cfg.saes; a.textContent = cfg.saes.replace(/^https?:\/\//,'').replace(/\/$/,'');
+      }
     }
   }
   json('nucleo').then(d=>{window.SATE_DATA=Object.assign({periodos:{actual:[],proximo:[]},asig:[],prof:[]},d);return script('nucleo.js')}).catch(error);

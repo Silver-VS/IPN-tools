@@ -148,7 +148,7 @@ assert.deepStrictEqual(proyeccionCreditos({curva:[{per:53,acum:240}],fin:55,tota
         self.assertEqual(result.returncode,0,result.stderr)
 
     def test_leyenda_roja_solo_si_la_tendencia_excede_el_limite(self):
-        html=(ROOT/'web/sate/nucleo.js').read_text(encoding='utf8')
+        html=(ROOT/'web/sate/desempeno.js').read_text(encoding='utf8')
         expression=re.search(r"\.\.\.(\(totalPer!=null&&plazo\.max&&totalPer>plazo\.max\?\[\['anillo'.*?\]\]:\[\]\))",html).group(1)
         script="const assert=require('assert');const legend=(totalPer,plazo)=>"+expression+".map(x=>x[2]).join('');"+"""
 assert.strictEqual(legend(10,{max:12}),'');

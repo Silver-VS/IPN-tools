@@ -896,16 +896,31 @@ def escribir_sate(data):
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
-    for nombre in ("mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js"):
+    for nombre in ("mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():
         c["siglas"] = unidades[u]["siglas"]
+        c["nombre"] = unidades[u]["nombre"]
         conf = ROOT / "data/unidades" / u / "unidad.json"
         c["saes"] = json.loads(conf.read_text(encoding="utf-8")).get("saes", "") if conf.exists() else saes.SAES_URL
     textos = contenido.objeto_t()
     html = (fuente / "cascaron.html").read_text(encoding="utf-8")
+    # Extraer las vistas ocultas sin modificar ids ni el estado de los controles.
+    inicio_hor = html.index('  <section id="v-hor"')
+    fin_hor = html.index('  <!-- módulo "Exportar horario"', inicio_hor)
+    vista_hor = html[inicio_hor:fin_hor]
+    apertura = vista_hor.index('>') + 1
+    interior_hor = vista_hor[apertura:vista_hor.rindex('</section>')]
+    html = html[:inicio_hor] + '  <section id="v-hor" hidden></section>\n' + html[fin_hor:]
+    exportacion = re.search(r'<dialog[^>]*id="exp-dlg".*?</dialog>', html, re.S)
+    if not exportacion:
+        raise ValueError("No se encontró el diálogo de exportación")
+    html_exportacion = exportacion.group(0)
+    html = html[:exportacion.start()] + html[exportacion.end():]
+    (destino / "horarios.js").write_text("document.getElementById('v-hor').innerHTML=" + json.dumps(interior_hor, ensure_ascii=False) + ";\n" + (fuente / "horarios.js").read_text(encoding="utf-8"), encoding="utf-8")
+    (destino / "exportacion.js").write_text("document.body.insertAdjacentHTML('beforeend'," + json.dumps(html_exportacion, ensure_ascii=False) + ");\n" + (fuente / "exportacion.js").read_text(encoding="utf-8"), encoding="utf-8")
     html = comun.inyectar(html)
     html = skins.inject(html)
     html = cuenta.inject(html)
@@ -913,14 +928,25 @@ def escribir_sate(data):
     html = html.replace("/*__COMPONENTES_CSS__*/", (fuente / "componentes.css").read_text(encoding="utf-8"))
     for marca, clave in (("TITULO", "sate.nombre"), ("NOMBRE", "sate.nombre"), ("SIGLAS", "sate.siglas")):
         html = html.replace("/*__SATE_" + marca + "__*/", textos[clave])
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos}, ensure_ascii=False, separators=(",", ":")) + ";")
+    textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
+    # El marcador completo y las instrucciones del SAES solo se descargan al abrirlos.
+    dialogo = re.search(r'<dialog[^>]*id="saes-dlg".*?</dialog>\s*<script>(.*?)</script>', html, re.S)
+    if not dialogo:
+        raise ValueError("No se encontró el diálogo del SAES para carga diferida")
+    contenido_dialogo = dialogo.group(0).split("<script>")[0]
+    js_dialogo = "document.body.insertAdjacentHTML('beforeend'," + json.dumps(contenido_dialogo, ensure_ascii=False) + ");\n" + dialogo.group(1)
+    (destino / "saes-dialogo.js").write_text(js_dialogo, encoding="utf-8")
+    html = html[:dialogo.start()] + html[dialogo.end():]
     html = encuesta.inject(html)
     # Las firmas comunes se reutilizan sin fijar el logotipo de una unidad en una entrada compartida.
-    salida = write_dist("sate/index", html, " | IPN", {"id":"sate", "siglas":"SATE", "nombre":textos["sate.nombre"]})
+    salida = write_dist("sate/index", html, " | IPN", {"id":"sate", "siglas":"SATE", "nombre":""})
     html = salida.read_text(encoding="utf-8").replace('src="assets/', 'src="../assets/').replace('href="assets/', 'href="../assets/')
     html = html.replace('href="./"', 'href="../index.html"')
+    # SATE ya reúne las herramientas de cada unidad: no lleva el enlace de regreso a la portada del proyecto (decisión del dueño)
+    html = re.sub(r'<a class="ipnt-home"[^>]*>.*?</a>', '', html, count=1, flags=re.S)
     salida.write_text(html, encoding="utf-8")
     core = (fuente / "nucleo.js").read_text(encoding="utf-8")
     core = cuenta.inject(core)
@@ -928,6 +954,22 @@ def escribir_sate(data):
     core = re.sub(r'("unidad"\s*:\s*)"[^"]*"', r'\1window.SATE_UNIDAD', core, count=1)
     core = core.replace('"url": "horarios-', '"url": "../horarios-')
     core = saes.inject(core, "horarios")
+    # Mantener carga/estado y el callback originales; conectar el diálogo una sola vez.
+    core = core.replace("// v1: solo se eligen materias", """const saesWire = SAES.wire.bind(SAES), saesOpen = SAES.open.bind(SAES);
+let saesOnLoad, saesConectado = false;
+SAES.wire = fn => { saesOnLoad = fn; };
+SAES.open = async () => {
+  try {
+    await SATE.script('saes-dialogo.js');
+    SATE.identidadSaes();
+    if (!saesConectado) { saesWire(saesOnLoad); saesConectado = true; }
+    SAES.status(ALUMNO); saesOpen();
+  } catch (e) { SATE.error(e); }
+};
+document.addEventListener('click', e => {
+  if (e.target.closest?.('[data-saes-open]') && !saesConectado) { e.preventDefault(); SAES.open(); }
+});
+// v1: solo se eligen materias""", 1)
     core = core.replace("new URL('auth.html',location.href)", "new URL('../auth.html',location.href)")
     core = core.replace('href="privacidad.html"', 'href="../privacidad.html"').replace('href="condiciones.html"', 'href="../condiciones.html"')
     core = core.replace('href="electivas.html"', 'href="../electivas.html"')
