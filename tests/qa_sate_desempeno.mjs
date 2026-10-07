@@ -23,7 +23,7 @@ for(const unidad of ['upiita','escom','upibi']){
     style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains(){return false}},eventos:{},
     addEventListener(k,fn){(this.eventos[k]??=[]).push(fn)},setAttribute(){},removeAttribute(){},getAttribute(){return null},appendChild(){},insertAdjacentHTML(){},
     querySelector:s=>s==='svg'?null:nodo(),querySelectorAll:s=>s==='.charts'?[nodo(),nodo()]:[],closest:()=>null,contains:()=>false,
-    getBoundingClientRect:()=>({top:0,left:0,bottom:800,width:375,height:800}),replaceChildren(){},remove(){},matches:()=>false};}
+    getBoundingClientRect:()=>({top:0,left:0,bottom:800,width:375,height:800}),replaceChildren(){},remove(){},matches:()=>false,focus(){document.activeElement=this}};}
   const document={readyState:'loading',addEventListener(){},querySelector(s){if(!nodos.has(s))nodos.set(s,nodo(s));return nodos.get(s)},
     getElementById(id){return this.querySelector('#'+id)},querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),documentElement:nodo(),
     head:{appendChild(s){solicitudes.push(s);queueMicrotask(()=>{
@@ -52,14 +52,23 @@ for(const unidad of ['upiita','escom','upibi']){
   const mod=SATE.modulos.desempeno;mod.montar();
   SATE.actual.pestana='desempeno';vm.runInContext('ALUMNO=null;for(const k in T)delete T[k]',c);
   await mod.mostrar();assert.equal(solicitudes.length,0,'Sin perfil no requiere Plot');
+  SATE.simAbrir=true;await mod.mostrar();
+  assert.equal(document.activeElement,document.querySelector('#desempeno-lector'),'B: sin SAES el acceso directo enfoca al Lector');
   assert.equal(document.querySelector('#desempeno-vacio').hidden,false);
   assert.match(document.querySelector('#desempeno-vacio-texto').textContent,/SAES/);
   vm.runInContext('ALUMNO=perfilDemo();for(const k in T)delete T[k]',c);
   assert.equal(texto('sate.desempeno.materias',{n:1}),'1 materia');
   assert.equal(texto('sate.desempeno.materias',{n:2}),'2 materias');
+  assert.equal(texto('sate.planeacion.cuenta',{n:1,creditos:6}),'1 materia · 6 créditos');
+  assert.equal(texto('sate.planeacion.cuenta',{n:2,creditos:12}),'2 materias · 12 créditos');
   const vaciarCuadros=()=>{while(cuadros.length)cuadros.shift()()};
   // Salir antes del cuadro diferido impide incluso comenzar la descarga.
-  let pendiente=mod.mostrar();mod.ocultar();SATE.actual.pestana='mapa';vaciarCuadros();await pendiente;
+  SATE.simAbrir=true;
+  let pendiente=mod.mostrar();
+  assert.equal(document.querySelector('#desempeno-simulacion').open,true,'B: acceso directo abre simulación');
+  assert.equal(document.querySelector('#desempeno-simulacion').hidden,false,'B: simulación visible antes de mover foco');
+  assert.equal(document.activeElement,document.querySelector('#desempeno-sim-titulo'),'B: foco en simulación');
+  mod.ocultar();SATE.actual.pestana='mapa';vaciarCuadros();await pendiente;
   assert.equal(solicitudes.length,0);
   SATE.actual.pestana='desempeno';pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.equal(solicitudes.length,2);assert.match(solicitudes[0].src,/d3@/);assert.match(solicitudes[1].src,/@observablehq/);

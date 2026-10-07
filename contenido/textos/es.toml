@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.8"
+version = "2026.10.9"
 
 [proyecto]
 nombre = "HADES"
@@ -335,3 +335,21 @@ recursar = "pasa a recursar"
 como_acredita = "Cómo se acredita"
 pendiente = "Sigue pendiente"
 acreditada_por = "Acreditada por {forma}"
+
+[sate.planeacion]
+titulo = "Planear en el mapa"
+periodos = "Periodo de planeación"
+elegidas = "Materias que quieres cursar"
+simular = "Simular cómo termina este semestre"
+supuesto = "Este periodo supone acreditadas las materias elegidas en el anterior. Su oferta y carga autorizada deberán confirmarse; los horarios se arman para el primer periodo."
+horario_n = "El armado de horario corresponde a este primer periodo."
+agregar = "Agregar sugeridas"
+sugeridas = "Sugeridas para {periodo}"
+cuenta = "{n, plural, one {# materia} other {# materias}} · {creditos} créditos"
+vacio = "Selecciona en el mapa las materias que deseas cursar."
+requisitos = "Según la seriación, conviene haber cursado antes: {materias}."
+carga = "{creditos} de {tope} créditos de carga autorizada o de referencia; {retenidos} retenidos por adeudos."
+sin_carga = "{creditos} créditos elegidos. Carga autorizada sin datos: confírmala en el SAES."
+periodo_proximo = "Periodo N"
+periodo_siguiente = "Periodo N+1"
+meta = "{creditos} de {meta} créditos nuevos sugeridos; {retenidos} retenidos por adeudos."

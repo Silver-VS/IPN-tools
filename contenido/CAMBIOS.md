@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-06 · 2026.10.9 · Codex
+
+| Claves | Cambio |
+|---|---|
+| `sate.planeacion.*` | Panel del mapa, dos periodos, proyección de N+1, créditos, acceso al simulador y cuenta ICU. |
+
 ## 2026-10-06 · 2026.10.8 · Codex
 
 | Claves | Cambio |

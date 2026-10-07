@@ -637,6 +637,9 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 :root,:root[data-theme],:root:not([data-theme]){--ipn-acento:var(--accent);--ipn-texto:var(--fg);--ipn-tenue:var(--muted);--ipn-superficie:var(--surface);--ipn-linea:var(--line)}
 @media(max-width:720px){#sate-tabs{display:none}}
 /*__CUENTA_CSS__*/
+.plan-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,360px);gap:16px;align-items:start}
+.plan-mapa,.plan-panel{min-width:0}.plan-panel .card{padding:12px 0;border:0;box-shadow:none}.plan-panel .wchips{overflow-wrap:anywhere}
+@media(max-width:900px){.plan-layout{grid-template-columns:minmax(0,1fr)}}
 </style>
 
 <!--__INST_HEADER__-->
@@ -666,12 +669,13 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
   <section id="sate-desempeno" class="card" hidden>
     <h2 id="desempeno-titulo"></h2>
     <div id="desempeno-vacio" hidden><p id="desempeno-vacio-texto"></p><button class="btn" type="button" id="desempeno-lector"></button> <button class="link" type="button" id="desempeno-demo" data-demo-open></button></div>
-    <div class="kstats" id="kstats" hidden></div>
     <details class="sate-desp" id="desempeno-simulacion" hidden><summary id="desempeno-sim-titulo"></summary><div class="sate-desp__cuerpo est-sim" id="est-sim"></div></details>
+    <div class="kstats" id="kstats" hidden></div>
   </section>
   <!-- ============ PANTALLA 1: TRAYECTORIA ============ -->
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
     <!-- Arriba del mapa solo controles de tamaño fijo; todo lo que crece o cambia va debajo para que el mapa nunca se desplace -->
+    <div class="plan-layout"><div class="plan-mapa">
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
@@ -684,6 +688,13 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
     <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
     <div class="tlist" id="tlist" hidden></div>
     <div class="insp" id="insp" aria-live="polite"></div>
+    </div>
+    <aside class="plan-panel card" aria-labelledby="plan-titulo">
+      <h2 id="plan-titulo"></h2>
+      <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button></div>
+      <p id="plan-supuesto"></p>
+      <button class="link" type="button" id="plan-simular"></button>
+      <p id="plan-carga" role="status"></p>
     <div class="card chosenbar" aria-labelledby="h-chosen">
       <div class="cb-head">
         <h3 class="sub" id="h-chosen">Materias que quieres cursar</h3>
@@ -693,10 +704,12 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
       <div class="wchips" id="chosen"></div>
       <small id="chosen-req"></small>
     </div>
+      <div class="card"><h3 class="sub" id="h-sugg">Sugeridas</h3><div class="sugg" id="sugg"></div>
+        <div class="actions" style="margin-top:10px"><button class="btn" id="b-sugg">Elegir las sugeridas</button><button class="btn" id="b-all" title="Agrega al banco todas las materias que ya puedes cursar y tienen grupos; después indica en «Generar horarios» cuántas quieres llevar">Elegir todas las que puedes cursar</button></div></div>
+    </aside>
+    </div>
     <ul class="mapnote" id="mapnote"></ul>
     <div class="below">
-      <div class="card" data-personal hidden><h3 class="sub" id="h-sugg">Sugeridas</h3><div class="sugg" id="sugg"></div>
-        <div class="actions" style="margin-top:10px"><button class="btn" id="b-sugg">Elegir las sugeridas</button><button class="btn" id="b-all" title="Agrega al banco todas las materias que ya puedes cursar y tienen grupos; después indica en «Generar horarios» cuántas quieres llevar">Elegir todas las que puedes cursar</button></div></div>
       <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
       <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>
     </div>

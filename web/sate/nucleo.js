@@ -71,7 +71,9 @@ const conSim=(on,fn)=>{if(on===SIM.on)return fn();const prev=SIM.on;SIM.on=on;fo
   try{return fn()}finally{SIM.on=prev;for(const k in T)delete T[k]}};
 // materias de este plan equivalentes a una clave de otra carrera o plan, según la tabla de Equivalencias del SAES
 const eqvPlan=k=>{const c=cur(),out=new Set();(DATA.equiv?.rel||[]).forEach(([o,ko,,d,kd])=>{if(ko===k&&d===S.car&&c[kd])out.add(kd);if(kd===k&&o===S.car&&c[ko])out.add(ko)});return [...out]};
-const tr=()=>{
+let PLAN_PASO=0, PLAN_CACHE=null;
+S.planPaso=0;
+const trayectoriaBase=()=>{
   if(!T[S.car]){
     const t=store.get('t.'+S.car,{want:[]}), me=isPersonal();
     const done0=me?[...new Set((ALUMNO.acreditadas||[]).filter(a=>a&&a[1]!=null&&String(a[1]).trim()!==''&&Number.isFinite(+a[1])&&+a[1]>=6&&+a[1]<=10).map(a=>a[0]))]:[];
@@ -96,9 +98,30 @@ const tr=()=>{
     const desfS=me?(ALUMNO.desfasadas_saes||[]).map(r=>r[0]).filter(k=>cur()[k]&&!doneS.has(k)):[];
     // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
     const pmeta=perMeta(), oblig=[...new Set([...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS])].filter(k=>!curso.includes(k));
-    T[S.car]={want:[...new Set([...(t.want||[]),...oblig])].filter(k=>!isElec(k)),oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,encEqv,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
+    const periodo=planClave(0), wantPorPeriodo=t.wantPorPeriodo||{};
+    T[S.car]={want:[...new Set([...(wantPorPeriodo[periodo]||t.want||[]),...oblig])].filter(k=>cur()[k]&&!isElec(k)),wantPorPeriodo,oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,encEqv,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
   }
   return T[S.car];
+};
+// El escenario anual se limita a los cálculos del mapa; Horarios siempre usa N.
+function planInicio(){return perMetaBase()??perIdx(DATA.calendario?.periodo)}
+function planClave(paso){const p=planInicio();return p==null?(paso?'siguiente':'proximo'):perName(p+paso)}
+function planEtiqueta(paso){const p=planInicio();return p==null?SATE.texto('sate.planeacion.'+(paso?'periodo_siguiente':'periodo_proximo')):perName(p+paso)}
+function conPlan(fn,paso=S.planPaso){const previo=PLAN_PASO;PLAN_PASO=paso;try{return fn()}finally{PLAN_PASO=previo}}
+const tr=()=>{
+  const previo=PLAN_PASO;PLAN_PASO=0;let base;
+  try{base=trayectoriaBase()}finally{PLAN_PASO=previo}
+  if(!PLAN_PASO)return base;
+  if(PLAN_CACHE?.base===base)return PLAN_CACHE.t;
+  const done=[...new Set([...base.done,...base.want])], ya=new Set(done);
+  const fail=base.fail.filter(k=>!ya.has(k)), meta=planInicio();
+  const oblig=[...new Set([...base.oblig,...fail.filter(k=>base.failP[k]!=null&&meta!=null&&meta+1>base.failP[k]+2)])].filter(k=>!ya.has(k)&&!base.curso.includes(k));
+  const want=[...new Set([...(base.wantPorPeriodo[planClave(1)]||base.wantPorPeriodo.siguiente||[]),...oblig])]
+    .filter(k=>cur()[k]&&!isElec(k)&&!ya.has(k));
+  const t={...base,want,done,fail,oblig,desfS:base.desfS.filter(k=>!ya.has(k)),
+    failP:Object.fromEntries(Object.entries(base.failP).filter(([k])=>!ya.has(k))),
+    curso:base.curso.filter(k=>!ya.has(k)),cursados:base.cursados==null?null:base.cursados+1};
+  PLAN_CACHE={base,t};return t;
 };
 /* "dd/mm/aaaa hh:mm:ss p. m." del SAES → ¿la cita (fin) ya pasó? */
 /* recordatorio para volver a usar el Lector: los datos son una copia del SAES y no se actualizan solos */
@@ -129,7 +152,7 @@ function perAgenda(A){
   return prox?prox.p:ev[ev.length-1].p+1;
 }
 /* periodo para el que se planea: el de la cita vigente, o el siguiente al que se cursa ahora */
-function perMeta(){
+function perMetaBase(){
   const A=ALUMNO;if(!A)return null;
   const c=perDeFecha(A.cita?.inicio);
   const seen=[...(A.acreditadas||[]).map(a=>perIdx(a[2])),...(A.reprobadas_periodo||[]).map(r=>perIdx(r[1]))].filter(x=>x!=null);
@@ -140,6 +163,7 @@ function perMeta(){
   const pa=perAgenda(A)??perIdx(DATA.calendario?.periodo);if(pa!=null&&(t==null||t<pa))t=pa;
   return t;
 }
+function perMeta(){const p=perMetaBase();return p==null?null:p+PLAN_PASO}
 /* Desfase OFICIAL (regla del SAES): una reprobada se desfasa cuando pasan más de 2 periodos sin acreditarla.
    El "atraso" respecto al semestre propuesto solo aplica a planes por semestre (Energía); en los planes 2009
    (por niveles) el orden de la trayectoria es una recomendación y llevar otro orden no es desfase. */
@@ -220,7 +244,7 @@ function reglaDesfase(){
 }
 /* Una sola proyección de las reglas existentes para tarjetas y calendario.
    Situación usa datos reales, aunque el alumno tenga una simulación activa en Mapa. */
-function situacionDatos(){return conSim(false,()=>{
+function situacionDatos(){return conPlan(()=>conSim(false,()=>{
   if(!isPersonal())return null;
   const fis=tr().fail.map(failInfo).sort((a,b)=>(a.idx??99)-(b.idx??99));
   const dS=(tr().desfS||[]).filter(k=>!fis.some(f=>f.k===k));
@@ -228,7 +252,7 @@ function situacionDatos(){return conSim(false,()=>{
   const rd=reglaDesfase(), D=statsDatos();
   return {fis,dS,nDes,rd,D,meta:perMeta(),aut:rd?.tope??SAES.autorizada(ALUMNO),
     adeudos:[...new Set([...tr().fail,...dS])],ret:retenidos()};
-})}
+}),0)}
 const cargaDe=()=>isPersonal()&&ALUMNO.carga?.media?{min:ALUMNO.carga.min,media:ALUMNO.carga.media,max:ALUMNO.carga.max}:CARGA[S.car];
 /* Carga en créditos (Reglamento General de Estudios, art. 52):
    - Las reprobadas pendientes retienen sus créditos de forma permanente hasta acreditarse; inscribirlas no suma de nuevo.
@@ -244,7 +268,13 @@ function cargaInfo(nuevos){
   const total=ret+(nuevos||0);
   return {L,ret,aut,regla,adeudo,libre,tope,total,nuevos:nuevos||0,faltaMin:Math.max(0,L.min-total)};
 }
-const saveT=()=>store.set('t.'+S.car,{want:tr().want});
+const saveT=()=>{
+  const t=tr(), base=conPlan(()=>tr(),0), anterior=store.get('t.'+S.car,{});
+  const wantPorPeriodo={...base.wantPorPeriodo,[planClave(0)]:[...base.want],[planClave(PLAN_PASO)]:[...t.want]};
+  // Conservar campos desconocidos y el espejo legado de N para lectores ipnt 1.
+  store.set('t.'+S.car,{...anterior,want:[...base.want],wantPorPeriodo});
+  for(const k in T)delete T[k];PLAN_CACHE=null;
+};
 
 /* ---------- oferta ---------- */
 // clase: [carrera,turno,nivel,grupo,asig,[prof],[[dia,ini,fin]],creditos,clave,tipo]
@@ -304,7 +334,7 @@ function levelOpen(niv){                        // ¿cumple la seriación recome
 function semNow(){const c=tr().cursados;return c==null?null:c+1}
 function ancestors(keys){const pre=prereqs(),out=new Set(),walk=k=>(pre[k]||[]).forEach(x=>{if(!out.has(x)){out.add(x);walk(x)}});keys.forEach(walk);return out}
 function statusOf(k){
-  if(!isPersonal()) return 'rest';
+  if(!isPersonal()&&!PLAN_PASO) return 'rest';
   const done=new Set(tr().done);
   if(done.has(k)) return 'done';
   // en curso primero: si recursa una reprobada este semestre, se planea suponiendo que la acredita (no se vuelve a proponer)
@@ -349,7 +379,7 @@ if(DEMO){
   $('#demo-salir').addEventListener('click',()=>{try{sessionStorage.removeItem('ipnt.demo')}catch(e){}location.reload()});
 }
 document.addEventListener('click',e=>{if(!e.target.closest?.('[data-demo-open]'))return;e.preventDefault();try{sessionStorage.setItem('ipnt.demo',UNIDAD)}catch(e){}location.reload()});
-function available(k){const s=statusOf(k);return !isElec(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')&&!s.includes('far')}
+function available(k){const s=statusOf(k);return !isElec(k)&&!tr().done.includes(k)&&!tr().curso.includes(k)&&!s.startsWith('done')&&!s.startsWith('curso')&&!s.includes('lock')&&!s.includes('far')}
 
 /* data/sugerencias.json: una materia con «antesDe» se sugiere hasta tener acreditadas o en curso las demás que pide
    esa otra materia (p. ej., Investigación y desarrollo de proyectos, el periodo previo a Metodología de la investigación) */
@@ -368,7 +398,7 @@ function suggestions(){
   const target=ci?(ci.adeudo?ci.libre:Math.min(ci.libre,ci.L.media)):40;
   const pre=prereqs(), hecho=new Set([...tr().done,...tr().curso]);
   const sigue=k=>cur()[k][3]==='P'&&(pre[k]||[]).some(x=>hecho.has(x)&&cur()[x]?.[3]==='P');   // optativa: continuación de su línea
-  const cands=Object.keys(cur()).filter(k=>available(k)&&off.has(k)&&(cur()[k][3]==='O'||sigue(k))&&!aunNo(k))
+  const cands=Object.keys(cur()).filter(k=>available(k)&&(PLAN_PASO||off.has(k))&&(cur()[k][3]==='O'||sigue(k))&&!aunNo(k))
     .sort((a,b)=>{const ra=rank[statusOf(a).split(' ')[0]], rb=rank[statusOf(b).split(' ')[0]];
       return ra-rb||(ra===3?unlocks(b)-unlocks(a):0)||(sp[a]||99)-(sp[b]||99)||cur()[a][2]-cur()[b][2]});
   const out=[], oq=optCupo(), tomadas={};let cr=0;
@@ -507,19 +537,28 @@ function renderLegend(){
         (MARK.avail.size?'<span><i class="l-avail"></i>Puedes cursarla</span>':'');
     })():'');
 }
-function renderSide(){return conSim(usaSim('sugg'),renderSide0)}
+function renderSide(){return conSim(usaSim('sugg'),()=>conPlan(renderSide0))}
 function renderSide0(){
   const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
   const req=[...ancestors(want)].filter(k=>!want.includes(k)&&!tr().done.includes(k));
-  $('#chosen-help').textContent=want.length?`${want.length} ${want.length>1?'materias':'materia'} · ${fmtCr(credWant)} créditos`:'Selecciona en el mapa las materias que deseas cursar; después consulta sus grupos para organizar tu horario.';
+  const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v);
+  $('#plan-titulo').textContent=tx('titulo');$('#plan-periodos').setAttribute('aria-label',tx('periodos'));
+  document.querySelectorAll('[data-plan-paso]').forEach(b=>{const paso=+b.dataset.planPaso;b.textContent=planEtiqueta(paso);b.setAttribute('aria-pressed',String(paso===S.planPaso))});
+  $('#plan-supuesto').textContent=tx(PLAN_PASO?'supuesto':'horario_n');
+  $('#plan-simular').textContent=tx('simular');$('#h-chosen').textContent=tx('elegidas');
+  $('#b-sugg').textContent=tx('agregar');$('#b-go').hidden=!!PLAN_PASO;
+  const nuevos=want.filter(k=>!tr().fail.includes(k)).reduce((s,k)=>s+c[k][1],0), ci=cargaInfo(nuevos);
+  $('#plan-carga').textContent=ci?tx('carga',{creditos:fmtCr(ci.total),tope:fmtCr(ci.tope),retenidos:fmtCr(ci.ret)}):tx('sin_carga',{creditos:fmtCr(credWant)});
+  $('#chosen-help').textContent=want.length?tx('cuenta',{n:want.length,creditos:fmtCr(credWant)}):tx('vacio');
   $('#chosen').innerHTML=want.sort((a,b)=>(semOf()[a]||99)-(semOf()[b]||99)).map(k=>`<span class="wchip"><span class="dot" style="background:var(--n${c[k][2]})"></span><span class="grp">${k}</span>${esc(pretty(c[k][0]))}${off.has(k)?'':' <small>(sin grupos)</small>'}${tr().oblig.includes(k)?'<span class="tag bad" title="Obligatoria: al estar desfasada, el SAES no permite la reinscripción sin ella">obligatoria</span>':`<button class="x" data-unwant="${k}" aria-label="Quitar ${esc(c[k][0])}">×</button>`}</span>`).join('');
-  $('#chosen-req').textContent=req.length&&!isPersonal()?`Según la seriación, conviene haber cursado antes: ${req.map(k=>c[k][0].toLowerCase()).join(', ')}.`:'';
+  $('#chosen-req').textContent=req.length?tx('requisitos',{materias:req.map(k=>c[k][0].toLowerCase()).join(', ')}):'';
+  $('#h-sugg').innerHTML=esc(tx('sugeridas',{periodo:planEtiqueta(PLAN_PASO)}))+' '+simTag('sugg');
+  const propuestas=suggestions();
+  $('#sugg').innerHTML=propuestas.list.map(k=>`<label><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
   document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
   if(isPersonal()){
-    const A=ALUMNO, meta=perMeta(), curso=tr().curso;
     const situacion=situacionDatos();
     renderCalendario(situacion.rd,situacion.nDes);
-    $('#h-sugg').innerHTML=esc(meta!=null?'Sugeridas para '+perName(meta):'Sugeridas')+' '+simTag('sugg');
     const st=levelStats(), R=MAP().reglas;
     // por nivel: avance (barra de ancho fijo) y, debajo, el porcentaje recomendado de niveles previos frente al tuyo
     const pct=k=>st[k]?Math.round(st[k].ok/st[k].tot*100):0;
@@ -528,9 +567,6 @@ function renderSide0(){
       const req=rq.length?`<div class="lvl-req">Para cursarlo se recomienda: ${rq.map(([k,f])=>{const ok=pct(k)>=Math.round(f*100);
           return `<span class="${ok?'ok':'warn'}">${ok?'✓':'·'} Nivel ${k} al ${Math.round(f*100)} %${ok?'':` (llevas ${pct(k)} %)`}</span>`}).join(' ')}</div>`:'';
       return `<div class="lvl"><div class="lvl-top"><b>Nivel ${n}</b><span class="minibar"><i style="width:${s.ok/s.tot*100}%;background:var(--n${n})"></i></span><span class="lvl-num">${s.ok} de ${s.tot}</span></div>${req}</div>`}).join('');
-    const sg=suggestions(), color={late:'var(--st-late)',fail:'var(--warn)',prev:'var(--line)',now:'var(--st-now)',rest:'var(--line)'};
-    $('#sugg').innerHTML=sg.list.map(k=>`<label><span class="dot" style="background:${color[statusOf(k).split(' ')[0]]}"></span><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+
-      `<small>${fmtCr(sg.cr)} de ${fmtCr(sg.target)} créditos nuevos${sg.ret?` (además de ${fmtCr(sg.ret)} retenidos por reprobadas, que no se vuelven a contar al recursarlas)`:''}; orden: desfasadas y reprobadas; después las que ya puedes cursar de cualquier semestre, primero las que desbloquean más materias.${curso.length?' No incluye las materias en curso.':''}</small>`;
   }
   renderLegend();renderLineas();
 }
@@ -781,7 +817,7 @@ function renderTray(){
   renderSimGlobal();
   if(SATE.actual?.pestana==='situacion'){SATE.modulos.situacion?.mostrar();return}
   if(SATE.actual?.pestana==='desempeno'){renderStats();return}
-  if(SATE.modulos.mapa){renderMap();renderList()}renderSide();
+  if(SATE.modulos.mapa){renderMap();conSim(usaSim('mapa'),()=>conPlan(renderList))}renderSide();
 }
 function renderHor(){if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv()}
 /* Equivalencias con otras carreras de la misma unidad (tabla «Equivalencia de Materias» del SAES): solo consulta.
@@ -826,11 +862,12 @@ function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1
     // desde "llenar hueco": la materia pasa a las elegidas (para poder cambiar de grupo) y se suelta el hueco
     if(S.gap||S.fit){if(cur()[c[8]]&&!tr().want.includes(c[8])){tr().want.push(c[8]);saveT()}S.gap=null;renderActive()}}
   refresh()}
-function toggleBox(k){
+function toggleBox(k){return conSim(usaSim('sugg'),()=>conPlan(()=>toggleBox0(k)))}
+function toggleBox0(k){
   if(isElec(k)){S.mapHover=k;S.mapFocus=true;renderMap();if(mview()==='lista'){S.lfocus=k;renderList()}return}   // se explica en el inspector
   const w=tr().want,i=w.indexOf(k);
   if(i>=0&&tr().oblig.includes(k)){$('#insp').innerHTML=`<span><b>${esc(cur()[k][0])} es obligatoria</b></span><span class="muted">Al estar desfasada, el SAES no permite la reinscripción sin ella.</span>`;return}
-  if(i>=0)w.splice(i,1);else{w.push(k);avisoOptativa(k,w)}saveT();renderTray()}
+  if(i>=0)w.splice(i,1);else{if(tr().done.includes(k)||tr().curso.includes(k))return;w.push(k);avisoOptativa(k,w)}saveT();renderTray()}
 
 /* ---------- eventos ---------- */
 
@@ -847,7 +884,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
   if(d.expand!==undefined){const k=+d.expand;S.expand.has(k)?S.expand.delete(k):S.expand.add(k);renderOffer();return}
-  if(d.lfocus){S.lfocus=S.lfocus===d.lfocus?null:d.lfocus;renderList();return}
+  if(d.lfocus){S.lfocus=S.lfocus===d.lfocus?null:d.lfocus;conSim(usaSim('mapa'),()=>conPlan(renderList));return}
   if(d.lwant){toggleBox(d.lwant);return}
   if(d.fwant){toggleBox(d.fwant);return}
   if(d.fclose){S.mapFocus=false;S.mapHover=null;renderMap();return}
@@ -907,8 +944,8 @@ $('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vist
   if(b.dataset.vista==='sigue'&&!SHOWSUG){SHOWSUG=true;store.set('verSug',true)}renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapVista',mapVista()==='todo'?'sigue':'todo');renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
 $('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;if(DEMO){ALUMNO=perfilDemo();for(const k in T)delete T[k]}render()});
-$('#b-all').addEventListener('click',()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&off.has(k))])];saveT();renderTray()});
-$('#b-sugg').addEventListener('click',()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT();renderTray()});
+$('#b-all').addEventListener('click',()=>{conSim(usaSim('sugg'),()=>conPlan(()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&(PLAN_PASO||off.has(k)))])];saveT()}));renderTray()});
+$('#b-sugg').addEventListener('click',()=>{conSim(usaSim('sugg'),()=>conPlan(()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT()}));renderTray()});
 $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);
   if(SHOWSUG)store.set('mapVista','sigue');else if(mapVista()==='sigue')store.set('mapVista','pend');renderMap()});
 // simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase
@@ -927,7 +964,9 @@ document.addEventListener('click',e=>{const b=e.target.closest?.('[data-simtgl]'
   if(blk==='mapa')renderMap();else if(blk==='sugg')renderSide();else renderStats();
   const fija=()=>{const n=document.querySelector(`[data-simtgl="${blk}"]`);if(n)window.scrollBy(0,n.getBoundingClientRect().top-y0)};
   requestAnimationFrame(fija);setTimeout(fija,450);setTimeout(fija,1200)});
-$('#b-none').addEventListener('click',()=>{tr().want=[...tr().oblig];saveT();renderTray()});
+$('#b-none').addEventListener('click',()=>{conSim(usaSim('sugg'),()=>conPlan(()=>{tr().want=[...tr().oblig];saveT()}));renderTray()});
+document.querySelectorAll('[data-plan-paso]').forEach(b=>b.addEventListener('click',()=>{S.planPaso=+b.dataset.planPaso;S.mapHover=null;S.mapFocus=false;renderTray()}));
+$('#plan-simular').addEventListener('click',()=>{SATE.simAbrir=true;SATE.ir('desempeno')});
 $('#b-go').addEventListener('click',()=>{S.onlyWant=true;store.set('onlyWant',true);SATE.ir('horarios');window.scrollTo({top:0})});
 (()=>{
   const wrap=$('#mapwrap'), map=$('#map'), areas=$('#areas'), HEAD=30, GAIN=1.8, ZMAX=2.5;

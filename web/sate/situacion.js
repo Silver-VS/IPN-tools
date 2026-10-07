@@ -70,6 +70,7 @@
   }
   function mostrar() {
     const box=document.getElementById('sate-situacion');box.replaceChildren();
+    const planear=el('button',SATE.texto('sate.planeacion.titulo'),'sate-enlace');planear.type='button';planear.onclick=()=>SATE.ir('mapa');box.appendChild(planear);
     if(!isPersonal()) {
       box.appendChild(SateUI.aviso({estado:'info',titulo:tx('sin_datos'),cuerpo:tx('lector_invitacion'),accion:{texto:tx('usar_lector'),onclick:()=>SAES.open()}}));
       const demo=el('button',tx('probar_demo'),'sate-btn');demo.type='button';demo.setAttribute('data-demo-open','');box.appendChild(demo);return;

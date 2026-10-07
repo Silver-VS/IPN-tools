@@ -57,6 +57,23 @@ El nombre de la clave es la llave de localStorage. El prefijo indica la herramie
 Una clave nueva con prefijo `hu.` o `ue.` se sincroniza sin cambiar el formato; las de pantalla se agregan
 a la lista de exclusión en `tools/cuenta.py`.
 
+### Planeación de dos periodos (opcional, ipnt 1)
+
+`hu.t.<carrera>` (o `hu.<unidad>.t.<carrera>`) admite
+`{"want":["B101"],"wantPorPeriodo":{"27/1":["B101"],"27/2":["B102"]}}`.
+`wantPorPeriodo` es opcional y asocia el periodo escolar a las claves elegidas.
+Sin ese campo, `want` se interpreta como la selección del periodo N; al editar,
+se conserva `want` como espejo de N para lectores anteriores y se preservan
+campos desconocidos. Al avanzar el horizonte se recupera la selección por su periodo.
+La pestaña seleccionada es estado transitorio de pantalla, no cambia `ipnt` ni el
+periodo del armado de horarios. N+1 se calcula suponiendo acreditadas las materias
+de N y excluye las de N y las acreditadas reales o simuladas; no modifica el SAES.
+La oferta futura no se conoce y la carga mostrada es una referencia con los datos
+disponibles, pendiente de confirmación en la cita correspondiente.
+Si no hay periodo conocido por SAES ni calendario, las claves opcionales son
+`proximo` y `siguiente`, mostradas como «Periodo N» y «Periodo N+1».
+La selección de `siguiente` se recupera cuando se conoce el periodo de destino.
+
 ## Fusión
 
 Se combina clave por clave: gana el valor con la `t` más reciente (último en escribir). Un borrado gana si
