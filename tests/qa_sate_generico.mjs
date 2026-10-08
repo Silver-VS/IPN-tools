@@ -92,7 +92,7 @@ for(const modo of ['actual','viejo','periodos','vacio']){
   if(modo==='periodos'){p.no_cursadas=[['Z401',null,0,null]];p.reprobadas_periodo=p.reprobadas_periodo.map(r=>r.slice(0,3));p.desfasadas_saes=[];}
   const almacen=new Map(modo==='vacio'?[]:[['saes.alumno',JSON.stringify(p)]]),nodos=new Map(),archivos=[],eventos={};let c;
   function nodo(id=''){return {id,hidden:false,textContent:'',innerHTML:'',style:{},dataset:{},children:[],
-    classList:{toggle(){}},setAttribute(){},removeAttribute(){},addEventListener(){},replaceChildren(){},appendChild(n){this.children.push(n)},
+    classList:{toggle(){}},setAttribute(){},removeAttribute(){},addEventListener(){},replaceChildren(){},prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)},
     querySelector:s=>nodo(s),querySelectorAll:()=>[],closest:()=>null};}
   const document={readyState:'loading',documentElement:{getAttribute(){return null},setAttribute(){},style:{setProperty(){},removeProperty(){}}},addEventListener(){},getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
     querySelector:s=>document.getElementById(s),querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){

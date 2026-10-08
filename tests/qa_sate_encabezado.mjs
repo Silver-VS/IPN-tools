@@ -26,6 +26,44 @@ assert.ok(!encabezado.includes('Tu avance (opcional)'));
 assert.ok(!encabezado.includes('<hr'));
 assert.ok(!html.includes('/*__SATE_'));
 const inicio = leer('web/sate/inicio.js');
+// Identidad publicada y comportamiento real del arranque, con DOM local en memoria.
+assert.deepEqual(config.identidadUnidades, JSON.parse(leer('data/unidades_identidad.json')).unidades);
+for (const unidad of ['upiita','escom','esimez','desconocida','enba']) {
+  const valores={}, atributos={}, titulo={replaceChildren(...n){this.children=n}};
+  const documento={querySelector:()=>null,getElementById:()=>titulo,
+    documentElement:{getAttribute:k=>atributos[k],style:{setProperty(k,v){valores[k]=v}}},
+    createElement:tag=>({tag,children:[],prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)}})};
+  let selector;
+  const c=vm.createContext({SATE_CONFIG:structuredClone(config),SateRutas:{ruta:()=>({unidad})},
+    URLSearchParams,localStorage:{getItem:()=>null},location:{hash:'#/'+unidad+'/mapa',search:''},window:{},
+    document:documento,texto,SateUI:{modal(t,n){selector=n}}});
+  vm.runInContext(inicio.slice(0,inicio.indexOf('  // plurales ICU'))+'\nglobalThis.aplicarRealce=aplicarRealce;})();',c);
+  vm.runInContext('const config=SATE_CONFIG.unidades,u=window.SATE_UNIDAD,cfg=config[u];let api;',c);
+  vm.runInContext(inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar(')),c);
+  vm.runInContext(inicio.slice(inicio.indexOf('  const siglasUnidad'),inicio.indexOf('  if (cfg.leyenda)')),c);
+  const img=titulo.children[0];
+  assert.equal(img.tag,'img');assert.equal(img.className,'sate-logo-unidad');
+  assert.equal(img.src,'../assets/logos/unidades/'+(config.identidadUnidades[unidad]?.logo||'ipn')+'.webp');
+  assert.equal(img.alt,c.SATE_CONFIG.unidades[unidad].nombre);
+  assert.equal(titulo.children[1],'SATE ');assert.equal(titulo.children[2].textContent,c.SATE_CONFIG.unidades[unidad].siglas);
+  img.onerror();assert.equal(img.hidden,true,unidad+': imagen fallida oculta');
+  const realce=config.unidades[unidad]?.realce||config.identidadUnidades[unidad]?.realce;
+  assert.equal(valores['--sate-realce'],realce?.claro||'var(--sate-acento-base)',unidad+': tema claro');
+  atributos['data-theme']='dark';
+  c.aplicarRealce(unidad);
+  assert.equal(valores['--sate-realce'],realce?.oscuro||'var(--sate-acento-base)',unidad+': tema oscuro');
+  vm.runInContext('elegirUnidad();',c);
+  for (const [i,id] of Object.keys(c.SATE_CONFIG.unidades).entries()) {
+    const boton=selector.children[i],icono=boton.children[0];
+    assert.equal(boton.textContent,c.SATE_CONFIG.unidades[id].siglas);
+    assert.equal(icono.src,'../assets/logos/unidades/'+(config.identidadUnidades[id]?.logo||'ipn')+'.webp');
+    icono.onerror();assert.equal(icono.hidden,true);
+  }
+}
+const estilosIdentidad=leer('web/sate/componentes.css');
+assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*max-height:36px;[^}]*width:auto;height:auto;[^}]*object-fit:contain;[^}]*background:#fff;[^}]*padding:2px/);
+assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
+assert.match(estilosIdentidad,/@media\(max-width:720px\)\{\s*#sate-titulo \.sate-logo-unidad\{max-height:28px\}/);
 const interaccion = inicio.slice(inicio.indexOf('  if (cfg.leyenda) {'), inicio.indexOf('  const nombreUnidad'));
 for (const unidad of Object.keys(config.unidades)) {
   const boton = {setAttribute(k,v){this[k]=v}};
