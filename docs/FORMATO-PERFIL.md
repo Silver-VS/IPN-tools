@@ -57,6 +57,21 @@ El nombre de la clave es la llave de localStorage. El prefijo indica la herramie
 Una clave nueva con prefijo `hu.` o `ue.` se sincroniza sin cambiar el formato; las de pantalla se agregan
 a la lista de exclusión en `tools/cuenta.py`.
 
+### Datos del SAES para unidades sin plan cargado
+
+El Lector agrega a `saes.alumno` el campo opcional `materias`, un mapa de clave a
+`[nombre, semestre|null]`. Ejemplo ficticio: `{"Z101": ["Álgebra ficticia", 1]}`.
+El semestre procede del título de la tabla del kárdex o, si no existe, de su orden;
+Estado General puede completarlo con `No_Periodo`. El horario aporta nombres sin
+inventar semestres. La versión `lector` sigue siendo la huella del código publicado.
+
+Una unidad ausente de `data/sate.json` abre SATE mediante `sate/index.html?sateUnidad=<unidad>`.
+Sus vistas son Mi trayectoria y Mapa curricular, construidas con el SAES, sin oferta
+ni seriación. Si faltan semestres, el mapa agrupa por periodo cursado y por cursar.
+Los perfiles anteriores siguen admitidos: muestran claves y solicitan actualizar el
+Lector para incorporar nombres. El desfase se presenta únicamente desde
+`desfasadas_saes` y `desfase_saes`; no se calcula a partir de antigüedad o seriación.
+
 ### Planeación de dos periodos (opcional, ipnt 1)
 
 `hu.t.<carrera>` (o `hu.<unidad>.t.<carrera>`) admite

@@ -982,7 +982,8 @@ def escribir_sate(data):
     for marca in ("UNIDAD", "CARRERA", "SIN_DATOS", "INDICADOR"):
         html = html.replace("/*__SATE_" + marca + "__*/", textos["sate.encabezado." + marca.lower()])
     textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate}, ensure_ascii=False, separators=(",", ":")) + ";")
+    nombres_unidades = json.loads((ROOT / 'data/unidades_saes.json').read_text(encoding='utf-8'))
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.
@@ -1044,6 +1045,11 @@ document.addEventListener('click', e => {
     core = core.replace('href="privacidad.html"', 'href="../privacidad.html"').replace('href="condiciones.html"', 'href="../condiciones.html"')
     core = core.replace('href="sate/index.html#/upiita/tramites/electivas"', 'href="#/upiita/tramites/electivas"')
     (destino / "nucleo.js").write_text(core, encoding="utf-8")
+    generico = cuenta.inject((fuente / 'generico.js').read_text(encoding='utf-8'))
+    generico = re.sub(r'("unidad"\s*:\s*)"[^"]*"', r'\1window.SATE_UNIDAD', generico, count=1)
+    generico = saes.inject(generico, 'horarios')
+    generico = generico.replace("new URL('auth.html',location.href)", "new URL('../auth.html',location.href)")
+    (destino / 'generico.js').write_text(generico, encoding='utf-8')
     print("datos SATE", UNIDAD, {p.name:p.stat().st_size for p in datos.glob("*.json")})
 
 

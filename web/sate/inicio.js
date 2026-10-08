@@ -7,6 +7,12 @@
   if (cascaron && ['v1','v3'].includes(variante)) cascaron.setAttribute('data-pestanas', variante);
   let api, actual, tabs, barra, version = 0;
   const leer = k => { try { return localStorage.getItem(k); } catch { return null; } };
+  const solicitada = location.hash.match(/^#\/([a-z0-9-]+)\//)?.[1] || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || leer('ipnt.unidad');
+  if (solicitada && /^[a-z0-9-]+$/.test(solicitada) && !config[solicitada]) {
+    const siglas = SATE_CONFIG.nombresUnidades?.[solicitada] || solicitada.toUpperCase();
+    config[solicitada] = {generica:true,siglas,nombre:siglas,saes:'https://saes.'+solicitada+'.ipn.mx/',
+      pestanas:['trayectoria','mapa'],grupos:[['trayectoria'],['mapa']],tramites:[]};
+  }
   const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
   const recordada = leer('ipnt.unidad');
   const unidad = inicial?.unidad || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || recordada || 'upiita';
@@ -46,6 +52,7 @@
     }).catch(e => { oferta = null; throw e; });
   }
   async function modulo(id) {
+    if (cfg.generica) return modulos[id];
     if (id === 'trayectoria') await script('desempeno.js');
     if (id === 'calendario') await script('calendario.js');
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
@@ -111,6 +118,10 @@
       b.onclick = () => { if (api) IPNT.set('ipnt.unidad', id); location.hash = '#/' + id + '/mapa'; if (id !== u) location.reload(); else SateUI.cerrarModal(); };
       caja.appendChild(b);
     }
+    const ayuda = document.createElement('p'); ayuda.textContent = '¿Tu unidad no aparece? Usa el Lector desde tu SAES. Guarda el marcador, ejecútalo en tu sesión y abre SATE desde el resumen; después pega tus datos.';
+    const boton = document.createElement('button'); boton.className='btn'; boton.textContent='Cómo usar el Lector';
+    boton.onclick=()=>{SateUI.cerrarModal();SAES.open()};
+    caja.appendChild(ayuda); caja.appendChild(boton);
     SateUI.modal('Unidad académica', caja);
   }
   async function activar(r) {
@@ -118,7 +129,7 @@
     if (r.unidad !== u) { IPNT.set('ipnt.unidad', r.unidad); location.reload(); return; }
     const v = ++version;
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
-    if (r.pestana === 'mapa' || r.pestana === 'horarios') await cargarOferta();
+    if (!cfg.generica && (r.pestana === 'mapa' || r.pestana === 'horarios')) await cargarOferta();
     const m = await modulo(r.pestana);
     if (r.pestana === 'tramites' && r.tramite === 'electivas') await SateElectivas.preparar();
     if (v !== version) return;
@@ -142,7 +153,7 @@
   }
   function repintar() {
     if (!actual) return;
-    if (window.SATE_DATA.mapas[api.estado.car]?.generico && actual.pestana !== 'horarios') { ir('horarios'); return; }
+    if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && actual.pestana !== 'horarios') { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos(); modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
@@ -152,7 +163,7 @@
   }
   window.SATE = {texto, modulos, error, script, identidadSaes, get actual(){return actual}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
     async nucleoListo(a) {
-      api = a; await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
+      api = a; if (!cfg.generica) await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta(location.hash, u, config) ||
         SateRutas.ruta('#/' + u + '/' + (api.personal() && cfg.pestanas.includes('trayectoria') ? 'trayectoria' : 'mapa'), u, config);
       const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
@@ -194,5 +205,6 @@
       }
     }
   }
-  json('nucleo').then(d=>{window.SATE_DATA=Object.assign({periodos:{actual:[],proximo:[]},asig:[],prof:[]},d);return script('nucleo.js')}).catch(error);
+  if (cfg.generica) script('generico.js').catch(error);
+  else json('nucleo').then(d=>{window.SATE_DATA=Object.assign({periodos:{actual:[],proximo:[]},asig:[],prof:[]},d);return script('nucleo.js')}).catch(error);
 })();

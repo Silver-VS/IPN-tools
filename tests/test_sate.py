@@ -15,6 +15,11 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_unidad_generica_y_lector(self):
+        resultado = subprocess.run([r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_generico.mjs'], cwd=ROOT,
+                                   capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
     def test_ventanilla_y_pdf(self):
         for archivo in ('qa_sate_ventanilla.mjs', 'qa_sate_pdf.mjs', 'qa_sate_electivas.mjs'):
             with self.subTest(archivo=archivo):
