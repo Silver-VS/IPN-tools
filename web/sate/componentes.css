@@ -2,7 +2,10 @@
 :root{--sate-realce:var(--sate-acento-base);--sate-sobre-realce:var(--sate-sobre-base)}
 .sate-unidad{color:var(--sate-realce)}
 #sate-titulo{display:flex;align-items:center;gap:.3rem}
-.sate-logo-unidad{max-height:36px;width:auto;height:auto;object-fit:contain;background:#fff;border-radius:3px;padding:2px;box-sizing:content-box;vertical-align:middle}
+.sate-logo-unidad{max-height:36px;width:auto;height:auto;object-fit:contain;vertical-align:middle;padding:4px;box-sizing:content-box;
+  /* Logo transparente con el color de la unidad: halo radial detrás y contorno tipo neón (pedido del dueño). */
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--sate-realce) 28%,transparent),transparent);
+  filter:drop-shadow(0 0 3px color-mix(in srgb,var(--sate-realce) 75%,transparent))}
 .sate-selector-unidad{display:inline-flex;align-items:center;gap:.3rem}
 .sate-selector-unidad .sate-logo-unidad{max-height:24px;max-width:24px}
 .tramite-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--ipn-esp-4)}
