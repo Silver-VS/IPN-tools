@@ -7,7 +7,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
  for(const personal of (hashInicial? [false]:[false,true])) {
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
   let cambioUnidad = 0;
-  function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
+  function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},prepend(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
   const realces = {};
   const raiz = {getAttribute(){return null},style:{setProperty(k,v){realces[k]=v}}};
   const location = {hash:hashInicial,pathname:'/sate/index.html',search:'?x=1',reload(){assert.equal(realces['--sate-realce'],config.escom.realce.claro,'El realce cambia antes de recargar módulos');cambioUnidad++}};

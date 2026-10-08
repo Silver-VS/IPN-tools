@@ -983,7 +983,8 @@ def escribir_sate(data):
         html = html.replace("/*__SATE_" + marca + "__*/", textos["sate.encabezado." + marca.lower()])
     textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
     nombres_unidades = json.loads((ROOT / 'data/unidades_saes.json').read_text(encoding='utf-8'))
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades}, ensure_ascii=False, separators=(",", ":")) + ";")
+    identidad_unidades = json.loads((ROOT / 'data/unidades_identidad.json').read_text(encoding='utf-8'))['unidades']
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.

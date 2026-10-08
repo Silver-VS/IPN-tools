@@ -10,7 +10,7 @@
   const solicitada = location.hash.match(/^#\/([a-z0-9-]+)\//)?.[1] || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || leer('ipnt.unidad');
   if (solicitada && /^[a-z0-9-]+$/.test(solicitada) && !config[solicitada]) {
     const siglas = SATE_CONFIG.nombresUnidades?.[solicitada] || solicitada.toUpperCase();
-    config[solicitada] = {generica:true,siglas,nombre:siglas,saes:'https://saes.'+solicitada+'.ipn.mx/',
+    config[solicitada] = {generica:true,siglas,nombre:siglas,realce:SATE_CONFIG.identidadUnidades?.[solicitada]?.realce,saes:'https://saes.'+solicitada+'.ipn.mx/',
       pestanas:['trayectoria','mapa'],grupos:[['trayectoria'],['mapa']],tramites:[]};
   }
   const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
@@ -129,10 +129,17 @@
     addEventListener('resize',programar);
     programar();
   }
+  function logoUnidad(id, nombre) {
+    const img = document.createElement('img'); img.className = 'sate-logo-unidad';
+    img.src = '../assets/logos/unidades/' + (SATE_CONFIG.identidadUnidades?.[id]?.logo || 'ipn') + '.webp';
+    img.alt = nombre; img.onerror = () => { img.hidden = true; };
+    return img;
+  }
   function elegirUnidad() {
     const caja = document.createElement('div');
     for (const [id, c] of Object.entries(config)) {
       const b = document.createElement('button'); b.className = 'btn'; b.textContent = c.siglas;
+      b.className += ' sate-selector-unidad'; b.prepend(logoUnidad(id, c.nombre));
       b.onclick = () => { aplicarRealce(id); if (api) IPNT.set('ipnt.unidad', id); location.hash = '#/' + id + '/mapa'; if (id !== u) location.reload(); else SateUI.cerrarModal(); };
       caja.appendChild(b);
     }
@@ -200,7 +207,7 @@
     }
   };
   const siglasUnidad = document.createElement('span'); siglasUnidad.className = 'sate-unidad'; siglasUnidad.textContent = cfg.siglas;
-  document.getElementById('sate-titulo').replaceChildren(texto('sate.siglas') + ' ', siglasUnidad);
+  document.getElementById('sate-titulo').replaceChildren(logoUnidad(u, cfg.nombre), texto('sate.siglas') + ' ', siglasUnidad);
   if (cfg.leyenda) {
     const ayuda = SateUI.ayuda('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas});
     const boton = ayuda.querySelector('button');

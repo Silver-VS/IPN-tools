@@ -1,6 +1,10 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
 :root{--sate-realce:var(--sate-acento-base);--sate-sobre-realce:var(--sate-sobre-base)}
 .sate-unidad{color:var(--sate-realce)}
+#sate-titulo{display:flex;align-items:center;gap:.3rem}
+.sate-logo-unidad{max-height:36px;width:auto;height:auto;object-fit:contain;background:#fff;border-radius:3px;padding:2px;box-sizing:content-box;vertical-align:middle}
+.sate-selector-unidad{display:inline-flex;align-items:center;gap:.3rem}
+.sate-selector-unidad .sate-logo-unidad{max-height:24px;max-width:24px}
 .tramite-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--ipn-esp-4)}
 .tramite-tarjeta{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);background:var(--ipn-superficie);overflow-wrap:anywhere}
 .tramite-asistente{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
@@ -83,6 +87,7 @@ body.sate-flotante #sate-tabs{display:none}
 .sate-medicion .sate-controles{width:15rem;max-width:none;flex:none}
 .sate-medicion .field{max-width:none}
 @media(max-width:720px){
+  #sate-titulo .sate-logo-unidad{max-height:28px}
   .sate-navegacion{margin-top:var(--ipn-esp-1)}
   .sate-controles{flex:1;width:100%}
   .sate-identidad{gap:var(--ipn-esp-1);flex-wrap:wrap}

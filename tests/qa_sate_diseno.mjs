@@ -148,8 +148,8 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
   let observador, cambioSistema, recargas=0;
   const raiz={getAttribute:k=>atributos[k]??null,style:{setProperty(k,v){valores[k]=v}}};
   const sistema={matches:false,addEventListener(k,f){assert.equal(k,'change');cambioSistema=f}};
-  const c=vm.createContext({config:catalogo,u:'upiita',inicial:null,recordada:null,URLSearchParams,
-    location:{search:'',hash:'',reload(){recargas++}},document:{documentElement:raiz,createElement(){return {appendChild(b){botones.push(b)}}}},
+  const c=vm.createContext({config:catalogo,SATE_CONFIG:config,u:'upiita',inicial:null,recordada:null,URLSearchParams,
+    location:{search:'',hash:'',reload(){recargas++}},document:{documentElement:raiz,createElement(){return {prepend(){},appendChild(b){botones.push(b)}}}},
     matchMedia:()=>sistema,MutationObserver:class{constructor(f){observador=f}observe(n,o){assert.equal(n,raiz);assert.equal(o.attributeFilter.join(','),'data-theme,data-tema')}},
     api:null,SateUI:{modal(){},cerrarModal(){}}});
   vm.runInContext(inicio.slice(inicio.indexOf('  let unidadRealce'),inicio.indexOf('  // plurales ICU')),c);
@@ -160,7 +160,7 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
     assert.ok(ratio>=4.5,`${u}/${modo}: ${color} sobre realce, AA ${ratio}`);
     assert.equal(color,modo==='claro'?'#ffffff':'#18181b');
   }
-  const elegir=inicio.slice(inicio.indexOf('  function elegirUnidad()'),inicio.indexOf('  async function activar('));
+  const elegir=inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar('));
   vm.runInContext(elegir+'\nelegirUnidad();',c);
   for(const [i,u] of Object.keys(catalogo).entries()){
     // El callback modifica el color en el documento actual antes de pedir la recarga histórica.
