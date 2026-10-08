@@ -1,4 +1,6 @@
-/* Componentes de SATE: solo variables --ipn-* (vendor/ipn-comun/dist/tokens.css). */
+/* Componentes de SATE: tokens comunes y realce local por unidad. */
+:root{--sate-realce:var(--ipn-acento)}
+.sate-unidad{color:var(--sate-realce)}
 .tramite-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--ipn-esp-4)}
 .tramite-tarjeta{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-4);background:var(--ipn-superficie);overflow-wrap:anywhere}
 .tramite-asistente{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
@@ -26,7 +28,7 @@
 .dictamen-opciones input{flex:none;margin-top:.25rem}
 .tramite-campo textarea{min-height:8rem;resize:vertical}
 .tramite-campo input[type=checkbox]{width:auto;align-self:flex-start}
-:is(.tramite-campo input,.tramite-campo textarea,.tramite-chips button,.tramite-acciones button):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+:is(.tramite-campo input,.tramite-campo textarea,.tramite-chips button,.tramite-acciones button):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .tramite-chips [aria-pressed=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);border-color:var(--ipn-acento)}
 .electivas-actividad{box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
 .electivas-resumen{position:sticky;top:0;z-index:1;background:var(--ipn-superficie);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control)}
@@ -35,10 +37,10 @@
 .sate-recorte-calendario{display:flex;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:0;height:28px;margin:0 0 var(--ipn-esp-2);padding:0;color:var(--ipn-tenue);background:none;border:0;font:inherit;font-size:var(--ipn-tamano-xs);text-align:left;cursor:pointer}
 .sate-recorte-calendario__texto{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sate-recorte-calendario__mas{flex:none;white-space:nowrap}
-.sate-recorte-calendario:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.sate-recorte-calendario:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .trayectoria-resumen .sate-recorte-calendario{margin:0}
 /* Dos filas, sin separadores heredados. min-width:0 permite carreras largas. */
-header.top{border-bottom:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0}
+header.top{border-bottom:0;border-top:2px solid var(--sate-realce);gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0}
 .brand .title-row{display:flex;justify-content:space-between;gap:var(--ipn-esp-2)}
 .sate-identidad{display:flex;align-items:center;gap:var(--ipn-esp-2);min-width:0}
 .sate-identidad h1{font-size:1.7rem;white-space:nowrap}
@@ -68,7 +70,7 @@ header.top{border-bottom:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0
 #sate-saes-indicador.on::before{background:var(--ipn-ok);border-color:var(--ipn-ok)}
 .bar-top{border-bottom:0;padding-block:0;align-items:center}
 .bar-top:has(>#sate-oferta-periodo[hidden]):has(>#notice[hidden]){display:none}
-:is(.unit-switch,.sate-controles select,.sate-datos .btn,.header-actions button):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+:is(.unit-switch,.sate-controles select,.sate-datos .btn,.header-actions button):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 /* El ancho natural decide cuándo separar controles, abreviar y usar la barra inferior. */
 .sate-navegacion[data-controles-separados=true]>#sate-tabs{flex-basis:100%}
 .sate-navegacion[data-controles-separados=true]>.sate-controles{flex-basis:100%}
@@ -137,7 +139,7 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-tick{stroke:var(--ipn-tenue);stroke-width:1;opacity:.55}
 .calendario-arco{fill:none;stroke:currentColor;stroke-width:11;stroke-linecap:round;cursor:pointer}
 circle.calendario-arco{fill:currentColor;stroke-width:2}
-.calendario-arco:hover,.calendario-arco:focus-visible{stroke-width:15;outline:2px solid var(--ipn-acento);outline-offset:4px}
+.calendario-arco:hover,.calendario-arco:focus-visible{stroke-width:15;outline:2px solid var(--sate-realce);outline-offset:4px}
 .calendario-arco[data-atenuado=true],.calendario-proceso[data-atenuado=true]{opacity:.35}
 .calendario-proceso[data-resaltado=true],.calendario-proceso[aria-pressed=true]{background:color-mix(in srgb,currentColor 10%,var(--ipn-superficie));box-shadow:inset 0 0 0 1px currentColor}
 .calendario-arco[aria-pressed=true]{stroke-width:14}
@@ -170,7 +172,7 @@ circle.calendario-arco{fill:currentColor;stroke-width:2}
 .calendario-pill[data-continua=false]{border-radius:999px;border-left-width:5px}
 .calendario-mas{margin-top:var(--ipn-esp-1)}
 .calendario-mas .sate-btn{min-width:0;min-height:2rem;padding:0;font-size:var(--ipn-tamano-xs);color:var(--ipn-acento);border:0;background:transparent;white-space:nowrap}
-:is(.calendario-dia,.calendario-pill,.calendario-proceso,.calendario-filtro input,.calendario-selector select):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
+:is(.calendario-dia,.calendario-pill,.calendario-proceso,.calendario-filtro input,.calendario-selector select):focus-visible{outline:2px solid var(--sate-realce);outline-offset:-2px}
 @media(max-width:720px){
   .calendario-layout{grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
   .calendario-detalle{position:static}
@@ -199,7 +201,7 @@ circle.calendario-arco{fill:currentColor;stroke-width:2}
 #sate-situacion .sate-globo{max-height:60dvh;overflow:auto}
 @media(max-width:720px){.situacion-cifras{grid-template-columns:repeat(2,minmax(0,1fr))}#sate-situacion .sate-avisos{grid-template-columns:1fr}body[data-sate-pestana=situacion] .bar-top{gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-2)}}
 :where(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary){font:inherit;color:inherit}
-:is(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary):focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+:is(.sate-chip,.sate-btn,.sate-enlace,.sate-ayuda__btn,.sate-pestana,.sate-barra__btn,.sate-modal__x,.sate-aviso__x,.sate-desp summary):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 
 /* chips: el color indica el estado; la marca (✓ ! ✕ i) lo repite sin depender del color */
 .sate-chips{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2);padding:var(--ipn-esp-1)}   /* se acomodan en varias líneas, sin barra lateral */
@@ -277,15 +279,15 @@ button.sate-chip{cursor:pointer}
 .sate-pestana__icono svg{width:100%;height:100%}
 [data-pestanas=v3] .sate-pestana__icono{display:none}
 [data-pestanas=v3] .sate-pestana{padding-bottom:var(--ipn-esp-4)}
-[data-pestanas=v3] .sate-pestana[aria-selected=true]::after{content:'';position:absolute;bottom:.3rem;left:calc(50% - .18rem);width:.36rem;height:.36rem;border-radius:50%;background:var(--ipn-acento)}
-.sate-pestana:focus-visible,.sate-barra__btn:focus-visible,.trayectoria-minimapa button:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.sate-pestana[aria-selected=true]::after,.sate-barra__btn[aria-current=page]::after{content:'';position:absolute;bottom:.3rem;left:calc(50% - .18rem);width:.36rem;height:.36rem;border-radius:50%;background:var(--sate-realce)}
+.sate-pestana:focus-visible,.sate-barra__btn:focus-visible,.trayectoria-minimapa button:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .sate-pestanas--seg{display:inline-flex;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-1);background:var(--ipn-hundido)}
 .sate-pestanas--seg .sate-pestana{min-height:2.25rem;border:0;border-radius:calc(var(--ipn-radio) - 2px)}
 .sate-pestanas--seg .sate-pestana[aria-selected=true]{background:var(--ipn-superficie);box-shadow:0 0 0 1px var(--ipn-linea)}
 
 /* barra inferior: teléfono y contenedores donde tampoco caben los textos cortos */
 .sate-barra{display:none;position:fixed;left:var(--ipn-esp-2);right:var(--ipn-esp-2);bottom:var(--ipn-esp-2);z-index:40;box-sizing:border-box;min-height:calc(64px + env(safe-area-inset-bottom,0px));gap:var(--ipn-esp-1);padding:var(--ipn-esp-2);padding-bottom:calc(var(--ipn-esp-2) + env(safe-area-inset-bottom,0px));border:1px solid var(--ipn-linea);border-radius:1.5rem;background:var(--ipn-hundido);box-shadow:inset 0 1px 3px var(--ipn-linea);font-family:var(--ipn-fuente-texto)}
-.sate-barra__btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ipn-esp-1);flex:1;min-width:0;min-height:48px;border:0;border-radius:1rem;background:none;color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);cursor:pointer;padding:var(--ipn-esp-1) 2px;transition:background var(--ipn-duracion-rapida)}
+.sate-barra__btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ipn-esp-1);flex:1;min-width:0;min-height:48px;border:0;border-radius:1rem;background:none;color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);cursor:pointer;padding:var(--ipn-esp-1) 2px var(--ipn-esp-3);transition:background var(--ipn-duracion-rapida)}
 .sate-barra__btn[aria-current=page]{color:var(--ipn-acento);background:var(--ipn-superficie);box-shadow:0 0 0 1px var(--ipn-linea),0 2px 4px var(--ipn-linea);font-weight:600}
 [data-pestanas] .sate-barra .sate-pestana__icono{display:inline-flex}
 body.sate-flotante:has(.sate-barra){padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
@@ -325,7 +327,7 @@ body.sate-flotante .sate-barra{display:flex}
 .trayectoria-plegable{margin-block:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio)}
 .trayectoria-plegable>summary{cursor:pointer;padding:var(--ipn-esp-3);font-weight:600}
 .trayectoria-plegable>summary small{display:block;font-weight:400;color:var(--ipn-tenue);margin-top:var(--ipn-esp-1)}
-.trayectoria-plegable>summary:focus-visible,.plan-menu>summary:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.trayectoria-plegable>summary:focus-visible,.plan-menu>summary:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .trayectoria-plegable>div{padding:var(--ipn-esp-3);min-width:0}
 @media(max-width:720px){
   .sate-texto-largo{display:none!important}.sate-texto-corto{display:inline}
