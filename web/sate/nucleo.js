@@ -383,7 +383,10 @@ function statusOf(k){
   const lock=req.length>0;
   const sn=semNow(), sp=semOf()[k];
   let st='rest';
-  if(sn&&sp){if(sp<sn)st=DESFASE_SEM.has(S.car)?'late':'prev';else if(sp===sn)st='now'}
+  // Con datos del SAES manda su lista de desfasadas (ya aplicada arriba con desfS): una materia de un semestre anterior
+  // que no se ha cursado va atrasada respecto al plan, no desfasada (el SAES de ESCOM no la marca así).
+  const saesDesfase=isPersonal()&&!!ALUMNO&&('desfasadas_saes' in ALUMNO||!!ALUMNO.desfase_saes);
+  if(sn&&sp){if(sp<sn)st=DESFASE_SEM.has(S.car)&&!saesDesfase?'late':'prev';else if(sp===sn)st='now'}
   const r=semRef(), far=r!=null&&sp!=null&&sp>r+2;   // fuera de la ventana de un año
   return st+(lock?' lock':'')+(far?' far':'');
 }
