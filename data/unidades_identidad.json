@@ -1,0 +1,157 @@
+{
+ "_fuente": "Logo y color de realce por unidad (sesion-04 §7, sesion-07). Logos en web/dist/assets/logos/unidades/<logo>.webp (no versionados). Colores muestreados de los logos del SAES; tonos ajustados a AA 4.5:1 contra las superficies de SATE (claro: #fff/#fafafa/#f4f4f5; oscuro: #18181b/#09090b). Sin realce = guinda institucional. UPIIH, UPIIC y UPIIT usan el escudo del IPN hasta tener su logo.",
+ "unidades": {
+  "cicsma": {
+   "logo": "cics-ma"
+  },
+  "enba": {
+   "logo": "enba"
+  },
+  "encb": {
+   "logo": "encb",
+   "realce": {
+    "claro": "#b00040",
+    "oscuro": "#cc5c85"
+   }
+  },
+  "enmh": {
+   "logo": "enmh"
+  },
+  "escasto": {
+   "logo": "esca-sto",
+   "realce": {
+    "claro": "#a00040",
+    "oscuro": "#c46189"
+   }
+  },
+  "escatep": {
+   "logo": "esca-tep",
+   "realce": {
+    "claro": "#a00040",
+    "oscuro": "#c46189"
+   }
+  },
+  "escom": {
+   "logo": "escom"
+  },
+  "ese": {
+   "logo": "ese"
+  },
+  "eseo": {
+   "logo": "eseo"
+  },
+  "esfm": {
+   "logo": "esfm",
+   "realce": {
+    "claro": "#b45400",
+    "oscuro": "#f07000"
+   }
+  },
+  "esiat": {
+   "logo": "esia-tic"
+  },
+  "esiatec": {
+   "logo": "esia-tec"
+  },
+  "esiaz": {
+   "logo": "esia-zac",
+   "realce": {
+    "claro": "#104090",
+    "oscuro": "#6483b7"
+   }
+  },
+  "esime-zac": {
+   "logo": "esime-zac",
+   "realce": {
+    "claro": "#008030",
+    "oscuro": "#26934f"
+   }
+  },
+  "esimeazc": {
+   "logo": "esime-azc",
+   "realce": {
+    "claro": "#008030",
+    "oscuro": "#26934f"
+   }
+  },
+  "esimecul": {
+   "logo": "esime-culh",
+   "realce": {
+    "claro": "#008030",
+    "oscuro": "#26934f"
+   }
+  },
+  "esimetic": {
+   "logo": "esime-tic",
+   "realce": {
+    "claro": "#008030",
+    "oscuro": "#26934f"
+   }
+  },
+  "esimez": {
+   "logo": "esime-zac",
+   "realce": {
+    "claro": "#008030",
+    "oscuro": "#26934f"
+   }
+  },
+  "esiqie": {
+   "logo": "esiqie"
+  },
+  "esit": {
+   "logo": "esit"
+  },
+  "esm": {
+   "logo": "esm"
+  },
+  "est": {
+   "logo": "est"
+  },
+  "upibi": {
+   "logo": "upibi"
+  },
+  "upiem": {
+   "logo": "upiem",
+   "realce": {
+    "claro": "#1c802b",
+    "oscuro": "#299438"
+   }
+  },
+  "upiic": {
+   "logo": "ipn"
+  },
+  "upiicsa": {
+   "logo": "upiicsa",
+   "realce": {
+    "claro": "#008030",
+    "oscuro": "#26934f"
+   }
+  },
+  "upiig": {
+   "logo": "upiig",
+   "realce": {
+    "claro": "#4f6fae",
+    "oscuro": "#6581b9"
+   }
+  },
+  "upiih": {
+   "logo": "ipn"
+  },
+  "upiip": {
+   "logo": "upiip",
+   "realce": {
+    "claro": "#0f74af",
+    "oscuro": "#1e88c4"
+   }
+  },
+  "upiit": {
+   "logo": "ipn"
+  },
+  "upiita": {
+   "logo": "upiita"
+  },
+  "upiiz": {
+   "logo": "upiiz"
+  }
+ }
+}
