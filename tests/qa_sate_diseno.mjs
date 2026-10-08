@@ -100,7 +100,7 @@ assert.equal(puente['--ipn-cal-academico'],'var(--sate-acento-base)','La categor
 assert.match(base['--accent-strong'],/color-mix.*var\(--sate-realce\)/);
 assert.match(base['--accent-soft'],/color-mix.*var\(--sate-realce\)/);
 // Pleca institucional, Opinar (componente común), pestaña, segmento, bandeja y botón principal.
-assert.match(leer('tools/institucional.py'),/\.inst\{[^}]*border-bottom:3px solid var\(--accent\)/);
+assert.match(leer('tools/institucional.py'),/\.inst\{[^}]*border-bottom:3px solid var\(--sate-realce,var\(--accent\)\)/);
 assert.match(leer('tools/encuesta.py'),/\.enc-btn svg\{[^}]*color:var\(--accent\)/);
 assert.match(fuente,/\.seg button\[aria-pressed="true"\][^{]*\{background:var\(--accent-soft\);color:var\(--accent\)/);
 assert.match(fuente,/\.plan-resumen span\{[^}]*border-left:4px solid var\(--accent\)/);
@@ -184,7 +184,7 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
   c.aplicarRealce(null);atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],'var(--sate-acento-base)');
   assert.equal(valores['--sate-sobre-realce'],'var(--sate-sobre-base)');
   assert.match(css,/\.sate-unidad\{color:var\(--sate-realce\)\}/);
-  assert.match(css,/header\.top\{[^}]*border-top:2px solid var\(--sate-realce\)/);
+  assert.match(css,/header\.top\{[^}]*border-top:0/);
   assert.match(css,/\.sate-barra__btn\[aria-current=page\]::after\{[^}]*background:var\(--sate-realce\)/);
   console.log('Realce: AA por unidad/superficie/tema, selector inmediato, guinda sin unidad y cambios de tema/sistema. OK.');
 }
@@ -267,3 +267,12 @@ assert.ok(!control('#load').innerHTML.includes('retenidos por reprobadas'));
 assert.equal(ayuda.k,'sate.horarios.carga_ayuda');assert.equal(ayuda.v.ret,'4.5');
 console.log('Horarios: filtros agrupados, acreditadas, preferencia recordada, prioridad, carga y textos por clave. OK.');
 console.log('Diseño §1–§3a: nombres, variantes/URL, SVG, grupos, teclado, barra móvil, foco, contraste AA y cinco estados compartidos. OK.');
+
+// Una pleca institucional, transparente en ambos temas y ligada al realce de cada unidad.
+const institucional=leer('tools/institucional.py').match(/\.inst\{([^}]+)\}/)[1];
+assert.match(institucional,/background:transparent/);assert.match(institucional,/border-radius:0/);
+assert.equal((institucional.match(/border-bottom:/g)||[]).length,1);
+assert.match(institucional,/border:0;border-radius:0;border-bottom:3px solid var\(--sate-realce,var\(--accent\)\)/);
+assert.match(css,/header\.top\{border-bottom:0;border-top:0/);
+assert.match(css,/\.tramite-acciones\{justify-content:flex-end\}/);
+assert.match(css,/\.tramite-campo input:not\(\[type=checkbox\]\),\.tramite-campo select\{min-height:2\.25rem/);

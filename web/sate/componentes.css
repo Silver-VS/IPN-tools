@@ -2,19 +2,19 @@
 :root{--sate-realce:var(--sate-acento-base);--sate-sobre-realce:var(--sate-sobre-base)}
 .sate-unidad{color:var(--sate-realce)}
 .tramite-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--ipn-esp-4)}
-.tramite-tarjeta{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-4);background:var(--ipn-superficie);overflow-wrap:anywhere}
+.tramite-tarjeta{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);background:var(--ipn-superficie);overflow-wrap:anywhere}
 .tramite-asistente{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
 .tramite-pantalla,.tramite-datos{min-width:0;max-width:100%;overflow-wrap:anywhere}
-.tramite-campo{display:flex;flex-direction:column;gap:var(--ipn-esp-1);margin-block:var(--ipn-esp-3)}
+.tramite-campo{display:flex;flex-direction:column;gap:var(--ipn-esp-1);margin-block:var(--ipn-esp-2)}
 .tramite-campo input,.tramite-campo textarea,.tramite-campo select{box-sizing:border-box;width:100%;min-width:0;max-width:100%;font:inherit;padding:var(--ipn-esp-2);color:var(--ipn-texto);background:var(--ipn-superficie);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
 .tramite-campo [aria-invalid=true]{border-color:var(--ipn-error)}
 .tramite-pasos,.tramite-chips,.tramite-acciones{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
 .tramite-compuesto,.tramite-chips>*{min-width:0;max-width:100%}
 #sate-tramites button{box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere}
 .tramite-acciones{position:sticky;bottom:calc(5rem + env(safe-area-inset-bottom,0px));z-index:2;background:var(--ipn-superficie);padding-block:var(--ipn-esp-2)}
-.tramite-acciones button{flex:1;min-width:0}
+.tramite-acciones{justify-content:flex-end}.tramite-acciones button{flex:0 1 auto;min-width:0}
 @media(min-width:1024px){.tramite-acciones{bottom:0}}
-.tramite-pasos{padding-left:var(--ipn-esp-4)}
+.tramite-pasos{display:block;margin-block:var(--ipn-esp-2);padding:0;font-weight:600;color:var(--ipn-acento)}
 .tramite-pasos li{margin-right:var(--ipn-esp-4);overflow-wrap:anywhere}
 .tramite-pasos [aria-current=step]{font-weight:700;color:var(--ipn-acento)}
 .tramite-revision>div{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-borde-control)}
@@ -23,7 +23,7 @@
 .tramite-preview iframe{width:100%;height:70vh;border:1px solid var(--ipn-borde-control)}
 .tramite-ver{display:block;margin-top:var(--ipn-esp-4)}
 .dictamen-opciones{min-width:0;border:0;padding:0;margin-block:var(--ipn-esp-3)}
-.dictamen-opciones label{display:flex;align-items:flex-start;gap:var(--ipn-esp-2);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-2);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);cursor:pointer}
+.dictamen-opciones label{display:flex;align-items:flex-start;gap:var(--ipn-esp-2);padding:var(--ipn-esp-2);margin-block:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);cursor:pointer}
 .dictamen-opciones label:has(input:checked){border-color:var(--ipn-acento);background:var(--ipn-hundido)}
 .dictamen-opciones input{flex:none;margin-top:.25rem}
 .tramite-campo textarea{min-height:8rem;resize:vertical}
@@ -40,7 +40,8 @@
 .sate-recorte-calendario:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .trayectoria-resumen .sate-recorte-calendario{margin:0}
 /* Dos filas, sin separadores heredados. min-width:0 permite carreras largas. */
-header.top{border-bottom:0;border-top:2px solid var(--sate-realce);gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0}
+header.top{border-bottom:0;border-top:0;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-4) 0}
+body>.inst{margin-inline:-16px}
 .brand .title-row{display:flex;justify-content:space-between;gap:var(--ipn-esp-2)}
 .sate-identidad{display:flex;align-items:center;gap:var(--ipn-esp-2);min-width:0}
 .sate-identidad h1{font-size:1.7rem;white-space:nowrap}
@@ -351,3 +352,13 @@ body.sate-flotante .sate-barra{display:flex}
   .plan-menu-cuerpo{display:none}
   .plan-menu[open]>.plan-menu-cuerpo{display:flex;flex-direction:column;position:absolute;right:0;bottom:calc(100% + var(--ipn-esp-2));width:max-content;max-width:80vw;padding:var(--ipn-esp-2);gap:var(--ipn-esp-1);background:var(--ipn-superficie);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio)}
 }
+
+/* Identidad y controles compactos, compartidos por los asistentes y el Lector. */
+.tramite-identidad{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+.tramite-identidad span{min-width:0}
+.tramite-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:0 var(--ipn-esp-3)}
+.tramite-datos>h3,.tramite-datos>.tramite-acciones{grid-column:1 / -1}
+.tramite-campo input:not([type=checkbox]),.tramite-campo select{min-height:2.25rem;padding:6px 8px}
+#sate-tramites .sate-btn,.tramite-datos .sate-btn{min-height:2.25rem;padding-inline:var(--ipn-esp-3);font:inherit}
+.saes-dlg .tramite-datos{font-size:1rem}
+.saes-dlg .tramite-acciones{position:static}

@@ -60,11 +60,16 @@ const SAES={
     document.addEventListener('click',e=>{if(!e.target.closest?.('[data-saes-open]'))return;e.preventDefault();SAES.open()});
     dl.querySelector('#saes-x').addEventListener('click',()=>SAES.close());
     dl.addEventListener('click',e=>{if(e.target===dl)SAES.close()});   // clic fuera de la ventana
-    const take=t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector IPN-tools. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
+    const take=async t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector IPN-tools. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
       if((d.unidad||'upiita')!==SAES.U()){msg.innerHTML='<span class="bad">Estos datos son del SAES de '+String(d.unidad||'upiita').toUpperCase()+'. Esta página es de la '+SAES.U().toUpperCase()+'.</span>';return}
-      SAES.save(d);paste.value='';msg.innerHTML='<span class="ok">Datos del SAES cargados.</span>';onLoad(d);setTimeout(()=>SAES.close(),900)};
-    paste.addEventListener('paste',e=>{e.preventDefault();take(e.clipboardData.getData('text'))});
-    paste.addEventListener('input',()=>{if(paste.value.trim().startsWith('{'))take(paste.value)});
+      const aceptar=()=>{SAES.save(d);paste.value='';msg.textContent='Datos del SAES cargados.';onLoad(d);setTimeout(()=>SAES.close(),900)};
+      if(globalThis.SATE){
+        try{await SATE.script('tramites.js');SateTramites.confirmarSaes(d,msg,aceptar)}
+        catch(e){console.error('Lector: confirmación no disponible',{fase:'identidad',error:e.name});msg.textContent='No se pudieron guardar tus datos. Intenta de nuevo.'}
+      }else aceptar();
+    };
+    paste.addEventListener('paste',e=>{e.preventDefault();return take(e.clipboardData.getData('text'))});
+    paste.addEventListener('input',()=>{if(paste.value.trim().startsWith('{'))return take(paste.value)});
     dl.querySelector('#saes-paste-clip').addEventListener('click',async e=>{
       const boton=e.currentTarget;
       let texto;
@@ -75,7 +80,7 @@ const SAES={
         // El permiso depende del navegador: conservar siempre el pegado manual.
         msg.textContent=boton.dataset.fallback;paste.focus();return;
       }
-      take(texto);
+      return take(texto);
     });
     // copiar el código: portapapeles moderno, luego execCommand; si ambos fallan, queda seleccionado para copiarlo a mano
     dl.querySelector('#saes-copybm').addEventListener('click',async e=>{const b=e.currentTarget,box=dl.querySelector('#saes-bmcode'),m=dl.querySelector('#saes-copymsg');
@@ -218,7 +223,7 @@ def card(bm_href, page="horarios", short="", u=None):
   </div>
   <ol start="3"><li><b>Pega aquí</b> <button class="btn primary" id="saes-paste-clip" type="button" data-fallback="{html.escape(textos['sate.lector.pegado_manual'], quote=True)}">{html.escape(textos['sate.lector.pegar'])}</button></li></ol>
   <textarea class="saes-paste" id="saes-paste" placeholder="Pega aquí tus datos del SAES (Ctrl+V)" aria-label="Pegar datos del SAES"></textarea>
-  <div class="actions" style="display:flex;gap:8px;align-items:center;margin-top:8px"><span id="saes-msg" aria-live="polite" style="font-size:.86rem"></span><button class="btn" id="saes-clear" type="button" style="margin-left:auto" hidden>Borrar mis datos</button></div>
+  <div class="actions" style="display:flex;gap:8px;align-items:center;margin-top:8px"><div id="saes-msg" aria-live="polite" style="flex:1;min-width:0;font-size:.86rem"></div><button class="btn" id="saes-clear" type="button" style="margin-left:auto" hidden>Borrar mis datos</button></div>
   {aviso}
   <p class="saes-note" style="margin:6px 0 0">Versión de la página: {version}</p>
 </dialog>
