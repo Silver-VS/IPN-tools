@@ -19,7 +19,7 @@
   window.SATE_UNIDAD = config[unidad] ? unidad : Object.keys(config)[0];
   const u = window.SATE_UNIDAD, cfg = config[u];
   let unidadRealce = inicial || recordada || new URLSearchParams(location.search).has('sateUnidad') ? u : null;
-  const raiz = document.documentElement, temaSistema = matchMedia('(prefers-color-scheme: dark)');
+  const raiz = document.documentElement, temaSistema = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: dark)') : { matches: false, addEventListener() {} };
   function aplicarRealce(id = unidadRealce) {
     unidadRealce = id;
     const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
@@ -34,7 +34,7 @@
     raiz.style.setProperty('--sate-sobre-realce', realce ? (1.05/(l+.05) >= (l+.05)/(negro+.05) ? '#ffffff' : '#18181b') : 'var(--sate-sobre-base)');
   }
   aplicarRealce();
-  new MutationObserver(() => aplicarRealce()).observe(raiz, {attributes:true,attributeFilter:['data-theme','data-tema']});
+  if (typeof MutationObserver === 'function') new MutationObserver(() => aplicarRealce()).observe(raiz, {attributes:true,attributeFilter:['data-theme','data-tema']});
   temaSistema.addEventListener('change', () => aplicarRealce());
   // plurales ICU mínimos del TOML: {n, plural, one {# materia} other {# materias}} (un nivel, «#» = el número)
   const reglaPlural = new Intl.PluralRules('es-MX'), numero = new Intl.NumberFormat('es-MX');
@@ -119,7 +119,7 @@
       document.body.classList.toggle('sate-flotante', escalon === 'flotante');
       // Si el cambio oculta el botón enfocado, conservar el foco en la navegación equivalente.
       if (escalon === 'flotante' && tabs.contains(foco)) barra.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
-      else if (escalon !== 'flotante' && !matchMedia('(max-width:720px)').matches && barra.contains(foco)) tabs.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
+      else if (escalon !== 'flotante' && !(typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches) && barra.contains(foco)) tabs.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
     }
     function programar() { if (!pendiente) { pendiente = true; requestAnimationFrame(calcular); } }
     new ResizeObserver(programar).observe(navegacion);

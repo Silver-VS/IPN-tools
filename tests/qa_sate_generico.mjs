@@ -94,7 +94,7 @@ for(const modo of ['actual','viejo','periodos','vacio']){
   function nodo(id=''){return {id,hidden:false,textContent:'',innerHTML:'',style:{},dataset:{},children:[],
     classList:{toggle(){}},setAttribute(){},removeAttribute(){},addEventListener(){},replaceChildren(){},appendChild(n){this.children.push(n)},
     querySelector:s=>nodo(s),querySelectorAll:()=>[],closest:()=>null};}
-  const document={readyState:'loading',addEventListener(){},getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
+  const document={readyState:'loading',documentElement:{getAttribute(){return null},setAttribute(){},style:{setProperty(){},removeProperty(){}}},addEventListener(){},getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
     querySelector:s=>document.getElementById(s),querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){
       if(!s.src)return;archivos.push(s.src);setImmediate(()=>{vm.runInContext(leer('web/dist/sate/'+s.src),c,{filename:s.src});s.onload()});
     }}};
