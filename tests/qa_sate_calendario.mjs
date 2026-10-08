@@ -114,7 +114,11 @@ assert.equal(nodos('calendario-detalle-evento').length,0,'El detalle respeta los
 document.getElementById('cal-vista-periodo').onclick();assert.equal(nodos('calendario-arco').length,0);assert.equal(nodos('calendario-proceso').length,0);
 assert.equal(nodos('calendario-pista').length,0,'Sin procesos no se dibujan pistas vacías');
 const css=leer('web/sate/componentes.css'), bloque=css.slice(css.indexOf('#sate-calendario{'),css.indexOf('.situacion-cifras'));
-assert.ok([...bloque.matchAll(/var\((--[^),]+)/g)].every(m=>m[1].startsWith('--ipn-')),'Solo tokens institucionales');
+assert.ok([...bloque.matchAll(/var\((--[^),]+)/g)].every(m=>m[1].startsWith('--ipn-')||m[1]==='--sate-realce'),'Tokens institucionales y realce local');
+for(const regla of bloque.matchAll(/([^{}]+)\{([^{}]+)\}/g))if(regla[2].includes('--sate-realce')){
+  assert.ok(regla[1].includes(':focus-visible'),'Realce reservado al foco');
+  assert.match(regla[2],/outline:2px solid var\(--sate-realce\)/);
+}
 assert.match(bloque,/@media\(max-width:720px\)/);assert.match(bloque,/\.calendario-anillo\{display:none\}/);assert.match(bloque,/\.calendario-banda\{display:block\}/);
 for(const categoria of categorias)assert.ok(bloque.includes(`color:var(--ipn-cal-${categoria})`),'Token categórico compartido: '+categoria);
 assert.match(bloque,/\[data-theme=dark\] #sate-calendario/);assert.match(bloque,/prefers-color-scheme:dark/);
@@ -193,7 +197,8 @@ SATE.calendario.hoy=()=> '2099-01-01';assert.equal(api.recorte('horarios').lengt
 c.DATA.calendario=null;assert.equal(api.proximos(1).length,0);assert.equal(api.recorte('mapa').length,0);
 for(const u of ['escom','upibi']){c.SATE_UNIDAD=u;assert.equal(api.recorte('trayectoria').length,0)}
 const recorteCSS=css.slice(css.indexOf('.sate-recorte-calendario{'),css.indexOf('/* Dos filas'));
-assert.ok([...recorteCSS.matchAll(/var\((--[^),]+)/g)].every(m=>m[1].startsWith('--ipn-')));
+assert.ok([...recorteCSS.matchAll(/var\((--[^),]+)/g)].every(m=>m[1].startsWith('--ipn-')||m[1]==='--sate-realce'));
+assert.match(recorteCSS,/\.sate-recorte-calendario:focus-visible\{outline:2px solid var\(--sate-realce\)/);
 assert.match(recorteCSS,/height:28px/);assert.match(recorteCSS,/white-space:nowrap/);
 console.log('Recortes: orden, filtro por pestaña/adeudos, cita SAES ficticia, +1, ausencia, repintado y clic al detalle del proceso/periodo. OK.');
 console.log(`Calendario: ${checks} eventos válidos; pistas sin solapamientos, guía exterior, leyenda, resaltado por cursor/foco, detalle inicial y respaldos, paleta con contraste AA claro/oscuro, filtros, mes/semana, hoy, teclado, continuidad y +N. OK.`);

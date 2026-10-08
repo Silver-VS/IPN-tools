@@ -96,7 +96,11 @@ const errorDef={id:'error-prueba',titulo:'Error',pasos:[{titulo:'Pregunta',campo
 const b=t.asistente(box,errorDef);box.todos().find(n=>n.textContent==='Continuar').click();assert.equal(b.modelo.paso,0);assert.equal(foco,box.querySelector('input'));b.destruir();
 const css=readFileSync('web/sate/componentes.css','utf8');assert.match(css,/@media\(min-width:1024px\)/);assert.match(css,/grid-template-columns:minmax\(0,1fr\)/);
 const cssVentanilla=css.slice(css.indexOf('.tramite-lista'),css.indexOf('.sate-recorte-calendario'));
-assert.ok(!/var\(--(?!ipn-)[\w-]+/.test(cssVentanilla));
+assert.ok(!/var\(--(?!ipn-|sate-realce\))[^),]+/.test(cssVentanilla));
+for(const regla of cssVentanilla.matchAll(/([^{}]+)\{([^{}]+)\}/g))if(regla[2].includes('--sate-realce')){
+  assert.ok(regla[1].includes(':focus-visible'),'Realce reservado al foco');
+  assert.match(regla[2],/outline:2px solid var\(--sate-realce\)/);
+}
 assert.match(cssVentanilla,/#sate-tramites button\{[^}]*max-width:100%[^}]*white-space:normal[^}]*overflow-wrap:anywhere/);
 assert.match(cssVentanilla,/\.tramite-acciones\{[^}]*position:sticky[^}]*safe-area-inset-bottom/);
 assert.match(cssVentanilla,/\.tramite-acciones button\{[^}]*min-width:0/);
