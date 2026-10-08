@@ -1,5 +1,5 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
-:root{--sate-realce:var(--ipn-acento)}
+:root{--sate-realce:var(--sate-acento-base);--sate-sobre-realce:var(--sate-sobre-base)}
 .sate-unidad{color:var(--sate-realce)}
 .tramite-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:var(--ipn-esp-4)}
 .tramite-tarjeta{border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-4);background:var(--ipn-superficie);overflow-wrap:anywhere}
@@ -29,7 +29,7 @@
 .tramite-campo textarea{min-height:8rem;resize:vertical}
 .tramite-campo input[type=checkbox]{width:auto;align-self:flex-start}
 :is(.tramite-campo input,.tramite-campo textarea,.tramite-chips button,.tramite-acciones button):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
-.tramite-chips [aria-pressed=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);border-color:var(--ipn-acento)}
+.tramite-chips [aria-pressed=true]{background:var(--ipn-acento);color:var(--sate-sobre-realce);border-color:var(--ipn-acento)}
 .electivas-actividad{box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
 .electivas-resumen{position:sticky;top:0;z-index:1;background:var(--ipn-superficie);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control)}
 .tramite-compuesto details button{display:block;text-align:left;max-width:100%;white-space:normal;margin-block:var(--ipn-esp-2)}
@@ -93,7 +93,7 @@ body.sate-flotante #sate-tabs{display:none}
   .header-actions .enc-btn span,.header-actions .ipnt-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 }
 /* Paleta local: los tokens comunes aún no ofrecen seis categorías ni data-theme. */
-#sate-calendario{--ipn-cal-academico:var(--ipn-acento);--ipn-cal-gestion:var(--ipn-info);--ipn-cal-becas:var(--ipn-ok);--ipn-cal-servicios:#086e79;--ipn-cal-tt:#7544a5;--ipn-cal-feriado:var(--ipn-aviso);color:var(--ipn-texto);min-width:0}
+#sate-calendario{--ipn-cal-gestion:var(--ipn-info);--ipn-cal-becas:var(--ipn-ok);--ipn-cal-servicios:#086e79;--ipn-cal-tt:#7544a5;--ipn-cal-feriado:var(--ipn-aviso);color:var(--ipn-texto);min-width:0}
 @media(prefers-color-scheme:dark){
   :root:not([data-theme=light]) #sate-calendario{--ipn-cal-gestion:#8db6f5;--ipn-cal-servicios:#5dd8df;--ipn-cal-tt:#c6a0ee;--ipn-cal-feriado:#f5c56b}
 }
@@ -230,7 +230,7 @@ button.sate-chip{cursor:pointer}
 
 /* botones */
 .sate-btn{min-height:2.5rem;padding:0 var(--ipn-esp-4);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);cursor:pointer;font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
-.sate-btn--primario{background:var(--ipn-acento);border-color:var(--ipn-acento);color:var(--ipn-sobre-acento)}
+.sate-btn--primario{background:var(--ipn-acento);border-color:var(--ipn-acento);color:var(--sate-sobre-realce)}
 
 /* modal */
 .sate-modal{box-sizing:border-box;width:min(36rem,calc(100vw - var(--ipn-esp-5)));max-height:calc(100dvh - var(--ipn-esp-6));padding:0;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);overflow:hidden}

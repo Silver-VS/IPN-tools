@@ -71,7 +71,7 @@ de N y excluye las de N y las acreditadas reales o simuladas; no modifica el SAE
 La oferta futura no se conoce y la carga mostrada es una referencia con los datos
 disponibles, pendiente de confirmación en la cita correspondiente.
 Si no hay periodo conocido por SAES ni calendario, las claves opcionales son
-`proximo` y `siguiente`, mostradas como «Periodo N» y «Periodo N+1».
+`proximo` y `siguiente`, mostradas como «el próximo periodo» y «el periodo siguiente».
 La selección de `siguiente` se recupera cuando se conoce el periodo de destino.
 
 ## Fusión

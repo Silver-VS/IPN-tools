@@ -19,7 +19,7 @@ const perLabel=()=>{if(isPersonal()){const t=perMeta(),n=semNow(),out=[];if(t!=n
 async function drawSchedule(part,k=3){
   await document.fonts?.ready;
   // paleta clara u oscura (opción «Tema de la imagen y el PDF»)
-  const DK=EXP.dark, D=scheduleData(),W=1400,PAD=48,F='"Noto Sans",system-ui,sans-serif',ACC=DK?'#b64a7c':'#750946',INK=DK?'#ece6e9':'#231f20',MUT=DK?'#a9a0a5':'#5c575a',LINE=DK?'#3a3237':'#e3dade',
+  const DK=EXP.dark, D=scheduleData(),W=1400,PAD=48,F='"Noto Sans",system-ui,sans-serif',ACC=SATE_CONFIG.unidades[UNIDAD]?.realce?.[DK?'oscuro':'claro']||getComputedStyle(document.documentElement).getPropertyValue('--sate-acento-base').trim(),INK=DK?'#ece6e9':'#231f20',MUT=DK?'#a9a0a5':'#5c575a',LINE=DK?'#3a3237':'#e3dade',
     BG=DK?'#17141a':'#ffffff', BAND=DK?'#211c22':'#f6f4f5', blkBg=h=>DK?`hsl(${h} 28% 24%)`:`hsl(${h} 45% 90%)`, blkBar=h=>DK?`hsl(${h} 55% 62%)`:`hsl(${h} 45% 38%)`;
   const ownFill=(x,y,w,h)=>{g.fillStyle=EXP.own;if(DK)g.globalAlpha=.32;g.fillRect(x,y,w,h);g.globalAlpha=1};
   const allSlots=[...D.sel.flatMap(c=>c[6]),...D.own.flatMap(o=>o.d.map(d=>[d,o.a,o.b]))];

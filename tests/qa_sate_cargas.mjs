@@ -87,6 +87,17 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
   assert.equal(nodos.get('#plan-supuesto').hidden,true,'supuesto oculto en N');
   assert.equal(nodos.get('#mapcut').hidden,true,'A: sin SAES la fila contiene solo planeación');
   assert.match(nodos.get('#plan-resumen').innerHTML,/Elige en el mapa las materias que quieres cursar en/,'bandeja vacía orienta al alumno');
+  // Sin SAES se usa el calendario; sin ninguna referencia se muestran textos neutros.
+  const periodoCalendario=vm.runInContext('planEtiqueta(0)',contexto);
+  assert.ok(nodos.get('#plan-resumen').innerHTML.includes(periodoCalendario));
+  assert.ok(!/Periodo N/.test(nodos.get('#plan-resumen').innerHTML+nodos.get('#b-go').innerHTML+nodos.get('#b-none').innerHTML));
+  const calendario=datos.calendario;
+  datos.calendario=null;api.renderTray();
+  assert.match(nodos.get('#plan-resumen').innerHTML,/en el próximo periodo/);
+  assert.match(nodos.get('#b-go').innerHTML,/>Ir a horarios<\/span>/);
+  assert.match(nodos.get('#b-none').innerHTML,/>Quitar todas<\/span>/);
+  for(const n of nodos.values())assert.ok(!/Periodo N(?:\+1)?\b/.test(n.innerHTML+n.textContent),'Sin marcadores visibles: '+n.id);
+  datos.calendario=calendario;api.renderTray();
   vm.runInContext(`const elegible=Object.keys(cur()).find(k=>!isElec(k));toggleBox(elegible)`,contexto);
   assert.match(nodos.get('#plan-resumen').innerHTML,/1 materia · [\d.,]+(?: de [\d.,]+)? créditos para/,'selección actualiza resumen');
   assert.match(nodos.get('#plan-resumen').innerHTML,/class="sate-texto-corto">1 materia · [\d.,]+(?:\/[\d.,]+)? cr/,'F: resumen móvil abreviado');
