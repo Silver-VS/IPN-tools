@@ -78,9 +78,9 @@ for (const unidad of ['upiita','escom','upibi','esimez','desconocida','enba']) {
 const estilosIdentidad=leer('web/sate/componentes.css');
 assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*max-height:36px;[^}]*width:auto;height:auto;[^}]*object-fit:contain;/);
 assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*background:#fff/);   // sin ficha blanca: halo del color de la unidad (dueño)
-assert.doesNotMatch(estilosIdentidad,/drop-shadow\(/);
+assert.match(estilosIdentidad,/\.sate-logo-halo img\{filter:drop-shadow\(0 0 9px [^}]*var\(--halo\)[^}]*drop-shadow\(0 0 18px [^}]*var\(--halo\)/);   // opción B del dueño: contorno amplio y tenue
 assert.match(estilosIdentidad,/\.sate-logo-halo\{[^}]*position:relative;display:inline-grid;place-items:center;[^}]*isolation:isolate;overflow:visible/);
-assert.match(estilosIdentidad,/\.sate-logo-halo::before\{[^}]*position:absolute;inset:-40%;[^}]*radial-gradient\(closest-side,transparent 45%,color-mix\(in srgb,var\(--halo\) 45%,transparent\) 62%,transparent 100%\);z-index:-1;pointer-events:none/);
+assert.match(estilosIdentidad,/\.sate-logo-halo::before\{content:none\}/);
 assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient/);   // el degradado se veía dentro del logo (dueño)
 assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
 assert.match(estilosIdentidad,/@media\(max-width:720px\)\{\s*#sate-titulo \.sate-logo-unidad\{max-height:28px\}/);
