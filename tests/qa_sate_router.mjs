@@ -8,11 +8,13 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
   let cambioUnidad = 0;
   function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
-  const location = {hash:hashInicial,pathname:'/sate/index.html',search:'?x=1',reload(){cambioUnidad++}};
+  const realces = {};
+  const raiz = {getAttribute(){return null},style:{setProperty(k,v){realces[k]=v}}};
+  const location = {hash:hashInicial,pathname:'/sate/index.html',search:'?x=1',reload(){assert.equal(realces['--sate-realce'],config.escom.realce.claro,'El realce cambia antes de recargar módulos');cambioUnidad++}};
   let c;
   const api = {store:{get:(k,d)=>guardado[k]??d,set:(k,v)=>guardado[k]=v},personal:()=>personal,estado:{car:'B'},
     renderTop(){},renderAviso(){},renderTray(){vistos.push('tray')},renderHor(){vistos.push('hor')},ofertaLista(){}};
-  const document = {getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
+  const document = {documentElement:raiz,getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
     addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){
       archivos.push(s.src);
       setImmediate(()=>{
@@ -26,6 +28,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
       });
     }}};
   c = vm.createContext({console,URLSearchParams,document,location,setTimeout,clearTimeout,
+    matchMedia:()=>({matches:false,addEventListener(){}}),MutationObserver:class{observe(){}},
     navigator:{connection:{saveData:true}},localStorage:{getItem:()=>null},IPNT:{set:(k,v)=>guardado[k]=v},
     SATE_CONFIG:{unidades:config,textos:{}},history:{replaceState(a,b,url){location.hash=url.slice(url.indexOf('#'))}},
     addEventListener:(n,f)=>eventos[n]=f,
@@ -91,8 +94,9 @@ for (const unidad of unidades) {
   const cfg=structuredClone(config);
   for(const u of unidades) Object.assign(cfg[u.id],{nombre:u.nombre,siglas:u.siglas});
   const c=vm.createContext({URLSearchParams,console,SATE_CONFIG:{unidades:cfg,textos:{}},
+    matchMedia:()=>({matches:false,addEventListener(){}}),MutationObserver:class{observe(){}},
     location:{hash:'#/'+unidad.id+'/mapa',search:''},localStorage:{getItem:()=>null},
-    document:{getElementById:()=>({appendChild(){},addEventListener(){}}),addEventListener(){},querySelector:s=>s==='.inst-name'?nombre:s==='.inst-in'?cabecera:null,
+    document:{documentElement:{getAttribute(){return null},style:{setProperty(){}}},getElementById:()=>({appendChild(){},addEventListener(){},replaceChildren(){}}),addEventListener(){},querySelector:s=>s==='.inst-name'?nombre:s==='.inst-in'?cabecera:null,
       createElement:()=>({children:[],appendChild(n){this.children.push(n)}})},
     SateUI:{usarTextos(){},ayuda(){return {querySelector:()=>({setAttribute(){}})}}},fetch:()=>new Promise(()=>{})});
   vm.runInContext('window=globalThis',c);

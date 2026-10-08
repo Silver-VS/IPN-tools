@@ -76,7 +76,7 @@ assert.match(css,/\.sate-barra__btn \.sate-pestana__texto\{white-space:nowrap;ov
 assert.match(css,/#sate-saes-indicador::before\{[^}]*border:2px solid var\(--ipn-tenue\)/);
 assert.match(css,/#sate-saes-indicador.on::before\{background:var\(--ipn-ok\);border-color:var\(--ipn-ok\)/);
 assert.match(css,/\.sate-datos \.saes-open::before\{content:none\}/);
-assert.match(css,/\.sate-datos \.btn[^}]*\):focus-visible\{outline:2px solid var\(--ipn-acento\)/);
+assert.match(css,/\.sate-datos \.btn[^}]*\):focus-visible\{outline:2px solid var\(--sate-realce\)/);
 // Ejecutar el adaptador real con geometría controlada, sin navegador ni red.
 {
 const adaptador = inicio.slice(inicio.indexOf('  function adaptarPestanas()'),inicio.indexOf('  function elegirUnidad()'));

@@ -70,7 +70,7 @@ assert.equal(c.SateRutas.ruta('#/upiita/tramites/ets','upiita',config.unidades),
 const css=leer('web/sate/componentes.css');
 assert.match(css,/\[data-pestanas=v3\] \.sate-pestana__icono\{display:none/);
 assert.match(css,/\[data-pestanas\] \.sate-barra \.sate-pestana__icono\{display:inline-flex/);
-assert.match(css,/aria-selected=true\]::after.*background:var\(--ipn-acento\)/);
+assert.match(css,/aria-selected=true\]::after.*background:var\(--sate-realce\)/);
 assert.match(css,/\.sate-grupo-inicio::before.*width:1px/);
 assert.match(css,/\.sate-pestana:focus-visible,\.sate-barra__btn:focus-visible,\.trayectoria-minimapa button:focus-visible/);
 assert.ok(css.includes('.trayectoria-resumen{grid-column:1 / -1}'));   // resumen a todo el ancho
@@ -82,6 +82,54 @@ const temas=[...fuente.matchAll(/(?:^:root|:root\[data-theme="dark"\]|:root:not\
 assert.equal(temas.length,3);
 const lum=hex=>hex.slice(1).match(/../g).map(h=>parseInt(h,16)/255).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,i)=>s+v*[.2126,.7152,.0722][i],0);
 const contraste=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
+// El catálogo es la única fuente de color; superficies efectivas del cascarón y tokens comunes.
+const catalogo=JSON.parse(leer('data/sate.json')).unidades;
+assert.equal(fuente.match(/--accent:(#[\da-f]+);/)[1],'#750946','Guinda institucional intacto');
+const tokens=leer('vendor/ipn-comun/dist/tokens.css');
+for(const [i,modo] of ['claro','oscuro'].entries()){
+  const tema=temas[i];
+  for(const fondo of ['bg','surface']){
+    const token=fondo==='bg'?'fondo':'superficie';
+    assert.ok(tokens.includes(`--ipn-${token}: ${tema[fondo]};`),'Superficie real compartida: '+token);
+    for(const [u,cfg] of Object.entries(catalogo)){
+      const ratio=contraste(cfg.realce[modo],tema[fondo]);
+      assert.ok(ratio>=4.5,`${u}/${modo}/${token}: texto AA, contraste ${ratio}`);
+      assert.ok(ratio>=3,`${u}/${modo}/${token}: elementos gráficos, contraste ${ratio}`);
+    }
+  }
+}
+// Ejecutar las funciones reales de realce y selector con DOM ficticio, sin red ni navegador.
+{
+  const inicio=leer('web/sate/inicio.js'), atributos={}, valores={}, botones=[];
+  let observador, cambioSistema, recargas=0;
+  const raiz={getAttribute:k=>atributos[k]??null,style:{setProperty(k,v){valores[k]=v}}};
+  const sistema={matches:false,addEventListener(k,f){assert.equal(k,'change');cambioSistema=f}};
+  const c=vm.createContext({config:catalogo,u:'upiita',inicial:null,recordada:null,URLSearchParams,
+    location:{search:'',hash:'',reload(){recargas++}},document:{documentElement:raiz,createElement(){return {appendChild(b){botones.push(b)}}}},
+    matchMedia:()=>sistema,MutationObserver:class{constructor(f){observador=f}observe(n,o){assert.equal(n,raiz);assert.equal(o.attributeFilter.join(','),'data-theme,data-tema')}},
+    api:null,SateUI:{modal(){},cerrarModal(){}}});
+  vm.runInContext(inicio.slice(inicio.indexOf('  let unidadRealce'),inicio.indexOf('  // plurales ICU')),c);
+  assert.equal(valores['--sate-realce'],'var(--ipn-acento)','Sin unidad: guinda');
+  const elegir=inicio.slice(inicio.indexOf('  function elegirUnidad()'),inicio.indexOf('  async function activar('));
+  vm.runInContext(elegir+'\nelegirUnidad();',c);
+  for(const [i,u] of Object.keys(catalogo).entries()){
+    // El callback modifica el color en el documento actual antes de pedir la recarga histórica.
+    c.location.reload=()=>{assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);recargas++};
+    botones[i].onclick();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    atributos['data-theme']='light';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    delete atributos['data-theme'];atributos['data-tema']='oscuro';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    atributos['data-tema']='claro';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    delete atributos['data-tema'];sistema.matches=true;cambioSistema();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    sistema.matches=false;cambioSistema();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+  }
+  assert.equal(recargas,2,'Se conserva aislamiento de módulos al cambiar unidad');
+  c.aplicarRealce(null);atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],'var(--ipn-acento)');
+  assert.match(css,/\.sate-unidad\{color:var\(--sate-realce\)\}/);
+  assert.match(css,/header\.top\{[^}]*border-top:2px solid var\(--sate-realce\)/);
+  assert.match(css,/\.sate-barra__btn\[aria-current=page\]::after\{[^}]*background:var\(--sate-realce\)/);
+  console.log('Realce: AA por unidad/superficie/tema, selector inmediato, guinda sin unidad y cambios de tema/sistema. OK.');
+}
 for(const tema of temas)for(const fondo of ['surface','sunken']){
   for(const frente of ['fg','muted','accent'])assert.ok(contraste(tema[frente],tema[fondo])>=4.5,`${frente}/${fondo}: AA`);
   for(const frente of ['ok','accent','muted','ipn-reprobada','ipn-desfasada'])assert.ok(contraste(tema[frente],tema[fondo])>=3,`${frente}/${fondo}: puntos y foco`);
@@ -98,6 +146,7 @@ const mini=ctx.minimapaCurricular();
 assert.deepEqual(JSON.parse(JSON.stringify(mini.cnt)),{done:1,curso:1,pend:2,fail:1,late:2});
 assert.equal((mini.svg.match(/data-estado="late"/g)||[]).length,2,'Desfase tiene prioridad sobre reprobación');
 assert.match(mini.svg,/data-estado="fail"[^>]+fill="var\(--ipn-reprobada\)"/);
+assert.match(mini.svg,/data-estado="curso"[^>]+fill="var\(--sate-realce\)"/);
 assert.match(mini.svg,/data-estado="late"[^>]+fill="var\(--ipn-desfasada\)"/);
 assert.match(mini.leyenda,/2 desfasadas/);
 assert.match(ctx.minimapaCurricular(null).svg,/<circle/,'También hay minimapa sin trazado PDF');

@@ -18,6 +18,17 @@
   const unidad = inicial?.unidad || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || recordada || 'upiita';
   window.SATE_UNIDAD = config[unidad] ? unidad : Object.keys(config)[0];
   const u = window.SATE_UNIDAD, cfg = config[u];
+  let unidadRealce = inicial || recordada || new URLSearchParams(location.search).has('sateUnidad') ? u : null;
+  const raiz = document.documentElement, temaSistema = matchMedia('(prefers-color-scheme: dark)');
+  function aplicarRealce(id = unidadRealce) {
+    unidadRealce = id;
+    const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
+    const oscuro = tema ? tema === 'dark' || tema === 'oscuro' : temaSistema.matches;
+    raiz.style.setProperty('--sate-realce', config[id]?.realce?.[oscuro ? 'oscuro' : 'claro'] || 'var(--ipn-acento)');
+  }
+  aplicarRealce();
+  new MutationObserver(() => aplicarRealce()).observe(raiz, {attributes:true,attributeFilter:['data-theme','data-tema']});
+  temaSistema.addEventListener('change', () => aplicarRealce());
   // plurales ICU mínimos del TOML: {n, plural, one {# materia} other {# materias}} (un nivel, «#» = el número)
   const reglaPlural = new Intl.PluralRules('es-MX'), numero = new Intl.NumberFormat('es-MX');
   const plurales = (s, vars) => s.replace(/\{(\w+),\s*plural,\s*((?:[^{}]*\{[^{}]*\})+)\s*\}/g, (m, k, cuerpo) => {
@@ -115,7 +126,7 @@
     const caja = document.createElement('div');
     for (const [id, c] of Object.entries(config)) {
       const b = document.createElement('button'); b.className = 'btn'; b.textContent = c.siglas;
-      b.onclick = () => { if (api) IPNT.set('ipnt.unidad', id); location.hash = '#/' + id + '/mapa'; if (id !== u) location.reload(); else SateUI.cerrarModal(); };
+      b.onclick = () => { aplicarRealce(id); if (api) IPNT.set('ipnt.unidad', id); location.hash = '#/' + id + '/mapa'; if (id !== u) location.reload(); else SateUI.cerrarModal(); };
       caja.appendChild(b);
     }
     const ayuda = document.createElement('p'); ayuda.textContent = '¿Tu unidad no aparece? Usa el Lector desde tu SAES. Guarda el marcador, ejecútalo en tu sesión y abre SATE desde el resumen; después pega tus datos.';
@@ -126,6 +137,7 @@
   }
   async function activar(r) {
     if (!r || !api) return;
+    if (unidadRealce || r.unidad !== u) aplicarRealce(r.unidad);
     if (r.unidad !== u) { IPNT.set('ipnt.unidad', r.unidad); location.reload(); return; }
     const v = ++version;
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
@@ -180,7 +192,8 @@
       if (!inicial && !recordada && !new URLSearchParams(location.search).has('sateUnidad')) elegirUnidad();
     }
   };
-  document.getElementById('sate-titulo').textContent = texto('sate.siglas') + ' ' + cfg.siglas;
+  const siglasUnidad = document.createElement('span'); siglasUnidad.className = 'sate-unidad'; siglasUnidad.textContent = cfg.siglas;
+  document.getElementById('sate-titulo').replaceChildren(texto('sate.siglas') + ' ', siglasUnidad);
   if (cfg.leyenda) {
     const ayuda = SateUI.ayuda('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas});
     const boton = ayuda.querySelector('button');

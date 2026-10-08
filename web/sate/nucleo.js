@@ -491,7 +491,7 @@ function minimapaCurricular(L=MAP().layout,FILL,op={}){
   }
   FILL=FILL||slotFill(L,new Set());
   const {nPend=0,FOCO=null}=op,bands=rowBands(L);
-  const colores={done:'var(--ipn-ok)',curso:'var(--ipn-acento)',pend:'var(--ipn-tenue)',fail:'var(--ipn-reprobada)',late:'var(--ipn-desfasada)'};
+  const colores={done:'var(--ipn-ok)',curso:'var(--sate-realce)',pend:'var(--ipn-tenue)',fail:'var(--ipn-reprobada)',late:'var(--ipn-desfasada)'};
   const cnt={done:0,curso:0,pend:0,fail:0,late:0};
   const estado=st=>st==='done'?'done':st.startsWith('curso')?'curso':st.startsWith('late')?'late':st.includes('fail')?'fail':'pend';
   let svg=`<svg viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true" focusable="false">`;
