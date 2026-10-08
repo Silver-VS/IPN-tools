@@ -63,7 +63,8 @@ for (const unidad of ['upiita','escom','esimez','desconocida','enba']) {
 const estilosIdentidad=leer('web/sate/componentes.css');
 assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*max-height:36px;[^}]*width:auto;height:auto;[^}]*object-fit:contain;/);
 assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*background:#fff/);   // sin ficha blanca: halo del color de la unidad (dueño)
-assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient\([^}]*var\(--sate-realce\)[^}]*filter:drop-shadow\([^}]*var\(--sate-realce\)/);
+assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*filter:drop-shadow\([^}]*var\(--sate-realce\)/);
+assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient/);   // el degradado se veía dentro del logo (dueño)
 assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
 assert.match(estilosIdentidad,/@media\(max-width:720px\)\{\s*#sate-titulo \.sate-logo-unidad\{max-height:28px\}/);
 const interaccion = inicio.slice(inicio.indexOf('  if (cfg.leyenda) {'), inicio.indexOf('  const nombreUnidad'));
