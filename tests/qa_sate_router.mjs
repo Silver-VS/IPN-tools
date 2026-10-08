@@ -7,7 +7,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
  for(const personal of (hashInicial? [false]:[false,true])) {
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
   let cambioUnidad = 0;
-  function nodo(id='') { return {id,hidden:false,textContent:'',setAttribute(){},prepend(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
+  function nodo(id='') { return {id,hidden:false,textContent:'',dataset:{},style:{setProperty(){}},setAttribute(){},prepend(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
   const realces = {};
   const raiz = {getAttribute(){return null},style:{setProperty(k,v){realces[k]=v}}};
   const location = {hash:hashInicial,pathname:'/sate/index.html',search:'?x=1',reload(){assert.equal(realces['--sate-realce'],config.escom.realce.claro,'El realce cambia antes de recargar módulos');cambioUnidad++}};
@@ -97,7 +97,7 @@ for (const unidad of unidades) {
     matchMedia:()=>({matches:false,addEventListener(){}}),MutationObserver:class{observe(){}},
     location:{hash:'#/'+unidad.id+'/mapa',search:''},localStorage:{getItem:()=>null},
     document:{documentElement:{getAttribute(){return null},style:{setProperty(){}}},getElementById:()=>({appendChild(){},addEventListener(){},replaceChildren(){}}),addEventListener(){},querySelector:s=>s==='.inst-name'?nombre:s==='.inst-in'?cabecera:null,
-      createElement:()=>({children:[],appendChild(n){this.children.push(n)}})},
+      querySelectorAll:()=>[],createElement:()=>({dataset:{},style:{setProperty(){}},children:[],appendChild(n){this.children.push(n)}})},
     SateUI:{usarTextos(){},ayuda(){return {querySelector:()=>({setAttribute(){}})}}},fetch:()=>new Promise(()=>{})});
   vm.runInContext('window=globalThis',c);
   vm.runInContext(readFileSync('web/sate/rutas.js','utf8'),c);

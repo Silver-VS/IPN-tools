@@ -20,6 +20,12 @@
   const u = window.SATE_UNIDAD, cfg = config[u];
   let unidadRealce = inicial || recordada || new URLSearchParams(location.search).has('sateUnidad') ? u : null;
   const raiz = document.documentElement, temaSistema = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: dark)') : { matches: false, addEventListener() {} };
+  function colorHalo(id) {
+    const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
+    const oscuro = tema ? tema === 'dark' || tema === 'oscuro' : temaSistema.matches;
+    const realce = config[id]?.realce || SATE_CONFIG.identidadUnidades?.[id]?.realce;
+    return realce?.[oscuro ? 'oscuro' : 'claro'] || 'var(--sate-acento-base)';
+  }
   function aplicarRealce(id = unidadRealce) {
     unidadRealce = id;
     const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
@@ -32,6 +38,7 @@
     const l = realce ? luminancia(realce) : null, negro = luminancia('#18181b');
     raiz.style.setProperty('--sate-realce', realce || 'var(--sate-acento-base)');
     raiz.style.setProperty('--sate-sobre-realce', realce ? (1.05/(l+.05) >= (l+.05)/(negro+.05) ? '#ffffff' : '#18181b') : 'var(--sate-sobre-base)');
+    for (const halo of document.querySelectorAll('.sate-logo-halo')) halo.style.setProperty('--halo', colorHalo(halo.dataset.unidad));
   }
   aplicarRealce();
   if (typeof MutationObserver === 'function') new MutationObserver(() => aplicarRealce()).observe(raiz, {attributes:true,attributeFilter:['data-theme','data-tema']});
@@ -130,10 +137,13 @@
     programar();
   }
   function logoUnidad(id, nombre) {
+    const halo = document.createElement('span'); halo.className = 'sate-logo-halo'; halo.dataset.unidad = id;
+    halo.style.setProperty('--halo', colorHalo(id));
     const img = document.createElement('img'); img.className = 'sate-logo-unidad';
     img.src = '../assets/logos/unidades/' + (SATE_CONFIG.identidadUnidades?.[id]?.logo || 'ipn') + '.webp';
-    img.alt = nombre; img.onerror = () => { img.hidden = true; };
-    return img;
+    img.alt = nombre; img.onerror = () => { halo.hidden = true; img.hidden = true; };
+    halo.appendChild(img);
+    return halo;
   }
   function elegirUnidad() {
     const caja = document.createElement('div');

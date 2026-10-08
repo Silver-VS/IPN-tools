@@ -28,42 +28,59 @@ assert.ok(!html.includes('/*__SATE_'));
 const inicio = leer('web/sate/inicio.js');
 // Identidad publicada y comportamiento real del arranque, con DOM local en memoria.
 assert.deepEqual(config.identidadUnidades, JSON.parse(leer('data/unidades_identidad.json')).unidades);
-for (const unidad of ['upiita','escom','esimez','desconocida','enba']) {
+assert.equal(config.identidadUnidades.escom.logo,'escom-saes');
+assert.equal(config.identidadUnidades.upibi.logo,'upibi-saes');
+for (const unidad of ['upiita','escom','upibi','esimez','desconocida','enba']) {
   const valores={}, atributos={}, titulo={replaceChildren(...n){this.children=n}};
+  const halos=[];
   const documento={querySelector:()=>null,getElementById:()=>titulo,
+    querySelectorAll:()=>halos,
     documentElement:{getAttribute:k=>atributos[k],style:{setProperty(k,v){valores[k]=v}}},
-    createElement:tag=>({tag,children:[],prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)}})};
+    createElement:tag=>{const n={tag,dataset:{},style:{setProperty(k,v){this[k]=v}},children:[],prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)}};if(tag==='span')halos.push(n);return n}};
   let selector;
   const c=vm.createContext({SATE_CONFIG:structuredClone(config),SateRutas:{ruta:()=>({unidad})},
     URLSearchParams,localStorage:{getItem:()=>null},location:{hash:'#/'+unidad+'/mapa',search:''},window:{},
     document:documento,texto,SateUI:{modal(t,n){selector=n}}});
-  vm.runInContext(inicio.slice(0,inicio.indexOf('  // plurales ICU'))+'\nglobalThis.aplicarRealce=aplicarRealce;})();',c);
+  vm.runInContext(inicio.slice(0,inicio.indexOf('  // plurales ICU'))+'\nglobalThis.aplicarRealce=aplicarRealce;globalThis.colorHalo=colorHalo;})();',c);
   vm.runInContext('const config=SATE_CONFIG.unidades,u=window.SATE_UNIDAD,cfg=config[u];let api;',c);
   vm.runInContext(inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar(')),c);
   vm.runInContext(inicio.slice(inicio.indexOf('  const siglasUnidad'),inicio.indexOf('  if (cfg.leyenda)')),c);
-  const img=titulo.children[0];
+  const halo=titulo.children[0],img=halo.children[0];
+  assert.equal(halo.tag,'span');assert.equal(halo.className,'sate-logo-halo');
   assert.equal(img.tag,'img');assert.equal(img.className,'sate-logo-unidad');
   assert.equal(img.src,'../assets/logos/unidades/'+(config.identidadUnidades[unidad]?.logo||'ipn')+'.webp');
   assert.equal(img.alt,c.SATE_CONFIG.unidades[unidad].nombre);
   assert.equal(titulo.children[1],'SATE ');assert.equal(titulo.children[2].textContent,c.SATE_CONFIG.unidades[unidad].siglas);
-  img.onerror();assert.equal(img.hidden,true,unidad+': imagen fallida oculta');
+  img.onerror();assert.equal(img.hidden,true,unidad+': imagen fallida oculta');assert.equal(halo.hidden,true);
   const realce=config.unidades[unidad]?.realce||config.identidadUnidades[unidad]?.realce;
   assert.equal(valores['--sate-realce'],realce?.claro||'var(--sate-acento-base)',unidad+': tema claro');
+  assert.equal(halo.style['--halo'],realce?.claro||'var(--sate-acento-base)');
   atributos['data-theme']='dark';
   c.aplicarRealce(unidad);
   assert.equal(valores['--sate-realce'],realce?.oscuro||'var(--sate-acento-base)',unidad+': tema oscuro');
+  assert.equal(halo.style['--halo'],realce?.oscuro||'var(--sate-acento-base)');
   vm.runInContext('elegirUnidad();',c);
   for (const [i,id] of Object.keys(c.SATE_CONFIG.unidades).entries()) {
-    const boton=selector.children[i],icono=boton.children[0];
+    const boton=selector.children[i],aro=boton.children[0],icono=aro.children[0];
+    const propio=config.unidades[id]?.realce||config.identidadUnidades[id]?.realce;
+    assert.equal(aro.style['--halo'],propio?.oscuro||'var(--sate-acento-base)',id+': aro propio oscuro');
     assert.equal(boton.textContent,c.SATE_CONFIG.unidades[id].siglas);
     assert.equal(icono.src,'../assets/logos/unidades/'+(config.identidadUnidades[id]?.logo||'ipn')+'.webp');
     icono.onerror();assert.equal(icono.hidden,true);
+  }
+  assert.notEqual(selector.children[0].children[0].style['--halo'],selector.children[1].children[0].style['--halo']);
+  atributos['data-theme']='light';c.aplicarRealce(unidad);
+  for (const [i,id] of Object.keys(c.SATE_CONFIG.unidades).entries()) {
+    const propio=config.unidades[id]?.realce||config.identidadUnidades[id]?.realce;
+    assert.equal(selector.children[i].children[0].style['--halo'],propio?.claro||'var(--sate-acento-base)',id+': aro propio claro tras cambio');
   }
 }
 const estilosIdentidad=leer('web/sate/componentes.css');
 assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*max-height:36px;[^}]*width:auto;height:auto;[^}]*object-fit:contain;/);
 assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*background:#fff/);   // sin ficha blanca: halo del color de la unidad (dueño)
-assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*filter:drop-shadow\([^}]*var\(--sate-realce\)/);
+assert.match(estilosIdentidad,/\.sate-logo-halo img\{filter:drop-shadow\(0 0 9px [^}]*var\(--halo\)[^}]*drop-shadow\(0 0 18px [^}]*var\(--halo\)/);   // opción B del dueño: contorno amplio y tenue
+assert.match(estilosIdentidad,/\.sate-logo-halo\{[^}]*position:relative;display:inline-grid;place-items:center;[^}]*isolation:isolate;overflow:visible/);
+assert.match(estilosIdentidad,/\.sate-logo-halo::before\{content:none\}/);
 assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient/);   // el degradado se veía dentro del logo (dueño)
 assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
 assert.match(estilosIdentidad,/@media\(max-width:720px\)\{\s*#sate-titulo \.sate-logo-unidad\{max-height:28px\}/);
