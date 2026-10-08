@@ -640,7 +640,8 @@ function renderSide0(){
   if(menu.dataset.telefono!==String(MQ_PHONE.matches)){menu.dataset.telefono=String(MQ_PHONE.matches);menu.open=!MQ_PHONE.matches}
   menu.querySelector('summary').textContent='⋯';menu.querySelector('summary').setAttribute('aria-label',tx('acciones'));
   $('#b-sugg').textContent=tx('agregar');$('#b-go').hidden=false;
-  etiqueta('#b-go',tx('horarios',{periodo:planEtiqueta(0)}),tx('horarios_corto'));etiqueta('#b-none',tx('quitar_activo',{periodo:planEtiqueta(PLAN_PASO)}),tx('quitar_corto'));
+  const periodoConocido=planInicio()!=null;
+  etiqueta('#b-go',tx(periodoConocido?'horarios':'horarios_neutro',{periodo:planEtiqueta(0)}),tx('horarios_corto'));etiqueta('#b-none',tx(periodoConocido?'quitar_activo':'quitar_corto',{periodo:planEtiqueta(PLAN_PASO)}),tx('quitar_corto'));
   $('#plan-activo').hidden=$('#plan-leyenda').hidden=!PLAN_DOS_PERIODOS;
   $('#chosen').classList.toggle('un-periodo',!PLAN_DOS_PERIODOS);
   for(const id of ['#plan-simular','#b-go','#b-none'])$(id).disabled=!want.length;

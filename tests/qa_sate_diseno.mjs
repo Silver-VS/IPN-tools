@@ -84,10 +84,47 @@ const lum=hex=>hex.slice(1).match(/../g).map(h=>parseInt(h,16)/255).map(v=>v<=.0
 const contraste=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
 // El catálogo es la única fuente de color; superficies efectivas del cascarón y tokens comunes.
 const catalogo=JSON.parse(leer('data/sate.json')).unidades;
-assert.equal(fuente.match(/--accent:(#[\da-f]+);/)[1],'#750946','Guinda institucional intacto');
+assert.equal(fuente.match(/--sate-acento-base:(#[\da-f]+);/)[1],'#750946','Guinda solo como respaldo sin unidad');
 const tokens=leer('vendor/ipn-comun/dist/tokens.css');
+// Toda la interfaz llega al realce por tokens; el respaldo guinda no puede formar un ciclo.
+const declaraciones=s=>Object.fromEntries([...s.matchAll(/(--[\w-]+):\s*([^;\n}]+)/g)].map(m=>[m[1],m[2].trim()]));
+const base=declaraciones(fuente.match(/^:root\{([^}]+)\}/m)[1]);
+const puente=declaraciones(fuente.match(/:root,:root\[data-theme\],:root:not\(\[data-theme\]\)\{([^}]+)\}/)[1]);
+assert.equal(base['--accent'],'var(--sate-realce)');
+assert.equal(base['--accent-fg'],'var(--sate-sobre-realce)');
+assert.equal(puente['--ipn-acento'],'var(--accent)');
+assert.equal(puente['--ipn-sobre-acento'],'var(--sate-sobre-realce)');
+assert.equal(puente['--ipn-acento-fuerte'],'var(--accent-strong)');
+assert.equal(puente['--ipn-acento-suave'],'var(--accent-soft)');
+assert.equal(puente['--ipn-cal-academico'],'var(--sate-acento-base)','La categoría académica conserva su color');
+assert.match(base['--accent-strong'],/color-mix.*var\(--sate-realce\)/);
+assert.match(base['--accent-soft'],/color-mix.*var\(--sate-realce\)/);
+// Pleca institucional, Opinar (componente común), pestaña, segmento, bandeja y botón principal.
+assert.match(leer('tools/institucional.py'),/\.inst\{[^}]*border-bottom:3px solid var\(--accent\)/);
+assert.match(leer('tools/encuesta.py'),/\.enc-btn svg\{[^}]*color:var\(--accent\)/);
+assert.match(fuente,/\.seg button\[aria-pressed="true"\][^{]*\{background:var\(--accent-soft\);color:var\(--accent\)/);
+assert.match(fuente,/\.plan-resumen span\{[^}]*border-left:4px solid var\(--accent\)/);
+assert.match(fuente,/\.btn.primary\{[^}]*background:var\(--accent\)[^}]*color:var\(--accent-fg\)/);
+assert.match(css,/\.sate-pestana\[aria-selected=true\]\{color:var\(--ipn-acento\)/);
+assert.match(css,/\.sate-btn--primario\{[^}]*color:var\(--sate-sobre-realce\)/);
+assert.match(css,/\.tramite-chips \[aria-pressed=true\]\{[^}]*color:var\(--sate-sobre-realce\)/);
+for(const regla of (fuente+css+leer('tools/institucional.py')+leer('tools/skins.py')).matchAll(/([^{}]+)\{([^{}]+)\}/g)){
+  const sinRespaldo=regla[2].replace(/--sate-acento-base:#[\da-f]+;/gi,'');
+  assert.ok(!/#(?:7a1f45|750946|ec9cbf|5b1237|f7c6db|f7eef2|2e1a24)\b|rgba\((?:117,9,70|236,156,191),/i.test(sinRespaldo),'Guinda fijo fuera del respaldo: '+regla[1]);
+}
 for(const [i,modo] of ['claro','oscuro'].entries()){
   const tema=temas[i];
+  for(const [u,cfg] of Object.entries(catalogo)){
+    const colores={...base,...puente,'--sate-realce':cfg.realce[modo]};
+    const resolver=k=>colores[k].startsWith('var(')?resolver(colores[k].slice(4,-1)):colores[k];
+    assert.equal(resolver('--accent'),cfg.realce[modo]);
+    assert.equal(resolver('--ipn-acento'),cfg.realce[modo],`${u}/${modo}: botones, Opinar y navegación sin guinda`);
+    // La selección con fondo suave conserva texto del realce, en vez del texto sobre fondo sólido.
+    const rgb=h=>h.slice(1).match(/../g).map(v=>parseInt(v,16));
+    const a=rgb(cfg.realce[modo]),s=rgb(tema.surface);
+    const suave='#'+a.map((v,j)=>Math.round(v*.05+s[j]*.95).toString(16).padStart(2,'0')).join('');
+    assert.ok(contraste(cfg.realce[modo],suave)>=4.5,`${u}/${modo}: segmento y chip sobre fondo suave`);
+  }
   for(const fondo of ['bg','surface']){
     const token=fondo==='bg'?'fondo':'superficie';
     assert.ok(tokens.includes(`--ipn-${token}: ${tema[fondo]};`),'Superficie real compartida: '+token);
@@ -97,6 +134,13 @@ for(const [i,modo] of ['claro','oscuro'].entries()){
       assert.ok(ratio>=3,`${u}/${modo}/${token}: elementos gráficos, contraste ${ratio}`);
     }
   }
+}
+// La exportación reutiliza el catálogo por tema, sin acentos guinda literales en el módulo.
+const exportacion=leer('web/sate/exportacion.js');
+const paleta=exportacion.slice(exportacion.indexOf('  const DK=EXP.dark'),exportacion.indexOf('  const ownFill='));
+for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro',false],['oscuro',true]]){
+  const acc=vm.runInNewContext(paleta+'\nACC',{EXP:{dark},SATE_CONFIG:config,UNIDAD:u,scheduleData:()=>({})});
+  assert.equal(acc,cfg.realce[modo],`${u}/${modo}: acento exportado`);
 }
 // Ejecutar las funciones reales de realce y selector con DOM ficticio, sin red ni navegador.
 {
@@ -109,28 +153,43 @@ for(const [i,modo] of ['claro','oscuro'].entries()){
     matchMedia:()=>sistema,MutationObserver:class{constructor(f){observador=f}observe(n,o){assert.equal(n,raiz);assert.equal(o.attributeFilter.join(','),'data-theme,data-tema')}},
     api:null,SateUI:{modal(){},cerrarModal(){}}});
   vm.runInContext(inicio.slice(inicio.indexOf('  let unidadRealce'),inicio.indexOf('  // plurales ICU')),c);
-  assert.equal(valores['--sate-realce'],'var(--ipn-acento)','Sin unidad: guinda');
+  assert.equal(valores['--sate-realce'],'var(--sate-acento-base)','Sin unidad: guinda sin ciclo de tokens');
+  assert.equal(valores['--sate-sobre-realce'],'var(--sate-sobre-base)');
+  function comprobarSobre(u,modo){
+    const color=valores['--sate-sobre-realce'],ratio=contraste(color,catalogo[u].realce[modo]);
+    assert.ok(ratio>=4.5,`${u}/${modo}: ${color} sobre realce, AA ${ratio}`);
+    assert.equal(color,modo==='claro'?'#ffffff':'#18181b');
+  }
   const elegir=inicio.slice(inicio.indexOf('  function elegirUnidad()'),inicio.indexOf('  async function activar('));
   vm.runInContext(elegir+'\nelegirUnidad();',c);
   for(const [i,u] of Object.keys(catalogo).entries()){
     // El callback modifica el color en el documento actual antes de pedir la recarga histórica.
     c.location.reload=()=>{assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);recargas++};
     botones[i].onclick();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    comprobarSobre(u,'claro');
     atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    comprobarSobre(u,'oscuro');
     atributos['data-theme']='light';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    comprobarSobre(u,'claro');
     delete atributos['data-theme'];atributos['data-tema']='oscuro';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    comprobarSobre(u,'oscuro');
     atributos['data-tema']='claro';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    comprobarSobre(u,'claro');
     delete atributos['data-tema'];sistema.matches=true;cambioSistema();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    comprobarSobre(u,'oscuro');
     sistema.matches=false;cambioSistema();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    comprobarSobre(u,'claro');
   }
   assert.equal(recargas,2,'Se conserva aislamiento de módulos al cambiar unidad');
-  c.aplicarRealce(null);atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],'var(--ipn-acento)');
+  c.aplicarRealce(null);atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],'var(--sate-acento-base)');
+  assert.equal(valores['--sate-sobre-realce'],'var(--sate-sobre-base)');
   assert.match(css,/\.sate-unidad\{color:var\(--sate-realce\)\}/);
   assert.match(css,/header\.top\{[^}]*border-top:2px solid var\(--sate-realce\)/);
   assert.match(css,/\.sate-barra__btn\[aria-current=page\]::after\{[^}]*background:var\(--sate-realce\)/);
   console.log('Realce: AA por unidad/superficie/tema, selector inmediato, guinda sin unidad y cambios de tema/sistema. OK.');
 }
 for(const tema of temas)for(const fondo of ['surface','sunken']){
+  tema.accent=tema['sate-acento-base'];
   for(const frente of ['fg','muted','accent'])assert.ok(contraste(tema[frente],tema[fondo])>=4.5,`${frente}/${fondo}: AA`);
   for(const frente of ['ok','accent','muted','ipn-reprobada','ipn-desfasada'])assert.ok(contraste(tema[frente],tema[fondo])>=3,`${frente}/${fondo}: puntos y foco`);
 }

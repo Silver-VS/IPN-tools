@@ -18,7 +18,14 @@
     unidadRealce = id;
     const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
     const oscuro = tema ? tema === 'dark' || tema === 'oscuro' : temaSistema.matches;
-    raiz.style.setProperty('--sate-realce', config[id]?.realce?.[oscuro ? 'oscuro' : 'claro'] || 'var(--ipn-acento)');
+    const realce = config[id]?.realce?.[oscuro ? 'oscuro' : 'claro'];
+    // Elegir el mayor contraste evita texto blanco ilegible sobre los realces claros del tema oscuro.
+    const luminancia = hex => hex.slice(1).match(/../g).map(h => parseInt(h,16)/255)
+      .map(c => c <= .04045 ? c/12.92 : ((c+.055)/1.055)**2.4)
+      .reduce((s,c,i) => s+c*[.2126,.7152,.0722][i],0);
+    const l = realce ? luminancia(realce) : null, negro = luminancia('#18181b');
+    raiz.style.setProperty('--sate-realce', realce || 'var(--sate-acento-base)');
+    raiz.style.setProperty('--sate-sobre-realce', realce ? (1.05/(l+.05) >= (l+.05)/(negro+.05) ? '#ffffff' : '#18181b') : 'var(--sate-sobre-base)');
   }
   aplicarRealce();
   new MutationObserver(() => aplicarRealce()).observe(raiz, {attributes:true,attributeFilter:['data-theme','data-tema']});

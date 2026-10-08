@@ -133,7 +133,7 @@ const contraste=(a,b)=>{const x=luminancia(a),y=luminancia(b);return (Math.max(x
 for(const oscuro of [false,true]){
   const valores={...declaraciones(tokens.match(/:root \{([^}]+)\}/)[1]),...declaraciones(cascaron.match(/:root\{([^}]+)\}/)[1]),...declaraciones(bloque.match(/#sate-calendario\{([^}]+)\}/)[1])};
   if(oscuro){Object.assign(valores,declaraciones(tokens.match(/:root\[data-tema="oscuro"\] \{([^}]+)\}/)[1]),declaraciones(cascaron.match(/:root\[data-theme="dark"\]\{([^}]+)\}/)[1]),declaraciones(bloque.match(/\[data-theme=dark\] #sate-calendario\{([^}]+)\}/)[1]))}
-  Object.assign(valores,{'--ipn-acento':'var(--accent)','--ipn-ok':'var(--ok)','--ipn-superficie':'var(--surface)'});
+  Object.assign(valores,{'--sate-realce':'var(--sate-acento-base)','--ipn-cal-academico':'var(--sate-acento-base)','--ipn-acento':'var(--accent)','--ipn-ok':'var(--ok)','--ipn-superficie':'var(--surface)'});
   const resolver=k=>valores[k].startsWith('var(')?resolver(valores[k].slice(4,-1)):valores[k];
   const superficie=rgb(resolver('--ipn-superficie')), colores=categorias.map(c=>resolver('--ipn-cal-'+c));
   assert.equal(new Set(colores).size,6,'Seis colores distintos en '+(oscuro?'oscuro':'claro'));
