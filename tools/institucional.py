@@ -13,7 +13,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / "web" / "dist"
 
 HEADER = """<style>
-.inst{background:var(--surface);border-bottom:3px solid var(--accent);padding-inline:16px}
+.inst{background:transparent;border:0;border-radius:0;border-bottom:3px solid var(--sate-realce,var(--accent));padding-inline:16px}
 .inst-in{max-width:1480px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:12px 28px;padding-block:12px}
 .inst-in img{height:80px;width:auto;display:block}
 .inst-in .unit img{height:72px}

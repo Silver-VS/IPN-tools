@@ -50,7 +50,7 @@
     return '';
   }
   function validarActividades(acts){
-    const d=identidad();if(!d)return 'Confirma primero Mis datos para trámites.';
+    const d=identidad();if(!d)return 'Guarda tus datos aquí para continuar.';
     for(const k of ['paterno','nombres','boleta','carrera','plan','correo']){const e=SateTramites.validarDatos(k,d[k]||'',true);if(e)return e}
     if(!R.REQ[carrera()])return 'El catálogo vigente cubre Biónica, Mecatrónica y Telemática. Consulta tus créditos con Gestión Escolar.';
     if(!Array.isArray(acts)||!acts.length)return 'Agrega al menos una actividad.';
@@ -93,11 +93,10 @@
     l.appendChild(nodo('span',texto));l.appendChild(n);l.appendChild(error);box.appendChild(l);return n;
   }
   campo.secuencia=0;
-  function resumen(box,datos){const t=totales(datos);box.textContent=t?`${R.fmt(t.all)} de ${t.r.n*t.r.c} créditos de electivas · ${t.r.lib} electivas ya liberadas según tu SAES`:'Confirma tu carrera en Mis datos para trámites.'}
+  function resumen(box,datos){const t=totales(datos);box.textContent=t?`${R.fmt(t.all)} de ${t.r.n*t.r.c} créditos de electivas · ${t.r.lib} electivas ya liberadas según tu SAES`:'Confirma tu carrera aquí para calcular los créditos.'}
   function actividades(box,ctx){
     const d=ctx.datos,acts=d.actividades;
-    const datos=identidad();box.appendChild(nodo('p',datos?`${datos.nombres} ${datos.paterno} ${datos.materno||''} · ${datos.boleta}`:'Confirma tus datos antes de continuar.'));
-    box.appendChild(boton('Mis datos para trámites',()=>SateTramites.misDatos(document.getElementById('sate-tramites'),()=>SATE.repintar())));
+    SateTramites.datosInline(box,()=>{ctx.cambiar();ctx.repintar()});
     const viejo=leer('ue.s');
     if(viejo&&!leer('hu.tramite.electivas.importacion')){
       const invitacion=nodo('section');invitacion.appendChild(nodo('p','Encontramos lo que llenaste en la página de Electivas. Importarlo reemplaza las actividades y respuestas de este borrador; tus datos anteriores se conservan.'));
@@ -167,7 +166,7 @@
   }
   function validarObservaciones(f){return textoValido(f.obs)||(!medir(f).ok?'Acorta el texto a cuatro renglones.':'')}
   function revisionActividades(acts){
-    const d=identidad()||{},filas=Object.entries({Nombre:[d.nombres,d.paterno,d.materno].filter(Boolean).join(' '),Boleta:d.boleta,Carrera:CARN[carrera()]||d.carrera,Plan:d.plan,Correo:d.correo}).map(([texto,valor])=>({texto,valor:valor||'',cambiar:()=>SateTramites.misDatos(document.getElementById('sate-tramites'),()=>SATE.repintar())}));
+    const d=identidad()||{},filas=Object.entries({Nombre:[d.nombres,d.paterno,d.materno].filter(Boolean).join(' '),Boleta:d.boleta,Carrera:CARN[carrera()]||d.carrera,Plan:d.plan,Correo:d.correo}).map(([texto,valor])=>({texto,valor:valor||''}));
     acts.forEach((a,i)=>{const c=R.CATK[a.k];filas.push({texto:'Actividad '+(i+1),valor:a.desc+' · '+R.fmt(R.credOf(a))+' créditos'});for(const [k,t] of [['inst','Institución'],['folio','Folio'],['fecha','Fecha'],['firma','Firma'],['h','Horas'],['ht','Horas teóricas'],['hp','Horas prácticas'],['ev','Evidencia']])if(a[k])filas.push({texto:t,valor:String(a[k])});if(c?.f.die)for(const [k,t] of [['car','Carrera de la materia'],['grupo','Grupo'],['horario','Horas semanales'],['profesor','Profesor'],['pmail','Correo del profesor'],['per','Periodo'],['dep','Departamento']])filas.push({texto:t,valor:k==='car'?CARN[a.o[k]]:k==='dep'?{TA:'Tecnologías Avanzadas',ING:'Ingeniería',CB:'Ciencias Básicas',FII:'Formación Integral e Institucional'}[a.o[k]]:String(a.o[k]||'')})});return filas;
   }
   function revisionFormulario(f,d){const filas=[];for(const [k,t,campos] of preguntas){filas.push({texto:t,valor:f[k]==='si'?'Sí':'No'});if(f[k]==='si')for(const [id,t] of campos)filas.push({texto:t,valor:String(f[id]||'0')})}filas.push({texto:'Observaciones',valor:f.obs||'Sin observaciones'});const t=totales(d);if(t)filas.push({texto:'Créditos de electivas',valor:R.fmt(t.all)+' de '+t.r.n*t.r.c});return filas}

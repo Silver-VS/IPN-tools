@@ -23,12 +23,14 @@
     if(borrador)return {id:'progreso',accion:'continuar',paso:Math.min((borrador.paso||0)+1,borrador.total||1),total:borrador.total||1,min:Math.max(0,Math.floor((ahora-borrador.actualizado)/60000))};
     return {id:'no_iniciado',accion:'empezar'};
   }
-  function separarNombre(nombre,inicioNombres,inicioMaterno,ultimaApellido=false){
-    const palabras=String(nombre||'').trim().split(/\s+/).filter(Boolean),limite=inicioNombres+(ultimaApellido?1:0);
-    if(limite<1||limite>=palabras.length)return null;
-    const materno=inicioMaterno==null?limite:inicioMaterno;
-    if(materno<1||materno>limite)return null;
-    return {paterno:palabras.slice(0,materno).join(' '),materno:palabras.slice(materno,limite).join(' '),nombres:palabras.slice(limite).join(' ')};
+  function separarNombre(nombre){
+    const palabras=String(nombre||'').trim().split(/\s+/).filter(Boolean);
+    const particulas=new Set('de del la las los y da das do dos van von mc mac'.split(' '));
+    // Reservar siempre el primer nombre; las partículas pertenecen a la palabra que sigue.
+    const apellido=()=>{let inicio=palabras.length-1;while(inicio>1&&particulas.has(palabras[inicio-1].toLowerCase()))inicio--;return palabras.splice(inicio).join(' ')};
+    if(palabras.length<2)return {paterno:'',materno:'',nombres:palabras.join(' ')};
+    const ultimo=apellido(),dos=palabras.length>1,paterno=dos?apellido():ultimo;
+    return {paterno,materno:dos?ultimo:'',nombres:palabras.join(' ')};
   }
   function modelo(def,borrador=leer(def.id)){
     const memoria=completados.get(def.id);
@@ -84,8 +86,7 @@
     function pintar(){
       def.preparar?.(m.datos,m.paso);confirmado=false;
       box.replaceChildren();box.appendChild(el('h2',def.titulo));
-      const indicador=el('ol',null,'tramite-pasos');indicador.setAttribute('aria-label',tx('pasos'));
-      [...def.pasos.map(p=>p.titulo),tx('revisar')].forEach((s,i)=>{const n=el('li',s);if(i===m.paso)n.setAttribute('aria-current','step');indicador.appendChild(n)});box.appendChild(indicador);
+      const indicador=el('p',`Paso ${m.paso+1} de ${def.pasos.length+1} · ${m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo}`,'tramite-pasos');indicador.setAttribute('aria-label',tx('pasos'));indicador.setAttribute('aria-current','step');box.appendChild(indicador);
       const layout=el('div',null,'tramite-asistente'),pantalla=el('div',null,'tramite-pantalla');layout.appendChild(pantalla);
       pantalla.appendChild(el('h3',m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo));
       if(def.pasos[m.paso]?.ayuda){const ayuda=def.pasos[m.paso].ayuda;pantalla.appendChild(el('p',typeof ayuda==='function'?ayuda(m.datos):ayuda))}
@@ -134,40 +135,50 @@
     pintar();return {modelo:m,descargar,destruir(){destruido=true;version++;clearTimeout(temporizador);revocar();for(const c of m.campos)if(c.sensible)m.datos[c.id]=''}};
   }
   function prellenar(a){
-    if(!a||a.upiita_saes!==1||(a.unidad||'upiita')!=='upiita')return {};
-    return {boleta:a.boleta||'',carrera:a.carrera_nombre||a.carrera||'',plan:a.plan||'',correo:a.correo_institucional||a.correo||'',celular:a.celular||'',telefono:a.telefono||''};
+    if(!a||a.upiita_saes!==1)return {};
+    return {boleta:a.boleta||'',carrera:a.carrera_nombre||a.carrera||'',plan:a.plan||'',correo:a.correo_institucional||a.correo||''};
   }
-  function misDatos(box,volver=()=>mostrarLista(box)){
-    box.replaceChildren();const previo=leer('datos'),a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})());
-    const datos={...prellenar(a),...(previo?.datos||{})},campos=['paterno','materno','nombres','boleta','carrera','plan','correo','celular','telefono'];
-    box.appendChild(el('h2',tx('datos_titulo')));box.appendChild(el('p',tx('datos_ayuda')));
-    const controles={},resumen=el('p','');resumen.setAttribute('aria-live','polite');
-    const actualizar=()=>resumen.textContent=tx('nombre_resumen',{paterno:controles.paterno.value,materno:controles.materno.value,nombres:controles.nombres.value});
-    if(a?.nombre&&(a.unidad||'upiita')==='upiita'){
-      const palabras=a.nombre.trim().split(/\s+/),chips=el('div',null,'tramite-chips');let nombres=null,materno=null,ultimo=false;
-      const modo=boton(tx('ultima_palabra'),()=>{ultimo=!ultimo;modo.textContent=tx(ultimo?'primera_palabra':'ultima_palabra');modo.setAttribute('aria-pressed',String(ultimo));nombres=null;materno=null;indicacion.textContent=tx(ultimo?'elige_ultimo_apellido':'elige_nombre')});
-      const indicacion=el('p',tx('elige_nombre'));
-      const aplicar=()=>{const s=separarNombre(a.nombre,nombres,materno,ultimo);if(s){for(const k of ['paterno','materno','nombres'])controles[k].value=s[k];actualizar()}};
-      palabras.forEach((p,i)=>chips.appendChild(boton(p,()=>{
-        if(nombres==null){const limite=i+(ultimo?1:0);if(limite<1||limite>=palabras.length)return;nombres=i;aplicar();indicacion.textContent=tx('elige_materno')}
-        else{const limite=nombres+(ultimo?1:0);if(i<1||i>=limite)return;materno=i;aplicar();indicacion.textContent=tx('editar_nombre')}
-      })));
-      box.appendChild(indicacion);box.appendChild(chips);box.appendChild(modo);
-    }
-    const form=el('form',null,'tramite-datos');form.noValidate=true;
+  function guardarDatos(datos){
+    try{IPNT.set('hu.tramite.datos',JSON.stringify({datos,confirmado:true,actualizado:Date.now()}))}
+    catch(e){console.error('Ventanilla: identidad no guardada',{fase:'confirmación',error:e.name});throw e}
+  }
+  function alumnoActual(){return window.SATE?.alumno?SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})()}
+  function formularioDatos(box,datos,campos,volver,{nombre=false}={}){
+    const form=el('form',null,'tramite-datos'),controles={};form.noValidate=true;
+    if(nombre)form.appendChild(el('h3','¿Así se escribe tu nombre?'));
     for(const k of campos){
-      const l=el('label',null,'tramite-campo'),n=el('input');n.name=k;n.value=datos[k]||'';n.type=k==='correo'?'email':k==='boleta'?'text':['celular','telefono'].includes(k)?'tel':'text';if(k==='boleta')n.inputMode='numeric';
-      n.required=['paterno','nombres','boleta','carrera','plan','correo'].includes(k);n.id='tramite-datos-'+k;
+      const l=el('label',null,'tramite-campo'),n=el('input');n.name=k;n.value=datos[k]||'';n.type=k==='correo'?'email':['celular','telefono'].includes(k)?'tel':'text';if(k==='boleta')n.inputMode='numeric';
+      n.required=['paterno','nombres','boleta','carrera','plan','correo'].includes(k);n.id='tramite-datos-'+k;n.readOnly=nombre;
       const error=el('small','');error.id=n.id+'-error';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',error.id);
       n.onblur=()=>{error.textContent=validarDatos(k,n.value,n.required);n.setAttribute('aria-invalid',String(!!error.textContent))};
-      n.oninput=actualizar;controles[k]=n;l.appendChild(el('span',tx('dato_'+k)));l.appendChild(n);l.appendChild(error);form.appendChild(l);
+      controles[k]=n;l.appendChild(el('span',tx('dato_'+k)));l.appendChild(n);l.appendChild(error);form.appendChild(l);
     }
-    form.appendChild(resumen);actualizar();form.appendChild(el('p',tx('datos_validacion')));
-    const confirmar=el('button',tx('confirmar'),'sate-btn');confirmar.type='submit';form.appendChild(confirmar);
-    form.onsubmit=e=>{e.preventDefault();for(const n of Object.values(controles))n.onblur();const mal=Object.values(controles).find(n=>n.getAttribute('aria-invalid')==='true');if(mal){mal.focus();return}
-      const d=Object.fromEntries(campos.map(k=>[k,controles[k].value.trim()]));IPNT.set('hu.tramite.datos',JSON.stringify({datos:d,confirmado:true,actualizado:Date.now()}));volver();
+    const acciones=el('div',null,'tramite-acciones');
+    if(nombre)acciones.appendChild(boton('Corregir',()=>{for(const n of Object.values(controles))n.readOnly=false;controles.paterno.focus()}));
+    const confirmar=el('button',nombre?'Sí, guardar':'Guardar','sate-btn');confirmar.type='submit';acciones.appendChild(confirmar);form.appendChild(acciones);
+    form.onsubmit=e=>{e.preventDefault();for(const n of Object.values(controles))n.onblur();const mal=Object.values(controles).find(n=>n.getAttribute('aria-invalid')==='true');if(mal){mal.readOnly=false;mal.focus();return}
+      guardarDatos({...datos,...Object.fromEntries(campos.map(k=>[k,controles[k].value.trim()]))});volver();
     };
-    form.appendChild(boton(tx('atras'),volver));box.appendChild(form);
+    box.appendChild(form);return form;
+  }
+  function confirmarSaes(a,box,continuar){
+    const previo=leer('datos'),datos={...(previo?.datos||{}),...prellenar(a)};
+    if(previo?.confirmado){guardarDatos(datos);continuar();return false}
+    box.replaceChildren();formularioDatos(box,{...datos,...separarNombre(a.nombre)},['paterno','materno','nombres'],continuar,{nombre:true});return true;
+  }
+  function misDatos(box,volver=()=>mostrarLista(box),contacto=[]){
+    const previo=leer('datos'),a=alumnoActual(),datos={...separarNombre(a?.nombre),...prellenar(a),...(previo?.datos||{})};
+    box.replaceChildren();formularioDatos(box,datos,['paterno','materno','nombres','boleta','carrera','plan','correo',...contacto],volver);
+  }
+  function datosInline(box,alGuardar,contacto=[]){
+    box.replaceChildren();
+    const previo=leer('datos'),d=previo?.datos;
+    if(!previo?.confirmado){misDatos(box,()=>{datosInline(box,alGuardar,contacto);alGuardar?.()},contacto);return}
+    const resumen=el('p',null,'tramite-identidad');resumen.appendChild(el('span',[[d.nombres,d.paterno,d.materno].filter(Boolean).join(' '),d.boleta,d.carrera].filter(Boolean).join(' · ')));
+    const editor=el('div');
+    const editar=()=>misDatos(editor,()=>{box.replaceChildren();datosInline(box,alGuardar,contacto);alGuardar?.()},contacto);
+    resumen.appendChild(boton('Editar',editar));box.appendChild(resumen);box.appendChild(editor);
+    if(contacto.some(k=>!(k in d))||['paterno','nombres','boleta','carrera','plan','correo'].some(k=>validarDatos(k,d[k]||'',true)))editar();
   }
   function validarDatos(k,v,requerido=false){
     if(requerido&&!v.trim())return tx('requerido');
@@ -177,7 +188,7 @@
   }
   const definiciones=new Map();let activo;
   function mostrarLista(box){
-    box.replaceChildren();box.appendChild(el('h2',tx('titulo')));box.appendChild(boton(tx('mis_datos'),()=>misDatos(box)));box.appendChild(el('p',tx('guardado_ayuda')));
+    box.replaceChildren();box.appendChild(el('h2',tx('titulo')));box.appendChild(el('p',tx('guardado_ayuda')));
     const lista=el('div',null,'tramite-lista');
     for(const id of SATE_CONFIG.unidades[SATE_UNIDAD].tramites){
       const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica),tarjeta=el('section',null,'tramite-tarjeta');
@@ -212,6 +223,6 @@
       mostrarLista(box);return;
     }mostrarLista(box);
   }
-  raiz.SateTramites={estado,separarNombre,modelo,asistente,misDatos,prellenar,validarDatos,mostrarLista,registrar:(def,id)=>definiciones.set(id||def.id,def)};
+  raiz.SateTramites={estado,separarNombre,modelo,asistente,misDatos,datosInline,confirmarSaes,prellenar,validarDatos,mostrarLista,registrar:(def,id)=>definiciones.set(id||def.id,def)};
   SATE.pestana('tramites',{mostrar,ocultar(){activo?.destruir();activo=null}});
 })(globalThis);

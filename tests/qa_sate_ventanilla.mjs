@@ -37,13 +37,20 @@ assert.deepEqual(plano(t.estado({paso:1,total:4,actualizado:0},null,300000)),{id
 assert.equal(t.estado({listo:true},null).accion,'descargar');
 assert.equal(t.estado(null,{aplica:false,motivo:'Motivo ficticio'}).motivo,'Motivo ficticio');
 assert.equal(t.estado(null,{aplica:false}).accion,null);
-assert.deepEqual(plano(t.separarNombre('DE LA CRUZ DEL RÍO ANA MARÍA',6,3)),{paterno:'DE LA CRUZ',materno:'DEL RÍO ANA',nombres:'MARÍA'});
-assert.deepEqual(plano(t.separarNombre('DE LA CRUZ DEL RÍO ANA MARÍA',5,3)),{paterno:'DE LA CRUZ',materno:'DEL RÍO',nombres:'ANA MARÍA'});
-assert.deepEqual(plano(t.separarNombre('DE LA CRUZ DEL RÍO ANA MARÍA',4,3,true)),{paterno:'DE LA CRUZ',materno:'DEL RÍO',nombres:'ANA MARÍA'});
-assert.equal(t.separarNombre('ANA',0),null);
+for(const [nombre,esperado] of [
+ ['JUAN CARLOS PEREZ LOPEZ',{paterno:'PEREZ',materno:'LOPEZ',nombres:'JUAN CARLOS'}],
+ ['JUAN MORENO DE LA PAZ',{paterno:'MORENO',materno:'DE LA PAZ',nombres:'JUAN'}],
+ ['ANA SOFIA DEL VALLE RUIZ',{paterno:'DEL VALLE',materno:'RUIZ',nombres:'ANA SOFIA'}],
+ ['LUIS GARCIA',{paterno:'GARCIA',materno:'',nombres:'LUIS'}],
+ ['MARIA DE LOS ANGELES LOPEZ DIAZ',{paterno:'LOPEZ',materno:'DIAZ',nombres:'MARIA DE LOS ANGELES'}],
+ ['Ana van valle von ruiz',{paterno:'van valle',materno:'von ruiz',nombres:'Ana'}],
+ ['ANA PEREZ PEREZ',{paterno:'PEREZ',materno:'PEREZ',nombres:'ANA'}],
+ ['ANA',{paterno:'',materno:'',nombres:'ANA'}]
+])assert.deepEqual(plano(t.separarNombre(nombre)),esperado);
+for(const particula of 'de del la las los y da das do dos van von mc mac'.split(' '))assert.deepEqual(plano(t.separarNombre('ANA '+particula+' PEREZ RUIZ')),{paterno:particula+' PEREZ',materno:'RUIZ',nombres:'ANA'});
 assert.equal(t.validarDatos('boleta','2099000000'),'');assert.ok(t.validarDatos('boleta','2099'));
 assert.equal(t.validarDatos('correo','ficticio@example.test'),'');assert.ok(t.validarDatos('correo','invalido'));
-assert.equal(Object.keys(t.prellenar({upiita_saes:1,unidad:'escom',boleta:'2099000000'})).length,0);
+assert.equal(t.prellenar({upiita_saes:1,unidad:'escom',boleta:'2099000000'}).boleta,'2099000000');
 aplicacion={aplica:true,motivo:'Causal ficticia'};t.mostrarLista(box);
 assert.equal(box.todos().filter(n=>n.tagName==='section').length,2);
 assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Empezar').length,2);
@@ -55,19 +62,56 @@ assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Contin
 assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Descargar').length,1);
 assert.ok(box.todos().some(n=>n.textContent.includes('Paso 2 de 4 · guardado hace 5 min')));
 aplicacion={aplica:false,motivo:'Motivo ficticio'};t.mostrarLista(box);
-assert.equal(box.todos().filter(n=>n.tagName==='section').length,2);assert.equal(box.todos().filter(n=>n.tagName==='button').length,1,'Solo Mis datos: ningún botón para un trámite que no aplica');
+assert.equal(box.todos().filter(n=>n.tagName==='section').length,2);assert.equal(box.todos().filter(n=>n.tagName==='button').length,0,'Ningún botón para un trámite que no aplica');
 aplicacion=null;
 modulo.mostrar({tramite:'dictamen'});assert.equal(abiertos.length,0,'Sin definición se muestra la lista; no hay página antigua');
-almacen.set('saes.alumno',JSON.stringify({upiita_saes:1,unidad:'upiita',nombre:'DE LA CRUZ DEL RÍO ANA MARÍA',boleta:'2099000000',carrera_nombre:'Ingeniería Biónica',plan:'2009',correo:'ficticio@example.test'}));
-t.misDatos(box);
-box.todos().find(n=>n.tagName==='button'&&n.textContent==='ANA').click();
-box.todos().find(n=>n.tagName==='button'&&n.textContent==='DEL').click();
-assert.equal(box.todos().find(n=>n.name==='paterno').value,'DE LA CRUZ');
-assert.equal(box.todos().find(n=>n.name==='materno').value,'DEL RÍO');
-assert.equal(box.todos().find(n=>n.name==='nombres').value,'ANA MARÍA');
+const ficticio={upiita_saes:1,unidad:'upiita',nombre:'ANA SOFIA DEL VALLE RUIZ',boleta:'2099000000',carrera_nombre:'Ingeniería Biónica',plan:'2009',correo:'ficticio@example.test'};
+almacen.set('saes.alumno',JSON.stringify(ficticio));
+let aceptadas=0;
+assert.equal(t.confirmarSaes(ficticio,box,()=>aceptadas++),true);
+assert.equal(aceptadas,0,'La carga espera la confirmación');
+assert.equal(box.todos().find(n=>n.name==='paterno').value,'DEL VALLE');
+assert.equal(box.todos().find(n=>n.name==='materno').value,'RUIZ');
+assert.equal(box.todos().find(n=>n.name==='nombres').value,'ANA SOFIA');
+assert.equal(box.todos().find(n=>n.name==='paterno').readOnly,true);
+box.todos().find(n=>n.textContent==='Corregir').click();
+assert.equal(box.todos().find(n=>n.name==='paterno').readOnly,false);
+box.todos().find(n=>n.name==='nombres').value='ANA SOFÍA';
 assert.ok(!almacen.has('hu.tramite.datos'),'Prellenar no confirma ni persiste');
 box.querySelector('form').onsubmit({preventDefault(){}});
-assert.equal(JSON.parse(almacen.get('hu.tramite.datos')).confirmado,true);
+assert.equal(aceptadas,1);assert.equal(JSON.parse(almacen.get('hu.tramite.datos')).confirmado,true);
+box.replaceChildren();
+assert.equal(t.confirmarSaes({...ficticio,nombre:'NOMBRE NUEVO DISTINTO',boleta:'2099000001',correo:'nuevo@example.test'},box,()=>aceptadas++),false);
+assert.equal(aceptadas,2);assert.equal(box.querySelector('form'),null,'La segunda carga no pregunta');
+const actualizado=JSON.parse(almacen.get('hu.tramite.datos')).datos;
+assert.equal(actualizado.nombres,'ANA SOFÍA');assert.equal(actualizado.boleta,'2099000001');assert.equal(actualizado.correo,'nuevo@example.test');assert.ok(!('celular' in actualizado));
+t.datosInline(box);assert.ok(box.todos().some(n=>n.textContent==='Editar'));assert.equal(box.querySelector('form'),null);
+box.todos().find(n=>n.textContent==='Editar').click();assert.ok(box.querySelector('form'));
+box.querySelector('form').onsubmit({preventDefault(){}});assert.equal(box.querySelector('form'),null);
+almacen.delete('hu.tramite.datos');box.replaceChildren();t.datosInline(box);
+assert.ok(box.querySelector('form'),'Sin confirmación, campos en el propio paso');
+box.querySelector('form').onsubmit({preventDefault(){}});
+assert.ok(!box.todos().some(n=>/Mis datos para trámites|Toca la primera palabra|Prefiero marcar/.test(n.textContent)));
+// Integración del pegado y aceptación con SAES.wire real, en las tres unidades.
+const identidadAnterior=almacen.get('hu.tramite.datos');
+const saesReal=readFileSync('web/dist/sate/nucleo.js','utf8').match(/const SAES=\{[\s\S]*?\n\};/)[0];
+for(const unidad of ['upiita','escom','upibi']){
+  almacen.delete('hu.tramite.datos');let cargadas=0,cerradas=0,guardado;
+  const nodos=new Map(),n=id=>{if(!nodos.has(id)){const e=new Nodo('div');e.eventos={};e.addEventListener=(k,f)=>e.eventos[k]=f;nodos.set(id,e)}return nodos.get(id)};
+  const dl={querySelector:n,addEventListener(){}};
+  const contexto=vm.createContext({console,document:{getElementById:()=>dl,addEventListener(){}},SATE:{script:async archivo=>assert.equal(archivo,'tramites.js')},SateTramites:t,setTimeout:f=>f()});
+  vm.runInContext(saesReal+'\nglobalThis.saes=SAES;',contexto);
+  const s=contexto.saes;s.U=()=>unidad;s.close=()=>cerradas++;s.save=d=>guardado=d;s.wire(()=>cargadas++);
+  const pegar=datos=>n('#saes-paste').eventos.paste({preventDefault(){},clipboardData:{getData:()=>JSON.stringify(datos)}});
+  await pegar({...ficticio,unidad,acreditadas:[]});
+  assert.equal(cargadas,0);assert.equal(guardado,undefined);assert.equal(cerradas,0);
+  n('#saes-msg').querySelector('form').onsubmit({preventDefault(){}});
+  assert.equal(cargadas,1);assert.equal(guardado.unidad,unidad);assert.equal(cerradas,1);
+  await pegar({...ficticio,unidad,acreditadas:[],boleta:'2099000002',nombre:'OTRO NOMBRE DISTINTO'});
+  assert.equal(cargadas,2);assert.equal(cerradas,2);assert.equal(guardado.boleta,'2099000002');
+  assert.equal(JSON.parse(almacen.get('hu.tramite.datos')).datos.nombres,'ANA SOFIA');
+}
+almacen.set('hu.tramite.datos',identidadAnterior);
 const def={id:'ejemplo-prueba',titulo:'Prueba invisible',pasos:[{titulo:'Pregunta',campos:[{id:'dato',texto:'Dato',requerido:true}]},{titulo:'Situación',campos:[{id:'secreto',texto:'Sensible',sensible:true}]}],generar:async()=>new Uint8Array([37,80,68,70])};
 const a=t.asistente(box,def),input=box.querySelector('input');
 input.value='Valor ficticio';input.oninput();assert.equal(input.getAttribute('aria-invalid'),null,'Sin validación al escribir');
@@ -123,9 +167,11 @@ vm.runInContext(readFileSync('web/sate/dictamen.js','utf8'),c);
 const dic=c.SateDictamen;await dic.cargar();
 c.SATE.repintar=()=>modulo.mostrar({tramite:'dictamen'});
 modulo.mostrar({tramite:'dictamen'});
-box.todos().find(n=>n.tagName==='button'&&n.textContent==='Mis datos para trámites').click();
+assert.ok(box.querySelector('form'),'Dictamen pide el contacto dentro del paso');
+assert.ok(box.todos().some(n=>n.name==='celular'));assert.ok(box.todos().some(n=>n.name==='telefono'));
 box.querySelector('form').onsubmit({preventDefault(){}});
-assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='¿Qué necesitas?'),'Mis datos vuelve al asistente de dictamen en la misma ruta');
+assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='¿Qué necesitas?'),'Guardar conserva el asistente de dictamen en la misma ruta');
+assert.equal(box.querySelector('form'),null,'El contacto guardado no vuelve a preguntarse');
 modulo.ocultar();
 assert.equal(dic.sugerir({nDes:1}).tipo,'interno');
 assert.equal(dic.sugerir({nDes:1,riesgoBajaDefinitiva:true}).tipo,'externo');
