@@ -1,0 +1,383 @@
+{
+ "_fuente": "Calendario académico IPN 2026-2027, modalidad escolarizada (PDF oficial de la DAE/SEP, entregado por el dueño 2026-10-07). Extraído con tools/calendario_ipn_dias.py (colores y marcas de cada día); fin de periodo y Día del Politécnico ajustados a mano contra el PDF (ajuste_manual). Aplica a todas las unidades salvo modificaciones propias (paros), que van aparte por unidad.",
+ "modalidad": "escolarizada",
+ "ciclo": "2026-2027",
+ "periodos": {
+  "27/1": [
+   "2026-08-24",
+   "2026-12-18"
+  ],
+  "27/2": [
+   "2027-01-25",
+   "2027-06-22"
+  ]
+ },
+ "eventos": [
+  {
+   "categoria": "vacaciones",
+   "titulo": "Vacaciones",
+   "audiencia": "alumnos",
+   "inicio": "2026-08-01",
+   "fin": "2026-08-07"
+  },
+  {
+   "categoria": "nivelacion_nuevo_ingreso",
+   "titulo": "Periodo de nivelación académica autogestiva para alumnos de nuevo ingreso",
+   "audiencia": "nuevo_ingreso",
+   "inicio": "2026-08-03",
+   "fin": "2026-08-21",
+   "simbolo": "punteado"
+  },
+  {
+   "categoria": "planeacion_docente",
+   "titulo": "Actividades para la planeación didáctica, académica y directiva",
+   "audiencia": "docentes",
+   "inicio": "2026-08-10",
+   "fin": "2026-08-21",
+   "simbolo": "contorno"
+  },
+  {
+   "categoria": "induccion_ns",
+   "titulo": "Inducción para alumnos de nuevo ingreso NS",
+   "audiencia": "nuevo_ingreso",
+   "inicio": "2026-08-17",
+   "fin": "2026-08-21",
+   "simbolo": "contorno"
+  },
+  {
+   "categoria": "inscripcion_reinscripcion",
+   "titulo": "Inscripción y reinscripción",
+   "audiencia": "alumnos",
+   "inicio": "2026-08-17",
+   "fin": "2026-08-21"
+  },
+  {
+   "categoria": "inicio_periodo",
+   "titulo": "Inicio del periodo escolar",
+   "audiencia": "alumnos",
+   "inicio": "2026-08-24",
+   "fin": "2026-08-24",
+   "simbolo": "triangulo"
+  },
+  {
+   "categoria": "induccion_nms",
+   "titulo": "Inducción para alumnos de nuevo ingreso NMS",
+   "audiencia": "nms",
+   "inicio": "2026-09-01",
+   "fin": "2026-09-04",
+   "simbolo": "contorno"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2026-09-16",
+   "fin": "2026-09-16",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "saberes_previos",
+   "titulo": "Fecha límite para registro de evaluación por saberes previamente adquiridos",
+   "audiencia": "alumnos",
+   "inicio": "2026-09-18",
+   "fin": "2026-09-18"
+  },
+  {
+   "categoria": "registro_ordinaria",
+   "titulo": "Registro de evaluación ordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2026-09-28",
+   "fin": "2026-09-30"
+  },
+  {
+   "categoria": "descanso_sindical",
+   "titulo": "Día de descanso por acuerdo sindical",
+   "audiencia": "alumnos",
+   "inicio": "2026-11-01",
+   "fin": "2026-11-02",
+   "simbolo": "circulo"
+  },
+  {
+   "categoria": "registro_ordinaria",
+   "titulo": "Registro de evaluación ordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2026-11-05",
+   "fin": "2026-11-09"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2026-11-16",
+   "fin": "2026-11-16",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "registro_ordinaria",
+   "titulo": "Registro de evaluación ordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2026-12-11",
+   "fin": "2026-12-15"
+  },
+  {
+   "categoria": "registro_extraordinaria",
+   "titulo": "Registro de evaluación extraordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2026-12-16",
+   "fin": "2026-12-18"
+  },
+  {
+   "categoria": "fin_periodo",
+   "titulo": "Fin del periodo escolar",
+   "audiencia": "alumnos",
+   "inicio": "2026-12-18",
+   "fin": "2026-12-18",
+   "simbolo": "triangulo_inv",
+   "ajuste_manual": true
+  },
+  {
+   "categoria": "nivelacion_nuevo_ingreso",
+   "titulo": "Periodo de nivelación académica autogestiva para alumnos de nuevo ingreso",
+   "audiencia": "nuevo_ingreso",
+   "inicio": "2026-12-21",
+   "fin": "2026-12-31",
+   "simbolo": "punteado"
+  },
+  {
+   "categoria": "vacaciones",
+   "titulo": "Vacaciones",
+   "audiencia": "alumnos",
+   "inicio": "2026-12-21",
+   "fin": "2026-12-24"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2026-12-25",
+   "fin": "2026-12-25",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "vacaciones",
+   "titulo": "Vacaciones",
+   "audiencia": "alumnos",
+   "inicio": "2026-12-26",
+   "fin": "2026-12-31"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2027-01-01",
+   "fin": "2027-01-01",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "nivelacion_nuevo_ingreso",
+   "titulo": "Periodo de nivelación académica autogestiva para alumnos de nuevo ingreso",
+   "audiencia": "nuevo_ingreso",
+   "inicio": "2027-01-04",
+   "fin": "2027-01-22",
+   "simbolo": "punteado"
+  },
+  {
+   "categoria": "planeacion_docente",
+   "titulo": "Actividades para la planeación didáctica, académica y directiva",
+   "audiencia": "docentes",
+   "inicio": "2027-01-04",
+   "fin": "2027-01-22",
+   "simbolo": "contorno"
+  },
+  {
+   "categoria": "inscripcion_ets",
+   "titulo": "Inscripción a evaluación a título de suficiencia",
+   "audiencia": "alumnos",
+   "inicio": "2027-01-06",
+   "fin": "2027-01-07"
+  },
+  {
+   "categoria": "limite_calificaciones_posgrado",
+   "titulo": "Fecha límite para el registro de calificaciones en el Nivel Posgrado",
+   "audiencia": "posgrado",
+   "inicio": "2027-01-08",
+   "fin": "2027-01-08",
+   "simbolo": "circulo"
+  },
+  {
+   "categoria": "ets",
+   "titulo": "Evaluación a título de suficiencia",
+   "audiencia": "alumnos",
+   "inicio": "2027-01-11",
+   "fin": "2027-01-15"
+  },
+  {
+   "categoria": "inscripcion_reinscripcion",
+   "titulo": "Inscripción y reinscripción",
+   "audiencia": "alumnos",
+   "inicio": "2027-01-18",
+   "fin": "2027-01-22"
+  },
+  {
+   "categoria": "inicio_periodo",
+   "titulo": "Inicio del periodo escolar",
+   "audiencia": "alumnos",
+   "inicio": "2027-01-25",
+   "fin": "2027-01-25",
+   "simbolo": "triangulo"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2027-02-01",
+   "fin": "2027-02-01",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "saberes_previos",
+   "titulo": "Fecha límite para registro de evaluación por saberes previamente adquiridos",
+   "audiencia": "alumnos",
+   "inicio": "2027-02-19",
+   "fin": "2027-02-19"
+  },
+  {
+   "categoria": "registro_ordinaria",
+   "titulo": "Registro de evaluación ordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2027-03-04",
+   "fin": "2027-03-08"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2027-03-15",
+   "fin": "2027-03-15",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "vacaciones",
+   "titulo": "Vacaciones",
+   "audiencia": "alumnos",
+   "inicio": "2027-03-22",
+   "fin": "2027-04-02"
+  },
+  {
+   "categoria": "registro_ordinaria",
+   "titulo": "Registro de evaluación ordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2027-04-30",
+   "fin": "2027-05-04"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2027-05-01",
+   "fin": "2027-05-01",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2027-05-05",
+   "fin": "2027-05-05",
+   "simbolo": "rayado"
+  },
+  {
+   "categoria": "descanso_sindical",
+   "titulo": "Día de descanso por acuerdo sindical",
+   "audiencia": "alumnos",
+   "inicio": "2027-05-10",
+   "fin": "2027-05-10",
+   "simbolo": "circulo"
+  },
+  {
+   "categoria": "descanso_sindical",
+   "titulo": "Día de descanso por acuerdo sindical",
+   "audiencia": "alumnos",
+   "inicio": "2027-05-15",
+   "fin": "2027-05-15",
+   "simbolo": "circulo"
+  },
+  {
+   "categoria": "dia_politecnico",
+   "titulo": "Celebración del Día del Politécnico",
+   "audiencia": "alumnos",
+   "inicio": "2027-05-21",
+   "fin": "2027-05-21",
+   "simbolo": "icono",
+   "ajuste_manual": true
+  },
+  {
+   "categoria": "registro_ordinaria",
+   "titulo": "Registro de evaluación ordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2027-06-15",
+   "fin": "2027-06-17"
+  },
+  {
+   "categoria": "registro_extraordinaria",
+   "titulo": "Registro de evaluación extraordinaria",
+   "audiencia": "alumnos",
+   "inicio": "2027-06-18",
+   "fin": "2027-06-22"
+  },
+  {
+   "categoria": "fin_periodo",
+   "titulo": "Fin del periodo escolar",
+   "audiencia": "alumnos",
+   "inicio": "2027-06-22",
+   "fin": "2027-06-22",
+   "simbolo": "triangulo_inv",
+   "ajuste_manual": true
+  },
+  {
+   "categoria": "inscripcion_ets",
+   "titulo": "Inscripción a evaluación a título de suficiencia",
+   "audiencia": "alumnos",
+   "inicio": "2027-06-24",
+   "fin": "2027-06-25"
+  },
+  {
+   "categoria": "limite_calificaciones_posgrado",
+   "titulo": "Fecha límite para el registro de calificaciones en el Nivel Posgrado",
+   "audiencia": "posgrado",
+   "inicio": "2027-06-25",
+   "fin": "2027-06-25",
+   "simbolo": "circulo"
+  },
+  {
+   "categoria": "ets",
+   "titulo": "Evaluación a título de suficiencia",
+   "audiencia": "alumnos",
+   "inicio": "2027-07-05",
+   "fin": "2027-07-09"
+  },
+  {
+   "categoria": "nivelacion_nuevo_ingreso",
+   "titulo": "Periodo de nivelación académica autogestiva para alumnos de nuevo ingreso",
+   "audiencia": "nuevo_ingreso",
+   "inicio": "2027-07-19",
+   "fin": "2027-07-30",
+   "simbolo": "punteado"
+  },
+  {
+   "categoria": "vacaciones",
+   "titulo": "Vacaciones",
+   "audiencia": "alumnos",
+   "inicio": "2027-07-19",
+   "fin": "2027-07-31"
+  },
+  {
+   "categoria": "descanso_obligatorio",
+   "titulo": "Día de descanso obligatorio",
+   "audiencia": "alumnos",
+   "inicio": "2027-07-21",
+   "fin": "2027-07-21",
+   "simbolo": "rayado"
+  }
+ ]
+}
