@@ -29,6 +29,9 @@ EARLY = ("<script>(function(){var r=document.documentElement;"
          # tema: sigue al navegador; una elección manual dura solo la visita (sessionStorage). Se borra la elección
          # permanente de versiones anteriores para que todos vuelvan a modo automático.
          "try{localStorage.removeItem('theme');localStorage.removeItem('skin');var t=sessionStorage.getItem('theme');if(t==='light'||t==='dark')r.setAttribute('data-theme',t)}catch(e){}"
+         # los tokens de ipn-comun cambian de tema con data-tema (claro/oscuro): se copia desde data-theme en todo momento
+         "var sync=function(){var t=r.getAttribute('data-theme');if(t)r.setAttribute('data-tema',t==='dark'?'oscuro':'claro');else r.removeAttribute('data-tema')};"
+         "sync();if(window.MutationObserver)new MutationObserver(sync).observe(r,{attributes:true,attributeFilter:['data-theme']});"
          # escala en pantallas anchas: el contenido se diseña para ~1550 px; más ancho, todo crece (máx. 1.35×).
          # Con zoom manual del navegador el ancho útil baja y la escala vuelve a 1 (no se acumula).
          "var z=function(){var v=Math.min(1.35,Math.max(1,innerWidth/1550));r.style.setProperty('--ui-zoom',v.toFixed(3))};"
