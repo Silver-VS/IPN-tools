@@ -21,7 +21,7 @@
 .tramite-revision dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .tramite-preview{display:none;min-width:0}
 .tramite-preview iframe{width:100%;height:70vh;border:1px solid var(--ipn-borde-control)}
-.tramite-ver{display:block;margin-top:var(--ipn-esp-4)}
+.tramite-ver{display:inline-flex;margin-top:var(--ipn-esp-3)}  /* el formato se abre aparte: el visor incrustado se veía tosco (dueño, 2026-10-07) */
 .dictamen-opciones{min-width:0;border:0;padding:0;margin-block:var(--ipn-esp-3)}
 .dictamen-opciones label{display:flex;align-items:flex-start;gap:var(--ipn-esp-2);padding:var(--ipn-esp-2);margin-block:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);cursor:pointer}
 .dictamen-opciones label:has(input:checked){border-color:var(--ipn-acento);background:var(--ipn-hundido)}
@@ -33,7 +33,7 @@
 .electivas-actividad{box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
 .electivas-resumen{position:sticky;top:0;z-index:1;background:var(--ipn-superficie);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control)}
 .tramite-compuesto details button{display:block;text-align:left;max-width:100%;white-space:normal;margin-block:var(--ipn-esp-2)}
-@media(min-width:1024px){.tramite-asistente:has(.tramite-preview){grid-template-columns:minmax(0,3fr) minmax(0,2fr)}.tramite-preview{display:block}.tramite-ver{display:none}.tramite-revision>div{grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto}}
+@media(min-width:1024px){.tramite-revision>div{grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto}}
 .sate-recorte-calendario{display:flex;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:0;height:28px;margin:0 0 var(--ipn-esp-2);padding:0;color:var(--ipn-tenue);background:none;border:0;font:inherit;font-size:var(--ipn-tamano-xs);text-align:left;cursor:pointer}
 .sate-recorte-calendario__texto{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sate-recorte-calendario__mas{flex:none;white-space:nowrap}
