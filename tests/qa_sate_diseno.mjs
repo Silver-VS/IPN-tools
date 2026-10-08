@@ -144,12 +144,12 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
 }
 // Ejecutar las funciones reales de realce y selector con DOM ficticio, sin red ni navegador.
 {
-  const inicio=leer('web/sate/inicio.js'), atributos={}, valores={}, botones=[];
+  const inicio=leer('web/sate/inicio.js'), atributos={}, valores={}, botones=[], halos=[];
   let observador, cambioSistema, recargas=0;
   const raiz={getAttribute:k=>atributos[k]??null,style:{setProperty(k,v){valores[k]=v}}};
   const sistema={matches:false,addEventListener(k,f){assert.equal(k,'change');cambioSistema=f}};
   const c=vm.createContext({config:catalogo,SATE_CONFIG:config,u:'upiita',inicial:null,recordada:null,URLSearchParams,
-    location:{search:'',hash:'',reload(){recargas++}},document:{documentElement:raiz,createElement(){return {prepend(){},appendChild(b){botones.push(b)}}}},
+    location:{search:'',hash:'',reload(){recargas++}},document:{documentElement:raiz,querySelectorAll:()=>halos,createElement(tag){const n={dataset:{},style:{setProperty(k,v){this[k]=v}},prepend(){},appendChild(b){if(b.onclick)botones.push(b)}};if(tag==='span')halos.push(n);return n}},
     matchMedia:()=>sistema,MutationObserver:class{constructor(f){observador=f}observe(n,o){assert.equal(n,raiz);assert.equal(o.attributeFilter.join(','),'data-theme,data-tema')}},
     api:null,SateUI:{modal(){},cerrarModal(){}}});
   vm.runInContext(inicio.slice(inicio.indexOf('  let unidadRealce'),inicio.indexOf('  // plurales ICU')),c);
@@ -162,12 +162,15 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
   }
   const elegir=inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar('));
   vm.runInContext(elegir+'\nelegirUnidad();',c);
+  function comprobarHalos(modo){for(const [i,u] of Object.keys(catalogo).entries())assert.equal(halos[i].style['--halo'],catalogo[u].realce[modo],u+': halo propio '+modo)}
+  comprobarHalos('claro');
   for(const [i,u] of Object.keys(catalogo).entries()){
     // El callback modifica el color en el documento actual antes de pedir la recarga histórica.
     c.location.reload=()=>{assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);recargas++};
     botones[i].onclick();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
     comprobarSobre(u,'claro');
     atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
+    comprobarHalos('oscuro');
     comprobarSobre(u,'oscuro');
     atributos['data-theme']='light';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
     comprobarSobre(u,'claro');
@@ -178,6 +181,7 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
     delete atributos['data-tema'];sistema.matches=true;cambioSistema();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
     comprobarSobre(u,'oscuro');
     sistema.matches=false;cambioSistema();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    comprobarHalos('claro');
     comprobarSobre(u,'claro');
   }
   assert.equal(recargas,2,'Se conserva aislamiento de módulos al cambiar unidad');
