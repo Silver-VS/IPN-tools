@@ -223,6 +223,11 @@
         const ya = new Set([...tr().done, ...tr().curso]), avoid = S.gavoid.map(norm);
         for (const o of g.top || []) {
           const cs = o.cs;
+          if(typeof semanaOk==='function'&&!semanaOk(cs))return 'horario incompatible con Mi semana';
+          if(typeof presupuestoSemana==='function'){
+            const p=presupuestoSemana(cs),s=Object.values(p.horas).reduce((a,b)=>a+b,0);
+            if(Math.abs(s-Math.max(168,p.total))>0.001)return 'presupuesto semanal no conserva las horas';
+          }
           if (new Set(cs.map(c => c[8])).size !== cs.length) return 'una materia repetida en un horario';
           for (let a = 0; a < cs.length; a++) for (let b = a + 1; b < cs.length; b++) if (solapa(cs[a], cs[b])) return 'traslape entre ' + cs[a][8] + ' y ' + cs[b][8];
           const x = cs.find(c => ya.has(c[8])); if (x) return 'propone acreditada o en curso: ' + x[8];

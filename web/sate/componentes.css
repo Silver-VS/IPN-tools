@@ -330,6 +330,22 @@ body.sate-flotante .sate-barra{display:flex}
 @media(prefers-reduced-motion:reduce){.sate-pestana,.sate-barra__btn{transition:none}}
 
 .mm-leg .mm-fila{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--ipn-esp-1) var(--ipn-esp-3)}
+.semana-campos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:12px}
+.semana-campos p{grid-column:1/-1}
+#semana-opciones{margin:12px 0}
+#semana-opciones .semana-campos{margin-top:12px}
+#mi-semana{margin-bottom:12px;color:var(--ipn-texto)}
+#mi-semana p{font-size:.84rem;overflow-wrap:anywhere}
+#mi-semana .field,#mi-semana input,#mi-semana select{min-width:0;max-width:100%;box-sizing:border-box}
+#mi-semana .ownrow{flex-wrap:wrap}
+.semana-barra{display:flex;height:18px;overflow:hidden;border-radius:8px;background:var(--ipn-superficie)}
+.semana-parte{flex-shrink:0;background:var(--ipn-acento)}
+.semana-parte-1{background:var(--ipn-ok)}
+.semana-parte-2{background:var(--ipn-desfasada)}
+.semana-parte-3{background:var(--ipn-reprobada)}
+.semana-parte-4{background:var(--ipn-tenue)}
+.semana-parte-5{background:var(--ipn-texto)}
+.semana-parte-6{background:var(--ipn-linea)}
 
 /* Etiquetas cortas sin cambiar la acción ni duplicar controles. */
 .sate-texto-corto{display:none}

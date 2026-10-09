@@ -32,7 +32,8 @@
           "calendario"
         ]
       ],
-      "planDosPeriodos": false
+      "planDosPeriodos": false,
+      "miSemana": true
     },
     "escom": {
       "realce": {"claro": "#006090", "oscuro": "#50a8d0"},
@@ -52,7 +53,8 @@
           "horarios"
         ]
       ],
-      "planDosPeriodos": false
+      "planDosPeriodos": false,
+      "miSemana": true
     },
     "upibi": {
       "realce": {"claro": "#00805a", "oscuro": "#20b070"},
@@ -72,7 +74,8 @@
           "horarios"
         ]
       ],
-      "planDosPeriodos": false
+      "planDosPeriodos": false,
+      "miSemana": true
     }
   }
 }

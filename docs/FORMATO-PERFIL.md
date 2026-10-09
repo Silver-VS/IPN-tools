@@ -47,6 +47,7 @@ El nombre de la clave es la llave de localStorage. El prefijo indica la herramie
 |---|---|---|---|
 | `hu.w.<periodo>` | Horarios | Planes A, B… (grupos elegidos y horarios propios), marcas Sí/Quizá/No | Sí |
 | `hu.t.<carrera>` | Horarios | Materias que quieres cursar (mapa) | Sí |
+| `hu.miSemana` / `hu.<unidad>.miSemana` | Horarios | Rutina opcional: trabajo semanal, traslado por sentido, sueño diario, estudio semanal, límites de entrada y días, rango de comida | Sí |
 | `hu.car`, `hu.excl`, `hu.hide`, `hu.onlyWant`, `hu.weekend`, `hu.gtime`, `hu.verSug`, `hu.sim` | Horarios | Carrera, profesores excluidos, filtros, criterios del generador, perfil de demostración | Sí |
 | `hu.exp*` | Horarios | Preferencias de exportación (estilo, tema, horarios por hoja) | Sí |
 | `hu.tab`, `hu.per`, `hu.tur`, `hu.niv`, `hu.view`, `hu.mview`, `hu.cview`, `hu.mobnote` | Horarios | Estado de la pantalla de cada dispositivo | No |
@@ -71,6 +72,12 @@ ni seriación. Si faltan semestres, el mapa agrupa por periodo cursado y por cur
 Los perfiles anteriores siguen admitidos: muestran claves y solicitan actualizar el
 Lector para incorporar nombres. El desfase se presenta únicamente desde
 `desfasadas_saes` y `desfase_saes`; no se calcula a partir de antigüedad o seriación.
+
+Los bloques de trabajo y responsabilidades reutilizan `own` en `hu.w.<periodo>` (o
+`hu.<unidad>.w.<periodo>`), con `tipo: "trabajo"` o `tipo: "otras"` opcional.
+Los bloques anteriores sin `tipo` se conservan y cuentan como otras responsabilidades;
+los bloques con `saes` cuentan como clases. Borrar Mi semana elimina las preferencias y
+los bloques con `tipo` de las versiones del periodo consultado, conservando los anteriores.
 
 ### Planeación de dos periodos (opcional, ipnt 1)
 

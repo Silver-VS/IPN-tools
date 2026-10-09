@@ -34,6 +34,13 @@ class SateBuild(unittest.TestCase):
             capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
 
+    def test_mi_semana(self):
+        """Rutina opcional y los tres modos reales del generador, sin red ni navegador."""
+        resultado = subprocess.run(
+            [r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_semana.mjs'], cwd=ROOT,
+            capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
     def test_primera_visita_sin_datos(self):
         """Salidas, ayuda recordada y pegado con permisos o respaldo manual."""
         resultado = subprocess.run(
