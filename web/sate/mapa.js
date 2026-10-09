@@ -11,7 +11,9 @@ function renderMap0(){
   const done=new Set(tr().done), req=new Set([...ancestors(want)].filter(k=>!want.has(k)&&!done.has(k)));
   // cadena de requisitos y dependientes de la materia bajo el cursor
   let hot=null;
-  if(S.mapHover){
+  if(S.mapHover&&S.reqHover){
+    hot=new Set([S.mapHover,...S.reqHover]);hot.pre=new Set([S.mapHover]);hot.post=new Set(S.reqHover);
+  }else if(S.mapHover){
     hot=new Set([S.mapHover]);
     const post={};Object.entries(pre).forEach(([b,as])=>as.forEach(a=>(post[a]=post[a]||[]).push(b)));
     const walk=(k,g)=>{(g[k]||[]).forEach(x=>{if(!hot.has(x)){hot.add(x);walk(x,g)}})};
@@ -19,6 +21,7 @@ function renderMap0(){
     const antes=new Set(hot);walk(S.mapHover,post);hot.post=new Set([...hot].filter(x=>!antes.has(x)));   // lo que desbloquea (después)
   }
   renderInsp();
+  if(mv==='lista')renderList();
   if(!L){ // carrera sin trayectoria propuesta: cuadrícula por nivel del SAES
     const by={};Object.entries(cur()).forEach(([k,v])=>(by[v[2]]=by[v[2]]||[]).push(k));
     const cols=Math.max(...Object.values(by).map(a=>a.length)), bw=118, bh=48, gx=10, gy=18, lw=40;
@@ -110,7 +113,7 @@ function renderMap0(){
   if(FOCO&&ZOOM==null){const c=((FOCO.x0+FOCO.x1)/2)*sc-wrap.clientWidth/2;requestAnimationFrame(()=>{wrap.scrollLeft=Math.max(0,c)})}
   const ar=$('#areas');ar.hidden=!L.cols;ar.style.width=L.w*sc+'px';
   // columnas que agrupan áreas pequeñas («A · B»): un renglón por área y letra un poco menor
-  ar.innerHTML=(L.cols||[]).map(([n,a,b])=>{const k=n.includes(' · ')?.82:1;return `<div style="left:${a*sc}px;width:${(b-a)*sc}px;font-size:${Math.max(8,Math.min(14,13*sc*1.4)*k)}px;white-space:pre-line" title="${esc(n)}">${esc(n.replaceAll(' · ','\n'))}</div>`}).join('');
+  ar.innerHTML=(L.cols||[]).map(([n,a,b],i)=>{const k=n.includes(' · ')?.82:1;return `<div style="left:${a*sc}px;width:${(b-a)*sc}px;font-size:${Math.max(8,Math.min(14,13*sc*1.4)*k)}px;white-space:pre-line;border-bottom:3px solid ${AREA_COLORES[i%AREA_COLORES.length]}" title="${esc(n)}">${esc(n.replaceAll(' · ','\n'))}</div>`}).join('');
   // La ayuda conserva las notas específicas del plan fuera del flujo del mapa.
   const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v), notas=[];
   if(L.nota)notas.push(...L.nota.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ¿])/));
@@ -140,7 +143,7 @@ function renderList(){
     return null};
   $('#tlist').innerHTML=Object.keys(by).sort((a,b)=>a-b).map(g=>`<section class="tl-sem"><h4>${useSem?'Semestre propuesto '+g:'Nivel '+g}</h4><div class="tl-rows">`+
     by[g].sort((a,b)=>c[a][2]-c[b][2]||a.localeCompare(b)).map(k=>{const t=tag(k), paso=planAsignado(k), w=paso===S.planPaso, done=statusOf(k)==='done', ob=oblig.has(k), open=S.lfocus===k;
-      return `<div class="tl-row${done?' done':''}${paso!=null?' want plan-'+(paso+1):''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
+      return `<div class="tl-row${done?' done':''}${paso!=null?' want plan-'+(paso+1):''}${S.reqHover?(k===S.mapHover?' hpre':S.reqHover.includes(k)?' hpost':''):''}" style="--nv:var(--n${c[k][2]})"><span class="tl-bar"></span>`+
         `<button type="button" class="tl-name" data-lfocus="${k}" aria-expanded="${open}"><b>${esc(pretty(c[k][0]))}</b><small>${k} · ${fmtCr(c[k][1])} cr${off.has(k)||isElec(k)?'':' · sin grupos'}${t?` <span class="tl-tag ${t[1]}">${t[0]}</span>`:''}${ob?' <span class="tl-tag bad">Obligatoria</span>':''}</small></button>`+
         `<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${done||ob||isElec(k)?' disabled':''} aria-label="${w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?(PLAN_DOS_PERIODOS?paso+1:'✓'):'+'}</button>`+
         (open?`<div class="tl-more">${inspParts(k).l2}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
