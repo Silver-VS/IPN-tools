@@ -66,7 +66,7 @@ assert.equal(api.proximos(2,['becas']).length,2);
 vm.runInContext(leer('web/dist/sate/calendario.js'),c);
 const mostrar=()=>SATE.modulos.calendario.mostrar();mostrar();
 const dias=()=>box.all().filter(n=>n.getAttribute('data-fecha'));
-const nodos=clase=>box.all().filter(n=>n.className?.split(' ').includes(clase)||n.getAttribute('class')===clase);
+const nodos=clase=>box.all().filter(n=>n.className?.split(' ').includes(clase)||n.getAttribute('class')?.split(' ').includes(clase));
 assert.equal(nodos('calendario-semicirculo').length,1);
 assert.equal(nodos('calendario-mes').length,1);
 assert.equal(nodos('calendario-anillo').length,0);assert.equal(nodos('calendario-banda').length,0);
@@ -74,9 +74,16 @@ assert.equal(document.getElementById('cal-vista-periodo'),undefined);
 assert.equal(nodos('calendario-lista')[0].tagName,'details');assert.equal(nodos('calendario-lista')[0].children[0].textContent,'Ver como lista');
 assert.equal(nodos('calendario-detalle')[0].parent,nodos('calendario-contenido')[0]);
 const eventos=api.eventos().filter(e=>e.periodo==='27/1');
-assert.equal(nodos('calendario-arco').length,eventos.length);
-const paths=box.all().filter(n=>n.tagName==='textPath');assert.equal(paths.length,eventos.filter(e=>e.desde!==e.hasta).length);
-assert.ok(paths.some(n=>n.textContent.endsWith('…')));
+assert.ok(nodos('calendario-arco').length<=eventos.length);
+const paths=box.all().filter(n=>n.tagName==='textPath');
+const letras=n=>(n.textContent.match(/\p{L}/gu)||[]).length;
+for(const n of [...paths,...nodos('calendario-etiqueta-nombre')]){assert.ok(letras(n)>=6,n.textContent);assert.ok(!n.textContent.includes('…'))}
+assert.ok(nodos('calendario-etiqueta-exterior').length>0);
+const cajas=()=>nodos('calendario-etiqueta-exterior').map(n=>n.getAttribute('data-caja').split(',').map(Number));
+const sinColision=()=>{const cs=cajas();for(let i=0;i<cs.length;i++)for(let j=i+1;j<cs.length;j++){const [x,y,w,h]=cs[i],[a,b,c,d]=cs[j];assert.ok(x+w<=a||a+c<=x||y+h<=b||b+d<=y,'Cajas de etiquetas exteriores separadas')}};sinColision();
+assert.deepEqual(nodos('calendario-anillo-categoria').map(n=>n.getAttribute('data-categoria')),Array.from(api.categorias.filter(c=>eventos.some(e=>e.categoria===c))));
+assert.ok(nodos('calendario-insignia').length>0);
+for(const n of nodos('calendario-anillo-categoria'))assert.ok(Number(n.getAttribute('stroke-width'))>=12);
 for(const t of paths){assert.ok(t.getAttribute('href').startsWith('#cal-arco-'));assert.equal(t.getAttribute('startOffset'),'50%')}
 assert.equal(nodos('calendario-aguja').length,1);
 assert.ok(nodos('calendario-semicirculo')[0].getAttribute('viewBox').split(' ').map(Number)[3]<nodos('calendario-semicirculo')[0].getAttribute('viewBox').split(' ').map(Number)[2],'Medio círculo');
@@ -84,6 +91,8 @@ const guia=nodos('calendario-pista')[0].getAttribute('d').match(/M ([\d.]+) ([\d
 assert.ok(guia&&Number(guia[1])<Number(guia[5]));assert.ok(Math.abs(Number(guia[2])-Number(guia[6]))<.001,'Inicio izquierdo y fin derecho a igual altura');
 const arcos=()=>nodos('calendario-arco');
 for(const a of arcos())for(const b of arcos())if(a!==b&&a.getAttribute('data-pista')===b.getAttribute('data-pista'))assert.ok(a.getAttribute('data-hasta')<b.getAttribute('data-desde')||b.getAttribute('data-hasta')<a.getAttribute('data-desde'));
+const insignia=nodos('calendario-insignia')[0],fechaGrupo=insignia.getAttribute('data-fecha-grupo');insignia.onclick();assert.equal(document.activeElement.getAttribute('data-fecha'),fechaGrupo);
+document.getElementById('cal-hoy').onclick();
 assert.equal(nodos('calendario-dias-semana')[0].children.map(n=>n.textContent).join(' '),'D L M M J V S');
 assert.equal(dias().filter(n=>n.getAttribute('data-fecha').startsWith('2026-10')).length,31);
 assert.equal(dias().filter(n=>n.tabIndex===0).length,1);
@@ -102,11 +111,11 @@ assert.ok(nodos('calendario-rayado').length&&nodos('calendario-sindical').length
 document.getElementById('cal-audiencia').checked=true;document.getElementById('cal-audiencia').onchange();
 assert.ok(nodos('calendario-proceso').some(n=>n.getAttribute('aria-label').includes('Planeación')));
 // Sin aviso local, ESCOM y UPIBI conservan las fechas oficiales.
-c.DATA.calendario=null;c.perName=()=> '27/2';api.hoy=()=> '2027-06-15';mostrar();
+c.DATA.calendario=null;c.perName=()=> '27/2';api.hoy=()=> '2027-06-15';document.getElementById('cal-periodo').value='27/2';document.getElementById('cal-periodo').onchange();
 assert.equal(api.eventos().find(e=>e.categoria==='inicio'&&e.periodo==='27/2').desde,'2027-01-25');
 assert.equal(dias().find(n=>n.getAttribute('data-fecha')==='2027-06-15').getAttribute('data-categoria'),'ordinaria');
 assert.ok(box.all().some(n=>n.getAttribute('data-simbolo')==='triangulo_invertido'));
-arcos().find(n=>n.getAttribute('data-categoria')==='politecnico').onclick();
+nodos('calendario-proceso').find(n=>n.getAttribute('data-categoria')==='politecnico').onclick();
 assert.equal(document.getElementById('cal-mes').textContent,'mayo 2027');assert.ok(box.all().some(n=>n.getAttribute('data-simbolo')==='estrella'));
 // Bisiesto y procesos superpuestos: selección íntegra y navegación civil.
 c.SATE_CONFIG={...config,calendarioBase:null};c.DATA.calendario={periodo:'28/2',eventos:[
@@ -131,9 +140,9 @@ const css=leer('web/sate/componentes.css'),bloque=css.slice(css.indexOf('#sate-c
 assert.match(bloque,/@media\(min-width:1024px\)\{\.calendario-layout\{grid-template-columns:minmax\(0,1fr\) minmax\(0,1fr\)/);
 assert.match(bloque,/\.calendario-layout\{display:grid;grid-template-columns:minmax\(0,1fr\)/);
 assert.match(bloque,/grid-template-columns:repeat\(7,minmax\(0,1fr\)\)/);
-assert.match(bloque,/\.calendario-semicirculo\{display:block;width:100%;max-width:38rem;height:auto/);
+assert.match(bloque,/\.calendario-semicirculo\{display:block;width:100%;height:auto/);
 assert.match(bloque,/overflow-wrap:anywhere/);assert.match(bloque,/@media\(max-width:720px\)/);
-assert.doesNotMatch(bloque,/min-width:(?:14rem|[4-9]\d\dpx)|calendario-anillo|calendario-banda/);
+assert.doesNotMatch(bloque,/min-width:(?:14rem|[4-9]\d\dpx)|\.calendario-anillo\{|calendario-banda/);
 assert.match(bloque,/\.calendario-dia\.calendario-rayado\{background:repeating-linear-gradient/);
 assert.match(bloque,/\.calendario-sindical \.calendario-numero\{border:2px solid #3470b0;border-radius:50%/);
 const rgb=s=>s.slice(1).match(/../g).map(n=>parseInt(n,16)/255);
@@ -141,4 +150,23 @@ const lum=s=>rgb(s).map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4).reduce((s,v,
 const ratio=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
 for(const m of bloque.matchAll(/\[data-categoria=([\w]+)\]\{--cal-fill:(#[\da-f]+);--cal-ink:(#[\da-f]+)/g))assert.ok(ratio(m[2],m[3])>=4.5,'AA relleno/texto '+m[1]);
 for(const m of bloque.matchAll(/--cal-fondo:(#[\da-f]+);--cal-texto:(#[\da-f]+);--cal-tenue:(#[\da-f]+)/g)){assert.ok(ratio(m[1],m[2])>=4.5);assert.ok(ratio(m[1],m[3])>=4.5)}
-console.log('CAL3: base única, fusión, audiencias, semicírculo/textPath/aguja, selección bidireccional, símbolos, teclado, bisiesto, recortes, CSS móvil y contraste AA. OK.');
+// Una instancia nueva elige hoy o el próximo periodo, aunque el plan señale otro.
+const reiniciar=()=>{vm.runInContext(leer('web/dist/sate/calendario.js'),c);mostrar()};
+c.SATE_CONFIG=config;c.DATA.calendario=data.upiita;c.perName=()=> '27/2';api.hoy=()=> '2026-10-09';reiniciar();
+assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'27/1');
+api.hoy=()=> '2027-06-15';reiniciar();assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'27/2');
+c.SATE_CONFIG={...config,calendarioBase:null};c.DATA.calendario={periodo:'28/1',eventos:[e('ets','2028-01-01',{hasta:'2028-01-05',periodo:'28/1'}),e('ets','2028-02-01',{hasta:'2028-02-05',periodo:'28/2'})]};
+api.hoy=()=> '2028-01-20';reiniciar();assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'28/2');
+// Solapamientos de una categoría usan subpistas; otras categorías conservan su anillo.
+c.DATA.calendario={periodo:'28/2',eventos:[e('ets','2028-02-01',{hasta:'2028-02-12',periodo:'28/2'}),e('ets','2028-02-03',{hasta:'2028-02-08',periodo:'28/2'}),e('saberes','2028-02-02',{hasta:'2028-02-09',periodo:'28/2'})]};api.hoy=()=> '2028-02-04';reiniciar();
+assert.equal(nodos('calendario-anillo-categoria').length,2);assert.equal(nodos('calendario-anillo-categoria')[0].getAttribute('data-subpistas'),'2');sinColision();
+// Teléfono: únicamente la selección tiene etiqueta exterior, incluyendo un día agrupado.
+c.SATE_CONFIG=config;c.DATA.calendario=data.upiita;c.matchMedia=()=>({matches:true});box.clientWidth=360;api.hoy=()=> '2026-10-09';reiniciar();
+assert.ok(nodos('calendario-etiqueta-exterior').length>0);assert.ok(nodos('calendario-etiqueta-exterior').every(n=>n.getAttribute('data-seleccionada')==='true'));sinColision();
+for(const n of nodos('calendario-anillo-categoria'))assert.ok(Number(n.getAttribute('stroke-width'))>=8);
+arcos().find(n=>n.getAttribute('aria-label').includes('protocolo')).onclick();assert.ok(nodos('calendario-etiqueta-nombre').some(n=>n.textContent==='Protocolo TT'));
+assert.equal(nodos('calendario-fuente')[0].tagName,'details');assert.equal(nodos('calendario-fuente')[0].children[0].textContent,'Fuente');
+assert.match(nodos('calendario-svg-hoy')[0].textContent,/hoy · 9 oct/);
+document.getElementById('cal-audiencia').checked=true;document.getElementById('cal-audiencia').onchange();
+for(const n of nodos('calendario-anillo-categoria'))assert.ok(Number(n.getAttribute('d').match(/ A ([\d.-]+)/)[1])>0,'Radio positivo al ampliar audiencia');
+console.log('CAL4: anillos por categoría, subpistas, nombres completos, cajas separadas, insignias, periodo actual/próximo, selección móvil y regresiones CAL3. OK.');
