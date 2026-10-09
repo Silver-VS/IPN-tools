@@ -682,12 +682,18 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 .box.want.plan-2,.box.want.plan-2.offered-no{background:var(--plan-segundo);border-color:var(--plan-segundo);color:var(--plan-segundo-fg)}
 .box.want::after{content:none}
 .box .plan-marca{position:absolute;top:1px;right:3px;margin:0;font-size:.95em}
+.box:has(.plan-marca){padding-top:1.4em}
+.box.plan-otra,.tl-row.plan-otra{opacity:.6}
+.plan-resumen .plan-vista{font-weight:700;background:var(--accent-soft)}
+.plan-bandeja .plan-resumen:has(.plan-vista){display:flex;flex-wrap:wrap;white-space:normal}
+.plan-bandeja .plan-resumen:has(.plan-vista)>span{display:block;font-size:inherit}
 .plan-leyenda{display:flex;gap:12px;flex-wrap:wrap}
 .plan-leyenda span{border-left:4px solid var(--accent);padding-left:6px}
 .plan-leyenda .plan-2{border-color:var(--plan-segundo)}
 @media(max-width:720px){.plan-grupos{grid-template-columns:1fr}}
 
 .maptools{flex-wrap:nowrap;gap:8px}
+.maptools:has(#plan-periodos:not([hidden])){flex-wrap:wrap}
 #map-ayuda{margin-left:auto;white-space:nowrap}
 #legend{flex-wrap:nowrap;margin-bottom:10px;white-space:nowrap}
 #plan-opciones[hidden],#plan-periodos [hidden],#plan-activo[hidden],#plan-leyenda[hidden]{display:none}
@@ -747,7 +753,7 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
     <div class="legend" id="legend" aria-label="Simbología"></div>
     <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     <div id="plan-opciones" hidden>
-      <div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button><button class="link" type="button" id="plan-supuesto" hidden>ⓘ</button></div>
+      <span id="plan-vista-etiqueta" hidden>Planear:</span><div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button><button class="link" type="button" id="plan-supuesto" hidden>ⓘ</button></div>
       <span id="plan-activo" role="status" aria-live="polite"></span>
       <div class="plan-leyenda" id="plan-leyenda"></div>
     </div>

@@ -32,7 +32,7 @@
           "calendario"
         ]
       ],
-      "planDosPeriodos": false,
+      "planDosPeriodos": true,
       "miSemana": true
     },
     "escom": {
@@ -53,7 +53,7 @@
           "horarios"
         ]
       ],
-      "planDosPeriodos": false,
+      "planDosPeriodos": true,
       "miSemana": true
     },
     "upibi": {
@@ -74,7 +74,7 @@
           "horarios"
         ]
       ],
-      "planDosPeriodos": false,
+      "planDosPeriodos": true,
       "miSemana": true
     }
   }
