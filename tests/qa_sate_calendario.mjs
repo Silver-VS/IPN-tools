@@ -176,18 +176,52 @@ assert.equal(vm.runInContext("perName(perDeFecha('19/10/2026'))",periodos),'27/1
 assert.equal(vm.runInContext("perName(perDeFecha('16/08/2027'))",periodos),'28/1');
 assert.equal(vm.runInContext("perName(perDeFecha('25/02/2027'))",periodos),'27/2');
 c.SATE_CONFIG=config;c.DATA.calendario=data.upiita;c.perName=()=> '27/2';api.hoy=()=> '2026-10-09';reiniciar();
-assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'27/1');
+assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'26/2','El ETS de hoy tiene prioridad sobre el periodo que contiene hoy');
+assert.equal(document.getElementById('cal-mes').textContent,'octubre 2026');
+const elegirPeriodo=p=>{document.getElementById('cal-periodo').value=p;document.getElementById('cal-periodo').onchange()};
+elegirPeriodo('27/1');
+const dia9=()=>dias().find(n=>n.getAttribute('data-fecha')==='2026-10-09');
+assert.ok(dia9().getAttribute('aria-label').includes('ETS'));
+dia9().onclick();
+assert.ok(nodos('calendario-detalle-evento').some(n=>n.textContent.includes('Periodo 26/2')));
+const ver26=()=>box.all().find(n=>n.tagName==='button'&&n.textContent==='Ver periodo 26/2');
+assert.ok(ver26());
+// Redibujar sin cambiar el periodo conserva la selección de otro periodo.
+mostrar();assert.ok(ver26());ver26().onclick();
+assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'26/2');
+assert.equal(document.getElementById('cal-mes').textContent,'octubre 2026');
+assert.ok(arcos().some(n=>n.getAttribute('aria-label').includes('ETS')&&n.getAttribute('aria-pressed')==='true'));
+elegirPeriodo('27/1');
+document.getElementById('cal-filtro-ets').checked=false;document.getElementById('cal-filtro-ets').onchange();
+assert.ok(!dia9().getAttribute('aria-label').includes('ETS'));
+document.getElementById('cal-filtro-ets').checked=true;document.getElementById('cal-filtro-ets').onchange();
+assert.ok(dia9().getAttribute('aria-label').includes('ETS'));
+for(const n of dias()){
+  const s=n.getAttribute('data-fecha'),esperados=api.eventos().filter(e=>e.desde<=s&&e.hasta>=s);
+  assert.deepEqual(n.children[1].children.map(n=>n.title),Array.from(esperados.map(e=>e.titulo)),'Todos los periodos del día '+s);
+}
+assert.ok(!dias().some(n=>n.getAttribute('aria-label').includes('Planeación')));
+document.getElementById('cal-audiencia').checked=true;document.getElementById('cal-audiencia').onchange();
+assert.ok(dias().some(n=>n.getAttribute('aria-label').includes('Planeación')));
+document.getElementById('cal-audiencia').checked=false;document.getElementById('cal-audiencia').onchange();
 sinColision();assert.equal(box.getAttribute('data-calendario-propio'),'true');
 assert.match(nodos('calendario-svg-hoy')[0].textContent,/hoy · 9 oct/);
 api.hoy=()=> '2027-02-10';reiniciar();assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'27/1','UPIITA sigue en 27/1 cuando la base oficial ya inició 27/2');
 api.hoy=()=> '2027-06-15';reiniciar();assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'27/2');
 c.SATE_CONFIG={...config,calendarioBase:null};c.DATA.calendario={periodo:'28/1',eventos:[e('ets','2028-01-01',{hasta:'2028-01-05',periodo:'28/1'}),e('ets','2028-02-01',{hasta:'2028-02-05',periodo:'28/2'})]};
 api.hoy=()=> '2028-01-20';reiniciar();assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'28/2');
+assert.equal(document.getElementById('cal-mes').textContent,'enero 2028','Hoy dentro del horizonte aunque el periodo elegido empiece en febrero');
+api.hoy=()=> '2029-01-20';reiniciar();assert.equal(document.getElementById('cal-mes').textContent,'febrero 2028','Fuera del horizonte abre el primer mes del periodo');
+c.DATA.calendario={periodo:'28/1',periodos:{'28/1':{desde:'2028-01-01',hasta:'2028-01-31'},'28/2':{desde:'2028-02-01',hasta:'2028-02-28'}},eventos:[e('ets','2028-01-03',{periodo:'28/1'}),e('ets','2028-02-02',{periodo:'28/2'})]};
+api.hoy=()=> '2028-01-20';reiniciar();assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'28/1','Sin proceso hoy usa el periodo que contiene hoy');
+api.hoy=()=> '2028-02-25';reiniciar();assert.equal(document.getElementById('cal-mes').textContent,'febrero 2028','Los límites del periodo también forman parte del horizonte');
+api.hoy=()=> '2029-01-01';reiniciar();assert.equal(document.getElementById('cal-mes').textContent,'febrero 2028');
 // Solapamientos de una categoría usan subpistas; otras categorías conservan su anillo.
 c.DATA.calendario={periodo:'28/2',eventos:[e('ets','2028-02-01',{hasta:'2028-02-12',periodo:'28/2'}),e('ets','2028-02-03',{hasta:'2028-02-08',periodo:'28/2'}),e('saberes','2028-02-02',{hasta:'2028-02-09',periodo:'28/2'})]};api.hoy=()=> '2028-02-04';reiniciar();
 assert.equal(nodos('calendario-anillo-categoria').length,2);assert.equal(nodos('calendario-anillo-categoria')[0].getAttribute('data-subpistas'),'2');sinColision();
 // Teléfono: únicamente la selección tiene etiqueta exterior, incluyendo un día agrupado.
 c.SATE_CONFIG=config;c.DATA.calendario=data.upiita;c.matchMedia=()=>({matches:true});box.clientWidth=375;api.hoy=()=> '2026-10-09';reiniciar();
+assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'26/2');elegirPeriodo('27/1');
 assert.ok(nodos('calendario-etiqueta-exterior').length>0);assert.ok(nodos('calendario-etiqueta-exterior').every(n=>n.getAttribute('data-seleccionada')==='true'));sinColision();
 for(const n of nodos('calendario-anillo-categoria'))assert.ok(Number(n.getAttribute('stroke-width'))>=8);
 arcos().find(n=>n.getAttribute('aria-label').includes('protocolo')).onclick();assert.ok(nodos('calendario-etiqueta-nombre').some(n=>n.textContent==='Protocolo TT'));
@@ -204,4 +238,4 @@ assert.match(bloque,/@media\(max-width:599px\)\{\.calendario-audiencia\{flex:0 0
 assert.match(bloque,/\.calendario-audiencia-larga\{display:none\}\.calendario-audiencia-corta\{display:inline\}/);
 document.getElementById('cal-audiencia').checked=true;document.getElementById('cal-audiencia').onchange();
 for(const n of nodos('calendario-anillo-categoria'))assert.ok(Number(n.getAttribute('d').match(/ A ([\d.-]+)/)[1])>0,'Radio positivo al ampliar audiencia');
-console.log('CAL5: calendario propio UPIITA, base oficial ESCOM, ETS locales, nomenclatura, colisiones compartidas, márgenes a 375 px, capas y controles móviles. OK.');
+console.log('CAL6: mes con todos los periodos, audiencia y filtros, detalle y cambio de periodo, prioridades de hoy y mes inicial con fecha fija; regresiones CAL5. OK.');
