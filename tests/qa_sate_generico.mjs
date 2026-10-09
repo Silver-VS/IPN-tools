@@ -106,6 +106,29 @@ assert.equal(Object.keys(encb.materias).length,45);assert.equal(encb.acreditadas
 assert.ok(encb.no_cursadas.every(r=>r[3]>=7));assert.equal(encb.en_curso.length,0);
 assert.deepEqual([...new Set(encb.acreditadas.map(r=>r[3]))].sort(),['ETS','EXT','ORD','REC']);
 assert.equal(encbHorario.en_curso.length,5);assert.equal(encbHorario.horario_inscrito.length,5);
+for(const a of [encb,encbHorario]){
+  const kardex=[...a.acreditadas,...a.kardex_reprobadas], periodos=[...new Set(kardex.map(r=>r[2]))].sort();
+  assert.deepEqual(periodos,['23/2','24/1','24/2','25/1','25/2','26/1']);
+  assert.equal(periodos.length,a.avance.cursados,'Periodos cursados = periodos distintos del kárdex');
+  for(const p of periodos){
+    const n=kardex.filter(r=>r[2]===p).length;
+    assert.ok(n>=5&&n<=8,p+': entre 5 y 8 evaluaciones, incluidas las reprobadas');
+  }
+  assert.ok(new Set(a.acreditadas.map(r=>r[1])).size>=4,'Histograma con al menos cuatro notas distintas');
+  assert.ok(a.acreditadas.every(r=>r[1]>=6&&r[1]<=10));
+  for(const [forma,n] of [['EXT',2],['ETS',1],['REC',1]])assert.equal(a.acreditadas.filter(r=>r[3]===forma).length,n,forma);
+  const recurse=a.acreditadas.find(r=>r[3]==='REC'), previa=a.kardex_reprobadas.find(r=>r[0]===recurse[0]);
+  assert.ok(previa&&previa[1]>=0&&previa[1]<=5&&previa[2]<recurse[2],'Recurse después de un intento reprobado');
+  const media=kardex.reduce((s,r)=>s+r[1],0)/kardex.length;
+  assert.equal(a.promedio,Math.round(media*100)/100,'Promedio SAES incluye las reprobadas 0–5 y se redondea a centésimas');
+  const cr=periodos.map(p=>a.acreditadas.filter(r=>r[2]===p).reduce((s,r)=>s+a.creditos_materias[r[0]],0));
+  assert.ok(new Set(cr).size>=4,'Créditos por periodo variables');
+  assert.equal(cr.reduce((s,n)=>s+n,0),a.avance.obtenidos);
+  assert.equal(a.avance.obtenidos+a.avance.faltan,a.carga.total);
+}
+assert.deepEqual(encbHorario.acreditadas,encb.acreditadas,'El horario no cambia el historial de seis periodos');
+assert.deepEqual(encbHorario.kardex_reprobadas,encb.kardex_reprobadas);
+assert.ok(encbHorario.en_curso.every(k=>!encbHorario.acreditadas.some(r=>r[0]===k)),'Inscritas pendientes para el siguiente periodo 26/2');
 for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','encb-viejo','encb-curso-sin-horario','demo','demo-horario']){
   const unidad=modo.startsWith('encb')||modo.startsWith('demo')?'encb':'esimez';
   const p=structuredClone(unidad==='encb'?(modo.endsWith('horario')?encbHorario:encb):perfil);
@@ -139,7 +162,8 @@ for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','va
   assert.equal(c.SATE.actual.pestana,modo==='vacio'?'mapa':'trayectoria');
   const tray=document.getElementById('sate-trayectoria');
   if(modo!=='vacio'){
-    assert.match(tray.innerHTML,/Promedio del SAES: 8/);assert.match(tray.innerHTML,/Duración máxima: 12/);
+    assert.ok(tray.innerHTML.includes('Promedio del SAES: '+p.promedio));assert.match(tray.innerHTML,/Duración máxima: 12/);
+    assert.match(tray.innerHTML,/<div class="trayectoria-datos"><p>[^<]+<\/p><p>Promedio del SAES:/,'Estado y datos agrupados, sin filas separadas por el minimapa');
     assert.match(tray.innerHTML,/class="kx-c g8"/);assert.doesNotMatch(tray.innerHTML,/NaN|undefined|Sugerida|Sin área/);
     for(const componente of ['Promedio sin reprobadas','k-regla','Tus calificaciones','k-hist','En ordinario','k-anillo','Créditos por periodo','Tu camino en la carrera','cm-track','Tu kárdex por periodo','trayectoria-kardex','¿Y si…?','meta-panel','id="sate-presente"','trayectoria-minimapa'])assert.ok(tray.innerHTML.includes(componente),componente+' a '+ancho+' px');
     assert.doesNotMatch(tray.innerHTML,/trayectoria-areas|trayectoria-observaciones|Tus áreas|seriación|oferta/);
@@ -147,7 +171,15 @@ for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','va
     assert.equal(/id="trayectoria-escenario" open/.test(tray.innerHTML),ancho>720,'Escenario sigue el mismo acomodo responsive');
     if(unidad==='encb')for(const componente of ['k-bars','cm-m pas','cm-m fut','Terminarías','<i>E</i>','<i>T</i>'])assert.ok(tray.innerHTML.includes(componente),componente);
     const D=c.SateGenerico.estadisticas(p,c.SateGenerico.datos(p));
-    assert.equal(D.media,8);assert.ok(D.rows.every(r=>r.cal>=6&&r.cal<=10));
+    assert.equal(D.media,p.acreditadas.reduce((s,r)=>s+r[1],0)/p.acreditadas.length);assert.ok(D.rows.every(r=>r.cal>=6&&r.cal<=10));
+    if(unidad==='encb'){
+      assert.equal(D.porPer.length,6);assert.equal(D.curva.length,6,'Tu camino tiene marcas de los seis periodos');
+      assert.equal(D.curva.at(-1).acum,p.avance.obtenidos);
+      assert.equal(D.meta,26*2+1,'Siguiente periodo en curso: 26/2');
+      assert.equal((tray.innerHTML.match(/class="cm-m pas/g)||[]).length,6);
+      for(const periodo of ['23/2','24/1','24/2','25/1','25/2','26/1'])assert.ok(tray.innerHTML.includes('title="'+periodo+':'),periodo+' en Tu camino');
+      assert.match(tray.innerHTML,/<i>R<\/i>/);
+    }
     const repetido=c.SateGenerico.estadisticas({...p,acreditadas:[...p.acreditadas,p.acreditadas[0]]},c.SateGenerico.datos(p));
     assert.equal(repetido.rows.length,D.rows.length,'Una acreditación por clave');
     if(modo==='actual')assert.equal(D.ritmo,null,'No inferir créditos por materia');
@@ -236,6 +268,9 @@ for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','va
 const css=leer('web/sate/componentes.css'), shell=leer('web/sate/cascaron.html');
 assert.match(css,/@media\(max-width:720px\)\{\.horario-inscrito/);
 assert.doesNotMatch(css,/\[data-sate-generico\] \.trayectoria-minimapa\{/,'Sin sustituir el acomodo compartido');
+assert.match(css,/\.trayectoria-datos\{[^}]*grid-column:1;grid-row:2 \/ span 4;align-self:start;display:grid;gap:\.35rem/);
+assert.match(css,/\.trayectoria-datos p\{margin:0;line-height:1\.6\}/);
+assert.match(css,/@media\(max-width:720px\)\{\.trayectoria-datos\{grid-row:3\}\}/);
 const acreditada=shell.match(/\.box\.done\{([^}]+)\}/)[1];
 assert.match(acreditada,/opacity:1/);assert.match(acreditada,/color:var\(--fg\)/);assert.match(acreditada,/background:var\(--surface\)/);
 assert.doesNotMatch(acreditada,/line-through/,'Contrato de contraste: texto sin tachado ni opacidad reducida');

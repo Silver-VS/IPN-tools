@@ -324,6 +324,10 @@ body.sate-flotante .sate-barra{display:flex}
 .trayectoria-minimapa .mm-leg{display:flex;flex-direction:column;align-items:center;gap:var(--ipn-esp-1);margin-top:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto)}
 [data-sate-generico] #v-tray,[data-sate-generico] #v-hor,[data-sate-generico] #sate-trayectoria{min-width:0;max-width:100%;overflow-wrap:anywhere}
 [data-sate-generico] .mapwrap,[data-sate-generico] .calwrap{max-width:100%;min-width:0}
+/* Un solo bloque evita que la altura del minimapa se reparta entre los datos del SAES. */
+.trayectoria-datos{grid-column:1;grid-row:2 / span 4;align-self:start;display:grid;gap:.35rem;min-width:0}
+.trayectoria-datos p{margin:0;line-height:1.6}
+@media(max-width:720px){.trayectoria-datos{grid-row:3}}
 [data-sate-generico] .box,[data-sate-generico] .blk{cursor:default}
 [data-sate-generico] .areas{position:relative;height:30px}
 [data-sate-generico] .tl-name{cursor:default}
