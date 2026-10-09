@@ -55,13 +55,20 @@
     const punto=(a,r)=>[centro+Math.cos(a)*r,centro+Math.sin(a)*r];
     const path=(a,b,r)=>{const p=punto(a,r),q=punto(b,r);return `M ${p[0]} ${p[1]} A ${r} ${r} 0 0 1 ${q[0]} ${q[1]}`};
     const dibujo=svg('svg',{class:'calendario-semicirculo','aria-label':tx('grafico_periodo',{periodo}),role:'group','data-grosor':grueso,'data-movil':movil}),defs=svg('defs');dibujo.appendChild(defs);
-    anillos.forEach(({c,r,n})=>dibujo.appendChild(svg('path',{d:path(Math.PI,2*Math.PI,r),class:'calendario-anillo-categoria','data-categoria':c,'data-subpistas':n,'stroke-width':grueso})));
-    dibujo.appendChild(svg('path',{d:path(Math.PI,2*Math.PI,interior),class:'calendario-anillo-simbolos'}));
+    anillos.filter(({c})=>items.some(i=>i.categoria===c)).forEach(({c,r,n})=>dibujo.appendChild(svg('path',{d:path(Math.PI,2*Math.PI,r),class:'calendario-anillo-categoria','data-categoria':c,'data-subpistas':n,'stroke-width':grueso})));
+    if(eventos.some(e=>e.desde===e.hasta))dibujo.appendChild(svg('path',{d:path(Math.PI,2*Math.PI,interior),class:'calendario-anillo-simbolos'}));
     dibujo.appendChild(svg('path',{d:path(Math.PI,2*Math.PI,exterior+12),class:'calendario-pista'}));
     function linea(a,r1,r2,clase){const p=punto(a,r1),q=punto(a,r2);dibujo.appendChild(svg('line',{x1:p[0],y1:p[1],x2:q[0],y2:q[1],class:clase}))}
+    if(api.hoy()>=desde&&api.hoy()<=hasta)linea(ang(api.hoy()),12,exterior+12,'calendario-aguja');
+    const cajas=[];let arriba=0;
+    function reservar(x,y,w,h){
+      // Meses, hoy y procesos comparten el mismo margen de separación.
+      while(cajas.some(c=>x<c.x+c.w+4&&x+w+4>c.x&&y<c.y+c.h+4&&y+h+4>c.y))y-=h+5;
+      cajas.push({x,y,w,h});arriba=Math.min(arriba,y-4);return y;
+    }
     for(let s=desde;s<=hasta;s=sumar(s,1)){
       if(date(s).getDay()===1)linea(ang(s),exterior+10,exterior+15,'calendario-tick');
-      if(s===desde||s.endsWith('-01')){linea(ang(s),exterior+7,exterior+12,'calendario-tick');const finMes=iso(new Date(date(s).getFullYear(),date(s).getMonth()+1,1)),medio=sumar(s,Math.floor((Math.min(numero(hasta)+1,numero(finMes))-numero(s))/2)),p=punto(ang(medio),exterior+10),t=svg('text',{x:p[0],y:p[1],'text-anchor':'middle',class:'calendario-svg-mes'});t.textContent=date(s).toLocaleDateString('es-MX',{month:'short'});dibujo.appendChild(t)}
+      if(s===desde||s.endsWith('-01')){linea(ang(s),exterior+7,exterior+12,'calendario-tick');const finMes=iso(new Date(date(s).getFullYear(),date(s).getMonth()+1,1)),medio=sumar(s,Math.floor((Math.min(numero(hasta)+1,numero(finMes))-numero(s))/2)),p=punto(ang(medio),exterior+10),nombre=date(s).toLocaleDateString('es-MX',{month:'short'}),w=nombre.length*8+8,x=Math.max(4,Math.min(tam-w-4,p[0]-w/2)),y=reservar(x,p[1]-14,w,18),t=svg('text',{x:x+4,y:y+14,'text-anchor':'start',class:'calendario-svg-mes','data-caja':[x,y,w,18].join(',')});t.textContent=nombre;dibujo.appendChild(t)}
     }
     const pendientes=[],elegido=e=>detalleActual?.eventos.some(v=>v.titulo===e.titulo&&v.desde===e.desde&&v.hasta===e.hasta);
     function marca(e,pista){
@@ -89,23 +96,21 @@
       dibujo.appendChild(g);es.forEach(e=>{if(elegido(e))pendientes.push({e,nombre:corto(e),a,r:interior,g})});
     });
     const etiquetas=[];
-    pendientes.sort((a,b)=>a.a-b.a).forEach(item=>{if(movil&&!elegido(item.e))return;const anterior=etiquetas.find(v=>v.e.categoria===item.e.categoria&&v.nombre===item.nombre&&Math.abs(v.a-item.a)<.16);
-      if(anterior){anterior.items.push(item);return}etiquetas.push({...item,items:[item]});});
-    const cajas=[];let arriba=0;
-    if(api.hoy()>=desde&&api.hoy()<=hasta){const a=ang(api.hoy());linea(a,12,exterior+12,'calendario-aguja');const p=punto(a,exterior+12),nombre=tx('hoy_fecha',{fecha:date(api.hoy()).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}),w=nombre.length*7;
-      const x=Math.max(4,Math.min(tam-w-4,p[0]-w/2)),y=p[1]-12,t=svg('text',{x,y,'text-anchor':'start',class:'calendario-svg-hoy'});t.textContent=nombre;dibujo.appendChild(t);cajas.push({x,y:y-14,w,h:18});arriba=Math.min(arriba,y-20);}
+    pendientes.sort((a,b)=>a.a-b.a).forEach(item=>{if(movil&&!elegido(item.e))return;const anterior=etiquetas.find(v=>v.e.categoria===item.e.categoria&&v.nombre===item.nombre);
+      if(anterior){anterior.items.push(item);anterior.a=anterior.items.reduce((s,i)=>s+i.a,0)/anterior.items.length;return}etiquetas.push({...item,items:[item]});});
+    if(api.hoy()>=desde&&api.hoy()<=hasta){const a=ang(api.hoy()),p=punto(a,exterior+12),nombre=tx('hoy_fecha',{fecha:date(api.hoy()).toLocaleDateString('es-MX',{day:'numeric',month:'short'})}),w=nombre.length*7;
+      const x=Math.max(4,Math.min(tam-w-4,p[0]-w/2)),y=reservar(x,p[1]-26,w,18),t=svg('text',{x,y:y+14,'text-anchor':'start',class:'calendario-svg-hoy','data-caja':[x,y,w,18].join(',')});t.textContent=nombre;dibujo.appendChild(t);}
     etiquetas.forEach(v=>{
       const nombre=v.nombre+(v.items.length>1?' ×'+v.items.length:''),w=nombre.length*7+8,h=18,p=punto(v.a,exterior+44),x=Math.max(4,Math.min(tam-w-4,p[0]-w/2));
       const cercano=Math.max(x,Math.min(x+w,centro));let y=Math.min(p[1]-h,centro-Math.sqrt(Math.max(0,exterior**2-(cercano-centro)**2))-h-20);
       // Subir la caja completa conserva separación y deja la guía unida al arco.
-      while(cajas.some(c=>x<c.x+c.w+4&&x+w+4>c.x&&y<c.y+c.h+4&&y+h+4>c.y))y-=h+5;
-      cajas.push({x,y,w,h});arriba=Math.min(arriba,y-4);
+      y=reservar(x,y,w,h);
       const grupo=svg('g',{class:'calendario-etiqueta-exterior','data-caja':[x,y,w,h].join(','),'data-seleccionada':v.items.some(i=>elegido(i.e))});
       v.items.forEach(i=>{const q=punto(i.a,i.r);grupo.appendChild(svg('path',{d:`M ${q[0]} ${q[1]} L ${p[0]} ${p[1]} L ${x+w/2} ${y+h}`,class:'calendario-guia'}))});
       grupo.appendChild(svg('rect',{x,y,width:w,height:h,rx:4,class:'calendario-etiqueta-fondo'}));const t=svg('text',{x:x+4,y:y+13,class:'calendario-etiqueta-nombre'});t.textContent=nombre;grupo.appendChild(t);conectar(grupo,v.e);grupo.setAttribute('role','button');grupo.setAttribute('tabindex',0);grupo.onkeydown=k=>{if(k.key==='Enter'||k.key===' '){k.preventDefault();grupo.onclick()}};dibujo.appendChild(grupo);
     });
     const titulo=svg('text',{x:centro,y:centro+20,'text-anchor':'middle',class:'calendario-svg-periodo'});titulo.textContent=tx('periodo_nombre',{periodo});dibujo.appendChild(titulo);
-    dibujo.setAttribute('viewBox',`0 ${arriba} ${tam} ${centro+28-arriba}`);contenido.appendChild(dibujo);contenido.appendChild(el('p',rango({desde,hasta}),'calendario-rango'));
+    dibujo.setAttribute('viewBox',`-20 ${arriba} ${tam+40} ${centro+28-arriba}`);contenido.appendChild(dibujo);contenido.appendChild(el('p',rango({desde,hasta}),'calendario-rango'));
   }
   function mesGrafico(contenido,eventos,desde,hasta){
     const disponibles=meses(desde,hasta);if(!disponibles.includes(mes))mes=disponibles.includes(api.hoy().slice(0,7))?api.hoy().slice(0,7):disponibles[0];
@@ -125,15 +130,17 @@
     }grid.appendChild(fechas);contenido.appendChild(grid);
   }
   function mostrar(){
-    const box=document.getElementById('sate-calendario'),eventos=api.eventos(ampliar),opciones=[...new Set(eventos.map(e=>e.periodo))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));marcas=[];dias=[];hover=null;enfocado=null;redibujarGrafico=null;box.replaceChildren();box.appendChild(el('h2',SATE.texto('sate.pestana.calendario.titulo')));if(!eventos.length){box.appendChild(el('p',tx('sin_eventos')));return}
+    const box=document.getElementById('sate-calendario'),eventos=api.eventos(ampliar),opciones=[...new Set(eventos.map(e=>e.periodo))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));box.setAttribute('data-unidad',SATE_UNIDAD);marcas=[];dias=[];hover=null;enfocado=null;redibujarGrafico=null;box.replaceChildren();box.appendChild(el('h2',SATE.texto('sate.pestana.calendario.titulo')));if(!eventos.length){box.appendChild(el('p',tx('sin_eventos')));return}
     const base=typeof SATE_CONFIG==='undefined'?null:SATE_CONFIG.calendarioBase;
     if(!opciones.includes(periodo)){
-      const limites=opciones.map(p=>{const es=eventos.filter(e=>e.periodo===p);return {p,...(base?.periodos[p]||{desde:es.map(e=>e.desde).sort()[0],hasta:es.map(e=>e.hasta).sort().at(-1)})}}).sort((a,b)=>a.desde.localeCompare(b.desde));
+      const local=typeof DATA==='undefined'?null:DATA.calendario;
+      const limites=opciones.map(p=>{const es=eventos.filter(e=>e.periodo===p);return {p,...(local?.periodos?.[p]||base?.periodos[p]||{desde:es.map(e=>e.desde).sort()[0],hasta:es.map(e=>e.hasta).sort().at(-1)})}}).sort((a,b)=>a.desde.localeCompare(b.desde));
       periodo=limites.find(p=>p.desde<=api.hoy()&&p.hasta>=api.hoy())?.p||limites.find(p=>p.desde>api.hoy())?.p||limites.at(-1).p;mes=null;detalleActual=null;
     }
     const solicitado=api.procesoPendiente;if(solicitado){periodo=solicitado.periodo;mes=solicitado.desde.slice(0,7);foco=solicitado.desde;seleccion.add(solicitado.categoria);detalleActual={eventos:[solicitado],titulo:tx('detalle')};api.procesoPendiente=null}
+    box.setAttribute('data-calendario-propio',!!(typeof DATA!=='undefined'&&DATA.calendario?.periodosPropios?.includes(periodo)));
     box.appendChild(el('p',tx('instrucciones'),'calendario-intro'));const controles=el('div',null,'calendario-controles'),label=el('label',tx('periodo'),'calendario-selector'),select=el('select');select.id='cal-periodo';select.setAttribute('aria-label',tx('periodo'));opciones.forEach(p=>{const o=el('option',tx('periodo_nombre',{periodo:p}));o.value=p;o.selected=p===periodo;select.appendChild(o)});select.onchange=()=>{periodo=select.value;mes=null;detalleActual=null;redibujar('cal-periodo')};label.appendChild(select);controles.appendChild(label);
-    const aud=el('label',null,'calendario-audiencia'),check=el('input');check.id='cal-audiencia';check.type='checkbox';check.checked=ampliar;check.onchange=()=>{ampliar=check.checked;detalleActual=null;redibujar(check.id)};aud.appendChild(check);aud.appendChild(el('span',tx('ampliar_audiencia')));controles.appendChild(aud);box.appendChild(controles);
+    const aud=el('label',null,'calendario-audiencia'),check=el('input');check.id='cal-audiencia';check.type='checkbox';check.checked=ampliar;check.onchange=()=>{ampliar=check.checked;detalleActual=null;redibujar(check.id)};aud.appendChild(check);aud.appendChild(el('span',tx('ampliar_audiencia'),'calendario-audiencia-larga'));aud.appendChild(el('span',tx('ampliar_audiencia_corta'),'calendario-audiencia-corta'));controles.appendChild(aud);box.appendChild(controles);
     const todos=eventos.filter(e=>e.periodo===periodo),visibles=todos.filter(e=>seleccion.has(e.categoria)),filtros=el('details',null,'calendario-filtros');filtros.appendChild(el('summary',tx('filtros')));api.categorias.filter(c=>todos.some(e=>e.categoria===c)).forEach(c=>{const l=el('label',null,'calendario-filtro'),ch=el('input');ch.type='checkbox';ch.id='cal-filtro-'+c;ch.checked=seleccion.has(c);ch.onchange=()=>{ch.checked?seleccion.add(c):seleccion.delete(c);detalleActual=null;redibujar(ch.id)};l.appendChild(ch);l.appendChild(el('span',tx('categoria_'+c)));filtros.appendChild(l)});box.appendChild(filtros);
     // Ampliar la escala cuando el aviso local desplaza las fechas oficiales.
     const extremos=todos.flatMap(e=>[e.desde,e.hasta]);if(base?.periodos[periodo])extremos.push(base.periodos[periodo].desde,base.periodos[periodo].hasta);extremos.sort();const desde=extremos[0],hasta=extremos.at(-1),layout=el('div',null,'calendario-layout'),izquierda=el('div',null,'calendario-contenido'),derecha=el('div',null,'calendario-cuadricula'),grafico=el('div');panel=el('aside',null,'calendario-detalle');panel.setAttribute('aria-labelledby','cal-detalle-titulo');izquierda.appendChild(grafico);izquierda.appendChild(panel);mesGrafico(derecha,visibles,desde,hasta);layout.appendChild(izquierda);layout.appendChild(derecha);box.appendChild(layout);

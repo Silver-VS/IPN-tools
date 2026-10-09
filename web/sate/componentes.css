@@ -104,6 +104,8 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-selector select{width:auto;min-width:0;max-width:100%;min-height:2.75rem;background:var(--cal-fondo);color:var(--cal-texto);border:1px solid var(--cal-linea);border-radius:.5rem;padding:.5rem}
 .calendario-audiencia input,.calendario-filtro input{flex-shrink:0;width:1rem;height:1rem;margin:0}
 .calendario-audiencia{flex:1;min-height:2.75rem}
+.calendario-audiencia-corta{display:none}
+@media(max-width:599px){.calendario-audiencia{flex:0 0 100%}.calendario-audiencia-larga{display:none}.calendario-audiencia-corta{display:inline}}
 .calendario-filtros{border-block:1px solid var(--cal-linea);padding:.5rem 0;margin-bottom:1rem}
 .calendario-filtros summary,.calendario-lista summary{cursor:pointer;min-height:2.75rem;padding:.65rem 0;font-weight:600}
 .calendario-filtro{display:inline-flex;align-items:center;gap:.5rem;min-height:2.75rem;margin-right:1rem;font-size:.85rem}
@@ -115,7 +117,7 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-detalle-evento{border-left:3px solid var(--cal-fill);padding-left:.75rem;margin-top:.75rem}
 .calendario-detalle-evento p{margin:.35rem 0;color:var(--cal-texto)}.calendario-fuente{font-size:.75rem;color:var(--cal-tenue)}
 .calendario-semicirculo{display:block;width:100%;height:auto;margin-inline:auto}
-.calendario-anillo-categoria{fill:none;stroke:var(--cal-fill);opacity:.16}
+.calendario-anillo-categoria{fill:none;stroke:var(--cal-fill);opacity:.06}
 .calendario-anillo-simbolos{fill:none;stroke:var(--cal-linea);stroke-width:1}
 .calendario-guia{fill:none;stroke:var(--cal-tenue);stroke-width:1;pointer-events:none}
 .calendario-etiqueta-exterior{cursor:pointer}
@@ -168,6 +170,8 @@ body.sate-flotante #sate-tabs{display:none}
 #sate-calendario [data-categoria=ets]{--cal-fill:#aad2eb;--cal-ink:#142634}
 #sate-calendario [data-categoria=vacaciones]{--cal-fill:#d7d7d7;--cal-ink:#222222}
 #sate-calendario [data-categoria=saberes]{--cal-fill:#f5c5a5;--cal-ink:#322316}
+#sate-calendario[data-unidad=upiita][data-calendario-propio=true] [data-categoria=inscripcion_ets]{--cal-fill:#f5c5a5;--cal-ink:#322316}
+#sate-calendario[data-unidad=upiita][data-calendario-propio=true] [data-categoria=saberes]{--cal-fill:#f5ecd1;--cal-ink:#322316}
 #sate-calendario [data-categoria=descanso]{--cal-fill:#eeeeee;--cal-ink:#222222}
 #sate-calendario [data-categoria=sindical]{--cal-fill:#d6e8ff;--cal-ink:#173a76}
 #sate-calendario [data-categoria=inicio]{--cal-fill:#b4dfb6;--cal-ink:#122716}

@@ -194,10 +194,10 @@ SATE.calendario={
   },
   fusion(base,unidad){
     const locales=[...(unidad?.actividades||[]),...(unidad?.eventos||[])].map(e=>({...e,hasta:e.hasta||e.desde,periodo:e.periodo||unidad.periodo,audiencia:e.audiencia||['alumnos'],fuente:e.fuente||unidad.fuente,origen:'unidad'}));
-    // Solo los procesos declarados sustituyen a la base; los días independientes se identifican por fecha.
+    // Un calendario propio sustituye sus periodos completos; los avisos aislados conservan la base restante.
     const clave=e=>[e.categoria,e.periodo,[...(e.audiencia||['alumnos'])].sort().join(','),['descanso','sindical','politecnico'].includes(e.categoria)?e.desde:''].join('|');
     const reemplazos=new Set(locales.filter(e=>e.reemplaza).map(clave));
-    return [...(base?.eventos||[]).filter(e=>!reemplazos.has(clave(e))).map(e=>({...e,fuente:base.fuente,url:base.url,origen:'ipn'})),...locales];
+    return [...(base?.eventos||[]).filter(e=>!unidad?.periodosPropios?.includes(e.periodo)&&!reemplazos.has(clave(e))).map(e=>({...e,fuente:base.fuente,url:base.url,origen:'ipn'})),...locales];
   },
   filtrarAudiencia(eventos,ampliar=false,alumno=null){
     const nuevo=!alumno||!Number(alumno.avance?.cursados)||Number(alumno.avance.cursados)<=1;

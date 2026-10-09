@@ -12,40 +12,6 @@
     "notaDesfase": "Se desfasa la materia que pasa más de dos periodos sin acreditarse. El primer periodo de desfase se autoriza sin trámite; después se necesita un dictamen, que se tramita con un periodo de anticipación.",
     "actividades": [
       {
-        "desde": "2026-10-05",
-        "hasta": "2026-10-06",
-        "titulo": "Inscripción a ETS 26/2",
-        "donde": "ventanillas",
-        "para": "adeudo",
-        "texto": "Paga $20 por materia con ficha de depósito en la caja y entrega la copia sellada y tu credencial en ventanillas. Luego descarga tu comprobante del SAES.",
-        "categoria": "inscripcion_ets",
-        "fuente": "Aviso de Gestión Escolar UPIITA",
-        "audiencia": [
-          "alumnos"
-        ],
-        "simbolo": "relleno",
-        "periodo": "26/2",
-        "fuenteOriginal": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)",
-        "reemplaza": true
-      },
-      {
-        "desde": "2026-10-07",
-        "hasta": "2026-10-12",
-        "titulo": "Aplicación de ETS 26/2",
-        "donde": "ventanillas",
-        "para": "adeudo",
-        "texto": "Consulta los horarios en la página de la unidad.",
-        "categoria": "ets",
-        "fuente": "Aviso de Gestión Escolar UPIITA",
-        "audiencia": [
-          "alumnos"
-        ],
-        "simbolo": "relleno",
-        "periodo": "26/2",
-        "fuenteOriginal": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)",
-        "reemplaza": true
-      },
-      {
         "desde": "2026-10-07",
         "titulo": "Citas publicadas",
         "donde": "saes",
@@ -158,23 +124,6 @@
         "fuenteOriginal": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)"
       },
       {
-        "desde": "2026-10-19",
-        "hasta": "2026-10-23",
-        "titulo": "Saberes previamente adquiridos",
-        "donde": "ventanillas",
-        "para": "todos",
-        "texto": "Entrega el formato en ventanillas; la aplicación es del 27 al 30 de octubre.",
-        "categoria": "saberes",
-        "fuente": "Aviso de Gestión Escolar UPIITA",
-        "audiencia": [
-          "alumnos"
-        ],
-        "simbolo": "relleno",
-        "periodo": "27/1",
-        "fuenteOriginal": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)",
-        "reemplaza": true
-      },
-      {
         "desde": "2026-10-23",
         "titulo": "Cita para altas",
         "donde": "saes",
@@ -212,18 +161,83 @@
     ],
     "eventos": [
       {
+        "desde": "2026-10-01",
+        "hasta": "2026-10-01",
+        "titulo": "Registro de evaluación extraordinaria",
+        "categoria": "extraordinaria",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
         "desde": "2026-10-02",
         "hasta": "2026-10-02",
         "titulo": "Fin del periodo 26/2",
         "categoria": "fin",
         "periodo": "26/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "triangulo_invertido",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
         "reemplaza": true
+      },
+      {
+        "desde": "2026-10-05",
+        "hasta": "2026-10-06",
+        "titulo": "Inscripción a ETS",
+        "categoria": "inscripcion_ets",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "donde": "ventanillas",
+        "para": "adeudo",
+        "texto": "Paga $20 por materia con ficha de depósito en la caja y entrega la copia sellada y tu credencial en ventanillas. Luego descarga tu comprobante del SAES."
+      },
+      {
+        "desde": "2026-10-07",
+        "hasta": "2026-10-09",
+        "titulo": "Aplicación de ETS",
+        "categoria": "ets",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "donde": "ventanillas",
+        "para": "adeudo",
+        "texto": "Consulta los horarios en la página de la unidad."
+      },
+      {
+        "desde": "2026-10-12",
+        "hasta": "2026-10-12",
+        "titulo": "Aplicación de ETS",
+        "categoria": "ets",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "donde": "ventanillas",
+        "para": "adeudo",
+        "texto": "Consulta los horarios en la página de la unidad."
       },
       {
         "desde": "2026-10-13",
@@ -232,11 +246,39 @@
         "categoria": "inscripcion",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "relleno",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-10-05",
+        "hasta": "2026-10-16",
+        "titulo": "Planeación didáctica, académica y directiva",
+        "categoria": "planeacion",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "docentes"
+        ],
+        "simbolo": "contorno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-02-15",
+        "hasta": "2027-02-26",
+        "titulo": "Planeación didáctica, académica y directiva",
+        "categoria": "planeacion",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "docentes"
+        ],
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
@@ -246,12 +288,42 @@
         "categoria": "inicio",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "triangulo",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
         "reemplaza": true
+      },
+      {
+        "desde": "2026-11-01",
+        "hasta": "2026-11-02",
+        "titulo": "Descanso por acuerdo sindical",
+        "categoria": "sindical",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "circulo",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-11-06",
+        "hasta": "2026-11-06",
+        "titulo": "Fecha límite de registro de saberes previamente adquiridos",
+        "categoria": "saberes",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "verificar": true,
+        "nota": "Fecha o rango pendiente de verificar en el calendario de Gestión Escolar UPIITA."
       },
       {
         "desde": "2026-11-16",
@@ -260,11 +332,11 @@
         "categoria": "descanso",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
@@ -274,11 +346,11 @@
         "categoria": "descanso",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
@@ -288,11 +360,11 @@
         "categoria": "descanso",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
@@ -302,39 +374,153 @@
         "categoria": "descanso",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
-        "desde": "2026-11-02",
-        "hasta": "2026-11-02",
-        "titulo": "Descanso por acuerdo sindical",
-        "categoria": "sindical",
+        "desde": "2026-11-18",
+        "hasta": "2026-11-20",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "circulo",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "relleno",
         "reemplaza": true
       },
       {
-        "desde": "2027-02-12",
+        "desde": "2027-01-04",
+        "hasta": "2027-01-06",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-02-08",
+        "hasta": "2027-02-10",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-12-21",
+        "hasta": "2026-12-31",
+        "titulo": "Nivelación académica autogestiva de nuevo ingreso",
+        "categoria": "nivelacion",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "nuevo_ingreso"
+        ],
+        "simbolo": "discontinuo",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-12-20",
+        "hasta": "2027-01-01",
+        "titulo": "Vacaciones",
+        "categoria": "vacaciones",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "verificar": true,
+        "nota": "Fecha o rango pendiente de verificar en el calendario de Gestión Escolar UPIITA."
+      },
+      {
+        "desde": "2027-02-11",
         "hasta": "2027-02-12",
+        "titulo": "Registro de evaluación extraordinaria",
+        "categoria": "extraordinaria",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-02-15",
+        "hasta": "2027-02-15",
         "titulo": "Fin del periodo 27/1",
         "categoria": "fin",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "triangulo_invertido",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-02-16",
+        "hasta": "2027-02-17",
+        "titulo": "Inscripción a ETS",
+        "categoria": "inscripcion_ets",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-02-18",
+        "hasta": "2027-02-19",
+        "titulo": "Aplicación de ETS",
+        "categoria": "ets",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-02-22",
+        "hasta": "2027-02-24",
+        "titulo": "Aplicación de ETS",
+        "categoria": "ets",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
         "reemplaza": true
       },
       {
@@ -344,11 +530,11 @@
         "categoria": "inscripcion",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "relleno",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
         "reemplaza": true
       },
       {
@@ -358,11 +544,25 @@
         "categoria": "inscripcion",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "relleno",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-14",
+        "hasta": "2027-07-16",
+        "titulo": "Inscripción y reinscripción 27/2",
+        "categoria": "inscripcion",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
         "reemplaza": true
       },
       {
@@ -372,11 +572,11 @@
         "categoria": "inicio",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "triangulo",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
         "reemplaza": true
       },
       {
@@ -386,11 +586,11 @@
         "categoria": "descanso",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
@@ -400,11 +600,11 @@
         "categoria": "descanso",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
         "reemplaza": true
       },
       {
@@ -414,11 +614,125 @@
         "categoria": "descanso",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
-        "simbolo": "rayado",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "simbolo": "contorno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-21",
+        "hasta": "2027-07-21",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "contorno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-04-09",
+        "hasta": "2027-04-09",
+        "titulo": "Fecha límite de registro de saberes previamente adquiridos",
+        "categoria": "saberes",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "verificar": true,
+        "nota": "Fecha o rango pendiente de verificar en el calendario de Gestión Escolar UPIITA."
+      },
+      {
+        "desde": "2027-04-16",
+        "hasta": "2027-04-16",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-05-19",
+        "hasta": "2027-05-20",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-05-24",
+        "hasta": "2027-05-26",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-06-25",
+        "hasta": "2027-06-25",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-06-28",
+        "hasta": "2027-06-29",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-05-10",
+        "hasta": "2027-05-10",
+        "titulo": "Descanso por acuerdo sindical",
+        "categoria": "sindical",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "circulo",
         "reemplaza": true
       },
       {
@@ -428,25 +742,39 @@
         "categoria": "sindical",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "circulo",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
         "reemplaza": true
       },
       {
         "desde": "2027-05-21",
         "hasta": "2027-05-21",
-        "titulo": "Día del Politécnico (celebración)",
+        "titulo": "Día del Politécnico",
         "categoria": "politecnico",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "estrella",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-06-30",
+        "hasta": "2027-07-01",
+        "titulo": "Registro de evaluación extraordinaria",
+        "categoria": "extraordinaria",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
         "reemplaza": true
       },
       {
@@ -456,11 +784,95 @@
         "categoria": "fin",
         "periodo": "27/2",
         "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
         "audiencia": [
           "alumnos"
         ],
         "simbolo": "triangulo_invertido",
-        "fuenteOriginal": "Calendario académico 26/2, 27/1 y 27/2, IPN",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-05",
+        "hasta": "2027-07-06",
+        "titulo": "Inscripción a ETS",
+        "categoria": "inscripcion_ets",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-07",
+        "hasta": "2027-07-09",
+        "titulo": "Aplicación de ETS",
+        "categoria": "ets",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-12",
+        "hasta": "2027-07-13",
+        "titulo": "Aplicación de ETS",
+        "categoria": "ets",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-05",
+        "hasta": "2027-07-16",
+        "titulo": "Planeación didáctica, académica y directiva",
+        "categoria": "planeacion",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "docentes"
+        ],
+        "simbolo": "contorno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-19",
+        "hasta": "2027-07-31",
+        "titulo": "Nivelación académica autogestiva de nuevo ingreso",
+        "categoria": "nivelacion",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "nuevo_ingreso"
+        ],
+        "simbolo": "discontinuo",
+        "reemplaza": true
+      },
+      {
+        "desde": "2027-07-19",
+        "hasta": "2027-07-31",
+        "titulo": "Vacaciones",
+        "categoria": "vacaciones",
+        "periodo": "27/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
         "reemplaza": true
       },
       {
@@ -518,6 +930,25 @@
         "simbolo": "relleno",
         "fuenteOriginal": "Trabajo Terminal, UPIITA"
       }
-    ]
+    ],
+    "periodosPropios": [
+      "26/2",
+      "27/1",
+      "27/2"
+    ],
+    "periodos": {
+      "26/2": {
+        "desde": "2026-10-01",
+        "hasta": "2026-10-02"
+      },
+      "27/1": {
+        "desde": "2026-10-03",
+        "hasta": "2027-02-15"
+      },
+      "27/2": {
+        "desde": "2027-02-16",
+        "hasta": "2027-07-31"
+      }
+    }
   }
 }
