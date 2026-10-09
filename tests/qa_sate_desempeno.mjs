@@ -2,7 +2,7 @@
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-const leer=f=>readFileSync(f,'utf8'), html=leer('web/dist/sate/index.html');
+  const leer=f=>readFileSync(f,'utf8'), html=leer('web/dist/sate/index.html');
 const config=JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const patron=/@observablehq|d3@|LIB_PLOT|cargarPlot/;
 for(const f of ['index.html','nucleo.js','inicio.js','mapa.js','situacion.js','horarios.js','componentes.js','rutas.js'])
@@ -14,7 +14,7 @@ assert.doesNotMatch(html,/<details[^>]+id="desempeno-simulacion"[^>]*\bopen\b/,'
 const almacen=()=>{const m=new Map();return {getItem:k=>m.get(k)??null,setItem:(k,v)=>m.set(k,String(v)),removeItem:k=>m.delete(k)}};
 for(const unidad of ['upiita','escom','upibi']){
   assert.ok(config.unidades[unidad].pestanas.includes('trayectoria'));
-  const nodos=new Map(),solicitudes=[],cuadros=[];let c,api,fallar=false,movil=true,trazados=0;
+  const nodos=new Map(),solicitudes=[],cuadros=[],graficas=[];let c,api,fallar=false,movil=true,oscuro=false,trazados=0;
   const texto=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+),\s*plural,\s*((?:[^{}]*\{[^{}]*\})+)\s*\}/g,(m,k,c)=>{
     const n=Number(v[k]),op={};c.replace(/(=?\w+)\s*\{([^{}]*)\}/g,(_,k,t)=>{op[k]=t});
     return (op['='+n]??op[new Intl.PluralRules('es-MX').select(n)]??op.other??'').replace(/#/g,String(n));
@@ -29,7 +29,7 @@ for(const unidad of ['upiita','escom','upibi']){
     head:{appendChild(s){solicitudes.push(s);queueMicrotask(()=>{
       if(fallar){s.onerror();return}
       if(s.src.includes('d3@'))c.d3={groups(rows,fn){const m=new Map();for(const r of rows){const k=fn(r);if(!m.has(k))m.set(k,[]);m.get(k).push(r)}return [...m]},mean:(rs,fn)=>rs.reduce((s,r)=>s+fn(r),0)/rs.length};
-      if(s.src.includes('@observablehq'))c.Plot={plot:()=>{trazados++;return nodo()},rectX(){},barX(){},text(){},ruleX(){}};
+      if(s.src.includes('@observablehq'))c.Plot={plot:op=>{trazados++;graficas.push(op);return nodo()},ruleY:(datos,op)=>({tipo:'recta',datos,op}),dot:(datos,op)=>({tipo:'puntos',datos,op}),ruleX:(datos,op)=>({tipo:'media',datos,op})};
       s.onload();
     })}}};
   const SATE={texto,actual:{pestana:'mapa'},modulos:{},pestana(id,m){this.modulos[id]=m},error:e=>{throw e},nucleoListo:async a=>{api=a},
@@ -37,7 +37,9 @@ for(const unidad of ['upiita','escom','upibi']){
   c=vm.createContext({console,document,SATE,SateUI:{cerrarModal(){}},SATE_DATA:{...JSON.parse(leer(`web/dist/sate/datos/${unidad}/nucleo.json`)),periodos:{actual:[],proximo:[]},asig:[],prof:[]},SATE_UNIDAD:unidad,
     URL,URLSearchParams,Blob,performance,localStorage:almacen(),sessionStorage:almacen(),location:{hash:'#/'+unidad+'/mapa',search:'',pathname:'/sate/index.html'},history:{replaceState(){}},
     navigator:{userAgent:'Node',maxTouchPoints:0},matchMedia:q=>({get matches(){return q.includes('720px')&&movil},addEventListener(){}}),addEventListener(){},setTimeout,clearTimeout,
-    requestAnimationFrame:fn=>cuadros.push(fn),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:375,innerHeight:800,
+    requestAnimationFrame:fn=>cuadros.push(fn),getComputedStyle:()=>({getPropertyValue:n=>((oscuro?
+      {'--ipn-acento':'#eaa2bd','--ipn-tenue':'#b1b4be','--ipn-linea':'#393c45','--ipn-texto':'#e6e7ec'}:
+      {'--ipn-acento':'#721e45','--ipn-tenue':'#667085','--ipn-linea':'#dddddd','--ipn-texto':'#222222'})[n]||'')}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:375,innerHeight:800,
     fetch(){throw new Error('Red prohibida')}});
   vm.runInContext('window=globalThis',c);
   vm.runInContext(leer('web/dist/sate/nucleo.js'),c);
@@ -81,6 +83,8 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(solicitudes.length,2);assert.match(solicitudes[0].src,/d3@/);assert.match(solicitudes[1].src,/@observablehq/);
   for(const s of solicitudes){assert.match(s.integrity,/^sha384-/);assert.equal(s.crossOrigin,'anonymous')}
   assert.equal(trazados,1,'F: gráfica solo al abrir áreas');
+  assert.deepEqual(Array.from(graficas[0].x.domain),[6,10],'K: escala absoluta fija');
+  assert.match(document.querySelector('#trayectoria-areas-datos').innerHTML,/<ol.*Promedio.*cr.*materias/,'K: ranking accesible con los mismos datos');
   areas.open=false;areas.eventos.toggle.at(-1)();
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.equal(areas.open,false,'F: cierre recordado');assert.equal(trazados,1,'F: no redibujar sección cerrada');
@@ -109,5 +113,52 @@ for(const unidad of ['upiita','escom','upibi']){
   await assert.rejects(vm.runInContext('cargarPlot()',c),/No se pudo cargar/);
   fallar=false;await vm.runInContext('cargarPlot()',c);
   assert.equal(solicitudes.length,5);
-  console.log(unidad+': módulo independiente, Plot/D3 diferidos y únicos, cancelación, error/reintento, DEMO, plurales y chip global correctos.');
+  // K: un 10 aislado no desplaza a áreas de varias materias; créditos incompletos no son cero.
+  const motor=vm.runInContext('statsDatos',c);
+  const datos=motor();
+  SATE.actual.pestana='trayectoria';
+  c.datosAreas={...datos,media:9.5,rows:[
+    {cat:'Aislada',cal:10,cr:6},{cat:'Control',cal:9.6,cr:6},{cat:'Control',cal:9.6,cr:7.5},
+    {cat:'Electrónica',cal:9.4,cr:6},{cat:'Electrónica',cal:9.4,cr:null},
+    {cat:'Ciencias básicas con nombre largo',cal:8,cr:6},{cat:'Ciencias básicas con nombre largo',cal:8,cr:6}]};
+  vm.runInContext('statsDatos=()=>datosAreas;store.set("trayectoria.seccion.areas",false)',c);
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  const antes=trazados;
+  assert.equal(areas.open,false);
+  assert.equal(document.querySelector('#trayectoria-areas-lectura').textContent,'Tus mejores áreas: Control (9.6) y Electrónica (9.4).');
+  areas.open=true;pendiente=areas.eventos.toggle.at(-1)();vaciarCuadros();await pendiente;
+  assert.equal(trazados,antes+1,'K: ranking y puntos se dibujan al abrir');
+  const figura=graficas.at(-1),puntos=figura.marks.find(m=>m.tipo==='puntos');
+  assert.deepEqual(Array.from(figura.x.domain),[6,10]);
+  assert.equal(figura.marks.find(m=>m.tipo==='media').datos[0],9.5);
+  assert.equal(figura.width,375);assert.equal(figura.marginLeft,118);
+  assert.ok(figura.y.tickFormat('Ciencias básicas con nombre largo').length<=18);
+  assert.equal(puntos.op.x,'media');assert.equal(puntos.datos[0].cat,'Aislada');
+  for(const d of puntos.datos){
+    assert.equal(puntos.op.fill(d),['Control','Electrónica'].includes(d.cat)?'#721e45':'#667085');
+    assert.equal(puntos.op.fillOpacity(d),d.n===1?.6:1);
+  }
+  const ranking=document.querySelector('#trayectoria-areas-datos').innerHTML;
+  assert.match(ranking,/Aislada \(1 materia\)/);assert.match(ranking,/Promedio 9\.60 · 13\.5 cr · 2 materias/);
+  assert.match(ranking,/créditos por confirmar/);assert.match(ranking,/Ciencias básicas con nombre largo/);
+  assert.doesNotMatch(ranking,/Por debajo|Por arriba|naranja/);
+  oscuro=true;document.querySelector('#ch-cat').clientWidth=260;
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  const noche=graficas.at(-1),puntosNoche=noche.marks.find(m=>m.tipo==='puntos');
+  assert.equal(noche.width,260,'K: el dibujo respeta el ancho interior en teléfono');
+  assert.equal(noche.style.color,'#e6e7ec');
+  for(const d of puntosNoche.datos)assert.equal(puntosNoche.op.fill(d),['Control','Electrónica'].includes(d.cat)?'#eaa2bd':'#b1b4be');
+  c.datosAreas={...datos,media:10,rows:[{cat:'Única',cal:10,cr:6}]};
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.match(document.querySelector('#trayectoria-areas-lectura').textContent,/Con más materias/);
+  assert.equal(document.querySelector('#trayectoria-areas-resumen').textContent,'');
+  c.datosAreas={...datos,media:null,rows:[]};
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.match(document.querySelector('#trayectoria-areas-lectura').textContent,/materias acreditadas/);
+  assert.equal(document.querySelector('#trayectoria-areas-datos').innerHTML,'');
+  c.datosAreas={...datos,media:9,rows:[{cat:'Control',cal:9,cr:6},{cat:'Control',cal:9,cr:6}]};
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.equal(document.querySelector('#trayectoria-areas-lectura').textContent,'Tu mejor área: Control (9.0).');
+  c.statsDatos=motor;
+  console.log(unidad+': módulo independiente, Plot/D3 diferidos, cancelación, error/reintento, DEMO, plurales, chip global y áreas 6–10, ranking, muestra mínima, créditos, teléfono y temas correctos.');
 }
