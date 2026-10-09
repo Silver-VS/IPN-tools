@@ -26,10 +26,21 @@ for(const [f,esperado] of [['titulos',{Z101:['Álgebra ficticia',1],Z301:['Contr
     CLAVE:/^(?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6}$/i,clean:s=>String(s||'').replace(/\s+/g,' ').trim(),num:s=>{const n=String(s).match(/\d+(?:\.\d+)?/);return n?+n[0]:null}});
   vm.runInContext(parser,c);
   assert.deepEqual(JSON.parse(JSON.stringify(c.materias)),esperado);
+  assert.deepEqual(JSON.parse(JSON.stringify(c.creditosMaterias)),{},'No confundir fecha o semestre con créditos');
   assert.equal(c.acred[0][0],'Z101');assert.equal(c.acred[0][1],8);
   assert.equal(c.semestreTitulo('SEGUNDO SEMESTRE'),2);assert.equal(c.semestreTitulo('TERCERO SEMESTRE'),3);
   assert.equal(c.semestreTitulo('NIVEL 5'),5);assert.equal(c.semestreTitulo('1'),1);assert.equal(c.semestreTitulo('Clave Materia'),null);
   assert.equal(c.semestreTitulo('NIVEL: 5'),5);assert.equal(c.semestreTitulo('1º SEMESTRE'),1);
+}
+{
+  const html=leer('tests/fixtures/kardex_generico_titulos.html').replace('<th>Calificación</th>','<th>Calificación</th><th>Créditos</th>').replace('<td>8</td>','<td>8</td><td>7.5</td>');
+  const c=vm.createContext({kx:kardex(html),CLAVE:/^(?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6}$/i,clean:s=>String(s||'').trim(),num:s=>{const n=String(s).match(/\d+(?:\.\d+)?/);return n?+n[0]:null}});
+  vm.runInContext(parser,c);assert.deepEqual(JSON.parse(JSON.stringify(c.creditosMaterias)),{Z101:7.5});
+  assert.equal(c.acred[0][1],8,'Conservar la calificación cuando hay columna opcional');
+  const intermedia=leer('tests/fixtures/kardex_generico_titulos.html').replace('<th>Materia</th>','<th>Materia</th><th>Créditos</th>').replace('<td>Álgebra ficticia</td>','<td>Álgebra ficticia</td><td>7.5</td>');
+  c.kx=kardex(intermedia);vm.runInContext(parser,c);
+  assert.deepEqual(JSON.parse(JSON.stringify(c.creditosMaterias)),{Z101:7.5});
+  assert.deepEqual(JSON.parse(JSON.stringify(c.acred[0])),['Z101',8,'25/1','ORD'],'Créditos entre nombre y fecha no desplaza evaluaciones');
 }
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 // Ejecuta el Lector completo: los únicos GET son dobles de las cinco páginas de SAES.
@@ -95,7 +106,7 @@ assert.equal(Object.keys(encb.materias).length,45);assert.equal(encb.acreditadas
 assert.ok(encb.no_cursadas.every(r=>r[3]>=7));assert.equal(encb.en_curso.length,0);
 assert.deepEqual([...new Set(encb.acreditadas.map(r=>r[3]))].sort(),['ETS','EXT','ORD','REC']);
 assert.equal(encbHorario.en_curso.length,5);assert.equal(encbHorario.horario_inscrito.length,5);
-for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','encb-viejo','encb-curso-sin-horario','demo','demo-horario']){
+for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','encb-viejo','encb-curso-sin-horario','demo','demo-horario']){
   const unidad=modo.startsWith('encb')||modo.startsWith('demo')?'encb':'esimez';
   const p=structuredClone(unidad==='encb'?(modo.endsWith('horario')?encbHorario:encb):perfil);
   if(modo==='encb-curso-sin-horario'){Object.assign(p,structuredClone(encbHorario));p.horario_inscrito=[];}
@@ -103,14 +114,14 @@ for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','en
   if(modo==='periodos'){p.no_cursadas=[['Z401',null,0,null]];p.reprobadas_periodo=p.reprobadas_periodo.map(r=>r.slice(0,3));p.desfasadas_saes=[];}
   const almacen=new Map(modo==='vacio'||modo.startsWith('demo')?[]:[['saes.alumno',JSON.stringify(p)]]),nodos=new Map(),archivos=[],eventos={};let c;
   function nodo(id=''){return {id,hidden:false,textContent:'',innerHTML:'',style:{setProperty(k,v){this[k]=v}},dataset:{},children:[],
-    clientWidth:375,classList:{toggle(){}},setAttribute(){},removeAttribute(){},addEventListener(){},replaceChildren(){},remove(){},prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)},
+    clientWidth:ancho,classList:{toggle(){}},setAttribute(){},removeAttribute(){},addEventListener(){},replaceChildren(){},remove(){},prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)},
     querySelector:s=>nodo(s),querySelectorAll:()=>[],closest:()=>null};}
-  const document={readyState:'loading',documentElement:{getAttribute(){return null},setAttribute(){},style:{setProperty(){},removeProperty(){}}},addEventListener(){},getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
+  const document={readyState:'loading',documentElement:{getAttribute(){return null},setAttribute(){},style:{setProperty(){},removeProperty(){}}},addEventListener(k,f){(eventos['dom:'+k]??=[]).push(f)},getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
     querySelector:s=>document.getElementById(s),querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){
       if(!s.src)return;archivos.push(s.src);setImmediate(()=>{vm.runInContext(leer('web/dist/sate/'+s.src),c,{filename:s.src});s.onload()});
     }}};
   const location={hash:modo.startsWith('demo')?'#'+modo:'',search:'?sateUnidad='+unidad,pathname:'/sate/index.html'};
-  c=vm.createContext({console,URL,URLSearchParams,document,location,SATE_CONFIG:structuredClone(config),setTimeout,clearTimeout,
+  c=vm.createContext({console:{...console,debug(){}},URL,URLSearchParams,document,location,SATE_CONFIG:structuredClone(config),setTimeout,clearTimeout,
     localStorage:{getItem:k=>almacen.get(k)??null,setItem:(k,v)=>almacen.set(k,v)},navigator:{userAgent:'Node',connection:{saveData:true}},
     addEventListener:(k,f)=>eventos[k]=f,history:{replaceState(a,b,url){location.hash=url.slice(url.indexOf('#'))}},
     fetch(){throw new Error('SATE genérico no descarga datos de planes')},
@@ -129,12 +140,36 @@ for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','en
   const tray=document.getElementById('sate-trayectoria');
   if(modo!=='vacio'){
     assert.match(tray.innerHTML,/Promedio del SAES: 8/);assert.match(tray.innerHTML,/Duración máxima: 12/);
-    assert.match(tray.innerHTML,/Calificación: 8/);assert.doesNotMatch(tray.innerHTML,/NaN|undefined|Sugerida|Sin área/);
+    assert.match(tray.innerHTML,/class="kx-c g8"/);assert.doesNotMatch(tray.innerHTML,/NaN|undefined|Sugerida|Sin área/);
+    for(const componente of ['Promedio sin reprobadas','k-regla','Tus calificaciones','k-hist','En ordinario','k-anillo','Créditos por periodo','Tu camino en la carrera','cm-track','Tu kárdex por periodo','trayectoria-kardex','¿Y si…?','meta-panel','id="sate-presente"','trayectoria-minimapa'])assert.ok(tray.innerHTML.includes(componente),componente+' a '+ancho+' px');
+    assert.doesNotMatch(tray.innerHTML,/trayectoria-areas|trayectoria-observaciones|Tus áreas|seriación|oferta/);
+    assert.equal(/id="trayectoria-kardex" open/.test(tray.innerHTML),ancho>720,'Kárdex abierto en escritorio y plegado en teléfono');
+    assert.equal(/id="trayectoria-escenario" open/.test(tray.innerHTML),ancho>720,'Escenario sigue el mismo acomodo responsive');
+    if(unidad==='encb')for(const componente of ['k-bars','cm-m pas','cm-m fut','Terminarías','<i>E</i>','<i>T</i>'])assert.ok(tray.innerHTML.includes(componente),componente);
+    const D=c.SateGenerico.estadisticas(p,c.SateGenerico.datos(p));
+    assert.equal(D.media,8);assert.ok(D.rows.every(r=>r.cal>=6&&r.cal<=10));
+    const repetido=c.SateGenerico.estadisticas({...p,acreditadas:[...p.acreditadas,p.acreditadas[0]]},c.SateGenerico.datos(p));
+    assert.equal(repetido.rows.length,D.rows.length,'Una acreditación por clave');
+    if(modo==='actual')assert.equal(D.ritmo,null,'No inferir créditos por materia');
+    const invalido=c.SateGenerico.estadisticas({...p,acreditadas:[...p.acreditadas,['INVALIDA',null,'26/1','ORD'],['INVALIDA2',11,'26/1','ORD']]},c.SateGenerico.datos(p));
+    assert.equal(invalido.rows.length,D.rows.length,'Excluir notas inválidas');
+    const equivalencia=structuredClone(p);equivalencia.acreditadas[0][3]='EQV';
+    const De=c.SateGenerico.estadisticas(equivalencia,c.SateGenerico.datos(equivalencia));
+    assert.equal(De.formasExcluidas,D.formasExcluidas+1);assert.ok(!De.porPer.length||De.porPer.reduce((s,r)=>s+r.n,0)===D.rows.length-1,'Equivalencias fuera del ritmo');
+    const inconsistente=c.SateGenerico.estadisticas({...p,avance:{...p.avance,obtenidos:999}},c.SateGenerico.datos(p));
+    assert.equal(inconsistente.fin,null);assert.equal(inconsistente.curva.length,0);
+    if(hayHorario){
+      const original=JSON.stringify(c.SATE.alumno()), cambio=t=>eventos['dom:change'].forEach(f=>f({target:t}));
+      cambio({id:'gen-sim',checked:true});assert.match(tray.innerHTML,/simulado/);
+      cambio({dataset:{genNota:p.horario_inscrito[0][1]},value:'10'});assert.match(tray.innerHTML,/kx-c g10 sim/);
+      assert.equal(JSON.stringify(c.SATE.alumno()),original,'La simulación conserva el SAES en memoria');
+      cambio({id:'gen-sim',checked:false});assert.doesNotMatch(tray.innerHTML,/kx-c g10 sim/);
+    }
     if(modo==='viejo')assert.match(tray.innerHTML,/Actualiza tus datos con el Lector/);
     if(modo==='actual')assert.match(tray.innerHTML,/Álgebra ficticia/);
   }
   location.hash='#/'+unidad+'/mapa';eventos.hashchange();await vaciar();
-  const mapa=document.getElementById('v-tray').innerHTML;
+  const mapa=document.getElementById('v-tray').innerHTML+document.getElementById('mapwrap').innerHTML;
   assert.match(mapa,/Mapa curricular/);
   if(modo==='actual'){assert.match(mapa,/Semestre 1/);assert.match(mapa,/Semestre 4/);assert.match(mapa,/Desfasada según el SAES/);assert.match(mapa,/En curso/);}
   if(modo==='actual')for(const st of ['done','curso','fail','late','']){
@@ -147,9 +182,20 @@ for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','en
   const rutaHor=c.SateRutas.ruta('#/'+unidad+'/horarios',unidad,c.SATE_CONFIG.unidades);
   assert.equal(!!rutaHor,hayHorario);
   if(modo!=='vacio'){
+    for(const componente of ['class="maptools"','data-mview="mapa"','data-mview="lista"','data-zoom="-1"','Mapa completo','data-zoom="1"','class="legend"','class="mapcut"','Tu avance','data-vista="pend"','Ya acreditada'])assert.ok(mapa.includes(componente),componente);
     assert.match(mapa,/class="mapwrap"/);assert.match(mapa,/data-estado="done"/);assert.match(mapa,/<circle/);
     assert.doesNotMatch(mapa,/data-box|role="button"|data-gap|data-lwant|sug-tgl|Agregar sugeridas|sin grupos|seriación|oferta/);
     assert.match(tray.innerHTML,/data-abrir-mapa/);
+    const click=(selector,dataset)=>eventos['dom:click'].forEach(f=>f({target:{closest:s=>s===selector?{dataset}:null}}));
+    click('[data-mview]',{mview:'lista'});assert.match(document.getElementById('v-tray').innerHTML,/id="mapwrap" hidden/);
+    click('[data-mview]',{mview:'mapa'});
+    click('[data-vista]',{vista:'pend'});assert.doesNotMatch(document.getElementById('mapwrap').innerHTML,/class="box done"/);
+    click('[data-vista]',{vista:'todo'});assert.match(document.getElementById('mapwrap').innerHTML,/class="box done"/);
+    const antes=document.getElementById('mapwrap').innerHTML;
+    const anchoMapa=+antes.match(/width:([\d.]+)px/)[1];
+    if(ancho===1440)assert.ok(Math.abs(anchoMapa-(ancho-2))<.01,'Mapa completo ocupa el ancho disponible');
+    click('[data-zoom]',{zoom:'1'});assert.notEqual(document.getElementById('mapwrap').innerHTML,antes);
+    click('[data-zoom]',{zoom:'0'});assert.equal(document.getElementById('mapwrap').innerHTML,antes);
   }
   if(unidad==='encb'){
     assert.equal((mapa.match(/class="box /g)||[]).length,45);
@@ -163,9 +209,11 @@ for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','en
     location.hash=rutaHor.hash;eventos.hashchange();await vaciar();
     const hor=document.getElementById('v-hor').innerHTML;
     assert.match(hor,/Tu horario inscrito/);assert.match(hor,/Solo lectura/);assert.match(hor,/Docente ficticio/);
+    assert.match(hor,/<table class="horario-inscrito">/);
+    for(const etiqueta of ['Materia','Grupo','Profesor(es)','Días y horas'])assert.ok(hor.includes('data-label="'+etiqueta+'"'));
     const cal=document.querySelector('#cal').innerHTML;
     assert.doesNotMatch(hor+cal,/data-gap|data-k=|<button|oferta|Agregar|Generar|undefined/);
-    if(unidad==='encb'){assert.equal((cal.match(/class="blk/g)||[]).length,5);assert.match(cal,/7FV1/);assert.match(cal,/07:00/);}
+    if(unidad==='encb'){assert.equal((cal.match(/class="blk/g)||[]).length,5);assert.match(cal,/7FV1/);assert.match(cal,/07:00/);assert.match(cal,/--h:137\.508/);assert.match(hor,/Lun 07:00–08:30/);}
     assert.equal(document.getElementById('sate-oferta-periodo').hidden,true);
     assert.equal(document.getElementById('notice').hidden,true);
   }
@@ -186,6 +234,20 @@ for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','en
   assert.ok(!archivos.includes('nucleo.js'));
 }
 const css=leer('web/sate/componentes.css'), shell=leer('web/sate/cascaron.html');
+assert.match(css,/@media\(max-width:720px\)\{\.horario-inscrito/);
+assert.doesNotMatch(css,/\[data-sate-generico\] \.trayectoria-minimapa\{/,'Sin sustituir el acomodo compartido');
+const acreditada=shell.match(/\.box\.done\{([^}]+)\}/)[1];
+assert.match(acreditada,/opacity:1/);assert.match(acreditada,/color:var\(--fg\)/);assert.match(acreditada,/background:var\(--surface\)/);
+assert.doesNotMatch(acreditada,/line-through/,'Contrato de contraste: texto sin tachado ni opacidad reducida');
+const luminancia=hex=>{const v=hex.match(/\w\w/g).map(c=>parseInt(c,16)/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
+const superficies=[...shell.matchAll(/--surface:(#[a-f0-9]{6})/g)].map(m=>m[1]), textos=[...shell.matchAll(/--fg:(#[a-f0-9]{6})/g)].map(m=>m[1]);
+assert.equal(superficies.length,textos.length);
+superficies.forEach((f,i)=>{const a=luminancia(f.slice(1)),b=luminancia(textos[i].slice(1));assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,'Acreditadas: contraste AA en tema '+i)});
+const componentes=leer('web/sate/componentes.js'), desempeno=leer('web/sate/desempeno.js');
+for(const componente of ['indicadoresTrayectoria','fichasKardex','caminoTrayectoria','leyendaGrafica']){
+  assert.ok(componentes.includes('function '+componente));
+  assert.ok(desempeno.includes('SateUI.'+componente));assert.ok(generico.includes('SateUI.'+componente));
+}
 assert.match(css,/\[data-sate-generico\] #v-tray[^}]*min-width:0;max-width:100%/);
 assert.match(css,/\[data-sate-generico\] \.mapwrap[^}]*max-width:100%;min-width:0/);
 assert.match(shell,/\.mapwrap\{[^}]*overflow:auto/);
@@ -197,4 +259,4 @@ for(const u of ['upiita','escom','upibi','esimez']){
   vm.runInContext(destino,c);
   assert.equal(c.TOOL,'https://ejemplo.invalid/upiita/'+(u==='esimez'?'sate/index.html?sateUnidad=esimez':'horarios-'+u+'.html'));
 }
-console.log('SATE genérico: Lector, ENCB 45/37/8, cinco inscritas, demo, perfiles viejos/vacíos, cajas y minimapas compartidos, horario de solo lectura, navegación variable y contención CSS a 375 px.');
+console.log('SATE genérico: Lector, analítica y componentes compartidos, simulación sin persistencia, mapa/lista/zoom/pendientes, horario compacto y contraste AA; DOM a 1440 y 375 px, sin navegador ni red.');
