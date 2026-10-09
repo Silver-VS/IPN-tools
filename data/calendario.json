@@ -161,6 +161,275 @@
     ],
     "eventos": [
       {
+        "desde": "2026-02-02",
+        "hasta": "2026-02-02",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-02-03",
+        "hasta": "2026-02-03",
+        "titulo": "Inicio del periodo 26/2",
+        "categoria": "inicio",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "triangulo",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-02-27",
+        "hasta": "2026-02-27",
+        "titulo": "Fecha límite de saberes previamente adquiridos",
+        "categoria": "saberes",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true,
+        "verificar": true
+      },
+      {
+        "desde": "2026-03-12",
+        "hasta": "2026-03-13",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-03-16",
+        "hasta": "2026-03-16",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-03-17",
+        "hasta": "2026-03-17",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-03-30",
+        "hasta": "2026-04-10",
+        "titulo": "Vacaciones",
+        "categoria": "vacaciones",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-05-01",
+        "hasta": "2026-05-01",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-05-05",
+        "hasta": "2026-05-05",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-05-12",
+        "hasta": "2026-05-12",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-05-15",
+        "hasta": "2026-05-15",
+        "titulo": "Descanso por acuerdo sindical",
+        "categoria": "sindical",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "circulo",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-05-18",
+        "hasta": "2026-09-11",
+        "titulo": "Suspensión de actividades (paro)",
+        "categoria": "suspension",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true,
+        "verificar": true,
+        "nota": "Actividades suspendidas; las fechas siguientes se reprogramaron."
+      },
+      {
+        "desde": "2026-05-21",
+        "hasta": "2026-05-21",
+        "titulo": "Día del Politécnico",
+        "categoria": "politecnico",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "estrella",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-07-20",
+        "hasta": "2026-07-31",
+        "titulo": "Vacaciones",
+        "categoria": "vacaciones",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-07-21",
+        "hasta": "2026-07-21",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-08-01",
+        "hasta": "2026-08-08",
+        "titulo": "Vacaciones",
+        "categoria": "vacaciones",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-09-14",
+        "hasta": "2026-09-14",
+        "titulo": "Reanudación de actividades académicas en otros ambientes de aprendizaje",
+        "categoria": "reanudacion",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "triangulo",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-09-16",
+        "hasta": "2026-09-16",
+        "titulo": "Descanso obligatorio",
+        "categoria": "descanso",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "rayado",
+        "reemplaza": true
+      },
+      {
+        "desde": "2026-09-28",
+        "hasta": "2026-09-30",
+        "titulo": "Registro de evaluación ordinaria",
+        "categoria": "ordinaria",
+        "periodo": "26/2",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "relleno",
+        "reemplaza": true
+      },
+      {
         "desde": "2026-10-01",
         "hasta": "2026-10-01",
         "titulo": "Registro de evaluación extraordinaria",
@@ -938,8 +1207,8 @@
     ],
     "periodos": {
       "26/2": {
-        "desde": "2026-10-01",
-        "hasta": "2026-10-02"
+        "desde": "2026-02-02",
+        "hasta": "2026-10-12"
       },
       "27/1": {
         "desde": "2026-10-03",

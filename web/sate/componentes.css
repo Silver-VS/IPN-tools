@@ -157,6 +157,12 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-signos{display:flex;flex-wrap:wrap;justify-content:center;gap:1px;max-width:100%;font-size:.65rem;line-height:1}
 .calendario-signo{color:var(--cal-ink);background:var(--cal-fill);border-radius:2px}
 .calendario-dia.calendario-rayado{background:repeating-linear-gradient(135deg,var(--cal-fondo) 0 4px,var(--cal-linea) 4px 5px)}
+/* El rayado del paro se superpone al relleno de vacaciones sin ocultar sus símbolos. */
+.calendario-dia.calendario-suspension{background-color:var(--cal-fondo);background-image:repeating-linear-gradient(135deg,transparent 0 4px,var(--cal-suspension-linea) 4px 5px)}
+.calendario-dia.calendario-suspension[data-categoria]{background-color:var(--cal-fill)}
+.calendario-suspension .calendario-numero{background:var(--cal-fondo);color:var(--cal-texto);border-radius:3px}
+#sate-calendario [data-categoria=suspension] .calendario-trazo{opacity:.35}
+#sate-calendario [data-categoria=suspension] .calendario-muestra{background-image:repeating-linear-gradient(135deg,transparent 0 4px,var(--cal-suspension-linea) 4px 5px)}
 .calendario-sindical .calendario-numero{border:2px solid #3470b0;border-radius:50%}
 .calendario-dia[data-seleccionado=true]{box-shadow:inset 0 0 0 2px var(--cal-aguja)}
 .calendario-dia[data-categoria][data-seleccionado=true]{box-shadow:inset 0 0 0 2px var(--cal-ink)}
@@ -174,6 +180,13 @@ body.sate-flotante #sate-tabs{display:none}
 #sate-calendario[data-unidad=upiita][data-calendario-propio=true] [data-categoria=saberes]{--cal-fill:#f5ecd1;--cal-ink:#322316}
 #sate-calendario [data-categoria=descanso]{--cal-fill:#eeeeee;--cal-ink:#222222}
 #sate-calendario [data-categoria=sindical]{--cal-fill:#d6e8ff;--cal-ink:#173a76}
+#sate-calendario{--cal-suspension-linea:#b3263b}
+#sate-calendario [data-categoria=suspension]{--cal-fill:#fbe8eb;--cal-ink:#891b2c}
+#sate-calendario [data-categoria=reanudacion]{--cal-fill:#e8d3ff;--cal-ink:#512772}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) #sate-calendario{--cal-suspension-linea:#ef889a}:root:not([data-theme=light]) #sate-calendario [data-categoria=suspension]{--cal-fill:#56232c;--cal-ink:#ffd9df}:root:not([data-theme=light]) #sate-calendario [data-categoria=reanudacion]{--cal-fill:#4a2a69;--cal-ink:#f2dfff}}
+[data-theme=dark] #sate-calendario{--cal-suspension-linea:#ef889a}
+[data-theme=dark] #sate-calendario [data-categoria=suspension]{--cal-fill:#56232c;--cal-ink:#ffd9df}
+[data-theme=dark] #sate-calendario [data-categoria=reanudacion]{--cal-fill:#4a2a69;--cal-ink:#f2dfff}
 #sate-calendario [data-categoria=inicio]{--cal-fill:#b4dfb6;--cal-ink:#122716}
 #sate-calendario [data-categoria=fin]{--cal-fill:#ffd6d6;--cal-ink:#7c1724}
 #sate-calendario [data-categoria=politecnico]{--cal-fill:#efd4df;--cal-ink:#671e3c}

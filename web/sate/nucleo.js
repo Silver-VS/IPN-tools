@@ -185,7 +185,7 @@ function semRef(){
 /* Calendario de Gestión Escolar: Ventanilla y modal de Situación comparten render y selección. */
 // Las fechas civiles se comparan como ISO para evitar cambios de día por zona horaria.
 SATE.calendario={
-  categorias:['inscripcion','ordinaria','extraordinaria','inscripcion_ets','ets','vacaciones','saberes','descanso','sindical','inicio','inicio_nms','fin','politecnico','induccion','induccion_nms','nivelacion','planeacion','posgrado','grado_posgrado','academico','gestion','becas','servicios','tt','feriado'],
+  categorias:['inscripcion','ordinaria','extraordinaria','inscripcion_ets','ets','vacaciones','saberes','descanso','sindical','suspension','reanudacion','inicio','inicio_nms','fin','politecnico','induccion','induccion_nms','nivelacion','planeacion','posgrado','grado_posgrado','academico','gestion','becas','servicios','tt','feriado'],
   hoy(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
   cita(){
     if(typeof isPersonal!=='function'||!isPersonal())return null;

@@ -62,8 +62,19 @@ assert.equal(api.eventos().find(e=>e.categoria==='fin'&&e.periodo==='27/1').desd
 assert.ok(!api.eventos(true).some(e=>e.origen==='ipn'&&data.upiita.periodosPropios.includes(e.periodo)),'UPIITA no hereda procesos del calendario incompatible');
 for(const p of ['26/2','27/1','27/2'])assert.ok(api.eventos().filter(e=>e.categoria==='ets'&&e.periodo===p).every(e=>e.origen==='unidad'&&e.fuenteOriginal.includes('Gestión Escolar UPIITA')));
 assert.deepEqual(Array.from(api.eventos().filter(e=>e.categoria==='ets'&&e.periodo==='26/2').map(e=>[e.desde,e.hasta])),[['2026-10-07','2026-10-09'],['2026-10-12','2026-10-12']]);
-assert.equal(data.upiita.eventos.filter(e=>e.verificar).length,3);
+assert.equal(data.upiita.eventos.filter(e=>e.verificar&&e.periodo!=='26/2').length,3);
+assert.deepEqual(data.upiita.eventos.filter(e=>e.verificar&&e.periodo==='26/2').map(e=>e.categoria),['saberes','suspension']);
+assert.deepEqual(data.upiita.periodos['26/2'],{desde:'2026-02-02',hasta:'2026-10-12'});
 const fechasLocales={
+ '26/2|descanso':['2026-02-02:2026-02-02','2026-03-16:2026-03-16','2026-05-01:2026-05-01','2026-05-05:2026-05-05','2026-07-21:2026-07-21','2026-09-16:2026-09-16'],
+ '26/2|inicio':['2026-02-03:2026-02-03'],
+ '26/2|saberes':['2026-02-27:2026-02-27'],
+ '26/2|ordinaria':['2026-03-12:2026-03-13','2026-03-17:2026-03-17','2026-05-12:2026-05-12','2026-09-28:2026-09-30'],
+ '26/2|vacaciones':['2026-03-30:2026-04-10','2026-07-20:2026-07-31','2026-08-01:2026-08-08'],
+ '26/2|sindical':['2026-05-15:2026-05-15'],
+ '26/2|politecnico':['2026-05-21:2026-05-21'],
+ '26/2|suspension':['2026-05-18:2026-09-11'],
+ '26/2|reanudacion':['2026-09-14:2026-09-14'],
  '27/1|ordinaria':['2026-11-18:2026-11-20','2027-01-04:2027-01-06','2027-02-08:2027-02-10'],
  '27/1|extraordinaria':['2027-02-11:2027-02-12'],
  '27/1|ets':['2027-02-18:2027-02-19','2027-02-22:2027-02-24'],
@@ -75,6 +86,8 @@ for(const [clave,fechas] of Object.entries(fechasLocales))assert.deepEqual(Array
 c.SATE_UNIDAD='escom';c.DATA.calendario=null;
 assert.equal(api.eventos().find(e=>e.categoria==='inicio'&&e.periodo==='27/1').desde,'2026-08-24');
 assert.ok(api.eventos().filter(e=>e.categoria==='ets').every(e=>e.origen==='ipn'));
+assert.deepEqual(Array.from(api.eventos(true)),Array.from(api.filtrarAudiencia(api.fusion(base,null),true)),'ESCOM conserva íntegro el calendario oficial disponible');
+assert.ok(!api.eventos(true).some(e=>e.periodo==='26/2'&&e.origen==='unidad'),'ESCOM no recibe el periodo local UPIITA 26/2');
 c.SATE_UNIDAD='upiita';c.DATA.calendario=data.upiita;
 assert.ok(api.eventos().some(e=>e.origen==='ipn')&&api.eventos().some(e=>e.origen==='unidad'));
 assert.ok(api.eventos().every(e=>!e.audiencia.includes('docentes')));
@@ -238,4 +251,41 @@ assert.match(bloque,/@media\(max-width:599px\)\{\.calendario-audiencia\{flex:0 0
 assert.match(bloque,/\.calendario-audiencia-larga\{display:none\}\.calendario-audiencia-corta\{display:inline\}/);
 document.getElementById('cal-audiencia').checked=true;document.getElementById('cal-audiencia').onchange();
 for(const n of nodos('calendario-anillo-categoria'))assert.ok(Number(n.getAttribute('d').match(/ A ([\d.-]+)/)[1])>0,'Radio positivo al ampliar audiencia');
-console.log('CAL6: mes con todos los periodos, audiencia y filtros, detalle y cambio de periodo, prioridades de hoy y mes inicial con fecha fija; regresiones CAL5. OK.');
+// CAL7: periodo completo, paro con vacaciones y descanso, reanudación y filtros.
+c.matchMedia=()=>({matches:false});box.clientWidth=1040;c.SATE_UNIDAD='upiita';api.hoy=()=> '2026-07-21';reiniciar();
+assert.equal(document.getElementById('cal-periodo').children.find(n=>n.selected).value,'26/2');
+assert.equal(nodos('calendario-rango')[0].textContent,'2 de febrero de 2026 al 12 de octubre de 2026');
+assert.deepEqual(nodos('calendario-svg-mes').map(n=>n.textContent),['feb','mar','abr','may','jun','jul','ago','sep','oct']);
+sinColision();
+const dia=s=>dias().find(n=>n.getAttribute('data-fecha')===s);
+const paro=arcos().find(n=>n.getAttribute('data-categoria')==='suspension');
+assert.equal(paro.getAttribute('data-desde'),'2026-05-18');assert.equal(paro.getAttribute('data-hasta'),'2026-09-11');
+assert.ok(dia('2026-07-21').className.includes('calendario-suspension'));
+assert.equal(dia('2026-07-21').getAttribute('data-categoria'),'vacaciones');
+assert.deepEqual(dia('2026-07-21').children[1].children.map(n=>n.getAttribute('data-categoria')),['suspension','vacaciones','descanso']);
+dia('2026-07-21').onclick();assert.equal(nodos('calendario-detalle-evento').length,3);
+assert.match(nodos('calendario-detalle')[0].textContent,/Actividades suspendidas; las fechas siguientes se reprogramaron\./);
+const leyenda=nodos('calendario-categorias')[0];
+assert.ok(leyenda.textContent.includes('Suspensión de actividades'));
+assert.ok(leyenda.textContent.includes('Reanudación en otros ambientes de aprendizaje'));
+document.getElementById('cal-filtro-suspension').checked=false;document.getElementById('cal-filtro-suspension').onchange();
+assert.ok(!dia('2026-07-21').className.includes('calendario-suspension'));
+assert.equal(dia('2026-07-21').children[1].children.length,2,'Ocultar paro conserva vacaciones y descanso');
+document.getElementById('cal-filtro-suspension').checked=true;document.getElementById('cal-filtro-suspension').onchange();
+assert.ok(dia('2026-07-21').className.includes('calendario-suspension'));
+api.hoy=()=> '2026-09-14';reiniciar();
+assert.ok(dia('2026-09-11').className.includes('calendario-suspension'));
+assert.ok(!dia('2026-09-12').className.includes('calendario-suspension'));
+const reanudacion=dia('2026-09-14').children[1].children.find(n=>n.getAttribute('data-categoria')==='reanudacion');
+assert.equal(reanudacion.textContent,'▲');assert.equal(reanudacion.getAttribute('data-simbolo'),'triangulo');
+assert.match(bloque,/\.calendario-dia\.calendario-suspension\{[^}]*background-image:repeating-linear-gradient\(135deg,transparent 0 4px,var\(--cal-suspension-linea\) 4px 5px\)/);
+assert.match(bloque,/data-categoria=suspension\] \.calendario-trazo\{opacity:\.35\}/);
+for(const categoria of ['suspension','reanudacion']){
+ assert.ok([...bloque.matchAll(new RegExp('data-categoria='+categoria+'\\]\\{--cal-fill:', 'g'))].length>=3,'Tokens claro, oscuro automático y oscuro explícito: '+categoria);
+ assert.ok(api.categorias.includes(categoria));
+ assert.ok(!box.textContent.includes('sate.calendario.nombre_'+categoria));
+}
+c.matchMedia=()=>({matches:true});box.clientWidth=375;reiniciar();sinColision();
+assert.equal(nodos('calendario-rango')[0].textContent,'2 de febrero de 2026 al 12 de octubre de 2026');
+assert.ok(dia('2026-09-11').className.includes('calendario-suspension'));
+console.log('CAL7: periodo UPIITA 26/2 completo, paro, solapamientos, reanudación, filtros, tokens AA y teléfono; calendario oficial ESCOM y regresiones CAL5/CAL6. OK.');
