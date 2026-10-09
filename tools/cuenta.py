@@ -15,20 +15,28 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 IPN_TENANT = "f94bf4d9-8097-4794-adf6-a5466ca28563"
 # unidades que ofrece la bienvenida (data/cuenta.json "unidades" la sustituye); "url" para las publicadas en otro sitio
 UNIDADES = [
-    {"id": "upiita", "siglas": "UPIITA", "nombre": "Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas", "disponible": True},
-    {"id": "escom", "siglas": "ESCOM", "nombre": "Escuela Superior de Cómputo", "disponible": False},
+    {"id": "upiita", "disponible": True},
+    {"id": "escom", "disponible": False},
 ]   # login.microsoftonline.com/alumno.ipn.mx (también ipn.mx)
 MSAL = ("https://cdn.jsdelivr.net/npm/@azure/msal-browser@4.30.0/lib/msal-browser.min.js",
         "sha384-RGxxfG5yRS8DLU7ZJ8OoLhbV/BsJFHyPuMVHrTLbpj3t5Z15LnviJmaznKY/a7LZ")
 
 
+def identidades():
+    return json.loads((ROOT / 'data/unidades_identidad.json').read_text(encoding='utf-8'))['unidades']
+
+
 def config():
     f = ROOT / "data" / "cuenta.json"
     c = json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    identidad = identidades()
+    unidades = [{**u, 'siglas': identidad[u['id']]['siglas'],
+                 'nombre': identidad[u['id']].get('nombre', identidad[u['id']]['siglas'])}
+                for u in c.get('unidades', UNIDADES)]
     v = (ROOT / "VERSION").read_text(encoding="utf-8").strip() if (ROOT / "VERSION").exists() else ""
     return {"clientId": os.environ.get("IPNT_CLIENT_ID", c.get("clientId", "")), "tenant": c.get("tenant", IPN_TENANT),
             "googleClientId": os.environ.get("IPNT_GOOGLE_CLIENT_ID", c.get("googleClientId", "")),
-            "unidades": c.get("unidades", UNIDADES),
+            "unidades": unidades,
             "googlePrueba": c.get("googlePrueba", False), "contacto": c.get("contacto", ""),
             "institucionalPendiente": c.get("institucionalPendiente", False),
             "version": v, "unidad": c.get("unidad", "upiita"), "msal": MSAL[0], "sri": MSAL[1]}

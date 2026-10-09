@@ -1,7 +1,5 @@
 {
   "id": "escom",
-  "siglas": "ESCOM",
-  "nombre": "Escuela Superior de Cómputo",
   "modelo": "semestral",
   "saes": "https://www.saes.escom.ipn.mx/",
   "fuente_mapas": "Mapas curriculares 2020 de la ESCOM (PDF), extraídos con tools/extract_mapa_escom.py"

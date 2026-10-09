@@ -33,7 +33,7 @@ HEADER = """<style>
     <span><img class="logo-lt" src="assets/logos/ipn-horizontal-guinda.webp" alt="Instituto Politécnico Nacional. La Técnica al Servicio de la Patria" width="264" height="80"><img class="logo-dk" src="assets/logos/ipn-horizontal-calado.webp" alt="Instituto Politécnico Nacional. La Técnica al Servicio de la Patria" width="264" height="80"></span>
     <a class="unit" href="https://www.upiita.ipn.mx/"><img class="logo-lt" src="assets/logos/upiita-oro.webp" alt="UPIITA, inicio del sitio de la unidad" width="91" height="72"><img class="logo-dk" src="assets/logos/upiita-blanco.webp" alt="UPIITA, inicio del sitio de la unidad" width="91" height="72"></a>
   </div>
-  <div class="inst-name">Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas</div>
+  <div class="inst-name">/*__UNIDAD_NOMBRE__*/</div>
 </header>"""
 
 FOOTER = """<footer class="inst-foot" role="contentinfo"><img src="assets/logos/pleca-horizontal.webp" alt="Educación, Secretaría de Educación Pública. Instituto Politécnico Nacional" width="1600" height="269" loading="lazy"></footer>"""
@@ -73,7 +73,9 @@ def write_dist(name, html, title_suffix=" | UPIITA IPN", unidad=None):
     if unidad and unidad.get("id", "upiita") != "upiita":
         # otra unidad: escudo del IPN y nombre de la unidad (sin el logotipo de la UPIITA)
         head = re.sub(r'\s*<a class="unit".*?</a>', "", head, flags=re.S)
-        head = head.replace("Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas", unidad["nombre"])
+    from cuenta import identidades
+    identidad = identidades().get((unidad or {}).get('id', 'upiita'), {})
+    head = head.replace('/*__UNIDAD_NOMBRE__*/', identidad.get('nombre', (unidad or {}).get('nombre', identidad.get('siglas', ''))))
     html = html.replace("<!--__INST_HEADER__-->", head, 1)
     html = html.replace("<!--__IPNT_HOME__-->", HOME, 1)   # regreso a la página principal de IPN-tools
     # pleca SEP | IPN al pie: retirada a petición del equipo (2026-10-01); FOOTER se conserva por si se vuelve a requerir

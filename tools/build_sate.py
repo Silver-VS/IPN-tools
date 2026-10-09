@@ -18,6 +18,8 @@ UNIDAD = os.environ.get("UNIDAD", "upiita").lower()
 UNI_DIR = ROOT / "data" / "unidades" / UNIDAD
 UCONF = (json.loads((UNI_DIR / "unidad.json").read_text(encoding="utf-8")) if (UNI_DIR / "unidad.json").exists()
          else {"id": "upiita", "siglas": "UPIITA"})
+from cuenta import identidades
+UCONF.update({k: v for k, v in identidades()[UNIDAD].items() if k in ('siglas', 'nombre')})
 if UNIDAD != "upiita":
     SRC, CUR, OUT = UNI_DIR / "horarios_saes.json", UNI_DIR / "mapa_curricular_saes.json", ROOT / "web" / f"horarios-{UNIDAD}.html"
 PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la oferta)
@@ -849,7 +851,7 @@ def main():
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
     idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
     idx = contenido.inject_apoyo(idx)
-    idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(json.loads((ROOT / "data" / "cuenta.json").read_text(encoding="utf-8")).get("unidades", []), ensure_ascii=False), 1)
+    idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(cuenta.config()['unidades'], ensure_ascii=False), 1)
     (ROOT / "web" / "dist" / "index.html").write_text(aplicar(idx, "index"), encoding="utf-8")   # página principal con inicio de sesión
     for f in ("revision.html", "privacidad.html", "condiciones.html"):
         shutil.copy(ROOT / "web" / f, ROOT / "web" / "dist" / f)
@@ -950,10 +952,12 @@ def escribir_sate(data):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))
+    identidad_unidades = cuenta.identidades()
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():
         c["siglas"] = unidades[u]["siglas"]
         c["nombre"] = unidades[u]["nombre"]
+        c["realce"] = identidad_unidades[u]['realce']
         conf = ROOT / "data/unidades" / u / "unidad.json"
         c["saes"] = json.loads(conf.read_text(encoding="utf-8")).get("saes", "") if conf.exists() else saes.SAES_URL
     textos = contenido.objeto_t()
@@ -982,8 +986,7 @@ def escribir_sate(data):
     for marca in ("UNIDAD", "CARRERA", "SIN_DATOS", "INDICADOR"):
         html = html.replace("/*__SATE_" + marca + "__*/", textos["sate.encabezado." + marca.lower()])
     textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
-    nombres_unidades = json.loads((ROOT / 'data/unidades_saes.json').read_text(encoding='utf-8'))
-    identidad_unidades = json.loads((ROOT / 'data/unidades_identidad.json').read_text(encoding='utf-8'))['unidades']
+    nombres_unidades = {alias: c['siglas'] for u, c in identidad_unidades.items() for alias in [u, *c.get('alias', [])]}
     html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")

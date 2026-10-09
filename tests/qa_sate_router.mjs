@@ -3,6 +3,10 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const config = JSON.parse(readFileSync('data/sate.json','utf8')).unidades;
+const identidades = JSON.parse(readFileSync('data/unidades_identidad.json','utf8')).unidades;
+for(const [id,cfg] of Object.entries(config)){
+  const {realce,siglas,nombre}=identidades[id];Object.assign(cfg,{realce,siglas,nombre});
+}
 for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#demo','#error=denied','']) {
  for(const personal of (hashInicial? [false]:[false,true])) {
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
@@ -88,7 +92,8 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
 console.log('Enrutador: carga única, ciclo montar/mostrar/ocultar, atrás/adelante, hashes ajenos y cambio de unidad correctos.');
 
 // La identidad se decide antes de descargar datos, también en unidades sin logo.
-const unidades = JSON.parse(readFileSync('data/cuenta.json','utf8')).unidades;
+const identidad = JSON.parse(readFileSync('data/unidades_identidad.json','utf8')).unidades;
+const unidades = JSON.parse(readFileSync('data/cuenta.json','utf8')).unidades.map(u=>({...u,...identidad[u.id]}));
 for (const unidad of unidades) {
   const nombre={textContent:''}, cabecera={children:[],appendChild(n){this.children.push(n)}};
   const cfg=structuredClone(config);

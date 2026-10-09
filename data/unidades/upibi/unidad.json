@@ -1,7 +1,5 @@
 {
   "id": "upibi",
-  "siglas": "UPIBI",
-  "nombre": "Unidad Profesional Interdisciplinaria de Biotecnología",
   "modelo": "niveles",
   "saes": "https://www.saes.upibi.ipn.mx/",
   "planes": {
