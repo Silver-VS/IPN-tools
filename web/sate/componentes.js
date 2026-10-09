@@ -316,6 +316,105 @@
     return nav;
   }
 
-  raiz.SateUI = { usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
+function rowBands(L){
+  if(L._bands) return L._bands;
+  const cs=L.rows.map(()=>[]);
+  L.boxes.forEach(b=>{const cy=b[1]+b[3]/2;let j=0;L.rows.forEach((r,i)=>{if(Math.abs(r[1]-cy)<Math.abs(L.rows[j][1]-cy))j=i});cs[j].push(cy)});
+  // Los mapas por áreas tienen filas exactas; solo se ajustan los centros de los PDF.
+  const ys=L.rows.map(([n,y],i)=>{const v=cs[i].sort((a,b)=>a-b);return v.length&&!L.propuesto&&!L.filas_exactas?v[Math.floor(v.length/2)]:y});
+  return L._bands=L.rows.map(([n],i)=>{const y=ys[i];
+    const a=i?(ys[i-1]+y)/2:Math.max(0,y-(ys[1]!=null?(ys[1]-y)/2:L.pitch/2));
+    const b=i<ys.length-1?(y+ys[i+1])/2:Math.min(L.h,y+(i?(y-ys[i-1])/2:L.pitch/2));
+    return [n,y,a,b]});
+}
+function minimapaCurricular(ctx,L,FILL,op={}){
+  const {isPersonal,cur,slotFill,isElec,statusOf,esc,SATE}=ctx;
+  if(!isPersonal())return null;
+  if(!L){
+    const niveles=[...new Set(Object.values(cur()).map(v=>v[2]))].sort((a,b)=>a-b),boxes=[];
+    let cols=1;
+    niveles.forEach((n,i)=>{const keys=Object.keys(cur()).filter(k=>cur()[k][2]===n);cols=Math.max(cols,keys.length);keys.forEach((k,j)=>boxes.push([j*50,i*50,40,40,k]))});
+    L={w:cols*50,h:Math.max(1,niveles.length)*50,boxes,edges:[],rows:niveles.map((n,i)=>[n,i*50+20]),pitch:50,filas_exactas:true};
+  }
+  FILL=FILL||slotFill(L,new Set());
+  const {nPend=0,FOCO=null}=op,bands=rowBands(L);
+  const colores={done:'var(--ipn-ok)',curso:'var(--sate-realce)',pend:'var(--ipn-tenue)',fail:'var(--ipn-reprobada)',late:'var(--ipn-desfasada)'};
+  const cnt={done:0,curso:0,pend:0,fail:0,late:0};
+  const estado=st=>st==='done'?'done':st.startsWith('curso')?'curso':st.startsWith('late')?'late':st.includes('fail')?'fail':'pend';
+  let svg=`<svg viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true" focusable="false">`;
+  bands.forEach(([n,y,a,b],i)=>{
+    if(i%2===0)svg+=`<rect x="0" y="${a}" width="${L.w}" height="${b-a}" fill="var(--ipn-hundido)"/>`;
+    if(i===nPend&&nPend){const fx=FOCO?FOCO.x0:1,fw=FOCO?FOCO.x1-FOCO.x0:L.w-2;svg+=`<rect x="${fx}" y="${a}" width="${fw}" height="${L.h-a-1}" fill="none" stroke="var(--ipn-acento)" stroke-width="4" stroke-dasharray="14 8" rx="8"/>`}
+  });
+  L.edges.forEach(([s,d,pp])=>{const pts=[];for(let i=0;i<pp.length;i+=2)pts.push(pp[i]+','+pp[i+1]);svg+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ipn-tenue)" stroke-opacity=".35" stroke-width="3"/>`});
+  L.boxes.forEach(([x,y,w,h,k,slot],i)=>{
+    const kk=k||FILL.get(i)?.k,cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.3;
+    if(!kk){if(/^optativa/i.test(slot)){svg+=`<circle data-estado="pend" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colores.pend}" stroke-width="4" stroke-dasharray="6 5"/>`;cnt.pend++}return}
+    if(isElec(kk))return;
+    const st=estado(statusOf(kk));cnt[st]++;
+    svg+=`<circle data-estado="${st}" cx="${cx}" cy="${cy}" r="${r}" fill="${colores[st]}"/>`;
+  });
+  svg+='</svg>';
+  // leyenda en dos filas centradas: avance (acreditadas, en curso, por cursar) y alertas (reprobadas, desfasadas)
+  const pastilla=st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`;
+  const leyenda=[['done','curso','pend'],['fail','late']].map(fila=>fila.filter(st=>st in cnt)).filter(f=>f.length)
+    .map(f=>`<div class="mm-fila">${f.map(pastilla).join('')}</div>`).join('');
+  return {svg,leyenda,cnt};
+}
+function cajaMateria(ctx,k,x,y,w,h,sc,want,off,hot,sem,req){
+  const {cur,statusOf,planAsignado,isElec,MARK,S,fmtCr,porNiveles,esc,SATE,PLAN_DOS_PERIODOS,planEtiqueta}=ctx;
+  const [n,cr,niv]=cur()[k]||[k,0,1];
+  const st=statusOf(k), paso=planAsignado(k);
+  if(ctx.soloLectura){
+    const tip=k+' · '+n+' · '+ctx.etiqueta(k);
+    return `<div class="box ${st}" data-estado="${st}" style="--nv:var(--sate-realce);left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}" aria-label="${esc(tip)}">${esc(n)}</div>`;
+  }
+  const el=isElec(k);
+  const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${paso!=null?' want plan-'+(paso+1):req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?' hot':hot.pre?.has(k)?' hpre':hot.post?.has(k)?' hpost':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
+  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem&&!porNiveles()?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${paso===S.planPaso}" aria-label="${esc(tip+(paso==null?'':' · '+SATE.texto('sate.planeacion.'+(PLAN_DOS_PERIODOS?'asignada':'periodo_elegido'),{marca:paso+1,periodo:planEtiqueta(paso)})))}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}${paso==null||!PLAN_DOS_PERIODOS?'':`<span class="plan-marca" aria-hidden="true">${paso+1}</span>`}</div>`;
+}
+function lanes(items){
+  const out=[];
+  for(let d=0;d<7;d++){
+    const bs=items.filter(b=>b.d===d).sort((a,b)=>a.a-b.a||b.b-a.b);
+    let group=[],end=-1;
+    const flush=()=>{const le=[];group.forEach(b=>{let i=le.findIndex(e=>e<=b.a);if(i<0){i=le.length;le.push(0)}le[i]=b.b;b.lane=i});group.forEach(b=>{b.n=le.length;b.clash=le.length>1&&!b.ghost});out.push(...group);group=[]};
+    bs.forEach(b=>{if(b.a>=end&&group.length)flush();group.push(b);end=Math.max(end,b.b)});
+    if(group.length)flush();
+  }
+  return out;
+}
+function cuadriculaHorario(all,op){
+  const {S,slots,START,BLOCK,SLOT,SLOTPX,$,DAYS,hm,esc,txH,hue,keyOf,name,profs,roomAt,ghost,soloLectura=false}=op;
+  const maxDay=Math.max(4,...all.flatMap(c=>slots(c).map(b=>b[0])));
+  const days=S.weekend?7:maxDay+1;
+  // bloques de 1:30 alineados a las 7:00 (si algo empieza antes, se agregan bloques completos hacia arriba)
+  const first=Math.min(START,...all.flatMap(c=>slots(c).map(b=>b[1])));
+  const lo=START-Math.ceil((START-first)/BLOCK)*BLOCK;
+  const hi=Math.max(14*60+30,...all.flatMap(c=>slots(c).map(b=>b[2])));
+  const end=lo+Math.ceil((hi-lo)/BLOCK)*BLOCK, h=(end-lo)/SLOT*SLOTPX;
+  const cal=$('#cal');cal.style.setProperty('--days',days);cal.style.setProperty('--slot',SLOTPX+'px');
+  let html='<div class="dh"></div>'+DAYS.slice(0,days).map(d=>`<div class="dh">${d}</div>`).join('');
+  html+=`<div class="hours" style="height:${h}px">`;
+  for(let m=lo;m<end;m+=BLOCK) html+=`<div style="top:${(m-lo)/SLOT*SLOTPX}px">${hm(m)}</div>`;
+  html+='</div>';
+  const items=lanes(all.flatMap(c=>slots(c).map(([d,a,b])=>({c,d,a,b,ghost:c===ghost}))));
+  for(let d=0;d<days;d++){
+    html+=`<div class="day" style="height:${h}px">`;
+    if(!soloLectura)for(let m=lo;m<end;m+=BLOCK){const on=S.gap&&S.gap.d===d&&S.gap.a===m;
+      html+=`<button type="button" class="gapcell${on?' on':''}" data-gap="${d}|${m}" style="top:${(m-lo)/SLOT*SLOTPX}px;height:${BLOCK/SLOT*SLOTPX}px" title="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)+'–'+hm(m+BLOCK)}))}" aria-label="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)}))}"></button>`}
+    items.filter(b=>b.d===d).forEach(b=>{
+      const top=(b.a-lo)/SLOT*SLOTPX, ht=(b.b-b.a)/SLOT*SLOTPX-2, w=100/b.n, pos=`top:${top}px;height:${ht}px;left:calc(${b.lane*w}% + 2px);width:calc(${w}% - 4px)`;
+      if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}" style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
+      else html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)};${pos}"${soloLectura?'':` data-k="${keyOf(b.c)}"`} title="${esc(b.c[3])} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}"><b>${esc(name(b.c))}</b><span class="t">${esc(b.c[3])} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></div>`;
+    });
+    html+='</div>';
+  }
+  cal.innerHTML=html;
+  return items;
+}
+
+  raiz.SateUI = { bandasMapa:rowBands, minimapaCurricular, cajaMateria, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior };
 })(typeof window !== 'undefined' ? window : globalThis);

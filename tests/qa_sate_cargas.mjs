@@ -77,6 +77,9 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
     requestAnimationFrame:fn=>fn(),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:1280,innerHeight:800,
     fetch(){throw new Error('Red prohibida en QA de cargas')}});
   vm.runInContext('window=globalThis',contexto);
+  const doblesUI=contexto.SateUI;
+  vm.runInContext(leer('web/dist/sate/componentes.js'),contexto);
+  Object.assign(contexto.SateUI,doblesUI);
   vm.runInContext(leer('web/dist/sate/nucleo.js'),contexto,{filename:'nucleo.js'});
   await SATE.script('mapa.js');
   SATE.modulos.mapa.montar();

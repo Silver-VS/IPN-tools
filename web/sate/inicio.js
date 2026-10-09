@@ -5,7 +5,7 @@
   const cascaron = document.querySelector('html[data-pestanas]');
   const variante = new URLSearchParams(location.search).get('pestanas');
   if (cascaron && ['v1','v3'].includes(variante)) cascaron.setAttribute('data-pestanas', variante);
-  let api, actual, tabs, barra, version = 0;
+  let api, actual, tabs, barra, version = 0, recalcularPestanas=()=>{};
   const leer = k => { try { return localStorage.getItem(k); } catch { return null; } };
   const solicitada = location.hash.match(/^#\/([a-z0-9-]+)\//)?.[1] || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || leer('ipnt.unidad');
   if (solicitada && /^[a-z0-9-]+$/.test(solicitada) && !config[solicitada]) {
@@ -129,6 +129,7 @@
       else if (escalon !== 'flotante' && !(typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches) && barra.contains(foco)) tabs.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
     }
     function programar() { if (!pendiente) { pendiente = true; requestAnimationFrame(calcular); } }
+    recalcularPestanas=programar;
     new ResizeObserver(programar).observe(navegacion);
     new MutationObserver(programar).observe(tabs, {childList:true,subtree:true,characterData:true});
     new MutationObserver(programar).observe(document.documentElement, {attributes:true,attributeFilter:['lang','class','style','data-pestanas']});
@@ -193,8 +194,8 @@
     api.renderTop(); api.renderAviso(); SATE.presente.avisos(); modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
-    document.getElementById('sate-oferta-periodo').hidden=actual.pestana!=='horarios';
-    document.getElementById('notice').hidden=actual.pestana!=='horarios';
+    document.getElementById('sate-oferta-periodo').hidden=cfg.generica||actual.pestana!=='horarios';
+    document.getElementById('notice').hidden=cfg.generica||actual.pestana!=='horarios';
     document.getElementById('mobnote').hidden=true;
   }
   window.SATE = {texto, modulos, error, script, identidadSaes, get actual(){return actual}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
@@ -202,20 +203,28 @@
       api = a; if (!cfg.generica) await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta(location.hash, u, config) ||
         SateRutas.ruta('#/' + u + '/' + (api.personal() && cfg.pestanas.includes('trayectoria') ? 'trayectoria' : 'mapa'), u, config);
-      const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
-      tabs = SateUI.pestanas({items,activa:r.pestana,alCambiar:id=>{if(actual && actual.pestana!==id)ir(id)}});
-      document.getElementById('sate-tabs').appendChild(tabs);
-      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');
-      barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa:r.pestana,alElegir:ir});
-      document.body.appendChild(barra);
+      actualizarPestanas(r.pestana);
       adaptarPestanas();
       addEventListener('hashchange',()=>{const r=SateRutas.ruta(location.hash,u,config);if(r)activar(r).catch(error)});
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
       await activar(r);
       if (!inicial && !recordada && !new URLSearchParams(location.search).has('sateUnidad')) elegirUnidad();
-    }
+    }, actualizarPestanas
   };
+  function actualizarPestanas(activa=actual?.pestana){
+      if(!cfg.pestanas.includes(activa))activa=api.personal()?'trayectoria':'mapa';
+      const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
+      tabs = SateUI.pestanas({items,activa,alCambiar:id=>{if(actual && actual.pestana!==id)ir(id)}});
+      document.getElementById('sate-tabs').replaceChildren();
+      document.getElementById('sate-tabs').appendChild(tabs);
+      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');
+      barra?.remove?.();
+      barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa,alElegir:ir});
+      document.body.appendChild(barra);
+      recalcularPestanas();
+      if(actual&&actual.pestana!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
+  }
   const siglasUnidad = document.createElement('span'); siglasUnidad.className = 'sate-unidad'; siglasUnidad.textContent = cfg.siglas;
   document.getElementById('sate-titulo').replaceChildren(logoUnidad(u, cfg.nombre), texto('sate.siglas') + ' ', siglasUnidad);
   if (cfg.leyenda) {

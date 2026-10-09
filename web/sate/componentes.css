@@ -322,6 +322,13 @@ body.sate-flotante .sate-barra{display:flex}
 .trayectoria-minimapa button:hover{border-color:var(--ipn-acento)}
 .trayectoria-minimapa svg{display:block;width:100%;height:auto;max-height:260px}
 .trayectoria-minimapa .mm-leg{display:flex;flex-direction:column;align-items:center;gap:var(--ipn-esp-1);margin-top:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto)}
+[data-sate-generico] #v-tray,[data-sate-generico] #v-hor,[data-sate-generico] #sate-trayectoria{min-width:0;max-width:100%;overflow-wrap:anywhere}
+[data-sate-generico] .mapwrap,[data-sate-generico] .calwrap{max-width:100%;min-width:0}
+[data-sate-generico] .box,[data-sate-generico] .blk{cursor:default}
+[data-sate-generico] .trayectoria-minimapa{max-width:420px;margin:16px auto;display:block}
+[data-sate-generico] .areas{position:relative;height:30px}
+[data-sate-generico] .tl-name{cursor:default}
+[data-sate-generico] .tl-row>span:last-child{align-self:center;padding:8px;font-size:.78rem}
 @media(max-width:720px){#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr)}.trayectoria-minimapa{grid-column:1;grid-row:2;width:100%}}
 .trayectoria-escenario{padding:1rem 0;border-block:1px solid var(--ipn-linea);margin:1rem 0}
 #sate-avisos-globales{margin-block:.65rem}
