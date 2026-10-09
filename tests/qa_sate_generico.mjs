@@ -92,10 +92,10 @@ for(const modo of ['actual','viejo','periodos','vacio']){
   if(modo==='periodos'){p.no_cursadas=[['Z401',null,0,null]];p.reprobadas_periodo=p.reprobadas_periodo.map(r=>r.slice(0,3));p.desfasadas_saes=[];}
   const almacen=new Map(modo==='vacio'?[]:[['saes.alumno',JSON.stringify(p)]]),nodos=new Map(),archivos=[],eventos={};let c;
   function nodo(id=''){return {id,hidden:false,textContent:'',innerHTML:'',style:{},dataset:{},children:[],
-    classList:{toggle(){}},setAttribute(){},removeAttribute(){},addEventListener(){},replaceChildren(){},appendChild(n){this.children.push(n)},
+    classList:{toggle(){}},setAttribute(){},getAttribute(){return null},removeAttribute(){},addEventListener(){},replaceChildren(){this.children=[]},appendChild(n){this.children.push(n)},
     querySelector:s=>nodo(s),querySelectorAll:()=>[],closest:()=>null};}
   const document={readyState:'loading',documentElement:{getAttribute(){return null},setAttribute(){},style:{setProperty(){},removeProperty(){}}},addEventListener(){},getElementById(id){if(!nodos.has(id))nodos.set(id,nodo(id));return nodos.get(id)},
-    querySelector:s=>document.getElementById(s),querySelectorAll:()=>[],createElement:()=>nodo(),body:nodo(),head:{appendChild(s){
+    querySelector:s=>document.getElementById(s),querySelectorAll:()=>[],createElement:()=>nodo(),createElementNS:()=>nodo(),body:nodo(),head:{appendChild(s){
       if(!s.src)return;archivos.push(s.src);setImmediate(()=>{vm.runInContext(leer('web/dist/sate/'+s.src),c,{filename:s.src});s.onload()});
     }}};
   const location={hash:'',search:'?sateUnidad=esimez',pathname:'/sate/index.html'};
@@ -108,7 +108,7 @@ for(const modo of ['actual','viejo','periodos','vacio']){
   for(const f of ['rutas.js','inicio.js'])vm.runInContext(leer('web/sate/'+f),c,{filename:f});
   await vaciar();
   assert.equal(c.SATE_UNIDAD,'esimez');assert.equal(c.SATE_CONFIG.unidades.esimez.siglas,'ESIME Zacatenco');
-  assert.deepEqual([...c.SATE_CONFIG.unidades.esimez.pestanas],['trayectoria','mapa']);
+  assert.deepEqual([...c.SATE_CONFIG.unidades.esimez.pestanas],['trayectoria','mapa','calendario']);
   assert.deepEqual(archivos,['generico.js']);
   assert.equal(c.SATE.actual.pestana,modo==='vacio'?'mapa':'trayectoria');
   const tray=document.getElementById('sate-trayectoria');
@@ -127,6 +127,14 @@ for(const modo of ['actual','viejo','periodos','vacio']){
   assert.equal(c.SateGenerico.datos({...perfil,desfasadas_saes:[],reprobadas_periodo:[['Z201','10/1',10,2]]}).materias.find(m=>m.clave==='Z201').estado,'Reprobada','La antigüedad no inventa desfase');
   assert.equal(c.SateGenerico.datos({...perfil,reprobadas_periodo:null,reprobadas:[['FÍSICA FICTICIA',20]]}).materias.find(m=>m.clave==='Z201').estado,'Reprobada','Reprobadas de la cita si no se leyó Estado General');
   assert.equal(c.SateRutas.ruta('#/esimez/horarios','esimez',c.SATE_CONFIG.unidades),null);
+  location.hash='#/esimez/calendario';eventos.hashchange();await vaciar();
+  assert.equal(c.SATE.actual.pestana,'calendario');
+  assert.equal(document.getElementById('sate-calendario').hidden,false);
+  assert.equal(archivos.filter(a=>a==='calendario.js').length,1);
+  assert.ok(c.SATE.calendario.eventos().some(e=>e.categoria==='inicio'));
+  const buscar=(n,clase)=>n.children?.some(h=>h.className===clase||buscar(h,clase));
+  assert.ok(buscar(document.getElementById('sate-calendario'),'calendario-mes'));
+  assert.equal(c.SATE.calendario.eventos().filter(e=>e.audiencia.includes('nuevo_ingreso')).length,modo==='vacio'?7:0);
   assert.ok(!archivos.includes('nucleo.js'));
 }
 // Destino del Lector: contrato de los tres enlaces existentes y la unidad genérica.

@@ -2,7 +2,10 @@
   "_fuente": "Qué pestañas y trámites muestra SATE en cada unidad (plan de la plataforma, secciones 1.2 y 5). Los textos van por clave en contenido/textos/es.toml (sate.pestana.<id>, sate.tramite.<id>); lo valida tools/contenido.py.",
   "unidades": {
     "upiita": {
-      "realce": {"claro": "#805000", "oscuro": "#b09020"},
+      "realce": {
+        "claro": "#805000",
+        "oscuro": "#b09020"
+      },
       "pestanas": [
         "trayectoria",
         "tramites",
@@ -35,11 +38,15 @@
       "planDosPeriodos": false
     },
     "escom": {
-      "realce": {"claro": "#006090", "oscuro": "#50a8d0"},
+      "realce": {
+        "claro": "#006090",
+        "oscuro": "#50a8d0"
+      },
       "pestanas": [
         "trayectoria",
         "mapa",
-        "horarios"
+        "horarios",
+        "calendario"
       ],
       "tramites": [],
       "leyenda": "prueba",
@@ -49,17 +56,22 @@
         ],
         [
           "mapa",
-          "horarios"
+          "horarios",
+          "calendario"
         ]
       ],
       "planDosPeriodos": false
     },
     "upibi": {
-      "realce": {"claro": "#00805a", "oscuro": "#20b070"},
+      "realce": {
+        "claro": "#00805a",
+        "oscuro": "#20b070"
+      },
       "pestanas": [
         "trayectoria",
         "mapa",
-        "horarios"
+        "horarios",
+        "calendario"
       ],
       "tramites": [],
       "leyenda": "prueba",
@@ -69,7 +81,8 @@
         ],
         [
           "mapa",
-          "horarios"
+          "horarios",
+          "calendario"
         ]
       ],
       "planDosPeriodos": false

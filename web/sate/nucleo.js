@@ -185,23 +185,40 @@ function semRef(){
 /* Calendario de Gestión Escolar: Ventanilla y modal de Situación comparten render y selección. */
 // Las fechas civiles se comparan como ISO para evitar cambios de día por zona horaria.
 SATE.calendario={
-  categorias:['academico','gestion','becas','servicios','tt','feriado'],
+  categorias:['inscripcion','ordinaria','extraordinaria','inscripcion_ets','ets','vacaciones','saberes','descanso','sindical','inicio','inicio_nms','fin','politecnico','induccion','induccion_nms','nivelacion','planeacion','posgrado','grado_posgrado','academico','gestion','becas','servicios','tt','feriado'],
   hoy(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
   cita(){
     if(typeof isPersonal!=='function'||!isPersonal())return null;
     const iso=s=>{const m=String(s||'').match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);return m?m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0'):null}, desde=iso(ALUMNO.cita?.inicio);
     return desde?{desde,hasta:iso(ALUMNO.cita.fin)||desde,titulo:SATE.texto('sate.calendario.tu_cita'),categoria:'gestion',periodo:perName(perDeFecha(ALUMNO.cita.inicio)),fuente:SATE.texto('sate.calendario.fuente_saes'),nota:ALUMNO.cita.inicio,personal:true}:null;
   },
-  eventos(){const c=DATA.calendario, cita=this.cita();return c?[...(c.actividades||[]).map(a=>({...a,hasta:a.hasta||a.desde,categoria:'gestion',fuente:a.fuente||c.fuente,periodo:c.periodo})),...(c.eventos||[]),...(cita?[cita]:[])]:[]},
+  fusion(base,unidad){
+    const locales=[...(unidad?.actividades||[]),...(unidad?.eventos||[])].map(e=>({...e,hasta:e.hasta||e.desde,periodo:e.periodo||unidad.periodo,audiencia:e.audiencia||['alumnos'],fuente:e.fuente||unidad.fuente,origen:'unidad'}));
+    // Solo los procesos declarados sustituyen a la base; los días independientes se identifican por fecha.
+    const clave=e=>[e.categoria,e.periodo,[...(e.audiencia||['alumnos'])].sort().join(','),['descanso','sindical','politecnico'].includes(e.categoria)?e.desde:''].join('|');
+    const reemplazos=new Set(locales.filter(e=>e.reemplaza).map(clave));
+    return [...(base?.eventos||[]).filter(e=>!reemplazos.has(clave(e))).map(e=>({...e,fuente:base.fuente,url:base.url,origen:'ipn'})),...locales];
+  },
+  filtrarAudiencia(eventos,ampliar=false,alumno=null){
+    const nuevo=!alumno||!Number(alumno.avance?.cursados)||Number(alumno.avance.cursados)<=1;
+    return eventos.filter(e=>(e.audiencia||['alumnos']).some(a=>a==='alumnos'||a==='nuevo_ingreso'&&nuevo||ampliar&&['docentes','posgrado','nms'].includes(a)));
+  },
+  eventos(ampliar=false){
+    const base=typeof SATE_CONFIG==='undefined'?null:SATE_CONFIG.calendarioBase;
+    const c=(typeof DATA==='undefined'?null:DATA.calendario)||(typeof SATE_CONFIG==='undefined'?null:SATE_CONFIG.calendariosUnidad?.[SATE_UNIDAD]);
+    const alumno=typeof ALUMNO!=='undefined'?ALUMNO:SATE.alumno?.(), cita=this.cita();
+    return this.filtrarAudiencia([...this.fusion(base,c),...(cita?[cita]:[])],ampliar,alumno);
+  },
   proximos(n=5,categorias=this.categorias){const hoy=this.hoy();return this.eventos().filter(a=>a.hasta>=hoy&&categorias.includes(a.categoria)).sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta)).slice(0,Math.max(0,n))},
   recorte(pestana){
-    if(!SATE_CONFIG.unidades[SATE_UNIDAD].pestanas.includes('calendario')||!['horarios','mapa','trayectoria'].includes(pestana))return [];
-    const todos=this.proximos(Infinity,pestana==='trayectoria'?this.categorias:['gestion','academico']);
+    if(SATE_CONFIG.unidades[SATE_UNIDAD].generica||!SATE_CONFIG.unidades[SATE_UNIDAD].pestanas.includes('calendario')||!['horarios','mapa','trayectoria'].includes(pestana))return [];
+    const todos=this.proximos(Infinity,pestana==='trayectoria'?this.categorias:['gestion','academico','inscripcion','inicio','ets','inscripcion_ets']);
     const adeudos=pestana==='mapa'&&isPersonal()&&conSim(false,()=>tr().fail.length>0);
-    return todos.filter(e=>pestana==='trayectoria'||(pestana==='horarios'?(e.personal||/citas publicadas|inscripci[oó]n/i.test(e.titulo)&&!/ETS/i.test(e.titulo)):(/^Inicio del periodo/i.test(e.titulo)||adeudos&&/ETS/i.test(e.titulo)))).slice(0,2);
+    return todos.filter(e=>pestana==='trayectoria'||(pestana==='horarios'?(e.personal||/citas publicadas|inscripci[oó]n/i.test(e.titulo)&&!['ets','inscripcion_ets'].includes(e.categoria)&&!/ETS/i.test(e.titulo)):(/^Inicio del periodo/i.test(e.titulo)||adeudos&&(['ets','inscripcion_ets'].includes(e.categoria)||/ETS/i.test(e.titulo))))).slice(0,2);
   },
   abrirProceso(evento){this.procesoPendiente=evento;SATE.ir('calendario')},
   pintarRecorte(pestana){
+    if(SATE_CONFIG.unidades[SATE_UNIDAD].generica)return;
     // Mi trayectoria reutiliza el próximo proceso dentro de su resumen personal.
     const panel=document.getElementById(pestana==='horarios'?'v-hor':pestana==='mapa'?'v-tray':'sate-trayectoria');
     if(!panel||!['horarios','mapa','trayectoria'].includes(pestana))return;
