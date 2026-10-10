@@ -1,5 +1,6 @@
 const DATA=window.SATE_DATA;
-const UNIDAD=DATA.unidad||'upiita';window.IPNT_UNIDAD=UNIDAD;   // la UPIITA conserva el prefijo hu.; otras unidades, hu.<unidad>.
+const UNIDAD=DATA.unidad||window.SATE_UNIDAD;window.IPNT_UNIDAD=UNIDAD;
+const CAPACIDADES=window.SATE_CONFIG?.unidades?.[UNIDAD]||{};
 const PLAN_DOS_PERIODOS=window.SATE_CONFIG?.unidades?.[UNIDAD]?.planDosPeriodos===true;
 const planPasos=()=>PLAN_DOS_PERIODOS?[0,1]:[0];
 const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], DAYN=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
@@ -12,7 +13,7 @@ const tactil=()=>PT!=='mouse';
 const TURNOS={M:'Matutino',V:'Vespertino'};
 const TIPO={O:'Obligatoria',P:'Optativa',T:'Taller'};
 // Carga en créditos confirmada en SAES (Cita de reinscripción). Las demás carreras se agregan cuando se capturen.
-const CARGA=UNIDAD==='upiita'?{B:{min:27,media:40,max:80}}:{};
+const CARGA=CAPACIDADES.carga||{};
 const LETRAS='ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const START=7*60, END=22*60, SLOT=30, SLOTPX=22, BLOCK=90;  // una clase dura 1:30
 const $=s=>document.querySelector(s);
@@ -172,7 +173,7 @@ function perMeta(){const p=perMetaBase();return p==null?null:p+PLAN_PASO}
 /* Desfase OFICIAL (regla del SAES): una reprobada se desfasa cuando pasan más de 2 periodos sin acreditarla.
    El "atraso" respecto al semestre propuesto solo aplica a planes por semestre (Energía); en los planes 2009
    (por niveles) el orden de la trayectoria es una recomendación y llevar otro orden no es desfase. */
-const SEMESTRAL=()=>MAP()?.modelo==='semestral'||(UNIDAD==='upiita'&&S.car==='E');
+const SEMESTRAL=()=>MAP()?.modelo==='semestral'||(CAPACIDADES.carrerasSemestrales||[]).includes(S.car);
 const DESFASE_SEM={has:()=>SEMESTRAL()};   // compatibilidad con los usos anteriores
 /* Modelo por semestres: no se pueden inscribir materias de más de un año (dos semestres) adelante del semestre de
    referencia, que es el más bajo con materias obligatorias pendientes (sin acreditar ni en curso). */
@@ -402,13 +403,13 @@ function statusOf(k){
   const sn=semNow(), sp=semOf()[k];
   let st='rest';
   // Con datos del SAES manda su lista de desfasadas (ya aplicada arriba con desfS): una materia de un semestre anterior
-  // que no se ha cursado va atrasada respecto al plan, no desfasada (el SAES de ESCOM no la marca así).
+  // que no se ha cursado va atrasada respecto al plan, no desfasada (el SAES no siempre la marca así).
   const saesDesfase=isPersonal()&&!!ALUMNO&&('desfasadas_saes' in ALUMNO||!!ALUMNO.desfase_saes);
   if(sn&&sp){if(sp<sn)st=DESFASE_SEM.has(S.car)&&!saesDesfase?'late':'prev';else if(sp===sn)st='now'}
   const r=semRef(), far=r!=null&&sp!=null&&sp>r+2;   // fuera de la ventana de un año
   return st+(lock?' lock':'')+(far?' far':'');
 }
-// Las electivas se acreditan por horas de actividades (DIE-03, Electivas UPIITA), nunca con un grupo del horario:
+// Las electivas se acreditan por horas de actividades (DIE-03, Electivas de la unidad), nunca con un grupo del horario:
 // no se eligen para cursar, no suman créditos a la selección ni se sugieren.
 function isElec(k){return /^ELECTIVA/i.test(cur()[k]?.[0]||'')}
 /* Perfil ficticio para conocer la herramienta sin datos del SAES: a partir del mapa de la carrera elegida, ~45 % de las
@@ -468,7 +469,7 @@ let ZOOM=null, MAPSC=1;   // MAPSC: escala con la que se dibujó el mapa por úl
 function rowBands(L){return SateUI.bandasMapa(L)}
 /* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
    mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
-   toma la continuación de esa línea (ESCOM ISC: optativa de 6.º -> 7.º) o la sugiere. */
+   toma la continuación de esa línea (optativa de 6.º -> 7.º) o la sugiere. */
 function slotFill(L,want){
   const out=new Map(), c=cur(), t=isPersonal()?tr():{done:[],curso:[]};
   const rank=k=>t.done.includes(k)?0:t.curso.includes(k)?1:want.has(k)?2:9;
@@ -476,7 +477,7 @@ function slotFill(L,want){
   const slots=L.boxes.map((b,i)=>[i,b]).filter(([,b])=>!b[4]&&/^optativa/i.test(b[5])).sort((a,b)=>a[1][6]-b[1][6]||a[1][0]-b[1][0]);
   const used=new Set(), dep=dependents(), next=i=>L.edges.filter(e=>e[0]===i).map(e=>e[1]);
   const put=(i,k)=>{out.set(i,{k});used.add(k)};
-  // el espacio con nivel conocido (b[7], UPIITA) solo lo cubre una optativa de ese nivel; N espacios del nivel, N optativas
+  // el espacio con nivel conocido (b[7]) solo lo cubre una optativa de ese nivel; N espacios del nivel, N optativas
   for(const [i,b] of slots){if(out.has(i))continue;const k=cands.find(k=>!used.has(k)&&c[k][2]===(b[7]||b[6]));if(k)put(i,k)}
   for(const [i,b] of slots){if(out.has(i)||b[7])continue;const k=cands.find(k=>!used.has(k));if(k)put(i,k)}
   // continuación de la línea en el espacio siguiente (flecha entre espacios)
@@ -495,7 +496,7 @@ function minimapaCurricular(L=MAP().layout,FILL,op={}){
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
 let MARK={avail:new Set(),sug:new Set()};
 let SHOWSUG=store.get('verSug',false);   // apagadas por defecto: el alumno las activa a propósito
-// planes por niveles (UPIBI 2006): las filas del mapa son niveles, no semestres
+// planes por niveles (según el modelo del plan): las filas del mapa son niveles, no semestres
 const porNiveles=()=>MAP().modelo==='niveles';
 // vista del mapa con datos del SAES: 'todo' (mapa completo), 'pend' (pendientes, por defecto) o 'sigue' (recomendaciones)
 const mapVista=()=>store.get('mapVista',store.get('mapFull',false)?'todo':'pend');
@@ -509,7 +510,7 @@ function rutaRedonda(P,r=7){
     d+=` L${+p[0].toFixed(1)} ${+p[1].toFixed(1)} Q${b[0]} ${b[1]} ${+q[0].toFixed(1)} ${+q[1].toFixed(1)}`}
   const z=P.at(-1);return d+` L${z[0]} ${z[1]}`;
 }
-/* Cupo de optativas por nivel (planes cuyo mapa indica el nivel de cada espacio, como la UPIITA): {nivel:{total,hechas,libre}}.
+/* Cupo de optativas por nivel (planes cuyo mapa indica el nivel de cada espacio): {nivel:{total,hechas,libre}}.
    «hechas» son las acreditadas o en curso; «libre» = espacios del nivel aún sin cubrir. null si el plan no lo indica. */
 function optCupo(){
   const L=MAP().layout;if(!L)return null;
@@ -561,7 +562,7 @@ function inspParts(k){
     st=s0==='done'?'Ya la acreditaste.':s0==='curso'?'La estás cursando.':s0.includes('fail')?'<b>Por recursar.</b>':
       s0.includes('lock')?`<b>Aún no puedes cursarla:</b> te falta ${miss.map(nm).join(', ')}.`:
       `<b>Puedes cursarla.</b>${lv.ok?'':` Seriación recomendada por nivel: ${lv.miss.join(', ')}.`}`}
-  if(isElec(k))return {l1,l2:(st?`<p class="insp-st">${st}</p>`:'')+`<p>${UNIDAD==='upiita'?'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="sate/index.html#/upiita/tramites/electivas">Ventanilla de Electivas</a>.':'Consulta con Gestión Escolar de tu unidad los requisitos y actividades para acreditar esta electiva.'}</p>`};
+  if(isElec(k))return {l1,l2:(st?`<p class="insp-st">${st}</p>`:'')+`<p>${SATE.texto(CAPACIDADES.electivas?.texto||'sate.electivas.acreditacion_consulta',{enlace:'#/'+UNIDAD+'/tramites/'+CAPACIDADES.electivas?.tramite})}</p>`};
   const l2=(st?`<p class="insp-st">${st}</p>`:'')+
     `<p><span class="tag-rel pre">Antes</span><b>Requisitos:</b> ${pre.length?pre.map(nm).join(', '):'ninguno registrado'}${all.size>pre.length?` <span class="muted">(${all.size} materias en toda su cadena)</span>`:''}</p>`+
     `<p><span class="tag-rel post">Después</span><b>Es requisito de:</b> ${post.length?post.map(nm).join(', '):'ninguna materia'}</p>`+
@@ -790,9 +791,9 @@ function promOficialSim(){
   return {antes:P,despues:(P*W+extra)/(W+k),exacto:false,reprobadasEstimadas:nf};
 }
 const creditoValido=v=>v==null||String(v).trim()===''||!Number.isFinite(+v)||+v<0?null:+v;
-// En UPIBI la duración capturada no concuerda con las cargas: usar una referencia explícita, no un plazo reglamentario.
+// Con cargaCalculada la duración capturada no concuerda con las cargas: usar una referencia explícita, no un plazo reglamentario.
 function plazoReferencia(A){
-  const c=A.carga||{}, calculado=UNIDAD==='upibi'&&c.total>0&&c.min>0;
+  const c=A.carga||{}, calculado=CAPACIDADES.cargaCalculada===true&&c.total>0&&c.min>0;
   return {dur:calculado?null:c.duracion,max:calculado?Math.ceil(c.total/c.min):c.duracion_max,calculado};
 }
 function proyeccionCreditos(D){

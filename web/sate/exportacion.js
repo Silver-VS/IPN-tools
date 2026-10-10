@@ -74,7 +74,7 @@ async function drawSchedule(part,k=3){
       g.fillStyle=INK;g.textAlign='right';g.fillText(fmtCr(c[7]),W-PAD,y+28);g.textAlign='left'});
   }
   const cap=new Date(DATA.capturado).toLocaleDateString('es-MX',{dateStyle:'long'});
-  g.fillStyle=MUT;g.font=`400 12px ${F}`;g.fillText(`Generado con Horarios UPIITA · Oferta del SAES capturada el ${cap}. Verifica cupo y horarios en el SAES antes de inscribirte.`,PAD,H-24);
+  g.fillStyle=MUT;g.font=`400 12px ${F}`;g.fillText(`${txH('exportacion_pie',{unidad:DATA.siglas||UNIDAD.toUpperCase(),captura:cap})}`,PAD,H-24);
   return cv;
 }
 
@@ -153,7 +153,7 @@ async function drawTable(part,k=3){
     g.font=`400 14px ${F}`;g.fillStyle=INK;g.textAlign='center';g.fillText(fmtCr(D.cr),X0+C[0][1]+C[1][1]+C[2][1]+C[3][1]/2,listTop+TH+22);g.textAlign='left';
   }
   const cap=new Date(DATA.capturado).toLocaleDateString('es-MX',{dateStyle:'long'});
-  g.fillStyle=FOOT;g.font=`400 10.5px ${F}`;g.fillText(`Generado con Horarios UPIITA · Oferta del SAES capturada el ${cap}. Verifica cupo y horarios en el SAES antes de inscribirte.`,PAD,H-16);
+  g.fillStyle=FOOT;g.font=`400 10.5px ${F}`;g.fillText(`${txH('exportacion_pie',{unidad:DATA.siglas||UNIDAD.toUpperCase(),captura:cap})}`,PAD,H-16);
   return cv;
 }
 const EXP={get perPage(){return store.get('expPer',2)},get dark(){return store.get('expDark',false)},get style(){return store.get('expStyle','color')},get own(){return store.get('expOwn','#dbe7f5')},get show(){return Object.assign({g:false,p:false},store.get('expShow',{}))}};
@@ -202,12 +202,12 @@ async function exportXlsx(){
   put(sp,L+1,4,{formula:`SUM(D3:D${L})`,result:D.cr});
   put(sp,L+3,1,`Horario ${ws().plan} · ${pretty(DATA.carreras[S.car]||'')} · ${perLabel()}`,{}).alignment={horizontal:'left'};sp.mergeCells(L+3,1,L+3,5);
   const buf=await wb.xlsx.writeBuffer();
-  return saveFile(`horario-${ws().plan}-upiita.xlsx`,new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  return saveFile(`horario-${ws().plan}-${UNIDAD}.xlsx`,new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
 }
 const toBlob=cv=>new Promise(r=>cv.toBlob(r,'image/png'));
 async function exportPng(){
   if(!selected().length&&!ownVis().length)return txH('exportacion_vacia');
-  const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-upiita.png`,await toBlob(cv));
+  const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-${UNIDAD}.png`,await toBlob(cv));
 }
 async function loadPdfLib(){if(window.PDFLib)return window.PDFLib;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de PDF.'));document.head.appendChild(s)});return window.PDFLib}
 // agrega una hoja carta al PDF con el horario dibujado (horizontal en colorido, vertical en minimalista)
@@ -223,7 +223,7 @@ async function exportPdf(){
   const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
   await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
   doc.setTitle(`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`);
-  return saveFile(`horario-${ws().plan}-upiita.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
+  return saveFile(`horario-${ws().plan}-${UNIDAD}.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
 }
 // todos los horarios con contenido en un solo PDF (una hoja por horario, en orden A, B, C…)
 const plansConContenido=()=>planIds().filter(id=>{const p=ws().plans[id];return p.sel.length||(p.own||[]).filter(o=>!o.oculto).length});
@@ -241,8 +241,8 @@ async function exportPdfAll(){
     if(!pg||col>=(two?2:1))nueva();
     const x0=m+col*(colW+GAP);
     pg.drawImage(png,{x:x0+(colW-w)/2,y:PH-m-h,width:w,height:h});col++}}finally{ws().plan=prev}
-  doc.setTitle('Horarios UPIITA');
-  const r=await saveFile('horarios-upiita.pdf',new Blob([await doc.save()],{type:'application/pdf'}));
+  doc.setTitle(txH('exportacion_titulo',{unidad:DATA.siglas||UNIDAD.toUpperCase()}));
+  const r=await saveFile(`horarios-${UNIDAD}.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
   const n=doc.getPageCount();
   return r.startsWith('Listo')?`${r} (${ids.length} ${ids.length>1?'horarios':'horario'} en ${n} ${n>1?'hojas':'hoja'})`:r;
 }

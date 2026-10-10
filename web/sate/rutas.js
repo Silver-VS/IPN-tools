@@ -25,7 +25,7 @@
     if (!hash) hash = unidad ? '#/' + unidad + '/mapa' : '';
     else if (hash.startsWith('#/')) {
       const p = hash.slice(2).split('/');
-      if (!['upiita', 'escom', 'upibi'].includes(p[0]) && unidad) hash = '#/' + unidad + '/' + p.join('/');
+      if (['mapa','horarios','trayectoria','situacion','desempeno','calendario','tramites'].includes(p[0].split('?')[0]) && unidad) hash = '#/' + unidad + '/' + p.join('/');
     }
     return 'sate/index.html' + query + hash;
   }

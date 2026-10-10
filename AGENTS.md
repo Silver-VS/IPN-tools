@@ -34,6 +34,28 @@ Sitio en vivo: https://silver-vs.github.io/upiita/ (se publica desde el reposito
    `docs/consulta-carga.md`, `docs/propuesta-planeacion-anual.md`, salidas `web/*.html` y `web/dist/`. No los subas.
 6. Redacción en español, profesional; términos del IPN («unidad académica», «alumnado», «UPIITA-IPN»).
 
+## Una sola implementación
+
+Los componentes, el diseño y la lógica de SATE son comunes a todas las unidades académicas.
+Una función nueva se activa mediante una capacidad en datos, nunca con `if (unidad === …)`.
+Los textos se consultan por clave; no se duplican componentes para cambiar información de una escuela.
+
+| Ruta | Responsabilidad |
+|---|---|
+| `web/sate/` | Implementación, componentes y diseño comunes |
+| `data/sate.json` | Unidad predeterminada, pestañas, trámites y capacidades: carga, carrerasSemestrales, electivas (texto y trámite), cargaCalculada, planDosPeriodos y miSemana |
+| `data/unidades/<u>/` | Oferta, planes, mapas y configuración de cada unidad |
+| `data/calendario*.json` | Calendarios institucionales y actividades locales |
+| `data/unidades_identidad.json` | Identidad, nombres, logos y colores por unidad |
+| `data/gestion_escolar/` | Formatos y recursos de trámites |
+| `contenido/textos/es.toml` | Textos por clave, incluidos los referidos desde capacidades |
+
+Excepción de compatibilidad: `nucleo.js` conserva el literal de UPIITA únicamente en la
+elección del prefijo histórico `hu.`; las otras unidades usan `hu.<unidad>.`.
+El campo `upiita_saes` pertenece al formato compartido del Lector, no es un id de unidad.
+`tests/qa_sate_arquitectura.mjs` impide introducir ids de unidad en JS y el cascarón de SATE,
+con una lista blanca que permite solamente la expresión exacta del prefijo histórico.
+
 ## Compilar y probar
 
 ```bash

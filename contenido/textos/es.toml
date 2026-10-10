@@ -284,6 +284,11 @@ titulo = "Reinscripción"
 [sate.tramite.dictamen]
 titulo = "Dictamen"
 
+[sate.electivas]
+acreditacion_breve = "se acredita con actividades validadas por horas, no con un grupo del horario"
+acreditacion_actividades = 'Se acredita con actividades validadas por horas (cursos, idiomas, congresos, prácticas, entre otras), no con un grupo del horario. Prepara tu solicitud en <a href="{enlace}">Ventanilla de Electivas</a>.'
+acreditacion_consulta = "Consulta con Gestión Escolar de tu unidad los requisitos y actividades para acreditar esta electiva."
+
 [sate.tramite.electivas]
 titulo = "Electivas"
 
@@ -674,6 +679,8 @@ pegado_manual = "No se pudo leer el portapapeles. Pega los datos en el recuadro.
 tactil = "Instalar en teléfono"
 
 [sate.horarios]
+exportacion_pie = "Generado con Horarios {unidad} · Oferta del SAES capturada el {captura}. Verifica cupo y horarios en el SAES antes de inscribirte."
+exportacion_titulo = "Horarios {unidad}"
 semana_titulo = "Extras"
 semana_subtitulo = "Trabajo, traslado y otras actividades que también ocupan tu semana"
 semana_privacidad = "Todo es opcional y se guarda solo en tu navegador o tu nube."

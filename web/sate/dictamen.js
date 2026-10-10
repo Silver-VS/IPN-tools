@@ -69,7 +69,7 @@
       }};
   }
   function definir(){
-    const base=SATE_DATA.dictamen,a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})()),alumno=a?.upiita_saes===1&&(a.unidad||'upiita')==='upiita'?a:{};
+    const base=SATE_DATA.dictamen,a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})()),alumno=a?.upiita_saes===1&&(a.unidad||SATE_CONFIG.unidadPredeterminada)===SATE_UNIDAD?a:{};
     const compartido=()=>{const v=leer('hu.tramite.datos');return v?.confirmado?v.datos:null};
     const datos=compartido()||{},catalogo=base.materias;
     const carrera=Object.entries(SATE_DATA.carreras||{}).find(([k,n])=>k===datos.carrera||n===datos.carrera)?.[0]||alumno.carrera;
@@ -197,7 +197,7 @@
         box.appendChild(sec);pintarLista();
       }};
     // Los motivos también pueden contener salud, familia o trabajo: jamás se guardan.
-    const valores=d=>({...compartido(),...d,unidad:'UPIITA-IPN',fecha:new Date().toLocaleDateString('en-CA'),oficios:d.anteriores==='Sí'?d.oficios:'',...Object.fromEntries(['dependientes','hijos','embarazo','organo'].map(k=>[k,typeof d[k]==='string'&&d[k]?[d[k]]:[]])),...Object.fromEntries(['situacion','causas','anexos'].map(k=>[k,Array.isArray(d[k])?d[k]:[]]))});
+    const valores=d=>({...compartido(),...d,unidad:SATE_CONFIG.unidades[SATE_UNIDAD].siglas+'-IPN',fecha:new Date().toLocaleDateString('en-CA'),oficios:d.anteriores==='Sí'?d.oficios:'',...Object.fromEntries(['dependientes','hijos','embarazo','organo'].map(k=>[k,typeof d[k]==='string'&&d[k]?[d[k]]:[]])),...Object.fromEntries(['situacion','causas','anexos'].map(k=>[k,Array.isArray(d[k])?d[k]:[]]))});
     // Qué falta para ver o generar el formato; nunca se genera una hoja en blanco.
     function faltante(d,final=false){
       const f=[];

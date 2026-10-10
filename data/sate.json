@@ -32,7 +32,22 @@
         ]
       ],
       "planDosPeriodos": true,
-      "miSemana": true
+      "miSemana": true,
+      "carga": {
+        "B": {
+          "min": 27,
+          "media": 40,
+          "max": 80
+        }
+      },
+      "carrerasSemestrales": [
+        "E"
+      ],
+      "cargaCalculada": false,
+      "electivas": {
+        "texto": "sate.electivas.acreditacion_actividades",
+        "tramite": "electivas"
+      }
     },
     "escom": {
       "pestanas": [
@@ -54,7 +69,14 @@
         ]
       ],
       "planDosPeriodos": true,
-      "miSemana": true
+      "miSemana": true,
+      "carga": {},
+      "carrerasSemestrales": [],
+      "cargaCalculada": false,
+      "electivas": {
+        "texto": "sate.electivas.acreditacion_consulta",
+        "tramite": null
+      }
     },
     "upibi": {
       "pestanas": [
@@ -76,7 +98,15 @@
         ]
       ],
       "planDosPeriodos": true,
-      "miSemana": true
+      "miSemana": true,
+      "carga": {},
+      "carrerasSemestrales": [],
+      "cargaCalculada": true,
+      "electivas": {
+        "texto": "sate.electivas.acreditacion_consulta",
+        "tramite": null
+      }
     }
-  }
+  },
+  "unidadPredeterminada": "upiita"
 }

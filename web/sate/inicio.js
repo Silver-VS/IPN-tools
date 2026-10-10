@@ -14,9 +14,9 @@
     config[solicitada] = {generica:true,siglas,nombre:identidad?.nombre || siglas,realce:identidad?.realce,logoUnidad:identidad?.logo,saes:'https://saes.'+solicitada+'.ipn.mx/',
       pestanas:['trayectoria','mapa','calendario'],grupos:[['trayectoria'],['mapa','calendario']],tramites:[]};
   }
-  const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
+  const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || SATE_CONFIG.unidadPredeterminada || Object.keys(config)[0], config);
   const recordada = leer('ipnt.unidad');
-  const unidad = inicial?.unidad || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || recordada || 'upiita';
+  const unidad = inicial?.unidad || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || recordada || SATE_CONFIG.unidadPredeterminada || Object.keys(config)[0];
   window.SATE_UNIDAD = config[unidad] ? unidad : Object.keys(config)[0];
   const u = window.SATE_UNIDAD, cfg = config[u];
   let unidadRealce = inicial || recordada || new URLSearchParams(location.search).has('sateUnidad') ? u : null;
@@ -87,9 +87,9 @@
     }
     if (id === 'tramites') {
       await cargas.get('tramites.json'); await script('tramites.js');
-      if (u === 'upiita') {
-        await script('dictamen.js');
-        await script('../tramites/electivas-reglas.js'); await script('electivas.js');
+      for (const tramite of cfg.tramites) {
+        if (tramite === 'electivas') await script('../tramites/electivas-reglas.js');
+        await script(tramite + '.js');
       }
     }
     if (!modulos[id]) throw new Error('Módulo sin registrar: ' + id);
@@ -248,7 +248,7 @@
   }
   function identidadSaes() {
     for (const a of document.querySelectorAll('#saes-dlg a')) {
-      if (a.href?.includes('saes.upiita.ipn.mx') && a.protocol !== 'javascript:') {
+      if (/^https?:\/\/saes\.[^/]+/.test(a.href||'') && a.protocol !== 'javascript:') {
         a.href = cfg.saes; a.textContent = cfg.saes.replace(/^https?:\/\//,'').replace(/\/$/,'');
       }
     }

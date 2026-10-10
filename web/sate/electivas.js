@@ -7,13 +7,13 @@
   const compartidos=()=>leer('hu.tramite.datos');
   const identidad=()=>compartidos()?.confirmado?compartidos().datos:null;
   const carrera=()=>{const d=identidad();return Object.keys(CARN).find(k=>k===d?.carrera||R.norm(CARN[k])===R.norm(d?.carrera||''))};
-  const alumno=()=>{const a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})());return a?.upiita_saes===1&&(a.unidad||'upiita')==='upiita'?a:null};
+  const alumno=()=>{const a=(window.SATE?.alumno?window.SATE.alumno():(()=>{try{return JSON.parse(localStorage.getItem('saes.alumno')||'null')}catch{return null}})());return a?.upiita_saes===1&&(a.unidad||SATE_CONFIG.unidadPredeterminada)===SATE_UNIDAD?a:null};
   let fuente,recursos,carga;
   async function preparar(){
     if(!carga)carga=(async()=>{
       await SATE.script('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
       await SATE.script('../tramites/pdf-comun.js');await SATE.script('../tramites/pdf-electivas.js');
-      const r=await fetch('datos/upiita/electivas.json');if(!r.ok)throw new Error('Electivas: HTTP '+r.status);
+      const r=await fetch('datos/'+SATE_UNIDAD+'/electivas.json');if(!r.ok)throw new Error('Electivas: HTTP '+r.status);
       recursos=await r.json();const doc=await PDFLib.PDFDocument.create();fuente=await doc.embedFont(PDFLib.StandardFonts.Helvetica);
     })().catch(e=>{carga=null;console.error('Electivas: carga fallida',{fase:'plantillas y fuente',error:e.name});throw e});
     return carga;
@@ -157,7 +157,7 @@
       if(k==='q5'){
         if(inscrito())seccion.appendChild(nodo('small','Tu SAES muestra inscripción reciente. Confirma si esta respuesta sigue siendo correcta.'));
         seccion.appendChild(boton(f.confirmada?'Respuesta confirmada':'Confirmar mi respuesta',()=>{if(['si','no'].includes(f.q5)){f.confirmada=true;ctx.cambiar();ctx.repintar()}}));
-        if(f.q5==='no'){seccion.appendChild(nodo('p','Necesitas un dictamen que autorice la liberación de electivas.'));const enlace=nodo('a','Ir al trámite de dictamen');enlace.href='#/upiita/tramites/dictamen';seccion.appendChild(enlace)}
+        if(f.q5==='no'){seccion.appendChild(nodo('p','Necesitas un dictamen que autorice la liberación de electivas.'));const enlace=nodo('a','Ir al trámite de dictamen');enlace.href='#/'+SATE_UNIDAD+'/tramites/dictamen';seccion.appendChild(enlace)}
       }box.appendChild(seccion);
     }
     const contador=nodo('p');contador.setAttribute('aria-live','polite');

@@ -107,7 +107,7 @@ function renderMap0(){
     if(!kOf(bandOf(y0+h0/2)))return;   // fila plegada
     if(!k&&f?.sigue){html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9*sc}px" title="${esc(slot)}: continúa tu línea con ${esc(cur()[f.sigue][0])}">${esc(slot)}<small class="slot-sig">sigue: ${esc(pretty(cur()[f.sigue][0]).replace(/\s*\(.*\)$/,''))}</small></div>`;return}
     if(k) html+=compacta(boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req),y0,h0);
-    else html+=compacta(`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?'se acredita con actividades validadas por horas (Electivas UPIITA), no con un grupo del horario':'cualquiera de las ofertadas'}">${esc(slot)}</div>`,y0,h0);
+    else html+=compacta(`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?SATE.texto('sate.electivas.acreditacion_breve'):'cualquiera de las ofertadas'}">${esc(slot)}</div>`,y0,h0);
   });
   el.style.width=L.w*sc+'px';el.style.height=H*sc+'px';el.innerHTML=html;
   if(FOCO&&ZOOM==null){const c=((FOCO.x0+FOCO.x1)/2)*sc-wrap.clientWidth/2;requestAnimationFrame(()=>{wrap.scrollLeft=Math.max(0,c)})}
