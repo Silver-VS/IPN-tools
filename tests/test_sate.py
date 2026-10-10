@@ -35,8 +35,8 @@ class SateBuild(unittest.TestCase):
                 self.assertTrue(identidad['siglas'])
                 if 'sitio' in identidad:
                     self.assertRegex(identidad['sitio'], r'^https://[a-z0-9.-]+\.ipn\.mx/')
-                if 'logo' not in identidad:
-                    continue
+                if 'logo' not in identidad or identidad.get('realce_nota'):
+                    continue  # sin logo, o color elegido a mano por el dueño
                 ruta = ROOT / 'web/dist/assets/logos/unidades' / (identidad['logo'] + '.webp')
                 self.assertEqual(proponer(dominante(ruta)), identidad['realce'])
                 for modo, fondos in SUPERFICIES.items():
