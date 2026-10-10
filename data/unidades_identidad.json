@@ -1,157 +1,289 @@
 {
- "_fuente": "Logo y color de realce por unidad (sesion-04 §7, sesion-07). Logos en web/dist/assets/logos/unidades/<logo>.webp (no versionados). Colores muestreados de los logos del SAES; tonos ajustados a AA 4.5:1 contra las superficies de SATE (claro: #fff/#fafafa/#f4f4f5; oscuro: #18181b/#09090b). Sin realce = guinda institucional. UPIIH, UPIIC y UPIIT usan el escudo del IPN hasta tener su logo.",
+ "_fuente": "Identidad: nombres completos de data/cuenta.json y data/unidades/*/unidad.json; ENCB según el dueño (2026-10-09). Sin nombre documentado se conservan siglas. Logos SAES locales no versionados en web/dist/assets/logos/unidades/<logo>.webp; UPIIH, UPIIC y UPIIT usan el escudo IPN. Realces reproducibles con python tools/realce_unidades.py --aplicar: miniatura RGBA hasta 256 px, alfa >=128, HSV S>=0.25 y 0.12<=V<=0.97; histograma de matiz de 36 sectores ponderado por saturación y alfa, promedio RGB del sector dominante. Se conserva matiz y saturación HSL y se busca L en pasos de 0.001 más próximo al original. Contraste WCAG sRGB: (Lmayor+0.05)/(Lmenor+0.05), luminancia lineal ponderada 0.2126R+0.7152G+0.0722B. Mínimo 4.8:1 (margen sobre AA 4.5) contra claro #fff/#fafafa/#f4f4f5 y oscuro #18181b/#09090b. No hay color guinda por omisión en unidades con logo.",
  "unidades": {
   "cicsma": {
-   "logo": "cics-ma"
+   "logo": "cics-ma",
+   "realce": {
+    "claro": "#3e0e12",
+    "oscuro": "#da5c66"
+   },
+   "siglas": "CICS Milpa Alta",
+   "nombre": "Centro Interdisciplinario de Ciencias de la Salud, Unidad Milpa Alta"
   },
   "enba": {
-   "logo": "enba"
+   "logo": "enba",
+   "realce": {
+    "claro": "#354b80",
+    "oscuro": "#6b84c2"
+   },
+   "siglas": "ENBA",
+   "nombre": "Escuela Nacional de Biblioteconomía y Archivonomía"
   },
   "encb": {
    "logo": "encb",
    "realce": {
-    "claro": "#b00040",
-    "oscuro": "#cc5c85"
-   }
+    "claro": "#163598",
+    "oscuro": "#5f80e8"
+   },
+   "siglas": "ENCB",
+   "nombre": "Escuela Nacional de Ciencias Biológicas"
   },
   "enmh": {
-   "logo": "enmh"
+   "logo": "enmh",
+   "realce": {
+    "claro": "#975e38",
+    "oscuro": "#bc794c"
+   },
+   "siglas": "ENMH",
+   "nombre": "Escuela Nacional de Medicina y Homeopatía"
   },
   "escasto": {
    "logo": "esca-sto",
    "realce": {
-    "claro": "#a00040",
-    "oscuro": "#c46189"
-   }
+    "claro": "#ac0745",
+    "oscuro": "#f7327c"
+   },
+   "siglas": "ESCA Santo Tomás",
+   "nombre": "Escuela Superior de Comercio y Administración, Unidad Santo Tomás"
   },
   "escatep": {
    "logo": "esca-tep",
    "realce": {
-    "claro": "#a00040",
-    "oscuro": "#c46189"
-   }
+    "claro": "#96163f",
+    "oscuro": "#e54d7e"
+   },
+   "siglas": "ESCA Tepepan",
+   "nombre": "Escuela Superior de Comercio y Administración, Unidad Tepepan"
   },
   "escom": {
-   "logo": "escom-saes"
+   "logo": "escom-saes",
+   "realce": {
+    "claro": "#1c6495",
+    "oscuro": "#278bd0"
+   },
+   "siglas": "ESCOM",
+   "nombre": "Escuela Superior de Cómputo"
   },
   "ese": {
-   "logo": "ese"
+   "logo": "ese",
+   "realce": {
+    "claro": "#2f7489",
+    "oscuro": "#3b90aa"
+   },
+   "siglas": "ESE",
+   "nombre": "Escuela Superior de Economía"
   },
   "eseo": {
-   "logo": "eseo"
+   "logo": "eseo",
+   "realce": {
+    "claro": "#ac3063",
+    "oscuro": "#d25d8d"
+   },
+   "siglas": "ESEO",
+   "nombre": "Escuela Superior de Enfermería y Obstetricia"
   },
   "esfm": {
    "logo": "esfm",
    "realce": {
-    "claro": "#b45400",
-    "oscuro": "#f07000"
-   }
+    "claro": "#965f1c",
+    "oscuro": "#ba7623"
+   },
+   "siglas": "ESFM",
+   "nombre": "Escuela Superior de Física y Matemáticas"
   },
   "esiat": {
-   "logo": "esia-tic"
+   "logo": "esia-tic",
+   "realce": {
+    "claro": "#0b0a63",
+    "oscuro": "#7877f1"
+   },
+   "siglas": "ESIA Ticomán",
+   "nombre": "Escuela Superior de Ingeniería y Arquitectura, Unidad Ticomán"
   },
   "esiatec": {
-   "logo": "esia-tec"
+   "logo": "esia-tec",
+   "realce": {
+    "claro": "#173393",
+    "oscuro": "#6280e6"
+   },
+   "siglas": "ESIA Tecamachalco",
+   "nombre": "Escuela Superior de Ingeniería y Arquitectura, Unidad Tecamachalco"
   },
   "esiaz": {
    "logo": "esia-zac",
    "realce": {
-    "claro": "#104090",
-    "oscuro": "#6483b7"
-   }
-  },
-  "esime-zac": {
-   "logo": "esime-zac",
-   "realce": {
-    "claro": "#008030",
-    "oscuro": "#26934f"
-   }
+    "claro": "#1b4e99",
+    "oscuro": "#4885df"
+   },
+   "siglas": "ESIA Zacatenco",
+   "nombre": "Escuela Superior de Ingeniería y Arquitectura, Unidad Zacatenco"
   },
   "esimeazc": {
    "logo": "esime-azc",
    "realce": {
-    "claro": "#008030",
-    "oscuro": "#26934f"
-   }
+    "claro": "#0f7638",
+    "oscuro": "#149a49"
+   },
+   "siglas": "ESIME Azcapotzalco",
+   "nombre": "Escuela Superior de Ingeniería Mecánica y Eléctrica, Unidad Azcapotzalco"
   },
   "esimecul": {
    "logo": "esime-culh",
    "realce": {
-    "claro": "#008030",
-    "oscuro": "#26934f"
-   }
+    "claro": "#0f7638",
+    "oscuro": "#149a49"
+   },
+   "siglas": "ESIME Culhuacán",
+   "nombre": "Escuela Superior de Ingeniería Mecánica y Eléctrica, Unidad Culhuacán"
   },
   "esimetic": {
    "logo": "esime-tic",
    "realce": {
-    "claro": "#008030",
-    "oscuro": "#26934f"
-   }
+    "claro": "#0d7c39",
+    "oscuro": "#109a47"
+   },
+   "siglas": "ESIME Ticomán",
+   "nombre": "Escuela Superior de Ingeniería Mecánica y Eléctrica, Unidad Ticomán"
   },
   "esimez": {
    "logo": "esime-zac",
    "realce": {
-    "claro": "#008030",
-    "oscuro": "#26934f"
-   }
+    "claro": "#0e7937",
+    "oscuro": "#129a46"
+   },
+   "siglas": "ESIME Zacatenco",
+   "nombre": "Escuela Superior de Ingeniería Mecánica y Eléctrica, Unidad Zacatenco",
+   "alias": [
+    "esime-zac"
+   ]
   },
   "esiqie": {
-   "logo": "esiqie"
+   "logo": "esiqie",
+   "realce": {
+    "claro": "#1c3390",
+    "oscuro": "#677fe1"
+   },
+   "siglas": "ESIQIE",
+   "nombre": "Escuela Superior de Ingeniería Química e Industrias Extractivas"
   },
   "esit": {
-   "logo": "esit"
+   "logo": "esit",
+   "realce": {
+    "claro": "#143c7b",
+    "oscuro": "#4a85e2"
+   },
+   "siglas": "ESIT",
+   "nombre": "Escuela Superior de Ingeniería Textil"
   },
   "esm": {
-   "logo": "esm"
+   "logo": "esm",
+   "realce": {
+    "claro": "#866637",
+    "oscuro": "#b08748"
+   },
+   "siglas": "ESM",
+   "nombre": "Escuela Superior de Medicina"
   },
   "est": {
-   "logo": "est"
+   "logo": "est",
+   "realce": {
+    "claro": "#6f032b",
+    "oscuro": "#f92e79"
+   },
+   "siglas": "EST",
+   "nombre": "Escuela Superior de Turismo"
   },
   "upibi": {
-   "logo": "upibi-saes"
+   "logo": "upibi-saes",
+   "realce": {
+    "claro": "#0f7b51",
+    "oscuro": "#129863"
+   },
+   "siglas": "UPIBI",
+   "nombre": "Unidad Profesional Interdisciplinaria de Biotecnología"
   },
   "upiem": {
    "logo": "upiem",
    "realce": {
-    "claro": "#1c802b",
-    "oscuro": "#299438"
-   }
+    "claro": "#13772e",
+    "oscuro": "#199a3c"
+   },
+   "siglas": "UPIEM",
+   "nombre": "Unidad Profesional Interdisciplinaria de Energía y Movilidad"
   },
   "upiic": {
-   "logo": "ipn"
+   "logo": "ipn",
+   "realce": {
+    "claro": "#6f1b44",
+    "oscuro": "#d65896"
+   },
+   "siglas": "UPIIC",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería Campus Coahuila"
   },
   "upiicsa": {
    "logo": "upiicsa",
    "realce": {
-    "claro": "#008030",
-    "oscuro": "#26934f"
-   }
+    "claro": "#027c35",
+    "oscuro": "#029a41"
+   },
+   "siglas": "UPIICSA",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería y Ciencias Sociales y Administrativas"
   },
   "upiig": {
    "logo": "upiig",
    "realce": {
-    "claro": "#4f6fae",
-    "oscuro": "#6581b9"
-   }
+    "claro": "#4b68b5",
+    "oscuro": "#6c84c2"
+   },
+   "siglas": "UPIIG",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería Campus Guanajuato"
   },
   "upiih": {
-   "logo": "ipn"
+   "logo": "ipn",
+   "realce": {
+    "claro": "#6f1b44",
+    "oscuro": "#d65896"
+   },
+   "siglas": "UPIIH",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería Campus Hidalgo"
   },
   "upiip": {
    "logo": "upiip",
    "realce": {
-    "claro": "#0f74af",
-    "oscuro": "#1e88c4"
-   }
+    "claro": "#207492",
+    "oscuro": "#2da5cf"
+   },
+   "siglas": "UPIIP",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería Campus Palenque"
   },
   "upiit": {
-   "logo": "ipn"
+   "logo": "ipn",
+   "realce": {
+    "claro": "#6f1b44",
+    "oscuro": "#d65896"
+   },
+   "siglas": "UPIIT",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería Campus Tlaxcala"
   },
   "upiita": {
-   "logo": "upiita"
+   "logo": "upiita",
+   "realce": {
+    "claro": "#846816",
+    "oscuro": "#a5821b"
+   },
+   "siglas": "UPIITA",
+   "nombre": "Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas",
+   "sitio": "https://www.upiita.ipn.mx/"
   },
   "upiiz": {
-   "logo": "upiiz"
+   "logo": "upiiz",
+   "realce": {
+    "claro": "#4a7728",
+    "oscuro": "#79c045"
+   },
+   "siglas": "UPIIZ",
+   "nombre": "Unidad Profesional Interdisciplinaria de Ingeniería Campus Zacatecas"
   }
- }
+ },
+ "_fuente_nombres": "Nombres oficiales de las unidades académicas del IPN (completados por el orquestador, 2026-10-09)."
 }

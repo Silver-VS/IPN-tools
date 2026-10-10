@@ -23,7 +23,8 @@ def lector_js(tool_url=""):
     import hashlib
     ver = hashlib.sha1(SRC.read_bytes().replace(b"\r\n", b"\n")).hexdigest()[:7]
     unidades = json.loads((ROOT / 'data/sate.json').read_text(encoding='utf-8'))['unidades']
-    nombres = json.loads((ROOT / 'data/unidades_saes.json').read_text(encoding='utf-8'))
+    from cuenta import identidades
+    nombres = {alias: c['siglas'] for u, c in identidades().items() for alias in [u, *c.get('alias', [])]}
     return (js.replace("__TOOL_URL__", tool_url).replace("__LECTOR_VERSION__", ver)
             .replace('__LECTOR_UNIDADES__', json.dumps(list(unidades)))
             .replace('__LECTOR_NOMBRES__', json.dumps(nombres, ensure_ascii=False)))

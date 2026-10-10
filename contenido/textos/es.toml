@@ -634,8 +634,8 @@ sin_grupos = "(sin grupos)"
 obligatoria = "Obligatoria por desfase: cúrsala en este periodo."
 
 [sate.pestana.trayectoria]
-titulo = "Mi trayectoria"
-corto = "Trayectoria"
+titulo = "Tu perfil"
+corto = "Perfil"
 
 [sate.trayectoria]
 kardex = "Tu kárdex por periodo"

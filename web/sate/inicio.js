@@ -9,8 +9,9 @@
   const leer = k => { try { return localStorage.getItem(k); } catch { return null; } };
   const solicitada = location.hash.match(/^#\/([a-z0-9-]+)\//)?.[1] || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || leer('ipnt.unidad');
   if (solicitada && /^[a-z0-9-]+$/.test(solicitada) && !config[solicitada]) {
-    const siglas = SATE_CONFIG.nombresUnidades?.[solicitada] || solicitada.toUpperCase();
-    config[solicitada] = {generica:true,siglas,nombre:siglas,realce:SATE_CONFIG.identidadUnidades?.[solicitada]?.realce,saes:'https://saes.'+solicitada+'.ipn.mx/',
+    const identidad = SATE_CONFIG.identidadUnidades?.[solicitada] || Object.values(SATE_CONFIG.identidadUnidades || {}).find(c=>c.alias?.includes(solicitada));
+    const siglas = identidad?.siglas || solicitada.toUpperCase();
+    config[solicitada] = {generica:true,siglas,nombre:identidad?.nombre || siglas,realce:identidad?.realce,logoUnidad:identidad?.logo,saes:'https://saes.'+solicitada+'.ipn.mx/',
       pestanas:['trayectoria','mapa','calendario'],grupos:[['trayectoria'],['mapa','calendario']],tramites:[]};
   }
   const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
@@ -30,7 +31,7 @@
     unidadRealce = id;
     const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
     const oscuro = tema ? tema === 'dark' || tema === 'oscuro' : temaSistema.matches;
-    const realce = config[id]?.realce?.[oscuro ? 'oscuro' : 'claro'];
+    const realce = (config[id]?.realce || SATE_CONFIG.identidadUnidades?.[id]?.realce)?.[oscuro ? 'oscuro' : 'claro'];
     // Elegir el mayor contraste evita texto blanco ilegible sobre los realces claros del tema oscuro.
     const luminancia = hex => hex.slice(1).match(/../g).map(h => parseInt(h,16)/255)
       .map(c => c <= .04045 ? c/12.92 : ((c+.055)/1.055)**2.4)
@@ -140,7 +141,7 @@
     const halo = document.createElement('span'); halo.className = 'sate-logo-halo'; halo.dataset.unidad = id;
     halo.style.setProperty('--halo', colorHalo(id));
     const img = document.createElement('img'); img.className = 'sate-logo-unidad';
-    img.src = '../assets/logos/unidades/' + (SATE_CONFIG.identidadUnidades?.[id]?.logo || 'ipn') + '.webp';
+    img.src = '../assets/logos/unidades/' + (SATE_CONFIG.identidadUnidades?.[id]?.logo || config[id]?.logoUnidad || 'ipn') + '.webp';
     img.alt = nombre; img.onerror = () => { halo.hidden = true; img.hidden = true; };
     halo.appendChild(img);
     return halo;
@@ -149,6 +150,7 @@
     const caja = document.createElement('div');
     for (const [id, c] of Object.entries(config)) {
       const b = document.createElement('button'); b.className = 'btn'; b.textContent = c.siglas;
+      b.title = c.nombre;
       b.className += ' sate-selector-unidad'; b.prepend(logoUnidad(id, c.nombre));
       b.onclick = () => { aplicarRealce(id); if (api) IPNT.set('ipnt.unidad', id); location.hash = '#/' + id + '/mapa'; if (id !== u) location.reload(); else SateUI.cerrarModal(); };
       caja.appendChild(b);

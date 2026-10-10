@@ -30,7 +30,10 @@ const inicio = leer('web/sate/inicio.js');
 assert.deepEqual(config.identidadUnidades, JSON.parse(leer('data/unidades_identidad.json')).unidades);
 assert.equal(config.identidadUnidades.escom.logo,'escom-saes');
 assert.equal(config.identidadUnidades.upibi.logo,'upibi-saes');
-for (const unidad of ['upiita','escom','upibi','esimez','desconocida','enba']) {
+assert.equal(config.textos['sate.pestana.trayectoria.titulo'],'Tu perfil');
+assert.equal(config.textos['sate.pestana.trayectoria.corto'],'Perfil');
+assert.match(leer('web/sate/componentes.js'),/trayectoria: '<circle cx="12" cy="8" r="4"\/>/);
+for (const [unidad,generica] of [['upiita'],['escom'],['upibi'],['encb'],['esimez'],['desconocida'],['enba'],['escom',true]]) {
   const valores={}, atributos={}, titulo={replaceChildren(...n){this.children=n}};
   const halos=[];
   const documento={querySelector:()=>null,getElementById:()=>titulo,
@@ -38,13 +41,20 @@ for (const unidad of ['upiita','escom','upibi','esimez','desconocida','enba']) {
     documentElement:{getAttribute:k=>atributos[k],style:{setProperty(k,v){valores[k]=v}}},
     createElement:tag=>{const n={tag,dataset:{},style:{setProperty(k,v){this[k]=v}},children:[],prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)}};if(tag==='span')halos.push(n);return n}};
   let selector;
-  const c=vm.createContext({SATE_CONFIG:structuredClone(config),SateRutas:{ruta:()=>({unidad})},
+  const configuracion=structuredClone(config);
+  if(generica)delete configuracion.unidades[unidad];
+  const c=vm.createContext({SATE_CONFIG:configuracion,SateRutas:{ruta:()=>({unidad})},
     URLSearchParams,localStorage:{getItem:()=>null},location:{hash:'#/'+unidad+'/mapa',search:''},window:{},
     document:documento,texto,SateUI:{modal(t,n){selector=n}}});
   vm.runInContext(inicio.slice(0,inicio.indexOf('  // plurales ICU'))+'\nglobalThis.aplicarRealce=aplicarRealce;globalThis.colorHalo=colorHalo;})();',c);
   vm.runInContext('const config=SATE_CONFIG.unidades,u=window.SATE_UNIDAD,cfg=config[u];let api;',c);
   vm.runInContext(inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar(')),c);
   vm.runInContext(inicio.slice(inicio.indexOf('  const siglasUnidad'),inicio.indexOf('  if (cfg.leyenda)')),c);
+  const nombre={textContent:''};
+  documento.querySelector=s=>s==='.inst-name'?nombre:null;
+  vm.runInContext(inicio.slice(inicio.indexOf('  const nombreUnidad'),inicio.indexOf('  if (cfg.logo)')),c);
+  assert.equal(nombre.textContent,config.identidadUnidades[unidad]?.nombre||c.SATE_CONFIG.unidades[unidad].siglas);
+  if(unidad==='encb')assert.equal(nombre.textContent,'Escuela Nacional de Ciencias Biológicas');
   const halo=titulo.children[0],img=halo.children[0];
   assert.equal(halo.tag,'span');assert.equal(halo.className,'sate-logo-halo');
   assert.equal(img.tag,'img');assert.equal(img.className,'sate-logo-unidad');

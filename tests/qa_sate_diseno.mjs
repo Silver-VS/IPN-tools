@@ -84,6 +84,7 @@ const lum=hex=>hex.slice(1).match(/../g).map(h=>parseInt(h,16)/255).map(v=>v<=.0
 const contraste=(a,b)=>(Math.max(lum(a),lum(b))+.05)/(Math.min(lum(a),lum(b))+.05);
 // El catálogo es la única fuente de color; superficies efectivas del cascarón y tokens comunes.
 const catalogo=JSON.parse(leer('data/sate.json')).unidades;
+for(const [id,cfg] of Object.entries(catalogo))cfg.realce=config.identidadUnidades[id].realce;
 assert.equal(fuente.match(/--sate-acento-base:(#[\da-f]+);/)[1],'#750946','Guinda solo como respaldo sin unidad');
 const tokens=leer('vendor/ipn-comun/dist/tokens.css');
 // Toda la interfaz llega al realce por tokens; el respaldo guinda no puede formar un ciclo.

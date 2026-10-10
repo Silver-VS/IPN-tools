@@ -15,6 +15,49 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_diccionario_identidad_y_realces(self):
+        from realce_unidades import SUPERFICIES, contraste, dominante, proponer
+        def sin_duplicados(pares):
+            resultado = {}
+            for clave, valor in pares:
+                self.assertNotIn(clave, resultado, f'Clave duplicada: {clave}')
+                resultado[clave] = valor
+            return resultado
+        unidades = json.loads((ROOT / 'data/unidades_identidad.json').read_text(encoding='utf-8'),
+                              object_pairs_hook=sin_duplicados)['unidades']
+        self.assertEqual(len(unidades), 31)
+        self.assertEqual(len({c['siglas'] for c in unidades.values()}), len(unidades))
+        aliases = [a for c in unidades.values() for a in c.get('alias', [])]
+        self.assertEqual(len(aliases), len(set(aliases)))
+        self.assertFalse(set(aliases) & unidades.keys())
+        for unidad, identidad in unidades.items():
+            with self.subTest(unidad=unidad):
+                self.assertTrue(identidad['siglas'])
+                if 'sitio' in identidad:
+                    self.assertRegex(identidad['sitio'], r'^https://[a-z0-9.-]+\.ipn\.mx/')
+                if 'logo' not in identidad:
+                    continue
+                ruta = ROOT / 'web/dist/assets/logos/unidades' / (identidad['logo'] + '.webp')
+                self.assertEqual(proponer(dominante(ruta)), identidad['realce'])
+                for modo, fondos in SUPERFICIES.items():
+                    for fondo in fondos:
+                        self.assertGreaterEqual(contraste(identidad['realce'][modo], fondo), 4.5)
+
+    def test_nombres_centralizados_y_bienvenida(self):
+        import cuenta
+        identidad = cuenta.identidades()
+        for u in cuenta.config()['unidades']:
+            self.assertEqual(u['nombre'], identidad[u['id']]['nombre'])
+            self.assertEqual(u['siglas'], identidad[u['id']]['siglas'])
+        self.assertEqual(identidad['encb']['nombre'], 'Escuela Nacional de Ciencias Biológicas')
+        portada = (ROOT / 'web/dist/index.html').read_text(encoding='utf-8')
+        sate = (ROOT / 'web/dist/sate/index.html').read_text(encoding='utf-8')
+        config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', sate, re.S)[1])
+        for u in cuenta.config()['unidades']:
+            self.assertIn(u['nombre'], portada)
+            self.assertEqual(config['unidades'][u['id']]['nombre'], u['nombre'])
+            self.assertEqual(config['unidades'][u['id']]['realce'], identidad[u['id']]['realce'])
+
     def test_unidad_generica_y_lector(self):
         resultado = subprocess.run([r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_generico.mjs'], cwd=ROOT,
                                    capture_output=True, text=True, encoding='utf-8')

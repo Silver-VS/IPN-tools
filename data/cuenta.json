@@ -7,22 +7,16 @@
   "unidades": [
     {
       "id": "upiita",
-      "siglas": "UPIITA",
-      "nombre": "Unidad Profesional Interdisciplinaria en Ingeniería y Tecnologías Avanzadas",
       "disponible": true,
       "url": "horarios-upiita.html"
     },
     {
       "id": "escom",
-      "siglas": "ESCOM",
-      "nombre": "Escuela Superior de Cómputo",
       "disponible": true,
       "url": "horarios-escom.html"
     },
     {
       "id": "upibi",
-      "siglas": "UPIBI",
-      "nombre": "Unidad Profesional Interdisciplinaria de Biotecnología",
       "disponible": true,
       "url": "horarios-upibi.html"
     }
