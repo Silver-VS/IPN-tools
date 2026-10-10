@@ -66,6 +66,7 @@ for(const modo of ['ok','ausente','denegado','invalido','sin-contrato','otra-uni
   n('#saes-install').eventos.click();assert.equal(n('#saes-manual').open,true);
   await n('#saes-paste-clip').eventos.click({currentTarget:n('#saes-paste-clip')});
   if(modo==='ok'){assert.equal(cargado.unidad,'upiita');assert.equal(guardadoSaes,cargado);assert.equal(cierres,1)}
+  else if(modo==='otra-unidad'){assert.equal(cargado,undefined,'no se aplica en esta unidad');assert.equal(guardadoSaes.unidad,'escom','se guarda para abrir su SATE');assert.equal(cierres,1,'programa la apertura del SATE de su unidad')}
   else {assert.equal(cargado,undefined);assert.equal(guardadoSaes,undefined)}
   if(modo==='ausente'||modo==='denegado'){
     assert.equal(n('#saes-paste').enfocado,true);assert.equal(n('#saes-msg').textContent,texto('sate.lector.pegado_manual'));
