@@ -22,11 +22,12 @@
   "encb": {
    "logo": "encb",
    "realce": {
-    "claro": "#163598",
-    "oscuro": "#5f80e8"
+    "claro": "#b00040",
+    "oscuro": "#cc5c85"
    },
    "siglas": "ENCB",
-   "nombre": "Escuela Nacional de Ciencias Biológicas"
+   "nombre": "Escuela Nacional de Ciencias Biológicas",
+   "realce_nota": "Rojo del escudo (elección del dueño, 2026-10-09); no recalcular con tools/realce_unidades.py."
   },
   "enmh": {
    "logo": "enmh",
