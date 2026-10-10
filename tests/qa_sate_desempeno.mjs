@@ -40,6 +40,8 @@ for(const unidad of ['upiita','escom','upibi']){
     requestAnimationFrame:fn=>cuadros.push(fn),getComputedStyle:()=>({getPropertyValue:()=>''}),MutationObserver:class{observe(){}},CSS:{escape:s=>s},innerWidth:375,innerHeight:800,
     fetch(){throw new Error('Red prohibida')}});
   vm.runInContext('window=globalThis',c);
+  vm.runInContext(leer('web/dist/sate/componentes.js'),c);
+  c.SateUI.cerrarModal=()=>{};
   vm.runInContext(leer('web/dist/sate/nucleo.js'),c);
   for(const perfil of ['ALUMNO=null','ALUMNO=perfilDemo()']){
     vm.runInContext(perfil+';for(const k in T)delete T[k]',c);

@@ -447,17 +447,7 @@ function suggestions(){
 let ZOOM=null, MAPSC=1;   // MAPSC: escala con la que se dibujó el mapa por última vez
 /* Bandas de semestre: el centro de cada fila es la mediana de sus bloques (las etiquetas del PDF pueden estar
    corridas) y cada banda llega a la mitad del espacio con la vecina, así ningún bloque se ve en la fila de al lado. */
-function rowBands(L){
-  if(L._bands) return L._bands;
-  const cs=L.rows.map(()=>[]);
-  L.boxes.forEach(b=>{const cy=b[1]+b[3]/2;let j=0;L.rows.forEach((r,i)=>{if(Math.abs(r[1]-cy)<Math.abs(L.rows[j][1]-cy))j=i});cs[j].push(cy)});
-  // Los mapas por áreas tienen filas exactas; solo se ajustan los centros de los PDF.
-  const ys=L.rows.map(([n,y],i)=>{const v=cs[i].sort((a,b)=>a-b);return v.length&&!L.propuesto&&!L.filas_exactas?v[Math.floor(v.length/2)]:y});
-  return L._bands=L.rows.map(([n],i)=>{const y=ys[i];
-    const a=i?(ys[i-1]+y)/2:Math.max(0,y-(ys[1]!=null?(ys[1]-y)/2:L.pitch/2));
-    const b=i<ys.length-1?(y+ys[i+1])/2:Math.min(L.h,y+(i?(y-ys[i-1])/2:L.pitch/2));
-    return [n,y,a,b]});
-}
+function rowBands(L){return SateUI.bandasMapa(L)}
 /* Espacios de optativas del mapa: se llenan con las optativas acreditadas, en curso o elegidas (primero las del
    mismo semestre; si no coincide, en el siguiente espacio libre). Un espacio unido por flecha a otro ya ocupado
    toma la continuación de esa línea (ESCOM ISC: optativa de 6.º -> 7.º) o la sugiere. */
@@ -482,37 +472,7 @@ function slotFill(L,want){
 /* Una sola representación para Mapa y el presente. La prioridad de desfase evita
    que «late fail» se cuente como una reprobada ordinaria. */
 function minimapaCurricular(L=MAP().layout,FILL,op={}){
-  if(!isPersonal())return null;
-  if(!L){
-    const niveles=[...new Set(Object.values(cur()).map(v=>v[2]))].sort((a,b)=>a-b),boxes=[];
-    let cols=1;
-    niveles.forEach((n,i)=>{const keys=Object.keys(cur()).filter(k=>cur()[k][2]===n);cols=Math.max(cols,keys.length);keys.forEach((k,j)=>boxes.push([j*50,i*50,40,40,k]))});
-    L={w:cols*50,h:Math.max(1,niveles.length)*50,boxes,edges:[],rows:niveles.map((n,i)=>[n,i*50+20]),pitch:50,filas_exactas:true};
-  }
-  FILL=FILL||slotFill(L,new Set());
-  const {nPend=0,FOCO=null}=op,bands=rowBands(L);
-  const colores={done:'var(--ipn-ok)',curso:'var(--sate-realce)',pend:'var(--ipn-tenue)',fail:'var(--ipn-reprobada)',late:'var(--ipn-desfasada)'};
-  const cnt={done:0,curso:0,pend:0,fail:0,late:0};
-  const estado=st=>st==='done'?'done':st.startsWith('curso')?'curso':st.startsWith('late')?'late':st.includes('fail')?'fail':'pend';
-  let svg=`<svg viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true" focusable="false">`;
-  bands.forEach(([n,y,a,b],i)=>{
-    if(i%2===0)svg+=`<rect x="0" y="${a}" width="${L.w}" height="${b-a}" fill="var(--ipn-hundido)"/>`;
-    if(i===nPend&&nPend){const fx=FOCO?FOCO.x0:1,fw=FOCO?FOCO.x1-FOCO.x0:L.w-2;svg+=`<rect x="${fx}" y="${a}" width="${fw}" height="${L.h-a-1}" fill="none" stroke="var(--ipn-acento)" stroke-width="4" stroke-dasharray="14 8" rx="8"/>`}
-  });
-  L.edges.forEach(([s,d,pp])=>{const pts=[];for(let i=0;i<pp.length;i+=2)pts.push(pp[i]+','+pp[i+1]);svg+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ipn-tenue)" stroke-opacity=".35" stroke-width="3"/>`});
-  L.boxes.forEach(([x,y,w,h,k,slot],i)=>{
-    const kk=k||FILL.get(i)?.k,cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.3;
-    if(!kk){if(/^optativa/i.test(slot)){svg+=`<circle data-estado="pend" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colores.pend}" stroke-width="4" stroke-dasharray="6 5"/>`;cnt.pend++}return}
-    if(isElec(kk))return;
-    const st=estado(statusOf(kk));cnt[st]++;
-    svg+=`<circle data-estado="${st}" cx="${cx}" cy="${cy}" r="${r}" fill="${colores[st]}"/>`;
-  });
-  svg+='</svg>';
-  // leyenda en dos filas centradas: avance (acreditadas, en curso, por cursar) y alertas (reprobadas, desfasadas)
-  const pastilla=st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`;
-  const leyenda=[['done','curso','pend'],['fail','late']].map(fila=>fila.filter(st=>st in cnt)).filter(f=>f.length)
-    .map(f=>`<div class="mm-fila">${f.map(pastilla).join('')}</div>`).join('');
-  return {svg,leyenda,cnt};
+  return SateUI.minimapaCurricular({isPersonal,cur,slotFill,isElec,statusOf,esc,SATE},L,FILL,op);
 }
 // modo personal: materias que puedes cursar el siguiente periodo (verde) y las sugeridas para tu carga (contorno)
 let MARK={avail:new Set(),sug:new Set()};
@@ -565,13 +525,8 @@ function avisoOptativa(k,otras){
   avisoOpt(t.libre<=0?`El plan pide ${t.total===1?'una optativa':t.total+' optativas'} de nivel ${v} y ya ${t.total===1?'cubriste ese espacio':'cubriste esos espacios'}: ${pretty(cur()[k][0])} no cubre otro espacio, solo suma como materia adicional.`:
     `El plan solo deja ${t.libre===1?'un espacio libre':t.libre+' espacios libres'} de optativa de nivel ${v}: con ${pretty(cur()[k][0])} ya elegiste más de las que cubren ese nivel; las demás no cubren espacio.`);
 }
-function boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req){
-  const [n,cr,niv]=cur()[k]||[k,0,1];
-  const st=statusOf(k), paso=planAsignado(k);
-  const el=isElec(k);
-  const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${paso!=null?' want plan-'+(paso+1):req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?' hot':hot.pre?.has(k)?' hpre':hot.post?.has(k)?' hpost':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
-  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem&&!porNiveles()?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
-  return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${paso===S.planPaso}" aria-label="${esc(tip+(paso==null?'':' · '+SATE.texto('sate.planeacion.'+(PLAN_DOS_PERIODOS?'asignada':'periodo_elegido'),{marca:paso+1,periodo:planEtiqueta(paso)})))}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}${paso==null||!PLAN_DOS_PERIODOS?'':`<span class="plan-marca" aria-hidden="true">${paso+1}</span>`}</div>`;
+function boxHtml(...args){
+  return SateUI.cajaMateria({cur,statusOf,planAsignado,isElec,MARK,S,fmtCr,porNiveles,esc,SATE,PLAN_DOS_PERIODOS,planEtiqueta},...args);
 }
 
 function inspParts(k){

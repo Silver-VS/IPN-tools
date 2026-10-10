@@ -154,8 +154,8 @@ input[type=number]{width:5rem}
 .edge.past{opacity:.3}   /* con datos del SAES: llega a una materia ya acreditada */
 .box{position:absolute;font-stretch:75%;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:7px;border:1.5px solid var(--line);background:var(--st-rest);color:var(--fg);font-weight:600;line-height:1.08;padding:2px 4px 2px 8px;cursor:pointer;overflow:hidden;letter-spacing:.01em;transition:opacity .12s, box-shadow .12s}
 .box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--nv,transparent)}
-.box.done{opacity:.28;text-decoration:line-through;font-weight:500;border-style:dotted}
-.box.done.want,.box.done.hot{opacity:.6}
+.box.done{opacity:1;color:var(--fg);background:var(--surface);font-weight:500;border-style:dotted;border-color:var(--ok)}
+.box.done.want,.box.done.hot{opacity:1}
 .box.late{border:2px solid var(--st-late)}
 .box.fail{background:var(--bad-soft)}
 .box.fail:not(.late){border:2px dashed var(--st-late)}
