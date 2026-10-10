@@ -159,7 +159,7 @@ for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','va
   assert.equal(c.SATE_CONFIG.unidades[unidad].nombre,config.identidadUnidades[unidad].nombre,'Nombre completo de la unidad genérica');
   assert.deepEqual(c.SATE_CONFIG.unidades[unidad].realce,config.identidadUnidades[unidad].realce,'Realce institucional conservado');
   const hayHorario=modo!=='vacio'&&p.horario_inscrito.length>0;
-  assert.deepEqual([...c.SATE_CONFIG.unidades[unidad].pestanas],['trayectoria','mapa','calendario',...(hayHorario?['horarios']:[])]);
+  assert.deepEqual([...c.SATE_CONFIG.unidades[unidad].pestanas],['trayectoria','mapa','calendario',...(hayHorario?['horarios']:[])].filter(t=>!(config.pestanasOcultas||[]).includes(t)));
   assert.deepEqual(archivos,['generico.js']);
   assert.equal(c.SATE.actual.pestana,modo==='vacio'?'mapa':'trayectoria');
   const tray=document.getElementById('sate-trayectoria');
@@ -213,6 +213,7 @@ for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','va
   if(modo==='vacio')assert.match(mapa,/Cargar datos del SAES/);
   assert.equal(c.SateGenerico.datos({...perfil,desfasadas_saes:[],reprobadas_periodo:[['Z201','10/1',10,2]]}).materias.find(m=>m.clave==='Z201').estado,'Reprobada','La antigüedad no inventa desfase');
   assert.equal(c.SateGenerico.datos({...perfil,reprobadas_periodo:null,reprobadas:[['FÍSICA FICTICIA',20]]}).materias.find(m=>m.clave==='Z201').estado,'Reprobada','Reprobadas de la cita si no se leyó Estado General');
+  if(!(config.pestanasOcultas||[]).includes('calendario')){
   location.hash='#/'+unidad+'/calendario';eventos.hashchange();await vaciar();
   assert.equal(c.SATE.actual.pestana,'calendario');
   assert.equal(document.getElementById('sate-calendario').hidden,false);
@@ -221,6 +222,7 @@ for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','va
   const buscar=(n,clase)=>n.children?.some(h=>h.className===clase||buscar(h,clase));
   assert.ok(buscar(document.getElementById('sate-calendario'),'calendario-mes'));
   assert.equal(c.SATE.calendario.eventos().filter(e=>e.audiencia.includes('nuevo_ingreso')).length,modo==='vacio'?7:0);
+  }
   const rutaHor=c.SateRutas.ruta('#/'+unidad+'/horarios',unidad,c.SATE_CONFIG.unidades);
   assert.equal(!!rutaHor,hayHorario);
   if(modo!=='vacio'){

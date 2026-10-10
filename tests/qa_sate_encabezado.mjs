@@ -70,20 +70,11 @@ for (const [unidad,generica] of [['upiita'],['escom'],['upibi'],['encb'],['esime
   assert.equal(valores['--sate-realce'],realce?.oscuro||'var(--sate-acento-base)',unidad+': tema oscuro');
   assert.equal(halo.style['--halo'],realce?.oscuro||'var(--sate-acento-base)');
   vm.runInContext('elegirUnidad();',c);
-  for (const [i,id] of Object.keys(c.SATE_CONFIG.unidades).entries()) {
-    const boton=selector.children[i],aro=boton.children[0],icono=aro.children[0];
-    const propio=config.unidades[id]?.realce||config.identidadUnidades[id]?.realce;
-    assert.equal(aro.style['--halo'],propio?.oscuro||'var(--sate-acento-base)',id+': aro propio oscuro');
-    assert.equal(boton.textContent,c.SATE_CONFIG.unidades[id].siglas);
-    assert.equal(icono.src,'../assets/logos/unidades/'+(config.identidadUnidades[id]?.logo||'ipn')+'.webp');
-    icono.onerror();assert.equal(icono.hidden,true);
-  }
-  assert.notEqual(selector.children[0].children[0].style['--halo'],selector.children[1].children[0].style['--halo']);
+  assert.equal(selector.children.length,1);
+  assert.equal(selector.children[0].textContent,'Cambiar de unidad');
+  selector.children[0].onclick();assert.equal(c.location.href,'index.html?sateEntrada=1');
   atributos['data-theme']='light';c.aplicarRealce(unidad);
-  for (const [i,id] of Object.keys(c.SATE_CONFIG.unidades).entries()) {
-    const propio=config.unidades[id]?.realce||config.identidadUnidades[id]?.realce;
-    assert.equal(selector.children[i].children[0].style['--halo'],propio?.claro||'var(--sate-acento-base)',id+': aro propio claro tras cambio');
-  }
+  assert.equal(halo.style['--halo'],realce?.claro||'var(--sate-acento-base)');
 }
 const estilosIdentidad=leer('web/sate/componentes.css');
 assert.match(estilosIdentidad,/\.sate-logo-unidad\{[^}]*max-height:36px;[^}]*width:auto;height:auto;[^}]*object-fit:contain;/);

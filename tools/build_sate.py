@@ -851,6 +851,7 @@ def main():
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
     idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
     idx = contenido.inject_apoyo(idx)
+    idx = idx.replace('/*__SATE_ENTRADA_ABRIR__*/', contenido.objeto_t()['sate.entrada.abrir'])
     idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(cuenta.config()['unidades'], ensure_ascii=False), 1)
     (ROOT / "web" / "dist" / "index.html").write_text(aplicar(idx, "index"), encoding="utf-8")   # página principal con inicio de sesión
     for f in ("revision.html", "privacidad.html", "condiciones.html"):
@@ -991,7 +992,8 @@ def escribir_sate(data):
     calendario_base = json.loads((ROOT / 'data/calendario_ipn.json').read_text(encoding='utf-8'))
     calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()
                          if not u.startswith('_') and u not in cfg['unidades']}
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
+    ocultas = set(cfg.get("pestanasOcultas", []))
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.

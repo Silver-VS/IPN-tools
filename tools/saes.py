@@ -62,7 +62,11 @@ const SAES={
     dl.querySelector('#saes-x').addEventListener('click',()=>SAES.close());
     dl.addEventListener('click',e=>{if(e.target===dl)SAES.close()});   // clic fuera de la ventana
     const take=async t=>{const d=SAES.parse(t);if(!d){msg.innerHTML='<span class="bad">El contenido no corresponde al Lector IPN-tools. Ejecuta el marcador en el SAES y selecciona «Copiar mis datos».</span>';return}
-      if((d.unidad||'upiita')!==SAES.U()){msg.innerHTML='<span class="bad">Estos datos son del SAES de '+String(d.unidad||'upiita').toUpperCase()+'. Esta página es de la '+SAES.U().toUpperCase()+'.</span>';return}
+      // Datos de otra unidad: se guardan y se abre el SATE de esa unidad (cualquier unidad tiene SATE).
+      const suya=String(d.unidad||'upiita');
+      if(suya!==SAES.U()&&/^[a-z0-9-]+$/.test(suya)){SAES.save(d);paste.value='';
+        msg.textContent='Tus datos son del SAES de '+suya.toUpperCase()+'. Abriendo SATE de '+suya.toUpperCase()+'…';
+        setTimeout(()=>{location.href=(globalThis.SATE?'index.html':'sate/index.html')+'?sateUnidad='+suya},900);return}
       const aceptar=()=>{SAES.save(d);paste.value='';msg.textContent='Datos del SAES cargados.';onLoad(d);setTimeout(()=>SAES.close(),900)};
       if(globalThis.SATE){
         try{await SATE.script('tramites.js');SateTramites.confirmarSaes(d,msg,aceptar)}

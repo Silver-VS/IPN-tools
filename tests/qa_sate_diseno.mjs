@@ -45,11 +45,11 @@ for(const [i,b] of tabs.children.entries()){
 assert.equal(tabs.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,1);
 assert.equal(barra.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,1);
 tabs.children[0].eventos.keydown({key:'End',preventDefault(){}});
-assert.equal(destino,'calendario');assert.equal(document.activeElement,tabs.children.at(-1));
+assert.equal(destino,config.unidades.upiita.pestanas.at(-1));assert.equal(document.activeElement,tabs.children.at(-1));
 tabs.children.at(-1).eventos.keydown({key:'ArrowRight',preventDefault(){}});
 assert.equal(destino,'trayectoria');assert.equal(document.activeElement,tabs.children[0]);
 tabs.children[0].eventos.keydown({key:'ArrowLeft',preventDefault(){}});
-assert.equal(destino,'calendario');assert.equal(document.activeElement,tabs.children.at(-1));
+assert.equal(destino,config.unidades.upiita.pestanas.at(-1));assert.equal(document.activeElement,tabs.children.at(-1));
 tabs.children.at(-1).eventos.keydown({key:'Home',preventDefault(){}});
 assert.equal(destino,'trayectoria');assert.equal(document.activeElement,tabs.children[0]);
 const mapa=tabs.children.find(b=>b.getAttribute('data-id')==='mapa');
@@ -149,10 +149,10 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
   let observador, cambioSistema, recargas=0;
   const raiz={getAttribute:k=>atributos[k]??null,style:{setProperty(k,v){valores[k]=v}}};
   const sistema={matches:false,addEventListener(k,f){assert.equal(k,'change');cambioSistema=f}};
-  const c=vm.createContext({config:catalogo,SATE_CONFIG:config,u:'upiita',inicial:null,recordada:null,URLSearchParams,
+  const c=vm.createContext({config:catalogo,SATE_CONFIG:config,u:null,inicial:null,recordada:null,URLSearchParams,
     location:{search:'',hash:'',reload(){recargas++}},document:{documentElement:raiz,querySelectorAll:()=>halos,createElement(tag){const n={dataset:{},style:{setProperty(k,v){this[k]=v}},prepend(){},appendChild(b){if(b.onclick)botones.push(b)}};if(tag==='span')halos.push(n);return n}},
     matchMedia:()=>sistema,MutationObserver:class{constructor(f){observador=f}observe(n,o){assert.equal(n,raiz);assert.equal(o.attributeFilter.join(','),'data-theme,data-tema')}},
-    api:null,SateUI:{modal(){},cerrarModal(){}}});
+    api:null,texto:k=>config.textos[k],SateUI:{modal(){},cerrarModal(){}}});
   vm.runInContext(inicio.slice(inicio.indexOf('  let unidadRealce'),inicio.indexOf('  // plurales ICU')),c);
   assert.equal(valores['--sate-realce'],'var(--sate-acento-base)','Sin unidad: guinda sin ciclo de tokens');
   assert.equal(valores['--sate-sobre-realce'],'var(--sate-sobre-base)');
@@ -163,12 +163,13 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
   }
   const elegir=inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar('));
   vm.runInContext(elegir+'\nelegirUnidad();',c);
+  assert.equal(botones.length,1);assert.equal(botones[0].textContent,'Cambiar de unidad');
+  botones[0].onclick();assert.equal(c.location.href,'index.html?sateEntrada=1');
+  vm.runInContext('Object.keys(config).forEach(id=>logoUnidad(id,config[id].nombre));',c);
   function comprobarHalos(modo){for(const [i,u] of Object.keys(catalogo).entries())assert.equal(halos[i].style['--halo'],catalogo[u].realce[modo],u+': halo propio '+modo)}
   comprobarHalos('claro');
   for(const [i,u] of Object.keys(catalogo).entries()){
-    // El callback modifica el color en el documento actual antes de pedir la recarga histórica.
-    c.location.reload=()=>{assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);recargas++};
-    botones[i].onclick();assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
+    c.aplicarRealce(u);assert.equal(valores['--sate-realce'],catalogo[u].realce.claro);
     comprobarSobre(u,'claro');
     atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],catalogo[u].realce.oscuro);
     comprobarHalos('oscuro');
@@ -185,13 +186,13 @@ for(const [u,cfg] of Object.entries(catalogo))for(const [modo,dark] of [['claro'
     comprobarHalos('claro');
     comprobarSobre(u,'claro');
   }
-  assert.equal(recargas,2,'Se conserva aislamiento de módulos al cambiar unidad');
+  assert.equal(recargas,0,'El cambio vuelve a la entrada mediante navegación');
   c.aplicarRealce(null);atributos['data-theme']='dark';observador();assert.equal(valores['--sate-realce'],'var(--sate-acento-base)');
   assert.equal(valores['--sate-sobre-realce'],'var(--sate-sobre-base)');
   assert.match(css,/\.sate-unidad\{color:var\(--sate-realce\)\}/);
   assert.match(css,/header\.top\{[^}]*border-top:0/);
   assert.match(css,/\.sate-barra__btn\[aria-current=page\]::after\{[^}]*background:var\(--sate-realce\)/);
-  console.log('Realce: AA por unidad/superficie/tema, selector inmediato, guinda sin unidad y cambios de tema/sistema. OK.');
+  console.log('Realce: AA por unidad/superficie/tema, regreso a la entrada, guinda sin unidad y cambios de tema/sistema. OK.');
 }
 for(const tema of temas)for(const fondo of ['surface','sunken']){
   tema.accent=tema['sate-acento-base'];

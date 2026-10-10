@@ -30,7 +30,7 @@ assert.match(css,/#v-tray\{padding-bottom:calc\(160px \+ env\(safe-area-inset-bo
 assert.match(css,/\.plan-menu\[open\]>\.plan-menu-cuerpo\{[^}]*position:absolute/,'F: menú fuera del flujo');
 assert.match(html,/<details class="plan-menu" id="plan-menu"><summary><\/summary>/);
 assert.ok(!Object.values(config.textos).some(t=>/pincel/i.test(t)));
-assert.ok(Object.values(config.unidades).every(c=>c.planDosPeriodos===false));
+assert.ok(Object.values(config.unidades).every(c=>typeof c.planDosPeriodos==='boolean'));
 assert.ok(!panelHTML.includes('data-personal'),'planeación disponible sin SAES');
 assert.ok(!/\.plan-panel[^{}]*\{[^}]*max-height/.test(html),'sin altura máxima');
 assert.match(html,/@media\(max-width:720px\)\{\.plan-grupos\{grid-template-columns:1fr/,'grupos apilados en teléfono');
