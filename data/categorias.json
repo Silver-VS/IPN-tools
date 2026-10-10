@@ -13,9 +13,63 @@
   "propia",
   "integral",
   "prof",
-  "esp"
+  "esp",
+  "mec",
+  "civil",
+  "amb",
+  "ind",
+  "salud",
+  "clin",
+  "adm",
+  "soc",
+  "info"
  ],
  "categorias": {
+  "mec": {
+   "nombre": "Mecánica y materiales",
+   "incluye": "Mecánica, diseño mecánico, manufactura, termofluidos, materiales, metalurgia y textiles.",
+   "propuesta": true
+  },
+  "civil": {
+   "nombre": "Construcción y tierra",
+   "incluye": "Estructuras, geotecnia, hidráulica, topografía, geología, geofísica y petróleo.",
+   "propuesta": true
+  },
+  "amb": {
+   "nombre": "Ambiente y energía",
+   "incluye": "Ingeniería ambiental, energía, recursos naturales y sustentabilidad.",
+   "propuesta": true
+  },
+  "ind": {
+   "nombre": "Operaciones y logística",
+   "incluye": "Investigación de operaciones, calidad, producción, logística y transporte.",
+   "propuesta": true
+  },
+  "salud": {
+   "nombre": "Ciencias de la salud",
+   "incluye": "Anatomía, fisiología, farmacología, patología, salud pública y nutrición.",
+   "propuesta": true
+  },
+  "clin": {
+   "nombre": "Práctica clínica",
+   "incluye": "Clínicas, propedéuticas, internado, odontología y optometría clínicas y enfermería clínica.",
+   "propuesta": true
+  },
+  "adm": {
+   "nombre": "Administración y negocios",
+   "incluye": "Contabilidad, finanzas, mercadotecnia, comercio, economía y derecho mercantil y fiscal; núcleo disciplinar de negocios, economía y contaduría.",
+   "propuesta": true
+  },
+  "soc": {
+   "nombre": "Ciencias sociales",
+   "incluye": "Psicología, trabajo social, sociología, derecho y educación.",
+   "propuesta": true
+  },
+  "info": {
+   "nombre": "Información y documentación",
+   "incluye": "Biblioteconomía, archivonomía y gestión documental.",
+   "propuesta": true
+  },
   "fm": {
    "nombre": "Ciencias básicas",
    "incluye": "Matemáticas, física, probabilidad y estadística, métodos numéricos y cuantitativos."
