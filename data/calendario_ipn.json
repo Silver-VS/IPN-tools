@@ -8,7 +8,7 @@
       "desde": "2026-08-01",
       "hasta": "2027-01-24",
       "inicio_clases": "2026-08-24",
-      "fin_clases": "2026-12-18"
+      "fin_clases": "2026-12-19"
     },
     "27/2": {
       "desde": "2027-01-25",
@@ -159,8 +159,9 @@
       "periodo": "27/1",
       "categoria": "vacaciones",
       "desde": "2026-12-21",
-      "hasta": "2026-12-31",
+      "hasta": "2027-01-01",
       "titulo": "Vacaciones",
+      "nota": "Último día de clases antes de vacaciones: 19 dic 2026. Regreso a clases: 25 ene 2027.",
       "audiencia": [
         "alumnos"
       ],
@@ -183,6 +184,7 @@
       "desde": "2027-01-25",
       "hasta": "2027-01-25",
       "titulo": "Inicio del periodo 27/2",
+      "nota": "Regreso a clases: 25 ene 2027.",
       "audiencia": [
         "alumnos"
       ],
@@ -578,7 +580,8 @@
       "categoria": "planeacion",
       "desde": "2027-01-04",
       "hasta": "2027-01-22",
-      "titulo": "Planeación didáctica, académica y directiva",
+      "titulo": "Procesos académico-administrativos",
+      "nota": "Planeación didáctica, académica y directiva; audiencia: docentes.",
       "audiencia": [
         "docentes"
       ],

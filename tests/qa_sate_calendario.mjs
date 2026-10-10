@@ -62,8 +62,29 @@ assert.equal(api.eventos().find(e=>e.categoria==='fin'&&e.periodo==='27/1').desd
 assert.ok(!api.eventos(true).some(e=>e.origen==='ipn'&&data.upiita.periodosPropios.includes(e.periodo)),'UPIITA no hereda procesos del calendario incompatible');
 for(const p of ['26/2','27/1','27/2'])assert.ok(api.eventos().filter(e=>e.categoria==='ets'&&e.periodo===p).every(e=>e.origen==='unidad'&&e.fuenteOriginal.includes('Gestión Escolar UPIITA')));
 assert.deepEqual(Array.from(api.eventos().filter(e=>e.categoria==='ets'&&e.periodo==='26/2').map(e=>[e.desde,e.hasta])),[['2026-10-07','2026-10-09'],['2026-10-12','2026-10-12']]);
-assert.equal(data.upiita.eventos.filter(e=>e.verificar&&e.periodo!=='26/2').length,3);
-assert.deepEqual(data.upiita.eventos.filter(e=>e.verificar&&e.periodo==='26/2').map(e=>e.categoria),['saberes','suspension']);
+assert.deepEqual(data.upiita.eventos.filter(e=>e.verificar).map(e=>e.desde),['2026-02-27']);
+// CAL8: correcciones del dueño sin heredar fechas oficiales incompatibles.
+const locales=api.eventos();
+const inscripcionNoviembre=locales.find(e=>e.desde==='2026-11-06');
+assert.equal(inscripcionNoviembre.categoria,'inscripcion_ets');
+assert.equal(inscripcionNoviembre.titulo,'Inscripción a ETS');
+assert.ok(!inscripcionNoviembre.verificar);
+assert.ok(!locales.some(e=>e.desde<='2027-04-09'&&e.hasta>='2027-04-09'),'UPIITA sin evento el 9 abr 2027');
+const vacacionesLocal=locales.find(e=>e.categoria==='vacaciones'&&e.periodo==='27/1');
+assert.deepEqual([vacacionesLocal.desde,vacacionesLocal.hasta],['2026-12-21','2027-01-01']);
+assert.ok(!vacacionesLocal.verificar);assert.match(vacacionesLocal.nota,/Último día de clases antes de vacaciones: 19 dic/);
+assert.match(vacacionesLocal.nota,/Regreso a clases: lunes 4 ene 2027/);
+assert.ok(locales.some(e=>e.categoria==='reanudacion'&&e.desde==='2027-01-04'&&e.audiencia.includes('alumnos')));
+const vacacionesOficial=base.eventos.find(e=>e.categoria==='vacaciones'&&e.desde==='2026-12-21');
+assert.equal(vacacionesOficial.hasta,'2027-01-01');
+assert.match(vacacionesOficial.nota,/Último día de clases antes de vacaciones: 19 dic 2026/);
+assert.equal(base.periodos['27/1'].fin_clases,'2026-12-19');
+const procesosEnero=base.eventos.find(e=>e.categoria==='planeacion'&&e.desde==='2027-01-04');
+assert.equal(procesosEnero.hasta,'2027-01-22');assert.deepEqual(procesosEnero.audiencia,['docentes']);
+assert.equal(procesosEnero.titulo,'Procesos académico-administrativos');
+// Noviembre: jueves, viernes y lunes; sábado y domingo carecen de registro ordinario.
+for(const d of ['05','06','09'])assert.ok(base.eventos.some(e=>e.categoria==='ordinaria'&&e.desde<='2026-11-'+d&&e.hasta>='2026-11-'+d),'Registro ordinario oficial: 2026-11-'+d);
+for(const d of ['07','08'])assert.ok(!base.eventos.some(e=>e.categoria==='ordinaria'&&e.desde<='2026-11-'+d&&e.hasta>='2026-11-'+d),'Sin registro ordinario en fin de semana: 2026-11-'+d);
 assert.deepEqual(data.upiita.periodos['26/2'],{desde:'2026-02-02',hasta:'2026-10-12'});
 const fechasLocales={
  '26/2|descanso':['2026-02-02:2026-02-02','2026-03-16:2026-03-16','2026-05-01:2026-05-01','2026-05-05:2026-05-05','2026-07-21:2026-07-21','2026-09-16:2026-09-16'],
@@ -84,6 +105,9 @@ const fechasLocales={
 };
 for(const [clave,fechas] of Object.entries(fechasLocales))assert.deepEqual(Array.from(api.eventos().filter(e=>e.periodo+'|'+e.categoria===clave).map(e=>e.desde+':'+e.hasta)),fechas,'Transcripción UPIITA: '+clave);
 c.SATE_UNIDAD='escom';c.DATA.calendario=null;
+assert.equal(api.eventos().find(e=>e.categoria==='inicio'&&e.periodo==='27/2').desde,'2027-01-25');
+assert.match(api.eventos().find(e=>e.categoria==='inicio'&&e.periodo==='27/2').nota,/Regreso a clases: 25 ene 2027/);
+assert.ok(!api.eventos().some(e=>e.categoria==='reanudacion'&&e.desde==='2027-01-04'),'ESCOM no hereda el regreso UPIITA');
 assert.equal(api.eventos().find(e=>e.categoria==='inicio'&&e.periodo==='27/1').desde,'2026-08-24');
 assert.ok(api.eventos().filter(e=>e.categoria==='ets').every(e=>e.origen==='ipn'));
 assert.deepEqual(Array.from(api.eventos(true)),Array.from(api.filtrarAudiencia(api.fusion(base,null),true)),'ESCOM conserva íntegro el calendario oficial disponible');
@@ -288,4 +312,14 @@ for(const categoria of ['suspension','reanudacion']){
 c.matchMedia=()=>({matches:true});box.clientWidth=375;reiniciar();sinColision();
 assert.equal(nodos('calendario-rango')[0].textContent,'2 de febrero de 2026 al 12 de octubre de 2026');
 assert.ok(dia('2026-09-11').className.includes('calendario-suspension'));
-console.log('CAL7: periodo UPIITA 26/2 completo, paro, solapamientos, reanudación, filtros, tokens AA y teléfono; calendario oficial ESCOM y regresiones CAL5/CAL6. OK.');
+// Las correcciones también se muestran en el detalle del calendario integrado.
+c.matchMedia=()=>({matches:false});box.clientWidth=1040;api.hoy=()=> '2027-01-04';reiniciar();
+dia('2027-01-04').onclick();assert.match(nodos('calendario-detalle')[0].textContent,/Regreso a clases: lunes 4 ene 2027/);
+api.hoy=()=> '2026-11-06';reiniciar();dia('2026-11-06').onclick();
+assert.match(nodos('calendario-detalle')[0].textContent,/Inscripción a ETS/);
+assert.doesNotMatch(nodos('calendario-detalle')[0].textContent,/saberes previamente|pendiente de verificar/);
+for(const unidad of ['escom','upibi']){
+ c.SATE_UNIDAD=unidad;c.DATA.calendario=null;api.hoy=()=> '2027-01-25';reiniciar();
+ dia('2027-01-25').onclick();assert.match(nodos('calendario-detalle')[0].textContent,/Regreso a clases: 25 ene 2027/);
+}
+console.log('CAL8: inscripción ETS, sin evento 9 abr, vacaciones, regreso UPIITA 4 ene vs oficial 25 ene y días hábiles; regresiones CAL5/CAL6/CAL7. OK.');

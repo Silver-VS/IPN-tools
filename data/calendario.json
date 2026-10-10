@@ -328,7 +328,6 @@
         ],
         "simbolo": "rayado",
         "reemplaza": true,
-        "verificar": true,
         "nota": "Actividades suspendidas; las fechas siguientes se reprogramaron."
       },
       {
@@ -581,8 +580,8 @@
       {
         "desde": "2026-11-06",
         "hasta": "2026-11-06",
-        "titulo": "Fecha límite de registro de saberes previamente adquiridos",
-        "categoria": "saberes",
+        "titulo": "Inscripción a ETS",
+        "categoria": "inscripcion_ets",
         "periodo": "27/1",
         "fuente": "Aviso de Gestión Escolar UPIITA",
         "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
@@ -590,9 +589,7 @@
           "alumnos"
         ],
         "simbolo": "relleno",
-        "reemplaza": true,
-        "verificar": true,
-        "nota": "Fecha o rango pendiente de verificar en el calendario de Gestión Escolar UPIITA."
+        "reemplaza": true
       },
       {
         "desde": "2026-11-16",
@@ -707,7 +704,7 @@
         "reemplaza": true
       },
       {
-        "desde": "2026-12-20",
+        "desde": "2026-12-21",
         "hasta": "2027-01-01",
         "titulo": "Vacaciones",
         "categoria": "vacaciones",
@@ -719,8 +716,21 @@
         ],
         "simbolo": "relleno",
         "reemplaza": true,
-        "verificar": true,
-        "nota": "Fecha o rango pendiente de verificar en el calendario de Gestión Escolar UPIITA."
+        "nota": "Último día de clases antes de vacaciones: 19 dic. Regreso a clases: lunes 4 ene 2027."
+      },
+      {
+        "desde": "2027-01-04",
+        "hasta": "2027-01-04",
+        "titulo": "Regreso a clases: lunes 4 ene 2027",
+        "categoria": "reanudacion",
+        "periodo": "27/1",
+        "fuente": "Aviso de Gestión Escolar UPIITA",
+        "fuenteOriginal": "Correcciones del dueño al calendario UPIITA (9 de octubre de 2026)",
+        "audiencia": [
+          "alumnos"
+        ],
+        "simbolo": "triangulo",
+        "reemplaza": true
       },
       {
         "desde": "2027-02-11",
@@ -903,22 +913,6 @@
         ],
         "simbolo": "contorno",
         "reemplaza": true
-      },
-      {
-        "desde": "2027-04-09",
-        "hasta": "2027-04-09",
-        "titulo": "Fecha límite de registro de saberes previamente adquiridos",
-        "categoria": "saberes",
-        "periodo": "27/2",
-        "fuente": "Aviso de Gestión Escolar UPIITA",
-        "fuenteOriginal": "Calendario académico UPIITA, periodos 26/2, 27/1 y 27/2, Gestión Escolar UPIITA",
-        "audiencia": [
-          "alumnos"
-        ],
-        "simbolo": "relleno",
-        "reemplaza": true,
-        "verificar": true,
-        "nota": "Fecha o rango pendiente de verificar en el calendario de Gestión Escolar UPIITA."
       },
       {
         "desde": "2027-04-16",
