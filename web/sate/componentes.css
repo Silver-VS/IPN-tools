@@ -369,6 +369,14 @@ body.sate-flotante .sate-barra{display:flex}
 #mi-semana p{font-size:.84rem;overflow-wrap:anywhere}
 #mi-semana .field,#mi-semana input,#mi-semana select{min-width:0;max-width:100%;box-sizing:border-box}
 #mi-semana .ownrow{flex-wrap:wrap}
+.semana-item{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.semana-acc{display:inline-flex;gap:6px;flex-wrap:wrap}
+.semana-ayuda-corta{flex-basis:100%;margin:0;color:var(--ipn-tenue)}
+.semana-ficha{display:grid;gap:12px}
+.semana-ficha .err:empty{display:none}
+.semana-ficha .err{color:var(--ipn-reprobada);margin:0}
+.aviso-deshacer{display:flex;gap:8px;align-items:center;margin:8px 0;font-size:.84rem}
+.blk.own:focus-visible,.ag-it.own:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:1px}
 .semana-barra{display:flex;height:18px;overflow:hidden;border-radius:8px;background:var(--ipn-superficie)}
 .semana-parte{flex-shrink:0;background:var(--ipn-acento)}
 .semana-parte-1{background:var(--ipn-ok)}

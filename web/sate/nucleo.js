@@ -339,7 +339,8 @@ function actualizarOferta(){for(const p in DATA.periodos){const m=new Map();DATA
 actualizarOferta();
 const byKey=k=>KEYMAP[S.per].get(k);
 const selected=()=>plan().sel.map(byKey).filter(Boolean);
-const ownAsClasses=()=>plan().own.map((o,i)=>({own:true,i,n:o.n,h:o.d.map(d=>[d,o.a,o.b])}));
+const ownAsClasses=()=>plan().own.map((o,i)=>o.oculto?null:{own:true,i,n:o.n,h:o.d.map(d=>[d,o.a,o.b])}).filter(Boolean);
+const ownVis=()=>plan().own.filter(o=>!o.oculto);
 const slots=x=>x.own?x.h:x[6];
 const offeredClaves=()=>new Set(classes().filter(c=>c[0]===S.car).map(c=>c[8]));
 
@@ -1121,7 +1122,7 @@ document.addEventListener('click',e=>{
   else if(d.delplan){const id=d.delplan;if(t.dataset.confirm!=='1'){t.dataset.confirm='1';t.textContent='¿Eliminar?';t.classList.add('warn');setTimeout(()=>{if(t.isConnected){t.dataset.confirm='';t.textContent='×';t.classList.remove('warn')}},3000);return}
     delete ws().plans[id];ws().plan=planIds()[0];S.hover=null;refresh()}
   else if('dup' in d){const id=nextPlan();ws().plans[id]=JSON.parse(JSON.stringify(plan()));ws().plan=id;refresh()}
-  else if(d.unown){plan().own.splice(+d.unown,1);refresh()}
+  else if(d.unown){eliminarPropia(+d.unown)}
   else if(d.oday){const i=+d.oday;S.ownDays=S.ownDays.includes(i)?S.ownDays.filter(x=>x!==i):[...S.ownDays,i];renderOwnForm()}
   else if(d.gt){S.gt=d.gt;renderHFilters()}
   else if(d.ungp){S.gpref.splice(+d.ungp,1);renderGPrefs()}

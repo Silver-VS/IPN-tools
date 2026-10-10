@@ -6,7 +6,7 @@ async function saveFile(name,blob){
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),4000);return 'Listo: '+name;
 }
 function scheduleData(){
-  const sel=selected(),own=plan().own;
+  const sel=selected(),own=ownVis();
   return {sel,own,cr:sel.reduce((s,c)=>s+c[7],0),hrs:sel.reduce((s,c)=>s+c[6].reduce((t,b)=>t+b[2]-b[1],0),0)/60};
 }
 // nombres del SAES (mayúsculas) en formato oración, conservando numerales romanos: "INGLES II" -> "Ingles II"
@@ -162,7 +162,7 @@ const drawFor=(part,k)=>EXP.style==='min'?drawTable(part,k):drawSchedule(part,k)
 /* ---------- Excel (.xlsx, también se abre en Google Sheets): mismo formato que la tabla minimalista ---------- */
 async function loadExcelJS(){if(window.ExcelJS)return window.ExcelJS;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de Excel.'));document.head.appendChild(s)});return window.ExcelJS}
 async function exportXlsx(){
-  if(!selected().length&&!plan().own.length)return txH('exportacion_vacia');
+  if(!selected().length&&!ownVis().length)return txH('exportacion_vacia');
   const ExcelJS=await loadExcelJS(), wb=new ExcelJS.Workbook(), {rows,days,cells,D}=weekGrid();
   wb.title=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`;
   const NAMES=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'], argb=h=>'FF'+String(h).replace('#','').toUpperCase();
@@ -206,7 +206,7 @@ async function exportXlsx(){
 }
 const toBlob=cv=>new Promise(r=>cv.toBlob(r,'image/png'));
 async function exportPng(){
-  if(!selected().length&&!plan().own.length)return txH('exportacion_vacia');
+  if(!selected().length&&!ownVis().length)return txH('exportacion_vacia');
   const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-upiita.png`,await toBlob(cv));
 }
 async function loadPdfLib(){if(window.PDFLib)return window.PDFLib;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de PDF.'));document.head.appendChild(s)});return window.PDFLib}
@@ -219,14 +219,14 @@ async function pdfPage(doc,rgb){
   pg.drawImage(png,{x:(PW-png.width*sc)/2,y:PH-m-png.height*sc,width:png.width*sc,height:png.height*sc});
 }
 async function exportPdf(){
-  if(!selected().length&&!plan().own.length)return txH('exportacion_vacia');
+  if(!selected().length&&!ownVis().length)return txH('exportacion_vacia');
   const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
   await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
   doc.setTitle(`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`);
   return saveFile(`horario-${ws().plan}-upiita.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
 }
 // todos los horarios con contenido en un solo PDF (una hoja por horario, en orden A, B, C…)
-const plansConContenido=()=>planIds().filter(id=>{const p=ws().plans[id];return p.sel.length||(p.own||[]).length});
+const plansConContenido=()=>planIds().filter(id=>{const p=ws().plans[id];return p.sel.length||(p.own||[]).filter(o=>!o.oculto).length});
 async function exportPdfAll(){
   const ids=plansConContenido();
   if(!ids.length)return txH('exportacion_todos_vacia');
@@ -247,7 +247,7 @@ async function exportPdfAll(){
   return r.startsWith('Listo')?`${r} (${ids.length} ${ids.length>1?'horarios':'horario'} en ${n} ${n>1?'hojas':'hoja'})`:r;
 }
 // módulo de exportación (ventana)
-function abrirExportacion(){const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||plan().own.length?'':txH('exportacion_vacia');dl.showModal?dl.showModal():dl.setAttribute('open','')}
+function abrirExportacion(){const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||ownVis().length?'':txH('exportacion_vacia');dl.showModal?dl.showModal():dl.setAttribute('open','')}
 $('#exp-x').addEventListener('click',()=>$('#exp-dlg').close());
 $('#exp-dlg').addEventListener('click',e=>{if(e.target.id==='exp-dlg')e.target.close()});
 const renderExpStyle=()=>{document.querySelectorAll('[data-exps]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.exps===EXP.style)));
@@ -267,11 +267,11 @@ for(const [id,fn] of [['#b-png',exportPng],['#b-pdf',exportPdf],['#b-pdfall',exp
 }
 
 $('#b-copy').addEventListener('click',async()=>{
-  const sel=selected();if(!sel.length&&!plan().own.length)return;
+  const sel=selected();if(!sel.length&&!ownVis().length)return;
   const cr=sel.reduce((s,c)=>s+c[7],0);
   const txt=`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()} (${S.per==='proximo'?'próximo periodo':'periodo actual'}) · ${fmtCr(cr)} créditos\n`+
     sel.map(c=>`${c[3]}  ${c[8]} ${name(c)} (${fmtCr(c[7])} cr)\n   ${profs(c)}\n   ${pattern(c).join('; ')}`).join('\n')+
-    plan().own.map(o=>`\n—  ${o.n}\n   ${o.d.map(d=>DAYS[d]).join(' ')}  ${hm(o.a)}–${hm(o.b)}`).join('');
+    ownVis().map(o=>`\n—  ${o.n}\n   ${o.d.map(d=>DAYS[d]).join(' ')}  ${hm(o.a)}–${hm(o.b)}`).join('');
   const box=$('#copybox');box.value=txt;
   try{await navigator.clipboard.writeText(txt);$('#b-copy').textContent=txH('copiado');setTimeout(()=>$('#b-copy').textContent=txH('copiar'),1500)}
   catch(err){box.hidden=false;box.select()}
