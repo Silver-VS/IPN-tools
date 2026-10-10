@@ -990,6 +990,7 @@ def escribir_sate(data):
     nombres_unidades = {alias: c['siglas'] for u, c in identidad_unidades.items() for alias in [u, *c.get('alias', [])]}
     calendario_base = json.loads((ROOT / 'data/calendario_ipn.json').read_text(encoding='utf-8'))
     calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()
+                         if not u.startswith('_') and u not in cfg['unidades']}
     html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
