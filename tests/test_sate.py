@@ -16,7 +16,7 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 class SateBuild(unittest.TestCase):
     def test_diccionario_identidad_y_realces(self):
-        from realce_unidades import SUPERFICIES, contraste, dominante, proponer
+        from realce_unidades import SUPERFICIES, contraste, dominante, insignia_rgb, proponer
         def sin_duplicados(pares):
             resultado = {}
             for clave, valor in pares:
@@ -38,12 +38,9 @@ class SateBuild(unittest.TestCase):
                 if 'logo' not in identidad:
                     continue
                 ruta = ROOT / 'web/dist/assets/logos/unidades' / (identidad['logo'] + '.webp')
-                if unidad == 'encb':
-                    # El dueño eligió el rojo del escudo; el muestreador respeta realce_nota.
-                    self.assertIn('elección del dueño', identidad['realce_nota'])
-                    self.assertEqual(identidad['realce'], {'claro': '#b00040', 'oscuro': '#cc5c85'})
-                else:
-                    self.assertEqual(proponer(dominante(ruta)), identidad['realce'])
+                # El realce sale de la insignia (color más representativo del escudo) ajustada a AA.
+                self.assertRegex(identidad.get('insignia', ''), r'^#[0-9a-f]{6}$')
+                self.assertEqual(proponer(insignia_rgb(identidad)), identidad['realce'])
                 for modo, fondos in SUPERFICIES.items():
                     for fondo in fondos:
                         self.assertGreaterEqual(contraste(identidad['realce'][modo], fondo), 4.5)

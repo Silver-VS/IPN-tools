@@ -41,6 +41,11 @@ def dominante(ruta):
     return tuple(round(sum(p[i] * p[3] for p in pixeles) / peso) for i in range(3))
 
 
+def insignia_rgb(identidad):
+    h = identidad.get('insignia')
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5)) if h else None
+
+
 def proponer(rgb):
     h, luminosidad, saturacion = colorsys.rgb_to_hls(*(c / 255 for c in rgb))
     # Conservar matiz y saturación; buscar la luminosidad más próxima que pase AA.
@@ -68,14 +73,15 @@ def main():
     destino = ROOT / 'web/dist/assets/logos/unidades'
     origen = ROOT.parent / 'desfase/web/dist/assets/logos/unidades'
     for unidad, identidad in datos['unidades'].items():
-        if not identidad.get('logo') or identidad.get('realce_nota'):
-            continue  # sin logo, o color elegido a mano por el dueño
+        if not identidad.get('logo'):
+            continue
         ruta = destino / (identidad['logo'] + '.webp')
         if not ruta.exists() and args.copiar_faltantes:
             destino.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(origen / ruta.name, ruta)
         try:
-            rgb = dominante(ruta)
+            # La insignia elegida (color más representativo del escudo) manda; el muestreo es solo propuesta inicial.
+            rgb = insignia_rgb(identidad) or dominante(ruta)
             realce = proponer(rgb)
         except (OSError, ValueError) as error:
             raise RuntimeError(f'Realce: unidad={unidad}, logo={ruta.name}, fase=muestreo: {error}') from error
