@@ -923,6 +923,7 @@ def datos_dictamen():
         'materias': {f'{c}|{p}|{k.upper()}': [n, nivel] for c, p, nivel, k, n, *_ in mapa['rows']},
         'pdfs': {tipo: base64.b64encode((ROOT / 'data/gestion_escolar' / archivo).read_bytes()).decode()
                  for tipo, archivo in (('interno', 'dictamen-interno-2026-1.pdf'), ('externo', 'dictamen-externo-cosie-01.pdf'))},
+        'motivos': json.loads((ROOT / 'data/dictamen_motivos.json').read_text(encoding='utf-8')),
         'textos': {k: v for k, v in contenido.objeto_t().items() if k.startswith('dictamen.')}}
 
 
