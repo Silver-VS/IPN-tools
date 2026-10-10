@@ -13,7 +13,7 @@ const cargarPlot=()=>window.Plot?Promise.resolve():PLOT_P||(PLOT_P=LIB_PLOT.redu
 let ST_RENDER=0;
 const trayectoriaAbierta=(id,inicial=false)=>store.get('trayectoria.seccion.'+id,!MQ_PHONE.matches&&inicial);
 function prepararSeccion(el,id,dibujar){
-  el.open=trayectoriaAbierta(id,id==='kardex'||id==='escenario');
+  el.open=trayectoriaAbierta(id,id==='kardex'||id==='escenario'||id==='simulacion');
   let dibujada=false,turno=0;
   const abrir=()=>{if(!el.open||dibujada)return;dibujada=true;const actual=++turno;return Promise.resolve(dibujar?.(()=>el.open&&actual===turno)).catch(e=>{
     if(actual===turno)dibujada=false;console.error('SATE: fallo al abrir sección',{unidad:UNIDAD,carrera:S.car,seccion:id,error:e.message});
