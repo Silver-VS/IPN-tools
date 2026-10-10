@@ -471,6 +471,8 @@ body.sate-flotante .sate-barra{display:flex}
 .req-elegido{display:block;color:var(--accent)}
 .req-etiqueta{display:none}
 .req-acreditados{margin:8px 0}
+.tl-acciones{display:flex;align-items:stretch}
+.tl-acciones>[data-ayuda-creditos]{align-self:center}
 .tl-row.hpre{outline:2px solid var(--rel-pre);outline-offset:-2px}
 .tl-row.hpost{outline:2px solid var(--rel-post);outline-offset:-2px}
 @media(max-width:720px){

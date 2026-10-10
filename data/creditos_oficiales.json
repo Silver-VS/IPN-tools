@@ -1,0 +1,3883 @@
+{
+ "_fuente": "Créditos oficiales por materia (TEPIC y SATCA) de los mapas curriculares publicados por el IPN (ipn.mx, oferta educativa), extraídos por OCR local (tools/planes_ocr.py, rama claude/planes-ipn) y emparejados por nombre con el mapa del SAES. Solo se incluyen planes con al menos 60 % de materias emparejadas. Generado por el orquestador 2026-10-09.",
+ "unidades": {
+  "upiita": {
+   "B/09": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-ib-upiita.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "B101": {
+      "tepic_oficial": 7.5,
+      "satca": 4.76,
+      "saes": 7.5
+     },
+     "B102": {
+      "tepic_oficial": 7.5,
+      "satca": 4.76,
+      "saes": 7.5
+     },
+     "B103": {
+      "tepic_oficial": 7.5,
+      "satca": 4.76,
+      "saes": 7.5
+     },
+     "B104": {
+      "tepic_oficial": 9.0,
+      "satca": 6.35,
+      "saes": 9.0
+     },
+     "B105": {
+      "tepic_oficial": 9.0,
+      "satca": 6.35,
+      "saes": 9.0
+     },
+     "B106": {
+      "tepic_oficial": 9.0,
+      "satca": 6.35,
+      "saes": 9.0
+     },
+     "B107": {
+      "tepic_oficial": 9.0,
+      "satca": 6.35,
+      "saes": 9.0
+     },
+     "B108": {
+      "tepic_oficial": 9.0,
+      "satca": 6.35,
+      "saes": 9.0
+     },
+     "B109": {
+      "tepic_oficial": 6.0,
+      "satca": 4.76,
+      "saes": 6.0
+     },
+     "B110": {
+      "tepic_oficial": 6.0,
+      "satca": 4.76,
+      "saes": 6.0
+     },
+     "B111": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B112": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B113": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     },
+     "B114": {
+      "tepic_oficial": 4.5,
+      "satca": 3.04,
+      "saes": 4.5
+     },
+     "B115": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B116": {
+      "tepic_oficial": 3.0,
+      "satca": 3.04,
+      "saes": 3.0
+     },
+     "B201": {
+      "tepic_oficial": 7.5,
+      "satca": 4.76,
+      "saes": 7.5
+     },
+     "B202": {
+      "tepic_oficial": 4.5,
+      "satca": 3.17,
+      "saes": 4.5
+     },
+     "B203": {
+      "tepic_oficial": 7.5,
+      "satca": 4.76,
+      "saes": 7.5
+     },
+     "B204": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B205": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B206": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B207": {
+      "tepic_oficial": 9.0,
+      "satca": 6.08,
+      "saes": 9.0
+     },
+     "B208": {
+      "tepic_oficial": 4.5,
+      "satca": 3.04,
+      "saes": 4.5
+     },
+     "B209": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B210": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B211": {
+      "tepic_oficial": 4.5,
+      "satca": 3.04,
+      "saes": 4.5
+     },
+     "B212": {
+      "tepic_oficial": 4.5,
+      "satca": 3.04,
+      "saes": 4.5
+     },
+     "B213": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "B214": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     },
+     "B215": {
+      "tepic_oficial": 4.5,
+      "satca": 3.04,
+      "saes": 4.5
+     },
+     "B216": {
+      "tepic_oficial": 3.0,
+      "satca": 3.04,
+      "saes": 3.0
+     },
+     "B301": {
+      "tepic_oficial": 9.0,
+      "satca": 6.35,
+      "saes": 9.0
+     },
+     "B302": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B303": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B304": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B305": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B306": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B307": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B308": {
+      "tepic_oficial": 3.0,
+      "satca": 3.04,
+      "saes": 3.0
+     },
+     "B309": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B310": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B311": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B312": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B313": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "B314": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B315": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B316": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B317": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B318": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B319": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B320": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B321": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B322": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B323": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B324": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B401": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B402": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B403": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B404": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B405": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B406": {
+      "tepic_oficial": 4.5,
+      "satca": 3.04,
+      "saes": 4.5
+     },
+     "B407": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B408": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B409": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B410": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B411": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     },
+     "B412": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B413": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B414": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B415": {
+      "tepic_oficial": 6.0,
+      "satca": 4.56,
+      "saes": 6.0
+     },
+     "B501": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "B503": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "B504": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "B505": {
+      "tepic_oficial": 7.5,
+      "satca": 7.26,
+      "saes": 7.5
+     },
+     "B502": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "B506": {
+      "tepic_oficial": 7.5,
+      "satca": 7.26,
+      "saes": 7.5
+     },
+     "B507": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     }
+    }
+   },
+   "E/18": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizada/mapa-curricular-ienergia-upiita.pdf",
+    "validacion_ocr": "discrepancia",
+    "materias": {
+     "E101": {
+      "tepic_oficial": 9.0,
+      "satca": 8.3,
+      "saes": 9.0
+     },
+     "E103": {
+      "tepic_oficial": 9.0,
+      "satca": 6.26,
+      "saes": 9.0
+     },
+     "E104": {
+      "tepic_oficial": 4.5,
+      "satca": 6.29,
+      "saes": 4.5
+     },
+     "E105": {
+      "tepic_oficial": 6.0,
+      "satca": 6.26,
+      "saes": 6.0
+     },
+     "E106": {
+      "tepic_oficial": 6.0,
+      "satca": 4.13,
+      "saes": 6.0
+     },
+     "E107": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E201": {
+      "tepic_oficial": 9.0,
+      "satca": 8.35,
+      "saes": 9.0
+     },
+     "E202": {
+      "tepic_oficial": 10.5,
+      "satca": 8.25,
+      "saes": 10.5
+     },
+     "E203": {
+      "tepic_oficial": 9.0,
+      "satca": 8.3,
+      "saes": 9.0
+     },
+     "E204": {
+      "tepic_oficial": 10.5,
+      "satca": 8.35,
+      "saes": 10.5
+     },
+     "E205": {
+      "tepic_oficial": 6.0,
+      "satca": 4.13,
+      "saes": 6.0
+     },
+     "E206": {
+      "tepic_oficial": 6.0,
+      "satca": 5.86,
+      "saes": 6.0
+     },
+     "E301": {
+      "tepic_oficial": 9.0,
+      "satca": 8.35,
+      "saes": 9.0
+     },
+     "E302": {
+      "tepic_oficial": 9.0,
+      "satca": 8.35,
+      "saes": 9.0
+     },
+     "E303": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E304": {
+      "tepic_oficial": 6.0,
+      "satca": 6.26,
+      "saes": 6.0
+     },
+     "E305": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E306": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E307": {
+      "tepic_oficial": 4.5,
+      "satca": 4.18,
+      "saes": 4.5
+     },
+     "E401": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E402": {
+      "tepic_oficial": 6.0,
+      "satca": 6.26,
+      "saes": 6.0
+     },
+     "E403": {
+      "tepic_oficial": 9.0,
+      "satca": 8.35,
+      "saes": 9.0
+     },
+     "E404": {
+      "tepic_oficial": 9.0,
+      "satca": 8.35,
+      "saes": 9.0
+     },
+     "E406": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E407": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E501": {
+      "tepic_oficial": 9.0,
+      "satca": 8.75,
+      "saes": 9.0
+     },
+     "E502": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E503": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E504": {
+      "tepic_oficial": 9.0,
+      "satca": 6.26,
+      "saes": 9.0
+     },
+     "E505": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E506": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E507": {
+      "tepic_oficial": 10.5,
+      "satca": 8.35,
+      "saes": 10.5
+     },
+     "E601": {
+      "tepic_oficial": 9.0,
+      "satca": 8.35,
+      "saes": 9.0
+     },
+     "E602": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E603": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E604": {
+      "tepic_oficial": 6.0,
+      "satca": 5.32,
+      "saes": 6.0
+     },
+     "E605": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E606": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E607": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E701": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E702": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E703": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E705": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E706": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E707": {
+      "tepic_oficial": 6.0,
+      "satca": 4.18,
+      "saes": 6.0
+     },
+     "E802": {
+      "tepic_oficial": 7.5,
+      "satca": 5.91,
+      "saes": 7.5
+     },
+     "E803": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     },
+     "E805": {
+      "tepic_oficial": 7.5,
+      "satca": 10.04,
+      "saes": 7.5
+     },
+     "E807": {
+      "tepic_oficial": 7.5,
+      "satca": 6.26,
+      "saes": 7.5
+     }
+    }
+   },
+   "M/09": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-im-upiita-upiih-upiiz.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "M101": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M102": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M103": {
+      "tepic_oficial": 9.0,
+      "satca": 6.08,
+      "saes": 9.0
+     },
+     "M104": {
+      "tepic_oficial": 9.0,
+      "satca": 6.08,
+      "saes": 9.0
+     },
+     "M105": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M106": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M107": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M108": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M109": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M110": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "M111": {
+      "tepic_oficial": 6.0,
+      "satca": 4.46,
+      "saes": 6.0
+     },
+     "M112": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M113": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M114": {
+      "tepic_oficial": 3.0,
+      "satca": 2.97,
+      "saes": 3.0
+     },
+     "M115": {
+      "tepic_oficial": 3.0,
+      "satca": 2.97,
+      "saes": 3.0
+     },
+     "M116": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M118": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M119": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M121": {
+      "tepic_oficial": 9.0,
+      "satca": 4.35,
+      "saes": 9.0
+     },
+     "M201": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M202": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M203": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M204": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M205": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M206": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M207": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M208": {
+      "tepic_oficial": 3.0,
+      "satca": 2.97,
+      "saes": 3.0
+     },
+     "M209": {
+      "tepic_oficial": 4.5,
+      "satca": 2.97,
+      "saes": 4.5
+     },
+     "M210": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M211": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M212": {
+      "tepic_oficial": 6.0,
+      "satca": 2.9,
+      "saes": 6.0
+     },
+     "M213": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M214": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M215": {
+      "tepic_oficial": 7.5,
+      "satca": 4.56,
+      "saes": 7.5
+     },
+     "M216": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M217": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M218": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M220": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M221": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M222": {
+      "tepic_oficial": 9.0,
+      "satca": 4.56,
+      "saes": 9.0
+     },
+     "M301": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M302": {
+      "tepic_oficial": 4.5,
+      "satca": 2.97,
+      "saes": 4.5
+     },
+     "M303": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M304": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M305": {
+      "tepic_oficial": 4.5,
+      "satca": 4.25,
+      "saes": 4.5
+     },
+     "M306": {
+      "tepic_oficial": 7.5,
+      "satca": 4.35,
+      "saes": 7.5
+     },
+     "M307": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M308": {
+      "tepic_oficial": 3.0,
+      "satca": 2.9,
+      "saes": 3.0
+     },
+     "M309": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M310": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M311": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M312": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M314": {
+      "tepic_oficial": 3.0,
+      "satca": 2.84,
+      "saes": 3.0
+     },
+     "M315": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M316": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M317": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M318": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M319": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M320": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M321": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M322": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M323": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M327": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M328": {
+      "tepic_oficial": 4.5,
+      "satca": 4.35,
+      "saes": 4.5
+     },
+     "M401": {
+      "tepic_oficial": 6.0,
+      "satca": 4.25,
+      "saes": 6.0
+     },
+     "M402": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M403": {
+      "tepic_oficial": 6.0,
+      "satca": 4.25,
+      "saes": 6.0
+     },
+     "M404": {
+      "tepic_oficial": 6.0,
+      "satca": 4.25,
+      "saes": 6.0
+     },
+     "M405": {
+      "tepic_oficial": 4.5,
+      "satca": 2.84,
+      "saes": 4.5
+     },
+     "M406": {
+      "tepic_oficial": 4.5,
+      "satca": 2.9,
+      "saes": 4.5
+     },
+     "M407": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M408": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M409": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M410": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M412": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M413": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M414": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M415": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M416": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M417": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M418": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M419": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M420": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M421": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M422": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M423": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M424": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M425": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M426": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M427": {
+      "tepic_oficial": 6.0,
+      "satca": 4.35,
+      "saes": 6.0
+     },
+     "M501": {
+      "tepic_oficial": 4.5,
+      "satca": 2.84,
+      "saes": 4.5
+     },
+     "M503": {
+      "tepic_oficial": 7.5,
+      "satca": 7.09,
+      "saes": 7.5
+     },
+     "M504": {
+      "tepic_oficial": 7.5,
+      "satca": 7.09,
+      "saes": 7.5
+     }
+    }
+   },
+   "T/09": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-it-upiita.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "T101": {
+      "tepic_oficial": 6.0,
+      "satca": 4.759,
+      "saes": 6.0
+     },
+     "T102": {
+      "tepic_oficial": 9.0,
+      "satca": 6.345,
+      "saes": 9.0
+     },
+     "T103": {
+      "tepic_oficial": 6.0,
+      "satca": 4.759,
+      "saes": 6.0
+     },
+     "T104": {
+      "tepic_oficial": 6.0,
+      "satca": 4.556,
+      "saes": 6.0
+     },
+     "T105": {
+      "tepic_oficial": 6.0,
+      "satca": 4.354,
+      "saes": 6.0
+     },
+     "T106": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T107": {
+      "tepic_oficial": 6.0,
+      "satca": 3.173,
+      "saes": 6.0
+     },
+     "T108": {
+      "tepic_oficial": 9.0,
+      "satca": 4.759,
+      "saes": 9.0
+     },
+     "T109": {
+      "tepic_oficial": 9.0,
+      "satca": 4.759,
+      "saes": 9.0
+     },
+     "T110": {
+      "tepic_oficial": 10.5,
+      "satca": 6.345,
+      "saes": 10.5
+     },
+     "T111": {
+      "tepic_oficial": 6.0,
+      "satca": 3.173,
+      "saes": 6.0
+     },
+     "T113": {
+      "tepic_oficial": 9.0,
+      "satca": 6.345,
+      "saes": 9.0
+     },
+     "T114": {
+      "tepic_oficial": 10.5,
+      "satca": 6.345,
+      "saes": 10.5
+     },
+     "T115": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T116": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T117": {
+      "tepic_oficial": 6.0,
+      "satca": 4.556,
+      "saes": 6.0
+     },
+     "T118": {
+      "tepic_oficial": 3.0,
+      "satca": 3.038,
+      "saes": 3.0
+     },
+     "T119": {
+      "tepic_oficial": 3.0,
+      "satca": 3.038,
+      "saes": 3.0
+     },
+     "T120": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T121": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T201": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T202": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T203": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T204": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T205": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T206": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T207": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T208": {
+      "tepic_oficial": 10.5,
+      "satca": 6.075,
+      "saes": 10.5
+     },
+     "T209": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T210": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T211": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T212": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T213": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T214": {
+      "tepic_oficial": 9.0,
+      "satca": 6.075,
+      "saes": 9.0
+     },
+     "T215": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T216": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T217": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T218": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T219": {
+      "tepic_oficial": 3.0,
+      "satca": 3.038,
+      "saes": 3.0
+     },
+     "T220": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T221": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T222": {
+      "tepic_oficial": 7.5,
+      "satca": 4.759,
+      "saes": 7.5
+     },
+     "T223": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T224": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T225": {
+      "tepic_oficial": 3.0,
+      "satca": 3.038,
+      "saes": 3.0
+     },
+     "T226": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T227": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T228": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T229": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T230": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T231": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T301": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T302": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T303": {
+      "tepic_oficial": 6.0,
+      "satca": 4.556,
+      "saes": 6.0
+     },
+     "T304": {
+      "tepic_oficial": 6.0,
+      "satca": 4.556,
+      "saes": 6.0
+     },
+     "T305": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T306": {
+      "tepic_oficial": 6.0,
+      "satca": 4.556,
+      "saes": 6.0
+     },
+     "T307": {
+      "tepic_oficial": 6.0,
+      "satca": 4.556,
+      "saes": 6.0
+     },
+     "T308": {
+      "tepic_oficial": 4.5,
+      "satca": 3.038,
+      "saes": 4.5
+     },
+     "T310": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T311": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T312": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T313": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T314": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T315": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T316": {
+      "tepic_oficial": 7.5,
+      "satca": 4.556,
+      "saes": 7.5
+     },
+     "T401": {
+      "tepic_oficial": 7.5,
+      "satca": 7.256,
+      "saes": 7.5
+     },
+     "T402": {
+      "tepic_oficial": 7.5,
+      "satca": 7.256,
+      "saes": 7.5
+     },
+     "T403": {
+      "tepic_oficial": 6.0,
+      "satca": 4.354,
+      "saes": 6.0
+     },
+     "T404": {
+      "tepic_oficial": 6.0,
+      "satca": 4.354,
+      "saes": 6.0
+     },
+     "T405": {
+      "tepic_oficial": 7.5,
+      "satca": 5.805,
+      "saes": 7.5
+     },
+     "T407": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     },
+     "T408": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     },
+     "T409": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     },
+     "T410": {
+      "tepic_oficial": 5.0,
+      "satca": 5.0,
+      "saes": 5.0
+     }
+    }
+   }
+  },
+  "escom": {
+   "A/20": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-lcd-escom-upiig-upiit-upiic.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "A101": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A102": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A103": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A105": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A201": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A202": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A203": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A205": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A301": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A302": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A303": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A304": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A305": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A306": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A401": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A402": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A403": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A404": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A405": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A406": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A501": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A502": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A503": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A504": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A505": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A506": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A601": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A602": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A603": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A604": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A620": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A621": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A622": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A623": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A624": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A625": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A626": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A627": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A628": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A629": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A630": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A631": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A632": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A701": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A703": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "A704": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A720": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A721": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A722": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A723": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A724": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A725": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A726": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A727": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A728": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A729": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A730": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A731": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A732": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A801": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A802": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "A803": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "A804": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     }
+    }
+   },
+   "B/20": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/iia-escom-upiic-upiit.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "B101": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B103": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B104": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B105": {
+      "tepic_oficial": 10.5,
+      "satca": null,
+      "saes": 10.5
+     },
+     "B106": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B201": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B202": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B203": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B204": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B205": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B206": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B301": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B302": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B303": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B304": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B305": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B306": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B401": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B402": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B403": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B404": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B405": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B406": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B501": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B502": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B503": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B504": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B505": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B506": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B601": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B603": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B604": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B640": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B641": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B642": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B643": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B644": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B645": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B646": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B647": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B648": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B649": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B650": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B651": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B652": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B653": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B701": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "B702": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B703": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B740": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B741": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B742": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B743": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B744": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B745": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B746": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B747": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B748": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B749": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B750": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B751": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B752": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B753": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B801": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "B802": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B803": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B804": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     }
+    }
+   }
+  },
+  "upibi": {
+   "A/06": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-iam-upibi-upiiz.pdf",
+    "validacion_ocr": "discrepancia",
+    "materias": {
+     "A101": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A102": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "A103": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A105": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A106": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A107": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A108": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A209": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A210": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A211": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A212": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A213": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A214": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A215": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A216": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A217": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A318": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A319": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A320": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A321": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A322": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A323": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A324": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A325": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A326": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "A327": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A328": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A429": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A430": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A431": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A432": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A433": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A435": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A536": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A537": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A538": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A540": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A541": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A542": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A545": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A650": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A651": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "A652": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A653": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A654": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A756": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "A757": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "A758": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "A759": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "A863": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     }
+    }
+   },
+   "B/06": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizada/mapa-curricular-ibiotecnologica-upibi-upiip-upiit--283-29--281-29--281-29.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "B101": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B102": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B103": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B105": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B106": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B107": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B108": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B109": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B110": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B211": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B212": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B213": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B215": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B216": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B217": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B318": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B319": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B320": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B321": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B322": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B323": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B326": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B327": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B428": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B429": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B430": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B431": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B434": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B535": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B538": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B540": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B541": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B643": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B644": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B645": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B646": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B647": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B648": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B649": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B650": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B651": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B652": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B753": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B754": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B755": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B756": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B757": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B859": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B860": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     },
+     "B861": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     }
+    }
+   },
+   "B/24": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizada/mapa-curricular-ibiotecnologica-upibi-upiip-upiit--283-29--281-29--281-29.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "B101": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B102": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B103": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B104": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B105": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     },
+     "B106": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B107": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B108": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B109": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B110": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B204": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     },
+     "B205": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B206": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B207": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B208": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B209": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B201": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B202": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B203": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B301": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B302": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B303": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B304": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B305": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B306": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B307": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B308": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B401": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B402": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B403": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B404": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "B405": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B406": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B407": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B408": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B409": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B501": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B502": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B503": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B504": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B505": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "B506": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "B507": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B508": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B601": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B602": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B603": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B604": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B606": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B607": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B612": {
+      "tepic_oficial": 18.0,
+      "satca": null,
+      "saes": 18.0
+     },
+     "B701": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B702": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B703": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B704": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B705": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "B706": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 1.5
+     },
+     "B801": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "B802": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     }
+    }
+   },
+   "F/06": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-if-upibi-upiig.pdf",
+    "validacion_ocr": "discrepancia",
+    "materias": {
+     "F101": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F102": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F103": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F104": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F105": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F107": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F108": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "F209": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F210": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F211": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F212": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F213": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "F214": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F215": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F316": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F317": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F319": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F320": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F321": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "F322": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F323": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F324": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F325": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F426": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F427": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F428": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F429": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F430": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F431": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F432": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F433": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F434": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F435": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F437": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     },
+     "F538": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F539": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F540": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F541": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "F542": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F544": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F546": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F648": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F649": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F650": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F652": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F653": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F654": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "F756": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F757": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F758": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "F759": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F860": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "F861": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F862": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "F863": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     }
+    }
+   },
+   "L/06": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizada/mapa-curricular-ialimentos-upibi-upiiz-upiiap.pdf",
+    "validacion_ocr": "ok",
+    "materias": {
+     "L101": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L102": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L103": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L105": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "L106": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L107": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L108": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L209": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L210": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L211": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L212": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L213": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L214": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L215": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L317": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L318": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L319": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L320": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L321": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "L322": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L323": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L325": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L426": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "L427": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L428": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L429": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L430": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L431": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "L433": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L434": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L435": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L436": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L437": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L539": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "L540": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "L541": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "L542": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L543": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "L544": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L545": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L546": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L547": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L548": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L549": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L550": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L551": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L652": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L653": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L654": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L655": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L656": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L657": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L759": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "L760": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L761": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "L762": {
+      "tepic_oficial": 1.5,
+      "satca": null,
+      "saes": 1.5
+     },
+     "L763": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "L764": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "L765": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     }
+    }
+   },
+   "M/06": {
+    "fuente": "https://www.ipn.mx/assets/files/ofertaEducativa/mapa-curricular/superior/escolarizado/mapa-curricular-ibm-upibi.pdf",
+    "validacion_ocr": "discrepancia",
+    "materias": {
+     "M101": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M102": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M103": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M105": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M106": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M107": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M108": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M209": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M210": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M211": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M212": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M213": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M214": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M215": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M316": {
+      "tepic_oficial": 12.0,
+      "satca": null,
+      "saes": 12.0
+     },
+     "M317": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M318": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M319": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M320": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M321": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M322": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M323": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M324": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M325": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M426": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M427": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M428": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M429": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M430": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     },
+     "M431": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M432": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M434": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M536": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M537": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M538": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M539": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M541": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M542": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M544": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M646": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M647": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M648": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M650": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M651": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M652": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 4.5
+     },
+     "M654": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M656": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M657": {
+      "tepic_oficial": 7.5,
+      "satca": null,
+      "saes": 7.5
+     },
+     "M759": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M760": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M761": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M762": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M763": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M764": {
+      "tepic_oficial": 4.5,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M766": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M767": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M768": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M769": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M770": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M871": {
+      "tepic_oficial": 9.0,
+      "satca": null,
+      "saes": 9.0
+     },
+     "M872": {
+      "tepic_oficial": 6.0,
+      "satca": null,
+      "saes": 6.0
+     },
+     "M873": {
+      "tepic_oficial": 3.0,
+      "satca": null,
+      "saes": 3.0
+     }
+    }
+   }
+  }
+ }
+}

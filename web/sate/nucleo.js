@@ -23,6 +23,23 @@ const hm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2
 const toMin=t=>{const[h,m]=t.split(':').map(Number);return h*60+m};
 const pretty=t=>{const l=String(t).toLowerCase().replace(/\b(i{1,3}|iv|vi{0,3}|ix|x)\b/g,m=>m.toUpperCase());return l.charAt(0).toUpperCase()+l.slice(1)};
 const fmtCr=n=>Number.isInteger(+n)?String(+n):(+n).toFixed(2).replace(/0$/,'');
+function textoCreditos(k,valor,detalle=false){
+  const d=cur()[k]?.[4]||{}, cr=(d.cr_calculado?'≈ ':'')+fmtCr(valor??d.cr??cur()[k]?.[1]??0);
+  return detalle&&d.satca!=null?SATE.texto('sate.creditos.detalle',{cr,satca:fmtCr(d.satca)}):cr+' '+SATE.texto('sate.creditos.rotulo');
+}
+function ayudaCreditos(k){
+  return `<span data-ayuda-creditos="${cur()[k]?.[4]?.cr_calculado?'calculado':'escala'}"></span>`;
+}
+function montarAyudasCreditos(){
+  document.querySelectorAll('[data-ayuda-creditos]').forEach(n=>{
+    if(n.dataset.montada)return;
+    n.dataset.montada='1';
+    n.appendChild(SateUI.ayuda('sate.creditos.contexto',{
+      escala:SATE.texto('sate.creditos.escala')+(n.dataset.ayudaCreditos==='calculado'?'. '+SATE.texto('sate.creditos.calculado'):''),
+      explicacion:SATE.texto('sate.creditos.ayuda')
+    }));
+  });
+}
 /*__CUENTA_JS__*/
 // modo demostración: perfil ficticio solo en esta pestaña; no toca los datos reales ni la cuenta (enlace «…#demo»)
 if(location.hash==='#demo'){try{sessionStorage.setItem('ipnt.demo',UNIDAD)}catch(e){}history.replaceState(null,'',location.pathname+location.search)}
@@ -356,7 +373,7 @@ function pattern(c){
    TRAYECTORIA
    ========================================================= */
 const MAP=()=>DATA.mapas[S.car];
-const cur=()=>MAP().cur;                       // clave -> [nombre, créditos, nivel, tipo]
+const cur=()=>MAP().cur;                       // clave -> [nombre, créditos TEPIC, nivel, tipo, {cr, satca?, cr_calculado?}]
 function prereqs(){                             // clave -> [claves requisito directas]: tutorías + flechas de la trayectoria
   if(MAP().req) return MAP().req;
   const L=MAP().layout, out={};
@@ -545,14 +562,14 @@ function avisoOptativa(k,otras){
     `El plan solo deja ${t.libre===1?'un espacio libre':t.libre+' espacios libres'} de optativa de nivel ${v}: con ${pretty(cur()[k][0])} ya elegiste más de las que cubren ese nivel; las demás no cubren espacio.`);
 }
 function boxHtml(...args){
-  return SateUI.cajaMateria({cur,statusOf,planAsignado,isElec,MARK,S,fmtCr,porNiveles,esc,SATE,PLAN_DOS_PERIODOS,planEtiqueta},...args);
+  return SateUI.cajaMateria({cur,statusOf,planAsignado,isElec,MARK,S,fmtCr,textoCreditos,porNiveles,esc,SATE,PLAN_DOS_PERIODOS,planEtiqueta},...args);
 }
 
 function inspParts(k){
   const c=cur(), [n,cr,niv]=c[k], pre=(prereqs()[k]||[]).filter(x=>c[x]), post=(dependents()[k]||[]).filter(x=>c[x]);
   const all=ancestors([k]), sem=semOf()[k], off=offeredClaves().has(k);
   const nm=x=>esc(pretty(c[x][0]));
-  const meta=`${fmtCr(cr)} créditos · nivel ${niv}${sem&&!porNiveles()?' · semestre propuesto '+sem:''}`;
+  const meta=`${esc(textoCreditos(k,cr,true))} ${ayudaCreditos(k)} · nivel ${niv}${sem&&!porNiveles()?' · semestre propuesto '+sem:''}`;
   const l1=`<b>${esc(n)}</b> <span class="mono">${k}</span><span class="insp-meta">${meta}</span>`;
   // con datos del SAES: su estado y qué le falta (en lugar de marcarlo en el mapa)
   let st='';
@@ -597,6 +614,7 @@ function renderInsp(){
   if(el.hidden){el.innerHTML='';return}
   const {l1,l2}=inspParts(k), w=planAsignado(k)===S.planPaso, ob=tr().oblig.includes(k), done=statusOf(k)==='done';
   el.innerHTML=`<div class="insp-t">${l1}</div><div class="insp-b">${l2}</div>`+(S.mapFocus?`<div class="insp-act">${PLAN_DOS_PERIODOS?planAcciones(k):ob||done||isElec(k)?'':`<button class="btn primary" type="button" data-fwant="${k}">${w?'Quitar de mi plan':'Quiero cursarla'}</button>`}<button class="btn" type="button" data-fclose="1">Cerrar</button></div>`:'');
+  montarAyudasCreditos();
 }
 function leyendaMapa(completa=false){
   const tx=k=>esc(SATE.texto('sate.planeacion.'+k));
@@ -608,7 +626,7 @@ function leyendaMapa(completa=false){
     `<span><i class="l-req"></i>${tx('estado_requisito')}</span><span><i class="l-slot"></i>${tx('estado_libre')}</span><span><i class="l-late"></i>${tx('estado_desfase')}</span>`;
 }
 function renderLegend(){$('#legend').innerHTML=leyendaMapa()}
-function renderSide(){return conSim(usaSim('sugg'),()=>conPlan(renderSide0))}
+function renderSide(){const r=conSim(usaSim('sugg'),()=>conPlan(renderSide0));montarAyudasCreditos();return r}
 const AREA_COLORES=['#8a98c7','#a76987','#577d63','#4d6f8d','#c9a36a','#721e45'];
 function requisitosElegidos(want){
   const c=cur(), done=new Set(tr().done), pedidos=new Map(), acreditados=new Set(), materias=new Set();
@@ -671,7 +689,7 @@ function renderSide0(){
     return `<span class="plan-${paso+1} sate-texto-largo">${esc(elegidas.length?tx(carga?'bandeja':'bandeja_sin_tope',v):tx('bandeja_vacia',v))}</span>`+
       (paso===PLAN_PASO?`<span class="sate-texto-corto">${esc(elegidas.length?tx(carga?'bandeja_corta':'bandeja_corta_sin_tope',v):tx('bandeja_corta_vacia'))}</span>`:'');
   },paso)).join('');
-  $('#plan-carga').textContent=ci?tx('carga',{creditos:fmtCr(ci.total),tope:fmtCr(ci.tope),retenidos:fmtCr(ci.ret)}):tx('sin_carga',{creditos:fmtCr(credWant)});
+  $('#plan-carga').innerHTML=ayudaCreditos()+esc(ci?tx('carga',{creditos:fmtCr(ci.total),tope:fmtCr(ci.tope),retenidos:fmtCr(ci.ret)}):tx('sin_carga',{creditos:fmtCr(credWant)}));
   $('#chosen-help').textContent=want.length?tx('cuenta',{n:want.length,creditos:fmtCr(credWant)}):tx('vacio');
   $('#chosen').innerHTML=planPasos().map(paso=>conPlan(()=>{
     const t=tr(), elegidas=t.want.filter(k=>c[k]), cr=elegidas.reduce((s,k)=>s+c[k][1],0);
@@ -685,7 +703,7 @@ function renderSide0(){
   $('#h-sugg').innerHTML=esc(tx('sugeridas',{periodo:planEtiqueta(PLAN_PASO)}))+' '+simTag('sugg');
   const propuestas=suggestions();
   const yaElegidas=new Set(tr().want);   // las sugeridas que ya están en el plan del periodo activo llevan ✓
-  $('#sugg').innerHTML=propuestas.list.map(k=>`<label${yaElegidas.has(k)?' class="ya"':''}><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}${yaElegidas.has(k)?' <span class="ya-marca" aria-label="ya elegida">✓</span>':''}</span><span class="cr">${fmtCr(c[k][1])}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
+  $('#sugg').innerHTML=propuestas.list.map(k=>`<label${yaElegidas.has(k)?' class="ya"':''}><span class="grp">${k}</span><span>${esc(pretty(c[k][0]))}${yaElegidas.has(k)?' <span class="ya-marca" aria-label="ya elegida">✓</span>':''}</span><span class="cr">${esc(textoCreditos(k,c[k][1]))} ${ayudaCreditos(k)}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
   document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
   if(isPersonal()){
     const situacion=situacionDatos();
@@ -716,7 +734,7 @@ function renderLineas(){
     const byNiv={};g.forEach(x=>(byNiv[x.niv]=byNiv[x.niv]||[]).push(x));
     const rows=Object.keys(byNiv).sort((a,b)=>a-b).map(n=>`<div class="ol-row"><span class="ol-niv">Nivel ${n}</span><div class="ol-boxes">${byNiv[n].map(x=>{
       const k=x.keys.find(k=>off.has(k))||x.keys[0];
-      return `<button class="obox${x.want?' want':''}${x.done?' done':''}${x.off?'':' offno'}" data-obox="${k}" aria-pressed="${x.want}" title="${esc(x.n)} · ${fmtCr(x.cr)} créditos${x.off?'':' · sin grupos este periodo'}">${esc(x.n.replace(/\s*\(([^()]*)\)$/,(m,g)=>norm(g)===norm(l.linea)?'':m).toLowerCase())}</button>`}).join('')}</div></div>`).join('');
+      return `<button class="obox${x.want?' want':''}${x.done?' done':''}${x.off?'':' offno'}" data-obox="${k}" aria-pressed="${x.want}" title="${esc(x.n)} · ${esc(textoCreditos(k,x.cr,true))}${x.off?'':' · sin grupos este periodo'}">${esc(x.n.replace(/\s*\(([^()]*)\)$/,(m,g)=>norm(g)===norm(l.linea)?'':m).toLowerCase())}</button>`}).join('')}</div></div>`).join('');
     return `<article class="ol-card" style="--area:${color}">
       <header><span class="ol-area">${esc(l.area)}</span><h4>${esc(l.linea!==l.area?l.linea:l.area)}</h4>
         <span class="ol-stat">${nOff} de ${g.length} con grupos${nWant?` · <b>${nWant} elegida${nWant>1?'s':''}</b>`:''}${best>0&&score[i]===best?' · <span class="tag good">línea con mayor avance</span>':''}</span></header>
@@ -949,7 +967,7 @@ function renderTray(){
   if(SATE.actual?.pestana==='trayectoria'){renderStats();return}
   if(SATE.modulos.mapa){renderMap();conSim(usaSim('mapa'),()=>conPlan(renderList))}renderSide();
 }
-function renderHor(){if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv()}
+function renderHor(){if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv();montarAyudasCreditos()}
 /* Equivalencias con otras carreras de la misma unidad (tabla «Equivalencia de Materias» del SAES): solo consulta.
    Cada unidad decide cómo aplicarlas; no cambian el avance, la seriación ni el generador de horarios. */
 function renderEquiv(){

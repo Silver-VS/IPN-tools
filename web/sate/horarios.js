@@ -91,7 +91,7 @@ function suggest(q){
   const cs=classes().filter(c=>c[0]===S.car), out=[], seen=new Set();
   const hit=s=>norm(s).includes(q);
   const push=(t,v,label,right)=>{const k=t+v;if(seen.has(k)||S.chips.some(x=>x.t===t&&x.v===v))return;seen.add(k);out.push({t,v,label,right})};
-  cs.forEach(c=>{if(hit(name(c))||hit(c[8]))push('m',c[4],name(c),`${c[8]} · ${fmtCr(c[7])} cr`)});
+  cs.forEach(c=>{if(hit(name(c))||hit(c[8]))push('m',c[4],name(c),`${c[8]} · ${esc(textoCreditos(c[8],c[7]))}`)});
   cs.forEach(c=>c[5].forEach(i=>{if(hit(DATA.prof[i]))push('p',i,DATA.prof[i],'')}));
   cs.forEach(c=>{if(hit(c[3]))push('g',c[3],c[3],TURNOS[c[1]]||'')});
   const rank=x=>(norm(x.label).startsWith(q)?0:1);
@@ -154,7 +154,7 @@ function optRow(c,sel,inGroup){
   let tags='';
   if(!on&&clash.length) tags+=`<span class="tag bad">${esc(txH('choca',{nombre:clash.map(s=>s.own?s.n:s[3]+' '+name(s).toLowerCase()).join(', ')}))}</span>`;
   if(!on&&same) tags+=`<span class="tag soft">${esc(txH('reemplaza',{grupo:same[3]}))}</span>`;
-  const who=inGroup?`<b>${esc(name(c))}</b> <small>${c[8]} · ${fmtCr(c[7])} cr</small><br>${esc(profs(c))}`:esc(profs(c));
+  const who=inGroup?`<b>${esc(name(c))}</b> <small>${c[8]} · ${esc(textoCreditos(c[8],c[7]))}</small><br>${esc(profs(c))}`:esc(profs(c));
   if(isExcl(c)) tags+=`<span class="tag soft">${esc(txH('profesor_excluido'))}</span>`;
   return `<div class="opt${mk.s==='no'||isExcl(c)?' no':''}" data-k="${k}"><span class="grp">${inGroup?'':c[3]}</span><span class="who">${who}</span>
     <div class="right"><button class="add" data-toggle="${k}" aria-pressed="${on}">${esc(txH(on?'quitar_opcion':'agregar'))}</button>
@@ -532,7 +532,7 @@ function renderGen(){
   $('#genres').innerHTML=dmsg+omsg+oexMsg+
     (none.length?`<small class="warn">${esc(txH('sin_grupos',{nombre:none.map(k=>cur()[k]?.[0]||k).join(', ')}))}</small>`:'')+
     g.top.map((r,i)=>{const cr=r.cs.reduce((s,c)=>s+c[7],0);
-      return `<div class="gen"><div><b>${esc(txH('opcion',{n:i+1}))}</b> · ${esc(txH('cantidad_materias',{n:r.cs.length}))} · ${fmtCr(cr)} cr · ${esc(txH('cantidad_dias',{n:r.days.length}))}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?' · '+esc(txH('jornada_comida',{n:(r.q.span/60).toFixed(1).replace('.0','')})):''}${r.miss.length?` · <span class="warn">${esc(txH('sin_materias',{n:r.miss.length,nombre:r.miss.map(k=>pretty(cur()[k]?.[0]||k)).join(', ')}))}</span>`:''}<div class="ls">${r.cs.map(c=>`<span class="grp">${c[3]}</span> ${esc(pretty(name(c)))}`).join(' · ')}</div></div>
+      return `<div class="gen"><div><b>${esc(txH('opcion',{n:i+1}))}</b> · ${esc(txH('cantidad_materias',{n:r.cs.length}))} · ${fmtCr(cr)} créditos · ${esc(txH('cantidad_dias',{n:r.days.length}))}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?' · '+esc(txH('jornada_comida',{n:(r.q.span/60).toFixed(1).replace('.0','')})):''}${r.miss.length?` · <span class="warn">${esc(txH('sin_materias',{n:r.miss.length,nombre:r.miss.map(k=>pretty(cur()[k]?.[0]||k)).join(', ')}))}</span>`:''}<div class="ls">${r.cs.map(c=>`<span class="grp">${c[3]}</span> ${esc(pretty(name(c)))}`).join(' · ')}</div></div>
         <div class="acts"><button class="btn" data-useg="${i}" data-to="${ws().plan}">${esc(txH('usar',{version:ws().plan}))}</button><button class="btn" data-useg="${i}" data-to="+">${esc(txH('usar_nuevo'))}</button><button class="btn" data-peekg="${i}">${esc(txH('ver'))}</button></div></div>`}).join('')+
     (g.trunc?`<small>${esc(txH(g.bank?'busqueda_prioridad':'busqueda_limitada'))}</small>`:'');
 }
@@ -554,7 +554,7 @@ function renderOffer(){
       const fl=cur()[c[8]]&&statusOf(c[8]).includes('fail');
       const etiqueta=st==='late'?(fl?(['agotada','dictamen'].includes(reglaDesfase()?.por[c[8]])?'desfasada_dictamen':'desfasada_recursar'):'desfasada'):st==='fail'?'recursar':st==='now'?'semestre':st==='curso'?'curso':st==='done'?'acreditada':(isPersonal()&&cur()[c[8]]&&available(c[8]))?'disponible':'';
       const badge=etiqueta?`<span class="tag ${['late','fail'].includes(st)?'bad':st==='now'||etiqueta==='disponible'?'good':'soft'}">${esc(txH(etiqueta))}</span> `:'';
-      return `<article class="subj"><header><h3>${badge}${esc(name(c))}</h3><span class="meta">${c[8]} · ${fmtCr(c[7])} cr · ${esc(txH('nivel',{n:c[2]}))}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="${esc(txH('linea'))}">${esc(l)}</span>`).join('')}</span>`:''}</header>${(()=>{
+      return `<article class="subj"><header><h3>${badge}${esc(name(c))}</h3><span class="meta">${c[8]} · ${esc(textoCreditos(c[8],c[7],true))} ${ayudaCreditos(c[8])} · ${esc(txH('nivel',{n:c[2]}))}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="${esc(txH('linea'))}">${esc(l)}</span>`).join('')}</span>`:''}</header>${(()=>{
         // con una opción marcada «Sí», la materia se colapsa a esa(s) opción(es) (y la que esté en el horario)
         const mk=ws().marks, keep=cs.filter(x=>mk[keyOf(x)]?.s==='si'||plan().sel.includes(keyOf(x)));
         const col=keep.length&&keep.some(x=>mk[keyOf(x)]?.s==='si')&&keep.length<cs.length, open=S.expand.has(c[4]);
@@ -565,10 +565,11 @@ function renderOffer(){
     const g=new Map();list.forEach(c=>{(g.get(c[3])||g.set(c[3],[]).get(c[3])).push(c)});
     const gp=cs=>Math.min(...cs.map(c=>prio(c[8])));
     const items=[...g.entries()].sort((a,b)=>gp(a[1])-gp(b[1])||a[0].localeCompare(b[0],'es',{numeric:true}));
-    html=items.map(([grp,cs])=>`<article class="subj"><header><h3 class="grp">${grp}</h3><span class="meta">${fmtCr(cs.reduce((s,c)=>s+c[7],0))} cr <button class="link" data-group="${grp}">${esc(txH('agregar_grupo'))}</button></span></header>${cs.map(c=>optRow(c,sel,true)).join('')}</article>`).join('');
+    html=items.map(([grp,cs])=>`<article class="subj"><header><h3 class="grp">${grp}</h3><span class="meta">${fmtCr(cs.reduce((s,c)=>s+c[7],0))} créditos ${ayudaCreditos()} <button class="link" data-group="${grp}">${esc(txH('agregar_grupo'))}</button></span></header>${cs.map(c=>optRow(c,sel,true)).join('')}</article>`).join('');
     $('#offer-count').textContent=txH('cuenta_grupos',{n:g.size,materias:list.length});
   }
   $('#offer').innerHTML=html||`<p class="empty">${esc(txH('oferta_sin_resultados'))}</p>`;
+  montarAyudasCreditos();
 }
 /* horario inscrito (leído del SAES con el Lector): se carga en la versión seleccionada para exportarlo o compararlo */
 function loadInscrito(){
@@ -590,7 +591,7 @@ function renderPlans(){
   $('#b-saeshor').hidden=!(isPersonal()&&ALUMNO.horario_inscrito?.length);
   const ids=planIds();
   $('#plans').innerHTML=`<span class="lbl" style="margin-right:4px">${esc(txH('version'))}</span>`+ids.map(p=>{const pl=ws().plans[p];const cr=pl.sel.map(byKey).filter(Boolean).reduce((s,c)=>s+c[7],0);
-    return `<span class="plan-tab"><button class="chip" data-plan="${p}" aria-pressed="${ws().plan===p}">${esc(txH('horario',{version:p}))}<small>${pl.sel.length?fmtCr(cr)+' cr':esc(txH('vacio'))}</small></button>${ids.length>1&&ws().plan===p?`<button class="x" data-delplan="${p}" aria-label="${esc(txH('eliminar_horario',{version:p}))}" title="${esc(txH('eliminar_horario',{version:p}))}">×</button>`:''}</span>`}).join('')+
+    return `<span class="plan-tab"><button class="chip" data-plan="${p}" aria-pressed="${ws().plan===p}">${esc(txH('horario',{version:p}))}<small>${pl.sel.length?fmtCr(cr)+' créditos':esc(txH('vacio'))}</small></button>${ids.length>1&&ws().plan===p?`<button class="x" data-delplan="${p}" aria-label="${esc(txH('eliminar_horario',{version:p}))}" title="${esc(txH('eliminar_horario',{version:p}))}">×</button>`:''}</span>`}).join('')+
     `<button class="chip plan-new" data-newplan="1" title="${esc(txH('nuevo_ayuda'))}">${esc(txH('nuevo'))}</button><button class="link" data-dup style="margin-left:8px">${esc(txH('duplicar',{version:ws().plan}))}</button>`;
 }
 function renderCal(){
@@ -612,7 +613,7 @@ function renderCal(){
   const both=[...sel,...own];let clashes=0;
   for(let i=0;i<both.length;i++)for(let j=i+1;j<both.length;j++)if(overlaps(both[i],both[j]))clashes++;
   const noSched=sel.filter(c=>!c[6].length).length;
-  $('#stats').innerHTML=sel.length||own.length?`<span><b>${fmtCr(cr)}</b> ${esc(txH('creditos_horario'))}</span><span>${txH('materias_horario',{n:sel.length})}</span><span><b>${(mins/60).toFixed(1)}</b> ${esc(txH('horas_semana'))}</span>`+
+  $('#stats').innerHTML=sel.length||own.length?`<span><b>${fmtCr(cr)}</b> ${esc(txH('creditos_horario'))} ${ayudaCreditos()}</span><span>${txH('materias_horario',{n:sel.length})}</span><span><b>${(mins/60).toFixed(1)}</b> ${esc(txH('horas_semana'))}</span>`+
     (clashes?`<span class="bad">${esc(txH('traslapes',{n:clashes}))}</span>`:`<span>${esc(txH('sin_traslapes'))}</span>`)+(noSched?`<span>${esc(txH('sin_horario',{n:noSched}))}</span>`:'')+
     (()=>{const have=new Set(sel.map(c=>c[8])),miss=tr().oblig.filter(k=>!have.has(k));return miss.length?`<span class="bad">${esc(txH('falta_obligatoria',{nombre:miss.map(k=>pretty(cur()[k][0])).join(', ')}))}</span>`:''})():
     `<span>${esc(txH('horario_inicio'))} ${esc(txH(tactil()?'previa_tactil':'previa_cursor'))}</span>`;
@@ -631,8 +632,9 @@ function renderCal(){
     if(ci.ret)$('#load .load-note').appendChild(SateUI.ayuda('sate.horarios.carga_ayuda',{ret:fmtCr(ci.ret),nuevos:fmtCr(ci.nuevos),libre:fmtCr(ci.libre),tope:fmtCr(ci.tope)}));
   }else $('#load').innerHTML='';
   $('#sel').hidden=!both.length;
-  $('#sel').innerHTML=sel.map(c=>`<div><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${c[3]}</span><span>${esc(pretty(name(c)))}<br><small>${esc(profs(c))}</small></span><span class="cr">${fmtCr(c[7])} cr</span><button class="x" data-toggle="${keyOf(c)}" aria-label="${esc(txH('quitar',{nombre:name(c)}))}">×</button></div>`).join('')+
+  $('#sel').innerHTML=sel.map(c=>`<div><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${c[3]}</span><span>${esc(pretty(name(c)))}<br><small>${esc(profs(c))}</small></span><span class="cr">${esc(textoCreditos(c[8],c[7]))} ${ayudaCreditos(c[8])}</span><button class="x" data-toggle="${keyOf(c)}" aria-label="${esc(txH('quitar',{nombre:name(c)}))}">×</button></div>`).join('')+
     own.map(o=>{const r=plan().own[o.i];return `<div><span class="sw own"></span><span class="grp">${esc(txH('extra'))}</span><span>${esc(o.n)}<br><small>${r.d.map(d=>DAYS[d]).join(' ')} ${hm(r.a)}–${hm(r.b)}</small></span><span></span><button class="x" data-unown="${o.i}" aria-label="${esc(txH('quitar',{nombre:o.n}))}">×</button></div>`}).join('');
+  montarAyudasCreditos();
 }
 function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="button" class="chip" data-oday="${i}" aria-pressed="${S.ownDays.includes(i)}">${d}</button>`).join('')}
 

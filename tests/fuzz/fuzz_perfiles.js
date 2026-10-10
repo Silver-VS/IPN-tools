@@ -23,6 +23,14 @@
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
   const carreras = Object.keys(DATA.mapas || {});
+  for(const car of carreras){
+    const c=DATA.mapas[car].cur;
+    for(const [k,v] of Object.entries(c)){
+      const d=v[4];
+      if(d&&(d.cr!==v[1]||d.cr_calculado&&(!Number.isFinite(d.satca)||!(d.cr>0))))
+        out.fallas.push({regla:'créditos en escala TEPIC y SATCA conservado',car,k,datos:d});
+    }
+  }
   const cal = () => pick([10, 10, 9, 9, 9, 8, 8, 8, 7, 7, 6]);
   const ESCENARIOS = ['regular', 'huecos', 'cambio_carrera', 'electivas_revalidadas', 'muchas_reprobadas', 'recursamiento',
     'historia_larga', 'datos_sucios', 'primer_ingreso', 'egresado', 'mezcla'];

@@ -24,6 +24,20 @@ if UNIDAD != "upiita":
     SRC, CUR, OUT = UNI_DIR / "horarios_saes.json", UNI_DIR / "mapa_curricular_saes.json", ROOT / "web" / f"horarios-{UNIDAD}.html"
 PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la oferta)
 OPTA = json.loads((UNI_DIR / "optativas.json").read_text(encoding="utf-8")) if (UNI_DIR / "optativas.json").exists() else {}
+CREDITOS_OFICIALES = json.loads((ROOT / "data/creditos_oficiales.json").read_text(encoding="utf-8"))["unidades"].get(UNIDAD, {})
+
+
+def creditos_materia(c, p, clave, cred, ht, hp):
+    """Conserva SAES salvo las filas con horas semestrales, que requieren una escala común."""
+    dato = {"cr": float(cred)}
+    oficial = CREDITOS_OFICIALES.get(f"{c}/{p}", {}).get("materias", {}).get(clave.upper(), {})
+    if oficial.get("satca") is not None:
+        dato["satca"] = oficial["satca"]
+    # Horas altas también aparecen en TEPIC y en actividades sin créditos: no son evidencia de SATCA.
+    if (float(ht) > 10 or float(hp) > 10) and float(cred) > 0 and abs(float(cred) - (2 * float(ht) + float(hp))) > .001:
+        dato.update(cr=(2 * float(ht) + float(hp)) / 18,
+                    satca=float(cred), cr_calculado=True)
+    return dato
 
 
 def carrera_plan(c, p):
@@ -75,10 +89,11 @@ def load_curriculum():
     m = json.loads(CUR.read_text(encoding="utf-8")) if CUR.exists() else {"rows": []}   # opcional fuera de la UPIITA
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
+        cr = creditos_materia(c, p, clave, cred, _ht, _hp)["cr"]
         c = carrera_plan(c, p)
         if p == "98" or (PLANES.get(c) and p != PLANES[c]):
             continue
-        cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), float(cred), tipo_letra(tipo)))
+        cur.setdefault((c, norm(nom)), []).append((int(niv), clave.upper(), cr, tipo_letra(tipo)))
     return cur
 
 
@@ -671,14 +686,20 @@ def load_maps(offer, upiita=True, extra=None):
         plan.setdefault(c, pl)
     if upiita:
         plan.update({"B": "09", "M": "09", "T": "09", "E": "18", "S": "08"})
+    for c, planes in UCONF.get("planes", {}).items():
+        for p in planes:
+            plan[carrera_plan(c, p)] = p
     cur = {}
     for c, p, niv, clave, nom, tipo, cred, _ht, _hp in m["rows"]:
+        dato = creditos_materia(c, p, clave, cred, _ht, _hp)
         c = carrera_plan(c, p)
         if plan.get(c) == p:
-            cur.setdefault(c, {})[clave.upper()] = [nom, float(cred), int(niv), tipo_letra(tipo)]
+            cur.setdefault(c, {})[clave.upper()] = [nom, dato["cr"], int(niv), tipo_letra(tipo), dato]
+            if dato.get("cr_calculado"):
+                print(f"créditos {UNIDAD} {c}/{p} {clave}: SAES/SATCA={cred}; T={_ht}, P={_hp} h/semestre; TEPIC={dato['cr']:.8f} (18 semanas)")
     for c, extra_c in (extra or {}).items():
         for k, v in extra_c.items():
-            cur.setdefault(c, {}).setdefault(k, v)
+            cur.setdefault(c, {}).setdefault(k, [*v, {"cr": v[1]}])
     esp = json.loads((ROOT / "data" / "especialidades.json").read_text(encoding="utf-8"))
     seri = json.loads((ROOT / "data" / "seriacion.json").read_text(encoding="utf-8"))["requisitos"]
     maps = {}

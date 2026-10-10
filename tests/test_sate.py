@@ -15,6 +15,17 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_creditos_por_escala(self):
+        from build_sate import creditos_materia
+        self.assertEqual(creditos_materia('B', '09', 'B101', '7.50', '3', '1.5'),
+                         {'cr': 7.5, 'satca': 4.76})
+        self.assertEqual(creditos_materia('C', '09', 'C101', '4.39', '27', '54'),
+                         {'cr': 6.0, 'satca': 4.39, 'cr_calculado': True})
+        self.assertAlmostEqual(creditos_materia('C', '09', 'C102', '4.45', '32', '49')['cr'], 113 / 18)
+        self.assertEqual(creditos_materia('S', '08', 'S950', '20', '0', '20')['cr'], 20)
+        self.assertEqual(creditos_materia('C', '09', 'C407', '0', '0', '480'), {'cr': 0})
+        self.assertEqual(creditos_materia('B', '06', 'B107', '3', '0', '3')['cr'], 3)
+
     def test_diccionario_identidad_y_realces(self):
         from realce_unidades import SUPERFICIES, contraste, dominante, insignia_rgb, proponer
         def sin_duplicados(pares):
