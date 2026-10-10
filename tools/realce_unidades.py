@@ -68,8 +68,8 @@ def main():
     destino = ROOT / 'web/dist/assets/logos/unidades'
     origen = ROOT.parent / 'desfase/web/dist/assets/logos/unidades'
     for unidad, identidad in datos['unidades'].items():
-        if not identidad.get('logo'):
-            continue
+        if not identidad.get('logo') or identidad.get('realce_nota'):
+            continue  # sin logo, o color elegido a mano por el dueño
         ruta = destino / (identidad['logo'] + '.webp')
         if not ruta.exists() and args.copiar_faltantes:
             destino.mkdir(parents=True, exist_ok=True)
