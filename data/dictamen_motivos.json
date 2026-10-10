@@ -1,0 +1,18 @@
+{
+  "documentos": {
+    "rge": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/rge-13-06-2011.pdf",
+    "ri": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-interno.pdf",
+    "rcgc": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-consejo-general-consultivo-01-nov-2006.pdf"
+  },
+  "interno": [
+    {"id": "i1", "doc": "ri"},
+    {"id": "i2", "doc": "rge"},
+    {"id": "i3", "doc": "rge"}
+  ],
+  "externo": [
+    {"id": "e1", "doc": "rge"},
+    {"id": "e2", "doc": "rge"},
+    {"id": "e3", "doc": "rge"},
+    {"id": "e4", "doc": "rcgc"}
+  ]
+}

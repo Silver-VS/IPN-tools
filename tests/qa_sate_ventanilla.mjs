@@ -266,3 +266,106 @@ const recarga=vm.createContext({console,Date,document:{},localStorage:c.localSto
 vm.runInContext(readFileSync('web/sate/tramites.js','utf8'),recarga);
 assert.equal(recarga.SateTramites.modelo(dd).datos.motivos,'');
 console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad, plantillas, medidor, confirmación y PDF único correctos.');
+
+// DIC2: elección guiada, formato nunca en blanco, motivo de la petición, anexos en un solo PDF y regreso a la lista.
+{
+  const dd3=dic.definir(),pasoTipo=dd3.pasos[0].campos.find(f=>f.id==='tipo');
+  const cajaTipo=new Nodo('div');pasoTipo.pintar(cajaTipo,{datos:{tipo:'interno'},cambiar(){}});
+  const enlaces=cajaTipo.todos().filter(n=>n.tagName==='a');
+  assert.equal(enlaces.length,c.SATE_DATA.dictamen.motivos.interno.length+c.SATE_DATA.dictamen.motivos.externo.length,'Cada situación enlaza su fundamento');
+  assert.ok(enlaces.every(a=>/^https:\/\/www\.ipn\.mx\/assets\/files\/normatividad\/docs\/reglamentos\/.+\.pdf$/.test(a.href)&&a.target==='_blank'&&a.rel==='noopener'));
+  for(const m of [...c.SATE_DATA.dictamen.motivos.interno,...c.SATE_DATA.dictamen.motivos.externo]){
+    assert.ok(c.SATE_DATA.dictamen.textos['dictamen.motivo_'+m.id],m.id);assert.ok(c.SATE_DATA.dictamen.textos['dictamen.fund_'+m.id],m.id);
+  }
+  assert.ok(cajaTipo.todos().some(n=>n.textContent.includes('art. 98')),'El fundamento aparece junto a la situación');
+  assert.ok(cajaTipo.todos().filter(n=>n.tagName==='li').length>=5);
+
+  // Sin tipo: no se puede ver ni generar; el motivo se explica y nunca se arma una hoja vacía.
+  const sinTipo={...dd3,id:'dictamen-sin-tipo',datos:{...dd3.datos,tipo:''}};
+  const a1=t.asistente(box,sinTipo);
+  assert.equal(box.querySelector('[data-ver-formato]').disabled,true);
+  assert.match(box.querySelector('[data-pdf-falta]').textContent,/elegir el tipo de dictamen/);
+  assert.match(dd3.faltante({...dd3.datos,tipo:''}),/elegir el tipo/);
+  assert.equal(dd3.faltante({...dd3.datos,tipo:'interno'}),'','Con tipo, datos, materia y periodo ya se puede ver el formato');
+  assert.match(dd3.faltante({...dd3.datos,tipo:'interno',peticion:''},true),/tu petición/);
+  assert.match(dd3.faltante({...dd3.datos,tipo:'interno',filas:[]}),/al menos una materia/);
+  assert.match(dd3.faltante({...dd3.datos,tipo:'interno',periodo:''}),/periodo/);
+  await assert.rejects(()=>dd3.generar({...dd3.datos,tipo:''}));
+  await assert.rejects(()=>dd3.previsualizar({...dd3.datos,tipo:''}));
+  a1.modelo.datos.tipo='interno';await new Promise(r=>setTimeout(r,450));
+  assert.equal(box.querySelector('[data-ver-formato]').disabled,false,'Con el tipo elegido se habilita');
+  assert.equal(box.querySelector('[data-pdf-falta]').textContent,'');
+  a1.destruir();
+
+  // Motivo de la petición: lo detectado en el kárdex o un motivo propio.
+  const d={...dd3.datos,tipo:'interno',periodo:'27/1',peticion:'',propuesta:'',peticion_origen:''};
+  dd3.preparar(d,3);
+  assert.equal(d.peticion_origen,'detectado');assert.match(d.peticion,/BIOLOGIA CELULAR \(cursada en 25\/1; recursada en 26\/2\)/,'Usa materias y periodos reales');
+  assert.ok(!/Expongo mis motivos/.test(d.peticion));
+  const cajaPet=new Nodo('div'),ctxPet={datos:d,cambiar(v){if(arguments.length)d.peticion=v}};
+  const campoPet=dd3.pasos[3].campos.find(f=>f.id==='peticion');
+  campoPet.pintar(cajaPet,ctxPet);
+  const radios=cajaPet.todos().filter(n=>n.type==='radio');assert.deepEqual(radios.map(r=>r.value),['detectado','otro']);
+  assert.deepEqual(cajaPet.todos().filter(n=>n.tagName==='span').map(n=>n.textContent).slice(0,2),['Por lo que SATE detectó en tu kárdex','Otro motivo']);
+  assert.ok(cajaPet.todos().some(n=>n.textContent==='Proponer ampliación de tiempo'));
+  radios[1].checked=true;radios[1].onchange();assert.equal(d.peticion_origen,'otro');assert.equal(d.peticion,'','Otro motivo parte de un texto libre vacío');
+  dd3.preparar(d,3);assert.equal(d.peticion,'','En otro motivo no se autocompleta');
+  const cajaOtro=new Nodo('div');campoPet.pintar(cajaOtro,ctxPet);
+  assert.ok(!cajaOtro.todos().some(n=>n.textContent==='Proponer ampliación de tiempo'));assert.ok(cajaOtro.todos().some(n=>/renglones/.test(n.textContent)),'Medidor de renglones disponible');
+  radios[0].checked=true;radios[0].onchange();assert.match(d.peticion,/BIOLOGIA CELULAR/);
+  assert.equal(dic.plantilla('interno','27/1',[]),'','Sin materias no hay texto de relleno');
+
+  // Anexos: un PDF de 2 páginas y una imagen se unen con formato y carta (1 + 1 + 2 + 1 páginas).
+  const paginasDe=b=>+(/PAGES=(\d+)/.exec(String.fromCharCode(...b))?.[1]||1);
+  let ultimaImagen;
+  const crear=()=>{let n=0;const doc={
+    embedJpg:async()=>({width:2000,height:1000}),embedPng:async()=>({width:100,height:300}),
+    embedFont:async()=>({widthOfTextAtSize:(s,size)=>s.length*size*.5}),
+    addPage(arg){n++;return arg&&arg.indice!==undefined?arg:{drawImage:(img,o)=>{ultimaImagen={a:arg,o}}}},
+    getPageIndices:()=>Array.from({length:n},(_,i)=>i),copyPages:async(src,idx)=>idx.map(indice=>({indice})),
+    save:async()=>new TextEncoder().encode('%PDF PAGES='+n),fijar(v){n=v}};return doc};
+  c.PDFLib={PDFDocument:{create:async()=>crear(),load:async b=>{const doc=crear();doc.fijar(paginasDe(b));return doc}},StandardFonts:{Helvetica:'Helvetica'}};
+  vm.runInContext(readFileSync('web/tramites/pdf-comun.js','utf8'),c);
+  const pdfFicticio=new TextEncoder().encode('%PDF-1.4 PAGES=2'),jpgFicticio=Uint8Array.from([0xFF,0xD8,0xFF,0xE0,0,0,0,0]),pngFicticio=Uint8Array.from([0x89,0x50,0x4E,0x47,13,10,26,10,0]),txtFicticio=new TextEncoder().encode('no soy un anexo');
+  const archivo=(name,bytes)=>({name,size:bytes.length,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length)});
+  const dAnexo={...dd3.datos,tipo:'interno',periodo:'27/1',peticion:'Solicito regularizar mi situación.',motivos:'Motivos ficticios.',peticion_origen:'otro',adjuntos:''};
+  const cajaAnexos=new Nodo('div'),campoAnexos=dd3.pasos[3].campos.find(f=>f.id==='adjuntos');
+  campoAnexos.pintar(cajaAnexos,{datos:dAnexo,cambiar(v){dAnexo.adjuntos=v}});
+  assert.ok(cajaAnexos.todos().some(n=>n.textContent==='Tus documentos se procesan en tu navegador; no se suben ni se guardan en ningún servidor.'));
+  assert.ok(cajaAnexos.todos().some(n=>n.textContent==='Anexos (opcional)'));
+  const entrada=cajaAnexos.todos().find(n=>n.type==='file');assert.equal(entrada.multiple,true);
+  entrada.files=[archivo('constancia.pdf',pdfFicticio),archivo('credencial.jpg',jpgFicticio),archivo('nota.txt',txtFicticio)];
+  await entrada.onchange();
+  assert.deepEqual(Array.from(dAnexo.adjuntos,a=>a.nombre),['constancia.pdf','credencial.jpg'],'El .txt se rechaza');
+  assert.equal(dAnexo.adjuntos[0].paginas,2);
+  assert.match(cajaAnexos.todos().find(n=>n.attrs.role==='status').textContent,/nota\.txt: solo se admiten PDF, JPG y PNG/);
+  const boton=(texto,etiqueta)=>cajaAnexos.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']===texto+': '+etiqueta);
+  assert.equal(boton('Subir','constancia.pdf').disabled,true,'El primero no sube');
+  boton('Subir','credencial.jpg').onclick();assert.deepEqual(Array.from(dAnexo.adjuntos,a=>a.nombre),['credencial.jpg','constancia.pdf'],'Las flechas reordenan');
+  const filasAnexo=cajaAnexos.todos().filter(n=>n.tagName==='li');filasAnexo[1].ondragstart({dataTransfer:{setData(){}}});filasAnexo[0].ondrop({preventDefault(){}});
+  assert.deepEqual(Array.from(dAnexo.adjuntos,a=>a.nombre),['constancia.pdf','credencial.jpg'],'Arrastrar reordena');
+  entrada.files=[archivo('foto.png',pngFicticio)];await entrada.onchange();assert.equal(dAnexo.adjuntos.length,3);
+  boton('Quitar','foto.png').onclick();assert.equal(dAnexo.adjuntos.length,2);
+  const pdfFinal=await dd3.generar(dAnexo);
+  assert.equal(paginasDe(pdfFinal),5,'Formato 1 + carta 1 + PDF de 2 + imagen de 1 = 5 páginas');
+  assert.deepEqual(Array.from(ultimaImagen.a),[612,792],'La imagen va en una hoja carta');
+  assert.ok(ultimaImagen.o.width<=540&&ultimaImagen.o.height<=720&&ultimaImagen.o.x>=36,'La imagen cabe dentro de los márgenes');
+  assert.equal(paginasDe(await dd3.generar({...dAnexo,adjuntos:[]})),2,'Sin anexos solo formato y carta');
+  assert.equal(paginasDe(await dd3.previsualizar(dAnexo)),2,'La vista previa no incluye anexos');
+  await assert.rejects(()=>dd3.generar({...dAnexo,adjuntos:[{id:'inexistente',nombre:'x.pdf',tipo:'pdf',paginas:1,peso:1}]}),'Un anexo perdido no se omite en silencio');
+  for(const [k,v] of almacen)assert.ok(!v.includes('constancia.pdf')&&!v.includes('credencial.jpg'),'Ningún anexo en el almacenamiento: '+k);
+
+  // Regreso a Ventanilla digital arriba (junto al título) y al final, separado de las acciones.
+  const a2=t.asistente(box,dd3);
+  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='← Ventanilla digital');
+  assert.equal(regresos.length,2);
+  assert.equal(box.children[0].className,'tramite-encabezado');assert.equal(box.children[0].children[0].textContent,'Solicitud de dictamen');
+  assert.ok(box.children[0].children.includes(regresos[0]),'Arriba, a la altura del título');
+  assert.equal(box.children.at(-1).className,'tramite-pie');assert.ok(box.children.at(-1).children.includes(regresos[1]),'Al final de la página');
+  assert.ok(!box.todos().filter(n=>n.className==='tramite-acciones').some(n=>n.todos().includes(regresos[1])),'No comparte renglón con Continuar ni Generar');
+  ir=null;regresos[1].click();assert.equal(ir,'tramites');ir=null;regresos[0].click();assert.equal(ir,'tramites');
+  a2.destruir();
+  const css2=readFileSync('web/sate/componentes.css','utf8');
+  assert.match(css2,/\.tramite-pie\{[^}]*border-top/);assert.match(css2,/\.tramite-encabezado\{[^}]*justify-content:space-between/);
+  console.log('Dictamen DIC2: fundamento por situación, formato nunca en blanco, motivo detectado u otro, anexos unidos en un PDF y regreso arriba y abajo correctos.');
+}

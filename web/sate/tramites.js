@@ -58,6 +58,7 @@
     function revocar(){if(url){URL.revokeObjectURL(url);url=null}}
     async function previsualizar(){
       const v=++version;
+      if(estadoFalta()){revocar();box.querySelector('iframe')?.removeAttribute('src');return}
       if(!def.generar||!def.previsualizar&&m.campos.some(c=>m.validar(c))){revocar();const marco=box.querySelector('iframe');if(marco)marco.removeAttribute('src');const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=true;return}
       try{
         const bytes=await (def.previsualizar||def.generar)({...m.datos});
@@ -67,8 +68,14 @@
         const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=false;
       }catch(e){if(destruido||v!==version)return;revocar();box.querySelector('iframe')?.removeAttribute('src');const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=true;console.error('Ventanilla: vista previa fallida',{tramite:def.id,paso:m.paso,error:e.name});const aviso=box.querySelector('[data-pdf-estado]');if(aviso)aviso.textContent=tx('pdf_error')}
     }
+    // Un trámite puede declarar qué le falta (def.faltante) para que nunca se genere una hoja vacía.
+    function estadoFalta(){
+      const f=def.faltante?.(m.datos,m.paso===def.pasos.length)||'',ver=box.querySelector('[data-ver-formato]'),gen=box.querySelector('[data-descargar]'),aviso=box.querySelector('[data-pdf-falta]');
+      if(f&&ver)ver.disabled=true;if(gen)gen.disabled=!!f;if(aviso)aviso.textContent=f;return f;
+    }
     function programar(){clearTimeout(temporizador);temporizador=setTimeout(previsualizar,300)}
     async function descargar(){
+      const falta=estadoFalta();if(falta){box.querySelector('[data-pdf-estado]').textContent=falta;return}
       if(def.confirmacion&&!confirmado){box.querySelector('[data-pdf-estado]').textContent=def.confirmacion;return}
       const invalidos=m.campos.filter(c=>m.validar(c));
       if(invalidos.length){m.cambiar(def.pasos.findIndex(p=>p.campos.includes(invalidos[0])));pintar();return}
@@ -80,12 +87,16 @@
         bajar(bytes,typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||def.id+'.pdf');
         m.listo=true;m.guardar();def.alTerminar?.(m.datos);
       }catch(e){console.error('Ventanilla: descarga fallida',{tramite:def.id,paso:m.paso,error:e.name});box.querySelector('[data-pdf-estado]').textContent=tx('pdf_error')}
-      finally{if(!destruido)b.disabled=false}
+      finally{if(!destruido)b.disabled=!!def.faltante?.(m.datos,true)}
     }
     let confirmado=false;
+    // Regreso a la lista: el avance ya está guardado, así que no pide confirmación.
+    function regreso(clase){const b=boton(tx('volver'),()=>SATE.ir('tramites'));b.className+=' tramite-regreso '+clase;return b}
     function pintar(){
       def.preparar?.(m.datos,m.paso);confirmado=false;
-      box.replaceChildren();box.appendChild(el('h2',def.titulo));
+      box.replaceChildren();
+      if(def.volver){const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));cabeza.appendChild(regreso('tramite-volver'));box.appendChild(cabeza)}
+      else box.appendChild(el('h2',def.titulo));
       const indicador=el('p',`Paso ${m.paso+1} de ${def.pasos.length+1} · ${m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo}`,'tramite-pasos');indicador.setAttribute('aria-label',tx('pasos'));indicador.setAttribute('aria-current','step');box.appendChild(indicador);
       const layout=el('div',null,'tramite-asistente'),pantalla=el('div',null,'tramite-pantalla');layout.appendChild(pantalla);
       pantalla.appendChild(el('h3',m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo));
@@ -128,9 +139,12 @@
       const aviso=el('p','');aviso.setAttribute('data-pdf-estado','');aviso.setAttribute('role','status');pantalla.appendChild(aviso);
       if(def.generar){
         const lateral=el('aside',null,'tramite-preview'),iframe=el('iframe');iframe.title=tx('vista_previa');if(url)iframe.src=url;lateral.appendChild(iframe);layout.appendChild(lateral);
-        const ver=boton(tx('ver_formato'),()=>{if(url)window.open(url,'_blank','noopener')});ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;pantalla.appendChild(ver);programar();
+        const ver=boton(tx('ver_formato'),()=>{if(url)window.open(url,'_blank','noopener')});ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;pantalla.appendChild(ver);
+        if(def.faltante){const falta=el('p','',  'tramite-falta');falta.setAttribute('data-pdf-falta','');falta.setAttribute('role','status');pantalla.appendChild(falta)}
+        programar();
       }
-      box.appendChild(layout);
+      box.appendChild(layout);if(def.generar)estadoFalta();
+      if(def.volver){const pie=el('div',null,'tramite-pie');pie.appendChild(regreso('tramite-volver-pie'));box.appendChild(pie)}
     }
     pintar();return {modelo:m,descargar,destruir(){destruido=true;version++;clearTimeout(temporizador);revocar();for(const c of m.campos)if(c.sensible)m.datos[c.id]=''}};
   }
