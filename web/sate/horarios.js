@@ -49,7 +49,10 @@ $('#gbreaks').addEventListener('change',e=>{const r=e.target.closest('[data-brk]
 $('#b-gen').addEventListener('click',()=>{S.gen=generate();renderGen();window.ENCUESTA?.marcar('gen')});
 $('#offer').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||e.target.closest('.note'))return;const o=e.target.closest('.opt');const k=o?o.dataset.k:null;if(k!==S.hover){S.hover=k;renderCal()}});
 $('#offer').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.hover){S.hover=null;renderCal()}});
+for(const id of ['#cal','#agenda'])$(id).addEventListener('keydown',bloquePropioEvento);
+$('#agenda').addEventListener('click',bloquePropioEvento);
 $('#cal').addEventListener('click',e=>{
+  if(bloquePropioEvento(e))return;
   // clic en un hueco vacío: filtra la oferta a lo que cabe en ese bloque (otro clic en el mismo hueco lo quita)
   const g=e.target.closest('.gapcell');
   if(g){const [d,a]=g.dataset.gap.split('|').map(Number);S.gap=S.gap&&S.gap.d===d&&S.gap.a===a?null:{d,a,b:a+BLOCK};
@@ -57,11 +60,13 @@ $('#cal').addEventListener('click',e=>{
   const b=e.target.closest('.blk[data-k]:not(.ghost)');if(!b)return;const o=document.querySelector(`.opt[data-k="${CSS.escape(b.dataset.k)}"]`);if(o)o.scrollIntoView({block:'center',behavior:'smooth'})});
 $('#own-f').addEventListener('submit',e=>{
   e.preventDefault();const n=$('#own-n').value.trim(),a=toMin($('#own-a').value),b=toMin($('#own-b').value);
-  const msg=!S.ownDays.length?txH('actividad_dias'):b<=a?txH('actividad_horas'):'';
+  const oculto=SEMANA_ACTIVA&&$('#semana-oculta').checked,hsTxt=oculto?$('#semana-hs').value:'',hs=hsTxt!==''?parseFloat(hsTxt):null;
+  const conHoras=oculto&&hs!=null;
+  const msg=conHoras?(hs>0&&hs<=168?'':txH('semana_horas_invalidas')):!S.ownDays.length?txH('actividad_dias'):b<=a?txH('actividad_horas'):'';
   if(!n||msg){$('#own-n').setCustomValidity(msg);$('#own-n').reportValidity();$('#own-n').setCustomValidity('');return}
-  plan().own.push({n,d:[...S.ownDays].sort(),a,b,...(SEMANA_ACTIVA?{tipo:$('#semana-tipo').value}:{})});
-  if(S.ownDays.some(d=>d>=5)){S.weekend=true;store.set('weekend',true);$('#f-weekend').checked=true}
-  $('#own-n').value='';S.ownDays=[];renderOwnForm();refresh();
+  plan().own.push(conHoras?{n,d:[],a:0,b:0,hs,oculto:true,tipo:$('#semana-tipo').value}:{n,d:[...S.ownDays].sort(),a,b,...(SEMANA_ACTIVA?{tipo:$('#semana-tipo').value}:{}),...(oculto?{oculto:true}:{})});
+  if(!conHoras&&S.ownDays.some(d=>d>=5)){S.weekend=true;store.set('weekend',true);$('#f-weekend').checked=true}
+  $('#own-n').value='';S.ownDays=[];if(SEMANA_ACTIVA){$('#semana-oculta').checked=false;$('#semana-hs').value='';$('#semana-hs-campo').hidden=true}renderOwnForm();refresh();
 });
 $('#b-saeshor').addEventListener('click',()=>loadInscrito());
 $('#b-clear').addEventListener('click',()=>{plan().sel=[];plan().own=[];$('#copybox').hidden=true;refresh()});
@@ -172,13 +177,14 @@ const gtSave=()=>store.set('gtime',GT);
 const SEMANA_ACTIVA=window.SATE_CONFIG?.unidades?.[UNIDAD]?.miSemana===true;
 const MS=store.get('miSemana',{})||{};
 const semanaValor=k=>SEMANA_ACTIVA?Math.max(0,Number(MS[k])||0):0;
+const SEMANA_ETQ={comidaA:'comida_desde',comidaB:'comida_hasta'};
 const semanaCampos=[['trabajo','number',168],['ida','number',1440],['vuelta','number',1440],['sueno','number',24],['estudio','number',168],['antes','time'],['dias','number',7],['comidaA','time'],['comidaB','time']];
 function montarSemana(){
   if(!SEMANA_ACTIVA)return;
   $('#mi-semana').hidden=false;
   const principales=['ida','vuelta','antes','dias'];
   for(const [id,campos] of [['principales',semanaCampos.filter(c=>principales.includes(c[0]))],['secundarios',semanaCampos.filter(c=>!principales.includes(c[0]))]]){
-    $(`#semana-${id}`).innerHTML=campos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${k}`))}</span><input id="semana-${k}" data-semana="${k}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}"></label>`).join('');
+    $(`#semana-${id}`).innerHTML=campos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${SEMANA_ETQ[k]||k}`))}</span><input id="semana-${k}" data-semana="${k}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}"></label>`).join('');
   }
   // Se mueve el formulario existente: conserva días, calendario y persistencia por versión.
   $('#semana-form').appendChild($('#ownform'));
@@ -188,7 +194,18 @@ function montarSemana(){
   $('#mi-semana').addEventListener('toggle',resumenSemana);
   resumenSemana();
   $('#own-n').placeholder='';$('#own-a').value='';$('#own-b').value='';
-  $('#own-f').insertAdjacentHTML('afterbegin',`<label class="field"><span>${esc(txH('semana_tipo'))}</span><select id="semana-tipo"><option value="trabajo">${esc(txH('semana_trabajo_bloque'))}</option><option value="otras">${esc(txH('semana_otras'))}</option></select></label>`);
+  $('#own-f').insertAdjacentHTML('afterbegin',`<p class="semana-ayuda-corta">${esc(txH('semana_agregar_ayuda'))}</p><label class="field"><span>${esc(txH('semana_tipo'))}</span><select id="semana-tipo"><option value="trabajo">${esc(txH('semana_trabajo_bloque'))}</option><option value="otras">${esc(txH('semana_otras'))}</option></select></label>`);
+  $('#own-f').insertAdjacentHTML('beforeend',`<label class="check"><input type="checkbox" id="semana-oculta"> ${esc(txH('semana_solo_horas'))}</label><label class="field" id="semana-hs-campo" hidden><span>${esc(txH('semana_horas_semana'))}</span><input type="number" id="semana-hs" min="0" max="168" step="0.5"><small>${esc(txH('semana_horas_semana_ayuda'))}</small></label>`);
+  $('#own-f').addEventListener('change',e=>{
+    if(e.target?.id!=='semana-oculta')return;
+    const solo=$('#semana-oculta').checked;$('#semana-hs-campo').hidden=!solo;
+    if(!solo)$('#semana-hs').value='';
+  });
+  $('#semana-bloques').addEventListener('click',e=>{
+    const ed=e.target.closest?.('[data-own-ed]'),el=e.target.closest?.('[data-own-del]');
+    if(ed)abrirFichaPropia(+ed.dataset.ownEd);else if(el)eliminarPropia(+el.dataset.ownDel);
+  });
+  $('#own-deshacer-b').addEventListener('click',deshacerPropia);
   $('#semana-campos').addEventListener('change',e=>{
     const k=e.target.dataset.semana;if(!k||!e.target.checkValidity())return;
     const a=k==='comidaA'?e.target.value:MS.comidaA,b=k==='comidaB'?e.target.value:MS.comidaB;
@@ -229,7 +246,7 @@ function semanaOk(cs){
   const clases=cs.flatMap(c=>c[6]||[]).concat(plan().own.filter(o=>o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b])));
   if(semanaValor('dias')&&new Set(clases.map(b=>b[0])).size>semanaValor('dias'))return false;
   const antes=tmin(MS.antes);if(antes!=null&&clases.some(b=>b[1]<antes))return false;
-  const viaje=semanaTraslados(cs),propios=plan().own.filter(o=>!o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b]));
+  const viaje=semanaTraslados(cs),propios=plan().own.filter(o=>!o.saes&&!o.oculto).flatMap(o=>o.d.map(d=>[d,o.a,o.b]));
   if(viaje.some(([d,a,b])=>a<0||b>1440||propios.some(([e,x,y])=>d===e&&a<y&&x<b)))return false;
   const a=tmin(MS.comidaA),b=tmin(MS.comidaB);
   // Como los descansos, el rango registrado se reserva completo, sin relajación automática.
@@ -246,15 +263,94 @@ function presupuestoSemana(cs){
   const propios=plan().own;
   sumar('clases',cs.flatMap(c=>c[6]||[]).concat(propios.filter(o=>o.saes).flatMap(o=>o.d.map(d=>[d,o.a,o.b]))));
   sumar('traslados',semanaTraslados(cs));
-  for(const k of ['trabajo','otras'])sumar(k,propios.filter(o=>!o.saes&&(k==='trabajo'?o.tipo==='trabajo':o.tipo!=='trabajo')).flatMap(o=>o.d.map(d=>[d,o.a,o.b])));
+  for(const k of ['trabajo','otras'])sumar(k,propios.filter(o=>!o.saes&&!o.oculto&&(k==='trabajo'?o.tipo==='trabajo':o.tipo!=='trabajo')).flatMap(o=>o.d.map(d=>[d,o.a,o.b])));
+  for(const o of propios)if(o.oculto&&!o.saes)horas[o.tipo==='trabajo'?'trabajo':'otras']+=horasPropia(o);
   if(!propios.some(o=>o.tipo==='trabajo'))horas.trabajo=semanaValor('trabajo');
   const total=Object.values(horas).reduce((a,b)=>a+b,0);horas.libre=Math.max(0,168-total);
   return {horas,total,disponible:168-total+horas.estudio,exceso:Math.max(0,total-168)};
 }
+/* ---------- actividades fijas propias: ficha, edición, eliminación con deshacer ---------- */
+const horasPropia=o=>o.hs!=null?Number(o.hs)||0:(o.d||[]).length*(o.b-o.a)/60;
+let OWN_UNDO=null,OWN_UNDO_T=null;
+function validarPropia(v){
+  if(!v.n)return txH('actividad_nombre');
+  if(v.oculto&&v.hs!=null)return v.hs>0&&v.hs<=168?'':txH('semana_horas_invalidas');
+  if(!v.d.length)return txH('actividad_dias');
+  return v.b<=v.a?txH('actividad_horas'):'';
+}
+function guardarPropia(i,v){
+  const o=plan().own[i];if(!o||o.saes)return '';
+  const err=validarPropia(v);if(err)return err;
+  const nuevo={...o,n:v.n,d:v.oculto&&v.hs!=null?[]:[...v.d].sort(),a:v.oculto&&v.hs!=null?0:v.a,b:v.oculto&&v.hs!=null?0:v.b};
+  if(SEMANA_ACTIVA){nuevo.tipo=v.tipo;if(v.oculto)nuevo.oculto=true;else delete nuevo.oculto;if(v.oculto&&v.hs!=null)nuevo.hs=v.hs;else delete nuevo.hs}
+  plan().own[i]=nuevo;
+  if(nuevo.d.some(d=>d>=5)){S.weekend=true;store.set('weekend',true);$('#f-weekend').checked=true}
+  refresh();return '';
+}
+function olvidarDeshacerPropia(){OWN_UNDO=null;clearTimeout(OWN_UNDO_T);$('#own-deshacer').hidden=true}
+function eliminarPropia(i){
+  const lista=plan().own,o=lista[i];if(!o)return;
+  lista.splice(i,1);
+  OWN_UNDO={plan:ws().plan,i,item:o};clearTimeout(OWN_UNDO_T);
+  OWN_UNDO_T=setTimeout(olvidarDeshacerPropia,10000);
+  $('#own-deshacer-txt').textContent=txH('semana_eliminada',{nombre:o.n});$('#own-deshacer').hidden=false;
+  refresh();
+}
+function deshacerPropia(){
+  const u=OWN_UNDO;if(!u)return;
+  const pl=ws().plans[u.plan];olvidarDeshacerPropia();if(!pl)return;
+  pl.own.splice(Math.min(u.i,pl.own.length),0,u.item);
+  $('#own-deshacer-txt').textContent=txH('semana_restaurada',{nombre:u.item.n});$('#own-deshacer').hidden=false;
+  OWN_UNDO_T=setTimeout(()=>{$('#own-deshacer').hidden=true},4000);
+  refresh();
+}
+function confirmarEliminarPropia(i){
+  const o=plan().own[i];if(!o)return;
+  SateUI.modal(txH('semana_eliminar'),txH('semana_confirmar_eliminar',{nombre:o.n}),{pequeno:true,acciones:[
+    {texto:txH('semana_eliminar'),primaria:true,onclick:()=>eliminarPropia(i)},{texto:txH('semana_cancelar')}]});
+}
+function abrirFichaPropia(i){
+  const o=plan().own[i];if(!o||o.saes)return;
+  let dias=[...(o.d||[])];const solo=!!o.oculto,conHoras=solo&&o.hs!=null;
+  const f=document.createElement('form');f.className='semana-ficha';
+  f.innerHTML=`<label class="field"><span>${esc(txH('semana_nombre'))}</span><input type="text" id="ficha-n" required></label>`+
+    (SEMANA_ACTIVA?`<label class="field"><span>${esc(txH('semana_tipo'))}</span><select id="ficha-tipo"><option value="trabajo">${esc(txH('semana_trabajo_bloque'))}</option><option value="otras">${esc(txH('semana_otras'))}</option></select></label>`:'')+
+    `<div class="field"><span>${esc(txH('semana_dias_ficha'))}</span><div class="daypick" id="ficha-dias"></div></div>`+
+    `<label class="field"><span>${esc(txH('semana_de'))}</span><input type="time" id="ficha-a" step="1800"></label><label class="field"><span>${esc(txH('semana_a'))}</span><input type="time" id="ficha-b" step="1800"></label>`+
+    (SEMANA_ACTIVA?`<label class="check"><input type="checkbox" id="ficha-mostrar"> ${esc(txH('semana_mostrar'))}</label><label class="field"><span>${esc(txH('semana_horas_semana'))}</span><input type="number" id="ficha-hs" min="0" max="168" step="0.5"></label>`:'')+
+    `<p class="err" id="ficha-err" role="alert"></p>`;
+  const q=s=>f.querySelector(s),pintar=()=>{q('#ficha-dias').innerHTML=DAYS.map((d,k)=>`<button type="button" class="chip" data-fd="${k}" aria-pressed="${dias.includes(k)}">${d}</button>`).join('')};
+  const hhmm=m=>String(Math.floor(m/60)).padStart(2,'0')+':'+String(m%60).padStart(2,'0');
+  q('#ficha-n').value=o.n;
+  q('#ficha-a').value=conHoras?'':hhmm(o.a);q('#ficha-b').value=conHoras?'':hhmm(o.b);
+  if(SEMANA_ACTIVA){q('#ficha-tipo').value=o.tipo==='trabajo'?'trabajo':'otras';q('#ficha-mostrar').checked=!solo;q('#ficha-hs').value=conHoras?o.hs:''}
+  pintar();
+  q('#ficha-dias').addEventListener('click',e=>{const b=e.target.closest?.('[data-fd]');if(!b)return;const k=+b.dataset.fd;dias=dias.includes(k)?dias.filter(x=>x!==k):[...dias,k];pintar()});
+  f.addEventListener('submit',e=>{e.preventDefault();guardar()});
+  const leer=()=>{
+    const oculto=SEMANA_ACTIVA&&!q('#ficha-mostrar').checked,hsTxt=SEMANA_ACTIVA?q('#ficha-hs').value:'';
+    const hs=oculto&&hsTxt!==''?parseFloat(hsTxt):null;
+    return {n:q('#ficha-n').value.trim(),tipo:SEMANA_ACTIVA?q('#ficha-tipo').value:o.tipo,d:dias,a:tmin(q('#ficha-a').value)??0,b:tmin(q('#ficha-b').value)??0,oculto,hs};
+  };
+  let m=null;
+  const guardar=()=>{const err=guardarPropia(i,leer());if(err){q('#ficha-err').textContent=err;return}m?.cerrar()};
+  m=SateUI.modal(txH('semana_ficha_titulo'),f,{acciones:[
+    {texto:txH('semana_guardar'),primaria:true,cierra:false,onclick:guardar},
+    {texto:txH('semana_eliminar'),cierra:false,onclick:()=>{m?.cerrar();eliminarPropia(i)}},
+    {texto:txH('semana_cancelar')}]});
+  return m;
+}
+function bloquePropioEvento(e){
+  const b=e.target.closest?.('[data-own]');if(!b)return false;
+  const i=+b.dataset.own;
+  if(e.type==='click'||e.key==='Enter'||e.key===' '){e.preventDefault?.();abrirFichaPropia(i);return true}
+  if(e.key==='Delete'||e.key==='Supr'){e.preventDefault?.();confirmarEliminarPropia(i);return true}
+  return false;
+}
 function renderSemana(){
   if(!SEMANA_ACTIVA)return;
   resumenSemana();
-  $('#semana-bloques').innerHTML=plan().own.map((o,i)=>o.saes?'':`<p>${esc(o.n)} · ${o.d.map(d=>DAYS[d]).join(' ')} ${hm(o.a)}–${hm(o.b)} <button type="button" class="x" data-unown="${i}" aria-label="${esc(txH('quitar',{nombre:o.n}))}">×</button></p>`).join('');
+  $('#semana-bloques').innerHTML=plan().own.map((o,i)=>o.saes?'':`<p class="semana-item"><b>${esc(o.n)}</b> · ${o.oculto&&o.hs!=null?'':o.d.map(d=>DAYS[d]).join(' ')+' '+hm(o.a)+'–'+hm(o.b)+' · '}${esc(txH('semana_lista_horas',{n:fmtCr(horasPropia(o))}))} · ${esc(txH(o.oculto?'semana_lista_oculta':'semana_lista_visible'))} <span class="semana-acc"><button type="button" class="btn" data-own-ed="${i}" aria-label="${esc(txH('semana_editar_nombre',{nombre:o.n}))}">${esc(txH('semana_editar'))}</button> <button type="button" class="btn" data-own-del="${i}" aria-label="${esc(txH('semana_eliminar_nombre',{nombre:o.n}))}">${esc(txH('semana_eliminar'))}</button></span></p>`).join('');
   const cs=selected(),presupuesto=$('#semana-presupuesto');
   presupuesto.hidden=!semanaCampos.some(([k])=>MS[k]!=null&&MS[k]!=='')&&!plan().own.length&&!cs.length;
   if(presupuesto.hidden){presupuesto.innerHTML='';return}
@@ -533,7 +629,7 @@ function renderCal(){
       html+=`<button type="button" class="gapcell${on?' on':''}" data-gap="${d}|${m}" style="top:${(m-lo)/SLOT*SLOTPX}px;height:${BLOCK/SLOT*SLOTPX}px" title="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)+'–'+hm(m+BLOCK)}))}" aria-label="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)}))}"></button>`}
     items.filter(b=>b.d===d).forEach(b=>{
       const top=(b.a-lo)/SLOT*SLOTPX, ht=(b.b-b.a)/SLOT*SLOTPX-2, w=100/b.n, pos=`top:${top}px;height:${ht}px;left:calc(${b.lane*w}% + 2px);width:calc(${w}% - 4px)`;
-      if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}" style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
+      if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}"${b.c.i!=null?` data-own="${b.c.i}" tabindex="0" role="button" aria-label="${esc(txH('semana_abrir_bloque',{nombre:b.c.n}))}"`:''} style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
       else html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)};${pos}" data-k="${keyOf(b.c)}" title="${b.c[3]} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}"><b>${esc(name(b.c))}</b><span class="t">${b.c[3]} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></div>`;
     });
     html+='</div>';
@@ -543,7 +639,7 @@ function renderCal(){
   $('.calwrap').hidden=cv==='dia';$('#agenda').hidden=cv!=='dia';
   if(cv==='dia'){const by={};items.forEach(b=>(by[b.d]=by[b.d]||[]).push(b));
     $('#agenda').innerHTML=Object.keys(by).length?Object.keys(by).sort((a,b)=>a-b).map(d=>`<section class="ag-day"><h4>${DAYN[d]}</h4>`+by[d].sort((x,y)=>x.a-y.a).map(b=>b.c.own?
-      `<div class="ag-it own${b.clash?' clash':''}"><span class="t">${hm(b.a)}–${hm(b.b)}</span><span><b>${esc(b.c.n)}</b><small>${esc(txH('actividad'))}${b.clash?' · '+esc(txH('traslape')):''}</small></span></div>`:
+      `<div class="ag-it own${b.clash?' clash':''}"${b.c.i!=null?` data-own="${b.c.i}" tabindex="0" role="button" aria-label="${esc(txH('semana_abrir_bloque',{nombre:b.c.n}))}"`:''}><span class="t">${hm(b.a)}–${hm(b.b)}</span><span><b>${esc(b.c.n)}</b><small>${esc(txH('actividad'))}${b.clash?' · '+esc(txH('traslape')):''}</small></span></div>`:
       `<div class="ag-it${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)}"><span class="t">${hm(b.a)}–${hm(b.b)}</span><span><b>${esc(name(b.c))}</b><small>${b.c[3]}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''} · ${esc(profs(b.c))}${b.ghost?' · '+esc(txH('vista_previa')):''}${b.clash?' · '+esc(txH('traslape')):''}</small></span></div>`).join('')+'</section>').join(''):
       `<p class="ag-empty">${esc(txH('horario_vacio'))}</p>`}
   const cr=sel.reduce((s,c)=>s+c[7],0);
