@@ -652,9 +652,35 @@ function leyendaMapa(completa=false){
 }
 function renderLegend(){$('#legend').innerHTML=leyendaMapa()}
 function renderSide(){return conSim(usaSim('sugg'),()=>conPlan(renderSide0))}
+const AREA_COLORES=['#8a98c7','#a76987','#577d63','#4d6f8d','#c9a36a','#721e45'];
+function requisitosElegidos(want){
+  const c=cur(), done=new Set(tr().done), pedidos=new Map(), acreditados=new Set(), materias=new Set();
+  // Conserva la seriación transitiva del mapa; cada requisito compartido ocupa una sola fila.
+  want.forEach(m=>ancestors([m]).forEach(k=>{
+    if(!c[k]||k===m)return;
+    if(done.has(k)){acreditados.add(k);return}
+    if(!pedidos.has(k))pedidos.set(k,[]);
+    pedidos.get(k).push(m);materias.add(m);
+  }));
+  return {pedidos,acreditados:acreditados.size,materias:materias.size};
+}
+function requisitosHtml(want){
+  const {pedidos,acreditados,materias}=requisitosElegidos(want), c=cur(), cats=catDe(), grupos=new Map();
+  const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v);
+  if(!pedidos.size)return `<p class="muted">${esc(tx('requisitos_sin_pendientes'))}</p>`;
+  pedidos.forEach((piden,k)=>{const area=cats[k]||tx('requisitos_sin_area');if(!grupos.has(area))grupos.set(area,[]);grupos.get(area).push([k,piden])});
+  const cols=MAP().layout?.cols||[];
+  return `<details class="chosen-requisitos"><summary><span>${esc(tx('requisitos_resumen',{n:pedidos.size,m:materias}))}</span><span class="req-ver">${esc(tx('requisitos_ver'))}</span></summary>`+
+    `<table class="req-tabla"><thead><tr><th scope="col">${esc(tx('requisitos_materia'))}</th><th scope="col">${esc(tx('requisitos_pide'))}</th></tr></thead>`+
+    [...grupos].sort(([a],[b])=>a.localeCompare(b,'es')).map(([area,filas])=>{
+      const i=cols.findIndex(([n])=>n.split(' · ').includes(area)), color=AREA_COLORES[Math.max(0,i)%AREA_COLORES.length];
+      return `<tbody><tr class="req-area"><th colspan="2" scope="colgroup" style="--area:${color}">${esc(area)}</th></tr>`+
+        filas.sort(([a],[b])=>c[a][0].localeCompare(c[b][0],'es')).map(([k,piden])=>`<tr class="req-fila" tabindex="0" data-req="${esc(k)}" data-piden="${esc(piden.join(' '))}"><th scope="row"><span class="grp">${esc(k)}</span> ${esc(pretty(c[k][0]))}${want.includes(k)?` <small class="req-elegido">${esc(tx('requisitos_elegido'))}</small>`:''}</th><td><span class="req-etiqueta">${esc(tx('requisitos_pide'))}: </span>${piden.map(m=>esc(pretty(c[m][0]))).join('; ')}</td></tr>`).join('')+'</tbody>';
+    }).join('')+'</table>'+(acreditados?`<p class="muted req-acreditados">${esc(tx('requisitos_acreditados',{n:acreditados}))}</p>`:'')+'</details>';
+}
 function renderSide0(){
+  if(S.reqHover){S.reqHover=null;S.mapHover=null;S.mapFocus=false;renderMap()}
   const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
-  const req=[...ancestors(want)].filter(k=>!want.includes(k)&&!tr().done.includes(k));
   const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v);
   $('#plan-panel').setAttribute('aria-label',tx('titulo'));$('#map-ayuda').textContent='ⓘ '+tx('leer_mapa');$('#plan-periodos').setAttribute('aria-label',tx('periodos'));
   if(!PLAN_DOS_PERIODOS)S.planPaso=0;
@@ -693,13 +719,12 @@ function renderSide0(){
   $('#chosen').innerHTML=planPasos().map(paso=>conPlan(()=>{
     const t=tr(), elegidas=t.want.filter(k=>c[k]), cr=elegidas.reduce((s,k)=>s+c[k][1],0);
     const nuevos=elegidas.filter(k=>!t.fail.includes(k)).reduce((s,k)=>s+c[k][1],0), carga=cargaInfo(nuevos);
-    const pendientes=[...ancestors(elegidas)].filter(k=>!elegidas.includes(k)&&!t.done.includes(k));
     const cuenta=carga?tx('resumen',{n:elegidas.length,creditos:fmtCr(cr),tope:fmtCr(carga.tope)}):tx('cuenta',{n:elegidas.length,creditos:fmtCr(cr)});
     return `<section class="plan-grupo plan-${paso+1}" aria-labelledby="plan-grupo-${paso}"><h4 id="plan-grupo-${paso}">${esc(tx('periodo_elegido',{periodo:planEtiqueta(paso)}))}</h4><p>${esc(cuenta)}</p><p>${esc(carga?tx('carga',{creditos:fmtCr(carga.total),tope:fmtCr(carga.tope),retenidos:fmtCr(carga.ret)}):tx('sin_carga',{creditos:fmtCr(cr)}))}</p><div class="wchips">`+
       elegidas.sort((a,b)=>(semOf()[a]||99)-(semOf()[b]||99)).map(k=>`<span class="wchip"><span class="grp">${k}</span>${esc(pretty(c[k][0]))}${off.has(k)?'':' <small>'+esc(tx('sin_grupos'))+'</small>'}${t.oblig.includes(k)?'<span class="tag bad">'+esc(tx('obligatoria'))+'</span>':`<button class="x" data-unwant="${k}" data-plan-quitar="${paso}" aria-label="${esc(tx('quitar',{materia:c[k][0],periodo:planEtiqueta(paso)}))}">×</button>`}</span>`).join('')+
-      (!elegidas.length?`<p>${esc(tx('vacio'))}</p>`:'')+`</div><small>${esc(pendientes.length?tx('requisitos',{materias:pendientes.map(k=>c[k][0].toLowerCase()).join(', ')}):'')}</small></section>`;
+      (!elegidas.length?`<p>${esc(tx('vacio'))}</p>`:'')+`</div></section>`;
   },paso)).join('');
-  $('#chosen-req').textContent=req.length?tx('requisitos',{materias:req.map(k=>c[k][0].toLowerCase()).join(', ')}):'';
+  $('#chosen-req').innerHTML=requisitosHtml(want);
   $('#h-sugg').innerHTML=esc(tx('sugeridas',{periodo:planEtiqueta(PLAN_PASO)}))+' '+simTag('sugg');
   const propuestas=suggestions();
   const yaElegidas=new Set(tr().want);   // las sugeridas que ya están en el plan del periodo activo llevan ✓
@@ -723,7 +748,7 @@ function renderLineas(){
   const ls=MAP().lineas, c=cur(), done=new Set(tr().done), want=new Set(tr().want), off=offeredClaves();
   if(!ls.length){$('#lineas').innerHTML='<p class="muted">Sin líneas de especialización registradas para esta carrera.</p>';return}
   const L=MAP().layout, slots=L?L.boxes.filter(b=>/^optativa/i.test(b[5])).length:0;
-  const AREA=['#8a98c7','#a76987','#577d63','#4d6f8d','#c9a36a','#721e45'], areas=[...new Set(ls.map(l=>l.area))];
+  const AREA=AREA_COLORES, areas=[...new Set(ls.map(l=>l.area))];
   // una optativa puede tener varias claves (una por semestre): se agrupan por nombre
   const group=l=>{const by=new Map();l.claves.forEach(k=>{if(!c[k])return;const n=c[k][0].toUpperCase();const g=by.get(n)||{n,keys:[],niv:c[k][2],cr:c[k][1],done:false,off:false,want:false};g.keys.push(k);g.done||=done.has(k);g.off||=off.has(k);g.want||=want.has(k);g.niv=Math.min(g.niv,c[k][2]);by.set(n,g)});return [...by.values()]};
   const gs=ls.map(group), score=gs.map(g=>g.filter(x=>x.done||x.want).length), best=Math.max(...score);
@@ -1060,9 +1085,11 @@ function toggleBox0(k,mover=false){
 document.addEventListener('click',e=>{
   const li=e.target.closest('#ac li');if(li){pick(+li.dataset.i);return}
   // táctil: un toque fuera del mapa y del inspector retira el enfoque
-  if(S.mapFocus&&!e.target.closest('#map,#insp,#lineas')){S.mapFocus=false;S.mapHover=null;renderMap()}
-  const bx=e.target.closest('[data-box]');if(bx){toggleBox(bx.dataset.box);return}
-  const ob=e.target.closest('[data-obox]');if(ob){toggleBox(ob.dataset.obox);return}
+  if((S.mapFocus||S.reqHover)&&!e.target.closest('#map,#insp,#lineas,#chosen-req')){S.mapFocus=false;S.mapHover=null;S.reqHover=null;renderMap()}
+  const requisito=e.target.closest('[data-req]');
+  if(requisito){S.mapHover=requisito.dataset.req;S.reqHover=requisito.dataset.piden.split(' ');S.mapFocus=true;renderMap();return}
+  const bx=e.target.closest('[data-box]');if(bx){S.reqHover=null;toggleBox(bx.dataset.box);return}
+  const ob=e.target.closest('[data-obox]');if(ob){S.reqHover=null;toggleBox(ob.dataset.obox);return}
   // táctil: tocar un grupo de la oferta muestra (o retira) su vista previa en el horario
   const op=e.target.closest('#offer .opt');if(op&&tactil()&&!e.target.closest('button,input,a,label,select,textarea,summary')){S.hover=S.hover===op.dataset.k?null:op.dataset.k;renderCal();return}
   const t=e.target.closest('button');if(!t)return;
@@ -1072,7 +1099,7 @@ document.addEventListener('click',e=>{
   if(d.lwant){toggleBox(d.lwant);return}
   if(d.fwant){toggleBox(d.fwant);return}
   if(d.fmover){const otro=planAsignado(d.fmover);if(otro!=null)conSim(usaSim('sugg'),()=>conPlan(()=>toggleBox0(d.fmover,true),1-otro));return}
-  if(d.fclose){S.mapFocus=false;S.mapHover=null;renderMap();return}
+  if(d.fclose){S.mapFocus=false;S.mapHover=null;S.reqHover=null;renderMap();return}
   if(d.mview){S.mview=d.mview;store.set('mview',S.mview);renderTray();return}
   if(d.cview){S.cview=d.cview;store.set('cview',S.cview);renderCal();return}
   if(t.id==='b-filt'){const f=t.closest('.filters');f.classList.toggle('open');t.setAttribute('aria-expanded',String(f.classList.contains('open')));return}
@@ -1104,8 +1131,14 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const k=bx.dataset.box;toggleBox(k);document.querySelector(`[data-box="${CSS.escape(k)}"]`)?.focus()}});
 document.addEventListener('change',e=>{if(e.target.dataset.note){const k=e.target.dataset.note,m=ws().marks;m[k]={...(m[k]||{}),n:e.target.value.trim()};save()}});
-$('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-box]');const k=b?b.dataset.box:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
-$('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover){S.mapHover=k;renderMap()}});
+$('#chosen-req').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const fila=e.target.closest('[data-req]');if(fila){S.mapHover=fila.dataset.req;S.reqHover=fila.dataset.piden.split(' ');S.mapFocus=false;renderMap()}});
+$('#chosen-req').addEventListener('focusin',e=>{const fila=e.target.closest('[data-req]');if(fila){S.mapHover=fila.dataset.req;S.reqHover=fila.dataset.piden.split(' ');S.mapFocus=false;renderMap()}});
+const salirRequisitos=()=>{if(S.reqHover&&!S.mapFocus){S.mapHover=null;S.reqHover=null;renderMap()}};
+$('#chosen-req').addEventListener('toggle',e=>{if(!e.target.open&&S.reqHover){S.mapFocus=false;salirRequisitos()}},true);
+$('#chosen-req').addEventListener('pointerleave',salirRequisitos);
+$('#chosen-req').addEventListener('focusout',e=>{if(!e.relatedTarget?.closest('[data-req]'))salirRequisitos()});
+$('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-box]');const k=b?b.dataset.box:null;if(k!==S.mapHover||S.reqHover){S.reqHover=null;S.mapHover=k;renderMap()}});
+$('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover||S.reqHover){S.reqHover=null;S.mapHover=k;renderMap()}});
 $('#lineas').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
 $('#map').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;renderMap()}});
 /* globo de ayuda inmediato (el «title» nativo tarda ~1 s): un solo elemento fijo, colocado junto al ⓘ sin salirse de la
