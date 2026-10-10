@@ -187,13 +187,13 @@ async function renderStatsVista(){
     <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}<small>${esc(SATE.texto('sate.trayectoria.kardex_resumen',{n:Dk.rows.length}))}</small></summary><div class="charts">
       <figure class="ch-wide"><figcaption>${simTag('kardex')}${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>Dk.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(Dk.rows.some(r=>r.sim)?[['simulada','var(--fg)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
     </div></details>
-    <details class="trayectoria-plegable" id="trayectoria-escenario"><summary id="trayectoria-escenario-titulo">${esc(SATE.texto('sate.trayectoria.y_si'))}</summary><div>
+    <div id="trayectoria-sim-slot"></div>
+    <details class="trayectoria-plegable" id="trayectoria-escenario"><summary id="trayectoria-escenario-titulo">${esc(SATE.texto('sate.trayectoria.y_si'))}<small>${esc(SATE.texto('sate.trayectoria.y_si_resumen'))}</small></summary><div>
       ${conSim(usaSim('meta'),()=>metaPanel(statsDatos()))}
       ${conSim(usaSim('pm'),()=>promMetaPanel(statsDatos()))}
     </div></details>
-    <div id="trayectoria-sim-slot"></div>
     <details class="trayectoria-plegable" id="trayectoria-areas"><summary>${esc(SATE.texto('sate.trayectoria.areas'))}<small id="trayectoria-areas-resumen"></small></summary><div class="charts">
-      <figure class="ch-wide trayectoria-afinidades"><figcaption>${simTag('areas')}<b id="trayectoria-areas-lectura"></b><span>${esc(SATE.texto('sate.trayectoria.areas_media',{promedio:f2(Da.media)}))}</span><small>${esc(SATE.texto('sate.trayectoria.areas_ayuda'))}</small></figcaption><div id="ch-cat" aria-hidden="true"></div><div id="trayectoria-areas-datos"></div></figure>
+      <figure class="ch-wide trayectoria-afinidades"><figcaption>${simTag('areas')}<span>${esc(SATE.texto('sate.trayectoria.areas_media',{promedio:f2(Da.media)}))}</span></figcaption><div id="ch-cat" aria-hidden="true"></div><details class="trayectoria-areas-detalle"><summary>${esc(SATE.texto('sate.trayectoria.areas_detalle'))}</summary><p id="trayectoria-areas-lectura"></p><div id="trayectoria-areas-datos"></div></details></figure>
     </div></details>
     <details class="trayectoria-plegable" id="trayectoria-observaciones"><summary>${esc(SATE.texto('sate.trayectoria.observaciones'))}</summary><div class="kanal" id="kanal"></div></details>
     ${D.rows.some(r=>r.eqv)?`<p class="st-note">${D.rows.filter(r=>r.eqv).length} ${D.rows.filter(r=>r.eqv).length===1?'materia reconocida':'materias reconocidas'} por equivalencia, revalidación o dictamen (${D.crEqv==null?'créditos incompletos':fmtCr(D.crEqv)+' créditos'}) ${info('Equivalencia: materia de otra carrera o plan del IPN (por ejemplo, cambio de carrera). Revalidación: materia cursada en otra institución, incluida la movilidad académica nacional o internacional. Dictamen: reconocimiento por resolución académica. Todas cuentan en tus promedios, áreas y créditos; como el SAES las registra al reconocerlas y no en el periodo en que se cursaron, no entran en el promedio por periodo ni en tu ritmo de créditos.')}</p>`:''}`;
@@ -253,8 +253,8 @@ async function renderStatsVista(){
   if(!vigente())return;
   const P=window.Plot;
   const col=d=>tok(mejores.includes(d)?'--ipn-acento':'--ipn-tenue');
-  put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(150,porArea.length*28+50),marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
-    x:{label:null,domain:[6,10],ticks:[6,7,8,9,10]},y:{label:null,domain:porArea.map(d=>d.cat),padding:.3,tickSize:0,tickFormat:d=>d.length>18?d.slice(0,17)+'…':d},
+  put('#ch-cat',P.plot({...base('#ch-cat'),height:porArea.length*24+32,marginTop:0,marginBottom:32,marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
+    x:{label:null,domain:[6,10],ticks:[6,7,8,9,10]},y:{label:null,domain:porArea.map(d=>d.cat),padding:0,tickSize:0,tickFormat:d=>d.length>18?d.slice(0,17)+'…':d},
     marks:[P.ruleY(porArea,{y:'cat',x1:6,x2:10,stroke:tok('--ipn-linea')}),
       P.ruleX(Da.media==null?[]:[Da.media],{stroke:tok('--ipn-tenue'),strokeOpacity:.4,strokeWidth:1}),
       P.dot(porArea,{x:'media',y:'cat',fill:col,fillOpacity:d=>d.n===1?.6:1,r:4.5})]}));

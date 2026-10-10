@@ -4,6 +4,9 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
   const leer=f=>readFileSync(f,'utf8'), html=leer('web/dist/sate/index.html');
 const config=JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
+assert.equal(config.textos['sate.trayectoria.y_si'],'Escenarios de avance');
+assert.equal(config.textos['sate.trayectoria.y_si_resumen'],'Proyecta tu trayectoria con distintas cargas y resultados');
+assert.match(html,/\.charts \.trayectoria-afinidades figcaption\{[^}]*min-height:0;[^}]*flex-wrap:wrap/,'Leyenda compacta y adaptable a teléfono');
 const patron=/@observablehq|d3@|LIB_PLOT|cargarPlot/;
 for(const f of ['index.html','nucleo.js','inicio.js','mapa.js','situacion.js','horarios.js','componentes.js','rutas.js'])
   assert.doesNotMatch(leer('web/dist/sate/'+f),patron,f+' no precarga dependencias de gráficas');
@@ -84,6 +87,9 @@ for(const unidad of ['upiita','escom','upibi']){
   for(const s of solicitudes){assert.match(s.integrity,/^sha384-/);assert.equal(s.crossOrigin,'anonymous')}
   assert.equal(trazados,1,'F: gráfica solo al abrir áreas');
   assert.deepEqual(Array.from(graficas[0].x.domain),[6,10],'K: escala absoluta fija');
+  assert.equal(graficas[0].height,graficas[0].y.domain.length*24+32,'REV1: filas de 24 px sin altura mínima vacía');
+  assert.equal(graficas[0].marginTop,0,'REV1: sin espacio vacío arriba');
+  assert.equal(graficas[0].y.padding,0);
   assert.match(document.querySelector('#trayectoria-areas-datos').innerHTML,/<ol.*Promedio.*cr.*materias/,'K: ranking accesible con los mismos datos');
   areas.open=false;areas.eventos.toggle.at(-1)();
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;
@@ -96,8 +102,11 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(kardex.open,false,'F: preferencia explícita prevalece');
   assert.match(document.querySelector('#kstats').innerHTML,/Tu camino|kpis/);
   const orden=document.querySelector('#kstats').innerHTML;
-  const bloques=['class="kpis"','id="ch-camino"','id="ch-kx"','id="trayectoria-escenario-titulo"','id="meta-periodos"','id="prom-meta"','id="trayectoria-sim-slot"','id="ch-cat"'];
+  const bloques=['class="kpis"','id="ch-camino"','id="ch-kx"','id="trayectoria-sim-slot"','id="trayectoria-escenario-titulo"','id="meta-periodos"','id="prom-meta"','id="ch-cat"'];
   assert.ok(bloques.every((x,i)=>orden.includes(x)&&(!i||orden.indexOf(bloques[i-1])<orden.indexOf(x))),'B1: orden del desempeño y metas agrupadas');
+  assert.match(orden,/<\/div><\/details>\s*<div id="trayectoria-sim-slot"><\/div>\s*<details[^>]+id="trayectoria-escenario"/,'REV1: simulación inmediatamente después del kárdex y antes de escenarios');
+  assert.match(orden,/<details class="trayectoria-areas-detalle"><summary>Ver detalle<\/summary>/,'REV1: datos de áreas plegados por omisión');
+  assert.match(orden,/Escala 6–10 · línea: tu promedio sin reprobadas \([^)]*\) · acento: tus 2 mejores áreas/);
   assert.match(document.querySelector('#est-sim').innerHTML,/Simular fin de semestre/);
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;assert.equal(solicitudes.length,2,'Carga única');
   // El chip es global y Quitar desactiva todas las comparaciones sin alterar el SAES.
