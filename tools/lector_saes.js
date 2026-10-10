@@ -67,7 +67,7 @@
     var kx = await get('/Alumnos/boleta/kardex.aspx');
     var gen = clean((byId(cita, 'Lbl_General') || {}).textContent);
     var p = pairs(cita);
-    var acred = [], kxRep = [], materias = {};
+    var acred = [], kxRep = [], materias = {}, creditosMaterias = {};
     var materia = function (k, n, s) {
       if (!CLAVE.test(k || '')) return;
       k = k.toUpperCase();
@@ -94,13 +94,26 @@
       while (previo && !clean(previo.textContent)) previo = previo.previousElementSibling;
       if (!titulo && previo && previo.tagName !== 'TABLE') titulo = semestreTitulo(previo.textContent);
       var semestre = titulo || ordenTabla;
+      // Algunas unidades informan créditos; solo se leen si el encabezado identifica la columna.
+      var columnaCreditos = -1;
+      var columnasKardex = {cal: 5, periodo: 3, forma: 4};
+      filas.forEach(function (tr) {
+        Array.prototype.forEach.call(tr.cells, function (celda, i) {
+          if (/^cr[eé]ditos$/i.test(clean(celda.textContent))) columnaCreditos = i;
+          if (/^calificaci[oó]n$/i.test(clean(celda.textContent))) columnasKardex.cal = i;
+          if (/^periodo$/i.test(clean(celda.textContent))) columnasKardex.periodo = i;
+          if (/^forma\s+eval/i.test(clean(celda.textContent))) columnasKardex.forma = i;
+        });
+      });
       filas.forEach(function (tr) {
         var c = Array.prototype.map.call(tr.cells, function (x) { return clean(x.textContent); });
         if (c.length >= 6 && CLAVE.test(c[0])) {
           materia(c[0], c[1], semestre);
-          var cal = num(c[5]);
-          if (cal !== null && cal >= 6) acred.push([c[0].toUpperCase(), cal, c[3], c[4]]);
-          else if (cal !== null && cal >= 0) kxRep.push([c[0].toUpperCase(), cal, c[3], c[4]]);   // reprobadas que aparecen en el kárdex (cuentan en el promedio oficial)
+          var creditos = columnaCreditos >= 0 ? num(c[columnaCreditos]) : null;
+          if (creditos !== null && creditos >= 0) creditosMaterias[c[0].toUpperCase()] = creditos;
+          var cal = num(c[columnasKardex.cal]);
+          if (cal !== null && cal >= 6) acred.push([c[0].toUpperCase(), cal, c[columnasKardex.periodo], c[columnasKardex.forma]]);
+          else if (cal !== null && cal >= 0) kxRep.push([c[0].toUpperCase(), cal, c[columnasKardex.periodo], c[columnasKardex.forma]]);   // reprobadas que aparecen en el kárdex (cuentan en el promedio oficial)
         }
       });
     });
@@ -212,6 +225,7 @@
       en_curso: curso,
       horario_inscrito: horario,
       acreditadas: acred,
+      creditos_materias: creditosMaterias,
       kardex_reprobadas: kxRep,
       agenda: agenda,   /* [evento, inicio, fin] de la Agenda escolar: de aquí sale el periodo que sigue */
       lector: '__LECTOR_VERSION__'   /* versión del Lector (huella del código), para atribuir errores a una versión */

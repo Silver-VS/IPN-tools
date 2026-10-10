@@ -38,7 +38,12 @@ class SateBuild(unittest.TestCase):
                 if 'logo' not in identidad:
                     continue
                 ruta = ROOT / 'web/dist/assets/logos/unidades' / (identidad['logo'] + '.webp')
-                self.assertEqual(proponer(dominante(ruta)), identidad['realce'])
+                if unidad == 'encb':
+                    # El dueño eligió el rojo del escudo; el muestreador respeta realce_nota.
+                    self.assertIn('elección del dueño', identidad['realce_nota'])
+                    self.assertEqual(identidad['realce'], {'claro': '#b00040', 'oscuro': '#cc5c85'})
+                else:
+                    self.assertEqual(proponer(dominante(ruta)), identidad['realce'])
                 for modo, fondos in SUPERFICIES.items():
                     for fondo in fondos:
                         self.assertGreaterEqual(contraste(identidad['realce'][modo], fondo), 4.5)

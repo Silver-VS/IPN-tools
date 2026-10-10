@@ -316,6 +316,177 @@
     return nav;
   }
 
-  raiz.SateUI = { usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
+function rowBands(L){
+  if(L._bands) return L._bands;
+  const cs=L.rows.map(()=>[]);
+  L.boxes.forEach(b=>{const cy=b[1]+b[3]/2;let j=0;L.rows.forEach((r,i)=>{if(Math.abs(r[1]-cy)<Math.abs(L.rows[j][1]-cy))j=i});cs[j].push(cy)});
+  // Los mapas por áreas tienen filas exactas; solo se ajustan los centros de los PDF.
+  const ys=L.rows.map(([n,y],i)=>{const v=cs[i].sort((a,b)=>a-b);return v.length&&!L.propuesto&&!L.filas_exactas?v[Math.floor(v.length/2)]:y});
+  return L._bands=L.rows.map(([n],i)=>{const y=ys[i];
+    const a=i?(ys[i-1]+y)/2:Math.max(0,y-(ys[1]!=null?(ys[1]-y)/2:L.pitch/2));
+    const b=i<ys.length-1?(y+ys[i+1])/2:Math.min(L.h,y+(i?(y-ys[i-1])/2:L.pitch/2));
+    return [n,y,a,b]});
+}
+function minimapaCurricular(ctx,L,FILL,op={}){
+  const {isPersonal,cur,slotFill,isElec,statusOf,esc,SATE}=ctx;
+  if(!isPersonal())return null;
+  if(!L){
+    const niveles=[...new Set(Object.values(cur()).map(v=>v[2]))].sort((a,b)=>a-b),boxes=[];
+    let cols=1;
+    niveles.forEach((n,i)=>{const keys=Object.keys(cur()).filter(k=>cur()[k][2]===n);cols=Math.max(cols,keys.length);keys.forEach((k,j)=>boxes.push([j*50,i*50,40,40,k]))});
+    L={w:cols*50,h:Math.max(1,niveles.length)*50,boxes,edges:[],rows:niveles.map((n,i)=>[n,i*50+20]),pitch:50,filas_exactas:true};
+  }
+  FILL=FILL||slotFill(L,new Set());
+  const {nPend=0,FOCO=null}=op,bands=rowBands(L);
+  const colores={done:'var(--ipn-ok)',curso:'var(--sate-realce)',pend:'var(--ipn-tenue)',fail:'var(--ipn-reprobada)',late:'var(--ipn-desfasada)'};
+  const cnt={done:0,curso:0,pend:0,fail:0,late:0};
+  const estado=st=>st==='done'?'done':st.startsWith('curso')?'curso':st.startsWith('late')?'late':st.includes('fail')?'fail':'pend';
+  let svg=`<svg viewBox="0 0 ${L.w} ${L.h}" aria-hidden="true" focusable="false">`;
+  bands.forEach(([n,y,a,b],i)=>{
+    if(i%2===0)svg+=`<rect x="0" y="${a}" width="${L.w}" height="${b-a}" fill="var(--ipn-hundido)"/>`;
+    if(i===nPend&&nPend){const fx=FOCO?FOCO.x0:1,fw=FOCO?FOCO.x1-FOCO.x0:L.w-2;svg+=`<rect x="${fx}" y="${a}" width="${fw}" height="${L.h-a-1}" fill="none" stroke="var(--ipn-acento)" stroke-width="4" stroke-dasharray="14 8" rx="8"/>`}
+  });
+  L.edges.forEach(([s,d,pp])=>{const pts=[];for(let i=0;i<pp.length;i+=2)pts.push(pp[i]+','+pp[i+1]);svg+=`<polyline points="${pts.join(' ')}" fill="none" stroke="var(--ipn-tenue)" stroke-opacity=".35" stroke-width="3"/>`});
+  L.boxes.forEach(([x,y,w,h,k,slot],i)=>{
+    const kk=k||FILL.get(i)?.k,cx=x+w/2,cy=y+h/2,r=Math.min(w,h)*.3;
+    if(!kk){if(/^optativa/i.test(slot)){svg+=`<circle data-estado="pend" cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colores.pend}" stroke-width="4" stroke-dasharray="6 5"/>`;cnt.pend++}return}
+    if(isElec(kk))return;
+    const st=estado(statusOf(kk));cnt[st]++;
+    svg+=`<circle data-estado="${st}" cx="${cx}" cy="${cy}" r="${r}" fill="${colores[st]}"/>`;
+  });
+  svg+='</svg>';
+  // leyenda en dos filas centradas: avance (acreditadas, en curso, por cursar) y alertas (reprobadas, desfasadas)
+  const pastilla=st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`;
+  const leyenda=[['done','curso','pend'],['fail','late']].map(fila=>fila.filter(st=>st in cnt)).filter(f=>f.length)
+    .map(f=>`<div class="mm-fila">${f.map(pastilla).join('')}</div>`).join('');
+  return {svg,leyenda,cnt};
+}
+function cajaMateria(ctx,k,x,y,w,h,sc,want,off,hot,sem,req){
+  const {cur,statusOf,planAsignado,isElec,MARK,S,fmtCr,porNiveles,esc,SATE,PLAN_DOS_PERIODOS,planEtiqueta}=ctx;
+  const [n,cr,niv]=cur()[k]||[k,0,1];
+  const st=statusOf(k), paso=planAsignado(k);
+  if(ctx.soloLectura){
+    const tip=k+' · '+n+' · '+ctx.etiqueta(k);
+    return `<div class="box ${st}" data-estado="${st}" style="--nv:var(--sate-realce);left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}" aria-label="${esc(tip)}">${esc(n)}</div>`;
+  }
+  const el=isElec(k);
+  const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${paso!=null?' want plan-'+(paso+1)+(PLAN_DOS_PERIODOS&&paso!==S.planPaso?' plan-otra':''):req&&req.has(k)?' req':''}${hot?(hot.has(k)?(k===S.mapHover?(S.reqHover?' hpre':' hot'):hot.pre?.has(k)?' hpre':hot.post?.has(k)?' hpost':''):' dim'):''}${off.has(k)||el?'':' offered-no'}`;
+  const tip=`${k} · ${n} · ${fmtCr(cr)} créditos · nivel ${niv}${sem&&!porNiveles()?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · desfasada (SAES): inscripción obligatoria':st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  return `<div class="${cls}" data-box="${k}" role="button" tabindex="0" aria-pressed="${paso===S.planPaso}" aria-label="${esc(tip+(paso==null?'':' · '+SATE.texto('sate.planeacion.periodo_elegido',{marca:paso+1,periodo:planEtiqueta(paso)})))}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}${paso==null||!PLAN_DOS_PERIODOS?'':`<span class="plan-marca" aria-hidden="true">${paso===0&&S.planPaso===1?'en ':''}${esc(planEtiqueta(paso))}</span>`}</div>`;
+}
+function lanes(items){
+  const out=[];
+  for(let d=0;d<7;d++){
+    const bs=items.filter(b=>b.d===d).sort((a,b)=>a.a-b.a||b.b-a.b);
+    let group=[],end=-1;
+    const flush=()=>{const le=[];group.forEach(b=>{let i=le.findIndex(e=>e<=b.a);if(i<0){i=le.length;le.push(0)}le[i]=b.b;b.lane=i});group.forEach(b=>{b.n=le.length;b.clash=le.length>1&&!b.ghost});out.push(...group);group=[]};
+    bs.forEach(b=>{if(b.a>=end&&group.length)flush();group.push(b);end=Math.max(end,b.b)});
+    if(group.length)flush();
+  }
+  return out;
+}
+function cuadriculaHorario(all,op){
+  const {S,slots,START,BLOCK,SLOT,SLOTPX,$,DAYS,hm,esc,txH,hue,keyOf,name,profs,roomAt,ghost,soloLectura=false}=op;
+  // Las actividades de solo horas no ocupan celdas ni amplían el rango visible.
+  all=all.filter(c=>!c.own||!c.oculto);
+  const maxDay=Math.max(4,...all.flatMap(c=>slots(c).map(b=>b[0])));
+  const days=S.weekend?7:maxDay+1;
+  // bloques de 1:30 alineados a las 7:00 (si algo empieza antes, se agregan bloques completos hacia arriba)
+  const first=Math.min(START,...all.flatMap(c=>slots(c).map(b=>b[1])));
+  const lo=START-Math.ceil((START-first)/BLOCK)*BLOCK;
+  const hi=Math.max(14*60+30,...all.flatMap(c=>slots(c).map(b=>b[2])));
+  const end=lo+Math.ceil((hi-lo)/BLOCK)*BLOCK, h=(end-lo)/SLOT*SLOTPX;
+  const cal=$('#cal');cal.style.setProperty('--days',days);cal.style.setProperty('--slot',SLOTPX+'px');
+  let html='<div class="dh"></div>'+DAYS.slice(0,days).map(d=>`<div class="dh">${d}</div>`).join('');
+  html+=`<div class="hours" style="height:${h}px">`;
+  for(let m=lo;m<end;m+=BLOCK) html+=`<div style="top:${(m-lo)/SLOT*SLOTPX}px">${hm(m)}</div>`;
+  html+='</div>';
+  const items=lanes(all.flatMap(c=>slots(c).map(([d,a,b])=>({c,d,a,b,ghost:c===ghost}))));
+  for(let d=0;d<days;d++){
+    html+=`<div class="day" style="height:${h}px">`;
+    if(!soloLectura)for(let m=lo;m<end;m+=BLOCK){const on=S.gap&&S.gap.d===d&&S.gap.a===m;
+      html+=`<button type="button" class="gapcell${on?' on':''}" data-gap="${d}|${m}" style="top:${(m-lo)/SLOT*SLOTPX}px;height:${BLOCK/SLOT*SLOTPX}px" title="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)+'–'+hm(m+BLOCK)}))}" aria-label="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)}))}"></button>`}
+    items.filter(b=>b.d===d).forEach(b=>{
+      const top=(b.a-lo)/SLOT*SLOTPX, ht=(b.b-b.a)/SLOT*SLOTPX-2, w=100/b.n, pos=`top:${top}px;height:${ht}px;left:calc(${b.lane*w}% + 2px);width:calc(${w}% - 4px)`;
+      if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}"${b.c.tipo?` data-tipo="${esc(b.c.tipo)}"`:""}${!soloLectura&&b.c.i!=null?` data-own="${b.c.i}" tabindex="0" role="button" aria-label="${esc(txH('semana_abrir_bloque',{nombre:b.c.n}))}"`:''} style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
+      else html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)};${pos}"${soloLectura?'':` data-k="${keyOf(b.c)}"`} title="${esc(b.c[3])} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}"><b>${esc(name(b.c))}</b><span class="t">${esc(b.c[3])} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></div>`;
+    });
+    html+='</div>';
+  }
+  cal.innerHTML=html;
+  return items;
+}
+
+function indicadoresTrayectoria(D,{esc,fmtCr,info,SATE}){
+  const f2=v=>v==null||!isFinite(v)?'—':(+v).toFixed(2);
+  const kpi=(lbl,val,viz,sub='',ayuda='',cls='')=>`<div class="kpi"><span>${lbl}${ayuda?' '+info(ayuda):''}</span><div class="kpi-v"><b class="${cls}">${val}</b>${viz||''}</div>${sub?`<small>${sub}</small>`:''}</div>`;
+  // promedio: regla 6–10 con tu marca
+  const regla=v=>v==null?'':`<span class="k-regla" aria-hidden="true"><i style="left:${Math.max(0,Math.min(100,(v-6)/4*100))}%"></i><em>6</em><em>10</em></span>`;
+  // calificaciones: mini histograma 6–10
+  const cuenta=[6,7,8,9,10].map(g=>D.rows.filter(r=>Math.round(r.cal)===g).length), cmax=Math.max(1,...cuenta), moda=[6,7,8,9,10].filter((g,j)=>cuenta[j]===Math.max(...cuenta)).sort((x,y)=>Math.abs(x-(D.mediana??8))-Math.abs(y-(D.mediana??8)))[0];   // en empate, la más cercana a la mediana
+  const hist=`<span class="k-hist" aria-hidden="true">${cuenta.map((n,j)=>`<i class="g${j+6}" style="height:${Math.max(2,n/cmax*100)}%" title="${n} con ${j+6}"></i>`).join('')}</span>`;
+  // ordinario: anillo de porcentaje
+  const pct=D.ord!=null?Math.round(D.ord*100):null, Rr=15, Cc=2*Math.PI*Rr;
+  const anillo=pct==null?'':`<svg class="k-anillo" viewBox="0 0 40 40" width="40" height="40" aria-hidden="true"><circle cx="20" cy="20" r="${Rr}" fill="none" stroke="var(--line)" stroke-width="6"/><circle cx="20" cy="20" r="${Rr}" fill="none" stroke="var(--ok)" stroke-width="6" stroke-dasharray="${(pct/100*Cc).toFixed(1)} ${Cc.toFixed(1)}" transform="rotate(-90 20 20)"/></svg>`;
+  const otras=[['EXT','extraordinario','extraordinarios'],['ETS','ETS','ETS'],['REC','recursada','recursadas']].map(([c,u,v])=>{const n=D.rows.filter(r=>r.codigo===c).length;return [n,n===1?u:v]}).filter(([n])=>n);
+  // créditos por periodo: mini barras de los últimos periodos
+  const ult=D.porPer.filter(d=>d.cr!=null&&!d.sim).slice(-6), crmax=Math.max(1,...ult.map(d=>d.cr));
+  const barras=ult.length?`<span class="k-bars" aria-hidden="true">${ult.map(d=>`<i style="height:${Math.max(4,d.cr/crmax*100)}%" title="${esc(d.lbl)}: ${fmtCr(d.cr)} créditos"></i>`).join('')}</span>`:'';
+  const dTxt=D.delta!=null&&Math.abs(D.delta)>=.01?`<em class="${D.delta>0?'up':'down'}">${D.delta>0?'▲':'▼'} ${Math.abs(D.delta).toFixed(2)}</em> frente al periodo anterior`:SATE.texto('sate.desempeno.materias',{n:D.rows.length});
+  return `<div class="kpis">
+      ${kpi(D.rows.some(r=>r.sim)?'Promedio sin reprobadas · simulado':'Promedio sin reprobadas',f2(D.media),regla(D.media),dTxt,`Promedio de tus ${D.rows.length} materias acreditadas (incluye equivalencias y revalidaciones). A diferencia del promedio oficial, no cuenta reprobadas ni no acreditadas: las que debes se acreditarán con calificación aprobatoria.`)}
+      ${kpi('Tus calificaciones',moda!=null&&D.rows.length?String(moda):'—',hist,moda!=null&&D.rows.length?`la más frecuente · mediana ${f2(D.mediana)}`:'',`Cuántas materias aprobaste con cada calificación, de 6 a 10. Desviación estándar: ${f2(D.sd)} (entre más baja, más parejas).`)}
+      ${kpi('En ordinario',pct!=null?pct+' %':'—',anillo,otras.length?otras.map(([n,l])=>`<span class="k-chip">${n} ${l}</span>`).join(' '):'sin extraordinarios',`Materias aprobadas en ordinario entre ${D.formasN} aprobadas en ordinario, extraordinario, ETS o recurse${D.formasExcluidas?`; no cuenta ${D.formasExcluidas} por equivalencia u otra vía`:''}.`)}
+      ${kpi('Créditos por periodo',D.ritmo?fmtCr(D.ritmo):'—',barras,D.ritmo?`promedio de ${D.ritmoN} periodos`:'',`Créditos aprobados en promedio en tus últimos ${D.ritmoN} periodos${D.ritmoNota?'; '+D.ritmoNota:''}.`)}
+    </div>`;
+}
+function fichasKardex(t,sub,rs,esc){
+    const col=()=>`<div class="kx-col"><div class="kx-h"><b>${esc(t)}</b><small>${sub}</small></div><div class="kx-cs">${rs.slice().sort((a,b)=>b.cal-a.cal).map(r=>{
+      const l={EXT:'E',ETS:'T',REC:'R'}[r.codigo]||'';
+      return `<span class="kx-c g${Math.round(r.cal)}${r.sim?' sim':''}" title="${esc(r.nombre)} · ${r.cal} · ${esc(r.forma)}${r.sim?' · simulada':''}">${r.cal}${l?`<i>${l}</i>`:''}</span>`}).join('')}</div></div>`;
+  return col();
+}
+function caminoTrayectoria(Dc,A,plazo,totalPer,{esc,fmtCr,perName,proyeccionCreditos,ec,info},ancho){
+  const host={clientWidth:ancho,innerHTML:""}, tot=Dc.total;
+    if(!(tot>0)||Dc.obt==null){host.innerHTML='<p class="muted">Faltan los créditos del plan para dibujar tu camino.</p>'}else{
+      const hecho=Math.min(tot,Dc.obt-(Dc.simCr||0)), sim=Math.min(tot-hecho,Dc.simCr||0), curso=Math.min(tot-hecho-sim,ec);
+      const pc=v=>(v/tot*100).toFixed(2)+'%';
+      const proy=proyeccionCreditos(Dc).slice(1), cursados=A.avance?.cursados;
+      const inicio=Dc.actual!=null&&cursados!=null?Dc.actual-cursados+1:null, limite=plazo.max&&inicio!=null?inicio+plazo.max-1:null;
+      const W=host.clientWidth||600;let ult=-1e9;
+      const marcas=(lst,cls)=>lst.map(d=>{const x=d.acum/tot*W, ver=x-ult>=46;if(ver)ult=x;
+        const pp=d.acum/tot*100;
+        return `<span class="cm-m ${cls}${limite!=null&&d.per>limite?' fuera':''}${pp>94?' der':pp<6?' izq':''}" style="left:${pc(d.acum)}" title="${esc(perName(d.per))}: ${fmtCr(d.acum)} créditos${cls==='fut'?' (estimado)':''}">${ver?esc(perName(d.per)):''}</span>`}).join('');
+      ult=-1e9;const pasado=marcas(Dc.curva.filter(d=>!d.sim),'pas');ult=-1e9;const futuro=marcas(proy,'fut');
+      const fin=Dc.falta===0?'Créditos completos':Dc.fin!=null?`Terminarías en <b>${esc(perName(Dc.fin))}</b>${totalPer?` (unos ${totalPer} periodos en total)`:''}`:'';
+      host.innerHTML=`<p class="cm-h"><span class="cm-n"><b>${fmtCr(Dc.obt)}</b> de ${fmtCr(tot)} créditos · ${Math.round(Dc.obt/tot*100)} %${Dc.falta?` · te faltan ${fmtCr(Dc.falta)}`:''}</span><span>${fin}</span></p>`+
+        `<div class="cm-past">${pasado}</div><div class="cm-track"><i class="hecho" style="width:${pc(hecho)}"></i><i class="rayado" style="width:${pc(sim+curso)}"></i></div><div class="cm-fut">${futuro}</div>`+
+        (limite!=null&&totalPer>plazo.max?`<p class="cm-alerta">A tu ritmo rebasarías el plazo de referencia de ${plazo.max} periodos (${esc(perName(limite))}).</p>`:'')+
+        (plazo.max?`<p class="cm-ref">Plazo de referencia: ${plazo.max} periodos ${info(plazo.calculado?`${fmtCr(A.carga.total)} créditos del plan ÷ ${fmtCr(A.carga.min)} de carga mínima. El SAES indica una duración de ${A.carga.duracion??'—'} y un máximo de ${A.carga.duracion_max??'—'} periodos; confirma tu plazo con Gestión Escolar.`:'Plazo máximo indicado por el SAES.')}</p>`:'')}
+  return host.innerHTML;
+}
+
+function leyendaGrafica(items,esc){
+  const m=(t,c)=>({linea:`<path d="M1 7H21" stroke="${c}" stroke-width="2.4"/><circle cx="11" cy="7" r="2.6" fill="${c}"/>`,
+    punteada:`<path d="M1 7H21" stroke="${c}" stroke-width="2" stroke-dasharray="4 3"/><circle cx="11" cy="7" r="2.8" fill="var(--bg)" stroke="${c}" stroke-width="1.5"/>`,
+    guion:`<path d="M1 7H21" stroke="${c}" stroke-width="1.6" stroke-dasharray="2 3"/>`,
+    area:`<rect x="1" y="2" width="20" height="10" rx="2" fill="${c}" fill-opacity=".2"/>`,
+    numero:`<text x="11" y="11" text-anchor="middle" font-size="10" font-weight="700" fill="${c}">8.5</text>`,
+    rayado:`<rect x="1" y="2" width="20" height="10" rx="2" fill="${c}" fill-opacity=".35"/><path d="M4 12L10 2M10 12L16 2M16 12L21 4" stroke="${c}" stroke-width="1.5"/>`,
+    marca:`<path d="M11 1V13" stroke="${c}" stroke-width="2"/>`,
+    grado:`<rect x="0" y="2" width="4" height="10" fill="var(--g6)"/><rect x="4.5" y="2" width="4" height="10" fill="var(--g7)"/><rect x="9" y="2" width="4" height="10" fill="var(--g8)"/><rect x="13.5" y="2" width="4" height="10" fill="var(--g9)"/><rect x="18" y="2" width="4" height="10" fill="var(--g10)"/>`,
+    letra:`<text x="11" y="11" text-anchor="middle" font-size="11" font-weight="700" fill="var(--fg)">${c}</text>`,
+    simulada:`<rect x="4" y="1.5" width="14" height="11" rx="2" fill="none" stroke="${c}" stroke-dasharray="2 2"/>`,
+    cuadro:`<rect x="5" y="2" width="12" height="10" rx="2" fill="${c}"/>`,
+    rango:`<path d="M11 2V12" stroke="${c}" stroke-opacity=".35" stroke-width="7" stroke-linecap="round"/>`,
+    barra:`<rect x="4" y="3" width="6" height="10" fill="${c}" fill-opacity=".75"/><rect x="12" y="6" width="6" height="7" fill="${c}" fill-opacity=".75"/>`,
+    punto:`<circle cx="11" cy="7" r="4" fill="${c}" fill-opacity=".8"/>`,
+    anillo:`<circle cx="11" cy="7" r="4" fill="var(--bg)" stroke="${c}" stroke-width="1.8"/>`,
+    vertical:`<path d="M11 1V13" stroke="${c}" stroke-width="2"/>`,
+    'vertical-p':`<path d="M11 1V13" stroke="${c}" stroke-width="1.6" stroke-dasharray="3 2"/>`}[t]);
+  return `<span class="ley">${items.map(([t,c,x])=>`<span><svg viewBox="0 0 22 14" width="22" height="14" aria-hidden="true" fill="none">${m(t,c)}</svg>${esc(x)}</span>`).join('')}</span>`;
+}
+
+  raiz.SateUI = { leyendaGrafica, indicadoresTrayectoria, fichasKardex, caminoTrayectoria, bandasMapa:rowBands, minimapaCurricular, cajaMateria, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior };
 })(typeof window !== 'undefined' ? window : globalThis);

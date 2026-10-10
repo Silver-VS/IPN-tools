@@ -570,17 +570,6 @@ function renderOffer(){
   }
   $('#offer').innerHTML=html||`<p class="empty">${esc(txH('oferta_sin_resultados'))}</p>`;
 }
-function lanes(items){
-  const out=[];
-  for(let d=0;d<7;d++){
-    const bs=items.filter(b=>b.d===d).sort((a,b)=>a.a-b.a||b.b-a.b);
-    let group=[],end=-1;
-    const flush=()=>{const le=[];group.forEach(b=>{let i=le.findIndex(e=>e<=b.a);if(i<0){i=le.length;le.push(0)}le[i]=b.b;b.lane=i});group.forEach(b=>{b.n=le.length;b.clash=le.length>1&&!b.ghost});out.push(...group);group=[]};
-    bs.forEach(b=>{if(b.a>=end&&group.length)flush();group.push(b);end=Math.max(end,b.b)});
-    if(group.length)flush();
-  }
-  return out;
-}
 /* horario inscrito (leído del SAES con el Lector): se carga en la versión seleccionada para exportarlo o compararlo */
 function loadInscrito(){
   const H=(isPersonal()&&ALUMNO.horario_inscrito)||[];if(!H.length)return;
@@ -610,31 +599,7 @@ function renderCal(){
   const ghost=S.hover&&!plan().sel.includes(S.hover)?byKey(S.hover):null;
   const viajes=SEMANA_ACTIVA?semanaTraslados(sel).map(([d,a,b])=>({own:true,n:txH('semana_categoria_traslados'),h:[[d,Math.max(0,a),Math.min(1440,b)]]})):[];
   const all=[...sel,...own,...viajes,...(ghost?[ghost]:[])];
-  const maxDay=Math.max(4,...all.flatMap(c=>slots(c).map(b=>b[0])));
-  const days=S.weekend?7:maxDay+1;
-  // bloques de 1:30 alineados a las 7:00 (si algo empieza antes, se agregan bloques completos hacia arriba)
-  const first=Math.min(START,...all.flatMap(c=>slots(c).map(b=>b[1])));
-  const lo=START-Math.ceil((START-first)/BLOCK)*BLOCK;
-  const hi=Math.max(14*60+30,...all.flatMap(c=>slots(c).map(b=>b[2])));
-  const end=lo+Math.ceil((hi-lo)/BLOCK)*BLOCK, h=(end-lo)/SLOT*SLOTPX;
-  const cal=$('#cal');cal.style.setProperty('--days',days);cal.style.setProperty('--slot',SLOTPX+'px');
-  let html='<div class="dh"></div>'+DAYS.slice(0,days).map(d=>`<div class="dh">${d}</div>`).join('');
-  html+=`<div class="hours" style="height:${h}px">`;
-  for(let m=lo;m<end;m+=BLOCK) html+=`<div style="top:${(m-lo)/SLOT*SLOTPX}px">${hm(m)}</div>`;
-  html+='</div>';
-  const items=lanes(all.flatMap(c=>slots(c).map(([d,a,b])=>({c,d,a,b,ghost:c===ghost}))));
-  for(let d=0;d<days;d++){
-    html+=`<div class="day" style="height:${h}px">`;
-    for(let m=lo;m<end;m+=BLOCK){const on=S.gap&&S.gap.d===d&&S.gap.a===m;
-      html+=`<button type="button" class="gapcell${on?' on':''}" data-gap="${d}|${m}" style="top:${(m-lo)/SLOT*SLOTPX}px;height:${BLOCK/SLOT*SLOTPX}px" title="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)+'–'+hm(m+BLOCK)}))}" aria-label="${esc(txH('buscar_hueco',{dia:DAYS[d],horas:hm(m)}))}"></button>`}
-    items.filter(b=>b.d===d).forEach(b=>{
-      const top=(b.a-lo)/SLOT*SLOTPX, ht=(b.b-b.a)/SLOT*SLOTPX-2, w=100/b.n, pos=`top:${top}px;height:${ht}px;left:calc(${b.lane*w}% + 2px);width:calc(${w}% - 4px)`;
-      if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}"${b.c.i!=null?` data-own="${b.c.i}" tabindex="0" role="button" aria-label="${esc(txH('semana_abrir_bloque',{nombre:b.c.n}))}"`:''} style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
-      else html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)};${pos}" data-k="${keyOf(b.c)}" title="${b.c[3]} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}"><b>${esc(name(b.c))}</b><span class="t">${b.c[3]} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></div>`;
-    });
-    html+='</div>';
-  }
-  cal.innerHTML=html;
+  const items=SateUI.cuadriculaHorario(all,{S,slots,START,BLOCK,SLOT,SLOTPX,$,DAYS,hm,esc,txH,hue,keyOf,name,profs,roomAt,ghost});
   const cv=cview();document.querySelectorAll('[data-cview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.cview===cv)));
   $('.calwrap').hidden=cv==='dia';$('#agenda').hidden=cv!=='dia';
   if(cv==='dia'){const by={};items.forEach(b=>(by[b.d]=by[b.d]||[]).push(b));
