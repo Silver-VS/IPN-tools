@@ -2,7 +2,15 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.20"
+version = "2026.10.21"
+
+[sate.creditos]
+rotulo = "créditos"
+escala = "Créditos TEPIC, la escala que usa el SAES"
+contexto = "{escala}. {explicacion}"
+detalle = "{cr} créditos (SATCA: {satca})"
+calculado = "≈ indica un cálculo a partir de las horas del SAES: se dividen las horas semestrales entre 18 y se calcula TEPIC = 2 × horas semanales de teoría + horas semanales de práctica."
+ayuda = "En los mapas curriculares del IPN, una misma materia puede tener dos cifras de créditos. SATE usa la escala TEPIC, la misma del SAES: cada hora semanal de teoría vale dos créditos y cada hora semanal de práctica, uno; por ejemplo, 3 horas de teoría y 1.5 de práctica suman 7.5 créditos. La escala SATCA (ANUIES, 2007) parte de las horas de trabajo de todo el semestre, no de las horas por semana. Por eso las dos cifras no coinciden y no se comparan entre sí. Tu carga autorizada y tus totales están en TEPIC. Fuente: <a href=\"https://doi.org/10.22201/iisue.20072872e.2011.4.40\" target=\"_blank\" rel=\"noopener\">ANUIES, RIES (2011)</a>."
 
 [proyecto]
 nombre = "HADES"
@@ -445,7 +453,7 @@ explorar_cursor = "Coloca el cursor sobre una materia para ver sus requisitos y 
 explorar_tactil = "Toca una materia para ver sus requisitos y las materias que dependen de ella. Tócala de nuevo o elige «Quiero cursarla» para agregarla a tu plan."
 explorar_tactil_anual = "Toca una materia para ver sus requisitos. Tócala de nuevo o usa «Quiero cursarla» para agregarla al periodo activo."
 supuesto_titulo = "Supuesto del periodo {periodo}"
-pie = "{marca} · {periodo}: {n, plural, one {# materia} other {# materias}} · {creditos}{carga} cr"
+pie = "{marca} · {periodo}: {n, plural, one {# materia} other {# materias}} · {creditos}{carga} créditos"
 pie_tope = " de {tope}"
 titulo = "Planear en el mapa"
 periodos = "Periodo de planeación"
@@ -558,7 +566,7 @@ mas_opciones = "{n, plural, one {Ver # opción más} other {Ver # opciones más}
 cuenta_materias = "{n, plural, one {# materia} other {# materias}} · {opciones, plural, one {# opción} other {# opciones}}"
 cuenta_grupos = "{n, plural, one {# grupo} other {# grupos}} · {materias, plural, one {# materia} other {# materias}}"
 agregar_grupo = "Agregar grupo completo"
-carga_total = "Carga total: {n} cr · {estado}"
+carga_total = "Carga total: {n} créditos · {estado}"
 carga_autorizada = "autorizada {n}"
 mas_filtros = "Más filtros"
 mas_filtros_activos = "Más filtros ({n})"
@@ -618,11 +626,11 @@ hora_1 = "1 h"
 hora_media = "1 h 30 min"
 horas_2 = "2 h"
 generador_auto = "Selección automática entre tus <b>{n}</b> materias: busca cerca de <b>{meta} créditos nuevos</b> (carga media{tope}) con un horario saludable: hasta 8 h en la escuela (idealmente 6.5 h o menos), no más de 3 clases seguidas, al menos 1 h para comer entre 12:00 y 16:30, pocas horas libres y clases repartidas entre los días."
-generador_tope = ", sin rebasar {n} cr en total"
+generador_tope = ", sin rebasar {n} créditos en total"
 generador_relajado = "Con tus exclusiones y filtros ninguna combinación cumple todos estos criterios; se muestran las más cercanas. Revisa la permanencia y los descansos de cada opción, o reduce las exclusiones."
 generador_carga_menor = "Con la oferta actual, las combinaciones que cumplen estos criterios llegan a <b>{n} créditos nuevos</b>. Para una carga mayor elige un número de materias por horario; esas opciones pueden tener jornadas más largas."
 generador_numero = "Horarios de <b>{n} materias</b> elegidas entre tus <b>{total}</b> seleccionadas{tope}. Cada opción combina materias distintas."
-generador_carga_tope = ", sin rebasar tu carga permitida ({n} cr en total)"
+generador_carga_tope = ", sin rebasar tu carga permitida ({n} créditos en total)"
 generador_dias = "Con todas las materias seleccionadas, el mínimo es de <b>{n, plural, one {# día} other {# días}}</b> a la semana."
 generador_dias_imposible = "En {n} días no es posible incluirlas todas; las opciones omiten al menos una materia."
 generador_dias_posible = "Es posible en {n} días o menos."

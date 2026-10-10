@@ -1,6 +1,13 @@
 {
   "id": "escom",
   "modelo": "semestral",
+  "planes": {"C": ["20", "09"]},
+  "creditos": {
+    "escala": "TEPIC",
+    "satca": "Dato oficial cuando existe; en filas con horas semestrales se conserva el crédito del SAES como SATCA.",
+    "conversion": "Si horas_teoria > 10 o horas_practica > 10, créditos > 0 y el crédito no coincide con 2 * horas_teoria + horas_practica: cr = (2 * horas_teoria + horas_practica) / 18; cr_calculado = true. Se excluyen TEPIC ya coherentes y actividades sin créditos. Se conservan las filas originales del SAES.",
+    "documentacion": "docs/DISCREPANCIAS-CREDITOS.md"
+  },
   "saes": "https://www.saes.escom.ipn.mx/",
   "fuente_mapas": "Mapas curriculares 2020 de la ESCOM (PDF), extraídos con tools/extract_mapa_escom.py"
 }
