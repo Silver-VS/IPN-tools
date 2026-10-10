@@ -985,7 +985,10 @@ def escribir_sate(data):
     textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
     nombres_unidades = json.loads((ROOT / 'data/unidades_saes.json').read_text(encoding='utf-8'))
     identidad_unidades = json.loads((ROOT / 'data/unidades_identidad.json').read_text(encoding='utf-8'))['unidades']
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades}, ensure_ascii=False, separators=(",", ":")) + ";")
+    calendario_base = json.loads((ROOT / 'data/calendario_ipn.json').read_text(encoding='utf-8'))
+    calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()
+                         if not u.startswith('_') and u not in cfg['unidades']}
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidades":cfg["unidades"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.
@@ -1051,6 +1054,9 @@ document.addEventListener('click', e => {
     generico = re.sub(r'("unidad"\s*:\s*)"[^"]*"', r'\1window.SATE_UNIDAD', generico, count=1)
     generico = saes.inject(generico, 'horarios')
     generico = generico.replace("new URL('auth.html',location.href)", "new URL('../auth.html',location.href)")
+    # Comparte la misma API de calendario sin copiar la base en cada unidad.
+    calendario_api = core[core.index('SATE.calendario={'):core.index('let CALAP=')]
+    generico = generico.replace('(function () {', calendario_api + '\n(function () {', 1)
     (destino / 'generico.js').write_text(generico, encoding='utf-8')
     print("datos SATE", UNIDAD, {p.name:p.stat().st_size for p in datos.glob("*.json")})
 

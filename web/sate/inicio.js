@@ -11,7 +11,7 @@
   if (solicitada && /^[a-z0-9-]+$/.test(solicitada) && !config[solicitada]) {
     const siglas = SATE_CONFIG.nombresUnidades?.[solicitada] || solicitada.toUpperCase();
     config[solicitada] = {generica:true,siglas,nombre:siglas,realce:SATE_CONFIG.identidadUnidades?.[solicitada]?.realce,saes:'https://saes.'+solicitada+'.ipn.mx/',
-      pestanas:['trayectoria','mapa'],grupos:[['trayectoria'],['mapa']],tramites:[]};
+      pestanas:['trayectoria','mapa','calendario'],grupos:[['trayectoria'],['mapa','calendario']],tramites:[]};
   }
   const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
   const recordada = leer('ipnt.unidad');
@@ -77,7 +77,7 @@
     }).catch(e => { oferta = null; throw e; });
   }
   async function modulo(id) {
-    if (cfg.generica) return modulos[id];
+    if (cfg.generica && id !== 'calendario') return modulos[id];
     if (id === 'trayectoria') await script('desempeno.js');
     if (id === 'calendario') await script('calendario.js');
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
@@ -189,7 +189,7 @@
   }
   function repintar() {
     if (!actual) return;
-    if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && actual.pestana !== 'horarios') { ir('horarios'); return; }
+    if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario'].includes(actual.pestana)) { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos(); modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
