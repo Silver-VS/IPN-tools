@@ -851,6 +851,7 @@ def main():
     import shutil   # páginas fijas del sitio e ícono de la app (docs/marca)
     idx = cuenta.inject((ROOT / "web" / "index.html").read_text(encoding="utf-8")).replace("/*__SAES_CSS__*/", saes.CSS, 1)
     idx = contenido.inject_apoyo(idx)
+    idx = idx.replace('/*__SATE_ENTRADA_ABRIR__*/', contenido.objeto_t()['sate.entrada.abrir'])
     idx = idx.replace("/*__UNIDADES__*/[]", json.dumps(cuenta.config()['unidades'], ensure_ascii=False), 1)
     (ROOT / "web" / "dist" / "index.html").write_text(aplicar(idx, "index"), encoding="utf-8")   # página principal con inicio de sesión
     for f in ("revision.html", "privacidad.html", "condiciones.html"):

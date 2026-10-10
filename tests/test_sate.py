@@ -86,6 +86,13 @@ class SateBuild(unittest.TestCase):
             capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
 
+    def test_entrada_y_unidad_del_saes(self):
+        """Entrada completa, prioridades y pegado del Lector con DOM en memoria."""
+        resultado = subprocess.run(
+            [r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_entrada.mjs'], cwd=ROOT,
+            capture_output=True, text=True, encoding='utf-8')
+        self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
+
     def test_planeacion_un_periodo_y_anual(self):
         """Perfiles ficticios y DOM local: conserva datos, selección, carga y oferta."""
         resultado = subprocess.run(

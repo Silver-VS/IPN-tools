@@ -7,19 +7,22 @@
   if (cascaron && ['v1','v3'].includes(variante)) cascaron.setAttribute('data-pestanas', variante);
   let api, actual, tabs, barra, version = 0, recalcularPestanas=()=>{};
   const leer = k => { try { return localStorage.getItem(k); } catch { return null; } };
-  const solicitada = location.hash.match(/^#\/([a-z0-9-]+)\//)?.[1] || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || leer('ipnt.unidad');
+  const parametros = new URLSearchParams(location.search), entrada = parametros.get('sateEntrada') === '1';
+  let alumnoUnidad;
+  try { alumnoUnidad = JSON.parse(leer('saes.alumno'))?.unidad; } catch {}
+  const recordada = leer('ipnt.unidad');
+  const solicitada = entrada ? null : location.hash.match(/^#\/([a-z0-9-]+)\//)?.[1] || parametros.getAll('sateUnidad').at(-1) || alumnoUnidad || recordada;
   if (solicitada && /^[a-z0-9-]+$/.test(solicitada) && !config[solicitada]) {
     const identidad = SATE_CONFIG.identidadUnidades?.[solicitada] || Object.values(SATE_CONFIG.identidadUnidades || {}).find(c=>c.alias?.includes(solicitada));
     const siglas = identidad?.siglas || solicitada.toUpperCase();
     config[solicitada] = {generica:true,siglas,nombre:identidad?.nombre || siglas,realce:identidad?.realce,logoUnidad:identidad?.logo,saes:'https://saes.'+solicitada+'.ipn.mx/',
       pestanas:['trayectoria','mapa'],grupos:[['trayectoria'],['mapa']],tramites:[]};
   }
-  const inicial = SateRutas.ruta(location.hash, leer('ipnt.unidad') || 'upiita', config);
-  const recordada = leer('ipnt.unidad');
-  const unidad = inicial?.unidad || new URLSearchParams(location.search).getAll('sateUnidad').at(-1) || recordada || 'upiita';
-  window.SATE_UNIDAD = config[unidad] ? unidad : Object.keys(config)[0];
+  const inicial = entrada ? null : SateRutas.ruta(location.hash, solicitada, config);
+  const unidad = inicial?.unidad || solicitada;
+  window.SATE_UNIDAD = config[unidad] ? unidad : null;
   const u = window.SATE_UNIDAD, cfg = config[u];
-  let unidadRealce = inicial || recordada || new URLSearchParams(location.search).has('sateUnidad') ? u : null;
+  let unidadRealce = u;
   const raiz = document.documentElement, temaSistema = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: dark)') : { matches: false, addEventListener() {} };
   function colorHalo(id) {
     const tema = raiz.getAttribute('data-theme') || raiz.getAttribute('data-tema');
@@ -149,18 +152,45 @@
   }
   function elegirUnidad() {
     const caja = document.createElement('div');
-    for (const [id, c] of Object.entries(config)) {
-      const b = document.createElement('button'); b.className = 'btn'; b.textContent = c.siglas;
-      b.title = c.nombre;
-      b.className += ' sate-selector-unidad'; b.prepend(logoUnidad(id, c.nombre));
-      b.onclick = () => { aplicarRealce(id); if (api) IPNT.set('ipnt.unidad', id); location.hash = '#/' + id + '/mapa'; if (id !== u) location.reload(); else SateUI.cerrarModal(); };
-      caja.appendChild(b);
-    }
-    const ayuda = document.createElement('p'); ayuda.textContent = '¿Tu unidad no aparece? Usa el Lector desde tu SAES. Guarda el marcador, ejecútalo en tu sesión y abre SATE desde el resumen; después pega tus datos.';
-    const boton = document.createElement('button'); boton.className='btn'; boton.textContent='Cómo usar el Lector';
-    boton.onclick=()=>{SateUI.cerrarModal();SAES.open()};
-    caja.appendChild(ayuda); caja.appendChild(boton);
-    SateUI.modal('Unidad académica', caja);
+    const boton = document.createElement('button'); boton.type='button'; boton.className='btn'; boton.textContent=texto('sate.entrada.cambiar');
+    // La entrada explícita conserva el perfil y la preferencia hasta elegir otra unidad.
+    boton.onclick=()=>{location.href='index.html?sateEntrada=1'};
+    caja.appendChild(boton);
+    SateUI.modal(texto('sate.encabezado.unidad'), caja);
+  }
+  async function mostrarEntrada() {
+    // La cuenta y el Lector deben estar listos antes de habilitar la selección y el pegado.
+    await script('generico.js');
+    document.body.setAttribute('data-sate-entrada','true');
+    document.getElementById('b-unidad').hidden=true;
+    for (const selector of ['.sate-navegacion','.sate-fila-avisos','.bar-top']) document.querySelector(selector).hidden=true;
+    document.getElementById('sate-carga').hidden=true;
+    const panel=document.getElementById('sate-entrada'); panel.hidden=false;
+    const titulo=document.createElement('h2'); titulo.id='sate-entrada-titulo'; titulo.textContent=texto('sate.entrada.titulo');
+    const alternativa=document.createElement('button'); alternativa.type='button'; alternativa.className='btn primary';
+    alternativa.textContent=texto('sate.entrada.saes'); alternativa.setAttribute('data-saes-open','');
+    const etiqueta=document.createElement('label'); etiqueta.htmlFor='sate-unidad-buscar'; etiqueta.textContent=texto('sate.entrada.buscar');
+    const buscar=document.createElement('input'); buscar.type='search'; buscar.id=etiqueta.htmlFor; buscar.autocomplete='off';
+    const lista=document.createElement('ul'); lista.className='sate-unidades'; lista.id='sate-unidades'; buscar.setAttribute('aria-controls',lista.id);
+    const estado=document.createElement('p'); estado.className='muted'; estado.setAttribute('role','status');
+    const normal=s=>s.normalize('NFD').replace(/\p{Diacritic}/gu,'').toLowerCase();
+    const unidades=Object.entries(SATE_CONFIG.identidadUnidades).sort(([a,ca],[b,cb])=>Number(!!config[b])-Number(!!config[a])||ca.siglas.localeCompare(cb.siglas,'es'));
+    const filas=unidades.map(([id,c])=>{
+      const fila=document.createElement('li'), boton=document.createElement('button'); boton.type='button'; boton.className='btn sate-selector-unidad';
+      boton.dataset.unidad=id;
+      const nombres=document.createElement('span'), siglas=document.createElement('strong'), nombre=document.createElement('span');
+      siglas.textContent=c.siglas; nombre.textContent=c.nombre; nombres.appendChild(siglas); nombres.appendChild(nombre);
+      const logo=logoUnidad(id,c.nombre); logo.querySelector('img').alt='';
+      boton.style.setProperty('--halo',colorHalo(id));
+      boton.appendChild(logo); boton.appendChild(nombres);
+      boton.onclick=()=>{IPNT.set('ipnt.unidad',id);location.href='index.html?sateUnidad='+id};
+      fila.appendChild(boton); lista.appendChild(fila); return {fila,terminos:normal(c.siglas+' '+c.nombre)};
+    });
+    buscar.addEventListener('input',()=>{
+      let n=0; for(const {fila,terminos} of filas){fila.hidden=!terminos.includes(normal(buscar.value.trim()));if(!fila.hidden)n++}
+      estado.textContent=texto(n?'sate.entrada.resultados':'sate.entrada.sin_resultados',{n});
+    });
+    panel.replaceChildren(titulo,alternativa,etiqueta,buscar,estado,lista);
   }
   async function activar(r) {
     if (!r || !api) return;
@@ -211,7 +241,6 @@
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
       await activar(r);
-      if (!inicial && !recordada && !new URLSearchParams(location.search).has('sateUnidad')) elegirUnidad();
     }, actualizarPestanas
   };
   function actualizarPestanas(activa=actual?.pestana){
@@ -227,6 +256,7 @@
       recalcularPestanas();
       if(actual&&actual.pestana!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
   }
+  if (!u) { mostrarEntrada().catch(error); return; }
   const siglasUnidad = document.createElement('span'); siglasUnidad.className = 'sate-unidad'; siglasUnidad.textContent = cfg.siglas;
   document.getElementById('sate-titulo').replaceChildren(logoUnidad(u, cfg.nombre), texto('sate.siglas') + ' ', siglasUnidad);
   if (cfg.leyenda) {

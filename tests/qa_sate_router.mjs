@@ -33,7 +33,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
     }}};
   c = vm.createContext({console,URLSearchParams,document,location,setTimeout,clearTimeout,
     matchMedia:()=>({matches:false,addEventListener(){}}),MutationObserver:class{observe(){}},
-    navigator:{connection:{saveData:true}},localStorage:{getItem:()=>null},IPNT:{set:(k,v)=>guardado[k]=v},
+    navigator:{connection:{saveData:true}},localStorage:{getItem:k=>k==='ipnt.unidad'?'upiita':null},IPNT:{set:(k,v)=>guardado[k]=v},
     SATE_CONFIG:{unidades:config,textos:{}},history:{replaceState(a,b,url){location.hash=url.slice(url.indexOf('#'))}},
     addEventListener:(n,f)=>eventos[n]=f,
     situacionDatos(){return null},renderCalendario(){vistos.push('calendario')},

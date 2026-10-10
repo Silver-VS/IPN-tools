@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.20"
+version = "2026.10.21"
 
 [proyecto]
 nombre = "HADES"
@@ -34,6 +34,15 @@ cargar_corto = "Cargar SAES"
 indicador = "SAES"
 usando_datos = "Con datos del SAES del {fecha}"
 sin_datos = "Sin datos del SAES: puedes usar el mapa y los horarios"
+
+[sate.entrada]
+abrir = "Abrir SATE"
+titulo = "¿De qué unidad académica eres?"
+buscar = "Busca por siglas o nombre"
+saes = "O carga tus datos del SAES"
+cambiar = "Cambiar de unidad"
+resultados = "Unidades encontradas: {n}"
+sin_resultados = "No encontramos esa unidad. Prueba con otras siglas o parte del nombre."
 
 [sate.pestana.situacion]
 titulo = "Situación escolar"

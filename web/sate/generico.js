@@ -3,6 +3,20 @@ window.IPNT_UNIDAD = window.SATE_UNIDAD;
 /*__CUENTA_JS__*/
 /*__SAES_JS__*/
 (function () {
+  if (!SATE_UNIDAD) {
+    // Reutilizar el Lector: una unidad vacía dirige cualquier pegado válido a su SATE.
+    window.IPNT_UNIDAD='entrada';
+    const abrir=SAES.open.bind(SAES); let conectado=false;
+    SAES.open=async()=>{
+      try {
+        await SATE.script('saes-dialogo.js');
+        if(!conectado){SAES.wire(()=>{});conectado=true}
+        SAES.status(null); abrir();
+      } catch(e){SATE.error(e)}
+    };
+    document.addEventListener('click',e=>{if(e.target.closest?.('[data-saes-open]')&&!conectado){e.preventDefault();SAES.open()}});
+    return;
+  }
   const unidad = SATE_UNIDAD, $ = id => document.getElementById(id);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const numero = v => v != null && String(v).trim() !== '' && Number.isFinite(+v) && +v >= 0 ? +v : null;
