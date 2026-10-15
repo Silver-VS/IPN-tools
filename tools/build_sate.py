@@ -1150,6 +1150,15 @@ def escribir_sate(data):
     revision = revision.replace('__REVISION_TEXTOS__', json.dumps(textos_cupos, ensure_ascii=False)).replace('/*__REVISION_MENU__*/', revision_menu)
     (ROOT / 'web/qa-cupos-hoja.html').write_text(revision, encoding='utf-8')
     (ROOT / 'web/qa-cupos-vista.html').write_text((ROOT / 'tools/qa_cupos_vista.template.html').read_text(encoding='utf-8'), encoding='utf-8')
+    if UNIDAD == 'upiita':
+        # Perfiles ficticios (data/perfiles-prueba/, tools/perfiles_prueba.py) para revisar y demostrar; web/qa-*.html no se publica.
+        carpeta = ROOT / 'data/perfiles-prueba'
+        indice = json.loads((carpeta / 'indice.json').read_text(encoding='utf-8'))
+        catalogo = {'indice': indice, 'perfiles': {p['id']: json.loads((carpeta / p['archivo']).read_text(encoding='utf-8')) for p in indice['perfiles']}}
+        pagina = (ROOT / 'tools/qa_perfiles.template.html').read_text(encoding='utf-8')
+        # '<' escapado: el JSON va dentro de un <script>
+        pagina = pagina.replace('/*__PERFILES__*/null', json.dumps(catalogo, ensure_ascii=False).replace('<', r'\u003c'))
+        (ROOT / 'web/qa-perfiles.html').write_text(pagina, encoding='utf-8')
     sate = (ROOT / 'tools/sate_saes.js').read_text(encoding='utf-8')
     sate = sate.replace('__CUPOS_TEXTOS__', json.dumps(textos_cupos, ensure_ascii=False))
     sate = sate.replace('/*__SATE_LECTOR__*/', saes.lector_js(site_cupos + 'horarios-upiita.html'))

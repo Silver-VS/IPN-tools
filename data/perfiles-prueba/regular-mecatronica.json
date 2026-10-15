@@ -1,0 +1,462 @@
+{
+ "upiita_saes": 1,
+ "unidad": "upiita",
+ "materias": {
+  "M101": [
+   "ALGEBRA LINEAL Y NUMEROS COMPLEJOS",
+   1
+  ],
+  "M102": [
+   "ANALISIS Y DISEÑO DE PROGRAMAS",
+   1
+  ],
+  "M103": [
+   "CALCULO DIFERENCIAL E INTEGRAL",
+   1
+  ],
+  "M104": [
+   "CALCULO VECTORIAL",
+   1
+  ],
+  "M105": [
+   "CIRCUITOS ELECTRICOS",
+   1
+  ],
+  "M106": [
+   "CIRCUITOS ELECTRICOS AVANZADOS",
+   1
+  ],
+  "M107": [
+   "DIBUJO ASISTIDO POR COMPUTADORA",
+   1
+  ],
+  "M108": [
+   "ECUACIONES DIFERENCIALES",
+   1
+  ],
+  "M109": [
+   "ELECTRICIDAD Y MAGNETISMO",
+   1
+  ],
+  "M110": [
+   "ESTRUCTURA Y PROPIEDADES DE LOS MATERIALES",
+   1
+  ],
+  "M111": [
+   "COMUNICACION ORAL Y ESCRITA",
+   1
+  ],
+  "M112": [
+   "FUNDAMENTOS DE ELECTRONICA",
+   1
+  ],
+  "M113": [
+   "HERRAMIENTAS COMPUTACIONALES",
+   1
+  ],
+  "M114": [
+   "INGLES I",
+   1
+  ],
+  "M115": [
+   "INGLES II",
+   1
+  ],
+  "M116": [
+   "INTRODUCCION A LA MECATRONICA",
+   1
+  ],
+  "M117": [
+   "INTRODUCCION A LA PROGRAMACION",
+   1
+  ],
+  "M118": [
+   "MECANICA DE LA PARTICULA",
+   1
+  ],
+  "M119": [
+   "MECANICA DEL CUERPO RIGIDO",
+   1
+  ],
+  "M120": [
+   "PROCESO DE MANUFACTURA",
+   1
+  ],
+  "M121": [
+   "RESISTENCIA DE MATERIALES",
+   1
+  ],
+  "M201": [
+   "ADMINISTRACION ORGANIZACIONAL",
+   2
+  ],
+  "M202": [
+   "ANALISIS DE SEÑALES Y SISTEMAS",
+   2
+  ],
+  "M203": [
+   "ANALISIS Y SINTESIS DE MECANISMOS",
+   2
+  ],
+  "M204": [
+   "CIRCUITOS LOGICOS",
+   2
+  ],
+  "M205": [
+   "DISEÑO BASICO DE ELEMENTOS DE MAQUINAS",
+   2
+  ],
+  "M206": [
+   "DISPOSITIVOS LOGICOS PROGRAMABLES",
+   2
+  ],
+  "M207": [
+   "ELECTRONICA ANALOGICA",
+   2
+  ],
+  "M208": [
+   "INGLES III",
+   2
+  ],
+  "M209": [
+   "LIDERAZGO Y EMPRENDEDORES",
+   2
+  ],
+  "M210": [
+   "MANTENIMIENTO Y SISTEMAS DE MANUFACTURA",
+   2
+  ],
+  "M215": [
+   "OSCILACIONES Y OPTICA",
+   2
+  ],
+  "M216": [
+   "PROBABILIDAD Y ESTADISTICA PARA INGENIERIA",
+   2
+  ],
+  "M217": [
+   "PROGRAMACION AVANZADA",
+   2
+  ],
+  "M218": [
+   "SENSORES Y ACONDICIONADORES DE SEÑAL",
+   2
+  ],
+  "M219": [
+   "SIMULACION ELECTRONICA Y DISEÑO DE CIRCUITOS IMPRESOS",
+   2
+  ],
+  "M222": [
+   "TERMODINAMICA",
+   2
+  ],
+  "M302": [
+   "ETICA PARA EL EJERCICIO PROFESIONAL",
+   3
+  ],
+  "M304": [
+   "MODELADO Y SIMULACION DE SISTEMAS MECATRONICOS",
+   3
+  ],
+  "M306": [
+   "DISEÑO AVANZADO DE ELEMENTOS DE MAQUINAS",
+   3
+  ]
+ },
+ "leido": "2026-10-14T18:00:00.000Z",
+ "boleta": "2099000102",
+ "nombre": "ALUMNO FICTICIO REGULAR PRUEBA",
+ "carrera": "M",
+ "carrera_nombre": "INGENIERIA MECATRONICA",
+ "plan": "09",
+ "promedio": 8.09,
+ "reprobadas_num": 0,
+ "cita": {
+  "inicio": "20/10/2026 10:00:00 a. m.",
+  "fin": "21/10/2026 10:00:00 a. m."
+ },
+ "carga": {
+  "total": 408.0,
+  "min": 27,
+  "media": 40,
+  "max": 80,
+  "duracion": 10,
+  "duracion_max": 15
+ },
+ "avance": {
+  "obtenidos": 196.5,
+  "faltan": 211.5,
+  "cursados": 6,
+  "autorizada": "MAXIMA (80.00 CREDITOS)"
+ },
+ "reprobadas": [],
+ "desfase_saes": "No tienes materias reprobadas de mas de 2 periodos anteriores",
+ "reprobadas_periodo": [],
+ "no_cursadas": [],
+ "desfasadas_saes": [],
+ "en_curso": [
+  "M216",
+  "M217",
+  "M218",
+  "M219",
+  "M222",
+  "M302",
+  "M304",
+  "M306"
+ ],
+ "horario_inscrito": [],
+ "acreditadas": [
+  [
+   "M101",
+   10,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "M103",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "M107",
+   6,
+   "24/1",
+   "ETS"
+  ],
+  [
+   "M110",
+   10,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "M111",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "M113",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "M104",
+   7,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "M105",
+   8,
+   "24/2",
+   "EXT"
+  ],
+  [
+   "M114",
+   7,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "M116",
+   9,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "M117",
+   7,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "M118",
+   10,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "M120",
+   10,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "M102",
+   10,
+   "25/1",
+   "ETS"
+  ],
+  [
+   "M106",
+   6,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "M108",
+   6,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "M109",
+   9,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "M115",
+   9,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "M119",
+   8,
+   "25/1",
+   "EXT"
+  ],
+  [
+   "M112",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "M121",
+   7,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "M201",
+   10,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "M202",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "M203",
+   7,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "M204",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "M205",
+   8,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "M206",
+   6,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "M207",
+   7,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "M208",
+   10,
+   "26/1",
+   "ETS"
+  ],
+  [
+   "M209",
+   8,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "M210",
+   8,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "M215",
+   10,
+   "26/1",
+   "ORD"
+  ]
+ ],
+ "creditos_materias": {
+  "M101": 9.0,
+  "M102": 3.0,
+  "M103": 9.0,
+  "M104": 9.0,
+  "M105": 4.5,
+  "M106": 7.5,
+  "M107": 3.0,
+  "M108": 9.0,
+  "M109": 9.0,
+  "M110": 7.5,
+  "M111": 6.0,
+  "M112": 6.0,
+  "M113": 3.0,
+  "M114": 3.0,
+  "M115": 3.0,
+  "M116": 4.5,
+  "M117": 4.5,
+  "M118": 9.0,
+  "M119": 9.0,
+  "M120": 4.5,
+  "M121": 9.0,
+  "M201": 4.5,
+  "M202": 7.5,
+  "M203": 7.5,
+  "M204": 6.0,
+  "M205": 7.5,
+  "M206": 3.0,
+  "M207": 7.5,
+  "M208": 3.0,
+  "M209": 4.5,
+  "M210": 6.0,
+  "M215": 7.5,
+  "M216": 9.0,
+  "M217": 3.0,
+  "M218": 4.5,
+  "M219": 3.0,
+  "M222": 9.0,
+  "M302": 4.5,
+  "M304": 3.0,
+  "M306": 7.5
+ },
+ "kardex_reprobadas": [],
+ "agenda": [
+  [
+   "INICIO DE SEMESTRE 26-2",
+   "2026-08-24",
+   "2026-12-18"
+  ],
+  [
+   "INICIO DE SEMESTRE 27-1",
+   "2027-01-25",
+   "2027-06-04"
+  ]
+ ],
+ "lector": "perfil-prueba",
+ "perfil_prueba": {
+  "id": "regular-mecatronica",
+  "caso": 2
+ }
+}

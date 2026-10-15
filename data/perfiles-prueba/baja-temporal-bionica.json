@@ -1,0 +1,352 @@
+{
+ "upiita_saes": 1,
+ "unidad": "upiita",
+ "materias": {
+  "B101": [
+   "BIOLOGIA CELULAR",
+   1
+  ],
+  "B102": [
+   "QUIMICA ORGANICA",
+   1
+  ],
+  "B103": [
+   "ALGEBRA LINEAL",
+   1
+  ],
+  "B104": [
+   "CALCULO DIFERENCIAL E INTEGRAL",
+   1
+  ],
+  "B105": [
+   "CALCULO VECTORIAL",
+   1
+  ],
+  "B106": [
+   "FUNDAMENTOS DE FISICA PARA LA INGENIERIA",
+   1
+  ],
+  "B107": [
+   "FUNDAMENTOS DE TEORIA ELECTROMAGNETICA",
+   1
+  ],
+  "B108": [
+   "BIOESTADISTICA",
+   1
+  ],
+  "B109": [
+   "METROLOGIA",
+   1
+  ],
+  "B110": [
+   "PROGRAMACION ORIENTADA A OBJETOS",
+   1
+  ],
+  "B111": [
+   "ANATOMIA",
+   1
+  ],
+  "B112": [
+   "HERRAMIENTAS COMPUTACIONALES",
+   1
+  ],
+  "B114": [
+   "BIOETICA",
+   1
+  ],
+  "B115": [
+   "DESARROLLO SOSTENIBLE",
+   1
+  ],
+  "B116": [
+   "INGLES I",
+   1
+  ],
+  "B201": [
+   "ECUACIONES DIFERENCIALES",
+   2
+  ],
+  "B202": [
+   "FUNDAMENTOS MATEMATICOS DE INGENIERIA",
+   2
+  ],
+  "B203": [
+   "ONDAS ELECTROMAGNETICAS Y SISTEMAS RADIANTES",
+   2
+  ],
+  "B204": [
+   "FISICA MODERNA Y OPTICA",
+   2
+  ],
+  "B205": [
+   "FISICOQUIMICA",
+   2
+  ],
+  "B206": [
+   "BIOQUIMICA",
+   2
+  ],
+  "B207": [
+   "TEORIA DE LOS CIRCUITOS",
+   2
+  ],
+  "B208": [
+   "FISIOLOGIA",
+   2
+  ],
+  "B210": [
+   "BIOLOGIA MOLECULAR",
+   2
+  ],
+  "B211": [
+   "INVESTIGACION Y DESARROLLO DE PROYECTOS",
+   2
+  ],
+  "B212": [
+   "SISTEMAS DE GESTION DE CALIDAD",
+   2
+  ],
+  "B215": [
+   "LIDERAZGO Y EMPRENDEDORES",
+   2
+  ],
+  "B216": [
+   "INGLES II",
+   2
+  ],
+  "B301": [
+   "ANALISIS NUMERICO",
+   3
+  ],
+  "B302": [
+   "DISPOSITIVOS ELECTRONICOS",
+   3
+  ]
+ },
+ "leido": "2026-10-14T18:00:00.000Z",
+ "boleta": "2099000109",
+ "nombre": "ALUMNA FICTICIA BAJA PRUEBA",
+ "carrera": "B",
+ "carrera_nombre": "INGENIERIA BIONICA",
+ "plan": "09",
+ "promedio": 7.91,
+ "reprobadas_num": 0,
+ "cita": {
+  "inicio": "23/10/2026 12:00:00 a. m.",
+  "fin": "24/10/2026 12:00:00 a. m."
+ },
+ "carga": {
+  "total": 399.5,
+  "min": 27,
+  "media": 40,
+  "max": 80,
+  "duracion": 10,
+  "duracion_max": 15
+ },
+ "avance": {
+  "obtenidos": 156.0,
+  "faltan": 243.5,
+  "cursados": 5,
+  "autorizada": "MAXIMA (80.00 CREDITOS)"
+ },
+ "reprobadas": [],
+ "desfase_saes": "No tienes materias reprobadas de mas de 2 periodos anteriores",
+ "reprobadas_periodo": [],
+ "no_cursadas": [],
+ "desfasadas_saes": [],
+ "en_curso": [
+  "B206",
+  "B208",
+  "B211",
+  "B212",
+  "B215",
+  "B216",
+  "B301",
+  "B302"
+ ],
+ "horario_inscrito": [],
+ "acreditadas": [
+  [
+   "B101",
+   9,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B102",
+   10,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B103",
+   7,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B104",
+   7,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B109",
+   7,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B105",
+   8,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B106",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B108",
+   6,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B111",
+   9,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B112",
+   10,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B107",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B110",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B114",
+   7,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B115",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B116",
+   7,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B201",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B202",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B203",
+   7,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B204",
+   8,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B205",
+   8,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B207",
+   6,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B210",
+   7,
+   "26/1",
+   "ORD"
+  ]
+ ],
+ "creditos_materias": {
+  "B101": 7.5,
+  "B102": 7.5,
+  "B103": 7.5,
+  "B104": 9.0,
+  "B105": 9.0,
+  "B106": 9.0,
+  "B107": 9.0,
+  "B108": 9.0,
+  "B109": 6.0,
+  "B110": 6.0,
+  "B111": 7.5,
+  "B112": 6.0,
+  "B114": 4.5,
+  "B115": 6.0,
+  "B116": 3.0,
+  "B201": 7.5,
+  "B202": 4.5,
+  "B203": 7.5,
+  "B204": 7.5,
+  "B205": 6.0,
+  "B206": 6.0,
+  "B207": 9.0,
+  "B208": 4.5,
+  "B210": 7.5,
+  "B211": 4.5,
+  "B212": 4.5,
+  "B215": 4.5,
+  "B216": 3.0,
+  "B301": 9.0,
+  "B302": 6.0
+ },
+ "kardex_reprobadas": [],
+ "agenda": [
+  [
+   "INICIO DE SEMESTRE 26-2",
+   "2026-08-24",
+   "2026-12-18"
+  ],
+  [
+   "INICIO DE SEMESTRE 27-1",
+   "2027-01-25",
+   "2027-06-04"
+  ]
+ ],
+ "lector": "perfil-prueba",
+ "perfil_prueba": {
+  "id": "baja-temporal-bionica",
+  "caso": 9
+ }
+}

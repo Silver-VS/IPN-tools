@@ -1,0 +1,673 @@
+{
+ "upiita_saes": 1,
+ "unidad": "upiita",
+ "materias": {
+  "T101": [
+   "PROGRAMACION",
+   1
+  ],
+  "T102": [
+   "ANALISIS Y DISEÑO DE SISTEMAS",
+   1
+  ],
+  "T103": [
+   "ESTRUCTURA DE DATOS",
+   1
+  ],
+  "T104": [
+   "ADMINISTRACION DE SISTEMAS OPERATIVOS",
+   1
+  ],
+  "T105": [
+   "DISEÑO DIGITAL",
+   1
+  ],
+  "T106": [
+   "ARQUITECTURA DE COMPUTADORAS",
+   1
+  ],
+  "T107": [
+   "FUNDAMENTOS DE FISICA",
+   1
+  ],
+  "T108": [
+   "ECUACIONES DIFERENCIALES",
+   1
+  ],
+  "T109": [
+   "PROBABILIDAD",
+   1
+  ],
+  "T110": [
+   "CALCULO DIFERENCIAL E INTEGRAL",
+   1
+  ],
+  "T111": [
+   "VARIABLE COMPLEJA",
+   1
+  ],
+  "T112": [
+   "ALGEBRA LINEAL",
+   1
+  ],
+  "T113": [
+   "ELECTROMAGNETISMO",
+   1
+  ],
+  "T114": [
+   "CALCULO MULTIVARIABLE",
+   1
+  ],
+  "T115": [
+   "ADMINISTRACION ORGANIZACIONAL",
+   1
+  ],
+  "T116": [
+   "ETICA, PROFESION Y SOCIEDAD",
+   1
+  ],
+  "T117": [
+   "COMUNICACION ORAL Y ESCRITA",
+   1
+  ],
+  "T118": [
+   "INGLES I",
+   1
+  ],
+  "T119": [
+   "INGLES II",
+   1
+  ],
+  "T120": [
+   "PROGRAMACION ESTRUCTURADA",
+   1
+  ],
+  "T201": [
+   "SEÑALES Y SISTEMAS",
+   2
+  ],
+  "T202": [
+   "PROPAGACION DE ONDAS ELECTROMAGNETICAS",
+   2
+  ],
+  "T203": [
+   "ELECTRONICA",
+   2
+  ],
+  "T204": [
+   "TEORIA DE LOS CIRCUITOS",
+   2
+  ],
+  "T205": [
+   "TEORIA DE LA INFORMACION",
+   2
+  ],
+  "T206": [
+   "TEORIA DE LAS COMUNICACIONES",
+   2
+  ],
+  "T207": [
+   "COMUNICACIONES DIGITALES",
+   2
+  ],
+  "T208": [
+   "PROCESAMIENTO DIGITAL DE SEÑALES",
+   2
+  ],
+  "T209": [
+   "TELEFONIA",
+   2
+  ],
+  "T210": [
+   "SISTEMAS CELULARES",
+   2
+  ],
+  "T211": [
+   "PROTOCOLOS DE INTERNET",
+   2
+  ],
+  "T212": [
+   "SISTEMAS DISTRIBUIDOS",
+   2
+  ],
+  "T213": [
+   "INGENIERIA WEB",
+   2
+  ],
+  "T214": [
+   "PROGRAMACION AVANZADA",
+   2
+  ],
+  "T215": [
+   "BASES DE DATOS",
+   2
+  ],
+  "T216": [
+   "TRANSMISION DE DATOS",
+   2
+  ],
+  "T217": [
+   "INFORMACION FINANCIERA E INGENIERIA ECONOMICA",
+   2
+  ],
+  "T218": [
+   "OPTATIVA I",
+   2
+  ],
+  "T219": [
+   "INGLES III",
+   2
+  ],
+  "T301": [
+   "REDES INTELIGENTES",
+   3
+  ],
+  "T302": [
+   "LINEAS DE TRANSMISION Y ANTENAS",
+   3
+  ],
+  "T303": [
+   "SEGURIDAD EN REDES",
+   3
+  ],
+  "T304": [
+   "MULTIMEDIA",
+   3
+  ],
+  "T305": [
+   "BASES DE DATOS DISTRIBUIDAS",
+   3
+  ],
+  "T306": [
+   "METODOLOGIA DE LA INVESTIGACION",
+   3
+  ],
+  "T307": [
+   "ADMINISTRACION DE PROYECTOS",
+   3
+  ],
+  "T308": [
+   "LIDERAZGO Y EMPRENDEDORES",
+   3
+  ],
+  "T310": [
+   "CRIPTOGRAFIA",
+   3
+  ],
+  "T401": [
+   "PROYECTO TERMINAL I",
+   4
+  ],
+  "T403": [
+   "REDES DE TELECOMUNICACIONES",
+   4
+  ],
+  "T404": [
+   "APLICACIONES DISTRIBUIDAS",
+   4
+  ],
+  "T405": [
+   "DISPOSITIVOS PROGRAMABLES",
+   4
+  ],
+  "T407": [
+   "ELECTIVA I",
+   4
+  ],
+  "T408": [
+   "ELECTIVA II",
+   4
+  ],
+  "T409": [
+   "ELECTIVA III",
+   4
+  ],
+  "T410": [
+   "ELECTIVA IV",
+   4
+  ]
+ },
+ "leido": "2026-10-14T18:00:00.000Z",
+ "boleta": "2099000107",
+ "nombre": "ALUMNA FICTICIA EGRESO PRUEBA",
+ "carrera": "T",
+ "carrera_nombre": "INGENIERIA TELEMATICA",
+ "plan": "09",
+ "promedio": 8.38,
+ "reprobadas_num": 0,
+ "cita": {
+  "inicio": "22/10/2026 12:00:00 a. m.",
+  "fin": "23/10/2026 12:00:00 a. m."
+ },
+ "carga": {
+  "total": 390.5,
+  "min": 27,
+  "media": 40,
+  "max": 80,
+  "duracion": 10,
+  "duracion_max": 15
+ },
+ "avance": {
+  "obtenidos": 375.5,
+  "faltan": 15.0,
+  "cursados": 11,
+  "autorizada": "MAXIMA (80.00 CREDITOS)"
+ },
+ "reprobadas": [],
+ "desfase_saes": "No tienes materias reprobadas de mas de 2 periodos anteriores",
+ "reprobadas_periodo": [],
+ "no_cursadas": [],
+ "desfasadas_saes": [],
+ "en_curso": [
+  "T401"
+ ],
+ "horario_inscrito": [],
+ "acreditadas": [
+  [
+   "T102",
+   8,
+   "21/2",
+   "ORD"
+  ],
+  [
+   "T104",
+   7,
+   "21/2",
+   "ORD"
+  ],
+  [
+   "T110",
+   7,
+   "21/2",
+   "ORD"
+  ],
+  [
+   "T112",
+   8,
+   "21/2",
+   "ORD"
+  ],
+  [
+   "T107",
+   10,
+   "22/1",
+   "ORD"
+  ],
+  [
+   "T108",
+   8,
+   "22/1",
+   "ETS"
+  ],
+  [
+   "T111",
+   7,
+   "22/1",
+   "ORD"
+  ],
+  [
+   "T114",
+   9,
+   "22/1",
+   "ORD"
+  ],
+  [
+   "T115",
+   9,
+   "22/1",
+   "ETS"
+  ],
+  [
+   "T116",
+   8,
+   "22/1",
+   "ORD"
+  ],
+  [
+   "T218",
+   8,
+   "22/1",
+   "ORD"
+  ],
+  [
+   "T407",
+   9,
+   "22/1",
+   "ORD"
+  ],
+  [
+   "T109",
+   8,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T113",
+   10,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T117",
+   8,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T118",
+   7,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T120",
+   7,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T201",
+   9,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T310",
+   10,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T408",
+   10,
+   "22/2",
+   "ORD"
+  ],
+  [
+   "T101",
+   9,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T119",
+   10,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T202",
+   10,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T204",
+   7,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T206",
+   7,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T217",
+   6,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T308",
+   10,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T409",
+   7,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "T103",
+   9,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "T105",
+   8,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "T203",
+   8,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "T205",
+   8,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "T208",
+   9,
+   "23/2",
+   "EXT"
+  ],
+  [
+   "T410",
+   9,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "T106",
+   9,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T207",
+   10,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T215",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T216",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T219",
+   9,
+   "24/1",
+   "EXT"
+  ],
+  [
+   "T302",
+   9,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T209",
+   10,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T213",
+   9,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T214",
+   8,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T307",
+   9,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T403",
+   9,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T405",
+   7,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T210",
+   9,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T211",
+   10,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T212",
+   7,
+   "25/1",
+   "ETS"
+  ],
+  [
+   "T304",
+   9,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T301",
+   6,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T303",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T305",
+   6,
+   "25/2",
+   "ETS"
+  ],
+  [
+   "T306",
+   10,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "T404",
+   9,
+   "26/1",
+   "ORD"
+  ]
+ ],
+ "creditos_materias": {
+  "T101": 6.0,
+  "T102": 9.0,
+  "T103": 6.0,
+  "T104": 6.0,
+  "T105": 6.0,
+  "T106": 7.5,
+  "T107": 6.0,
+  "T108": 9.0,
+  "T109": 9.0,
+  "T110": 10.5,
+  "T111": 6.0,
+  "T112": 12.0,
+  "T113": 9.0,
+  "T114": 10.5,
+  "T115": 4.5,
+  "T116": 4.5,
+  "T117": 6.0,
+  "T118": 3.0,
+  "T119": 3.0,
+  "T120": 7.5,
+  "T201": 7.5,
+  "T202": 7.5,
+  "T203": 7.5,
+  "T204": 7.5,
+  "T205": 7.5,
+  "T206": 7.5,
+  "T207": 7.5,
+  "T208": 10.5,
+  "T209": 7.5,
+  "T210": 7.5,
+  "T211": 7.5,
+  "T212": 7.5,
+  "T213": 7.5,
+  "T214": 9.0,
+  "T215": 7.5,
+  "T216": 7.5,
+  "T217": 4.5,
+  "T218": 7.5,
+  "T219": 3.0,
+  "T301": 4.5,
+  "T302": 7.5,
+  "T303": 6.0,
+  "T304": 6.0,
+  "T305": 7.5,
+  "T306": 6.0,
+  "T307": 6.0,
+  "T308": 4.5,
+  "T310": 7.5,
+  "T401": 7.5,
+  "T403": 6.0,
+  "T404": 6.0,
+  "T405": 7.5,
+  "T407": 5.0,
+  "T408": 5.0,
+  "T409": 5.0,
+  "T410": 5.0
+ },
+ "kardex_reprobadas": [],
+ "agenda": [
+  [
+   "INICIO DE SEMESTRE 26-2",
+   "2026-08-24",
+   "2026-12-18"
+  ],
+  [
+   "INICIO DE SEMESTRE 27-1",
+   "2027-01-25",
+   "2027-06-04"
+  ]
+ ],
+ "lector": "perfil-prueba",
+ "perfil_prueba": {
+  "id": "por-egresar-telematica",
+  "caso": 7
+ }
+}

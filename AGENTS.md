@@ -119,3 +119,14 @@ créditos, reprobadas y recursamientos, historias largas, datos sucios, primer i
 estadísticas, sugerencias y generador. Ajustes: `FUZZ_N`, `FUZZ_SEMILLAS`. Una falla se reproduce abriendo
 `web/dist/qa-fuzz-<unidad>.html?n=<N>&semilla=<S>` (los `qa-*` no se publican). Si agregas una regla de negocio, agrega
 su invariante en `tests/fuzz/fuzz_perfiles.js`.
+
+### Perfiles de prueba ficticios (AYUDA1)
+
+`data/perfiles-prueba/` guarda 9 perfiles del alumnado en el formato de `localStorage['saes.alumno']` (primer ingreso,
+regular, adeuda, desfase con dictamen, electivas por liberar y liberadas, a punto de egresar, cambio de carrera, baja
+temporal) más `indice.json`. No los edites a mano: `python tools/perfiles_prueba.py` los regenera con semilla fija
+(`--verificar` solo compara) y `python -m unittest tests.test_perfiles_prueba` valida claves, seriación e invariantes de
+cada caso. `python tools/build_horarios.py` genera `web/qa-perfiles.html` (local, no se publica; ábrelo con
+`python -m http.server 8080 --directory web`): lista los perfiles y con un clic guarda uno y abre SATE. Para un caso nuevo
+agrega su entrada a `CASOS` en el generador y su prueba. Todo es ficticio (boletas 2099xxxxxx).
+
