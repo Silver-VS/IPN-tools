@@ -1,0 +1,47 @@
+<!doctype html><html lang="es"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Perfiles de prueba · SATE QA</title>
+<style>
+:root{color-scheme:light dark;font:16px/1.6 system-ui;color:#30242b;background:#faf7f8}
+@media (prefers-color-scheme:dark){:root{color:#efe6ea;background:#1d1519}.tarjeta{background:#2a1f25!important;border-color:#4a3a42!important}a,button{color:#e8a9bf!important}}
+body{max-width:56rem;margin:32px auto;padding:0 20px}h1{font-size:1.6rem;margin:0 0 4px}p{margin:8px 0}
+.lista{display:grid;gap:16px;margin:24px 0;padding:0;list-style:none}
+.tarjeta{border:1px solid #d9ccd2;border-radius:12px;padding:16px 20px;background:#fff}
+.tarjeta h2{font-size:1.1rem;margin:0}.meta{font-size:.9rem;opacity:.8}
+.datos{font-size:.85rem;opacity:.85;margin:8px 0 12px}
+button{font:inherit;padding:8px 16px;border-radius:8px;border:1px solid #78364f;background:transparent;color:#78364f;cursor:pointer}
+button:hover{background:#78364f22}.acciones{display:flex;gap:12px;flex-wrap:wrap}
+#estado{min-height:1.6em}code{font-size:.9em}
+</style>
+<h1>Perfiles de prueba</h1>
+<p>Alumnado ficticio (boletas 2099xxxxxx) para revisar SATE, preparar guías y manuales o demostrar casos a directivos.
+Esta página es solo de revisión local: no se publica ni se enlaza desde el sitio.</p>
+<p>«Cargar y abrir SATE» guarda el perfil en <code>localStorage['saes.alumno']</code> de este origen y abre SATE con esos datos.
+Reemplaza los datos del SAES que hubiera en este navegador.</p>
+<div id="estado" role="status"></div>
+<ol class="lista" id="lista"></ol>
+<div class="acciones"><button type="button" id="limpiar">Quitar el perfil cargado</button></div>
+<script>
+const CATALOGO=/*__PERFILES__*/null;
+const SATE_URL='dist/sate/index.html#/upiita/trayectoria';
+const $=s=>document.querySelector(s),estado=t=>{$('#estado').textContent=t};
+const fmt=n=>Number.isInteger(n)?String(n):n.toFixed(1);
+function resumen(p){const a=p.avance||{};return `${p.acreditadas.length} acreditadas · ${p.en_curso.length} en curso · ${p.reprobadas_periodo.length} reprobadas pendientes · ${fmt(a.obtenidos)} de ${fmt(p.carga.total)} créditos`}
+function guardar(p){
+  // Misma persistencia que usa el sitio (tools/cuenta.py): sin esta marca los datos van a sessionStorage.
+  localStorage.setItem('ipnt.persistir','si');localStorage.setItem('ipnt.bienvenida','1');
+  localStorage.setItem('saes.alumno',JSON.stringify(p));
+  localStorage.setItem('hu.car',JSON.stringify(p.carrera));
+}
+for(const meta of CATALOGO.indice.perfiles){
+  const p=CATALOGO.perfiles[meta.id],li=document.createElement('li');li.className='tarjeta';
+  li.innerHTML=`<h2></h2><div class="meta"></div><div class="datos"></div><div class="acciones"><button type="button">Cargar y abrir SATE</button></div><p class="demuestra"></p>`;
+  li.querySelector('h2').textContent=`${meta.caso}. ${meta.titulo}`;
+  li.querySelector('.meta').textContent=`${meta.carrera_nombre} · plan ${meta.plan} · ${p.nombre} · boleta ${p.boleta}`;
+  li.querySelector('.datos').textContent=resumen(p);
+  li.querySelector('.demuestra').textContent=meta.demuestra;
+  li.querySelector('button').addEventListener('click',()=>{try{guardar(p);estado(`Perfil «${meta.titulo}» guardado. Abriendo SATE…`);location.href=SATE_URL}catch(e){estado('No se pudo guardar en el almacenamiento del navegador: '+e.name)}});
+  $('#lista').append(li);
+}
+$('#limpiar').addEventListener('click',()=>{try{localStorage.removeItem('saes.alumno');estado('Perfil quitado de este navegador.')}catch(e){estado('No se pudo quitar: '+e.name)}});
+</script>
+</html>
