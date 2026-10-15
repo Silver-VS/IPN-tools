@@ -1,6 +1,17 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-15 · 2026.10.26 · Claude (GUIA5)
+
+| Claves | Cambio |
+|---|---|
+| `sate.guia.situacion`, `tramites`, `reglamentos`, `acudir` y sus `_descripcion`/`_intro`, `buscar_guia_*`, `resultados_preguntas`, `que_hacer`, `a_quien`, `formato_titulo`, `fuente*`, `revisado`, `en_ventanilla` | Nuevas: la Guía politécnica ahora tiene cinco apartados (preguntas frecuentes buscables con fuente, reglamentos, a quién acudir y programas de estudio). El contenido vive en `data/guia/upiita.json`. `sate.guia.intro` cambia a la nueva presentación. |
+| `sate.guia.caminos`, `explorar_titulo/texto/punto_*/boton`, `ayuda_*`, `ver_todos`, `oficial`, `buscar_catalogo`, `abrir_externo`, `normativa*`; `temarios.buscar.*`, `temarios.filtro.nivel*/tipo*/carrera_todas`, `temarios.lista.coincide`, `temarios.donde.*`, `temarios.explorador.titulo/volver/elegir/cargando`, `temarios.panel.abrir_explorador` | Retiradas: ya no hay tres vistas de materia ni lista larga; la ficha es una sola y el selector es una ventana. |
+| `temarios.selector.*`, `temarios.ficha.*`, `temarios.explorador.no_encontrado_titulo` | Nuevas: selector de unidad de aprendizaje (buscador, áreas, orden por nivel o de la A a la Z), ficha única con índice, «Ver ficha completa» en el vistazo del Mapa. |
+| `sate.biblio.*`, `sate.guia.biblio_digital_aviso`, `biblio_tesis*` | Nuevas: búsqueda en las bibliotecas del IPN (catálogo, Biblioteca Digital y tesis) desde SATE. |
+| `componentes.migas`, `volver_a`, `buscar_borrar`, `pestana_nueva` | Nuevas: migas y «Volver a …» comunes, buscador y aviso de pestaña nueva. |
+| `sate.ventanilla.volver`, `ver_guia*`, `guia_*` | `volver` ahora dice «← Volver a Ventanilla digital»; nuevos enlaces de la Ventanilla a la respuesta de la Guía. |
+
 ## 2026-10-15 · 2026.10.25 · Claude (GUIA4)
 
 | Claves | Cambio |

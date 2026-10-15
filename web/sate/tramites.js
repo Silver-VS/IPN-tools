@@ -15,6 +15,8 @@
       ]});
     });
   }
+  // Respuesta de la Guía politécnica para este trámite (data/sate.json: guiaTramites); '' si la unidad no tiene Guía con contenido.
+  function enlaceGuia(id){const u=SATE_CONFIG.unidades[SATE_UNIDAD],r=u?.guiaDatos&&u.guiaTramites?.[id];return r?'#/'+SATE_UNIDAD+'/guia/'+r:''}
   function leer(id){try{return JSON.parse((window.IPNT?.almacen||localStorage).getItem('hu.tramite.'+id)||'null')}catch{return null}}
   const completados=new Map();
   function estado(borrador,aplicacion,ahora=Date.now()){
@@ -91,7 +93,7 @@
     }
     let confirmado=false;
     // Regreso a la lista: el avance ya está guardado, así que no pide confirmación.
-    function regreso(clase){const b=boton(tx('volver'),()=>SATE.ir('tramites'));b.className+=' tramite-regreso '+clase;return b}
+    function regreso(clase){const b=boton(tx('volver'),()=>SATE.ir('tramites'));b.className+=' sate-volver tramite-regreso '+clase;return b}
     function pintar(){
       def.preparar?.(m.datos,m.paso);confirmado=false;
       box.replaceChildren();
@@ -99,6 +101,7 @@
       if(def.volver){const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));cabeza.appendChild(regreso('tramite-volver'));box.appendChild(cabeza)}
       else box.appendChild(el('h2',def.titulo));
       const lead=typeof def.lead==='string'?def.lead:'';if(lead)box.appendChild(el('p',lead,'tramite-lead'));
+      const guia=enlaceGuia(def.id);if(guia){const g=SateUI.tarjetaNav({href:guia,titulo:tx('guia_titulo'),detalle:tx('guia_detalle'),compacta:true});g.className+=' tramite-guia';box.appendChild(g)}
       // Los pasos ya hechos se pueden volver a abrir; el activo y los pendientes no son botones.
       const pasos=el('ol',null,'tramite-pasos');pasos.setAttribute('aria-label',tx('pasos'));
       nombres.forEach((nombre,i)=>{
@@ -288,6 +291,8 @@
             lateral.appendChild(extra);
           }
         }
+        const guia=enlaceGuia(id);
+        if(guia){const g=el('a',tx('ver_guia'),'sate-btn tramite-ver-guia');g.href=guia;g.setAttribute('aria-label',tx('ver_guia_aria',{tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));lateral.appendChild(g)}
         fila.appendChild(lateral);lista.appendChild(fila);
       }
       grupo.appendChild(lista);box.appendChild(grupo);

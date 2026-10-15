@@ -1,0 +1,43 @@
+/* Guía politécnica: portada de apartados, preguntas frecuentes, reglamentos y a quién acudir.
+   Solo tokens --ipn-*; los componentes que se reutilizan (migas, tarjeta de navegación, buscador, pregunta desplegable)
+   viven en web/sate/componentes.css. */
+.guia-cab{display:grid;gap:var(--ipn-esp-4);min-width:0}
+.guia-cab h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.2;overflow-wrap:anywhere}
+.guia-cab .tmr-intro{margin:0}
+.guia-buscar{display:grid;gap:var(--ipn-esp-3);max-width:42rem}
+.guia-buscar>label{font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.guia-resultados{margin:0;padding:0;list-style:none;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);overflow:hidden}
+.guia-resultados li+li{border-top:1px solid var(--ipn-linea)}
+.guia-resultado{display:grid;gap:var(--ipn-esp-1);min-height:2.75rem;padding:var(--ipn-esp-3) var(--ipn-esp-4);color:var(--ipn-texto);text-decoration:none}
+.guia-resultado:hover,.guia-resultado:focus-visible{background:var(--ipn-hundido)}
+.guia-resultado:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
+.guia-resultado small{color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs)}
+.guia-vacio{margin:0;padding:var(--ipn-esp-3) var(--ipn-esp-4);color:var(--ipn-tenue)}
+.guia-apartado{display:grid;gap:var(--ipn-esp-5);min-width:0}
+.guia-resumen{margin:0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.guia-respuesta{max-width:66ch}
+.guia-bloque{display:grid;gap:var(--ipn-esp-3);min-width:0}
+.guia-bloque>h4{font-size:var(--ipn-tamano-s);font-weight:700;letter-spacing:.02em;color:var(--ipn-tenue)}
+.guia-pasos{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-3);counter-reset:gp}
+.guia-pasos li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--ipn-esp-3);align-items:start;max-width:66ch;counter-increment:gp}
+.guia-pasos li::before{content:counter(gp);display:grid;place-items:center;width:2rem;height:2rem;border:1.5px solid var(--ipn-acento);border-radius:50%;color:var(--ipn-acento);font-size:var(--ipn-tamano-xs);font-weight:600}
+.guia-acudir{margin:0;padding:0;list-style:none;display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+.guia-acudir a{box-sizing:border-box;display:inline-flex;align-items:center;min-height:2.75rem;padding:0 var(--ipn-esp-4);border:1px solid var(--ipn-borde-control);border-radius:999px;background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-s);text-decoration:none}
+.guia-acudir a:hover{border-color:var(--ipn-acento);color:var(--ipn-acento)}
+.guia-acudir a:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.guia-acciones{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr));gap:var(--ipn-esp-3)}
+.guia-pie{display:grid;gap:var(--ipn-esp-2);padding-top:var(--ipn-esp-4);border-top:1px solid var(--ipn-linea);color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.guia-fuentes{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-1)}
+.guia-fuentes a{display:inline-flex;align-items:center;min-height:2.25rem;color:var(--ipn-acento);overflow-wrap:anywhere}
+.guia-lista-acudir{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-4)}
+.guia-lista-acudir>li{display:grid;gap:var(--ipn-esp-2);padding:var(--ipn-esp-5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);scroll-margin-top:var(--ipn-esp-5)}
+.guia-lista-acudir h3{font-size:var(--ipn-tamano-m)}
+.guia-lista-acudir p{max-width:66ch}
+.guia-lista-acudir small{color:var(--ipn-tenue)}
+.guia-pronto{display:grid;gap:var(--ipn-esp-3);padding-top:var(--ipn-esp-4);border-top:1px dashed var(--ipn-linea)}
+.guia-pronto h3{font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.guia-pronto ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:var(--ipn-esp-3)}
+.guia-pronto li{display:flex;gap:var(--ipn-esp-3);align-items:flex-start;color:var(--ipn-tenue);opacity:.8}
+.guia-pronto small{display:block}
+@media(max-width:639.98px){.guia-cab h2{font-size:var(--ipn-tamano-l)}.guia-lista-acudir>li{padding:var(--ipn-esp-4)}}
+.guia-portal{display:inline-flex;align-items:center;min-height:2.75rem;justify-self:start}

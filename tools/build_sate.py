@@ -1119,6 +1119,28 @@ def datos_dictamen():
         'textos': {k: v for k, v in contenido.objeto_t().items() if k.startswith('dictamen.')}}
 
 
+def escribir_guia(datos):
+    """Copia el contenido de la Guía politécnica de la unidad (data/guia/<u>.json) a datos/<u>/guia.json.
+    Los formatos oficiales de baja se resuelven aquí desde data/gestion_escolar/bajas.json (una sola fuente de verdad):
+    `formato: {"ref": "bajas.temporal"}` pasa a `formato: {"texto", "url"}`."""
+    from urllib.parse import quote
+    fuente = ROOT / 'data/guia' / (UNIDAD + '.json')
+    if not fuente.exists():
+        (datos / 'guia.json').unlink(missing_ok=True)
+        return
+    guia = json.loads(fuente.read_text(encoding='utf-8'))
+    bajas = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
+    for p in guia['preguntas']:
+        formato = p.get('formato')
+        if formato and 'ref' in formato:
+            clave = formato['ref'].split('.', 1)[1]
+            if formato['ref'].split('.', 1)[0] != 'bajas' or clave not in bajas:
+                raise ValueError('Formato sin resolver en la Guía: ' + formato['ref'])
+            p['formato'] = {'texto': formato['texto'], 'url': bajas['base'] + quote(bajas[clave])}
+    guia.pop('_fuente', None)
+    (datos / 'guia.json').write_text(json.dumps(guia, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+
+
 def escribir_sate(data):
     import shutil, cuenta, saes, comun, contenido, skins, encuesta
     from institucional import write_dist
@@ -1141,6 +1163,7 @@ def escribir_sate(data):
         (datos / 'electivas.json').write_text(json.dumps(electivas, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     escribir_temarios(data, datos)
     escribir_recursos(datos)
+    escribir_guia(datos)
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
@@ -1149,7 +1172,7 @@ def escribir_sate(data):
         shutil.copy(fuente / "medicion.js", destino / "medicion.js")
     else:
         (destino / "medicion.js").unlink(missing_ok=True)
-    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "bajas.js", "temarios.js", "temarios.css"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "bajas.js", "temarios.js", "temarios.css", "guia.js", "guia.css", "bibliotecas.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
     shutil.copytree(ROOT / 'web/assets/vendor', dist / 'assets/vendor', dirs_exist_ok=True)
@@ -1159,6 +1182,7 @@ def escribir_sate(data):
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():
         c["vistas"] = [v for v in c.get("vistas", []) if DATOS_VISTAS.get(v["id"], lambda _u: True)(u)]
+        c["guiaDatos"] = (ROOT / "data/guia" / (u + ".json")).exists()
         c["siglas"] = unidades[u]["siglas"]
         c["nombre"] = unidades[u]["nombre"]
         c["realce"] = identidad_unidades[u]['realce']

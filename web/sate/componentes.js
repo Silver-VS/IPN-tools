@@ -73,6 +73,7 @@
     dlg.querySelector('.sate-modal__titulo').textContent = titulo;
     dlg.querySelector('.sate-modal__x').setAttribute('aria-label', traducir('componentes.cerrar'));
     dlg.classList.toggle('sate-modal--pequeno', !!op.pequeno);
+    dlg.classList.toggle('sate-modal--amplio', !!op.amplio);
     var cuerpo = dlg.querySelector('.sate-modal__cuerpo');
     cuerpo.textContent = '';
     var c = typeof contenido === 'function' ? contenido() : contenido;
@@ -234,6 +235,97 @@
     d.open = g === '1' ? true : g === '0' ? false : !!o.abierto;
     d.addEventListener('toggle', function () { almGuardar(k, d.open ? '1' : '0'); });
     return d;
+  }
+
+  /* ---------- Navegación y consulta comunes (Guía, Ventanilla, Programas) ---------- */
+  /* volver(destino, href, {clase}) → «← Volver a <destino>» como botón de navegación (enlace con aspecto de botón). */
+  function volver(destino, href, op) {
+    return el('a', { class: 'sate-volver' + (op && op.clase ? ' ' + op.clase : ''), href: href }, [
+      el('span', { 'aria-hidden': 'true', texto: '←' }),
+      el('span', { texto: traducir('componentes.volver_a', { destino: destino }) })]);
+  }
+  /* migas([{texto, href}]) → <nav>; el último elemento es la página actual. En teléfono queda solo «← Volver a <padre>». */
+  function migas(items) {
+    var nav = el('nav', { class: 'sate-migas', 'aria-label': traducir('componentes.migas') });
+    var ol = el('ol');
+    items.forEach(function (it, i) {
+      var ultimo = i === items.length - 1;
+      ol.appendChild(el('li', {}, [ultimo || !it.href ? el('span', { texto: it.texto, 'aria-current': ultimo ? 'page' : null }) : el('a', { href: it.href, texto: it.texto })]));
+    });
+    nav.appendChild(ol);
+    var padre = items.slice(0, -1).filter(function (x) { return x.href; }).pop();
+    if (padre) nav.appendChild(volver(padre.texto, padre.href, { clase: 'sate-migas__volver' }));
+    return nav;
+  }
+  /* tarjetaNav({href, titulo, detalle, icono, externo, compacta}) → enlace con aspecto de tarjeta; externo abre en pestaña nueva. */
+  function tarjetaNav(o) {
+    var a = el('a', { class: 'sate-tarjeta-nav' + (o.compacta ? ' sate-tarjeta-nav--compacta' : ''), href: o.href });
+    if (o.externo) { a.setAttribute('target', '_blank'); a.setAttribute('rel', 'noopener noreferrer'); }
+    if (o.icono) a.appendChild(el('span', { class: 'sate-tarjeta-nav__icono', 'aria-hidden': 'true', texto: o.icono }));
+    a.appendChild(el('span', { class: 'sate-tarjeta-nav__texto' }, [
+      el('span', { class: 'sate-tarjeta-nav__titulo', texto: o.titulo }),
+      o.detalle ? el('span', { class: 'sate-tarjeta-nav__detalle', texto: o.detalle }) : null,
+      o.externo ? el('span', { class: 'sate-sr', texto: traducir('componentes.pestana_nueva') }) : null]));
+    a.appendChild(el('span', { class: 'sate-tarjeta-nav__flecha', 'aria-hidden': 'true', texto: o.externo ? '↗' : '›' }));
+    return a;
+  }
+  /* buscador({etiqueta, marcador, valor, alCambiar(valor), alEnviar(valor)}) → {raiz, entrada, fijar(valor)}. */
+  function buscador(o) {
+    var NS = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 20 20'); svg.setAttribute('aria-hidden', 'true'); svg.setAttribute('fill', 'none');
+    svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '2'); svg.setAttribute('stroke-linecap', 'round');
+    var c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', '9'); c.setAttribute('cy', '9'); c.setAttribute('r', '6');
+    var l = document.createElementNS(NS, 'path'); l.setAttribute('d', 'M14 14l4 4');
+    svg.appendChild(c); svg.appendChild(l);
+    var entrada = el('input', { type: 'search', autocomplete: 'off', spellcheck: 'false', 'aria-label': o.etiqueta, placeholder: o.marcador || null, id: o.id || null });
+    var borrar = el('button', { type: 'button', class: 'sate-buscador__borrar', 'aria-label': traducir('componentes.buscar_borrar'), texto: '×', hidden: true });
+    var raizB = el('div', { class: 'sate-buscador', role: 'search' }, [svg, entrada, borrar]);
+    function cambio() { borrar.hidden = !entrada.value; if (o.alCambiar) o.alCambiar(entrada.value); }
+    function fijar(v) { entrada.value = v || ''; borrar.hidden = !entrada.value; }
+    entrada.addEventListener('input', cambio);
+    entrada.addEventListener('keydown', function (e) { if (e.key === 'Enter' && o.alEnviar) { e.preventDefault(); o.alEnviar(entrada.value); } });
+    borrar.addEventListener('click', function () { fijar(''); if (o.alCambiar) o.alCambiar(''); entrada.focus(); });
+    fijar(o.valor);
+    return { raiz: raizB, entrada: entrada, fijar: fijar };
+  }
+  /* segmentado({etiqueta, opciones:[{id, texto}], valor, alCambiar(id)}) → {raiz, fijar(id)}: control de una sola elección. */
+  function segmentado(o) {
+    var botones = {};
+    var raizS = el('div', { class: 'sate-segmentado', role: 'group', 'aria-label': o.etiqueta });
+    function fijar(id) { Object.keys(botones).forEach(function (k) { botones[k].setAttribute('aria-pressed', k === id ? 'true' : 'false'); }); }
+    o.opciones.forEach(function (op) {
+      var b = el('button', { type: 'button', 'data-id': op.id, texto: op.texto });
+      b.addEventListener('click', function () { fijar(op.id); if (o.alCambiar) o.alCambiar(op.id); });
+      botones[op.id] = b; raizS.appendChild(b);
+    });
+    fijar(o.valor);
+    return { raiz: raizS, fijar: fijar };
+  }
+  /* pregunta({id, titulo, cuerpo:Node|función, abierta, alAbrir}) → <details> cuyo cuerpo se crea al abrir por primera vez. */
+  function pregunta(o) {
+    var d = el('details', { class: 'sate-pregunta', id: o.id || null });
+    d.appendChild(el('summary', { texto: o.titulo }));
+    var hecho = false;
+    function llenar() {
+      if (hecho) return; hecho = true;
+      var c = typeof o.cuerpo === 'function' ? o.cuerpo() : o.cuerpo;
+      d.appendChild(el('div', { class: 'sate-pregunta__cuerpo' }, [c]));
+    }
+    d.addEventListener('toggle', function () { if (d.open) { llenar(); if (o.alAbrir) o.alAbrir(d); } });
+    if (o.abierta) { d.open = true; llenar(); }
+    return d;
+  }
+  /* revelar(nodo) → lleva el resultado a la vista (desplazamiento suave; sin movimiento si el sistema lo pide) y lo resalta. */
+  function revelar(nodo) {
+    if (!nodo || !nodo.getBoundingClientRect) return;
+    var reducido = !!(raiz.matchMedia && raiz.matchMedia('(prefers-reduced-motion:reduce)').matches);
+    var r = nodo.getBoundingClientRect(), alto = raiz.innerHeight || document.documentElement.clientHeight;
+    if (r.top < 0 || r.bottom > alto) nodo.scrollIntoView({ behavior: reducido ? 'auto' : 'smooth', block: 'center' });
+    nodo.classList.remove('sate-resalte');
+    void nodo.offsetWidth;
+    nodo.classList.add('sate-resalte');
+    raiz.setTimeout(function () { nodo.classList.remove('sate-resalte'); }, 1600);
   }
 
   /* ---------- Pestañas ---------- */
@@ -514,5 +606,6 @@ function leyendaGrafica(items,esc){
 }
 
   raiz.SateUI = { leyendaGrafica, indicadoresTrayectoria, fichasKardex, caminoTrayectoria, bandasMapa:rowBands, minimapaCurricular, cajaMateria, resalteCaja, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
-    ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior };
+    ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior,
+    volver: volver, migas: migas, tarjetaNav: tarjetaNav, buscador: buscador, segmentado: segmentado, pregunta: pregunta, revelar: revelar };
 })(typeof window !== 'undefined' ? window : globalThis);

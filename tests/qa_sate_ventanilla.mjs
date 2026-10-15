@@ -13,7 +13,7 @@ class Nodo{
   todos(){return this.children.flatMap(n=>[n,...n.todos()])}focus(){foco=this}click(){this.onclick?.()}
 }
 let dialogo, foco,aplicacion=null,ir,modulo;const almacen=new Map(),urls=new Set(),revocados=[],abiertos=[],box=new Nodo('section');
-const c=vm.createContext({SateUI:{modal(titulo,contenido,op){dialogo={titulo,contenido,...op}}},console,setTimeout:(fn,ms)=>{const h=setTimeout(fn,ms);if(ms>=30000)h.unref();return h},clearTimeout,Blob,Date,
+const c=vm.createContext({SateUI:{modal(titulo,contenido,op){dialogo={titulo,contenido,...op}},tarjetaNav(o){const a=new Nodo('a');a.href=o.href;a.className='sate-tarjeta-nav';return a}},console,setTimeout:(fn,ms)=>{const h=setTimeout(fn,ms);if(ms>=30000)h.unref();return h},clearTimeout,Blob,Date,
   document:{createElement:t=>new Nodo(t),getElementById:()=>box},
   localStorage:{getItem:k=>almacen.get(k)||null},IPNT:{set:(k,v)=>almacen.set(k,v)},
   URL:{createObjectURL(){const u='blob:'+urls.size;urls.add(u);return u},revokeObjectURL(u){revocados.push(u)}},
@@ -368,8 +368,10 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
 
   // Regreso a Ventanilla digital arriba (junto al título) y al final, separado de las acciones.
   const a2=t.asistente(box,dd3);
-  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='← Ventanilla digital');
+  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='← Volver a Ventanilla digital');
   assert.equal(regresos.length,2);
+  assert.equal(box.todos().find(n=>n.className.includes('tramite-guia'))?.href,'#/upiita/guia/situacion/que-es-dictamen','El dictamen enlaza a su respuesta de la Guía');
+  assert.ok(regresos.every(n=>n.className.includes('sate-volver')),'«Volver» es un botón del sistema');
   assert.equal(box.children[0].className,'tramite-encabezado');assert.equal(box.children[0].children[0].textContent,'Solicitud de dictamen');
   assert.ok(box.children[0].children.includes(regresos[0]),'Arriba, a la altura del título');
   assert.equal(box.children.at(-1).className,'tramite-pie');assert.ok(box.children.at(-1).children.includes(regresos[1]),'Al final de la página');
@@ -442,7 +444,8 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.ok(box.querySelector('iframe'),'Vista previa del formato oficial');
   assert.ok(box.querySelector('[data-ver-formato]'));
   assert.equal(box.todos().find(n=>n.className.includes('tramite-imprimible')),undefined,'El resumen no es la salida del trámite');
-  const enlace=box.todos().find(n=>n.tagName==='a');
+  const enlace=box.todos().find(n=>n.tagName==='a'&&n.target==='_blank');
+  assert.equal(box.todos().find(n=>n.className.includes('tramite-guia'))?.href,'#/upiita/guia/tramites/baja-temporal','La baja temporal enlaza a su respuesta de la Guía');
   assert.equal(enlace.href,B.urlFormato('temporal'));assert.equal(enlace.target,'_blank');assert.equal(enlace.rel,'noopener');assert.ok(!enlace.download,'Solo enlaza el formato; no lo descarga');
   assert.equal(box.todos().filter(n=>n.className.includes('sate-btn--primario')).length,1);
   // Pasos hechos navegables y «Cambiar» lleva al paso de ese dato.
@@ -478,13 +481,13 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.ok(box.todos().some(n=>n.tagName==='li'&&/baja temporal conserva tu lugar/.test(n.textContent)),'Sugiere la baja temporal en tono informativo');
   box.todos().filter(n=>n.type==='radio')[0].checked=true;box.todos().filter(n=>n.type==='radio')[0].onchange();
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
-  assert.equal(box.todos().find(n=>n.tagName==='a').href,B.urlFormato('definitiva'));
+  assert.equal(box.todos().find(n=>n.tagName==='a'&&n.target==='_blank').href,B.urlFormato('definitiva'));
   modulo.ocultar();
   // Sin enlace en los datos, se explica en vez de mostrar un botón roto.
   const datosBajas=c.SATE_DATA.bajas;c.SATE_DATA.bajas=undefined;
   modulo.mostrar({tramite:'baja_temporal'});
   assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa y descarga el PDF'),'Reanuda en el último paso con lo capturado en esta sesión');
-  assert.equal(box.todos().find(n=>n.tagName==='a'),undefined);assert.ok(box.todos().some(n=>/No está disponible el formato/.test(n.textContent)));
+  assert.equal(box.todos().find(n=>n.tagName==='a'&&n.target==='_blank'),undefined);assert.ok(box.todos().some(n=>/No está disponible el formato/.test(n.textContent)));
   assert.ok(box.querySelector('[data-descargar]').disabled,'Sin original no permite generar una hoja vacía');
   c.SATE_DATA.bajas=datosBajas;modulo.ocultar();
   const definitiva=B.definir('definitiva');
