@@ -770,8 +770,9 @@ body.sate-flotante .sate-barra{display:flex}
   .wrap>header.top .sate-datos .sate-texto-largo{display:none!important}
   .wrap>header.top .sate-datos .sate-texto-corto{display:inline}
 }
-/* Teléfono: fila 1 = logos pequeños, «SATE UPIITA», ▾ y los tres íconos centrados; fila 2 = chapa «Fase de prueba» a la
-   izquierda y el estado del SAES compacto a la derecha; luego avisos y la carrera. Colocación explícita: .sate-identidad
+/* Teléfono: fila 1 = logos pequeños, «SATE UPIITA» y ▾; fila 2 = chapa «Fase de prueba» a la izquierda y los tres íconos a la
+   derecha; fila 3 = estado del SAES compacto. A 320 px: logos 135 + nombre 100 + ▾ 24 + huecos 16 = 275 <= 294 útiles;
+   fila 2: chapa 95 + íconos 140 = 235; luego avisos y la carrera. Colocación explícita: .sate-identidad
    pasa a display:contents para que nombre, ▾ y chapa sean celdas de la misma cuadrícula y no se encimen. */
 @media(max-width:639.98px){
   .wrap>header.top{grid-template-columns:auto auto minmax(0,1fr) auto;grid-template-areas:none;margin-top:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-3) 0;column-gap:var(--ipn-esp-2);row-gap:var(--ipn-esp-2)}
@@ -781,10 +782,10 @@ body.sate-flotante .sate-barra{display:flex}
   .wrap>header.top .sate-identidad{display:contents}
   .wrap>header.top #sate-titulo{grid-area:auto;grid-column:2;grid-row:1;align-self:center;margin:0;white-space:nowrap}
   .wrap>header.top .unit-switch{grid-area:auto;grid-column:3;grid-row:1;justify-self:start;align-self:center}
-  .wrap>header.top .header-actions{grid-area:auto;grid-column:4;grid-row:1;justify-self:end;align-self:center}
+  .wrap>header.top .header-actions{grid-area:auto;grid-column:3 / -1;grid-row:2;justify-self:end;align-self:center}
   .wrap>header.top #sate-leyenda{grid-column:1 / 3;grid-row:2;justify-self:start;align-self:center;min-width:0}
-  .wrap>header.top .sate-datos{grid-area:auto;grid-column:3 / -1;grid-row:2;justify-self:end;align-self:center;justify-content:flex-end;margin-top:0;min-width:0}
-  .wrap>header.top #sate-avisos-globales{grid-area:auto;grid-column:1 / -1;grid-row:3;margin-top:0}
+  .wrap>header.top .sate-datos{grid-area:auto;grid-column:1 / -1;grid-row:3;justify-self:stretch;align-self:center;justify-content:space-between;margin-top:0;min-width:0}
+  .wrap>header.top #sate-avisos-globales{grid-area:auto;grid-column:1 / -1;grid-row:4;margin-top:0}
   .wrap>header.top #sate-avisos-globales:empty{display:none}
-  .wrap>header.top>.sate-navegacion{grid-area:auto;grid-column:1 / -1;grid-row:4;margin-top:var(--ipn-esp-1);padding-block:var(--ipn-esp-2)}
+  .wrap>header.top>.sate-navegacion{grid-area:auto;grid-column:1 / -1;grid-row:5;margin-top:var(--ipn-esp-1);padding-block:var(--ipn-esp-2)}
 }

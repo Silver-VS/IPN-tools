@@ -198,12 +198,20 @@ assert.equal(medicion.inert,true);
   const telefono = bloque.match(/@media\(max-width:639\.98px\)\{([\s\S]*?)\n\}/)[1];
   assert.match(telefono, /\.sate-identidad\{display:contents\}/, 'nombre, ▾ y chapa son celdas de la cuadrícula: no se encimen');
   assert.match(telefono, /#sate-titulo\{[^}]*grid-column:2;grid-row:1/);
-  assert.match(telefono, /\.header-actions\{[^}]*grid-column:4;grid-row:1;justify-self:end;align-self:center/, 'tres íconos en la fila 1, centrados');
+  const fila = (re, quien) => Number(telefono.match(re)?.[1] ?? NaN);
+  const filaNombre = fila(/#sate-titulo\{[^}]*grid-row:(\d)/), filaIconos = fila(/\.header-actions\{[^}]*grid-row:(\d)/);
+  assert.equal(filaNombre, 1); assert.equal(filaIconos, 2);
+  assert.notEqual(filaIconos, filaNombre, 'en teléfono las acciones no comparten fila con el nombre');
+  assert.match(telefono, /\.header-actions\{[^}]*justify-self:end;align-self:center/, 'tres íconos a la derecha, centrados');
+  assert.equal(fila(/#sate-leyenda\{[^}]*grid-row:(\d)/), filaIconos, 'chapa e íconos en la misma fila');
+  assert.equal(fila(/\.sate-datos\{[^}]*grid-row:(\d)/), 3, 'SAES compacto en la fila 3');
   assert.match(telefono, /#sate-leyenda\{grid-column:1 \/ 3;grid-row:2/);
-  assert.match(telefono, /\.sate-datos\{[^}]*grid-column:3 \/ -1;grid-row:2/, 'SAES compacto en la fila 2');
-  assert.match(telefono, /\.sate-navegacion\{[^}]*grid-row:4/);
+  assert.match(telefono, /\.sate-navegacion\{[^}]*grid-row:5/);
   assert.match(telefono, /\.inst-in img,[^{]*\{height:28px\}/);
   assert.match(telefono, /\.inst-name\{display:none\}/);
+  // 320 px: 320 - 2*12 (relleno) - 2 (borde) = 294 útiles. Fila 1: logos 28 px (IPN ~92 + unidad ~35 + 8) + 8 + nombre ~100 + 8 + ▾ 24 = 275.
+  // Fila 2: chapa ~95 + acciones 3x44+2x4 = 140 -> 235. Las dos caben; las columnas flexibles son minmax(0,1fr).
+  assert.ok(92 + 35 + 8 + 8 + 100 + 8 + 24 <= 294 && 95 + 140 + 8 <= 294);
   assert.match(cortos, /\.sate-datos \.sate-texto-corto\{display:inline\}/, 'escalón corto: «Traer datos» abreviado');
   // Cada cuadrícula tiene una columna flexible que puede encogerse (nada se parte en anchos intermedios)
   for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)/, m[1]);
