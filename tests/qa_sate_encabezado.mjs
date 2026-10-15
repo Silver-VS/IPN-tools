@@ -196,9 +196,15 @@ assert.equal(medicion.inert,true);
   const cortos = bloque.match(/@media\(max-width:1023\.98px\)\{([\s\S]*?)\n\}/)[1];
   assert.match(cortos, /\.enc-btn span[^{]*\{position:absolute/);
   const telefono = bloque.match(/@media\(max-width:639\.98px\)\{([\s\S]*?)\n\}/)[1];
-  assert.match(telefono, /grid-template-areas:"logos ident acciones" "datos datos datos" "avisos avisos avisos" "nav nav nav"/);
-  assert.match(telefono, /\.inst-in img,[^{]*\{height:32px\}/);
+  assert.match(telefono, /\.sate-identidad\{display:contents\}/, 'nombre, ▾ y chapa son celdas de la cuadrícula: no se encimen');
+  assert.match(telefono, /#sate-titulo\{[^}]*grid-column:2;grid-row:1/);
+  assert.match(telefono, /\.header-actions\{[^}]*grid-column:4;grid-row:1;justify-self:end;align-self:center/, 'tres íconos en la fila 1, centrados');
+  assert.match(telefono, /#sate-leyenda\{grid-column:1 \/ 3;grid-row:2/);
+  assert.match(telefono, /\.sate-datos\{[^}]*grid-column:3 \/ -1;grid-row:2/, 'SAES compacto en la fila 2');
+  assert.match(telefono, /\.sate-navegacion\{[^}]*grid-row:4/);
+  assert.match(telefono, /\.inst-in img,[^{]*\{height:28px\}/);
   assert.match(telefono, /\.inst-name\{display:none\}/);
+  assert.match(cortos, /\.sate-datos \.sate-texto-corto\{display:inline\}/, 'escalón corto: «Traer datos» abreviado');
   // Cada cuadrícula tiene una columna flexible que puede encogerse (nada se parte en anchos intermedios)
   for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)/, m[1]);
   // La identidad institucional sigue limitada al sitio publicado y con su acento por unidad
