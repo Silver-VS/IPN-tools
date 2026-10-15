@@ -1,6 +1,14 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-15 · Claude (GUIA4)
+
+| Claves | Cambio |
+|---|---|
+| `sate.guia.oficial`, `sate.guia.nota` | «Leer el programa completo aquí» (transcripción) y nota que remite al PDF original. |
+| `sate.guia.pdf`, `pdf_ayuda`, `descripcion_pendiente`, `bibliografia`, `buscar_catalogo`, `relaciones`, `antes`, `despues`, `*_ninguna` | Ficha en panel grande: PDF original en la nube de la UPIITA, bibliografía, nota de descripción pendiente de revisión y materias de antes y después. |
+| `sate.guia.consultar_*`, `explorar_*`, `modo_*`, `ayuda_*`, `biblio_*`, `inspector_vacio`, `que_es`, `abrir_*` | Portada de la Guía con dos caminos (consultar un temario / explorar mi carrera), explorador por líneas de aprendizaje y «¿No sabes por dónde empezar?» con las bibliotecas del IPN (enlaces en `data/sate.json`, `bibliotecas`). |
+
 ## 2026-10-15 · 2026.10.24 · Claude (GOOG1)
 
 | Claves | Cambio |

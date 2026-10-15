@@ -76,6 +76,10 @@ def write_dist(name, html, title_suffix=" | UPIITA IPN", unidad=None):
     from cuenta import identidades
     identidad = identidades().get((unidad or {}).get('id', 'upiita'), {})
     head = head.replace('/*__UNIDAD_NOMBRE__*/', identidad.get('nombre', (unidad or {}).get('nombre', identidad.get('siglas', ''))))
+    if "<!--__INST_EN_ENCABEZADO__-->" in html:
+        # SATE: la pieza institucional va dentro de su encabezado (una sola pieza, sin dos <header role=banner>)
+        dentro = head.replace('<header class="inst" role="banner">', '<div class="inst">').replace("</header>", "</div>")
+        html = html.replace("<!--__INST_EN_ENCABEZADO__-->", dentro, 1)
     html = html.replace("<!--__INST_HEADER__-->", head, 1)
     html = html.replace("<!--__IPNT_HOME__-->", HOME, 1)   # regreso a la página principal de GuindaLabs
     # pleca SEP | IPN al pie: retirada a petición del equipo (2026-10-01); FOOTER se conserva por si se vuelve a requerir

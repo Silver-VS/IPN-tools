@@ -176,6 +176,38 @@ completo=1100;corto=1050;fuentes();frame();assert.equal(tabs.dataset.escalon,'fl
 completo=600;corto=400;mutacion();frame();assert.equal(tabs.dataset.escalon,'completo');
 assert.equal(medicion.inert,true);
 }
+// Encabezado unificado (GUIA4): una sola pieza con la identidad institucional dentro, acciones a la derecha y escalones por CSS.
+{
+  const enc = html.slice(html.indexOf('<header class="top">'), html.indexOf('</header>', html.indexOf('<header class="top">')));
+  assert.equal((html.match(/<header\b/g) || []).length, 1, 'un solo <header>: la pieza institucional ya no es un banner aparte');
+  assert.match(enc, /<div class="inst">[\s\S]*class="inst-in"[\s\S]*class="inst-name"/, 'logos y nombre de la unidad dentro del encabezado');
+  assert.ok(enc.indexOf('class="inst"') < enc.indexOf('class="brand"') && enc.indexOf('class="brand"') < enc.indexOf('class="sate-navegacion"'));
+  assert.ok(!html.includes('<!--__INST_'), 'sin marcadores sin sustituir');
+  const css = leer('web/sate/componentes.css'), bloque = css.slice(css.indexOf('/* ===== Encabezado unificado (GUIA4)'));
+  assert.ok(bloque.length > 500);
+  assert.match(bloque, /\.wrap>header\.top\{display:grid;grid-template-columns:auto minmax\(0,1fr\) auto;grid-template-areas:"logos ident acciones" "logos nombre datos" "avisos avisos avisos" "nav nav nav"/);
+  assert.match(bloque, /\.wrap>header\.top>\.brand,\.wrap>header\.top \.title-row,\.wrap>header\.top>\.inst,\.wrap>header\.top \.sate-fila-avisos\{display:contents\}/);
+  assert.match(bloque, /\.sate-fila-avisos\[hidden\],\.wrap>header\.top>\.sate-navegacion\[hidden\]\{display:none\}/, 'hidden protegido frente a display:contents/grid');
+  assert.match(bloque, /\.inst-name\{[^}]*text-overflow:ellipsis;white-space:nowrap/, 'el nombre largo se recorta, no se parte');
+  assert.match(bloque, /\.sate-identidad\{grid-area:ident;min-width:0\}/);
+  assert.match(bloque, /\.header-actions\{grid-area:acciones;justify-self:end\}/);
+  assert.match(bloque, /\.sate-datos\{grid-area:datos;justify-self:end;margin-left:0\}/);
+  // Escalones: completo (>=1024), corto (640-1023: acciones con ícono) y teléfono (<640: SAES en su fila, logos pequeños)
+  const cortos = bloque.match(/@media\(max-width:1023\.98px\)\{([\s\S]*?)\n\}/)[1];
+  assert.match(cortos, /\.enc-btn span[^{]*\{position:absolute/);
+  const telefono = bloque.match(/@media\(max-width:639\.98px\)\{([\s\S]*?)\n\}/)[1];
+  assert.match(telefono, /grid-template-areas:"logos ident acciones" "datos datos datos" "avisos avisos avisos" "nav nav nav"/);
+  assert.match(telefono, /\.inst-in img,[^{]*\{height:32px\}/);
+  assert.match(telefono, /\.inst-name\{display:none\}/);
+  // Cada cuadrícula tiene una columna flexible que puede encogerse (nada se parte en anchos intermedios)
+  for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)/, m[1]);
+  // La identidad institucional sigue limitada al sitio publicado y con su acento por unidad
+  assert.match(leer('tools/institucional.py'), /<!--__INST_EN_ENCABEZADO__-->/);
+  assert.match(bloque, /border-top:3px solid var\(--sate-realce,var\(--ipn-acento\)\)/);
+  // Pestañas: seis en escritorio; la barra inferior (cuatro + Más) y el escalón corto se conservan
+  assert.match(css, /body\.sate-flotante \.sate-barra\{display:flex\}/);
+  assert.equal(config.unidades.upiita.pestanas.length, 6);
+}
 let bloques = 0;
 const paginas = [...readdirSync('web/dist').filter(f=>/^horarios-.*\.html$/.test(f)).map(f=>'web/dist/'+f), ...readdirSync('web/dist/sate').filter(f=>f.endsWith('.html')).map(f=>'web/dist/sate/'+f)];
 for (const archivo of paginas) for (const m of leer(archivo).matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
