@@ -35,9 +35,10 @@ leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener error
 unidad = "Cambiar unidad académica"
 carrera = "Carrera"
 prueba = "Fase de prueba ⓘ"
-actualizar = "Traer mis datos del SAES"
-actualizar_corto = "Traer datos"
-cargar = "Traer mis datos del SAES"
+# Botón del encabezado: con datos del SAES ya cargados («actualizar») o sin ellos («cargar»); `_corto` en anchos medios y teléfono.
+actualizar = "Actualizar datos SAES"
+actualizar_corto = "Actualizar"
+cargar = "Traer datos SAES"
 cargar_corto = "Traer datos"
 indicador = "SAES"
 usando_datos = "Con datos del SAES del {fecha}"

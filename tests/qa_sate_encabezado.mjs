@@ -7,15 +7,25 @@ const html = leer('web/dist/sate/index.html');
 const config = JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const texto = (k,v={}) => config.textos[k].replace(/\{(\w+)\}/g,(_,n)=>v[n]??'{'+n+'}');
 const encabezado = html.slice(html.indexOf('<header class="top">'), html.indexOf('</header>', html.indexOf('<header class="top">')));
-assert.match(encabezado, /id="b-unidad"[^>]*aria-label="Cambiar unidad académica"[^>]*>▾<\/button>/);
+assert.match(encabezado, /<h1 id="sate-titulo">SATE <button class="sate-unidad-btn" id="b-unidad"[^>]*aria-label="Cambiar unidad académica"[^>]*><\/button><\/h1>/);
+assert.match(encabezado, /<p id="sate-nombre">Sistema de Apoyo a la Trayectoria Escolar<\/p>/);
+assert.ok(!encabezado.includes('unit-switch'), 'sin selector de unidad aparte');
 assert.match(encabezado, /<span id="sate-leyenda"><\/span>/);
 assert.match(encabezado, /class="sate-navegacion"[\s\S]*id="sate-tabs"[\s\S]*class="sate-controles"/);
 assert.match(encabezado, /<label class="field"><span class="sate-sr">Carrera<\/span><select id="f-carrera">/);
 assert.equal((html.match(/id="f-carrera"/g) || []).length, 1);
 assert.equal((html.match(/id="saes-open"/g) || []).length, 1);
-const fila = encabezado.slice(encabezado.indexOf('class="sate-fila-avisos"'),encabezado.indexOf('class="sate-navegacion"'));
-assert.match(fila,/id="sate-avisos-globales"[\s\S]*id="saes-open"[^>]*data-saes-open[\s\S]*Traer mis datos del SAES[\s\S]*id="sate-saes-indicador"[^>]*role="status"[^>]*aria-label="Sin datos del SAES: puedes usar el mapa y los horarios"/);
+const acciones = encabezado.slice(encabezado.indexOf('class="header-actions"'), encabezado.indexOf('class="enc-btn sate-boton-flota"'));
+// De derecha a izquierda: tema, sesión, SAES (en el HTML, de izquierda a derecha).
+assert.ok(acciones.indexOf('id="saes-open"') < acciones.indexOf('id="ipnt-open"') && acciones.indexOf('id="ipnt-open"') < acciones.indexOf('id="theme-btn"'), 'orden: SAES, sesión, tema');
+assert.match(acciones, /id="saes-open"[^>]*data-saes-open[\s\S]*id="sate-saes-indicador"[^>]*role="img"[^>]*aria-label="Sin datos del SAES: puedes usar el mapa y los horarios"[\s\S]*Traer datos SAES/);
+assert.match(encabezado, /class="enc-btn sate-boton-flota" type="button" data-encuesta hidden/, 'Opinar es el botón flotante');
+assert.ok(encabezado.indexOf('sate-logo-ipn') < encabezado.indexOf('class="brand"') && encabezado.indexOf('class="brand"') < encabezado.indexOf('class="sate-lado"'));
 assert.ok(!encabezado.slice(encabezado.indexOf('class="sate-navegacion"')).includes('saes-open'));
+// Ruta del logo del IPN: un solo lugar (data/identidad/logo_ipn.json)
+const logo = JSON.parse(leer('data/identidad/logo_ipn.json'));
+assert.ok(encabezado.includes('src="../' + logo.claro + '"') && encabezado.includes('src="../' + logo.oscuro + '"'));
+assert.ok(!leer('tools/institucional.py').includes(logo.claro), 'la ruta del logo del IPN no se repite en el código');
 assert.ok(!html.includes('sate-datos-menu'));
 for (const archivo of ['index.html','nucleo.js','inicio.js','mapa.js','situacion.js','desempeno.js','saes-dialogo.js']) {
   const fuente=leer('web/dist/sate/'+archivo);
@@ -33,34 +43,41 @@ assert.equal(config.identidadUnidades.upibi.logo,'upibi-saes');
 assert.equal(config.textos['sate.pestana.trayectoria.titulo'],'Tu perfil');
 assert.equal(config.textos['sate.pestana.trayectoria.corto'],'Perfil');
 assert.match(leer('web/sate/componentes.js'),/trayectoria: '<circle cx="12" cy="8" r="4"\/>/);
-for (const [unidad,generica] of [['upiita'],['escom'],['upibi'],['encb'],['esimez'],['desconocida'],['enba'],['escom',true]]) {
-  const valores={}, atributos={}, titulo={replaceChildren(...n){this.children=n}};
+for (const [unidad,generica,sinLogo] of [['upiita'],['upiita',false,true],['escom'],['upibi'],['encb'],['esimez'],['desconocida'],['enba'],['escom',true]]) {
+  const valores={}, atributos={}, titulo={replaceChildren(...n){this.children=n}}, ranura={children:[],appendChild(n){this.children.push(n)}};
+  const botonUnidad={setAttribute(k,v){this[k]=v}};
   const halos=[];
-  const documento={querySelector:()=>null,getElementById:()=>titulo,
+  const documento={querySelector:()=>null,getElementById:id=>id==='b-unidad'?botonUnidad:id==='sate-logo-unidad'?ranura:titulo,
     querySelectorAll:()=>halos,
     documentElement:{getAttribute:k=>atributos[k],style:{setProperty(k,v){valores[k]=v}}},
     createElement:tag=>{const n={tag,dataset:{},style:{setProperty(k,v){this[k]=v}},children:[],prepend(n){this.children.unshift(n)},appendChild(n){this.children.push(n)}};if(tag==='span')halos.push(n);return n}};
   let selector;
   const configuracion=structuredClone(config);
   if(generica)delete configuracion.unidades[unidad];
+  if(sinLogo)delete configuracion.unidades[unidad].logo;
   const c=vm.createContext({SATE_CONFIG:configuracion,SateRutas:{ruta:()=>({unidad})},
     URLSearchParams,localStorage:{getItem:()=>null},location:{hash:'#/'+unidad+'/mapa',search:''},window:{},
     document:documento,texto,SateUI:{modal(t,n){selector=n}}});
   vm.runInContext(inicio.slice(0,inicio.indexOf('  // plurales ICU'))+'\nglobalThis.aplicarRealce=aplicarRealce;globalThis.colorHalo=colorHalo;})();',c);
   vm.runInContext('const config=SATE_CONFIG.unidades,u=window.SATE_UNIDAD,cfg=config[u];let api;',c);
   vm.runInContext(inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar(')),c);
-  vm.runInContext(inicio.slice(inicio.indexOf('  const siglasUnidad'),inicio.indexOf('  if (cfg.leyenda)')),c);
-  const nombre={textContent:''};
-  documento.querySelector=s=>s==='.inst-name'?nombre:null;
-  vm.runInContext(inicio.slice(inicio.indexOf('  const nombreUnidad'),inicio.indexOf('  if (cfg.logo)')),c);
-  assert.equal(nombre.textContent,config.identidadUnidades[unidad]?.nombre||c.SATE_CONFIG.unidades[unidad].siglas);
-  if(unidad==='encb')assert.equal(nombre.textContent,'Escuela Nacional de Ciencias Biológicas');
-  const halo=titulo.children[0],img=halo.children[0];
+  vm.runInContext(inicio.slice(inicio.indexOf('  // «SATE {unidad}»'),inicio.indexOf('  if (cfg.leyenda)')),c);
+  const siglas=c.SATE_CONFIG.unidades[unidad].siglas;
+  assert.equal(botonUnidad.textContent,siglas);assert.equal(botonUnidad.hidden,false);
+  assert.equal(botonUnidad['aria-label'],siglas+'. Cambiar unidad académica');
+  assert.equal(titulo.children[0],'SATE ');assert.equal(titulo.children[1],botonUnidad,unidad+': la unidad es el botón del título');
+  vm.runInContext(inicio.slice(inicio.indexOf('  // Logo de la unidad, hasta la derecha'),inicio.indexOf('  function identidadSaes()')),c);
+  if(c.SATE_CONFIG.unidades[unidad].logo){
+    const enlace=ranura.children[0];assert.equal(enlace.className,'unit');assert.equal(enlace.children.length,2);
+    assert.deepEqual(enlace.children.map(i=>i.className),['logo-lt','logo-dk']);
+    assert.equal(halos.length,0);
+    continue;
+  }
+  const halo=ranura.children[0],img=halo.children[0];
   assert.equal(halo.tag,'span');assert.equal(halo.className,'sate-logo-halo');
   assert.equal(img.tag,'img');assert.equal(img.className,'sate-logo-unidad');
   assert.equal(img.src,'../assets/logos/unidades/'+(config.identidadUnidades[unidad]?.logo||'ipn')+'.webp');
   assert.equal(img.alt,c.SATE_CONFIG.unidades[unidad].nombre);
-  assert.equal(titulo.children[1],'SATE ');assert.equal(titulo.children[2].textContent,c.SATE_CONFIG.unidades[unidad].siglas);
   img.onerror();assert.equal(img.hidden,true,unidad+': imagen fallida oculta');assert.equal(halo.hidden,true);
   const realce=config.unidades[unidad]?.realce||config.identidadUnidades[unidad]?.realce;
   assert.equal(valores['--sate-realce'],realce?.claro||'var(--sate-acento-base)',unidad+': tema claro');
@@ -84,8 +101,7 @@ assert.match(estilosIdentidad,/\.sate-logo-halo\{[^}]*position:relative;display:
 assert.match(estilosIdentidad,/\.sate-logo-halo::before\{content:none\}/);
 assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient/);   // el degradado se veía dentro del logo (dueño)
 assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
-assert.match(estilosIdentidad,/@media\(max-width:639px\)\{\s*#sate-titulo \.sate-logo-unidad\{max-height:28px\}/);
-const interaccion = inicio.slice(inicio.indexOf('  if (cfg.leyenda) {'), inicio.indexOf('  const nombreUnidad'));
+const interaccion = inicio.slice(inicio.indexOf('  if (cfg.leyenda) {'), inicio.indexOf('  // Logo de la unidad, hasta la derecha'));
 for (const unidad of Object.keys(config.unidades)) {
   const boton = {setAttribute(k,v){this[k]=v}};
   const ayuda = {querySelector:()=>boton};
@@ -110,8 +126,8 @@ const c=vm.createContext({SATE:{texto},document:{getElementById:id=>id==='saes-o
 vm.runInContext(saes+'\nglobalThis.estado=SAES.status;',c);
 for (const datos of [null,{leido:'2026-10-07T12:00:00Z'},{leido:'2026-10-08T15:00:00Z'},null,{demo:true,leido:'2026-10-07T12:00:00Z'}]) {
   const usando=!!datos&&!datos.demo;
-  c.estado(datos);assert.equal(clases.on,usando);assert.equal(span.textContent,'Traer mis datos del SAES');
-  assert.equal(corto.textContent,'Traer datos');
+  c.estado(datos);assert.equal(clases.on,usando);assert.equal(span.textContent,usando?'Actualizar datos SAES':'Traer datos SAES');
+  assert.equal(corto.textContent,usando?'Actualizar':'Traer datos');
   const esperado=usando?texto('sate.encabezado.usando_datos',{fecha:new Date(datos.leido).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})}):texto('sate.encabezado.sin_datos');
   assert.equal(indicador.title,esperado);assert.equal(indicador['aria-label'],esperado);
 }
@@ -120,22 +136,14 @@ assert.match(core,/if\(location.hash==='#demo'\)/);
 assert.match(core,/Modo demostración[\s\S]*Salir del modo demostración/);
 assert.match(core,/sessionStorage.removeItem\('ipnt.demo'\)/);
 const css=leer('web/sate/componentes.css');
-assert.match(fila,/class="sate-texto-corto">Traer datos/,'H: etiqueta móvil inicial en catálogo');
-assert.match(css,/@media\(max-width:639px\)\{[\s\S]*\.sate-fila-avisos\{flex-wrap:nowrap;overflow-x:auto/,'F: avisos y SAES en una fila desplazable');
+assert.match(acciones,/class="sate-texto-corto">Traer datos/,'H: etiqueta móvil inicial en catálogo');
 assert.match(css,/#sate-avisos-globales \.sate-chips\{flex-wrap:nowrap/);
-assert.match(css,/header\.top\{border-bottom:0/);
 assert.match(css,/\.bar-top\{border-bottom:0/);
 assert.match(css,/\.sate-navegacion\{display:flex;align-items:center/);
-assert.match(css,/@media\(max-width:639px\)\{[\s\S]*\.sate-controles\{flex:1;width:100%\}/);
-assert.match(css,/\.sate-datos\{[^}]*margin-left:auto/);
 assert.match(css,/:is\(#sate-tabs,\.sate-medicion\) \.sate-pestana__texto\{white-space:nowrap;overflow-wrap:normal\}/);
 assert.match(css,/data-controles-separados=true\]>#sate-tabs\{flex-basis:100%\}/);
 assert.match(css,/body\.sate-flotante \.sate-barra\{display:flex\}/);
 assert.match(css,/\.sate-barra__btn \.sate-pestana__texto\{white-space:nowrap;overflow-wrap:normal\}/);
-assert.match(css,/#sate-saes-indicador::before\{[^}]*border:2px solid var\(--ipn-tenue\)/);
-assert.match(css,/#sate-saes-indicador.on::before\{background:var\(--ipn-ok\);border-color:var\(--ipn-ok\)/);
-assert.match(css,/\.sate-datos \.saes-open::before\{content:none\}/);
-assert.match(css,/\.sate-datos \.btn[^}]*\):focus-visible\{outline:2px solid var\(--sate-realce\)/);
 // Ejecutar el adaptador real con geometría controlada, sin navegador ni red.
 {
 const adaptador = inicio.slice(inicio.indexOf('  function adaptarPestanas()'),inicio.indexOf('  function elegirUnidad()'));
@@ -176,49 +184,40 @@ completo=1100;corto=1050;fuentes();frame();assert.equal(tabs.dataset.escalon,'fl
 completo=600;corto=400;mutacion();frame();assert.equal(tabs.dataset.escalon,'completo');
 assert.equal(medicion.inert,true);
 }
-// Encabezado unificado (GUIA4): una sola pieza con la identidad institucional dentro, acciones a la derecha y escalones por CSS.
+// Encabezado v2 (ENC2): isologo del IPN | SATE {unidad} + nombre | logo de la unidad y controles; respiro común bajo la barra.
 {
-  const enc = html.slice(html.indexOf('<header class="top">'), html.indexOf('</header>', html.indexOf('<header class="top">')));
-  assert.equal((html.match(/<header\b/g) || []).length, 1, 'un solo <header>: la pieza institucional ya no es un banner aparte');
-  assert.match(enc, /<div class="inst">[\s\S]*class="inst-in"[\s\S]*class="inst-name"/, 'logos y nombre de la unidad dentro del encabezado');
-  assert.ok(enc.indexOf('class="inst"') < enc.indexOf('class="brand"') && enc.indexOf('class="brand"') < enc.indexOf('class="sate-navegacion"'));
+  assert.equal((html.match(/<header\b/g) || []).length, 1, 'un solo <header>');
   assert.ok(!html.includes('<!--__INST_'), 'sin marcadores sin sustituir');
-  const css = leer('web/sate/componentes.css'), bloque = css.slice(css.indexOf('/* ===== Encabezado unificado (GUIA4)'));
+  const css = leer('web/sate/componentes.css'), bloque = css.slice(css.indexOf('/* ===== Encabezado v2 (ENC2)'));
   assert.ok(bloque.length > 500);
-  assert.match(bloque, /\.wrap>header\.top\{display:grid;grid-template-columns:auto minmax\(0,1fr\) auto;grid-template-areas:"logos ident acciones" "logos nombre datos" "avisos avisos avisos" "nav nav nav"/);
-  assert.match(bloque, /\.wrap>header\.top>\.brand,\.wrap>header\.top \.title-row,\.wrap>header\.top>\.inst,\.wrap>header\.top \.sate-fila-avisos\{display:contents\}/);
-  assert.match(bloque, /\.sate-fila-avisos\[hidden\],\.wrap>header\.top>\.sate-navegacion\[hidden\]\{display:none\}/, 'hidden protegido frente a display:contents/grid');
-  assert.match(bloque, /\.inst-name\{[^}]*text-overflow:ellipsis;white-space:nowrap/, 'el nombre largo se recorta, no se parte');
-  assert.match(bloque, /\.sate-identidad\{grid-area:ident;min-width:0\}/);
-  assert.match(bloque, /\.header-actions\{grid-area:acciones;justify-self:end\}/);
-  assert.match(bloque, /\.sate-datos\{grid-area:datos;justify-self:end;margin-left:0\}/);
-  // Escalones: completo (>=1024), corto (640-1023: acciones con ícono) y teléfono (<640: SAES en su fila, logos pequeños)
-  const cortos = bloque.match(/@media\(max-width:1023\.98px\)\{([\s\S]*?)\n\}/)[1];
-  assert.match(cortos, /\.enc-btn span[^{]*\{position:absolute/);
+  assert.match(bloque, /grid-template-areas:"ipn marca lado" "avisos avisos avisos" "nav nav nav"/);
+  // El logo del IPN es siempre más alto que el de la unidad, en cada escalón
+  for (const [m, ipn, uni] of [[bloque.match(/:root\{\s*--ipn-espacio[\s\S]*?\}/)[0], 3.5, 2.5], [bloque.match(/@media\(max-width:1023\.98px\)\{\s*:root\{([^}]*)\}/)[1], 3, 2.25], [bloque.match(/@media\(max-width:639\.98px\)\{\s*:root\{([^}]*)\}/)[1], 2.5, 1.75]]) {
+    assert.equal(Number(m.match(/--sate-logo-ipn-alto:([\d.]+)rem/)[1]), ipn); assert.equal(Number(m.match(/--sate-logo-unidad-alto:([\d.]+)rem/)[1]), uni); assert.ok(ipn > uni);
+  }
+  // Un solo token de respiro bajo el encabezado, usado por el encabezado y no por cada pestaña
+  assert.match(bloque, /--ipn-espacio-bajo-encabezado:calc\(/);
+  assert.match(bloque, /margin:var\(--ipn-esp-3\) 0 var\(--ipn-espacio-bajo-encabezado\)/);
+  assert.match(leer('web/sate/cascaron.html'), /\[data-view-panel\]\{padding-top:0\}/);
+  // Unidad subrayada con el color de la unidad
+  assert.match(bloque, /\.sate-unidad-btn\{[^}]*color:var\(--sate-realce\)[^}]*text-decoration:underline;text-decoration-color:var\(--sate-realce\)/);
+  // Opinar flota bajo la barra, dentro del respiro
+  assert.match(bloque, /\.sate-boton-flota\{position:absolute;right:[^;]+;top:100%/);
+  // Estado del SAES con forma y color
+  assert.match(bloque, /\.sate-estado-dato\.on\{background:var\(--ipn-ok\)\}/);
+  assert.match(bloque, /\.sate-estado-dato\{[^}]*background:var\(--ipn-error\)/);
+  // Escalones: medio (SAES abreviado, leyenda bajo el nombre) y teléfono (controles en su fila, nombre largo oculto <480)
+  assert.match(bloque, /@media\(max-width:899\.98px\)\{[\s\S]*saes-open \.sate-texto-corto\{display:inline\}/);
   const telefono = bloque.match(/@media\(max-width:639\.98px\)\{([\s\S]*?)\n\}/)[1];
-  assert.match(telefono, /\.sate-identidad\{display:contents\}/, 'nombre, ▾ y chapa son celdas de la cuadrícula: no se encimen');
-  assert.match(telefono, /#sate-titulo\{[^}]*grid-column:2;grid-row:1/);
-  const fila = (re, quien) => Number(telefono.match(re)?.[1] ?? NaN);
-  const filaNombre = fila(/#sate-titulo\{[^}]*grid-row:(\d)/), filaIconos = fila(/\.header-actions\{[^}]*grid-row:(\d)/);
-  assert.equal(filaNombre, 1); assert.equal(filaIconos, 2);
-  assert.notEqual(filaIconos, filaNombre, 'en teléfono las acciones no comparten fila con el nombre');
-  assert.match(telefono, /\.header-actions\{[^}]*justify-self:end;align-self:center/, 'tres íconos a la derecha, centrados');
-  assert.equal(fila(/#sate-leyenda\{[^}]*grid-row:(\d)/), filaIconos, 'chapa e íconos en la misma fila');
-  assert.equal(fila(/\.sate-datos\{[^}]*grid-row:(\d)/), 3, 'SAES compacto en la fila 3');
-  assert.match(telefono, /#sate-leyenda\{grid-column:1 \/ 3;grid-row:2/);
-  assert.match(telefono, /\.sate-navegacion\{[^}]*grid-row:5/);
-  assert.match(telefono, /\.inst-in img,[^{]*\{height:28px\}/);
-  assert.match(telefono, /\.inst-name\{display:none\}/);
-  // 320 px: 320 - 2*12 (relleno) - 2 (borde) = 294 útiles. Fila 1: logos 28 px (IPN ~92 + unidad ~35 + 8) + 8 + nombre ~100 + 8 + ▾ 24 = 275.
-  // Fila 2: chapa ~95 + acciones 3x44+2x4 = 140 -> 235. Las dos caben; las columnas flexibles son minmax(0,1fr).
-  assert.ok(92 + 35 + 8 + 8 + 100 + 8 + 24 <= 294 && 95 + 140 + 8 <= 294);
-  assert.match(cortos, /\.sate-datos \.sate-texto-corto\{display:inline\}/, 'escalón corto: «Traer datos» abreviado');
-  // Cada cuadrícula tiene una columna flexible que puede encogerse (nada se parte en anchos intermedios)
-  for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)/, m[1]);
-  // La identidad institucional sigue limitada al sitio publicado y con su acento por unidad
-  assert.match(leer('tools/institucional.py'), /<!--__INST_EN_ENCABEZADO__-->/);
+  assert.match(telefono, /grid-template-areas:"ipn marca unidad" "acciones acciones acciones"/);
+  assert.match(telefono, /\.sate-lado\{display:contents\}/);
+  assert.match(bloque, /@media\(max-width:479\.98px\)\{\.brand #sate-nombre\{display:none\}\}/);
+  // Nada se parte: columnas flexibles y nombre largo recortado
+  for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)|auto minmax/, m[1]);
+  assert.match(bloque, /#sate-nombre\{[^}]*text-overflow:ellipsis;white-space:nowrap/);
+  // Paleta común: el bloque solo usa tokens --ipn-* y --sate-realce, sin colores sueltos
+  assert.doesNotMatch(bloque, /#[0-9a-fA-F]{3,8}\b|rgba?\(/);
   assert.match(bloque, /border-top:3px solid var\(--sate-realce,var\(--ipn-acento\)\)/);
-  // Pestañas: seis en escritorio; la barra inferior (cuatro + Más) y el escalón corto se conservan
   assert.match(css, /body\.sate-flotante \.sate-barra\{display:flex\}/);
   assert.equal(config.unidades.upiita.pestanas.length, 6);
 }

@@ -119,14 +119,14 @@ for (const unidad of unidades) {
   const c=vm.createContext({URLSearchParams,console,SATE_CONFIG:{unidades:cfg,textos:{}},
     matchMedia:()=>({matches:false,addEventListener(){}}),MutationObserver:class{observe(){}},
     location:{hash:'#/'+unidad.id+'/mapa',search:''},localStorage:{getItem:()=>null},
-    document:{documentElement:{getAttribute(){return null},style:{setProperty(){}}},getElementById:()=>({appendChild(){},addEventListener(){},replaceChildren(){}}),addEventListener(){},querySelector:s=>s==='.inst-name'?nombre:s==='.inst-in'?cabecera:null,
+    document:{documentElement:{getAttribute(){return null},style:{setProperty(){}}},getElementById:id=>id==='sate-logo-unidad'?cabecera:({appendChild(){},addEventListener(){},replaceChildren(){},setAttribute(){}}),addEventListener(){},querySelector:()=>null,
       querySelectorAll:()=>[],createElement:()=>({dataset:{},style:{setProperty(){}},children:[],appendChild(n){this.children.push(n)}})},
     SateUI:{usarTextos(){},ayuda(){return {querySelector:()=>({setAttribute(){}})}}},fetch:()=>new Promise(()=>{})});
   vm.runInContext('window=globalThis',c);
   vm.runInContext(readFileSync('web/sate/rutas.js','utf8'),c);
   vm.runInContext(readFileSync('web/sate/inicio.js','utf8'),c);
-  assert.equal(nombre.textContent,unidad.nombre);
-  assert.equal(cabecera.children.length,cfg[unidad.id].logo?1:0);
+  assert.equal(cabecera.children.length,1);   // logo de la unidad: oficial (enlace) o el del catálogo con halo
+  if(!cfg[unidad.id].logo)assert.equal(cabecera.children[0].className,'sate-logo-halo');
   if(cfg[unidad.id].logo){
     const a=cabecera.children[0];assert.equal(a.href,cfg[unidad.id].logo.enlace);
     assert.equal(a.children[0].src,'../assets/logos/upiita-oro.webp');
