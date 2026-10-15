@@ -1041,7 +1041,9 @@ function toggleBox(k){return conSim(usaSim('sugg'),()=>conPlan(()=>toggleBox0(k)
 function toggleBox0(k,mover=false){
   if(isElec(k)){S.mapHover=k;S.mapFocus=true;resaltarMapa();if(mview()==='lista'){S.lfocus=k;renderList()}return}   // se explica en el inspector
   const paso=PLAN_PASO, base=conPlan(()=>tr(),0), otro=planAsignado(k);
-  if(PLAN_DOS_PERIODOS&&otro!=null&&otro!==paso&&!mover){S.mapHover=k;S.mapFocus=true;S.lfocus=k;resaltarMapa();conPlan(renderList);return}
+  // El vencimiento en N+1 la asigna automáticamente allí; elegirla en N debe poder adelantarla.
+  const adelantarObligatoria=otro===1&&paso===0&&conPlan(()=>tr().oblig.includes(k),1);
+  if(PLAN_DOS_PERIODOS&&otro!=null&&otro!==paso&&!mover&&!adelantarObligatoria){S.mapHover=k;S.mapFocus=true;S.lfocus=k;resaltarMapa();conPlan(renderList);return}
   if(mover&&(!PLAN_DOS_PERIODOS||otro==null||otro===paso))return;
   if(PLAN_DOS_PERIODOS){S.mapHover=k;S.mapFocus=true}
   // Una obligatoria no puede quitarse ni posponerse a un periodo posterior; sí adelantarse (N+1 → N), que evita el desfase.
