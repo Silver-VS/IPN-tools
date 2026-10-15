@@ -934,6 +934,30 @@ def nombre_materia(texto):
     return t[:1].upper() + t[1:]
 
 
+def requisitos_directos(req):
+    """Quita de cada lista de requisitos los que ya llegan por otro requisito (reducción transitiva).
+
+    `req` es {clave: [requisitos]} (seriación compilada del mapa). Una clave que no es lista se ignora. Tolera ciclos.
+    """
+    req = {k: [x for x in v if x != k] for k, v in (req or {}).items() if isinstance(v, list)}
+    memo = {}
+
+    def ancestros(c, visita=()):
+        if c in memo:
+            return memo[c]
+        r = set()
+        for x in req.get(c, []):
+            if x in visita:
+                continue
+            r.add(x)
+            r |= ancestros(x, visita + (c,))
+        if not visita:
+            memo[c] = r
+        return r
+
+    return {c: [p for p in dict.fromkeys(ps) if not any(p in ancestros(q) for q in ps if q != p)] for c, ps in req.items()}
+
+
 def escribir_temarios(data, datos):
     """Copia los temarios de la unidad a datos/<u>/temarios/ (se descargan bajo demanda, no van en el HTML).
 
@@ -947,6 +971,8 @@ def escribir_temarios(data, datos):
     if not DATOS_VISTAS["temarios"](UNIDAD):
         return False
     destino.mkdir(parents=True)
+    from urls_pdf_temarios import cargar_fuentes, url_pdf
+    fuentes = cargar_fuentes(UNIDAD)
     carreras, materias = {}, {}
     for archivo in sorted((ROOT / "data/temarios" / UNIDAD).glob("*.json")):
         d = json.loads(archivo.read_text(encoding="utf-8"))
@@ -954,6 +980,8 @@ def escribir_temarios(data, datos):
         mapa = data.get("mapas", {}).get(letra, {})
         cur = mapa.get("cur", {})
         layout = mapa.get("layout", {})
+        directos = requisitos_directos(mapa.get("req"))
+        columnas = []   # áreas de la carrera en el orden de las columnas del mapa, para el explorador de la Guía
         salida = []
         # Descripciones redactadas aparte (no oficiales): el extractor de temarios no las toca.
         arch_desc = ROOT / "data/temarios" / UNIDAD / "descripciones" / archivo.name
@@ -964,6 +992,7 @@ def escribir_temarios(data, datos):
             desc = descripciones.get(clave, {}).get("descripcion")
             if desc:
                 m["descripcion"] = desc
+                m["descripcion_revisada"] = bool(descripciones.get(clave, {}).get("revisada"))
             if clave in cur and not any(k in (m.get("creditos") or {}) for k in ("tepic", "satca")) and cur[clave][1] > 0:
                 m["creditos"] = {**(m.get("creditos") or {}), "tepic": cur[clave][1], "fuente": "plan"}
             horas = HORAS_PLAN.get((letra, clave))
@@ -978,13 +1007,25 @@ def escribir_temarios(data, datos):
             columna = next((i for i, col in enumerate(layout.get("cols", [])) if area in col[0].split(" · ")), None)
             if area and columna is not None:
                 m["area"] = {"nombre": area, "color": CATS["paleta"][columna % len(CATS["paleta"])]}
-            m.pop("fuente", None)
+            enlace_pdf = url_pdf(d["carrera"], m.pop("fuente", None), fuentes)
+            if enlace_pdf:
+                m["pdf"] = enlace_pdf
             if clave in cur:
                 m["nombre"] = nombre_materia(cur[clave][0])
             salida.append(m)
             materias[clave] = {"c": d["carrera"], "n": m["nombre"], "v": m["nivel"], "t": m["tipo"]}
+            if m.get("area"):
+                materias[clave]["a"] = m["area"]["nombre"]
+                if m["area"] not in columnas:
+                    columnas.append(m["area"])
+            if directos.get(clave):
+                materias[clave]["r"] = [x for x in directos[clave] if x in cur]
+        orden = {c[0]: i for i, c in enumerate(layout.get("cols", []))}
+        columnas.sort(key=lambda a: orden.get(a["nombre"], 99))
+        lineas = [{"area": l.get("area"), "linea": l.get("linea"), "claves": [k for k in l.get("claves", []) if k in cur]}
+                  for l in mapa.get("lineas", []) if l.get("claves")]
         carreras[d["carrera"]] = {"letra": letra, "nombre": nombre_propio(data["carreras"].get(letra, d["carrera"])),
-                                  "plan": d["plan"], "total": len(salida)}
+                                  "plan": d["plan"], "total": len(salida), "areas": columnas, "lineas": lineas}
         (destino / (d["carrera"] + ".json")).write_text(json.dumps(
             {"carrera": d["carrera"], "plan": d["plan"], "materias": salida}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     recursos = sorted(p.stem for p in (ROOT / "data/recursos" / UNIDAD).glob("*.json"))
@@ -1187,7 +1228,7 @@ def escribir_sate(data):
     calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()
                          if not u.startswith('_') and u not in cfg['unidades']}
     ocultas = set(cfg.get("pestanasOcultas", []))
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"guia":cfg["guia"],"siglasTemarios":cfg["siglasTemarios"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"guia":cfg["guia"],"bibliotecas":cfg.get("bibliotecas",[]),"siglasTemarios":cfg["siglasTemarios"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.

@@ -137,7 +137,25 @@
     }
   },
   "unidadPredeterminada": "upiita",
-  "siglasTemarios": ["ADN", "ARN", "PCR", "DSP", "FPGA", "PLC", "CAD", "CAM", "IA", "VHDL", "ISO", "SQL", "TCP", "IP", "RF", "AC", "DC"],
+  "siglasTemarios": [
+    "ADN",
+    "ARN",
+    "PCR",
+    "DSP",
+    "FPGA",
+    "PLC",
+    "CAD",
+    "CAM",
+    "IA",
+    "VHDL",
+    "ISO",
+    "SQL",
+    "TCP",
+    "IP",
+    "RF",
+    "AC",
+    "DC"
+  ],
   "guia": [
     {
       "id": "programas",
@@ -162,6 +180,20 @@
       "titulo": "sate.guia.historia",
       "descripcion": "sate.guia.historia_descripcion",
       "icono": "◷"
+    }
+  ],
+  "bibliotecas": [
+    {
+      "id": "catalogo",
+      "titulo": "sate.guia.biblio_catalogo",
+      "descripcion": "sate.guia.biblio_catalogo_texto",
+      "url": "https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b-0"
+    },
+    {
+      "id": "digital",
+      "titulo": "sate.guia.biblio_digital",
+      "descripcion": "sate.guia.biblio_digital_texto",
+      "url": "https://www.ipn.mx/bibliotecas-publicaciones/recursos-digitales/biblioteca-digital.html"
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "_fuente": "Carpetas públicas (recurso compartido de Nextcloud) donde la UPIITA publica los programas sintéticos en PDF. El campo `fuente` de cada temario trae la ruta relativa (carrera/nivel/archivo.pdf); `prefijo` es el primer tramo que se quita porque la carpeta compartida ya es la de la carrera. El enlace se arma en tools/urls_pdf_temarios.py. Verificados por el dueño (2026-10-15): Biónica, Mecatrónica y Telemática.",
+  "nube": "https://cloud.upiita.ipn.mx/s/",
+  "carreras": {
+    "bionica": {"compartido": "73kqMKWfwDNAd2r", "prefijo": "bionica"},
+    "mecatronica": {"compartido": "WbEkK2p7LY6jfaz", "prefijo": "mecatronica"},
+    "telematica": {"compartido": "9tA4wYgYwezEcPW", "prefijo": "telematica"}
+  }
+}
