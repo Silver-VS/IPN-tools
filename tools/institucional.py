@@ -8,6 +8,7 @@ Los archivos de logotipo NO se incluyen: deben ser los oficiales que entrega la 
 Imagen Institucional (www.ipn.mx/imageninstitucional/identidad-institucional.html) y la propia unidad.
 """
 import pathlib, re
+from PIL import Image
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / "web" / "dist"
@@ -68,6 +69,13 @@ def write_dist(name, html, title_suffix=" | UPIITA IPN", unidad=None):
     DIST.mkdir(parents=True, exist_ok=True)
     logos = DIST / "assets" / "logos"
     logos.mkdir(parents=True, exist_ok=True)
+    # Los originales quedan fuera del sitio; dist debe bastar tras compilar en limpio.
+    for nombre in ('ipn-horizontal-guinda', 'ipn-horizontal-calado', 'upiita-oro', 'upiita-blanco'):
+        original = ROOT / 'data/identidad/originales' / (nombre + '.png')
+        salida = logos / (nombre + '.webp')
+        if not salida.exists() or salida.stat().st_mtime < original.stat().st_mtime:
+            with Image.open(original) as imagen:
+                imagen.save(salida, lossless=True)
     (logos / "README.md").write_text(README, encoding="utf-8")
     head = HEADER
     if unidad and unidad.get("id", "upiita") != "upiita":
