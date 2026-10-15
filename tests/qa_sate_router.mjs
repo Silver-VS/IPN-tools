@@ -121,7 +121,7 @@ for (const unidad of unidades) {
     location:{hash:'#/'+unidad.id+'/mapa',search:''},localStorage:{getItem:()=>null},
     document:{documentElement:{getAttribute(){return null},style:{setProperty(){}}},getElementById:id=>id==='sate-logo-unidad'?cabecera:({appendChild(){},addEventListener(){},replaceChildren(){},setAttribute(){}}),addEventListener(){},querySelector:()=>null,
       querySelectorAll:()=>[],createElement:()=>({dataset:{},style:{setProperty(){}},children:[],appendChild(n){this.children.push(n)}})},
-    SateUI:{usarTextos(){},ayuda(){return {querySelector:()=>({setAttribute(){}})}}},fetch:()=>new Promise(()=>{})});
+    SateUI:{usarTextos(){},ayuda(){return {querySelector:()=>({dataset:{},setAttribute(){}})}}},fetch:()=>new Promise(()=>{})});
   vm.runInContext('window=globalThis',c);
   vm.runInContext(readFileSync('web/sate/rutas.js','utf8'),c);
   vm.runInContext(readFileSync('web/sate/inicio.js','utf8'),c);

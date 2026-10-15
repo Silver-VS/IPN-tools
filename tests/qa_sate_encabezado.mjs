@@ -103,7 +103,7 @@ assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient/)
 assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
 const interaccion = inicio.slice(inicio.indexOf('  if (cfg.leyenda) {'), inicio.indexOf('  // Logo de la unidad, hasta la derecha'));
 for (const unidad of Object.keys(config.unidades)) {
-  const boton = {setAttribute(k,v){this[k]=v}};
+  const boton = {dataset:{},setAttribute(k,v){this[k]=v}};
   const ayuda = {querySelector:()=>boton};
   const leyenda = {appendChild(n){this.ayuda=n}};
   let clave, variables;
@@ -210,8 +210,8 @@ assert.equal(medicion.inert,true);
   assert.match(bloque, /@media\(max-width:899\.98px\)\{[\s\S]*saes-open \.sate-texto-corto\{display:inline\}/);
   const telefono = bloque.match(/@media\(max-width:639\.98px\)\{([\s\S]*?)\n\}/)[1];
   assert.match(telefono, /grid-template-areas:"ipn marca unidad" "acciones acciones acciones"/);
+  assert.match(telefono, /grid-template-areas:"t l"\}\s*\.brand #sate-nombre\{display:none\}/, "teléfono: título e insignia en una fila, sin nombre largo");
   assert.match(telefono, /\.sate-lado\{display:contents\}/);
-  assert.match(bloque, /@media\(max-width:479\.98px\)\{\.brand #sate-nombre\{display:none\}\}/);
   // Nada se parte: columnas flexibles y nombre largo recortado
   for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)|auto minmax/, m[1]);
   assert.match(bloque, /#sate-nombre\{[^}]*text-overflow:ellipsis;white-space:nowrap/);

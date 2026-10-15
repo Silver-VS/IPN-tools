@@ -300,7 +300,7 @@
     const ayuda = SateUI.ayuda('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas});
     const boton = ayuda.querySelector('button');
     boton.textContent = texto('sate.encabezado.prueba');
-    boton.setAttribute('aria-label', texto('sate.encabezado.prueba'));
+    boton.setAttribute('aria-label', texto('sate.encabezado.prueba')); boton.dataset.corto = texto('sate.encabezado.prueba_corto');
     document.getElementById('sate-leyenda').appendChild(ayuda);
   }
   // Logo de la unidad, hasta la derecha: el oficial de la unidad si lo hay; si no, el del catálogo SAES con su halo.

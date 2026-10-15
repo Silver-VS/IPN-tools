@@ -41,6 +41,11 @@ actualizar_corto = "Actualizar"
 cargar = "Traer datos SAES"
 cargar_corto = "Traer datos"
 indicador = "SAES"
+# Botón flotante bajo el encabezado: etiqueta y ayuda.
+opinar = "Opinar"
+opinar_titulo = "Responde la encuesta o reporta un error"
+# Insignia de prueba abreviada (teléfono).
+prueba_corto = "Prueba ⓘ"
 usando_datos = "Con datos del SAES del {fecha}"
 sin_datos = "Sin datos del SAES: puedes usar el mapa y los horarios"
 

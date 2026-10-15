@@ -1234,7 +1234,7 @@ def escribir_sate(data):
     html = html.replace("/*__COMPONENTES_CSS__*/", (fuente / "componentes.css").read_text(encoding="utf-8"))
     for marca, clave in (("TITULO", "sate.nombre"), ("NOMBRE", "sate.nombre"), ("SIGLAS", "sate.siglas")):
         html = html.replace("/*__SATE_" + marca + "__*/", textos[clave])
-    for marca in ("UNIDAD", "CARRERA", "SIN_DATOS", "INDICADOR"):
+    for marca in ("UNIDAD", "CARRERA", "SIN_DATOS", "INDICADOR", "OPINAR_TITULO", "OPINAR"):
         html = html.replace("/*__SATE_" + marca + "__*/", textos["sate.encabezado." + marca.lower()])
     textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes.", "temarios.", "policore."))}
     nombres_unidades = {alias: c['siglas'] for u, c in identidad_unidades.items() for alias in [u, *c.get('alias', [])]}
