@@ -5,6 +5,14 @@
     const partes = hash.slice(2).split('?')[0].split('/');
     if (config[partes[0]]) unidad = partes.shift();
     let pestaña = partes.shift() || 'mapa';
+    // Canonizar enlaces guardados antes de la Guía, conservando materia y sección.
+    if (pestaña === 'temarios') { pestaña = 'guia'; partes.unshift('programas'); }
+    if (pestaña === 'guia' && partes[0] === 'programas') {
+      const detalle = partes.slice(1);
+      if (!config[unidad]?.pestanas.includes('guia') || detalle.length > 3 || !detalle.every(p => /^[A-Za-z0-9_-]+$/.test(p))) return null;
+      return {unidad, pestana:'temarios', vista:true, padre:'guia', partes:detalle, tramite:null,
+        hash:'#/' + unidad + '/guia/programas' + detalle.map(p => '/' + p).join('') + (hash.includes('?') ? '?' + hash.split('?').slice(1).join('?') : '')};
+    }
     // Los enlaces de Ventanilla previos a esta publicación siguen siendo navegables.
     if (pestaña === 'tramites' && config[unidad]?.pestanas.includes('trayectoria') && (!config[unidad].pestanas.includes('tramites') || partes[0]==='reinscripcion')) {
       pestaña = 'trayectoria';
@@ -32,7 +40,8 @@
     if (!hash) hash = unidad ? '#/' + unidad + '/mapa' : '';
     else if (hash.startsWith('#/')) {
       const p = hash.slice(2).split('/');
-      if (['mapa','horarios','trayectoria','situacion','desempeno','calendario','tramites','temarios'].includes(p[0].split('?')[0]) && unidad) hash = '#/' + unidad + '/' + p.join('/');
+      if (['mapa','horarios','trayectoria','situacion','desempeno','calendario','tramites','temarios','guia'].includes(p[0].split('?')[0]) && unidad) hash = '#/' + unidad + '/' + p.join('/');
+      hash = hash.replace(/\/temarios(?=\/|\?|$)/, '/guia/programas');
     }
     return 'sate/index.html' + query + hash;
   }

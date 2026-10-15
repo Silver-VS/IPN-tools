@@ -160,7 +160,7 @@ for(const ancho of [1440,1024,768,414,375])for(const modo of ['actual','viejo','
   assert.equal(c.SATE_CONFIG.unidades[unidad].nombre,config.identidadUnidades[unidad].nombre,'Nombre completo de la unidad genérica');
   assert.deepEqual(c.SATE_CONFIG.unidades[unidad].realce,config.identidadUnidades[unidad].realce,'Realce institucional conservado');
   const hayHorario=modo!=='vacio'&&p.horario_inscrito.length>0;
-  assert.deepEqual([...c.SATE_CONFIG.unidades[unidad].pestanas],['trayectoria','mapa','calendario',...(hayHorario?['horarios']:[])].filter(t=>!(config.pestanasOcultas||[]).includes(t)));
+  assert.deepEqual([...c.SATE_CONFIG.unidades[unidad].pestanas],['trayectoria','mapa','calendario','guia',...(hayHorario?['horarios']:[])].filter(t=>!(config.pestanasOcultas||[]).includes(t)));
   assert.deepEqual(archivos,['generico.js']);
   assert.equal(c.SATE.actual.pestana,modo==='vacio'?'mapa':'trayectoria');
   const tray=document.getElementById('sate-trayectoria');

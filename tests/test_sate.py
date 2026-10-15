@@ -16,6 +16,29 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_recursos_opcionales(self):
+        import tempfile
+        import build_sate
+        recurso = {'titulo': 'Curso ficticio', 'url': 'https://example.org/curso',
+                   'fuente': 'Academia ficticia', 'idioma': 'es', 'tipo': 'Curso',
+                   'licencia': 'CC0', 'unidades': [1, 2]}
+        datos = {'DEMO101': [recurso]}
+        self.assertTrue(build_sate.recursos_validos(datos))
+        for url in ('javascript:alert(1)', 'data:text/html,test', '//example.org', 'file:///test'):
+            self.assertFalse(build_sate.recursos_validos({'DEMO101': [{**recurso, 'url': url}]}))
+        self.assertFalse(build_sate.recursos_validos({'DEMO101': [{**recurso, 'unidades': [True]}]}))
+        with tempfile.TemporaryDirectory(dir=ROOT) as temporal:
+            raiz = pathlib.Path(temporal)
+            origen = raiz / 'data/recursos/demo'
+            origen.mkdir(parents=True)
+            (origen / 'carrera.json').write_text(json.dumps(datos), encoding='utf-8')
+            with unittest.mock.patch.object(build_sate, 'ROOT', raiz), unittest.mock.patch.object(build_sate, 'UNIDAD', 'demo'):
+                build_sate.escribir_recursos(raiz / 'salida')
+                self.assertEqual(json.loads((raiz / 'salida/recursos/carrera.json').read_text(encoding='utf-8')), datos)
+                (origen / 'carrera.json').unlink()
+                build_sate.escribir_recursos(raiz / 'salida')
+                self.assertFalse((raiz / 'salida/recursos').exists())
+
     def test_creditos_por_escala(self):
         from build_sate import creditos_materia
         self.assertEqual(creditos_materia('B', '09', 'B101', '7.50', '3', '1.5'),

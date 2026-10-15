@@ -25,7 +25,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
         if(s.src==='nucleo.js') c.SATE.nucleoListo(api).catch(e=>{throw e});
         if(s.src==='mapa.js') c.SATE.pestana('mapa',{montar(){vistos.push('montar-mapa')},mostrar(){vistos.push('mapa')},ocultar(){vistos.push('ocultar-mapa')}});
         if(s.src==='situacion.js') c.SATE.presente={avisos(){vistos.push('avisos')},tramite(){vistos.push('procedimiento')}};
-        if(s.src==='temarios.js'){c.SATE.temarios={preparar:async()=>{}};c.SATE.pestana('temarios',{montar(){vistos.push('montar-temarios')},mostrar(r){vistos.push('temarios:'+r.partes.join('/'))},ocultar(){vistos.push('ocultar-temarios')}})}
+        if(s.src==='temarios.js'){c.SATE.pestana('guia',{montar(){},mostrar(){vistos.push('guia')},ocultar(){}});c.SATE.temarios={preparar:async()=>{}};c.SATE.pestana('temarios',{montar(){vistos.push('montar-temarios')},mostrar(r){vistos.push('temarios:'+r.partes.join('/'))},ocultar(){vistos.push('ocultar-temarios')}})}
         if(s.src==='calendario.js') c.SATE.pestana('calendario',{montar(){vistos.push('montar-calendario')},mostrar(){vistos.push('mes')},ocultar(){vistos.push('ocultar-calendario')}});
         if(s.src==='desempeno.js') c.SATE.pestana('trayectoria',{montar(){vistos.push('montar-desempeno')},mostrar(){vistos.push('desempeno')},ocultar(){vistos.push('ocultar-desempeno')}});
         if(s.src==='horarios.js') c.SATE.pestana('horarios',{montar(){vistos.push('montar-hor')},mostrar(){vistos.push('hor')}});
@@ -80,10 +80,10 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
     const n=seleccionados.length;
     location.hash='#/upiita/temarios/bionica/B103/objetivo';eventos.hashchange();await vaciar();
     assert.equal(c.SATE.actual.pestana,'temarios');assert.equal(c.SATE.actual.partes.join('/'),'bionica/B103/objetivo');
-    assert.equal(location.hash,'#/upiita/temarios/bionica/B103/objetivo');
+    assert.equal(location.hash,'#/upiita/guia/programas/bionica/B103/objetivo');
     assert.ok(archivos.includes('../policore/lector.js')&&archivos.includes('temarios.js'));
     assert.equal(archivos.filter(a=>a==='temarios.js').length,1);
-    assert.equal(seleccionados.slice(n).join(),'mapa','la vista marca la pestaña Mapa, sin navegar a ella');
+    assert.equal(seleccionados.slice(n).join(),'guia','la vista marca la Guía, sin navegar a ella');
     assert.equal(document.getElementById('sate-temarios').hidden,false);assert.equal(document.getElementById('v-tray').hidden,true);
     assert.ok(vistos.includes('temarios:bionica/B103/objetivo')&&vistos.includes('montar-temarios'));
     location.hash='#/upiita/temarios/bionica/B103/contenidos';eventos.hashchange();await vaciar();

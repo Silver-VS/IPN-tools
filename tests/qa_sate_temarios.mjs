@@ -39,7 +39,7 @@ function contexto(extra = {}) {
   const c = vm.createContext({console, setTimeout, clearTimeout, Intl, document, Evento,
     matchMedia: q => ({matches: /min-width:1024px/.test(q) ? estado.lateral : false, addEventListener() {}}),
     navigator: {clipboard: {writeText: async u => { estado.copiados.push(u); }}},
-    location: {href: 'https://sitio.test/sate/index.html#/upiita/temarios', pathname: '/sate/index.html', search: ''},
+    location: {href: 'https://sitio.test/sate/index.html#/upiita/guia/programas', pathname: '/sate/index.html', search: ''},
     history: {replaceState(a, b, u) { estado.urls.push(u); }},
     CSS: {escape: s => s}, Event: Evento, dispatchEvent: e => { if (e.type === 'resize') estado.resize++; },
     scrollTo: (x, y) => estado.scroll.push([x, y]),
@@ -110,8 +110,16 @@ function el(document, tag, attrs = {}, hijos = []) {
   const g = T.agrupar(T.filtrar(indice.materias, {q: '', carrera: 'bionica'}, null));
   igual(g.map(x => x.nivel), [1, 2, 3, 4, 5]);
   for (const x of g) igual(x.items.map(i => i.n), x.items.map(i => i.n).sort((a, b) => a.localeCompare(b, 'es')));
-  assert.equal(T.enlace('u1', 'bionica', 'B103', 'objetivo'), '#/u1/temarios/bionica/B103/objetivo');
-  assert.equal(T.enlace('u1'), '#/u1/temarios');
+  assert.equal(T.enlace('u1', 'bionica', 'B103', 'objetivo'), '#/u1/guia/programas/bionica/B103/objetivo');
+  assert.equal(T.enlace('u1'), '#/u1/guia/programas');
+  const recurso = {titulo:'Vectores ficticios',url:'https://example.org/vectores',fuente:'Academia ficticia',idioma:'es',tipo:'Vídeo',licencia:'CC0',unidades:[1,2]};
+  assert.equal(T.recursosValidos({B101:[recurso]}), true);
+  for(const url of ['javascript:alert(1)','data:text/html,test','file:///test','//example.org']) assert.equal(T.recursosValidos({B101:[{...recurso,url}]}), false);
+  assert.equal(T.recursosValidos({B101:[{...recurso,licencia:null}]}), false);
+  assert.equal(T.recursosValidos({B101:[{...recurso,unidades:[0]}]}), false);
+  assert.equal(T.tituloTema('ÁLGEBRA LINEAL.'),'Álgebra lineal');
+  assert.equal(T.frase('Primera oración. Segunda oración.'),'Primera oración.');
+  assert.ok(T.frase('Objetivo '.repeat(100)).length <= 260);
 }
 
 /* ---------- 2. Lector de PoliCORE con un documento que no es temario ---------- */
@@ -217,7 +225,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   const tr = {want: ['B106']};
   Object.assign(c, {
     SATE: {texto, pestana: (id, m) => { modulos[id] = m; }, error: e => { throw e; }, cargarTemarios: async () => {}},
-    SATE_CONFIG: {unidades: {upiita: {vistas: [{id: 'temarios', padre: 'mapa'}]}}}, SATE_UNIDAD: 'upiita',
+    SATE_CONFIG: {unidades: {upiita: {vistas: [{id: 'temarios', padre: 'guia'}]}}}, SATE_UNIDAD: 'upiita',
     S: {car: 'B', mapHover: null, mapFocus: false, reqHover: null, lfocus: null},
     store: {get: (k, d) => { assert.notEqual(k, 'mmodo', 'el modo antiguo no se consulta'); return almacen[k] ?? d; }, set: (k, v) => { almacen[k] = v; }},
     toggleBox: k => { toggles.push(k); tr.want.push(k); }, conSim: (a, f) => f(), conPlan: f => f(), usaSim: () => false, renderList() {}, tr: () => tr,
@@ -242,7 +250,16 @@ function el(document, tag, attrs = {}, hijos = []) {
   document.body.appendChild(el(document, 'section', {id: 'sate-temarios'}));
 
   const T = c.SATE.temarios;
+  c.SATE_CONFIG.guia = config.guia;
+  const portada = document.body.appendChild(el(document,'section',{id:'sate-guia'}));
+  modulos.guia.mostrar();
+  assert.equal(portada.querySelectorAll('.guia-tarjeta').length,4);
+  assert.equal(portada.querySelectorAll('a').length,1);
+  assert.equal(portada.querySelector('a').getAttribute('href'),'#/upiita/guia/programas');
+  const fetchOriginal = c.fetch;
+  c.fetch = async url => url.endsWith('/recursos/bionica.json') ? {ok:true,json:async()=>({B101:[{titulo:'Vectores de prueba',url:'https://example.org/estudio',fuente:'Academia ficticia',idioma:'es',tipo:'Curso',licencia:'CC0'}]})} : fetchOriginal(url);
   await T.preparar();
+  T.estado.indice.recursos = ['bionica']; // El catálogo ficticio habilita el cargador sin solicitudes 404.
   // Incluso con la preferencia antigua guardada, clic y teclado solo planean.
   caja1.dispatchEvent(new Evento('click', {target: caja1}));
   sinTem.dispatchEvent(new Evento('click', {target: sinTem}));
@@ -275,35 +292,41 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(panel.hidden, false);
   assert.equal(panel.getAttribute('aria-label'), 'Temario de ' + indice.materias.B101.n);
   assert.equal(panel.parentNode, document.documentElement, 'el panel cuelga de <html>, fuera del zoom del <body>');
-  assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B101.n);
-  assert.equal(panel.querySelector('.pc-lector').getAttribute('data-pc-modo'), 'panel');
-  assert.equal(panel.querySelector('.tmr-panel-abrir').getAttribute('href'), '#/upiita/temarios/bionica/B101');
+  assert.equal(panel.querySelector('.tmr-ficha-enc h2').textContent, indice.materias.B101.n);
+  assert.equal(panel.querySelector('.pc-lector'), null, 'la ficha breve no monta el lector oficial');
+  assert.equal(panel.querySelectorAll('.tmr-cifras strong').length, 3);
+  assert.equal(panel.querySelector('.tmr-recurso').getAttribute('href'),'https://example.org/estudio');
+  assert.match(panel.querySelector('.tmr-recurso').textContent,/Academia ficticia/);
+  assert.equal(panel.querySelector('.tmr-oficial').getAttribute('href'), '#/upiita/guia/programas/bionica/B101/objetivo');
   assert.equal(document.activeElement, panel);
-  assert.equal(document.body.classList.contains('tmr-lateral'), true, 'escritorio: panel al lado');
-  assert.equal(estado.resize, 1, 'el mapa se reajusta una sola vez');
-  assert.equal(panel.getAttribute('aria-modal'), 'false');
+  assert.equal(document.body.inert, true, 'el fondo queda inerte');
+  assert.equal(estado.resize, 0, 'el modal no cambia el ancho del mapa');
+  assert.equal(panel.getAttribute('aria-modal'), 'true');
+  const cierre = panel.querySelector('.tmr-panel-x'), oficial = panel.querySelector('.tmr-oficial');
+  oficial.focus(); panel.dispatchEvent(new Evento('keydown',{key:'Tab'})); assert.equal(document.activeElement,cierre);
+  cierre.focus(); panel.dispatchEvent(new Evento('keydown',{key:'Tab',shiftKey:true})); assert.equal(document.activeElement,oficial);
   // Otra llamada cambia el contenido sin abrir un segundo panel; una caja sin temario no abre nada
   const otra = el(document, 'div', {'class': 'box', 'data-box': 'B106', role: 'button'});
   document.querySelector('#map').appendChild(otra);
   await T.abrir('B106', otra);
   await dormir(20);
-  assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B106.n);
-  assert.equal(c.PoliCORE.lector.activos(), 1);
+  assert.equal(panel.querySelector('.tmr-ficha-enc h2').textContent, indice.materias.B106.n);
+  assert.equal(c.PoliCORE.lector.activos(), 0);
   await T.abrir('B102', sinTem);
   await dormir(10);
-  assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B106.n, 'B102 no cambia el panel');
+  assert.equal(panel.querySelector('.tmr-ficha-enc h2').textContent, indice.materias.B106.n, 'B102 no cambia el panel');
   assert.equal(JSON.stringify(tr), antes);
   // Esc cierra el panel y devuelve el foco
   caja1.focus();
   await T.abrir('B101', caja1);
-  assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B101.n);
+  assert.equal(panel.querySelector('.tmr-ficha-enc h2').textContent, indice.materias.B101.n);
   assert.equal(JSON.stringify(tr), antes);
   document.dispatchEvent(new Evento('keydown', {key: 'Escape', target: document.body}));
   assert.equal(panel.hidden, true);
   assert.equal(document.activeElement, caja1, 'el foco vuelve a la materia');
   assert.equal(c.PoliCORE.lector.activos(), 0);
-  assert.equal(document.body.classList.contains('tmr-lateral'), false);
-  assert.equal(estado.resize, 2);
+  assert.equal(document.body.inert, false);
+  assert.equal(estado.resize, 0);
   // Teléfono: hoja con velo, modal y sin desplazamiento del fondo
   estado.lateral = false;
   await T.abrir('B101', caja1);
@@ -315,7 +338,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(document.documentElement.classList.contains('sate-sin-scroll'), false);
   estado.lateral = true;
   // Enlace desde la ficha de la materia (inspector)
-  assert.match(T.enlaceHtml('B101'), /href="#\/upiita\/temarios\/bionica\/B101"[^>]*>Ver programa</);
+  assert.match(T.enlaceHtml('B101'), /href="#\/upiita\/guia\/programas\/bionica\/B101"[^>]*>Ver programa</);
   assert.equal(T.enlaceHtml('B102'), '');
   assert.equal(T.enlaceHtml('XXX'), '');
 
@@ -324,13 +347,13 @@ function el(document, tag, attrs = {}, hijos = []) {
   const m = modulos.temarios; assert.ok(m, 'registra la vista temarios');
   await m.mostrar({partes: []});
   assert.equal(caja2.querySelector('.tmr').getAttribute('data-vista'), 'lista');
-  assert.equal(caja2.querySelector('h2').textContent, 'Temarios de unidades de aprendizaje');
+  assert.equal(caja2.querySelector('h2').textContent, 'Programas de estudio de unidades de aprendizaje');
   assert.equal(caja2.querySelector('.tmr-elegir').textContent, 'Elige una unidad de aprendizaje de la lista para leer su temario.');
   const items = () => caja2.querySelectorAll('.tmr-item');
   assert.equal(items().length, 72, 'la carrera del mapa (Biónica) viene seleccionada');
   assert.equal(caja2.querySelector('.tmr-resumen').textContent, '72 unidades de aprendizaje');
   igual(caja2.querySelectorAll('.tmr-grupo h3').map(h => h.textContent), ['Nivel 1', 'Nivel 2', 'Nivel 3', 'Nivel 4', 'Nivel 5']);
-  assert.equal(items()[0].getAttribute('href').startsWith('#/upiita/temarios/bionica/B'), true);
+  assert.equal(items()[0].getAttribute('href').startsWith('#/upiita/guia/programas/bionica/B'), true);
   const selCarrera = caja2.querySelectorAll('select')[0];
   assert.equal(selCarrera.querySelectorAll('option').length, 4, 'Todas + 3 carreras');
   // Filtros
@@ -382,10 +405,10 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(document.scrolled.getAttribute('data-pc-seccion'), 'evaluacion');
   caja2.querySelector('.pc-copiar[data-id=objetivo]').dispatchEvent(new Evento('click'));
   await dormir(5);
-  assert.equal(estado.copiados.at(-1), 'https://sitio.test/sate/index.html#/upiita/temarios/bionica/B103/objetivo');
+  assert.equal(estado.copiados.at(-1), 'https://sitio.test/sate/index.html#/upiita/guia/programas/bionica/B103/objetivo');
   caja2.querySelector('.pc-indice-a[data-id=bibliografia]').dispatchEvent(new Evento('click'));
-  assert.equal(estado.urls.at(-1), '/sate/index.html#/upiita/temarios/bionica/B103/bibliografia', 'la sección abierta actualiza la dirección sin recargar');
-  assert.equal(caja2.querySelector('.tmr-volver').getAttribute('href'), '#/upiita/temarios');
+  assert.equal(estado.urls.at(-1), '/sate/index.html#/upiita/guia/programas/bionica/B103/bibliografia', 'la sección abierta actualiza la dirección sin recargar');
+  assert.equal(caja2.querySelector('.tmr-volver').getAttribute('href'), '#/upiita/guia/programas');
   await m.mostrar({partes: ['bionica', 'B999']});
   assert.equal(caja2.querySelector('.tmr-lector').textContent, 'No encontramos ese temario. Puede que la clave haya cambiado.');
   await m.mostrar({partes: ['telematica', 'B103']});
@@ -393,13 +416,47 @@ function el(document, tag, attrs = {}, hijos = []) {
   await m.mostrar({partes: []});
   assert.equal(caja2.querySelector('.tmr').getAttribute('data-vista'), 'lista');
   assert.equal(c.PoliCORE.lector.activos(), 0);
+  // Enlaces de lista abren la misma ficha y no montan el texto oficial.
+  const primero = items()[0]; primero.dispatchEvent(new Evento('click',{target:primero})); await dormir(20);
+  assert.equal(T.estado.panel.hidden,false); assert.equal(T.estado.panel.querySelectorAll('.tmr-cifras strong').length,3);
+  T.cerrar({foco:true}); assert.equal(document.activeElement,primero);
   // Sin datos en la unidad: mensaje, sin errores
   const sin = contexto();
-  Object.assign(sin.c, {SATE: {texto, pestana: (id, m2) => { modulos.sin = m2; }, error: e => { throw e; }}, SATE_CONFIG: {unidades: {}}, SATE_UNIDAD: 'otra'});
+  const sinModulos = {};
+  Object.assign(sin.c, {SATE: {texto, pestana: (id, m2) => { sinModulos[id] = m2; }, error: e => { throw e; }}, SATE_CONFIG: {unidades: {},guia:config.guia}, SATE_UNIDAD: 'otra'});
   vm.runInContext(leer('web/policore/lector.js'), sin.c); vm.runInContext(leer('web/sate/temarios.js'), sin.c);
   const cajaSin = sin.document.body.appendChild(el(sin.document, 'section', {id: 'sate-temarios'}));
-  await modulos.sin.mostrar({partes: []});
-  assert.equal(cajaSin.textContent, 'Esta unidad académica aún no tiene temarios en SATE.');
+  await sinModulos.temarios.mostrar({partes: []});
+  assert.equal(cajaSin.textContent, 'Aún no hay programas de estudio de esta unidad');
+  const portadaSin = sin.document.body.appendChild(el(sin.document,'section',{id:'sate-guia'}));
+  sinModulos.guia.mostrar();
+  assert.equal(portadaSin.querySelectorAll('.guia-tarjeta').length,4);
+  assert.equal(portadaSin.querySelectorAll('a').length,0);
+  assert.match(portadaSin.textContent,/Aún no hay programas de estudio de esta unidad/);
+  assert.equal(sin.estado.fetches.length,0,'la Guía sin programas no solicita datos inexistentes');
+}
+
+/* Hoja Más: navegación, cierre por Esc (cancel nativo) y foco de regreso. */
+{
+  const {c,document,Evento} = contexto();
+  c.addEventListener = () => {};
+  document.contains = n => document.documentElement.contains(n);
+  const crear = document.createElement.bind(document);
+  document.createElement = tag => { const n=crear(tag); if(tag==='dialog') {n.showModal=()=>{n.open=true};n.close=()=>{n.open=false};} return n; };
+  vm.runInContext(leer('web/sate/componentes.js'),c);
+  c.SateUI.usarTextos(texto);
+  let elegida;
+  const items = config.unidades.upiita.pestanas.map(id=>({id,texto:texto('sate.pestana.'+id+'.corto'),titulo:texto('sate.pestana.'+id+'.titulo')}));
+  const nav = c.SateUI.barraInferior({items,activa:'mapa',alElegir:id=>elegida=id});document.body.appendChild(nav);
+  const mas = nav.querySelector('[data-id=mas]');mas.click();
+  const dlg = document.querySelector('dialog');
+  assert.equal(dlg.open,true);assert.equal(mas.getAttribute('aria-expanded'),'true');
+  assert.equal(dlg.querySelectorAll('.sate-mas-lista button').length,2);
+  assert.match(dlg.textContent,/Guía politécnica/);
+  dlg.dispatchEvent(new Evento('cancel'));
+  assert.equal(dlg.open,false);assert.equal(document.activeElement,mas);
+  mas.click();dlg.querySelector('[data-id=guia]').click();
+  assert.equal(elegida,'guia');assert.equal(dlg.open,false);assert.equal(mas.getAttribute('aria-current'),'page');
 }
 
 /* ---------- 4. Rutas, datos y compilación ---------- */
@@ -407,22 +464,24 @@ function el(document, tag, attrs = {}, hijos = []) {
   const c = vm.createContext({});
   vm.runInContext(leer('web/sate/rutas.js'), c);
   const R = c.SateRutas, cfg = config.unidades;
-  const r = R.ruta('#/upiita/temarios/bionica/B103/objetivo', 'upiita', cfg);
-  assert.equal(r.pestana, 'temarios'); assert.equal(r.vista, true); assert.equal(r.padre, 'mapa');
+  const r = R.ruta('#/upiita/guia/programas/bionica/B103/objetivo', 'upiita', cfg);
+  assert.equal(r.pestana, 'temarios'); assert.equal(r.vista, true); assert.equal(r.padre, 'guia');
   igual(r.partes, ['bionica', 'B103', 'objetivo']);
-  assert.equal(r.hash, '#/upiita/temarios/bionica/B103/objetivo');
-  igual(R.ruta('#/upiita/temarios', 'upiita', cfg).partes, []);
-  assert.equal(R.ruta('#/upiita/temarios/a/b/c/d/e', 'upiita', cfg), null, 'demasiadas partes');
-  assert.equal(R.ruta('#/upiita/temarios/a b', 'upiita', cfg), null);
-  assert.equal(R.ruta('#/upiita/temarios/..%2f', 'upiita', cfg), null);
+  assert.equal(r.hash, '#/upiita/guia/programas/bionica/B103/objetivo');
+  igual(R.ruta('#/upiita/guia/programas', 'upiita', cfg).partes, []);
+  assert.equal(R.ruta('#/upiita/temarios/bionica/B103/contenidos', 'upiita', cfg).hash, '#/upiita/guia/programas/bionica/B103/contenidos');
+  assert.equal(R.ruta('#/upiita/guia/programas/a/b/c/d/e', 'upiita', cfg), null, 'demasiadas partes');
+  assert.equal(R.ruta('#/upiita/guia/programas/a b', 'upiita', cfg), null);
+  assert.equal(R.ruta('#/upiita/guia/programas/..%2f', 'upiita', cfg), null);
   assert.equal(R.ruta('#/upiita/mapa/algo', 'upiita', cfg), null, 'las pestañas normales no aceptan partes');
   for (const u of Object.keys(cfg).filter(u => u !== 'upiita')) {
-    assert.equal(R.ruta('#/' + u + '/temarios', u, cfg), null, u + ': sin temarios la ruta no existe');
+    assert.equal(R.ruta('#/' + u + '/guia', u, cfg).pestana, 'guia');
+    assert.equal(R.ruta('#/' + u + '/temarios', u, cfg).hash, '#/' + u + '/guia/programas');
     igual(cfg[u].vistas, [], u);
     assert.equal(existsSync('web/dist/sate/datos/' + u + '/temarios'), false, u + ': no se copian temarios');
   }
-  igual(cfg.upiita.vistas, [{id: 'temarios', padre: 'mapa'}]);
-  assert.equal(R.redireccion('upiita', '', '#/temarios/bionica'), 'sate/index.html#/upiita/temarios/bionica');
+  igual(cfg.upiita.vistas, [{id: 'temarios', padre: 'guia'}]);
+  assert.equal(R.redireccion('upiita', '', '#/temarios/bionica'), 'sate/index.html#/upiita/guia/programas/bionica');
   // Datos compilados
   assert.equal(Object.keys(indice.materias).length, 240);
   for (const [id, car] of Object.entries(indice.carreras)) assert.equal(registros(id).length, car.total);

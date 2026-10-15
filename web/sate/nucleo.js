@@ -627,7 +627,7 @@ function leyendaMapa(completa=false){
 }
 function renderLegend(){$('#legend').innerHTML=leyendaMapa()}
 function renderSide(){const r=conSim(usaSim('sugg'),()=>conPlan(renderSide0));montarAyudasCreditos();return r}
-const AREA_COLORES=['#8a98c7','#a76987','#577d63','#4d6f8d','#c9a36a','#721e45'];
+const AREA_COLORES=DATA.areaColores || [];
 function requisitosElegidos(want){
   const c=cur(), done=new Set(tr().done), pedidos=new Map(), acreditados=new Set(), materias=new Set();
   // Conserva la seriación transitiva del mapa; cada requisito compartido ocupa una sola fila.

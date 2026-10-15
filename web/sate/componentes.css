@@ -541,3 +541,9 @@ body.sate-flotante .sate-barra{display:flex}
   .req-etiqueta{display:inline;color:var(--muted)}
 }
 
+
+/* Más comparte cierre, foco y teclado con el modal común. */
+.sate-mas-lista{display:grid;gap:var(--ipn-esp-4)}
+.sate-mas-lista button{display:flex;align-items:center;gap:var(--ipn-esp-3);min-height:3rem}
+.sate-mas-lista .sate-pestana__texto--corto{display:none}
+.sate-modal--mas{margin:auto auto 0;width:min(100%,36rem);height:auto;max-height:80dvh;border-radius:var(--ipn-radio) var(--ipn-radio) 0 0}

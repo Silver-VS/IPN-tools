@@ -7,10 +7,11 @@
     "upiita": {
       "pestanas": [
         "trayectoria",
-        "tramites",
         "mapa",
         "horarios",
-        "calendario"
+        "tramites",
+        "calendario",
+        "guia"
       ],
       "tramites": [
         "dictamen",
@@ -25,19 +26,22 @@
       },
       "grupos": [
         [
-          "trayectoria",
-          "tramites"
+          "trayectoria"
         ],
         [
           "mapa",
-          "horarios",
-          "calendario"
+          "horarios"
+        ],
+        [
+          "tramites",
+          "calendario",
+          "guia"
         ]
       ],
       "vistas": [
         {
           "id": "temarios",
-          "padre": "mapa"
+          "padre": "guia"
         }
       ],
       "planDosPeriodos": true,
@@ -63,7 +67,9 @@
         "trayectoria",
         "mapa",
         "horarios",
-        "calendario"
+        "tramites",
+        "calendario",
+        "guia"
       ],
       "tramites": [],
       "leyenda": "prueba",
@@ -73,8 +79,12 @@
         ],
         [
           "mapa",
-          "horarios",
-          "calendario"
+          "horarios"
+        ],
+        [
+          "tramites",
+          "calendario",
+          "guia"
         ]
       ],
       "planDosPeriodos": true,
@@ -92,7 +102,9 @@
         "trayectoria",
         "mapa",
         "horarios",
-        "calendario"
+        "tramites",
+        "calendario",
+        "guia"
       ],
       "tramites": [],
       "leyenda": "prueba",
@@ -102,8 +114,12 @@
         ],
         [
           "mapa",
-          "horarios",
-          "calendario"
+          "horarios"
+        ],
+        [
+          "tramites",
+          "calendario",
+          "guia"
         ]
       ],
       "planDosPeriodos": true,
@@ -117,5 +133,23 @@
       }
     }
   },
-  "unidadPredeterminada": "upiita"
+  "unidadPredeterminada": "upiita",
+  "guia": [
+    {
+      "id": "programas",
+      "titulo": "sate.guia.programas"
+    },
+    {
+      "id": "normativa",
+      "titulo": "sate.guia.normativa"
+    },
+    {
+      "id": "unidad",
+      "titulo": "sate.guia.unidad"
+    },
+    {
+      "id": "historia",
+      "titulo": "sate.guia.historia"
+    }
+  ]
 }

@@ -1,8 +1,8 @@
 /* Temarios de unidades de aprendizaje en SATE.
    A. Funciones puras (adaptador de un registro de data/temarios/<unidad>/<carrera>.json al documento genérico del lector
       de PoliCORE, búsqueda y agrupación): se prueban en Node y las usa la página de revisión.
-   B. Integración (solo con SATE): enlace desde la ficha de materia, panel o hoja con el lector y la vista
-      #/<unidad>/temarios (explorador independiente). Todo se activa por datos: sin temarios en la unidad, nada de esto existe. */
+   B. Integración: ficha breve de materia, portada de la Guía y explorador con lector oficial
+      en #/<unidad>/guia/programas. La portada existe también en unidades sin programas. */
 (function (raiz) {
   'use strict';
 
@@ -95,15 +95,26 @@
     return [...g.entries()].map(([nivel, items]) => ({ nivel, items }));
   }
   function enlace(unidad, carrera, clave, seccion) {
-    return '#/' + unidad + '/temarios' + (carrera ? '/' + carrera + (clave ? '/' + clave + (seccion ? '/' + seccion : '') : '') : '');
+    return '#/' + unidad + '/guia/programas' + (carrera ? '/' + carrera + (clave ? '/' + clave + (seccion ? '/' + seccion : '') : '') : '');
   }
-  raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace };
+  function recursosValidos(datos) {
+    return !!datos && typeof datos === 'object' && !Array.isArray(datos) && Object.values(datos).every(rs => Array.isArray(rs) && rs.every(r =>
+      r && ['titulo','url','fuente','idioma','tipo','licencia'].every(k => typeof r[k] === 'string' && r[k].trim()) &&
+      /^https?:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(r.url) && (r.unidades === undefined || Array.isArray(r.unidades) && r.unidades.every(n => Number.isInteger(n) && n > 0))));
+  }
+  function frase(objetivo) {
+    const s = String(objetivo || '').replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s/)[0];
+    if (s.length <= 260) return s;
+    return s.slice(0, 257).replace(/\s+\S*$/, '') + '…';
+  }
+  const tituloTema = s => { const n = String(s || '').trim().replace(/[.\s]+$/, '').toLocaleLowerCase('es'); return n.charAt(0).toUpperCase() + n.slice(1); };
+  raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace, recursosValidos, frase, tituloTema };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
   /* ===================== B. Integración con SATE ===================== */
   const t = (c, v) => SATE.texto(c, v);
-  const E = { indice: null, pIndice: null, carreras: {}, pCarreras: {}, panel: null, token: 0, origen: null, origenClave: null };
+  const E = { indice: null, pIndice: null, carreras: {}, pCarreras: {}, recursos: {}, panel: null, token: 0, origen: null, origenClave: null };
   const BASE = (document.currentScript && document.currentScript.src || '').replace(/[^\/]*$/, '');
   const mq = s => (raiz.matchMedia ? raiz.matchMedia(s) : { matches: false, addEventListener() {} });
   const lateral = () => mq('(min-width:1024px)').matches;
@@ -154,39 +165,49 @@
     const c = await carreraDatos(e.c), reg = c.materias.get(k);
     return reg ? { registro: reg, carreraId: e.c, plan: c.plan } : null;
   }
+  async function cargarRecursos(carrera) {
+    if (!E.indice?.recursos?.includes(carrera)) return {};
+    return E.recursos[carrera] ||= fetch('datos/' + unidad() + '/recursos/' + carrera + '.json').then(async r => {
+      if (r.status === 404) return {};
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const d = await r.json();
+      if (!recursosValidos(d)) throw new Error('Esquema de recursos inválido');
+      return d;
+    }).catch(e => { delete E.recursos[carrera]; console.warn('SATE: recursos no disponibles', {unidad:unidad(), carrera, mensaje:e.message}); return {}; });
+  }
   const documentoDe = r => documento(r.registro, { t, carrera: E.indice.carreras[r.carreraId]?.nombre, plan: r.plan });
   const lector = () => raiz.PoliCORE && raiz.PoliCORE.lector;
 
   function nombreDe(k) { const e = E.indice?.materias?.[claveNorm(k)]; return e ? e.n : k; }
   const enlaceHtml = k => (tiene(k) ? '<p class="insp-temario"><a href="' + esc(ir(E.indice.materias[claveNorm(k)].c, claveNorm(k))) + '">' + esc(t('temarios.mapa.ver')) + '</a></p>' : '');
 
-  /* ---------- panel lateral (escritorio) u hoja inferior (teléfono) ---------- */
+  /* ---------- ficha de materia: modal compartido por mapa y Guía ---------- */
   function construirPanel() {
     if (E.panel) return E.panel;
     const x = h('button', { type: 'button', 'class': 'tmr-panel-x', 'aria-label': t('temarios.panel.cerrar'), texto: '×' });
-    const abrirEn = h('a', { 'class': 'tmr-panel-abrir', href: '#', texto: t('temarios.panel.abrir_explorador') });
+    const abrirEn = h('span', { texto: t('sate.guia.ficha') });
     const cuerpo = h('div', { 'class': 'tmr-panel-cuerpo' });
-    const p = h('aside', { 'class': 'tmr-panel', role: 'dialog', 'aria-modal': 'false', tabindex: '-1', hidden: true },
+    const p = h('section', { 'class': 'tmr-panel', role: 'dialog', 'aria-modal': 'true', tabindex: '-1', hidden: true },
       [h('div', { 'class': 'tmr-panel-enc' }, [abrirEn, x]), cuerpo]);
     const velo = h('div', { 'class': 'tmr-velo', hidden: true });
     x.addEventListener('click', () => cerrar({ foco: true }));
     velo.addEventListener('click', () => cerrar({ foco: true }));
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && E.panel && !E.panel.hidden) cerrar({ foco: true }); });
-    mq('(min-width:1024px)').addEventListener('change', () => { if (E.panel && !E.panel.hidden) ajustarPanel(); });
+    p.addEventListener('keydown', e => {
+      if (e.key !== 'Tab') return;
+      const f = [...p.querySelectorAll('button,a[href]')], a = f[0], z = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === a || document.activeElement === p)) { e.preventDefault(); z.focus(); }
+      else if (!e.shiftKey && (document.activeElement === z || document.activeElement === p)) { e.preventDefault(); a.focus(); }
+    });
     // Fuera del <body>: no hereda el zoom de interfaz (--ui-zoom), igual que el globo de ayuda.
     document.documentElement.appendChild(velo); document.documentElement.appendChild(p);
     E.panel = p; E.velo = velo; E.cuerpo = cuerpo; E.abrirEn = abrirEn;
     return p;
   }
   function ajustarPanel() {
-    const lat = lateral();
-    E.panel.setAttribute('aria-modal', String(!lat));
-    E.velo.hidden = lat || E.panel.hidden;
-    const empuja = lat && !E.panel.hidden;
-    document.body.classList.toggle('tmr-lateral', empuja);
-    document.documentElement.classList.toggle('sate-sin-scroll', !lat && !E.panel.hidden);
-    // El mapa se vuelve a ajustar al ancho libre cuando el panel va al lado (solo si ese estado cambió).
-    if (empuja !== !!E.empuja) { E.empuja = empuja; if (raiz.dispatchEvent && typeof raiz.Event === 'function') raiz.dispatchEvent(new raiz.Event('resize')); }
+    E.velo.hidden = E.panel.hidden;
+    document.body.inert = !E.panel.hidden;
+    document.documentElement.classList.toggle('sate-sin-scroll', !E.panel.hidden);
   }
   async function abrir(clave, origen) {
     const k = claveNorm(clave);
@@ -194,7 +215,6 @@
     E.origen = origen || E.origen; E.origenClave = k;
     const token = ++E.token, p = construirPanel();
     p.hidden = false; ajustarPanel();
-    E.abrirEn.setAttribute('href', ir(E.indice.materias[k].c, k));
     p.setAttribute('aria-label', t('temarios.panel.etiqueta', { materia: nombreDe(k) }));
     E.cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }));
     p.focus();
@@ -202,16 +222,36 @@
       await (lector() ? 0 : SATE.cargarTemarios());
       const r = await registro(k);
       if (token !== E.token) return;
-      lector().montar(E.cuerpo, documentoDe(r), { texto: t, modo: 'panel', nivelTitulo: 2, indice: 'desplegable',
-        enlace: s => absoluto(ir(r.carreraId, k, s)) });
+      const recursos = await cargarRecursos(r.carreraId);
+      if (token !== E.token) return;
+      pintarFicha(r, recursos[k] || []);
       p.setAttribute('aria-label', t('temarios.panel.etiqueta', { materia: r.registro.nombre }));
     } catch (e) {
       if (token !== E.token) return;
-      console.debug('SATE: temario no disponible', e.message);
+      console.warn('SATE: ficha no disponible', {unidad:unidad(), clave:k, ruta:raiz.location.hash, mensaje:e.message, pila:e.stack});
       const otra = h('button', { type: 'button', 'class': 'btn', texto: t('temarios.panel.reintentar') });
       otra.addEventListener('click', () => abrir(k, E.origen));
       E.cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra);
     }
+  }
+  function pintarFicha(r, recursos) {
+    const m = r.registro, mapa = raiz.SATE_DATA?.mapas?.[E.indice.carreras[r.carreraId]?.letra];
+    const area = mapa?.layout?.cat?.[m.clave], cols = mapa?.layout?.cols || [];
+    const i = cols.findIndex(([n]) => n.split(' · ').includes(area));
+    // Es la misma paleta y posición de columna que usa el mapa curricular.
+    const color = typeof AREA_COLORES !== 'undefined' && i >= 0 ? AREA_COLORES[i % AREA_COLORES.length] : 'var(--ipn-acento)';
+    E.panel.style.setProperty('--tmr-area', color);
+    const oficial = h('a', {'class':'btn tmr-oficial', href:ir(r.carreraId, m.clave, 'objetivo'), texto:t('sate.guia.oficial')});
+    oficial.addEventListener('click', () => cerrar({foco:true}));
+    const dato = (valor, etiqueta) => h('div', {}, [h('strong', {texto:valor}), h('small', {texto:t('sate.guia.' + etiqueta)})]);
+    const horas = m.horas || {}, cr = m.creditos || {};
+    E.cuerpo.replaceChildren(...[
+      h('header', {'class':'tmr-ficha-enc'}, [h('h2', {texto:m.nombre}), h('p', {'class':'tmr-meta', texto:[m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel',{n:m.nivel}) : null].filter(Boolean).join(' · ')}), h('p', {texto:frase(m.objetivo)})]),
+      h('div', {'class':'tmr-cifras'}, [dato(cr.tepic != null || cr.satca != null ? num(cr.tepic ?? cr.satca) : '—','creditos'), dato(horas.teoria_semana != null || horas.practica_semana != null ? num((horas.teoria_semana || 0) + (horas.practica_semana || 0)) : '—','horas'), dato(m.tipo ? t('temarios.tipo.' + m.tipo) : '—','tipo')]),
+      h('section', {'class':'tmr-bloque'}, [h('h3', {texto:t('sate.guia.veras')}), h('ol', {'class':'tmr-pasos'}, (m.contenidos || []).map((u, i) => h('li', {}, [h('span', {'class':'tmr-paso', texto:String(i+1)}), h('div', {}, [h('h4',{texto:tituloTema(u.titulo)}), ...(u.subtemas || []).slice(0,5).map(s => h('p', {texto:tituloTema(s)})), (u.subtemas || []).length > 5 ? h('small', {texto:t('sate.guia.mas_temas', {n:u.subtemas.length-5})}) : null])])))]),
+      recursos.length ? h('section', {'class':'tmr-bloque'}, [h('h3',{texto:t('sate.guia.recursos')}), ...recursos.map(x => h('a', {'class':'tmr-recurso', href:x.url, target:'_blank', rel:'noopener noreferrer'}, [h('small', {texto:[x.fuente,x.idioma,x.tipo].join(' · ')}), h('span',{texto:x.titulo+' ↗'})]))]) : null,
+      h('footer', {'class':'tmr-bloque'}, [oficial, h('p', {'class':'tmr-nota', texto:t('sate.guia.nota')})])
+    ].filter(Boolean));
   }
   function cerrar(op) {
     const p = E.panel;
@@ -226,7 +266,7 @@
     }
   }
 
-  /* ---------- explorador independiente: #/<unidad>/temarios[/<carrera>/<clave>[/<seccion>]] ---------- */
+  /* ---------- Programas de estudio: #/<unidad>/guia/programas[/<carrera>/<clave>[/<seccion>]] ---------- */
   const F = { q: '', carrera: '*', nivel: '*', tipo: '*', sel: null, montado: false, inst: null, instClave: null, buscaToken: 0 };
   const X = {};
   function guardarFiltros() { try { store.set('tmFiltros', { carrera: F.carrera, nivel: F.nivel, tipo: F.tipo }); } catch (e) {} }
@@ -294,7 +334,9 @@
           const meta = [m.clave, porCarrera ? ind.carreras[m.c]?.nombre : null, m.t ? t('temarios.tipo.' + m.t) : null].filter(Boolean).join(' · ');
           const donde = terms.length && !m.donde.includes('nombre') ? h('small', { 'class': 'tmr-donde', texto: t('temarios.lista.coincide', { donde: m.donde.map(d => t('temarios.donde.' + d)).join(', ') }) }) : null;
           const sel = F.sel && F.sel.clave === m.clave;
-          return h('li', {}, [h('a', { 'class': 'tmr-item', href: ir(m.c, m.clave), 'aria-current': sel ? 'page' : null, 'data-clave': m.clave }, [nombre, h('small', { 'class': 'tmr-meta', texto: meta }), donde])]);
+          const a = h('a', { 'class': 'tmr-item', href: ir(m.c, m.clave), 'aria-current': sel ? 'page' : null, 'data-clave': m.clave }, [nombre, h('small', { 'class': 'tmr-meta', texto: meta }), donde]);
+          a.addEventListener('click', e => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; e.preventDefault(); abrir(m.clave, a); });
+          return h('li', {}, [a]);
         }))]));
     }
     if (!lista.length) hijos.push(h('p', { 'class': 'tmr-vacio', texto: t('temarios.lista.sin_resultados') }));
@@ -313,7 +355,7 @@
       X.lector.replaceChildren(h('p', { 'class': 'tmr-vacio tmr-elegir', texto: t('temarios.explorador.elegir') }));
       return;
     }
-    if (F.inst && F.instClave === sel.carr + '/' + sel.clave) { if (sel.seccion) F.inst.irA(sel.seccion, { notificar: false }); return; }
+    if (sel.seccion && F.inst && F.instClave === sel.carr + '/' + sel.clave) { F.inst.irA(sel.seccion, { notificar: false }); return; }
     const clave = sel.clave, id = sel.carr + '/' + clave;
     X.lector.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }));
     let r = null;
@@ -322,8 +364,14 @@
       if (F.sel && F.sel.clave === clave) X.lector.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }));
       return;
     }
-    if (!F.sel || F.sel.clave !== clave) return;
+    if (F.sel !== sel) return;
     if (!r || r.carreraId !== sel.carr) { L.desmontar(X.lector); F.inst = null; X.lector.replaceChildren(h('p', { 'class': 'tmr-vacio', role: 'alert', texto: t('temarios.explorador.no_encontrado') })); return; }
+    if (!sel.seccion) {
+      L.desmontar(X.lector); F.inst = null; F.instClave = null;
+      X.raiz.setAttribute('data-vista','lista');
+      await abrir(clave, X.lista.querySelector('[data-clave="' + clave + '"]') || document.activeElement);
+      return;
+    }
     F.inst = L.montar(X.lector, documentoDe(r), { texto: t, modo: 'pagina', nivelTitulo: 2, consulta: F.q, seccion: sel.seccion || null,
       enlace: s => absoluto(ir(r.carreraId, clave, s)),
       alNavegar: s => { try { history.replaceState(null, '', raiz.location.pathname + raiz.location.search + ir(r.carreraId, clave, s)); } catch (e) {} } });
@@ -333,6 +381,10 @@
   }
   async function mostrarExplorador(r) {
     const caja = document.getElementById('sate-temarios');
+    if (!SATE_CONFIG.unidades[unidad()]?.vistas?.some(v => v.id === 'temarios')) {
+      caja.replaceChildren(h('p', {'class':'tmr-vacio', texto:t('sate.guia.sin_programas')}));
+      return;
+    }
     try { await preparar(); } catch (e) {
       caja.replaceChildren(h('p', { 'class': 'tmr-vacio', role: 'alert', texto: t('temarios.explorador.sin_datos') }));
       F.montado = false; return;
@@ -350,6 +402,18 @@
     await pintarLector();
   }
 
-  SATE.temarios = { preparar, tiene, abrir, cerrar, enlaceHtml, documento: documentoDe, estado: E };
-  SATE.pestana('temarios', { montar() {}, mostrar(r) { return mostrarExplorador(r).catch(e => SATE.error(e)); }, ocultar() {} });
+  SATE.temarios = { preparar, tiene, abrir, cerrar, enlaceHtml, documento: documentoDe, cargarRecursos, estado: E };
+  document.addEventListener('click', e => {
+    const a = e.target.closest?.('.insp-temario a');
+    if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+    const clave = a.getAttribute('href').split('/').at(-1);
+    if (tiene(clave)) { e.preventDefault(); abrir(clave, a); }
+  });
+  SATE.pestana('temarios', { montar() {}, mostrar(r) { return mostrarExplorador(r).catch(e => SATE.error(e)); }, ocultar() { cerrar(); } });
+  SATE.pestana('guia', { montar() {}, mostrar() {
+    const caja = document.getElementById('sate-guia');
+    const disponible = SATE_CONFIG.unidades[unidad()]?.vistas?.some(v => v.id === 'temarios');
+    caja.replaceChildren(h('div', {'class':'tmr guia'}, [h('header', {'class':'tmr-enc'}, [h('h2', {texto:t('sate.pestana.guia.titulo')}), h('p', {'class':'tmr-intro', texto:t('sate.guia.intro')})]),
+      h('div', {'class':'guia-apartados'}, (SATE_CONFIG.guia || []).map(a => h('article', {'class':'guia-tarjeta'}, [h('h3', {texto:t(a.titulo)}), a.id === 'programas' ? (disponible ? h('a', {'class':'btn', href:ir(), texto:t('sate.guia.explorar')}) : h('p', {'class':'tmr-nota', texto:t('sate.guia.sin_programas')})) : h('p', {'class':'tmr-nota', texto:t('sate.guia.proximamente')})]))) ]));
+  }, ocultar() {} });
 })(typeof window !== 'undefined' ? window : globalThis);

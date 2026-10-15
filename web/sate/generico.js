@@ -96,7 +96,7 @@ window.IPNT_UNIDAD = window.SATE_UNIDAD;
   }
   function pestañas(){
     const cfg=SATE_CONFIG.unidades[unidad], hay=!!alumno?.horario_inscrito?.length;
-    cfg.pestanas=['trayectoria','mapa','calendario',...(hay?['horarios']:[])];cfg.grupos=[['trayectoria'],['mapa','calendario'],...(hay?[['horarios']]:[])];
+    cfg.pestanas=['trayectoria','mapa','calendario','guia',...(hay?['horarios']:[])];cfg.grupos=[['trayectoria'],['mapa','calendario','guia'],...(hay?[['horarios']]:[])];
     const oculta=t=>(SATE_CONFIG.pestanasOcultas||[]).includes(t);cfg.pestanas=cfg.pestanas.filter(t=>!oculta(t));cfg.grupos=cfg.grupos.map(g=>g.filter(t=>!oculta(t))).filter(g=>g.length);
   }
   pestañas();

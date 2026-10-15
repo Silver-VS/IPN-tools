@@ -1,6 +1,13 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-15 · Codex (GUIA1)
+
+| Claves | Cambio |
+|---|---|
+| `sate.pestana.guia.*`, `sate.guia.*` | Guía politécnica, apartados desde datos, hoja «Más» y ficha breve de materia: tres datos, pasos temáticos, recursos opcionales y acceso al programa completo. |
+| `temarios.explorador.titulo`, `sate.ventanilla.sin_tramites` | Título formal de Programas de estudio y estado vacío de Ventanilla en unidades sin trámites disponibles. |
+
 ## 2026-10-15 · Codex (LEC2)
 
 | Claves | Cambio |

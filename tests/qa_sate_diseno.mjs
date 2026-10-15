@@ -39,11 +39,14 @@ for(const [i,b] of tabs.children.entries()){
   assert.equal(b.children[1].textContent,items[i].texto);
   assert.equal(b.children[2].textContent,items[i].corto);
   assert.equal(b.getAttribute('aria-label'),items[i].texto);
-  assert.equal(barra.children[i].getAttribute('aria-label'),items[i].texto);
-  assert.match(barra.children[i].children[0].innerHTML,/<svg/);
+  const movil=barra.children.find(b=>b.getAttribute('data-id')===items[i].id);
+  if(movil){assert.equal(movil.getAttribute('aria-label'),items[i].texto);assert.match(movil.children[0].innerHTML,/<svg/);}
 }
-assert.equal(tabs.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,1);
-assert.equal(barra.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,1);
+assert.equal(tabs.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,2);
+assert.equal(barra.children.filter(b=>b.className.includes('sate-grupo-inicio')).length,0);
+assert.deepEqual(barra.children.map(b=>b.getAttribute('data-id')),['trayectoria','mapa','horarios','tramites','mas']);
+barra.marcar('guia');assert.equal(barra.children.at(-1).getAttribute('aria-current'),'page');
+barra.marcar('calendario');assert.equal(barra.children.at(-1).getAttribute('aria-current'),'page');
 tabs.children[0].eventos.keydown({key:'End',preventDefault(){}});
 assert.equal(destino,config.unidades.upiita.pestanas.at(-1));assert.equal(document.activeElement,tabs.children.at(-1));
 tabs.children.at(-1).eventos.keydown({key:'ArrowRight',preventDefault(){}});

@@ -123,8 +123,8 @@ assert.ok(!config.unidades.escom.pestanas.includes('situacion'));assert.ok(!conf
 assert.ok(document.getElementById('sate-avisos-globales').querySelectorAll('.sate-chip').length>0);
 const items=config.unidades.upiita.pestanas.map(id=>({id,texto:id,grupo:config.unidades.upiita.grupos.findIndex(g=>g.includes(id))}));
 const tabs=c.SateUI.pestanas({items,activa:'trayectoria'}),barra=c.SateUI.barraInferior({items,activa:'trayectoria'});
-assert.equal(tabs.querySelectorAll('.sate-grupo-inicio').length,1);
-assert.equal(barra.querySelectorAll('.sate-grupo-inicio').length,1);
+assert.equal(tabs.querySelectorAll('.sate-grupo-inicio').length,2);
+assert.equal(barra.querySelectorAll('.sate-grupo-inicio').length,0);
 assert.match(tabs.querySelector('.sate-grupo-inicio').textContent,/mapa/);
 tabs.children[1].dispatchEvent({type:'keydown',key:'ArrowRight',preventDefault(){}});
 assert.equal(document.activeElement,tabs.children[2],'Flechas atraviesan grupos');

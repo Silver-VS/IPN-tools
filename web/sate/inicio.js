@@ -19,7 +19,7 @@
     const identidad = SATE_CONFIG.identidadUnidades?.[solicitada] || Object.values(SATE_CONFIG.identidadUnidades || {}).find(c=>c.alias?.includes(solicitada));
     const siglas = identidad?.siglas || solicitada.toUpperCase();
     config[solicitada] = {generica:true,siglas,nombre:identidad?.nombre || siglas,realce:identidad?.realce,logoUnidad:identidad?.logo,saes:'https://saes.'+solicitada+'.ipn.mx/',
-      pestanas:['trayectoria','mapa','calendario'].filter(t=>!oculta(t)),grupos:[['trayectoria'],['mapa','calendario'].filter(t=>!oculta(t))],tramites:[]};
+      pestanas:['trayectoria','mapa','calendario','guia'].filter(t=>!oculta(t)),grupos:[['trayectoria'],['mapa','calendario','guia'].filter(t=>!oculta(t))],tramites:[]};
   }
   const inicial = entrada ? null : SateRutas.ruta(location.hash, solicitada, config);
   const unidad = inicial?.unidad || solicitada;
@@ -84,11 +84,12 @@
     }).catch(e => { oferta = null; throw e; });
   }
   async function modulo(id) {
-    if (cfg.generica && id !== 'calendario') return modulos[id];
+    if (cfg.generica && !['calendario','guia','temarios'].includes(id)) return modulos[id];
     if (id === 'trayectoria') await script('desempeno.js');
     if (id === 'calendario') await script('calendario.js');
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
-    if (id === 'temarios') await cargarTemarios();
+    if (id === 'guia') await script('temarios.js');
+    if (id === 'temarios') await Promise.all([script('../policore/lector.js'), script('temarios.js')]);
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
@@ -139,8 +140,8 @@
       if (tabs.dataset.escalon !== escalon) tabs.dataset.escalon = escalon;
       document.body.classList.toggle('sate-flotante', escalon === 'flotante');
       // Si el cambio oculta el botón enfocado, conservar el foco en la navegación equivalente.
-      if (escalon === 'flotante' && tabs.contains(foco)) barra.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
-      else if (escalon !== 'flotante' && !(typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches) && barra.contains(foco)) tabs.querySelector('[data-id="'+foco.dataset.id+'"]').focus();
+      if (escalon === 'flotante' && tabs.contains(foco)) (barra.querySelector('[data-id="'+foco.dataset.id+'"]') || barra.querySelector('[data-id="mas"]')).focus();
+      else if (escalon !== 'flotante' && !(typeof matchMedia === 'function' && matchMedia('(max-width:720px)').matches) && barra.contains(foco)) tabs.querySelector('[data-id="'+(foco.dataset.id==='mas' ? (actual?.padre || actual?.pestana) : foco.dataset.id)+'"]').focus();
     }
     function programar() { if (!pendiente) { pendiente = true; requestAnimationFrame(calcular); } }
     recalcularPestanas=programar;
@@ -227,7 +228,8 @@
     document.getElementById('v-hor').hidden = r.pestana !== 'horarios';
     document.getElementById('sate-tramites').hidden = r.pestana !== 'tramites';
     document.getElementById('sate-temarios').hidden = r.pestana !== 'temarios';
-    const panel = document.getElementById(r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : r.pestana === 'temarios' ? 'sate-temarios' : r.pestana === 'trayectoria' ? 'sate-trayectoria' : r.pestana === 'calendario' ? 'sate-calendario' : 'v-tray');
+    document.getElementById('sate-guia').hidden = r.pestana !== 'guia';
+    const panel = document.getElementById(r.pestana === 'guia' ? 'sate-guia' : r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : r.pestana === 'temarios' ? 'sate-temarios' : r.pestana === 'trayectoria' ? 'sate-trayectoria' : r.pestana === 'calendario' ? 'sate-calendario' : 'v-tray');
     panel.setAttribute('role','tabpanel');
     panel.setAttribute('aria-labelledby',tabs.querySelector('[data-id="'+marca+'"]').id);
     api.store.set('ruta', r.hash);
@@ -237,7 +239,7 @@
   }
   function repintar() {
     if (!actual) return;
-    if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios'].includes(actual.pestana)) { ir('horarios'); return; }
+    if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios','guia'].includes(actual.pestana)) { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos();
     const m = window.SateMedicion;
     if (m) m.render(actual.pestana, () => modulos[actual.pestana].mostrar(actual));
@@ -261,18 +263,18 @@
       await activar(r);
     }, actualizarPestanas
   };
-  function actualizarPestanas(activa=actual?.pestana){
+  function actualizarPestanas(activa=actual?.padre || actual?.pestana){
       if(!cfg.pestanas.includes(activa))activa=api.personal()?'trayectoria':'mapa';
       const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
       tabs = SateUI.pestanas({items,activa,alCambiar:id=>{if(!seleccionProgramada && actual && actual.pestana!==id)ir(id)}});
       document.getElementById('sate-tabs').replaceChildren();
       document.getElementById('sate-tabs').appendChild(tabs);
-      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');
+      for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='guia'?'sate-guia':id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');
       barra?.remove?.();
       barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa,alElegir:ir});
       document.body.appendChild(barra);
       recalcularPestanas();
-      if(actual&&actual.pestana!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
+      if(actual&&(actual.padre || actual.pestana)!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
   }
   // Sin el parámetro no se descarga ni se ejecuta el módulo de diagnóstico.
   // Medición interna: solo con ?medir en un servidor local (el archivo no se publica).

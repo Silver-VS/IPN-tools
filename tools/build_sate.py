@@ -956,9 +956,39 @@ def escribir_temarios(data, datos):
                                   "plan": d["plan"], "total": len(salida)}
         (destino / (d["carrera"] + ".json")).write_text(json.dumps(
             {"carrera": d["carrera"], "plan": d["plan"], "materias": salida}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
-    (destino / "indice.json").write_text(json.dumps({"unidad": UNIDAD, "carreras": carreras, "materias": materias},
+    recursos = sorted(p.stem for p in (ROOT / "data/recursos" / UNIDAD).glob("*.json"))
+    (destino / "indice.json").write_text(json.dumps({"unidad": UNIDAD, "carreras": carreras, "materias": materias, "recursos": recursos},
                                                     ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     return True
+
+
+def escribir_recursos(datos):
+    """Los recursos opcionales son datos públicos; no se copian archivos de recursos/."""
+    import shutil
+    destino = datos / "recursos"
+    shutil.rmtree(destino, ignore_errors=True)
+    for archivo in sorted((ROOT / "data/recursos" / UNIDAD).glob("*.json")):
+        d = json.loads(archivo.read_text(encoding="utf-8"))
+        if not recursos_validos(d):
+            raise ValueError(f"Recursos inválidos: {archivo.relative_to(ROOT)}")
+        destino.mkdir(parents=True, exist_ok=True)
+        (destino / archivo.name).write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+
+
+def recursos_validos(datos):
+    from urllib.parse import urlsplit
+    def url_valida(url):
+        try:
+            return bool(re.match(r'^https?://\S+$', url, re.I) and urlsplit(url).netloc)
+        except ValueError:
+            return False
+    return isinstance(datos, dict) and all(
+        isinstance(clave, str) and isinstance(rs, list) and all(
+            isinstance(r, dict) and all(isinstance(r.get(k), str) and r[k].strip()
+                for k in ("titulo", "url", "fuente", "idioma", "tipo", "licencia"))
+            and url_valida(r["url"])
+            and ("unidades" not in r or isinstance(r["unidades"], list) and all(type(n) is int and n > 0 for n in r["unidades"]))
+            for r in rs) for clave, rs in datos.items())
 
 
 PDFS_ELECTIVAS = {
@@ -1012,6 +1042,8 @@ def escribir_sate(data):
     datos = destino / "datos" / UNIDAD
     datos.mkdir(parents=True, exist_ok=True)
     for nombre, d in zip(("nucleo", "oferta", "tramites"), separar_datos(data)):
+        if nombre == 'nucleo':
+            d['areaColores'] = CATS['paleta']
         if UNIDAD == 'upiita' and nombre == 'tramites':
             d['dictamen'] = datos_dictamen()
         (datos / (nombre + ".json")).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
@@ -1022,6 +1054,7 @@ def escribir_sate(data):
                      'pdfs': {k: base64.b64encode((ROOT / 'data/gestion_escolar' / f).read_bytes()).decode() for k, f in PDFS_ELECTIVAS.items()}}
         (datos / 'electivas.json').write_text(json.dumps(electivas, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     escribir_temarios(data, datos)
+    escribir_recursos(datos)
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
@@ -1075,7 +1108,7 @@ def escribir_sate(data):
     calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()
                          if not u.startswith('_') and u not in cfg['unidades']}
     ocultas = set(cfg.get("pestanasOcultas", []))
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"guia":cfg["guia"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.

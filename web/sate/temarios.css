@@ -1,26 +1,40 @@
-/* Temarios en SATE: panel o hoja con el lector y explorador independiente.
+/* Programas en SATE: ficha breve modal y explorador con lector oficial.
    Solo tokens --ipn-*; el lector (web/policore/lector.css) pone su propio estilo al documento. */
 
 .insp-temario{margin:.4rem 0 0}
 .insp-temario a{color:var(--ipn-acento);text-decoration:underline}
 
-/* ---------- panel lateral (≥ 1024 px) u hoja inferior ---------- */
-.tmr-panel{position:fixed;z-index:60;display:flex;flex-direction:column;min-height:0;background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);border:1px solid var(--ipn-linea);box-shadow:0 0 24px rgba(0,0,0,.18);--pc-desfase-pagina:0px}
+/* Ficha centrada; en teléfono ocupa la pantalla con cabecera fija. */
+.tmr-panel{position:fixed;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 3rem));max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);border:1px solid var(--ipn-linea);border-top:6px solid var(--tmr-area,var(--ipn-acento));border-radius:var(--ipn-radio);box-shadow:0 1rem 3rem color-mix(in srgb,var(--ipn-texto) 20%,transparent);overflow:hidden}
 .tmr-panel[hidden],.tmr-velo[hidden]{display:none}
-.tmr-panel:focus{outline:none}
-.tmr-panel-enc{display:flex;align-items:center;justify-content:space-between;gap:var(--ipn-esp-3);padding:var(--ipn-esp-2) var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea);background:var(--ipn-hundido)}
-.tmr-panel-abrir{display:inline-flex;align-items:center;min-height:2.75rem;color:var(--ipn-acento);font-size:var(--ipn-tamano-s);text-decoration:underline}
-.tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:inherit;font:inherit;font-size:1.4rem;line-height:1;cursor:pointer}
-.tmr-panel-x:focus-visible,.tmr-panel-abrir:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
-.tmr-panel-cuerpo{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;padding:var(--ipn-esp-4)}
+.tmr-velo{position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.45)}
+.tmr-panel-enc{display:flex;align-items:center;justify-content:space-between;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-5);border-bottom:1px solid var(--ipn-linea);color:var(--ipn-tenue)}
+.tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:1.5rem;cursor:pointer}
+.tmr-panel-cuerpo{overflow:auto;overscroll-behavior:contain;padding:var(--ipn-esp-5);display:grid;gap:calc(var(--ipn-esp-5) * 1.5);line-height:1.6}
+.tmr-panel :focus-visible{outline:2px solid var(--ipn-acento);outline-offset:3px}
+.tmr-panel h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}
+.tmr-panel h3{margin:0 0 var(--ipn-esp-4);font-size:var(--ipn-tamano-l)}
+.tmr-ficha-enc p{margin:var(--ipn-esp-3) 0 0}
+.tmr-cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-4)}
+.tmr-cifras div{display:grid;align-content:start;gap:var(--ipn-esp-1)}
+.tmr-cifras strong{font-size:var(--ipn-tamano-l);overflow-wrap:anywhere}
+.tmr-cifras small{color:var(--ipn-tenue)}
+.tmr-pasos{display:grid;gap:var(--ipn-esp-5);list-style:none;padding:0;margin:0}
+.tmr-pasos li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--ipn-esp-3)}
+.tmr-paso{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;border:2px solid var(--tmr-area);background:color-mix(in srgb,var(--tmr-area) 18%,var(--ipn-superficie));color:var(--ipn-texto)}
+.tmr-pasos h4{margin:0 0 var(--ipn-esp-2);font-weight:400;font-size:1rem}
+.tmr-pasos p{margin:var(--ipn-esp-1) 0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.tmr-recurso{display:grid;gap:var(--ipn-esp-2);padding:var(--ipn-esp-4);margin-top:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);color:var(--ipn-texto);text-decoration:none}
+.tmr-recurso small{color:var(--ipn-tenue)}
+.tmr-oficial{display:inline-flex;align-items:center;min-height:2.75rem;white-space:normal}
+.guia-apartados{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-5)}
+.guia-tarjeta{padding:var(--ipn-esp-5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+.guia-tarjeta h3{margin:0 0 var(--ipn-esp-4)}
 .tmr-estado{margin:0;color:var(--ipn-tenue)}
-@media(min-width:1024px){
-  .tmr-panel{top:0;right:0;bottom:0;width:min(34rem,42vw);border-width:0 0 0 1px}
-  body.tmr-lateral{padding-right:min(34rem,42vw)}
-}
-@media(max-width:1023.98px){
-  .tmr-panel{left:0;right:0;bottom:0;height:min(88vh,44rem);height:min(88dvh,44rem);border-width:1px 0 0;border-radius:1.25rem 1.25rem 0 0}
-  .tmr-velo{position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.45)}
+@media(max-width:639.98px){
+  .tmr-panel{inset:0;transform:none;width:100%;height:100dvh;max-height:100dvh;border-radius:0;box-sizing:border-box}
+  .tmr-panel-enc,.tmr-panel-cuerpo{padding:var(--ipn-esp-4)}
+  .guia-apartados{grid-template-columns:minmax(0,1fr)}
 }
 
 /* ---------- explorador ---------- */

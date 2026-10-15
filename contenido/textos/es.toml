@@ -971,6 +971,7 @@ busqueda_prioridad = "Se analizaron las combinaciones de mayor prioridad (desfas
 busqueda_limitada = "Búsqueda limitada por el número de combinaciones; reduce las materias seleccionadas para un análisis completo."
 
 [sate.ventanilla]
+sin_tramites = "Aún no hay trámites disponibles para esta unidad académica."
 entrega_firmados = "Entrega tus formatos firmados en las ventanillas de Gestión Escolar."
 generar_pdf = "Generar PDF"
 cancelar = "Cancelar"
@@ -1072,7 +1073,7 @@ error = "No se pudo cargar el temario. Revisa tu conexión e inténtalo de nuevo
 reintentar = "Reintentar"
 
 [temarios.explorador]
-titulo = "Temarios de unidades de aprendizaje"
+titulo = "Programas de estudio de unidades de aprendizaje"
 intro = "Consulta el programa de cada materia: objetivo, contenido, evaluación y bibliografía."
 volver = "Volver a la lista"
 elegir = "Elige una unidad de aprendizaje de la lista para leer su temario."
@@ -1146,6 +1147,30 @@ seccion_otro = "Otro documento: un reglamento ficticio"
 [temarios.biblio]
 basica = "Básica"
 complementaria = "Complementaria"
+
+[sate.pestana.guia]
+titulo = "Guía politécnica"
+corto = "Guía"
+
+[sate.guia]
+intro = "Conoce tus materias y encuentra tu camino en el IPN."
+programas = "Programas de estudio"
+normativa = "Normativa"
+unidad = "Tu unidad académica"
+historia = "Historia y organización del IPN"
+explorar = "Explorar unidades de aprendizaje"
+sin_programas = "Aún no hay programas de estudio de esta unidad"
+proximamente = "Próximamente"
+mas = "Más"
+ficha = "Tu materia, de un vistazo"
+oficial = "Ver programa oficial completo"
+creditos = "Créditos"
+horas = "Horas por semana"
+tipo = "Tipo"
+veras = "Qué vas a ver"
+recursos = "Recursos para estudiar"
+mas_temas = "y {n} más"
+nota = "Transcripción automática del programa sintético; cotéjala con el documento oficial"
 
 [temarios.aviso]
 ocr = "Transcripción automática del programa sintético; cotéjalo con el documento oficial."
