@@ -134,22 +134,31 @@
     }
   },
   "unidadPredeterminada": "upiita",
+  "siglasTemarios": ["ADN", "ARN", "PCR", "DSP", "FPGA", "PLC", "CAD", "CAM", "IA", "VHDL", "ISO", "SQL", "TCP", "IP", "RF", "AC", "DC"],
   "guia": [
     {
       "id": "programas",
-      "titulo": "sate.guia.programas"
+      "titulo": "sate.guia.programas",
+      "descripcion": "sate.guia.programas_descripcion",
+      "icono": "▤"
     },
     {
       "id": "normativa",
-      "titulo": "sate.guia.normativa"
+      "titulo": "sate.guia.normativa",
+      "descripcion": "sate.guia.normativa_descripcion",
+      "icono": "§"
     },
     {
       "id": "unidad",
-      "titulo": "sate.guia.unidad"
+      "titulo": "sate.guia.unidad",
+      "descripcion": "sate.guia.unidad_descripcion",
+      "icono": "⌂"
     },
     {
       "id": "historia",
-      "titulo": "sate.guia.historia"
+      "titulo": "sate.guia.historia",
+      "descripcion": "sate.guia.historia_descripcion",
+      "icono": "◷"
     }
   ]
 }

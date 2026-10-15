@@ -942,11 +942,22 @@ def escribir_temarios(data, datos):
     for archivo in sorted((ROOT / "data/temarios" / UNIDAD).glob("*.json")):
         d = json.loads(archivo.read_text(encoding="utf-8"))
         letra = Counter(m["clave"][0].upper() for m in d["materias"]).most_common(1)[0][0]
-        cur = data.get("mapas", {}).get(letra, {}).get("cur", {})
+        mapa = data.get("mapas", {}).get(letra, {})
+        cur = mapa.get("cur", {})
+        layout = mapa.get("layout", {})
         salida = []
         for m in d["materias"]:
             clave = m["clave"].upper()
             m = {**m, "clave": clave}
+            area = layout.get("cat", {}).get(clave)
+            if "cat" not in layout:
+                caja = next((b for b in layout.get("boxes", []) if b[4] == clave), None)
+                if caja:
+                    centro = caja[0] + caja[2] / 2
+                    area = next((n for n, a, b in layout.get("cols", []) if a <= centro < b), None)
+            columna = next((i for i, col in enumerate(layout.get("cols", [])) if area in col[0].split(" · ")), None)
+            if area and columna is not None:
+                m["area"] = {"nombre": area, "color": CATS["paleta"][columna % len(CATS["paleta"])]}
             m.pop("fuente", None)
             if clave in cur:
                 m["nombre"] = nombre_materia(cur[clave][0])
@@ -1108,7 +1119,7 @@ def escribir_sate(data):
     calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()
                          if not u.startswith('_') and u not in cfg['unidades']}
     ocultas = set(cfg.get("pestanasOcultas", []))
-    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"guia":cfg["guia"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
+    html = html.replace("/*__SATE_CONFIG__*/", "window.SATE_CONFIG=" + json.dumps({"unidadPredeterminada":cfg["unidadPredeterminada"],"unidades":cfg["unidades"],"pestanasOcultas":sorted(ocultas),"guia":cfg["guia"],"siglasTemarios":cfg["siglasTemarios"],"textos":textos_sate,"nombresUnidades":nombres_unidades,"identidadUnidades":identidad_unidades,"calendarioBase":calendario_base,"calendariosUnidad":calendarios_unidad}, ensure_ascii=False, separators=(",", ":")) + ";")
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.

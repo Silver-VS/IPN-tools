@@ -1,0 +1,821 @@
+{
+  "B103": [
+    {
+      "titulo": "Álgebra lineal",
+      "url": "https://es.khanacademy.org/math/algebra-lineal",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas teóricas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy (Uso educativo no comercial)",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Linear Algebra (18.06)",
+      "url": "https://ocw.mit.edu/courses/18-06-linear-algebra-spring-2010/",
+      "fuente": "MIT OpenCourseWare (Prof. Gilbert Strang)",
+      "idioma": "en",
+      "tipo": "Curso completo (videoclases magistrales, notas de clase, tareas resueltas, exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Un Primer Curso de Álgebra Lineal (Kuttler)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Matematicas/Algebra_lineal/Un_Primer_Curso_de_%C3%81lgebra_Lineal_(Kuttler)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (lecturas teóricas, demostraciones y problemas)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B111": [
+    {
+      "titulo": "Libro: Anatomía y Fisiología 1e (OpenStax)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Salud/Anatomia_y_Fisiologia/Libro%3A_Anatom%C3%ADa_y_Fisiolog%C3%ADa_1e_(OpenStax)",
+      "fuente": "LibreTexts Español (Traducción oficial OpenStax)",
+      "idioma": "es",
+      "tipo": "Libro de texto digital e interactivo (lecturas, diagramas anatómicos e ilustraciones)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    {
+      "titulo": "Anatomy and Physiology 2e",
+      "url": "https://openstax.org/details/books/anatomy-and-physiology-2e",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto completo (descarga PDF y lectura web con recursos docentes)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    }
+  ],
+  "B108": [
+    {
+      "titulo": "Estadística y probabilidad",
+      "url": "https://es.khanacademy.org/math/statistics-probability",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso completo (videos, artículos conceptuales y ejercicios evaluados)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Introduction to Probability and Statistics (18.05)",
+      "url": "https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2022/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso universitario (notas de clase, ejercicios en R, problem sets y exámenes resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B101": [
+    {
+      "titulo": "Biología (Curso Completo)",
+      "url": "https://es.khanacademy.org/science/biology",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso temático (videos, lecturas y cuestionarios interactivos)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Fundamentals of Biology (7.01SC)",
+      "url": "https://ocw.mit.edu/courses/7-01sc-fundamentals-of-biology-fall-2011/",
+      "fuente": "MIT OpenCourseWare (Profs. Eric Lander, Robert Weinberg)",
+      "idioma": "en",
+      "tipo": "Curso completo para autoaprendizaje (videoclases magistrales, problemas y exámenes resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Biology 2e",
+      "url": "https://openstax.org/details/books/biology-2e",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto universitario de referencia",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B114": [
+    {
+      "titulo": "Bioethics (24.06J / STS.006J)",
+      "url": "https://ocw.mit.edu/courses/24-06j-bioethics-spring-2009/",
+      "fuente": "MIT OpenCourseWare (Profs. Caspar Hare y David Jones)",
+      "idioma": "en",
+      "tipo": "Curso universitario (programa, lecturas asignadas, guías de discusión y ensayos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "titulo": "Dilemmas in Bio-Medical Ethics: Playing God or Doing Good? (21A.302J)",
+      "url": "https://ocw.mit.edu/courses/21a-302j-dilemmas-in-bio-medical-ethics-playing-god-or-doing-good-fall-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso universitario (lecturas seleccionadas, temarios y guías analíticas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "B104": [
+    {
+      "titulo": "Cálculo diferencial & Cálculo integral",
+      "url": "https://es.khanacademy.org/math/differential-calculus",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso modular (videos, ejercicios de dominio, resolución paso a paso)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Cálculo diferencial & Cálculo integral",
+      "url": "https://es.khanacademy.org/math/integral-calculus",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso modular (videos, ejercicios de dominio, resolución paso a paso)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Cálculo volumen 1",
+      "url": "https://openstax.org/details/books/c%C3%A1lculo-volumen-1",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (teoría formal, ejercicios resueltos y propuestos)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Cálculo volumen 2",
+      "url": "https://openstax.org/details/books/c%C3%A1lculo-volumen-2",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Single Variable Calculus (18.01SC)",
+      "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/",
+      "fuente": "MIT OpenCourseWare (Prof. David Jerison)",
+      "idioma": "en",
+      "tipo": "Curso completo para autoaprendizaje (videoclases, exámenes, notas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B105": [
+    {
+      "titulo": "Cálculo multivariable",
+      "url": "https://es.khanacademy.org/math/multivariable-calculus",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos de intuición geométrica, lecturas y problemas)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Cálculo volumen 3",
+      "url": "https://openstax.org/details/books/c%C3%A1lculo-volumen-3",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto universitario abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Multivariable Calculus (18.02SC)",
+      "url": "https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/",
+      "fuente": "MIT OpenCourseWare (Prof. Denis Auroux)",
+      "idioma": "en",
+      "tipo": "Curso completo universitario (videoclases, notas, problemas y soluciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B115": [
+    {
+      "titulo": "Libro: Introducción a la Ciencia Ambiental (Zehnder et al.)",
+      "url": "https://espanol.libretexts.org/Geociencias/Ciencias_Ambientales/Libro%3A_Introducci%C3%B3n_a_la_Ciencia_Ambiental_(Zehnder_et_al.)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Sustainability: Political Economy, Science, and Policy (17.181)",
+      "url": "https://ocw.mit.edu/courses/17-181-sustainability-political-economy-science-and-policy-fall-2016/",
+      "fuente": "MIT OpenCourseWare (Prof. Nazli Choucri)",
+      "idioma": "en",
+      "tipo": "Curso universitario (programa, lecturas, marcos analíticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        5
+      ]
+    }
+  ],
+  "B106": [
+    {
+      "titulo": "Física universitaria volumen 1",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-1",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto universitario (teoría rigurosa, ejemplos con cálculo vectorial y problemas)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Física (Mecánica)",
+      "url": "https://es.khanacademy.org/science/physics",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos y ejercicios)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Classical Mechanics (8.01SC)",
+      "url": "https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videoclases, notas guiadas, simulaciones y exámenes resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B107": [
+    {
+      "titulo": "Física (Cargas eléctricas, circuitos y magnetismo)",
+      "url": "https://es.khanacademy.org/science/physics",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Unidades temáticas interactivas (videos teóricos y práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Physics II: Electricity and Magnetism (8.02)",
+      "url": "https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo universitario (notas teóricas, lecturas TEAL y problemas resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "B112": [
+    {
+      "titulo": "Introduction to MATLAB (6.057)",
+      "url": "https://ocw.mit.edu/courses/6-057-introduction-to-matlab-january-iap-2019/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso intensivo (notas de clase, ejercicios de código y proyectos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "B116": [
+    {
+      "titulo": "Grammar: The Verb (Tenses & Modals)",
+      "url": "https://www.khanacademy.org/humanities/grammar/parts-of-speech-the-verb",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Unidad interactiva (videos pedagógicos, artículos explicativos y ejercicios de fijación)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "B109": [
+    {
+      "titulo": "Biological Engineering II: Instrumentation and Measurement (20.309)",
+      "url": "https://ocw.mit.edu/courses/20-309-biological-engineering-ii-instrumentation-and-measurement-fall-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso de instrumentación (notas de laboratorio, teoría de transductores y análisis de error)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "B110": [
+    {
+      "titulo": "Introduction to Programming in Java (6.092)",
+      "url": "https://ocw.mit.edu/courses/6-092-introduction-to-programming-in-java-january-iap-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso universitario (diapositivas de clase, asignaciones de código y proyectos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Programación de computadoras (Introducción a objetos y algoritmos)",
+      "url": "https://es.khanacademy.org/computing/computer-programming",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso interactivo en línea con editor de código integrado",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "B209": [
+    {
+      "titulo": "Quantitative Physiology: Cells and Tissues (6.021J / 2.791J / 20.370J)",
+      "url": "https://ocw.mit.edu/courses/6-021j-quantitative-physiology-cells-and-tissues-fall-2004/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso universitario cuantitativo (notas de clase, problem sets, exámenes resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Quantitative Physiology: Organ Transport Systems (HST.542J)",
+      "url": "https://ocw.mit.edu/courses/hst-542j-quantitative-physiology-organ-transport-systems-spring-2004/",
+      "fuente": "MIT OpenCourseWare (Harvard-MIT Division of Health Sciences and Technology)",
+      "idioma": "en",
+      "tipo": "Curso especializado (apuntes de cátedra de bioingeniería, simulaciones y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        5
+      ]
+    }
+  ],
+  "B210": [
+    {
+      "titulo": "7.28x Molecular Biology Series (RES.7-008)",
+      "url": "https://ocw.mit.edu/courses/res-7-008-7-28x-molecular-biology/",
+      "fuente": "MIT OpenCourseWare (Profs. Stephen Bell y Tania Baker)",
+      "idioma": "en",
+      "tipo": "Curso universitario avanzado (material didáctico estructurado, análisis experimental y problemas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Biología: Genética molecular y biotecnología",
+      "url": "https://es.khanacademy.org/science/biology",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Módulos temáticos (videos y lecturas explicativas)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B206": [
+    {
+      "titulo": "Biological Chemistry I (5.07SC)",
+      "url": "https://ocw.mit.edu/courses/5-07sc-biological-chemistry-i-fall-2013/",
+      "fuente": "MIT OpenCourseWare (Profs. JoAnne Stubbe y John Essigmann)",
+      "idioma": "en",
+      "tipo": "Curso completo para autoaprendizaje (videoclases, notas de clase, problem sets con soluciones detalladas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Biología: Macromoléculas y respiración celular",
+      "url": "https://es.khanacademy.org/science/biology",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Módulo interactivo (videos y prácticas guiadas)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B201": [
+    {
+      "titulo": "Differential Equations (18.03SC)",
+      "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+      "fuente": "MIT OpenCourseWare (Prof. Arthur Mattuck)",
+      "idioma": "en",
+      "tipo": "Curso completo (videoclases, notas de cátedra, apuntes de sesión y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Libro: Ecuaciones Diferenciales para Ingenieros (Lebl)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Matematicas/Ecuaciones_diferenciales/Libro%3A_Ecuaciones_Diferenciales_para_Ingenieros_(Lebl)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Ecuaciones diferenciales",
+      "url": "https://es.khanacademy.org/math/differential-equations",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso práctico (videos y ejercicios)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "B205": [
+    {
+      "titulo": "Libro: Química General (OpenStax)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Quimica/Libro%3A_Qu%C3%ADmica_General_(OpenSTAX)",
+      "fuente": "LibreTexts Español (Traducción oficial OpenStax)",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto estructurado por capítulos",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Thermodynamics & Kinetics (5.60)",
+      "url": "https://ocw.mit.edu/courses/5-60-thermodynamics-kinetics-spring-2008/",
+      "fuente": "MIT OpenCourseWare (Profs. Moungi Bawendi y Keith Nelson)",
+      "idioma": "en",
+      "tipo": "Curso universitario completo (videoclases, notas de clase, exámenes resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B208": [
+    {
+      "titulo": "Libro: Anatomía y Fisiología 1e (OpenStax)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Salud/Anatomia_y_Fisiologia/Libro%3A_Anatom%C3%ADa_y_Fisiolog%C3%ADa_1e_(OpenStax)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto digital",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Quantitative Physiology: Organ Transport Systems (HST.542J)",
+      "url": "https://ocw.mit.edu/courses/hst-542j-quantitative-physiology-organ-transport-systems-spring-2004/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso avanzado de fisiología cuantitativa para ingenieros",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B202": [
+    {
+      "titulo": "Complex Variables with Applications (18.04)",
+      "url": "https://ocw.mit.edu/courses/18-04-complex-variables-with-applications-spring-2018/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso universitario completo (notas de clase en PDF por tema, tareas, exámenes y código en MATLAB)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Signals and Systems (6.003)",
+      "url": "https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso universitario (videoclases, notas temáticas y problem sets)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        5
+      ]
+    }
+  ],
+  "B204": [
+    {
+      "titulo": "Física Universitaria Volumen 3",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-3",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto universitario (teoría formal, deducciones, esquemas ópticos y problemas)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Vibrations and Waves (8.03SC)",
+      "url": "https://ocw.mit.edu/courses/8-03sc-physics-iii-vibrations-and-waves-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo de autoaprendizaje (videoclases, notas, problemas resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B216": [
+    {
+      "titulo": "Grammar: Syntax, Verbals, Voice and Clauses",
+      "url": "https://www.khanacademy.org/humanities/grammar",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Curso interactivo completo (videos, notas breves y práctica calificada)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B203": [
+    {
+      "titulo": "Electromagnetics and Applications (6.013)",
+      "url": "https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/",
+      "fuente": "MIT OpenCourseWare (Prof. David Staelin)",
+      "idioma": "en",
+      "tipo": "Curso universitario completo (libro de texto abierto en PDF, notas de cátedra, asignaciones resueltas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Physics II: Electricity and Magnetism (8.02 - Módulo de Ondas)",
+      "url": "https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Unidades de curso con material audiovisual y notas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "B212": [
+    {
+      "titulo": "Lean/Six Sigma Processes (ESD.60)",
+      "url": "https://ocw.mit.edu/courses/esd-60-lean-six-sigma-processes-summer-2004/",
+      "fuente": "MIT OpenCourseWare (Prof. Joel Cutcher-Gershenfeld)",
+      "idioma": "en",
+      "tipo": "Curso universitario / ejecutivo (lecciones modulares SPL, casos de estudio y ejercicios prácticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "B207": [
+    {
+      "titulo": "Circuits and Electronics (6.002)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Prof. Anant Agarwal)",
+      "idioma": "en",
+      "tipo": "Curso universitario fundamental (videoclases, apuntes teóricos interactivos, tareas y soluciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "Análisis de circuitos (Ingeniería Eléctrica)",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-circuit-analysis-topic",
+      "fuente": "Khan Academy",
+      "idioma": "es",
+      "tipo": "Curso modular interactivo (videos demostrativos, artículos y problemas prácticos)",
+      "licencia": "CC BY-NC-SA 3.0 US / Términos Khan Academy",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ]
+}

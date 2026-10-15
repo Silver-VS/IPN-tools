@@ -107,7 +107,13 @@
     if (s.length <= 260) return s;
     return s.slice(0, 257).replace(/\s+\S*$/, '') + '…';
   }
-  const tituloTema = s => { const n = String(s || '').trim().replace(/[.\s]+$/, '').toLocaleLowerCase('es'); return n.charAt(0).toUpperCase() + n.slice(1); };
+  function tituloTema(s, siglas = raiz.SATE_CONFIG?.siglasTemarios || []) {
+    const n = String(s || '').trim().replace(/[.\s]+$/, '');
+    if (n !== n.toLocaleUpperCase('es')) return n;
+    const conocidas = new Set(siglas);
+    const oracion = n.toLocaleLowerCase('es').replace(/\p{L}+/gu, p => conocidas.has(p.toUpperCase()) ? p.toUpperCase() : p);
+    return oracion.charAt(0).toUpperCase() + oracion.slice(1);
+  }
   raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace, recursosValidos, frase, tituloTema };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
@@ -235,11 +241,9 @@
     }
   }
   function pintarFicha(r, recursos) {
-    const m = r.registro, mapa = raiz.SATE_DATA?.mapas?.[E.indice.carreras[r.carreraId]?.letra];
-    const area = mapa?.layout?.cat?.[m.clave], cols = mapa?.layout?.cols || [];
-    const i = cols.findIndex(([n]) => n.split(' · ').includes(area));
-    // Es la misma paleta y posición de columna que usa el mapa curricular.
-    const color = typeof AREA_COLORES !== 'undefined' && i >= 0 ? AREA_COLORES[i % AREA_COLORES.length] : 'var(--ipn-acento)';
+    const m = r.registro;
+    // El compilador resuelve el área con el mismo layout y paleta del mapa, aunque esa vista no se haya cargado.
+    const color = m.area?.color || 'var(--ipn-acento)';
     E.panel.style.setProperty('--tmr-area', color);
     const oficial = h('a', {'class':'btn tmr-oficial', href:ir(r.carreraId, m.clave, 'objetivo'), texto:t('sate.guia.oficial')});
     oficial.addEventListener('click', () => cerrar({foco:true}));
@@ -414,6 +418,13 @@
     const caja = document.getElementById('sate-guia');
     const disponible = SATE_CONFIG.unidades[unidad()]?.vistas?.some(v => v.id === 'temarios');
     caja.replaceChildren(h('div', {'class':'tmr guia'}, [h('header', {'class':'tmr-enc'}, [h('h2', {texto:t('sate.pestana.guia.titulo')}), h('p', {'class':'tmr-intro', texto:t('sate.guia.intro')})]),
-      h('div', {'class':'guia-apartados'}, (SATE_CONFIG.guia || []).map(a => h('article', {'class':'guia-tarjeta'}, [h('h3', {texto:t(a.titulo)}), a.id === 'programas' ? (disponible ? h('a', {'class':'btn', href:ir(), texto:t('sate.guia.explorar')}) : h('p', {'class':'tmr-nota', texto:t('sate.guia.sin_programas')})) : h('p', {'class':'tmr-nota', texto:t('sate.guia.proximamente')})]))) ]));
+      h('div', {'class':'guia-apartados'}, (SATE_CONFIG.guia || []).map(a => {
+        const activa = a.id === 'programas' && disponible;
+        return h(activa ? 'a' : 'article', {'class':'guia-tarjeta' + (activa ? '' : ' guia-tarjeta--pendiente'), href:activa ? ir() : null}, [
+          h('span', {'class':'guia-icono', 'aria-hidden':'true', texto:a.icono}),
+          h('h3', {texto:t(a.titulo)}), h('p', {texto:t(a.descripcion)}),
+          activa ? null : h('small', {texto:t(a.id === 'programas' ? 'sate.guia.sin_programas' : 'sate.guia.proximamente')})
+        ]);
+      })) ]));
   }, ocultar() {} });
 })(typeof window !== 'undefined' ? window : globalThis);

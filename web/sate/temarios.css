@@ -17,24 +17,31 @@
 .tmr-ficha-enc p{margin:var(--ipn-esp-3) 0 0}
 .tmr-cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-4)}
 .tmr-cifras div{display:grid;align-content:start;gap:var(--ipn-esp-1)}
-.tmr-cifras strong{font-size:var(--ipn-tamano-l);overflow-wrap:anywhere}
+.tmr-cifras strong{font-size:var(--ipn-tamano-l);white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .tmr-cifras small{color:var(--ipn-tenue)}
 .tmr-pasos{display:grid;gap:var(--ipn-esp-5);list-style:none;padding:0;margin:0}
 .tmr-pasos li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--ipn-esp-3)}
 .tmr-paso{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;border:2px solid var(--tmr-area);background:color-mix(in srgb,var(--tmr-area) 18%,var(--ipn-superficie));color:var(--ipn-texto)}
 .tmr-pasos h4{margin:0 0 var(--ipn-esp-2);font-weight:400;font-size:1rem}
 .tmr-pasos p{margin:var(--ipn-esp-1) 0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
-.tmr-recurso{display:grid;gap:var(--ipn-esp-2);padding:var(--ipn-esp-4);margin-top:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);color:var(--ipn-texto);text-decoration:none}
+.tmr-recurso{display:grid;gap:var(--ipn-esp-3);padding:var(--ipn-esp-5);margin-top:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);color:var(--ipn-texto);text-decoration:none}
 .tmr-recurso small{color:var(--ipn-tenue)}
 .tmr-oficial{display:inline-flex;align-items:center;min-height:2.75rem;white-space:normal}
 .guia-apartados{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-5)}
-.guia-tarjeta{padding:var(--ipn-esp-5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
-.guia-tarjeta h3{margin:0 0 var(--ipn-esp-4)}
+.guia-tarjeta{display:grid;align-content:start;gap:var(--ipn-esp-3);padding:calc(var(--ipn-esp-5) * 1.5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:inherit;text-decoration:none}
+.guia-tarjeta h3,.guia-tarjeta p{margin:0}
+.guia-tarjeta p,.guia-tarjeta small{color:var(--ipn-tenue)}
+.guia-icono{font-size:2rem;line-height:1;color:var(--ipn-acento)}
+.guia-tarjeta--pendiente{opacity:.65}
+a.guia-tarjeta:hover{border-color:var(--ipn-acento);background:var(--ipn-hundido)}
+a.guia-tarjeta:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:3px}
 .tmr-estado{margin:0;color:var(--ipn-tenue)}
 @media(max-width:639.98px){
   .tmr-panel{inset:0;transform:none;width:100%;height:100dvh;max-height:100dvh;border-radius:0;box-sizing:border-box}
   .tmr-panel-enc,.tmr-panel-cuerpo{padding:var(--ipn-esp-4)}
   .guia-apartados{grid-template-columns:minmax(0,1fr)}
+  .tmr-cifras{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tmr-cifras div:last-child{grid-column:1 / -1}
 }
 
 /* ---------- explorador ---------- */

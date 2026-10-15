@@ -45,7 +45,7 @@ function contexto(extra = {}) {
     scrollTo: (x, y) => estado.scroll.push([x, y]),
     fetch: async url => {
       estado.fetches.push(url);
-      const m = url.match(/^datos\/([^/]+)\/temarios\/([\w-]+)\.json$/), f = m && `web/dist/sate/datos/${m[1]}/temarios/${m[2]}.json`;
+      const m = url.match(/^datos\/([^/]+)\/(temarios|recursos)\/([\w-]+)\.json$/), f = m && `web/dist/sate/datos/${m[1]}/${m[2]}/${m[3]}.json`;
       if (!f || !existsSync(f)) return {ok: false, status: 404};
       return {ok: true, json: async () => JSON.parse(leer(f))};
     }, ...extra});
@@ -118,6 +118,18 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(T.recursosValidos({B101:[{...recurso,licencia:null}]}), false);
   assert.equal(T.recursosValidos({B101:[{...recurso,unidades:[0]}]}), false);
   assert.equal(T.tituloTema('ÁLGEBRA LINEAL.'),'Álgebra lineal');
+  assert.equal(T.tituloTema('Replicación del ADN.'), 'Replicación del ADN');
+  assert.equal(T.tituloTema('REPLICACIÓN DEL ADN.', config.siglasTemarios), 'Replicación del ADN');
+  assert.equal(T.tituloTema('PCR, ARN Y ADN.', config.siglasTemarios), 'PCR, ARN y ADN');
+  assert.equal(T.tituloTema('Uso de SQL y TCP/IP.'), 'Uso de SQL y TCP/IP');
+  assert.equal(T.tituloTema('ESTUDIO DEL SOL.' , config.siglasTemarios), 'Estudio del sol');
+  const piloto = JSON.parse(leer('data/recursos/upiita/bionica.json'));
+  assert.ok(T.recursosValidos(piloto));
+  igual(JSON.parse(leer('web/dist/sate/datos/upiita/recursos/bionica.json')), piloto);
+  assert.equal(Object.keys(piloto).length, 26);
+  assert.equal(Object.values(piloto).flat().length, 55);
+  for (const clave of ['B213', 'B211', 'B215']) assert.equal(piloto[clave], undefined);
+  assert.ok(piloto.B103.some(r => r.url.endsWith('_(Kuttler)')), 'conserva el paréntesis de LibreTexts');
   assert.equal(T.frase('Primera oración. Segunda oración.'),'Primera oración.');
   assert.ok(T.frase('Objetivo '.repeat(100)).length <= 260);
 }
@@ -256,6 +268,10 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(portada.querySelectorAll('.guia-tarjeta').length,4);
   assert.equal(portada.querySelectorAll('a').length,1);
   assert.equal(portada.querySelector('a').getAttribute('href'),'#/upiita/guia/programas');
+  assert.ok(portada.querySelector('a').classList.contains('guia-tarjeta'), 'toda la tarjeta es el enlace');
+  assert.equal(portada.querySelectorAll('.guia-icono').length, 4);
+  assert.equal(portada.querySelectorAll('.guia-tarjeta--pendiente').length, 3);
+  assert.match(portada.querySelector('a').textContent, /Qué se ve en cada materia y con qué estudiarla/);
   const fetchOriginal = c.fetch;
   c.fetch = async url => url.endsWith('/recursos/bionica.json') ? {ok:true,json:async()=>({B101:[{titulo:'Vectores de prueba',url:'https://example.org/estudio',fuente:'Academia ficticia',idioma:'es',tipo:'Curso',licencia:'CC0'}]})} : fetchOriginal(url);
   await T.preparar();
@@ -295,8 +311,15 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(panel.querySelector('.tmr-ficha-enc h2').textContent, indice.materias.B101.n);
   assert.equal(panel.querySelector('.pc-lector'), null, 'la ficha breve no monta el lector oficial');
   assert.equal(panel.querySelectorAll('.tmr-cifras strong').length, 3);
+  assert.equal(c.SATE_DATA, undefined, 'abre desde la Guía sin cargar los datos del mapa');
+  assert.ok(bionica.find(r => r.clave === 'B101').area?.color, 'el compilador proporciona el acento');
+  const estilos = {};
+  panel.style.setProperty = (k, v) => { estilos[k] = v; };
+  await T.abrir('B101', caja1);
+  assert.equal(estilos['--tmr-area'], bionica.find(r => r.clave === 'B101').area.color);
   assert.equal(panel.querySelector('.tmr-recurso').getAttribute('href'),'https://example.org/estudio');
   assert.match(panel.querySelector('.tmr-recurso').textContent,/Academia ficticia/);
+  assert.equal(panel.querySelector('.tmr-recurso').getAttribute('rel'), 'noopener noreferrer');
   assert.equal(panel.querySelector('.tmr-oficial').getAttribute('href'), '#/upiita/guia/programas/bionica/B101/objetivo');
   assert.equal(document.activeElement, panel);
   assert.equal(document.body.inert, true, 'el fondo queda inerte');
@@ -436,6 +459,28 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(sin.estado.fetches.length,0,'la Guía sin programas no solicita datos inexistentes');
 }
 
+/* Catálogo real del piloto: carga y tarjetas en la ficha sin montar el mapa. */
+{
+  const {c, document} = contexto();
+  Object.assign(c, {
+    SATE_CONFIG: config, SATE_UNIDAD: 'upiita',
+    SATE: {texto, pestana() {}, cargarTemarios: async () => {}}
+  });
+  vm.runInContext(leer('web/policore/lector.js'), c);
+  vm.runInContext(leer('web/sate/temarios.js'), c);
+  await c.SATE.temarios.preparar();
+  await c.SATE.temarios.abrir('B103');
+  const tarjetas = document.querySelectorAll('.tmr-recurso');
+  assert.equal(tarjetas.length, 3);
+  assert.ok(tarjetas.some(a => a.getAttribute('href').endsWith('_(Kuttler)')));
+  for (const a of tarjetas) {
+    assert.equal(a.getAttribute('target'), '_blank');
+    assert.equal(a.getAttribute('rel'), 'noopener noreferrer');
+    assert.ok(a.querySelector('small').textContent);
+  }
+  assert.equal(c.SATE_DATA, undefined);
+}
+
 /* Hoja Más: navegación, cierre por Esc (cancel nativo) y foco de regreso. */
 {
   const {c,document,Evento} = contexto();
@@ -457,6 +502,10 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(dlg.open,false);assert.equal(document.activeElement,mas);
   mas.click();dlg.querySelector('[data-id=guia]').click();
   assert.equal(elegida,'guia');assert.equal(dlg.open,false);assert.equal(mas.getAttribute('aria-current'),'page');
+  mas.click();
+  assert.equal(dlg.querySelector('[data-id=guia]').getAttribute('aria-current'), 'page');
+  assert.equal(dlg.querySelector('[data-id=calendario]').getAttribute('aria-current'), null);
+  dlg.dispatchEvent(new Evento('cancel'));
 }
 
 /* ---------- 4. Rutas, datos y compilación ---------- */

@@ -191,6 +191,16 @@ class SateBuild(unittest.TestCase):
             crudo = (t / 'temarios/bionica.json').read_text(encoding='utf-8')
             self.assertNotIn('NIVEL_I', crudo)
             self.assertEqual({m['clave'] for m in json.loads(crudo)['materias']}, {k for k, v in indice['materias'].items() if v['c'] == 'bionica'})
+            for layout, nombre, columna in (
+                ({'boxes': [[10, 0, 20, 10, 'B103']], 'cols': [['Área de prueba', 0, 40]]}, 'Área de prueba', 0),
+                ({'cat': {'B103': 'Área de prueba'}, 'cols': [['Otra', 0, 40], ['Área de prueba · Afín', 40, 80]]}, 'Área de prueba', 1),
+            ):
+                with self.subTest(layout=layout):
+                    data['mapas']['B']['layout'] = layout
+                    build_sate.escribir_temarios(data, t)
+                    materias = json.loads((t / 'temarios/bionica.json').read_text(encoding='utf-8'))['materias']
+                    area = next(m['area'] for m in materias if m['clave'] == 'B103')
+                    self.assertEqual(area, {'nombre': nombre, 'color': build_sate.CATS['paleta'][columna]})
         with unittest.mock.patch.object(build_sate, 'UNIDAD', 'unidad-sin-temarios'):
             with tempfile.TemporaryDirectory() as t:
                 self.assertFalse(build_sate.escribir_temarios({}, pathlib.Path(t)))
