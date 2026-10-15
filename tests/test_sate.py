@@ -256,7 +256,7 @@ class SateBuild(unittest.TestCase):
                 rutas = {r for r in rutas if not re.match(r'[a-z]+:', r)}
                 rutas.update(('nucleo.js', 'situacion.js', 'desempeno.js', 'mapa.js',
                               'cupos.html', 'cupos.js', 'cupos-comun.js', 'cupos-receptor.js', '../cupos.js',
-                              'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js',
+                              'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js', 'bajas.js',
                               '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js',
                               'temarios.js', 'temarios.css', '../policore/lector.js', '../policore/lector.css'))
                 config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', html, re.S)[1])

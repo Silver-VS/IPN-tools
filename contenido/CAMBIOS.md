@@ -1,6 +1,15 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-15 · 2026.10.25 · Claude (VEN1)
+
+| Claves | Cambio |
+|---|---|
+| `sate.ventanilla.*` | Portada por grupos («En curso y terminados», «Disponibles»), pasos navegables, ayuda de revisión, texto de guardado y botones de datos movidos del código a claves. `titulo` ahora es «Ventanilla digital»; `estado_no_iniciado` → «Sin iniciar»; `revisar` → «Revisa y descarga». |
+| `sate.baja.*`, `sate.tramite.baja_temporal/baja_definitiva.titulo` | Nuevas: bajas temporal y definitiva. Textos de requisitos y plazos **pendientes de contrastar con el reglamento**. |
+| `sate.electivas.categoria_catalogo/nombre_ayuda` | Nuevas: la categoría del catálogo va aparte y el nombre de la actividad se puede cambiar. |
+| `sate.cupos.config_titulo` y relacionadas | Barra de configuración de Cupos (avisos y consulta automática), «Última consulta» con aviso de consulta antigua y medidor por fila. `avisos_mas` se conserva porque el marcador del SAES todavía la usa. |
+
 ## 2026-10-15 · 2026.10.24 · Claude (GOOG1)
 
 | Claves | Cambio |
