@@ -83,14 +83,17 @@
     }
     return {actividades:acts,formulario:{...inicial().formulario,...viejo?.f,confirmada:false}};
   }
-  function campo(box,texto,valor,cambiar,{tipo='text',opciones,validar=textoValido}={}){
+  const tx=(k,v)=>SATE.texto('sate.electivas.'+k,v);
+  function campo(box,texto,valor,cambiar,{tipo='text',opciones,validar=textoValido,ayuda}={}){
     const l=nodo('label',null,'tramite-campo'),n=nodo(opciones?'select':tipo==='textarea'?'textarea':'input'),error=nodo('small','');
     if(opciones)for(const [v,t] of opciones){const o=nodo('option',t);o.value=v;n.appendChild(o)}else if(tipo!=='textarea')n.type=tipo;
     n.value=valor??'';n.id='electivas-campo-'+(++campo.secuencia);error.id=n.id+'-error';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',error.id);
     if(tipo==='number'){n.min=0;n.step='any'}
     n.oninput=()=>cambiar(n.value);n.onchange=()=>cambiar(n.value);
     n.onblur=()=>{cambiar(n.value);const e=validar(n.value);error.textContent=e;n.setAttribute('aria-invalid',String(!!e))};
-    l.appendChild(nodo('span',texto));l.appendChild(n);l.appendChild(error);box.appendChild(l);return n;
+    l.appendChild(nodo('span',texto));l.appendChild(n);
+    if(ayuda){const a=nodo('small',ayuda);a.id=n.id+'-ayuda';n.setAttribute('aria-describedby',a.id+' '+error.id);l.appendChild(a)}
+    l.appendChild(error);box.appendChild(l);return n;
   }
   campo.secuencia=0;
   function resumen(box,datos){const t=totales(datos);box.textContent=t?`${R.fmt(t.all)} de ${t.r.n*t.r.c} créditos de electivas · ${t.r.lib} electivas ya liberadas según tu SAES`:'Confirma tu carrera aquí para calcular los créditos.'}
@@ -118,7 +121,9 @@
       const calculo=()=>`${c.f.cc?R.fmt(+a.ht||0)+' + '+R.fmt(+a.hp||0)+' h por semana':R.fmt(R.hoursOf(a))+' h'} = ${R.fmt(R.credOf(a))} créditos${c.f.cap?' · tope de congresos: '+c.f.cap+' h':''}`;
       const actualizar=()=>{credito.textContent=calculo();resumen(sum,d);ctx.cambiar()};
       const editar=(k,v)=>{a[k]=v;actualizar()};
-      campo(card,c.f.die?'Materia':'¿Cómo se llama tu actividad?',a.desc,v=>editar('desc',v),{validar:v=>!v.trim()?'Escribe el nombre.':c.f.noIngles&&/ingl[eé]s|english/i.test(String(v).replace(/\(\s*excepto\s+ingl[eé]s\s*\)/ig,''))?'Los cursos de inglés no cuentan porque forman parte del mapa curricular.':textoValido(v)});
+      // La categoría la asigna el catálogo y no se edita; el nombre es lo que dice la constancia y sí se puede cambiar.
+      const categoria=nodo('p',null,'tramite-categoria');categoria.appendChild(nodo('small',tx('categoria_catalogo')));categoria.appendChild(nodo('b',c.t));card.appendChild(categoria);
+      campo(card,c.f.die?'Materia':'¿Cómo se llama tu actividad?',a.desc,v=>editar('desc',v),{ayuda:c.f.die?undefined:tx('nombre_ayuda'),validar:v=>!v.trim()?'Escribe el nombre.':c.f.noIngles&&/ingl[eé]s|english/i.test(String(v).replace(/\(\s*excepto\s+ingl[eé]s\s*\)/ig,''))?'Los cursos de inglés no cuentan porque forman parte del mapa curricular.':textoValido(v)});
       if(c.f.die)optativa(card,a,ctx,actualizar);
       else if(c.f.cc){for(const [k,t] of [['ht','¿Cuántas horas teóricas por semana?'],['hp','¿Cuántas horas prácticas por semana?']])campo(card,t,a[k],v=>editar(k,v),{tipo:'number',validar:v=>v!==''&&Number.isFinite(+v)&&+v>=0?'':'Escribe un número mayor o igual a cero.'})}
       else campo(card,'¿Cuántas horas dice tu constancia?',a.h,v=>editar('h',v),{tipo:'number',validar:v=>Number.isFinite(+v)&&+v>0?'':'Escribe un número mayor que cero.'});
@@ -181,7 +186,7 @@
     }
     return PdfTramites.unir(pdfs);
   }
-  const def={id:'electivas',titulo:'Tus electivas',volver:true,datos:inicial,preparar,descargaTexto:'Descargar mi solicitud (PDF)',archivo:()=>`electivas-${identidad()?.boleta}.pdf`,generar,pasos:[
+  const def={id:'electivas',titulo:'Tus electivas',get lead(){return SATE.texto('sate.ventanilla.electivas_para')},volver:true,datos:inicial,preparar,descargaTexto:'Descargar mi solicitud (PDF)',archivo:()=>`electivas-${identidad()?.boleta}.pdf`,generar,pasos:[
     {titulo:'Tus actividades',campos:[{id:'actividades',texto:'Actividades',render:actividades,validar:validarActividades,revision:revisionActividades}]},
     {titulo:'Preguntas del formulario',campos:[{id:'formulario',texto:'Formulario',render:formulario,validar:validarFormulario,revision:revisionFormulario}]}
   ]};

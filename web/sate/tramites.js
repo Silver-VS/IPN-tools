@@ -95,55 +95,83 @@
     function pintar(){
       def.preparar?.(m.datos,m.paso);confirmado=false;
       box.replaceChildren();
+      const ultimo=m.paso===def.pasos.length,nombres=[...def.pasos.map(p=>p.titulo),def.revisarTitulo||tx('revisar')];
       if(def.volver){const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));cabeza.appendChild(regreso('tramite-volver'));box.appendChild(cabeza)}
       else box.appendChild(el('h2',def.titulo));
-      const indicador=el('p',`Paso ${m.paso+1} de ${def.pasos.length+1} · ${m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo}`,'tramite-pasos');indicador.setAttribute('aria-label',tx('pasos'));indicador.setAttribute('aria-current','step');box.appendChild(indicador);
-      const layout=el('div',null,'tramite-asistente'),pantalla=el('div',null,'tramite-pantalla');layout.appendChild(pantalla);
-      pantalla.appendChild(el('h3',m.paso===def.pasos.length?tx('revisar'):def.pasos[m.paso].titulo));
-      if(def.pasos[m.paso]?.ayuda){const ayuda=def.pasos[m.paso].ayuda;pantalla.appendChild(el('p',typeof ayuda==='function'?ayuda(m.datos):ayuda))}
-      if(m.paso===def.pasos.length){
+      const lead=typeof def.lead==='string'?def.lead:'';if(lead)box.appendChild(el('p',lead,'tramite-lead'));
+      // Los pasos ya hechos se pueden volver a abrir; el activo y los pendientes no son botones.
+      const pasos=el('ol',null,'tramite-pasos');pasos.setAttribute('aria-label',tx('pasos'));
+      nombres.forEach((nombre,i)=>{
+        const li=el('li',null,'tramite-paso'+(i<m.paso?' hecho':i===m.paso?' activo':'')),hecho=i<m.paso;
+        const cuerpo=el(hecho?'button':'span',null,'tramite-paso-ir');
+        if(hecho){cuerpo.type='button';cuerpo.onclick=()=>{m.paso=i;m.guardar();pintar()};cuerpo.setAttribute('aria-label',tx('ir_paso',{n:i+1,paso:nombre}))}
+        else if(i===m.paso)li.setAttribute('aria-current','step');
+        cuerpo.appendChild(el('span',tx('paso_n',{n:i+1}),'tramite-paso-n'));cuerpo.appendChild(el('span',nombre,'tramite-paso-t'));
+        li.appendChild(cuerpo);pasos.appendChild(li);
+      });box.appendChild(pasos);
+      const conVista=ultimo&&!!def.generar;
+      const layout=el('div',null,'tramite-asistente'+(conVista?' con-vista':'')),pantalla=el('div',null,'tramite-pantalla');layout.appendChild(pantalla);
+      const cabecera=el('header',null,'tramite-paso-cabecera');cabecera.appendChild(el('h3',nombres[m.paso]));
+      const ayuda=ultimo?(def.revisionAyuda||tx('revision_ayuda')):def.pasos[m.paso]?.ayuda;
+      if(ayuda)cabecera.appendChild(el('p',typeof ayuda==='function'?ayuda(m.datos):ayuda,'tramite-ayuda'));
+      pantalla.appendChild(cabecera);
+      // Cada paso agrupa sus campos en tarjetas; un campo con `grupo` abre una tarjeta nueva con ese título.
+      let bloque=null,rejilla=null,grupoActual;
+      const nuevoBloque=titulo=>{bloque=el('section',null,'tramite-bloque');if(titulo)bloque.appendChild(el('h4',titulo));rejilla=el('div',null,'tramite-rejilla');bloque.appendChild(rejilla);pantalla.appendChild(bloque)};
+      if(ultimo){
+        bloque=el('section',null,'tramite-bloque'+(def.imprimible?' tramite-imprimible':''));
+        if(def.imprimible)bloque.appendChild(el('p',def.titulo+' · '+new Date().toLocaleDateString('es-MX',{dateStyle:'long'}),'tramite-solo-impresion'));
         const resumen=el('dl',null,'tramite-revision');
         def.pasos.forEach((p,i)=>(p.campos||[]).filter(c=>!c.visible||c.visible(m.datos)).forEach(c=>{
           const filas=c.revision?c.revision(m.datos[c.id],m.datos):[{texto:c.texto,valor:c.resumen?c.resumen(m.datos[c.id],m.datos):String(m.datos[c.id]||tx('sin_dato'))}];
-          for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
-        }));pantalla.appendChild(resumen);
-        def.revisar?.(pantalla,m.datos);
+          for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.className+=' tramite-sin-impresion tramite-texto';b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
+        }));bloque.appendChild(resumen);pantalla.appendChild(bloque);
+        def.revisar?.(pantalla,m.datos,bloque);
         if(def.confirmacion){const l=el('label',null,'tramite-campo'),n=el('input');n.type='checkbox';n.onchange=()=>confirmado=n.checked;l.appendChild(n);l.appendChild(el('span',def.confirmacion));pantalla.appendChild(l)}
       }else for(const c of def.pasos[m.paso].campos||[]){
         if(c.visible&&!c.visible(m.datos))continue;
+        if(!bloque||c.grupo&&c.grupo!==grupoActual){grupoActual=c.grupo;nuevoBloque(c.grupo)}
         const render=c.pintar||c.render;
         if(render){
-          const grupo=el('div',null,'tramite-compuesto'),error=el('p','');
+          const grupo=el('div',null,'tramite-compuesto tramite-ancho'),error=el('p','');
           grupo.id='tramite-'+def.id+'-'+c.id;grupo.tabIndex=-1;
           error.id=grupo.id+'-error';error.setAttribute('aria-live','polite');grupo.setAttribute('aria-describedby',error.id);
           grupo.onblur=()=>{const mensaje=m.validar(c);error.textContent=mensaje;grupo.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
           render(grupo,{datos:m.datos,cambiar(valor,repintar=false){if(arguments.length)m.datos[c.id]=valor;m.listo=false;m.guardar();programar();if(repintar)pintar()},validar:()=>m.validar(c),repintar:pintar});
-          grupo.appendChild(error);pantalla.appendChild(grupo);continue;
+          grupo.appendChild(error);rejilla.appendChild(grupo);continue;
         }
-        const l=el('label',null,'tramite-campo'),n=el(c.tipo==='textarea'?'textarea':'input'),ayuda=el('small',c.ayuda||''),error=el('span','');
+        const l=el('label',null,'tramite-campo'+(c.tipo==='textarea'||c.ancho?' tramite-ancho':'')),n=el(c.tipo==='textarea'?'textarea':'input'),ayudaCampo=el('small',c.ayuda||''),error=el('span','');
         n.id='tramite-'+def.id+'-'+c.id;n.value=m.datos[c.id];if(c.tipo!=='textarea')n.type=c.tipo||'text';
-        n.required=!!c.requerido;error.id=n.id+'-error';ayuda.id=n.id+'-ayuda';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',ayuda.id+' '+error.id);
+        n.required=!!c.requerido;error.id=n.id+'-error';ayudaCampo.id=n.id+'-ayuda';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',ayudaCampo.id+' '+error.id);
         n.oninput=()=>{m.datos[c.id]=n.value;m.listo=false;programar()};
         n.onblur=()=>{m.datos[c.id]=n.value;const mensaje=m.validar(c);error.textContent=mensaje;n.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
-        l.appendChild(el('span',c.texto));l.appendChild(n);l.appendChild(ayuda);l.appendChild(error);pantalla.appendChild(l);
+        l.appendChild(el('span',c.texto));l.appendChild(n);l.appendChild(ayudaCampo);l.appendChild(error);rejilla.appendChild(l);
       }
-      const acciones=el('div',null,'tramite-acciones');if(m.paso>0)acciones.appendChild(boton(tx('atras'),()=>{m.atras();pintar()}));
-      if(m.paso<def.pasos.length)acciones.appendChild(boton(tx('continuar'),()=>{
+      // La vista previa y «Ver formato» solo en el último paso: antes se podía sacar un PDF casi vacío.
+      if(conVista){
+        const lateral=el('aside',null,'tramite-preview'),iframe=el('iframe');iframe.title=tx('vista_previa');if(url)iframe.src=url;lateral.appendChild(iframe);layout.appendChild(lateral);
+        const fila=el('div',null,'tramite-ver-fila'),ver=boton(tx('ver_formato'),()=>{if(url)window.open(url,'_blank','noopener')});ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;
+        fila.appendChild(ver);fila.appendChild(el('small',tx('ver_formato_ayuda')));pantalla.appendChild(fila);
+        programar();
+      }
+      if(def.generar&&def.faltante){const falta=el('p','',  'tramite-falta');falta.setAttribute('data-pdf-falta','');falta.setAttribute('role','status');pantalla.appendChild(falta)}
+      const aviso=el('p','');aviso.setAttribute('data-pdf-estado','');aviso.setAttribute('role','status');pantalla.appendChild(aviso);
+      const acciones=el('div',null,'tramite-acciones');acciones.appendChild(el('span',tx('guardado'),'tramite-guardado'));
+      if(m.paso>0)acciones.appendChild(boton(tx('atras'),()=>{m.atras();pintar()}));
+      const primario=b=>{b.className+=' sate-btn--primario';acciones.appendChild(b);return b};
+      if(m.paso<def.pasos.length)primario(boton(tx('continuar'),()=>{
         // Validar también al continuar; la escritura por sí sola no muestra errores.
         for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);if(n){if(!c.pintar&&!c.render)m.datos[c.id]=n.value;n.onblur()}}
         if(m.avanzar())pintar();else{aviso.textContent=(def.pasos[m.paso].campos||[]).map(m.validar).filter(Boolean).join(' ');box.querySelector('[aria-invalid="true"]')?.focus()}
       }));
-      else if(def.generar){const b=boton(def.descargaTexto||tx('descargar'),descargar);b.setAttribute('data-descargar','');acciones.appendChild(b)}
-      else if(def.alTerminar)acciones.appendChild(boton(tx('confirmar'),()=>{if(!m.campos.some(c=>m.validar(c))){m.listo=true;m.guardar();def.alTerminar(m.datos)}}));
+      else if(def.generar){const b=primario(boton(def.descargaTexto||tx('descargar'),descargar));b.setAttribute('data-descargar','')}
+      else if(def.alTerminar)primario(boton(def.terminarTexto||tx('confirmar'),()=>{
+        // Si falta algo (p. ej. un dato sensible que no sobrevivió a la recarga), se vuelve al paso que lo pide.
+        const invalidos=m.campos.filter(c=>m.validar(c));
+        if(invalidos.length){m.cambiar(Math.max(0,def.pasos.findIndex(p=>(p.campos||[]).includes(invalidos[0]))));pintar();return}
+        m.listo=true;m.guardar();def.alTerminar(m.datos);
+      }));
       pantalla.appendChild(acciones);
-      const aviso=el('p','');aviso.setAttribute('data-pdf-estado','');aviso.setAttribute('role','status');pantalla.appendChild(aviso);
-      // La vista previa y «Ver formato» solo en el último paso: antes se podía sacar un PDF casi vacío.
-      if(def.generar&&m.paso>=def.pasos.length){
-        const lateral=el('aside',null,'tramite-preview'),iframe=el('iframe');iframe.title=tx('vista_previa');if(url)iframe.src=url;lateral.appendChild(iframe);layout.appendChild(lateral);
-        const ver=boton(tx('ver_formato'),()=>{if(url)window.open(url,'_blank','noopener')});ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;pantalla.appendChild(ver);
-        programar();
-      }
-      if(def.generar&&def.faltante){const falta=el('p','',  'tramite-falta');falta.setAttribute('data-pdf-falta','');falta.setAttribute('role','status');pantalla.appendChild(falta)}
       box.appendChild(layout);if(def.generar)estadoFalta();
       if(def.volver){const pie=el('div',null,'tramite-pie');pie.appendChild(regreso('tramite-volver-pie'));box.appendChild(pie)}
     }
@@ -160,7 +188,7 @@
   function alumnoActual(){return window.SATE?.alumno?SATE.alumno():(()=>{try{return JSON.parse((window.IPNT?.almacen||localStorage).getItem('saes.alumno')||'null')}catch{return null}})()}
   function formularioDatos(box,datos,campos,volver,{nombre=false}={}){
     const form=el('form',null,'tramite-datos'),controles={};form.noValidate=true;
-    if(nombre)form.appendChild(el('h3','¿Así se escribe tu nombre?'));
+    if(nombre)form.appendChild(el('h3',tx('nombre_titulo')));
     for(const k of campos){
       const l=el('label',null,'tramite-campo'),n=el('input');n.name=k;n.value=datos[k]||'';n.type=k==='correo'?'email':['celular','telefono'].includes(k)?'tel':'text';if(k==='boleta')n.inputMode='numeric';
       n.required=['paterno','nombres','boleta','carrera','plan','correo'].includes(k);n.id='tramite-datos-'+k;n.readOnly=nombre;
@@ -170,8 +198,8 @@
     }
     form.appendChild(el('p',tx('apellidos_aviso'),'tramite-apellidos-aviso'));
     const acciones=el('div',null,'tramite-acciones');
-    if(nombre)acciones.appendChild(boton('Corregir',()=>{for(const n of Object.values(controles))n.readOnly=false;controles.paterno.focus()}));
-    const confirmar=el('button',nombre?'Sí, guardar':'Guardar','sate-btn');confirmar.type='submit';acciones.appendChild(confirmar);form.appendChild(acciones);
+    if(nombre)acciones.appendChild(boton(tx('corregir_nombre'),()=>{for(const n of Object.values(controles))n.readOnly=false;controles.paterno.focus()}));
+    const confirmar=el('button',tx(nombre?'si_guardar':'guardar'),'sate-btn sate-btn--primario');confirmar.type='submit';acciones.appendChild(confirmar);form.appendChild(acciones);
     form.onsubmit=e=>{e.preventDefault();for(const n of Object.values(controles))n.onblur();const mal=Object.values(controles).find(n=>n.getAttribute('aria-invalid')==='true');if(mal){mal.readOnly=false;mal.focus();return}
       guardarDatos({...datos,...Object.fromEntries(campos.map(k=>[k,controles[k].value.trim()]))});volver();
     };
@@ -193,7 +221,7 @@
     const resumen=el('p',null,'tramite-identidad');resumen.appendChild(el('span',[[d.nombres,d.paterno,d.materno].filter(Boolean).join(' '),d.boleta,d.carrera].filter(Boolean).join(' · ')));
     const editor=el('div');
     const editar=()=>misDatos(editor,()=>{box.replaceChildren();datosInline(box,alGuardar,contacto);alGuardar?.()},contacto);
-    resumen.appendChild(boton('Editar',editar));box.appendChild(resumen);box.appendChild(editor);
+    resumen.appendChild(boton(tx('editar'),editar));box.appendChild(resumen);box.appendChild(editor);
     if(contacto.some(k=>!(k in d))||['paterno','nombres','boleta','carrera','plan','correo'].some(k=>validarDatos(k,d[k]||'',true)))editar();
   }
   function validarDatos(k,v,requerido=false){
@@ -204,44 +232,66 @@
   }
   const definiciones=new Map();let activo;
   function mostrarLista(box){
-    box.replaceChildren();box.appendChild(el('h2',tx('titulo')));box.appendChild(el('p',tx('guardado_ayuda')));
+    box.replaceChildren();box.appendChild(el('h2',tx('titulo')));box.appendChild(el('p',tx('guardado_ayuda'),'tramite-lead'));
     if(!SATE_CONFIG.unidades[SATE_UNIDAD].tramites.length){box.replaceChildren(el('h2',tx('titulo')),el('p',tx('sin_tramites')));return}
-    const lista=el('div',null,'tramite-lista');
+    // Lo que ya tiene avance o está terminado va primero; lo demás queda como disponible.
+    const grupos={curso:[],disponibles:[]};
     for(const id of SATE_CONFIG.unidades[SATE_UNIDAD].tramites){
-      const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica),tarjeta=el('section',null,'tramite-tarjeta');
-      tarjeta.appendChild(el('h3',SATE.texto('sate.tramite.'+id+'.titulo')));tarjeta.appendChild(el('p',tx(id+'_para')));
-      tarjeta.appendChild(el('p',tx('estado_'+e.id)+(e.id==='progreso'?' · '+tx('avance',e):e.motivo?' · '+e.motivo:'')));
-      if(aplica?.aplica){const n=el('p',tx('te_aplica')+' · '+aplica.motivo);tarjeta.appendChild(n)}
-      if(e.accion){
-        const accion=boton(tx(e.accion),async()=>{
-          const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada;
-          if(e.accion!=='descargar'||!def?.generar){SATE.ir('tramites/'+id);return}
-          if(!await confirmarDescarga())return;
-          accion.disabled=true;
-          try{
-            const m=modelo(def);
-            await def.preparar?.(m.datos,m.paso);
-            if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
-            bajar(await def.generar({...m.datos}),typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||id+'.pdf');
+      const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica);
+      grupos[e.id==='progreso'||e.id==='listo'?'curso':'disponibles'].push({id,aplica,e});
+    }
+    const clases={listo:'ok',progreso:'curso',no_aplica:'',no_iniciado:''};
+    for(const [clave,filas] of Object.entries(grupos)){
+      if(!filas.length)continue;
+      const grupo=el('section',null,'tramite-grupo'),rotulo=el('h3',tx('grupo_'+clave),'tramite-grupo-rotulo'),lista=el('ul',null,'tramite-filas');
+      rotulo.id='tramite-grupo-'+clave;lista.setAttribute('aria-labelledby',rotulo.id);grupo.appendChild(rotulo);
+      for(const {id,aplica,e} of filas){
+        const fila=el('li',null,'tramite-fila'),texto=el('div',null,'tramite-fila-texto');
+        texto.appendChild(el('h4',SATE.texto('sate.tramite.'+id+'.titulo')));texto.appendChild(el('p',tx(id+'_para'),'tramite-fila-para'));
+        const meta=e.id==='progreso'?tx('avance',e):e.motivo?e.motivo:'';
+        if(meta)texto.appendChild(el('p',meta,'tramite-fila-meta'));
+        if(aplica?.aplica)texto.appendChild(el('p',tx('te_aplica')+' · '+aplica.motivo,'tramite-fila-meta tramite-aplica'));
+        const aviso=el('p','','tramite-fila-meta');aviso.setAttribute('role','status');texto.appendChild(aviso);
+        fila.appendChild(texto);
+        fila.appendChild(el('span',tx('estado_'+e.id),'tramite-estado'+(clases[e.id]?' '+clases[e.id]:'')));
+        const lateral=el('div',null,'tramite-fila-acciones');
+        if(e.accion){
+          const entrada0=definiciones.get(id);
+          // Un trámite sin PDF (bajas) se termina con un resumen imprimible: no hay nada que descargar.
+          const sinPdf=!!entrada0&&(entrada0.sinPdf||typeof entrada0!=='function'&&!entrada0.generar);
+          const verbo=e.accion==='descargar'&&sinPdf?'ver_resumen':e.accion;
+          const accion=boton(tx(verbo),async()=>{
+            const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada;
+            if(e.accion!=='descargar'||!def?.generar){SATE.ir('tramites/'+id);return}
+            if(!await confirmarDescarga())return;
+            accion.disabled=true;
+            try{
+              const m=modelo(def);
+              await def.preparar?.(m.datos,m.paso);
+              if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
+              bajar(await def.generar({...m.datos}),typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||id+'.pdf');
+            }
+            catch(error){console.error('Ventanilla: descarga guardada fallida',{tramite:id,error:error.name});aviso.textContent=tx('pdf_error')}
+            finally{accion.disabled=false}
+          });
+          accion.setAttribute('aria-label',tx('accion_aria',{accion:tx(verbo),tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));
+          if(e.id==='progreso')accion.className+=' sate-btn--primario';
+          lateral.appendChild(accion);
+          // Un trámite terminado se puede revisar (vuelve al asistente) o reiniciar.
+          if(e.id==='listo'){
+            const extra=el('div',null,'tramite-acciones-extra');
+            for(const [texto0,hacer] of [[tx('corregir'),()=>SATE.ir('tramites/'+id)],[tx('reiniciar'),()=>{
+              if(!confirm(tx('reiniciar_confirmar')))return;
+              const k='hu.tramite.'+id;try{IPNT.borrar?.(k);(IPNT.almacen||localStorage).removeItem(k)}catch(err){}
+              completados.delete(id);mostrarLista(box);
+            }]]){const b=boton(texto0,hacer);b.className+=' tramite-texto';b.setAttribute('aria-label',texto0+': '+SATE.texto('sate.tramite.'+id+'.titulo'));extra.appendChild(b)}
+            lateral.appendChild(extra);
           }
-          catch(error){console.error('Ventanilla: descarga guardada fallida',{tramite:id,error:error.name});aviso.textContent=tx('pdf_error')}
-          finally{accion.disabled=false}
-        });
-        const aviso=el('p','');aviso.setAttribute('role','status');tarjeta.appendChild(accion);tarjeta.appendChild(aviso);
-        // Un trámite terminado se puede revisar (vuelve al asistente) o reiniciar; antes solo se podía descargar.
-        if(e.id==='listo'){
-          const fila=el('div',null,'tramite-acciones-extra');
-          fila.appendChild(boton(tx('corregir'),()=>SATE.ir('tramites/'+id)));
-          fila.appendChild(boton(tx('reiniciar'),()=>{
-            if(!confirm(tx('reiniciar_confirmar')))return;
-            const k='hu.tramite.'+id;try{IPNT.borrar?.(k);(IPNT.almacen||localStorage).removeItem(k)}catch(err){}
-            completados.delete(id);mostrarLista(box);
-          }));
-          tarjeta.appendChild(fila);
         }
+        fila.appendChild(lateral);lista.appendChild(fila);
       }
-      lista.appendChild(tarjeta);
-    }box.appendChild(lista);
+      grupo.appendChild(lista);box.appendChild(grupo);
+    }
   }
   function mostrar(r){return globalThis.SateMedicion?globalThis.SateMedicion.render('ventanilla',()=>mostrarVista(r)):mostrarVista(r)}
   function mostrarVista(r){

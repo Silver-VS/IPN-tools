@@ -1,0 +1,7 @@
+{
+  "_fuente": "Formatos oficiales de baja que publica la Gestión Escolar de la UPIITA. Un solo dato: si cambia el nombre del archivo o el año, se ajusta aquí y nada más. SATE solo enlaza el formato, no lo descarga ni lo copia.",
+  "base": "https://www.upiita.ipn.mx/adjuntos/gestion_escolar/2026/",
+  "temporal": "BAJA TEMPORAL 26-2_2.pdf",
+  "definitiva": "BAJA DEFINITIVA_2.pdf",
+  "_pendiente": "Los textos de requisitos y plazos de contenido/textos/es.toml ([sate.baja]) están pendientes de contrastar con el reglamento vigente."
+}
