@@ -305,6 +305,9 @@
   }
   // Logo de la unidad, hasta la derecha: el oficial de la unidad si lo hay; si no, el del catálogo SAES con su halo.
   const ranura = document.getElementById('sate-logo-unidad');
+  // Nombre de la unidad a la izquierda de su logo, pequeño, hasta 2 líneas (dato de identidad, nunca un literal).
+  const nombreUnidad = document.getElementById('sate-unidad-nombre');
+  nombreUnidad.textContent = cfg.nombre; nombreUnidad.title = cfg.nombre;
   if (cfg.logo) {
     const enlace = document.createElement('a'); enlace.className = 'unit'; enlace.href = cfg.logo.enlace;
     for (const [tema, clase] of [['claro','logo-lt'],['oscuro','logo-dk']]) {

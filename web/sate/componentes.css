@@ -727,6 +727,9 @@ body.sate-flotante .sate-barra{display:flex}
 .sate-logo-slot{display:inline-flex;align-items:center;justify-content:flex-end;min-height:var(--sate-logo-unidad-alto)}
 .sate-logo-slot img{height:var(--sate-logo-unidad-alto);max-height:none;width:auto;padding:0;display:block}
 .sate-logo-slot img[hidden]{display:none}
+/* Nombre de la unidad a la izquierda del logo: pequeño, alineado a la derecha, máximo 2 líneas balanceadas y centrado con el logo. */
+.sate-unidad-nombre{max-width:15rem;margin-right:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs);line-height:1.25;text-align:right;text-wrap:balance;color:var(--ipn-tenue);display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+.sate-unidad-nombre:empty{display:none}
 /* Identidad: «SATE {unidad}» y nombre completo; la leyenda de prueba va a la derecha del título o debajo del nombre. */
 .wrap>header.top>.brand{grid-area:marca;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"t l" "n n";align-items:center;gap:var(--ipn-esp-1) var(--ipn-esp-3)}
 .sate-identidad{display:contents}
@@ -775,6 +778,7 @@ body.sate-flotante .sate-barra{display:flex}
   .wrap>header.top{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ipn marca unidad" "acciones acciones acciones" "avisos avisos avisos" "nav nav nav";margin-top:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-3) 0;column-gap:var(--ipn-esp-2);row-gap:var(--ipn-esp-2)}
   .sate-lado{display:contents}
   .sate-logo-slot{grid-area:unidad;align-self:center}
+  .sate-unidad-nombre{display:none}
   .header-actions{grid-area:acciones;justify-self:end}
   .brand h1#sate-titulo{font-size:1.3rem}
   /* Compacto: «SATE UPIITA» y la insignia de prueba en la misma fila; sin nombre largo. */
