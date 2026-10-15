@@ -1,0 +1,427 @@
+{
+ "upiita_saes": 1,
+ "unidad": "upiita",
+ "materias": {
+  "T101": [
+   "PROGRAMACION",
+   1
+  ],
+  "T102": [
+   "ANALISIS Y DISEÑO DE SISTEMAS",
+   1
+  ],
+  "T103": [
+   "ESTRUCTURA DE DATOS",
+   1
+  ],
+  "T104": [
+   "ADMINISTRACION DE SISTEMAS OPERATIVOS",
+   1
+  ],
+  "T105": [
+   "DISEÑO DIGITAL",
+   1
+  ],
+  "T106": [
+   "ARQUITECTURA DE COMPUTADORAS",
+   1
+  ],
+  "T107": [
+   "FUNDAMENTOS DE FISICA",
+   1
+  ],
+  "T108": [
+   "ECUACIONES DIFERENCIALES",
+   1
+  ],
+  "T109": [
+   "PROBABILIDAD",
+   1
+  ],
+  "T110": [
+   "CALCULO DIFERENCIAL E INTEGRAL",
+   1
+  ],
+  "T111": [
+   "VARIABLE COMPLEJA",
+   1
+  ],
+  "T112": [
+   "ALGEBRA LINEAL",
+   1
+  ],
+  "T113": [
+   "ELECTROMAGNETISMO",
+   1
+  ],
+  "T114": [
+   "CALCULO MULTIVARIABLE",
+   1
+  ],
+  "T115": [
+   "ADMINISTRACION ORGANIZACIONAL",
+   1
+  ],
+  "T116": [
+   "ETICA, PROFESION Y SOCIEDAD",
+   1
+  ],
+  "T117": [
+   "COMUNICACION ORAL Y ESCRITA",
+   1
+  ],
+  "T118": [
+   "INGLES I",
+   1
+  ],
+  "T119": [
+   "INGLES II",
+   1
+  ],
+  "T120": [
+   "PROGRAMACION ESTRUCTURADA",
+   1
+  ],
+  "T201": [
+   "SEÑALES Y SISTEMAS",
+   2
+  ],
+  "T202": [
+   "PROPAGACION DE ONDAS ELECTROMAGNETICAS",
+   2
+  ],
+  "T203": [
+   "ELECTRONICA",
+   2
+  ],
+  "T204": [
+   "TEORIA DE LOS CIRCUITOS",
+   2
+  ],
+  "T205": [
+   "TEORIA DE LA INFORMACION",
+   2
+  ],
+  "T206": [
+   "TEORIA DE LAS COMUNICACIONES",
+   2
+  ],
+  "T207": [
+   "COMUNICACIONES DIGITALES",
+   2
+  ],
+  "T208": [
+   "PROCESAMIENTO DIGITAL DE SEÑALES",
+   2
+  ],
+  "T216": [
+   "TRANSMISION DE DATOS",
+   2
+  ],
+  "T217": [
+   "INFORMACION FINANCIERA E INGENIERIA ECONOMICA",
+   2
+  ],
+  "T219": [
+   "INGLES III",
+   2
+  ],
+  "T302": [
+   "LINEAS DE TRANSMISION Y ANTENAS",
+   3
+  ],
+  "T307": [
+   "ADMINISTRACION DE PROYECTOS",
+   3
+  ],
+  "T308": [
+   "LIDERAZGO Y EMPRENDEDORES",
+   3
+  ]
+ },
+ "leido": "2026-10-14T18:00:00.000Z",
+ "boleta": "2099000103",
+ "nombre": "ALUMNA FICTICIA ADEUDO PRUEBA",
+ "carrera": "T",
+ "carrera_nombre": "INGENIERIA TELEMATICA",
+ "plan": "09",
+ "promedio": 7.61,
+ "reprobadas_num": 2,
+ "cita": {
+  "inicio": "20/10/2026 12:00:00 a. m.",
+  "fin": "21/10/2026 12:00:00 a. m."
+ },
+ "carga": {
+  "total": 390.5,
+  "min": 27,
+  "media": 40,
+  "max": 80,
+  "duracion": 10,
+  "duracion_max": 15
+ },
+ "avance": {
+  "obtenidos": 184.5,
+  "faltan": 206.0,
+  "cursados": 6,
+  "autorizada": "MEDIA-REPROBADAS = 40.00 - 13.50 CREDITOS"
+ },
+ "reprobadas": [
+  [
+   "ESTRUCTURA DE DATOS",
+   6.0
+  ],
+  [
+   "ELECTRONICA",
+   7.5
+  ]
+ ],
+ "desfase_saes": "No tienes materias reprobadas de mas de 2 periodos anteriores",
+ "reprobadas_periodo": [
+  [
+   "T103",
+   "20261",
+   1
+  ],
+  [
+   "T203",
+   "20261",
+   1
+  ]
+ ],
+ "no_cursadas": [],
+ "desfasadas_saes": [],
+ "en_curso": [
+  "T106",
+  "T207",
+  "T216",
+  "T219",
+  "T302",
+  "T307"
+ ],
+ "horario_inscrito": [],
+ "acreditadas": [
+  [
+   "T102",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T104",
+   8,
+   "24/1",
+   "ETS"
+  ],
+  [
+   "T110",
+   10,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "T112",
+   7,
+   "24/1",
+   "EXT"
+  ],
+  [
+   "T107",
+   7,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T108",
+   8,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T111",
+   9,
+   "24/2",
+   "ETS"
+  ],
+  [
+   "T114",
+   8,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T115",
+   8,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "T116",
+   7,
+   "24/2",
+   "EXT"
+  ],
+  [
+   "T109",
+   10,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T113",
+   9,
+   "25/1",
+   "EXT"
+  ],
+  [
+   "T117",
+   9,
+   "25/1",
+   "ETS"
+  ],
+  [
+   "T118",
+   10,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T120",
+   7,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T201",
+   10,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "T101",
+   7,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T119",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T202",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T204",
+   10,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T206",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T217",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T308",
+   7,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "T105",
+   7,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "T205",
+   6,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "T208",
+   7,
+   "26/1",
+   "EXT"
+  ]
+ ],
+ "creditos_materias": {
+  "T101": 6.0,
+  "T102": 9.0,
+  "T103": 6.0,
+  "T104": 6.0,
+  "T105": 6.0,
+  "T106": 7.5,
+  "T107": 6.0,
+  "T108": 9.0,
+  "T109": 9.0,
+  "T110": 10.5,
+  "T111": 6.0,
+  "T112": 12.0,
+  "T113": 9.0,
+  "T114": 10.5,
+  "T115": 4.5,
+  "T116": 4.5,
+  "T117": 6.0,
+  "T118": 3.0,
+  "T119": 3.0,
+  "T120": 7.5,
+  "T201": 7.5,
+  "T202": 7.5,
+  "T203": 7.5,
+  "T204": 7.5,
+  "T205": 7.5,
+  "T206": 7.5,
+  "T207": 7.5,
+  "T208": 10.5,
+  "T216": 7.5,
+  "T217": 4.5,
+  "T219": 3.0,
+  "T302": 7.5,
+  "T307": 6.0,
+  "T308": 4.5
+ },
+ "kardex_reprobadas": [
+  [
+   "T103",
+   0,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "T203",
+   3,
+   "26/1",
+   "ORD"
+  ]
+ ],
+ "agenda": [
+  [
+   "INICIO DE SEMESTRE 26-2",
+   "2026-08-24",
+   "2026-12-18"
+  ],
+  [
+   "INICIO DE SEMESTRE 27-1",
+   "2027-01-25",
+   "2027-06-04"
+  ]
+ ],
+ "lector": "perfil-prueba",
+ "perfil_prueba": {
+  "id": "adeuda-telematica",
+  "caso": 3
+ }
+}

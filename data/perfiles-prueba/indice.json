@@ -1,0 +1,98 @@
+{
+ "aviso": "Perfiles ficticios para guías, manuales y demostraciones. Generados por tools/perfiles_prueba.py; no editar a mano.",
+ "semilla": 2026,
+ "formato": "saes.alumno (tools/lector_saes.js)",
+ "unidad": "upiita",
+ "perfiles": [
+  {
+   "id": "primer-ingreso-bionica",
+   "caso": 1,
+   "titulo": "Primer ingreso",
+   "carrera": "B",
+   "carrera_nombre": "INGENIERIA BIONICA",
+   "plan": "09",
+   "demuestra": "Sin kárdex ni materias acreditadas: cursa el primer periodo y SATE debe orientar sin historial.",
+   "archivo": "primer-ingreso-bionica.json"
+  },
+  {
+   "id": "regular-mecatronica",
+   "caso": 2,
+   "titulo": "Regular a mitad de carrera",
+   "carrera": "M",
+   "carrera_nombre": "INGENIERIA MECATRONICA",
+   "plan": "09",
+   "demuestra": "Cinco periodos aprobados sin adeudos, seriación respetada y el siguiente periodo en curso.",
+   "archivo": "regular-mecatronica.json"
+  },
+  {
+   "id": "adeuda-telematica",
+   "caso": 3,
+   "titulo": "Adeuda materias sin recursar",
+   "carrera": "T",
+   "carrera_nombre": "INGENIERIA TELEMATICA",
+   "plan": "09",
+   "demuestra": "Dos reprobadas del último periodo que aún no se recursan: retienen créditos y limitan la carga.",
+   "archivo": "adeuda-telematica.json"
+  },
+  {
+   "id": "desfase-dictamen-bionica",
+   "caso": 4,
+   "titulo": "En desfase: necesita dictamen",
+   "carrera": "B",
+   "carrera_nombre": "INGENIERIA BIONICA",
+   "plan": "09",
+   "demuestra": "Una reprobada de hace más de 3 periodos y otra con dos intentos: ambas exigen dictamen.",
+   "archivo": "desfase-dictamen-bionica.json"
+  },
+  {
+   "id": "electivas-por-liberar-bionica",
+   "caso": 5,
+   "titulo": "Electivas por liberar",
+   "carrera": "B",
+   "carrera_nombre": "INGENIERIA BIONICA",
+   "plan": "09",
+   "demuestra": "Dos de cuatro electivas liberadas: faltan créditos de electivas y el trámite de acreditación.",
+   "archivo": "electivas-por-liberar-bionica.json"
+  },
+  {
+   "id": "electivas-liberadas-mecatronica",
+   "caso": 6,
+   "titulo": "Electivas ya liberadas",
+   "carrera": "M",
+   "carrera_nombre": "INGENIERIA MECATRONICA",
+   "plan": "09",
+   "demuestra": "Las tres electivas del plan ya liberadas: no debe ofrecerse de nuevo el trámite.",
+   "archivo": "electivas-liberadas-mecatronica.json"
+  },
+  {
+   "id": "por-egresar-telematica",
+   "caso": 7,
+   "titulo": "A punto de egresar",
+   "carrera": "T",
+   "carrera_nombre": "INGENIERIA TELEMATICA",
+   "plan": "09",
+   "demuestra": "Casi todo acreditado: al plan le faltan a lo más dos periodos (trabajo terminal y cierre).",
+   "archivo": "por-egresar-telematica.json"
+  },
+  {
+   "id": "cambio-carrera-mecatronica",
+   "caso": 8,
+   "titulo": "Cambio de carrera interno con revalidaciones",
+   "carrera": "M",
+   "carrera_nombre": "INGENIERIA MECATRONICA",
+   "plan": "09",
+   "demuestra": "Viene de Bionica: materias comunes revalidadas (EQV) y avance menor al tiempo cursado.",
+   "archivo": "cambio-carrera-mecatronica.json"
+  },
+  {
+   "id": "baja-temporal-bionica",
+   "caso": 9,
+   "titulo": "Baja temporal previa",
+   "carrera": "B",
+   "carrera_nombre": "INGENIERIA BIONICA",
+   "plan": "09",
+   "demuestra": "Dos periodos sin cursar entre su primer tramo y su regreso: hueco en el historial.",
+   "archivo": "baja-temporal-bionica.json"
+  }
+ ]
+}

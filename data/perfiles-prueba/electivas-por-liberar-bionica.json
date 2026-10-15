@@ -1,0 +1,598 @@
+{
+ "upiita_saes": 1,
+ "unidad": "upiita",
+ "materias": {
+  "B101": [
+   "BIOLOGIA CELULAR",
+   1
+  ],
+  "B102": [
+   "QUIMICA ORGANICA",
+   1
+  ],
+  "B103": [
+   "ALGEBRA LINEAL",
+   1
+  ],
+  "B104": [
+   "CALCULO DIFERENCIAL E INTEGRAL",
+   1
+  ],
+  "B105": [
+   "CALCULO VECTORIAL",
+   1
+  ],
+  "B106": [
+   "FUNDAMENTOS DE FISICA PARA LA INGENIERIA",
+   1
+  ],
+  "B107": [
+   "FUNDAMENTOS DE TEORIA ELECTROMAGNETICA",
+   1
+  ],
+  "B108": [
+   "BIOESTADISTICA",
+   1
+  ],
+  "B109": [
+   "METROLOGIA",
+   1
+  ],
+  "B110": [
+   "PROGRAMACION ORIENTADA A OBJETOS",
+   1
+  ],
+  "B111": [
+   "ANATOMIA",
+   1
+  ],
+  "B112": [
+   "HERRAMIENTAS COMPUTACIONALES",
+   1
+  ],
+  "B113": [
+   "ELECTIVA I",
+   1
+  ],
+  "B114": [
+   "BIOETICA",
+   1
+  ],
+  "B115": [
+   "DESARROLLO SOSTENIBLE",
+   1
+  ],
+  "B116": [
+   "INGLES I",
+   1
+  ],
+  "B201": [
+   "ECUACIONES DIFERENCIALES",
+   2
+  ],
+  "B202": [
+   "FUNDAMENTOS MATEMATICOS DE INGENIERIA",
+   2
+  ],
+  "B203": [
+   "ONDAS ELECTROMAGNETICAS Y SISTEMAS RADIANTES",
+   2
+  ],
+  "B204": [
+   "FISICA MODERNA Y OPTICA",
+   2
+  ],
+  "B205": [
+   "FISICOQUIMICA",
+   2
+  ],
+  "B206": [
+   "BIOQUIMICA",
+   2
+  ],
+  "B207": [
+   "TEORIA DE LOS CIRCUITOS",
+   2
+  ],
+  "B208": [
+   "FISIOLOGIA",
+   2
+  ],
+  "B209": [
+   "BIOFISICA",
+   2
+  ],
+  "B210": [
+   "BIOLOGIA MOLECULAR",
+   2
+  ],
+  "B211": [
+   "INVESTIGACION Y DESARROLLO DE PROYECTOS",
+   2
+  ],
+  "B212": [
+   "SISTEMAS DE GESTION DE CALIDAD",
+   2
+  ],
+  "B213": [
+   "BIOGNOSIS",
+   2
+  ],
+  "B214": [
+   "ELECTIVA II",
+   2
+  ],
+  "B215": [
+   "LIDERAZGO Y EMPRENDEDORES",
+   2
+  ],
+  "B216": [
+   "INGLES II",
+   2
+  ],
+  "B301": [
+   "ANALISIS NUMERICO",
+   3
+  ],
+  "B302": [
+   "DISPOSITIVOS ELECTRONICOS",
+   3
+  ],
+  "B303": [
+   "ELECTRONICA DIGITAL",
+   3
+  ],
+  "B304": [
+   "TEORIA DEL CONTROL",
+   3
+  ],
+  "B305": [
+   "BIOMATERIALES",
+   3
+  ],
+  "B308": [
+   "INGLES III",
+   3
+  ],
+  "B309": [
+   "ELECTRONICA ANALOGICA Y DE POTENCIA",
+   3
+  ],
+  "B310": [
+   "PROCESAMIENTO DE IMAGENES",
+   3
+  ],
+  "B311": [
+   "BIOMAGNETISMO",
+   3
+  ],
+  "B312": [
+   "MECANISMOS BIOMIMETICOS",
+   3
+  ],
+  "B313": [
+   "BIOINSTRUMENTACION",
+   3
+  ],
+  "B314": [
+   "PROCESAMIENTO DE SEÑALES BIOLOGICAS",
+   3
+  ],
+  "B315": [
+   "SENSORES Y ACTUADORES",
+   3
+  ],
+  "B316": [
+   "CONTROL DE SISTEMAS BIOLOGICOS",
+   3
+  ],
+  "B402": [
+   "DISPOSITIVOS PROGRAMABLES",
+   4
+  ],
+  "B403": [
+   "ANALISIS DE ESFUERZOS",
+   4
+  ],
+  "B404": [
+   "MANUFACTURA DE ELEMENTOS BIOMIMETICOS",
+   4
+  ],
+  "B406": [
+   "NORMATIVIDAD Y GESTION TECNOLOGICA",
+   4
+  ],
+  "B407": [
+   "INSTRUMENTACION BIOTECNOLOGICA",
+   4
+  ]
+ },
+ "leido": "2026-10-14T18:00:00.000Z",
+ "boleta": "2099000105",
+ "nombre": "ALUMNA FICTICIA ELECTIVAS PRUEBA",
+ "carrera": "B",
+ "carrera_nombre": "INGENIERIA BIONICA",
+ "plan": "09",
+ "promedio": 8.2,
+ "reprobadas_num": 0,
+ "cita": {
+  "inicio": "21/10/2026 11:00:00 a. m.",
+  "fin": "22/10/2026 11:00:00 a. m."
+ },
+ "carga": {
+  "total": 399.5,
+  "min": 27,
+  "media": 40,
+  "max": 80,
+  "duracion": 10,
+  "duracion_max": 15
+ },
+ "avance": {
+  "obtenidos": 295.0,
+  "faltan": 104.5,
+  "cursados": 8,
+  "autorizada": "MAXIMA (80.00 CREDITOS)"
+ },
+ "reprobadas": [],
+ "desfase_saes": "No tienes materias reprobadas de mas de 2 periodos anteriores",
+ "reprobadas_periodo": [],
+ "no_cursadas": [],
+ "desfasadas_saes": [],
+ "en_curso": [
+  "B304",
+  "B313",
+  "B314",
+  "B402",
+  "B404"
+ ],
+ "horario_inscrito": [],
+ "acreditadas": [
+  [
+   "B101",
+   9,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "B102",
+   8,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "B103",
+   7,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "B104",
+   8,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "B109",
+   9,
+   "23/1",
+   "ORD"
+  ],
+  [
+   "B105",
+   9,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B106",
+   7,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B108",
+   7,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B111",
+   7,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B112",
+   10,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B113",
+   6,
+   "23/2",
+   "ORD"
+  ],
+  [
+   "B107",
+   9,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B110",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B114",
+   7,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B115",
+   8,
+   "24/1",
+   "EXT"
+  ],
+  [
+   "B116",
+   9,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B201",
+   9,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B202",
+   10,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B316",
+   8,
+   "24/1",
+   "ORD"
+  ],
+  [
+   "B203",
+   10,
+   "24/2",
+   "ETS"
+  ],
+  [
+   "B204",
+   8,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "B205",
+   8,
+   "24/2",
+   "EXT"
+  ],
+  [
+   "B207",
+   10,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "B210",
+   7,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "B407",
+   8,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "B214",
+   9,
+   "24/2",
+   "ORD"
+  ],
+  [
+   "B206",
+   8,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B208",
+   10,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B211",
+   8,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B212",
+   7,
+   "25/1",
+   "EXT"
+  ],
+  [
+   "B215",
+   9,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B216",
+   7,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B301",
+   9,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B302",
+   7,
+   "25/1",
+   "ORD"
+  ],
+  [
+   "B209",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B213",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B308",
+   10,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B309",
+   8,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B310",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B315",
+   9,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B403",
+   6,
+   "25/2",
+   "ORD"
+  ],
+  [
+   "B303",
+   10,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B305",
+   6,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B311",
+   8,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B312",
+   6,
+   "26/1",
+   "ORD"
+  ],
+  [
+   "B406",
+   9,
+   "26/1",
+   "ORD"
+  ]
+ ],
+ "creditos_materias": {
+  "B101": 7.5,
+  "B102": 7.5,
+  "B103": 7.5,
+  "B104": 9.0,
+  "B105": 9.0,
+  "B106": 9.0,
+  "B107": 9.0,
+  "B108": 9.0,
+  "B109": 6.0,
+  "B110": 6.0,
+  "B111": 7.5,
+  "B112": 6.0,
+  "B113": 5.0,
+  "B114": 4.5,
+  "B115": 6.0,
+  "B116": 3.0,
+  "B201": 7.5,
+  "B202": 4.5,
+  "B203": 7.5,
+  "B204": 7.5,
+  "B205": 6.0,
+  "B206": 6.0,
+  "B207": 9.0,
+  "B208": 4.5,
+  "B209": 6.0,
+  "B210": 7.5,
+  "B211": 4.5,
+  "B212": 4.5,
+  "B213": 7.5,
+  "B214": 5.0,
+  "B215": 4.5,
+  "B216": 3.0,
+  "B301": 9.0,
+  "B302": 6.0,
+  "B303": 7.5,
+  "B304": 7.5,
+  "B305": 7.5,
+  "B308": 3.0,
+  "B309": 7.5,
+  "B310": 6.0,
+  "B311": 7.5,
+  "B312": 6.0,
+  "B313": 7.5,
+  "B314": 6.0,
+  "B315": 6.0,
+  "B316": 6.0,
+  "B402": 6.0,
+  "B403": 6.0,
+  "B404": 6.0,
+  "B406": 4.5,
+  "B407": 6.0
+ },
+ "kardex_reprobadas": [],
+ "agenda": [
+  [
+   "INICIO DE SEMESTRE 26-2",
+   "2026-08-24",
+   "2026-12-18"
+  ],
+  [
+   "INICIO DE SEMESTRE 27-1",
+   "2027-01-25",
+   "2027-06-04"
+  ]
+ ],
+ "lector": "perfil-prueba",
+ "perfil_prueba": {
+  "id": "electivas-por-liberar-bionica",
+  "caso": 5
+ }
+}
