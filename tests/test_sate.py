@@ -8,6 +8,7 @@ import sys
 import threading
 import subprocess
 import unittest
+import unittest.mock
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
@@ -142,6 +143,36 @@ class SateBuild(unittest.TestCase):
         self.assertIn('location.search,location.hash', html)
         self.assertIn('sate/index.html', html)
 
+    def test_temarios_se_copian_solo_si_la_unidad_los_tiene(self):
+        """Los temarios van a datos/<u>/temarios/ (bajo demanda); una unidad sin ellos no muestra la vista."""
+        import build_sate
+        datos = json.loads((ROOT / 'data/sate.json').read_text(encoding='utf-8'))
+        self.assertTrue(build_sate.DATOS_VISTAS['temarios']('upiita'))
+        for unidad in datos['unidades']:
+            tiene = (ROOT / 'data/temarios' / unidad).is_dir() and any((ROOT / 'data/temarios' / unidad).glob('*.json'))
+            self.assertEqual(build_sate.DATOS_VISTAS['temarios'](unidad), tiene, unidad)
+            declarada = any(v['id'] == 'temarios' for v in datos['unidades'][unidad].get('vistas', []))
+            self.assertTrue(tiene or not declarada or unidad not in ('escom', 'upibi'), unidad)
+        self.assertEqual(build_sate.nombre_materia('ÁLGEBRA LINEAL II'), 'Álgebra lineal II')
+        self.assertEqual(build_sate.nombre_materia('INGLÉS I'), 'Inglés I')
+        self.assertEqual(build_sate.nombre_propio('INGENIERÍA EN SISTEMAS DE LA INFORMACIÓN'), 'Ingeniería en Sistemas de la Información')
+        import tempfile
+        with tempfile.TemporaryDirectory() as t:
+            t = pathlib.Path(t)
+            data = {'carreras': {'B': 'INGENIERÍA BIÓNICA'}, 'mapas': {'B': {'cur': {'B103': ['ÁLGEBRA LINEAL', 7.5, 1, 'O']}}}}
+            self.assertTrue(build_sate.escribir_temarios(data, t))
+            indice = json.loads((t / 'temarios/indice.json').read_text(encoding='utf-8'))
+            self.assertEqual(indice['carreras']['bionica'], {'letra': 'B', 'nombre': 'Ingeniería Biónica', 'plan': '09', 'total': 72})
+            self.assertEqual(indice['materias']['B103'], {'c': 'bionica', 'n': 'Álgebra lineal', 'v': 1, 't': 'obligatoria'})
+            self.assertIn('B307', indice['materias'])   # clave en minúsculas en el OCR
+            crudo = (t / 'temarios/bionica.json').read_text(encoding='utf-8')
+            self.assertNotIn('NIVEL_I', crudo)
+            self.assertEqual({m['clave'] for m in json.loads(crudo)['materias']}, {k for k, v in indice['materias'].items() if v['c'] == 'bionica'})
+        with unittest.mock.patch.object(build_sate, 'UNIDAD', 'unidad-sin-temarios'):
+            with tempfile.TemporaryDirectory() as t:
+                self.assertFalse(build_sate.escribir_temarios({}, pathlib.Path(t)))
+                self.assertFalse((pathlib.Path(t) / 'temarios').exists())
+
     def test_recursos_publicados_por_http(self):
         """Resuelve las rutas como http.server --directory web, sin navegador."""
         class Servidor(http.server.SimpleHTTPRequestHandler):
@@ -160,10 +191,13 @@ class SateBuild(unittest.TestCase):
                 rutas = {r for r in rutas if not re.match(r'[a-z]+:', r)}
                 rutas.update(('nucleo.js', 'situacion.js', 'desempeno.js', 'mapa.js',
                               'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js',
-                              '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js'))
+                              '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js',
+                              'temarios.js', 'temarios.css', '../policore/lector.js', '../policore/lector.css'))
                 config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', html, re.S)[1])
                 for unidad, cfg in config['unidades'].items():
                     rutas.update(f'datos/{unidad}/{nombre}.json' for nombre in ('nucleo', 'oferta'))
+                    rutas.update(f'datos/{unidad}/temarios/{n}.json' for v in cfg.get('vistas', []) if v['id'] == 'temarios'
+                                 for n in ('indice', *json.loads((ROOT / f'web/dist/sate/datos/{unidad}/temarios/indice.json').read_text(encoding='utf-8'))['carreras']))
                     rutas.update('../' + cfg['logo'][tema] for tema in ('claro', 'oscuro') if 'logo' in cfg)
                 for ruta in sorted(rutas):
                     with self.subTest(ruta=ruta):

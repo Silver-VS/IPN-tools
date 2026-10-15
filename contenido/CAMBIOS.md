@@ -1,6 +1,13 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-14 · 2026.10.23 · Claude (LEC1)
+
+| Claves | Cambio |
+|---|---|
+| `policore.lector.*` | Textos del lector de documentos de PoliCORE (índice, búsqueda, copiar enlace, fuente). |
+| `sate.vista.temarios.*`, `temarios.*` | Modo «Explorar unidades de aprendizaje» del mapa, panel del temario, explorador de temarios y etiquetas del adaptador. |
+
 ## 2026-10-07 · 2026.10.20 · Codex
 
 | Claves | Cambio |

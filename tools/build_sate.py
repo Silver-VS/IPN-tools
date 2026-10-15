@@ -908,6 +908,59 @@ def separar_datos(data):
     return nucleo, oferta, tramites
 
 
+# Vistas con datos propios: una unidad sin ellos no las muestra (data/sate.json: vistas).
+DATOS_VISTAS = {"temarios": lambda u: any((ROOT / "data/temarios" / u).glob("*.json"))}
+PARTICULAS = {"de", "del", "la", "las", "los", "el", "en", "y", "e", "a", "para", "con", "por", "al"}
+
+
+def nombre_propio(texto):
+    """«INGENIERÍA EN SISTEMAS» -> «Ingeniería en Sistemas» (nombres de carrera)."""
+    palabras = texto.lower().split()
+    return " ".join(p if (i and p in PARTICULAS) else p[:1].upper() + p[1:] for i, p in enumerate(palabras))
+
+
+def nombre_materia(texto):
+    """«ÁLGEBRA LINEAL II» -> «Álgebra lineal II» (misma regla que pretty() de la interfaz)."""
+    t = re.sub(r"\b(i{1,3}|iv|vi{0,3}|ix|x)\b", lambda m: m.group(0).upper(), texto.lower())
+    return t[:1].upper() + t[1:]
+
+
+def escribir_temarios(data, datos):
+    """Copia los temarios de la unidad a datos/<u>/temarios/ (se descargan bajo demanda, no van en el HTML).
+
+    Una carrera por archivo más indice.json con lo mínimo para el mapa y la lista del explorador. El nombre de cada
+    materia es el del SAES con su ortografía (el OCR pierde acentos); se omiten la ruta del PDF y los duplicados.
+    """
+    import shutil
+    from collections import Counter
+    destino = datos / "temarios"
+    shutil.rmtree(destino, ignore_errors=True)
+    if not DATOS_VISTAS["temarios"](UNIDAD):
+        return False
+    destino.mkdir(parents=True)
+    carreras, materias = {}, {}
+    for archivo in sorted((ROOT / "data/temarios" / UNIDAD).glob("*.json")):
+        d = json.loads(archivo.read_text(encoding="utf-8"))
+        letra = Counter(m["clave"][0].upper() for m in d["materias"]).most_common(1)[0][0]
+        cur = data.get("mapas", {}).get(letra, {}).get("cur", {})
+        salida = []
+        for m in d["materias"]:
+            clave = m["clave"].upper()
+            m = {**m, "clave": clave}
+            m.pop("fuente", None)
+            if clave in cur:
+                m["nombre"] = nombre_materia(cur[clave][0])
+            salida.append(m)
+            materias[clave] = {"c": d["carrera"], "n": m["nombre"], "v": m["nivel"], "t": m["tipo"]}
+        carreras[d["carrera"]] = {"letra": letra, "nombre": nombre_propio(data["carreras"].get(letra, d["carrera"])),
+                                  "plan": d["plan"], "total": len(salida)}
+        (destino / (d["carrera"] + ".json")).write_text(json.dumps(
+            {"carrera": d["carrera"], "plan": d["plan"], "materias": salida}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    (destino / "indice.json").write_text(json.dumps({"unidad": UNIDAD, "carreras": carreras, "materias": materias},
+                                                    ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    return True
+
+
 PDFS_ELECTIVAS = {
     "die01": "FORMATO DIE-01 OTRO PROGRAMA_1.pdf",
     "die02": "FORMATO DIE-02 MISMO PROGRAMA.pdf",
@@ -968,6 +1021,7 @@ def escribir_sate(data):
         electivas = {'oferta': rows, 'curric': curric, 'capturado': cap,
                      'pdfs': {k: base64.b64encode((ROOT / 'data/gestion_escolar' / f).read_bytes()).decode() for k, f in PDFS_ELECTIVAS.items()}}
         (datos / 'electivas.json').write_text(json.dumps(electivas, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    escribir_temarios(data, datos)
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
@@ -976,13 +1030,15 @@ def escribir_sate(data):
         shutil.copy(fuente / "medicion.js", destino / "medicion.js")
     else:
         (destino / "medicion.js").unlink(missing_ok=True)
-    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "temarios.js", "temarios.css"):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
+    shutil.copytree(ROOT / 'web/policore', dist / 'policore', dirs_exist_ok=True)   # lector de documentos de PoliCORE
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))
     identidad_unidades = cuenta.identidades()
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():
+        c["vistas"] = [v for v in c.get("vistas", []) if DATOS_VISTAS.get(v["id"], lambda _u: True)(u)]
         c["siglas"] = unidades[u]["siglas"]
         c["nombre"] = unidades[u]["nombre"]
         c["realce"] = identidad_unidades[u]['realce']
@@ -1013,7 +1069,7 @@ def escribir_sate(data):
         html = html.replace("/*__SATE_" + marca + "__*/", textos[clave])
     for marca in ("UNIDAD", "CARRERA", "SIN_DATOS", "INDICADOR"):
         html = html.replace("/*__SATE_" + marca + "__*/", textos["sate.encabezado." + marca.lower()])
-    textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes."))}
+    textos_sate = {k: v for k, v in textos.items() if k.startswith(("proyecto.", "sate.", "componentes.", "temarios.", "policore."))}
     nombres_unidades = {alias: c['siglas'] for u, c in identidad_unidades.items() for alias in [u, *c.get('alias', [])]}
     calendario_base = json.loads((ROOT / 'data/calendario_ipn.json').read_text(encoding='utf-8'))
     calendarios_unidad = {u: c for u, c in json.loads((ROOT / 'data/calendario.json').read_text(encoding='utf-8')).items()

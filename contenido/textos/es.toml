@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.22"
+version = "2026.10.23"
 
 [sate.creditos]
 rotulo = "créditos"
@@ -1021,3 +1021,144 @@ copiar = "Copiar resultados (JSON)"
 copiado = "Resultados copiados"
 error_copia = "No se pudo copiar. Consulta SateMedicion.resultados() en la consola."
 resumen = "FCP: {fcp} ms · Render: {render} ms · Generación: {generacion} ms · {nodos} nodos · {tareas} tareas largas"
+
+# ---------------------------------------------------------------------------
+# PoliCORE · lector de documentos (web/policore/lector.js). Común a temarios y, después, a reglamentos.
+[policore.lector]
+# Sin secciones con contenido.
+vacio = "Este documento no tiene secciones para mostrar."
+
+[policore.lector.indice]
+# Texto del botón que despliega las secciones en pantallas angostas.
+titulo = "Ir a una sección"
+# Nombre accesible de la lista de secciones.
+etiqueta = "Secciones del documento"
+
+[policore.lector.buscar]
+marcador = "Buscar en este documento"
+etiqueta = "Buscar en este documento"
+anterior = "Coincidencia anterior"
+siguiente = "Coincidencia siguiente"
+limpiar = "Borrar la búsqueda"
+resultados = "{n, plural, =0 {Sin coincidencias} one {# coincidencia} other {# coincidencias}}"
+posicion = "Coincidencia {i} de {n}"
+en_seccion = "{n, plural, one {# coincidencia} other {# coincidencias}} en esta sección"
+
+[policore.lector.seccion]
+copiar = "Copiar enlace"
+copiar_aria = "Copiar el enlace a la sección «{seccion}»"
+copiado = "Enlace copiado"
+copiar_error = "No se pudo copiar"
+
+[policore.lector.fuente]
+titulo = "Fuente:"
+abrir = "Abrir la fuente"
+
+# ---------------------------------------------------------------------------
+# Temarios de unidades de aprendizaje (web/sate/temarios.js)
+[sate.vista.temarios]
+titulo = "Temarios"
+corto = "Temarios"
+
+[temarios.modo]
+# Selector del mapa curricular. «corto» se usa en teléfono.
+etiqueta = "Modo del mapa"
+planear = "Planear horario"
+planear_corto = "Planear"
+explorar = "Explorar unidades de aprendizaje"
+explorar_corto = "Explorar"
+leyenda = "Toca o haz clic en una materia para leer su temario. En este modo no se elige nada para tu horario."
+ayuda_enlace = "Ver todos los temarios"
+
+[temarios.mapa]
+sin_temario = "Sin temario disponible"
+abrir_aria = "Leer el temario de {materia}"
+ver = "Ver temario"
+
+[temarios.panel]
+etiqueta = "Temario de {materia}"
+cerrar = "Cerrar el temario"
+abrir_explorador = "Abrir en Temarios"
+cargando = "Cargando el temario…"
+error = "No se pudo cargar el temario. Revisa tu conexión e inténtalo de nuevo."
+reintentar = "Reintentar"
+
+[temarios.explorador]
+titulo = "Temarios de unidades de aprendizaje"
+intro = "Consulta el programa de cada materia: objetivo, contenido, evaluación y bibliografía."
+volver = "Volver a la lista"
+elegir = "Elige una unidad de aprendizaje de la lista para leer su temario."
+no_encontrado = "No encontramos ese temario. Puede que la clave haya cambiado."
+sin_datos = "Esta unidad académica aún no tiene temarios en SATE."
+cargando = "Cargando temarios…"
+
+[temarios.buscar]
+etiqueta = "Buscar una unidad de aprendizaje"
+marcador = "Nombre, clave o tema"
+ayuda = "También busca dentro del objetivo y de los contenidos."
+buscando = "Buscando en los temarios…"
+
+[temarios.filtro]
+carrera = "Carrera"
+carrera_todas = "Todas las carreras"
+nivel = "Nivel"
+nivel_todos = "Todos los niveles"
+tipo = "Tipo"
+tipo_todos = "Todos los tipos"
+
+[temarios.tipo]
+obligatoria = "Obligatoria"
+optativa = "Optativa"
+elegible = "Elegible"
+
+[temarios.lista]
+etiqueta = "Unidades de aprendizaje"
+nivel = "Nivel {n}"
+resultados = "{n, plural, =0 {Ninguna unidad de aprendizaje coincide} one {# unidad de aprendizaje} other {# unidades de aprendizaje}}"
+sin_resultados = "Prueba con otro nombre o quita algún filtro."
+coincide = "Coincide en: {donde}"
+
+[temarios.donde]
+nombre = "nombre"
+objetivo = "objetivo"
+contenidos = "contenido"
+
+[temarios.seccion]
+objetivo = "Objetivo"
+contenidos = "Contenido"
+orientacion = "Orientación didáctica"
+evaluacion = "Evaluación"
+bibliografia = "Bibliografía"
+
+[temarios.meta]
+carrera = "Carrera"
+nivel = "Nivel"
+tipo = "Tipo"
+tepic = "Créditos TEPIC"
+satca = "Créditos SATCA"
+horas_semana = "Horas por semana"
+horas_semestre = "Horas por semestre"
+vigencia = "Vigencia"
+academia = "Academia"
+horas_semana_valor = "{teoria} de teoría · {practica} de práctica"
+
+[temarios.documento]
+subtitulo = "{clave} · {carrera}"
+unidad = "Unidad"
+fuente = "Programa sintético de la unidad de aprendizaje, plan {plan}."
+
+[qa.temarios]
+# Página de revisión local web/qa-temarios.html (no se publica).
+titulo = "Lector de documentos de PoliCORE (prueba)"
+ancho = "Ancho del marco"
+seccion_temario = "Un temario real, en página"
+seccion_panel = "El mismo temario en un panel angosto"
+seccion_otro = "Otro documento: un reglamento ficticio"
+
+[temarios.biblio]
+basica = "Básica"
+complementaria = "Complementaria"
+
+[temarios.aviso]
+ocr = "Transcripción automática del programa sintético; cotéjalo con el documento oficial."
+coincidencia = "La clave del SAES se asoció a este programa por la semejanza de sus nombres; confirma que sea la unidad de aprendizaje correcta."

@@ -747,6 +747,7 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
   <div id="sate-simulacion" class="tag sim" role="status" hidden><span id="sate-simulacion-texto"></span> <button class="link" type="button" id="sate-simulacion-quitar"></button></div>
   <section id="sate-tramites" class="card" hidden></section>
   <section id="sate-calendario" class="card" hidden></section>
+  <section id="sate-temarios" hidden></section>
   <section id="sate-trayectoria" class="card" hidden>
     <h2 id="desempeno-titulo"></h2>
     <div id="sate-presente"></div>
@@ -760,6 +761,10 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
     <!-- La planeación anual se activa por unidad desde los datos. -->
     <div class="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
+      <div class="mapa-modo" id="mapa-modo-caja" hidden>
+        <div class="seg" role="group" id="mapa-modo"><button type="button" data-mmodo="planear" aria-pressed="true"></button><button type="button" data-mmodo="explorar" aria-pressed="false"></button></div>
+        <a class="link" id="mapa-modo-enlace" href="#"></a>
+      </div>
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
         <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0" aria-label="Mapa completo">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
       </div>
@@ -772,6 +777,7 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
         <button class="link" type="button" id="map-ayuda"></button>
       </div>
     </div>
+    <p class="mapa-modo-leyenda" id="mapa-modo-leyenda" role="note" hidden></p>
     <div class="legend" id="legend" aria-label="Simbología"></div>
     <label class="tgl" id="sug-tgl" hidden title="Muestra u oculta el indicador de materias sugeridas"><input type="checkbox" id="sug-on"><span class="tgl-ui" aria-hidden="true"></span><i class="l-sug" aria-hidden="true"></i><span>Ver sugeridas</span></label>
     <div class="mapcut" id="mapcut" hidden><button class="minimap" type="button" id="minimap" aria-label="Avance completo en miniatura; muestra el mapa completo"></button><div class="mapcut-info"><b>Tu avance <span id="mapcut-sim"></span></b><span id="mapcut-txt"></span><span class="mm-leg" id="mm-leg"></span><div class="seg sm mapvista" role="group" aria-label="Qué mostrar del mapa" id="mapvista"><button type="button" data-vista="todo">Mapa completo</button><button type="button" data-vista="pend">Pendientes</button><button type="button" data-vista="sigue">Recomendaciones</button></div></div></div>

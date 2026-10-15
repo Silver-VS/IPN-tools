@@ -2,6 +2,7 @@
   "_fuente": "Qué pestañas y trámites muestra SATE en cada unidad (plan de la plataforma, secciones 1.2 y 5). Los textos van por clave en contenido/textos/es.toml (sate.pestana.<id>, sate.tramite.<id>); lo valida tools/contenido.py.",
   "pestanasOcultas": [],
   "_pestanasOcultas": "Pestañas que no se muestran en ninguna unidad mientras se rediseñan.",
+  "_vistas": "Vistas con ruta propia (#/<unidad>/<id>) que no ocupan una pestaña: `padre` es la pestaña que se marca al estar en ellas. La compilación las quita de una unidad que no tenga datos (temarios: data/temarios/<unidad>/). Textos: sate.vista.<id>.titulo.",
   "unidades": {
     "upiita": {
       "pestanas": [
@@ -32,6 +33,12 @@
           "horarios",
           "calendario"
         ]
+      ],
+      "vistas": [
+        {
+          "id": "temarios",
+          "padre": "mapa"
+        }
       ],
       "planDosPeriodos": true,
       "miSemana": true,

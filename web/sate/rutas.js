@@ -11,6 +11,13 @@
       partes.length = 0;
     }
     if (['situacion','desempeno'].includes(pestaña)) pestaña = 'trayectoria';
+    // Vistas con ruta propia que no ocupan una pestaña (data/sate.json: vistas); las partes siguientes son suyas.
+    const vista = config[unidad]?.vistas?.find(v => v.id === pestaña);
+    if (vista) {
+      if (partes.length > 4 || !partes.every(p => /^[A-Za-z0-9_.-]+$/.test(p))) return null;
+      return { unidad, pestana: pestaña, vista: true, padre: vista.padre, partes: partes.slice(), tramite: null,
+        hash: '#/' + unidad + '/' + pestaña + partes.map(p => '/' + p).join('') + (hash.includes('?') ? '?' + hash.split('?').slice(1).join('?') : '') };
+    }
     if (!config[unidad] || !config[unidad].pestanas.includes(pestaña)) return null;
     if (partes.length && (pestaña !== 'tramites' || partes.length !== 1 || !config[unidad].tramites.includes(partes[0]))) return null;
     return { unidad, pestana: pestaña, tramite: partes[0] || null,
@@ -25,7 +32,7 @@
     if (!hash) hash = unidad ? '#/' + unidad + '/mapa' : '';
     else if (hash.startsWith('#/')) {
       const p = hash.slice(2).split('/');
-      if (['mapa','horarios','trayectoria','situacion','desempeno','calendario','tramites'].includes(p[0].split('?')[0]) && unidad) hash = '#/' + unidad + '/' + p.join('/');
+      if (['mapa','horarios','trayectoria','situacion','desempeno','calendario','tramites','temarios'].includes(p[0].split('?')[0]) && unidad) hash = '#/' + unidad + '/' + p.join('/');
     }
     return 'sate/index.html' + query + hash;
   }

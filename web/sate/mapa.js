@@ -1,4 +1,4 @@
-function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
+function renderMap(){const r=conSim(usaSim('mapa'),()=>conPlan(renderMap0));SATE.temarios?.pintarModo?.();return r}
 /* Cadena de requisitos y dependientes de la materia bajo el cursor (o de la fila elegida en «requisitos»).
    Devuelve null sin resaltado, o un Set con .pre (antes) y .post (después). Pura: solo usa sus argumentos. */
 function calcHot(mapHover,reqHover,pre){
@@ -161,6 +161,7 @@ function renderList(){
         `<span class="tl-acciones">${ayudaCreditos(k)}<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${(done||ob)&&!(PLAN_DOS_PERIODOS&&paso!=null&&paso!==S.planPaso)||isElec(k)?' disabled':''} aria-label="${PLAN_DOS_PERIODOS&&paso!=null&&paso!==S.planPaso?'Ver acciones de':w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?(PLAN_DOS_PERIODOS?(paso===0&&S.planPaso===1?'en ':'')+esc(planEtiqueta(paso)):'✓'):'+'}</button></span>`+
         (open?`<div class="tl-more">${inspParts(k).l2}${PLAN_DOS_PERIODOS?`<div class="insp-act">${planAcciones(k)}</div>`:''}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
   montarAyudasCreditos();
+  SATE.temarios?.pintarModo?.();
 }
 
 function renderAyudaPrimeraVisita(){
@@ -169,7 +170,7 @@ function renderAyudaPrimeraVisita(){
   if(!box.hidden)box.appendChild(SateUI.aviso({estado:'info',titulo:SATE.texto('sate.planeacion.primera_visita'),descartable:true,
     alDescartar(){store.set('mapAyudaDescartada',true);box.hidden=true}}));
 }
-SATE.pestana('mapa',{montar(){},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta()}});
+SATE.pestana('mapa',{montar(){SATE.cargarTemarios?.()},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta();SATE.temarios?.cerrar?.()}});
 
 /* ---------- resaltado al pasar el cursor, sin redibujar ----------
    Alterna clases en las cajas y flechas ya dibujadas (mismas reglas que el dibujo: resalteCaja y resalteArista). */

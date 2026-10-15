@@ -358,7 +358,7 @@ def generar(recursos=RECURSOS, root=ROOT):
                   'duplicados': [{'clave': c, 'elegido': e, 'descartado': d} for c, e, d in duplicados]}
         destino = root / f'data/temarios/upiita/{carrera}.json'
         destino.parent.mkdir(parents=True, exist_ok=True)
-        destino.write_text(json.dumps(salida, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        destino.write_text(json.dumps(salida, ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
         LOG.info('%s plan %s: %d OCR, %d/%d SAES, %d duplicados, %d sin clave', carrera, plan,
                  len(rutas), len(por_clave), len(filas), len(duplicados), sum(not m['clave'] for m in materias))
         informe += [f'## {numero}. {carrera.capitalize()}', '', f'Plan {plan}: **{len(por_clave)} / {len(filas)}** materias SAES con temario; {len(rutas)} OCR de entrada.', '']
@@ -383,7 +383,7 @@ def generar(recursos=RECURSOS, root=ROOT):
         informe += ['']
         resumen.append((carrera, len(por_clave), len(filas)))
     (root / 'docs').mkdir(exist_ok=True)
-    (root / 'docs/TEMARIOS.md').write_text('\n'.join(informe), encoding='utf-8')
+    (root / 'docs/TEMARIOS.md').write_text('\n'.join(informe), encoding='utf-8', newline='\n')
     return resumen
 
 
