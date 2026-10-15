@@ -93,6 +93,10 @@ let destino;const opener={};const loc={href:'https://sate.test/sate/cupos.html?u
 vm.runInNewContext([...leer('web/sate/cupos.html').matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1],{URL,URLSearchParams,location:loc,opener});
 assert.equal(destino.pathname,'/sate/index.html');assert.equal(destino.searchParams.get('vista'),'cupos');assert.equal(destino.searchParams.get('modo'),'saes');assert.equal(destino.searchParams.get('code'),'ficticio');assert.equal(destino.hash,'#estado');
 const css=leer('web/sate/cascaron.html');assert.match(css,/html\[data-vista=cupos\] \.sate-navegacion/);assert.match(css,/#cupos-vista button.*min-height:44px/);
+// VEN1: barra de configuración arriba (sin «Avisos y más»), medidor por fila y tarjetas de fila en teléfono.
+for(const regla of [/\.cupos-config\{/,/\.cupos-interruptor-pista\{/,/\.cupos-pista\{[^}]*height:8px/,/\.cupos-m-lleno \.cupos-pista i\{/,/\.cupos-tabla tr\{display:grid/,/\.cupos-config select:disabled/])assert.match(css,regla);
+assert.doesNotMatch(leer('web/sate/cupos-vista.js'),/summary>\$\{esc\(tx\('avisos_mas'\)\)\}/,'Avisos ya no es un bloque desplegable');
+assert.match(leer('web/sate/cupos-vista.js'),/id="cupos-config"[\s\S]*id="cupos-avisos-controles"[\s\S]*id="cupos-ultima"[\s\S]*id="cupos-auto-estado"/);
 assert.match(leer('web/dist/sate.js'),/sate\/index\.html\?vista=cupos/);
 // El núcleo completo adopta los cambios de la ventana receptora sin escribirlos otra vez.
 const eventos={};let renders=0;

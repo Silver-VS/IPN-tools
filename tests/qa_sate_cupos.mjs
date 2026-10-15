@@ -88,7 +88,8 @@ for(const unidad of ['upiita','escom','upibi']){
   const nodo=id=>{if(!nodos.has(id))nodos.set(id,{...nuevo(),value:'',checked:true,innerHTML:'',querySelector:nodo,textContent:'',classList:{toggle(){}},focus(){},scrollIntoView(){throw Error('Cupos no debe desplazar la página')}});return nodos.get(id)};
   const opener={postMessage:(d,o)=>enviados.push({d,o})};let sesion=false,nube=null;
   const ipnt={get cuenta(){return sesion?{}:null},get proveedor(){return sesion?'ms':null},set:(k,v)=>storage.set(k,v),cupos:async(u,d)=>{graph.push({u,d});if(d)nube=d;return nube}};
-  const ctx=vm.createContext({URL,URLSearchParams,Date:class extends Date{static now(){return t}},console,location:{href:'https://sate.test/sate/cupos.html?unidad='+unidad},
+  const intervalos=[];
+  const ctx=vm.createContext({URL,URLSearchParams,Date:class extends Date{static now(){return t}},console,setInterval(f,ms){intervalos.push({f,ms});return intervalos.length},clearInterval(){},location:{href:'https://sate.test/sate/cupos.html?unidad='+unidad},
     CUPOS_CONFIG:{textos:config.textos,unidades:{[unidad]:{saes:config.unidades[unidad].saes,prefijo:prefix}}},
     fetch:async ruta=>({ok:true,json:async()=>ruta.endsWith('nucleo.json')?{opciones_plan:{B:{carrera:'B',plan:'09'}}}:{asig:['Oferta ficticia'],prof:['Docente de oferta'],periodos:{actual:[['B','M',1,'1BM3',0,[0],[[0,630,690]],4,'B105']]}}}),
     SateUI:{usarTextos(){},modal:(...args)=>modales.push(args)},document:{getElementById:nodo},localStorage:{getItem:k=>storage.get(k)},IPNT:ipnt,BroadcastChannel:class{constructor(n){assert.equal(n,'ipnt-cupos')}postMessage(d){difundidos.push(d)}}});
@@ -112,6 +113,33 @@ for(const unidad of ['upiita','escom','upibi']){
   nodo('[data-r="filtro"]').value='B205';nodo('[data-r="filtro"]').oninput();assert.doesNotMatch(nodo('cupos-tabla').innerHTML,/1BM3/);
   nodo('[data-r="filtro"]').value='';nodo('[data-r="filtro"]').oninput();
   mensaje(origin,opener,{tipo:'ipnt.cupos.ritmo',v:1,unidad,n:1,busy:false});assert.equal(nodo('[data-r="consultar"]').textContent,'Consultar en 1 segundo');
+  // VEN1: barra de configuración (sonido, notificación, consulta automática con intervalo) y «Última consulta».
+  {
+    const t0=t,auto=nodo('[data-r="auto"]'),inter=nodo('[data-r="intervalo"]'),pulso=()=>intervalos.at(-1).f();
+    const html=nodo('cupos-avisos-controles').innerHTML;
+    assert.equal((html.match(/role="switch"/g)||[]).length,3,'Sonido, notificación y consulta automática son interruptores');
+    assert.match(html,/<option value="1">Cada 1 minuto<\/option>/);assert.ok(!/<option value="0/.test(html),'El intervalo mínimo es 1 minuto');
+    assert.equal(intervalos.at(-1).ms,1000);
+    assert.match(nodo('cupos-ultima').textContent,/Última consulta .*justo ahora/);assert.notEqual(nodo('cupos-ultima').className,'cupos-antigua');
+    assert.match(nodo('cupos-tabla').innerHTML,/class="cupos-medidor cupos-m-(ok|poco|lleno)"/,'Medidor por fila');
+    assert.match(nodo('cupos-tabla').innerHTML,/ocupados/);assert.doesNotMatch(nodo('cupos-tabla').innerHTML,/<th scope="col">Inscritos/);
+    auto.checked=false;auto.onchange();assert.equal(inter.disabled,true,'Con la consulta automática apagada el intervalo se deshabilita');
+    nodo('[data-r="carrera"]').value='B';nodo('[data-r="plan"]').value='09';
+    const consultas=()=>enviados.filter(e=>e.d.tipo==='ipnt.cupos.consultar');const previas=consultas().length;
+    auto.checked=true;auto.onchange();assert.equal(inter.disabled,false);
+    assert.match(nodo('cupos-auto-estado').textContent,/Consulta automática activa · cada 5 minutos/);
+    inter.value='1';inter.onchange();assert.match(nodo('cupos-auto-estado').textContent,/cada 1 minuto/);
+    assert.equal(JSON.parse(storage.get(prefix+'cuposAjustes')).minutos,1,'Se recuerda el intervalo');
+    t=t0+30000;pulso();assert.equal(consultas().length,previas,'Antes de un minuto no consulta');
+    t=t0+61000;pulso();assert.equal(consultas().length,previas+1);
+    assert.equal(consultas().at(-1).d.carrera,'B');assert.equal(consultas().at(-1).d.plan,'09');assert.equal(consultas().at(-1).o,origin);
+    t=t0+62000;pulso();assert.equal(consultas().length,previas+1,'Una consulta por intervalo');
+    t=t0+31*60000;pulso();assert.equal(auto.checked,false);assert.match(nodo('cupos-auto-estado').textContent,/Terminó la consulta automática de 30 min/);assert.equal(inter.disabled,true);
+    t=t0+61*60000;pulso();
+    assert.equal(nodo('cupos-ultima').className,'cupos-antigua','Pasada una hora la consulta se marca como vieja');
+    assert.match(nodo('cupos-ultima').textContent,/Consulta antigua.*Los lugares pueden haber cambiado/);
+    t=t0;pulso();assert.notEqual(nodo('cupos-ultima').className,'cupos-antigua');
+  }
   assert.ok(enviados.every(e=>e.o===origin));assert.equal(enviados[0].d.grupos.length,2);
   const antes=enviados.length;eventos.storage({key:prefix+'cuposContexto'});assert.equal(enviados.length,antes+1);
   sesion=true;await eventos['ipnt-sincronizado']();

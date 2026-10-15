@@ -15,8 +15,14 @@
       ],
       "tramites": [
         "dictamen",
-        "electivas"
+        "electivas",
+        "baja_temporal",
+        "baja_definitiva"
       ],
+      "scriptsTramite": {
+        "baja_temporal": "bajas.js",
+        "baja_definitiva": "bajas.js"
+      },
       "leyenda": "prueba",
       "logo": {
         "claro": "assets/logos/upiita-oro.webp",

@@ -49,7 +49,7 @@ Los textos se consultan por clave; no se duplican componentes para cambiar infor
 | `data/unidades/<u>/` | Oferta, planes, mapas y configuración de cada unidad |
 | `data/calendario*.json` | Calendarios institucionales y actividades locales |
 | `data/unidades_identidad.json` | Identidad, nombres, logos y colores por unidad |
-| `data/gestion_escolar/` | Formatos y recursos de trámites |
+| `data/gestion_escolar/` | Formatos y recursos de trámites; `bajas.json` es el único dato de los enlaces a los formatos oficiales de baja (`web/sate/bajas.js`; scripts de trámite que no se llaman como el id van en `scriptsTramite` de `data/sate.json`) |
 | `contenido/textos/es.toml` | Textos por clave, incluidos los referidos desde capacidades |
 
 Excepción de compatibilidad: `nucleo.js` conserva el literal de UPIITA únicamente en la

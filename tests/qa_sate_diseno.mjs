@@ -61,7 +61,7 @@ assert.equal(mapa.getAttribute('aria-selected'),'true');assert.equal(mapa.tabInd
 const horarios=barra.children.find(b=>b.getAttribute('data-id')==='horarios');
 horarios.eventos.click();assert.equal(destino,'horarios');
 assert.equal(horarios.getAttribute('aria-current'),'page');
-assert.deepEqual(config.unidades.upiita.tramites,['dictamen','electivas']);
+assert.deepEqual(config.unidades.upiita.tramites,['dictamen','electivas','baja_temporal','baja_definitiva']);
 for(const nav of [tabs,barra])assert.ok(nav.children.some(b=>b.getAttribute('data-id')==='tramites'));
 vm.runInContext(leer('web/dist/sate/rutas.js'),c);
 for(const hash of ['#/upiita/tramites','#/upiita/tramites/dictamen?origen=viejo']){

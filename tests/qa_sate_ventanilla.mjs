@@ -52,8 +52,12 @@ assert.equal(t.validarDatos('boleta','2099000000'),'');assert.ok(t.validarDatos(
 assert.equal(t.validarDatos('correo','ficticio@example.test'),'');assert.ok(t.validarDatos('correo','invalido'));
 assert.equal(t.prellenar({upiita_saes:1,unidad:'escom',boleta:'2099000000'}).boleta,'2099000000');
 aplicacion={aplica:true,motivo:'Causal ficticia'};t.mostrarLista(box);
-assert.equal(box.todos().filter(n=>n.tagName==='section').length,2);
-assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Empezar').length,2);
+const filasLista=()=>box.todos().filter(n=>n.tagName==='li'&&n.className==='tramite-fila');
+const rotulos=()=>box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent);
+assert.equal(filasLista().length,4,'Dictamen, Electivas y las dos bajas, una fila cada uno');
+assert.deepEqual(rotulos(),['Disponibles'],'Sin avance, todo está disponible');
+assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Empezar').length,4);
+assert.equal(box.todos().filter(n=>n.tagName==='button').length,4,'Una sola acción por fila');
 assert.ok(box.todos().some(n=>n.textContent==='Te aplica · Causal ficticia'));
 box.todos().find(n=>n.textContent==='Empezar').click();assert.equal(ir,'tramites/dictamen');
 almacen.set('hu.tramite.dictamen',JSON.stringify({paso:1,total:4,actualizado:Date.now()-300000}));
@@ -61,8 +65,16 @@ almacen.set('hu.tramite.electivas',JSON.stringify({listo:true}));t.mostrarLista(
 assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Continuar').length,1);
 assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Descargar').length,1);
 assert.ok(box.todos().some(n=>n.textContent.includes('Paso 2 de 4 · guardado hace 5 min')));
+assert.deepEqual(rotulos(),['En curso y terminados','Disponibles'],'Lo iniciado o listo va primero; Dictamen listo no se mezcla con lo disponible');
+const grupoCurso=box.todos().filter(n=>n.tagName==='ul')[0];
+assert.equal(grupoCurso.todos().filter(n=>n.tagName==='h4').length,2,'Dictamen (en progreso) y Electivas (listo) en el primer grupo');
+assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Empezar').length,2,'Las dos bajas siguen sin iniciar');
+assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Revisar o corregir'),'Un trámite listo se puede revisar');
+assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Empezar de nuevo'));
+assert.ok(box.todos().filter(n=>n.tagName==='button'&&n.attrs['aria-label']).every(n=>n.attrs['aria-label'].includes(': ')),'Cada botón de la lista dice sobre qué trámite actúa');
 aplicacion={aplica:false,motivo:'Motivo ficticio'};t.mostrarLista(box);
-assert.equal(box.todos().filter(n=>n.tagName==='section').length,2);assert.equal(box.todos().filter(n=>n.tagName==='button').length,0,'Ningún botón para un trámite que no aplica');
+assert.equal(filasLista().length,4);assert.equal(box.todos().filter(n=>n.tagName==='button').length,0,'Ningún botón para un trámite que no aplica');
+assert.ok(box.todos().some(n=>n.textContent==='No aplica'));
 aplicacion=null;
 modulo.mostrar({tramite:'dictamen'});assert.equal(abiertos.length,0,'Sin definición se muestra la lista; no hay página antigua');
 const ficticio={upiita_saes:1,unidad:'upiita',nombre:'ANA SOFIA DEL VALLE RUIZ',boleta:'2099000000',carrera_nombre:'Ingeniería Biónica',plan:'2009',correo:'ficticio@example.test'};
@@ -367,4 +379,109 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   const css2=readFileSync('web/sate/componentes.css','utf8');
   assert.match(css2,/\.tramite-pie\{[^}]*border-top/);assert.match(css2,/\.tramite-encabezado\{[^}]*justify-content:space-between/);
   console.log('Dictamen DIC2: fundamento por situación, formato nunca en blanco, motivo detectado u otro, anexos unidos en un PDF y regreso arriba y abajo correctos.');
+}
+
+// VEN1: bajas con el mismo asistente, portada por grupos y pasos navegables.
+{
+  vm.runInContext('window.print=()=>{globalThis.__impresiones=(globalThis.__impresiones||0)+1}',c);
+  vm.runInContext(readFileSync('web/sate/bajas.js','utf8'),c);
+  const B=c.SateBajas,codigoBajas=readFileSync('web/sate/bajas.js','utf8');
+  almacen.set('saes.alumno',JSON.stringify({upiita_saes:1,unidad:'upiita',periodo_actual:'27/1'}));
+  almacen.set('hu.tramite.datos',JSON.stringify({confirmado:true,datos:{paterno:'PRUEBA',materno:'FICTICIA',nombres:'ALUMNA',boleta:'2099000000',carrera:'Ingeniería Biónica',plan:'2009',correo:'ficticio@example.test'}}));
+  for(const id of ['baja_temporal','baja_definitiva'])almacen.delete('hu.tramite.'+id);
+  assert.equal(B.urlFormato('temporal'),'https://www.upiita.ipn.mx/adjuntos/gestion_escolar/2026/BAJA%20TEMPORAL%2026-2_2.pdf','La URL sale de data/gestion_escolar/bajas.json');
+  assert.equal(B.urlFormato('definitiva'),'https://www.upiita.ipn.mx/adjuntos/gestion_escolar/2026/BAJA%20DEFINITIVA_2.pdf');
+  assert.deepEqual(plano(B.periodos()),['27/1','27/2','28/1']);
+  assert.equal(B.validarIdentidad(),'');
+  // Todo texto visible de bajas.js existe en es.toml (claves estáticas y las que se arman con id).
+  const claves=new Set([...codigoBajas.matchAll(/tx\('([a-z0-9_]+)'(?!\s*\+)/g)].map(m=>m[1]));
+  for(const tipo of ['temporal','definitiva']){
+    for(const k of ['titulo_','lead_','paso_motivo_ayuda_','periodo_texto_'])claves.add(k+tipo);
+    for(const n of [1,2,3])claves.add('aviso_'+tipo+'_'+n);
+    for(const m of B.MOTIVOS[tipo]){claves.add('motivo_'+m);claves.add('motivo_'+m+'_ayuda')}
+  }
+  for(const k of claves)assert.ok(config.textos['sate.baja.'+k],'Falta la clave sate.baja.'+k);
+  for(const id of ['baja_temporal','baja_definitiva'])assert.ok(config.textos['sate.tramite.'+id+'.titulo']&&config.textos['sate.ventanilla.'+id+'_para']);
+  assert.ok(config.unidades.upiita.tramites.includes('baja_temporal')&&config.unidades.upiita.tramites.includes('baja_definitiva'));
+  assert.equal(config.unidades.upiita.scriptsTramite.baja_temporal,'bajas.js');
+  assert.deepEqual(config.unidades.escom.tramites,[],'Las bajas son una capacidad de datos de la unidad, no de todas');
+
+  // Baja temporal paso a paso.
+  modulo.mostrar({tramite:'baja_temporal'});
+  assert.equal(box.children[0].className,'tramite-encabezado');assert.equal(box.children[0].children[0].textContent,'Baja temporal');
+  assert.ok(box.todos().some(n=>n.className==='tramite-lead'),'Frase breve de qué es el trámite');
+  const pasosLi=()=>box.todos().filter(n=>n.tagName==='li'&&n.className.startsWith('tramite-paso'));
+  assert.equal(pasosLi().length,3);assert.equal(pasosLi()[0].attrs['aria-current'],'step');
+  assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.className==='tramite-paso-ir').length,0,'Ningún paso hecho todavía: nada navegable');
+  assert.ok(box.querySelector('form'),'Los datos de contacto se piden dentro del primer paso');
+  assert.ok(box.todos().some(n=>n.name==='celular'));
+  box.querySelector('form').onsubmit({preventDefault(){}});
+  assert.equal(box.querySelector('form'),null);
+  assert.equal(box.todos().filter(n=>n.className.includes('sate-btn--primario')).length,1,'Un solo botón primario por paso');
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Motivo y periodo'));
+  const bloques=box.todos().filter(n=>n.className==='tramite-bloque');assert.equal(bloques.length,3,'Aviso, motivo y periodo: una tarjeta por tema');
+  assert.deepEqual(bloques.slice(1).map(n=>n.children[0].textContent),['Motivo','Periodo']);
+  assert.ok(box.todos().some(n=>n.tagName==='aside'&&n.className==='tramite-aviso'));
+  const radios=box.todos().filter(n=>n.type==='radio');assert.deepEqual(radios.map(r=>r.value),plano(B.MOTIVOS.temporal));
+  assert.equal(box.todos().filter(n=>n.tagName==='select').length,2,'Periodo de inicio y periodos solicitados');
+  assert.deepEqual(box.todos().filter(n=>n.tagName==='option').slice(0,3).map(n=>n.value),['27/1','27/2','28/1']);
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  assert.match(box.querySelector('[data-pdf-estado]').textContent,/Elige el motivo/,'No avanza sin motivo y lo explica');
+  radios[0].checked=true;radios[0].onchange();
+  box.todos().find(n=>n.tagName==='textarea').value='Texto ficticio sensible';box.todos().find(n=>n.tagName==='textarea').onblur();
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa e imprime'));
+  const guardado=almacen.get('hu.tramite.baja_temporal');
+  assert.ok(!guardado.includes('salud')&&!guardado.includes('sensible'),'Motivo y explicación solo viven en memoria');
+  assert.ok(guardado.includes('27/1'),'El periodo sí se guarda');
+  assert.ok(box.todos().some(n=>n.tagName==='dd'&&n.textContent==='Salud'),'El resumen muestra el motivo');
+  assert.ok(box.todos().some(n=>n.tagName==='dd'&&n.textContent==='2099000000'));
+  assert.equal(box.querySelector('iframe'),null,'Sin PDF generado por SATE: no hay vista previa');
+  assert.equal(box.querySelector('[data-ver-formato]'),null);
+  const imprimible=box.todos().find(n=>n.className.includes('tramite-imprimible'));assert.ok(imprimible,'Resumen imprimible');
+  assert.ok(imprimible.todos().some(n=>n.className.includes('tramite-firmas')));
+  const enlace=box.todos().find(n=>n.tagName==='a');
+  assert.equal(enlace.href,B.urlFormato('temporal'));assert.equal(enlace.target,'_blank');assert.equal(enlace.rel,'noopener');assert.ok(!enlace.download,'Solo enlaza el formato; no lo descarga');
+  assert.equal(box.todos().filter(n=>n.className.includes('sate-btn--primario')).length,1);
+  // Pasos hechos navegables y «Cambiar» lleva al paso de ese dato.
+  const hechos=()=>box.todos().filter(n=>n.tagName==='button'&&n.className==='tramite-paso-ir');
+  assert.equal(hechos().length,2);assert.ok(hechos()[0].attrs['aria-label'].startsWith('Ir al paso 1'));
+  box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']==='Cambiar Motivo').click();
+  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Motivo y periodo'));
+  assert.equal(hechos().length,1);
+  hechos()[0].click();assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Tus datos'));assert.equal(hechos().length,0);
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  assert.equal(box.todos().find(n=>n.type==='radio'&&n.checked)?.value,'salud','Dentro de la sesión se conserva');
+  assert.equal(t.modelo(B.definir('temporal')).datos.motivo,'','Al recargar, el motivo sensible se vuelve a preguntar');
+  // La impresión marca el trámite como listo; la lista ofrece «Ver resumen», no «Descargar».
+  c.__impresiones=0;
+  const radiosOtra=box.todos().filter(n=>n.type==='radio');radiosOtra[1].checked=true;radiosOtra[1].onchange();
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Imprimir resumen').click();
+  assert.equal(c.__impresiones,1);
+  modulo.ocultar();t.mostrarLista(box);
+  assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Ver resumen'),'Sin PDF no se ofrece Descargar');
+  assert.deepEqual(box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent),['En curso y terminados','Disponibles']);
+
+  // Baja definitiva: mismo asistente, motivo propio y enlace a su formato.
+  modulo.mostrar({tramite:'baja_definitiva'});
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  assert.deepEqual(box.todos().filter(n=>n.type==='radio').map(r=>r.value),plano(B.MOTIVOS.definitiva));
+  assert.equal(box.todos().filter(n=>n.tagName==='select').length,1,'La definitiva no pide periodos solicitados');
+  assert.ok(box.todos().some(n=>n.tagName==='li'&&/baja temporal conserva tu lugar/.test(n.textContent)),'Sugiere la baja temporal en tono informativo');
+  box.todos().filter(n=>n.type==='radio')[0].checked=true;box.todos().filter(n=>n.type==='radio')[0].onchange();
+  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
+  assert.equal(box.todos().find(n=>n.tagName==='a').href,B.urlFormato('definitiva'));
+  modulo.ocultar();
+  // Sin enlace en los datos, se explica en vez de mostrar un botón roto.
+  const datosBajas=c.SATE_DATA.bajas;c.SATE_DATA.bajas=undefined;
+  modulo.mostrar({tramite:'baja_temporal'});
+  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa e imprime'),'Reanuda en el último paso con lo capturado en esta sesión');
+  assert.equal(box.todos().find(n=>n.tagName==='a'),undefined);assert.ok(box.todos().some(n=>/no tenemos el enlace/.test(n.textContent)));
+  c.SATE_DATA.bajas=datosBajas;modulo.ocultar();
+  // CSS: pasos, tarjetas, impresión y foco con tokens.
+  const cssV=readFileSync('web/sate/componentes.css','utf8');
+  for(const regla of [/\.tramite-bloque\{/,/\.tramite-rejilla\{/,/\.tramite-fila\{/,/\.tramite-paso-ir\{/,/@media print\{/,/\.tramite-solo-impresion\{display:none\}/,/\.tramite-guardado\{/])assert.match(cssV,regla);
+  console.log('Ventanilla VEN1: portada por grupos, bajas temporal y definitiva, pasos navegables, tarjetas, privacidad y resumen imprimible correctos.');
 }

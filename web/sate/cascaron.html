@@ -804,6 +804,50 @@ html[data-vista=cupos] .brand h1{font-size:1.5rem}
 .cupos-mini-agenda{display:none}
 #cupos-calendario .blk{cursor:default}
 @media(max-width:639px){#cupos-vista .cupos-alternativa{align-items:stretch;flex-direction:column}#cupos-vista .colhead{align-items:stretch;flex-direction:column}#cupos-opciones .calwrap{display:none}.cupos-mini-agenda{display:block}#cupos-vista .box2{padding:12px}}
+/* Barra de configuración de Cupos (VEN1): avisos y consulta automática arriba, sin bloque desplegable. */
+.cupos-config{display:grid;gap:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+#cupos-vista .cupos-config h3{margin:0;font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ipn-tenue)}
+#cupos-vista .cupos-config-controles{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2) var(--ipn-esp-5);padding:0}
+.cupos-config-grupo{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2) var(--ipn-esp-4);min-width:0}
+#cupos-vista .cupos-interruptor{position:relative;display:inline-flex;flex-wrap:nowrap;align-items:center;gap:10px;min-height:44px;cursor:pointer;font-weight:500}
+.cupos-interruptor input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.cupos-interruptor-pista{position:relative;flex:none;width:38px;height:22px;border-radius:999px;background:var(--ipn-linea);transition:background .15s}
+.cupos-interruptor-pista::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--ipn-superficie);transition:transform .15s}
+.cupos-interruptor input:checked~.cupos-interruptor-pista{background:var(--ipn-acento)}
+.cupos-interruptor input:checked~.cupos-interruptor-pista::after{transform:translateX(16px)}
+.cupos-interruptor input:disabled~*{opacity:.55}
+.cupos-interruptor input:focus-visible~.cupos-interruptor-pista{outline:2px solid var(--sate-realce);outline-offset:2px}
+.cupos-config select:disabled{opacity:.5}
+.cupos-config-estado{display:grid;gap:2px}
+#cupos-vista .cupos-config-estado p,#cupos-vista .cupos-config-ayuda{margin:0;font-size:.85rem;color:var(--ipn-tenue)}
+#cupos-vista .cupos-config-estado p:empty{display:none}
+#cupos-vista .cupos-config-estado .cupos-antigua{color:var(--ipn-aviso)}
+#cupos-vista .cupos-config p:empty{display:none}
+#cupos-vista summary::after{content:"";margin-left:auto;width:.55rem;height:.55rem;border-right:2px solid var(--ipn-tenue);border-bottom:2px solid var(--ipn-tenue);transform:rotate(45deg) translateY(-2px);transition:transform .15s}
+#cupos-vista details[open]>summary::after{transform:rotate(-135deg) translateY(-2px)}
+.cupos-medidor{display:grid;gap:4px;min-width:9rem;font-variant-numeric:tabular-nums}
+.cupos-medidor-t{font-weight:600}
+.cupos-medidor-d{font-size:.8rem;color:var(--ipn-tenue)}
+.cupos-pista{display:block;height:8px;border-radius:4px;background:var(--ipn-hundido);border:1px solid var(--ipn-linea);overflow:hidden}
+.cupos-pista i{display:block;height:100%;background:var(--ipn-ok)}
+.cupos-m-ok .cupos-medidor-t{color:var(--ipn-ok)}
+.cupos-m-poco .cupos-medidor-t{color:var(--ipn-aviso)}.cupos-m-poco .cupos-pista i{background:var(--ipn-aviso)}
+.cupos-m-lleno .cupos-medidor-t{color:var(--ipn-error)}.cupos-m-lleno .cupos-pista i{background:var(--ipn-error)}
+@media(max-width:639px){
+  .cupos-config{padding:var(--ipn-esp-3)}
+  .cupos-config-grupo{width:100%;justify-content:space-between}
+  .cupos-tabla table,.cupos-tabla tbody,.cupos-tabla tr{display:block}
+  .cupos-tabla thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .cupos-tabla caption{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+  .cupos-tabla tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding-block:12px;border-bottom:1px solid var(--ipn-linea)}
+  .cupos-tabla th,.cupos-tabla td{display:block;padding:0;border:0}
+  .cupos-tabla th[scope=row]{grid-column:2;grid-row:1;text-align:right}
+  .cupos-tabla td:nth-child(2){grid-column:1;grid-row:1;min-width:0}
+  .cupos-tabla td:nth-child(3){display:none}
+  .cupos-tabla td:nth-child(4),.cupos-tabla td:nth-child(5){grid-column:1/-1;font-size:.85rem;color:var(--ipn-tenue)}
+  .cupos-tabla td:nth-child(6){grid-column:1/-1}
+  .cupos-tabla td:last-child{position:static}
+}
 </style>
 
 <!--__INST_HEADER__-->

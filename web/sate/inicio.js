@@ -107,7 +107,7 @@
       await cargas.get('tramites.json'); await script('tramites.js');
       for (const tramite of cfg.tramites) {
         if (tramite === 'electivas') await script('../tramites/electivas-reglas.js');
-        await script(tramite + '.js');
+        await script(cfg.scriptsTramite?.[tramite] || tramite + '.js');
       }
     }
     if (!modulos[id]) throw new Error('Módulo sin registrar: ' + id);
