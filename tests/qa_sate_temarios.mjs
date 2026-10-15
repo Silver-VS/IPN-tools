@@ -126,8 +126,13 @@ function el(document, tag, attrs = {}, hijos = []) {
   const piloto = JSON.parse(leer('data/recursos/upiita/bionica.json'));
   assert.ok(T.recursosValidos(piloto));
   igual(JSON.parse(leer('web/dist/sate/datos/upiita/recursos/bionica.json')), piloto);
-  assert.equal(Object.keys(piloto).length, 26);
-  assert.equal(Object.values(piloto).flat().length, 55);
+  assert.equal(Object.keys(piloto).length, 63);   // piloto (niveles 1–2) + REC2 (niveles 3–5)
+  assert.equal(Object.values(piloto).flat().length, 109);
+  for (const carrera of ['mecatronica', 'telematica']) {
+    const datos = JSON.parse(leer(`data/recursos/upiita/${carrera}.json`));
+    assert.ok(T.recursosValidos(datos), carrera);
+    igual(JSON.parse(leer(`web/dist/sate/datos/upiita/recursos/${carrera}.json`)), datos);
+  }
   for (const clave of ['B213', 'B211', 'B215']) assert.equal(piloto[clave], undefined);
   assert.ok(piloto.B103.some(r => r.url.endsWith('_(Kuttler)')), 'conserva el paréntesis de LibreTexts');
 }
