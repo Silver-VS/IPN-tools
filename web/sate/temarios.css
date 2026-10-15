@@ -8,7 +8,8 @@
 .tmr-panel{position:fixed;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 3rem));max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);border:1px solid var(--ipn-linea);border-radius:12px;box-shadow:0 24px 60px -16px rgba(0,0,0,.45);overflow:hidden}
 .tmr-panel[hidden],.tmr-velo[hidden]{display:none}
 .tmr-velo{position:fixed;inset:0;z-index:59;background:rgba(20,12,16,.45)}
-.tmr-panel-enc{display:flex;align-items:center;justify-content:flex-end;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-5);color:var(--ipn-tenue)}
+.tmr-panel-enc{position:absolute;top:var(--ipn-esp-2);right:var(--ipn-esp-3);z-index:1;display:flex;color:var(--ipn-tenue)}
+.tmr-panel-cuerpo>:first-child{padding-right:2.5rem}
 .tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font:inherit;font-size:1.5rem;cursor:pointer}
 .tmr-panel-cuerpo{overflow:auto;overscroll-behavior:contain;padding:var(--ipn-esp-5);display:grid;gap:calc(var(--ipn-esp-5) * 1.5);line-height:1.6}
 .tmr-panel :focus-visible{outline:2px solid var(--ipn-acento);outline-offset:3px}
@@ -38,7 +39,7 @@ a.guia-tarjeta:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:
 .tmr-estado{margin:0;color:var(--ipn-tenue)}
 @media(max-width:639.98px){
   .tmr-panel{inset:0;transform:none;width:100%;height:100dvh;max-height:100dvh;border-radius:0;box-sizing:border-box}
-  .tmr-panel-enc,.tmr-panel-cuerpo{padding:var(--ipn-esp-4)}
+  .tmr-panel-cuerpo{padding:var(--ipn-esp-4)}
   .guia-apartados{grid-template-columns:minmax(0,1fr)}
   .tmr-cifras{grid-template-columns:repeat(2,minmax(0,1fr))}
   .tmr-cifras div:last-child{grid-column:1 / -1}
