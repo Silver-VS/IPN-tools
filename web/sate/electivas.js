@@ -162,7 +162,7 @@
       if(k==='q5'){
         if(inscrito())seccion.appendChild(nodo('small','Tu SAES muestra inscripción reciente. Confirma si esta respuesta sigue siendo correcta.'));
         seccion.appendChild(boton(f.confirmada?'Respuesta confirmada':'Confirmar mi respuesta',()=>{if(['si','no'].includes(f.q5)){f.confirmada=true;ctx.cambiar();ctx.repintar()}}));
-        if(f.q5==='no'){seccion.appendChild(nodo('p','Necesitas un dictamen que autorice la liberación de electivas.'));const enlace=nodo('a','Ir al trámite de dictamen');enlace.href='#/'+SATE_UNIDAD+'/tramites/dictamen';seccion.appendChild(enlace)}
+        if(f.q5==='no'){seccion.appendChild(nodo('p','Necesitas un dictamen que autorice la liberación de electivas.'));const enlace=nodo('a','Ir al trámite de dictamen');enlace.href='#/'+SATE_UNIDAD+'/tramites/dictamen';enlace.className='sate-btn';seccion.appendChild(enlace)}
       }box.appendChild(seccion);
     }
     const contador=nodo('p');contador.setAttribute('aria-live','polite');

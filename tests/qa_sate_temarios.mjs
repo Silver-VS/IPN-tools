@@ -1,4 +1,4 @@
-// Temarios: adaptador, lector de PoliCORE, planeación del mapa, panel, explorador y rutas.
+// Temarios: adaptador, lector de PoliCORE, planeación del mapa, vistazo, selector, vista única y rutas.
 // DOM en memoria (tests/dom_minimo.mjs): sin navegador ni red. Requiere haber compilado: python tools/build_horarios.py
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
@@ -50,6 +50,13 @@ function contexto(extra = {}) {
       return {ok: true, json: async () => JSON.parse(leer(f))};
     }, ...extra});
   vm.runInContext('window=globalThis', c);
+  const crear = document.createElement.bind(document);
+  document.createElement = tag => { const n = crear(tag); if (tag === 'dialog') { n.showModal = () => { n.open = true; }; n.close = () => { n.open = false; }; } return n; };
+  document.createElementNS = (ns, tag) => document.createElement(tag);
+  document.contains = n => document.documentElement.contains(n);
+  c.innerHeight = 800; c.addEventListener = () => {};
+  vm.runInContext(leer('web/sate/componentes.js'), c);
+  c.SateUI.usarTextos(texto);
   return {c, document, Evento, estado};
 }
 function el(document, tag, attrs = {}, hijos = []) {
@@ -286,30 +293,35 @@ function el(document, tag, attrs = {}, hijos = []) {
 
   const T = c.SATE.temarios, T_ = c.SateTemarios;
   c.SATE_CONFIG.guia = config.guia;
-  const portada = document.body.appendChild(el(document,'section',{id:'sate-guia'}));
   c.SATE_CONFIG.bibliotecas = config.bibliotecas;
-  await modulos.guia.mostrar();
-  // Dos caminos de primera clase, sin tarjetas genéricas
-  assert.equal(portada.querySelectorAll('.guia-tarjeta').length, 0, 'la portada ya no son tarjetas genéricas');
-  igual(portada.querySelectorAll('.gd-camino h3').map(x => x.textContent), ['Consultar un temario', 'Explorar mi carrera']);
-  igual(portada.querySelectorAll('.gd-camino--dos .gd-puntos li').map(x => x.textContent).length, 3);
-  assert.equal(portada.querySelector('.gd-todos').getAttribute('href'), '#/upiita/guia/programas');
-  // Camino 1: búsqueda directa
-  const q = portada.querySelector('.gd-buscar');
+  vm.runInContext(leer('web/sate/bibliotecas.js'), c);
+  const m = modulos.temarios; assert.ok(m, 'registra la vista temarios');
+  assert.equal(modulos.guia, undefined, 'la portada de la Guía ya no vive en temarios.js (guia.js)');
+  const caja2 = document.getElementById('sate-temarios');
+  await m.mostrar({partes: []});
+  const portada = caja2;
+  // Programas de estudio: migas, búsqueda directa, selector y explorador por líneas
+  assert.equal(portada.querySelector('h2').textContent, 'Programas de estudio');
+  igual(portada.querySelectorAll('.sate-migas li').map(x => x.textContent), ['Guía politécnica', 'Programas de estudio']);
+  assert.equal(portada.querySelector('.sate-migas li a').getAttribute('href'), '#/upiita/guia');
+  assert.equal(portada.querySelector('.sate-migas__volver').getAttribute('href'), '#/upiita/guia', 'en teléfono: «← Volver a Guía politécnica»');
+  assert.match(portada.querySelector('.sate-migas__volver').textContent, /Volver a Guía politécnica/);
+  // Consultar una materia
+  const q = portada.querySelector('#gd-q');
   q.value = 'algebra'; q.dispatchEvent(new Evento('input', {target: q}));
-  const resultados = portada.querySelectorAll('.gd-res-item');
+  const resultados = portada.querySelectorAll('.guia-resultado');
   assert.ok(resultados.length >= 1 && resultados.length <= 8);
   assert.equal(resultados[0].getAttribute('href').startsWith('#/upiita/guia/programas/bionica/B'), true);
   assert.ok(resultados.some(a => a.getAttribute('href') === '#/upiita/guia/programas/bionica/B103'));
-  assert.equal(portada.querySelector('.gd-res').hidden, false);
+  assert.equal(portada.querySelector('#gd-res').hidden, false);
   q.dispatchEvent(new Evento('keydown', {key: 'Enter', target: q}));
   assert.equal(c.location.hash, resultados[0].getAttribute('href'), 'Enter abre el primer resultado');
   q.value = 'zzzxyz'; q.dispatchEvent(new Evento('input', {target: q}));
-  assert.equal(portada.querySelectorAll('.gd-res-item').length, 0);
-  assert.match(portada.querySelector('.gd-res').textContent, /No hay una materia con ese nombre/);
+  assert.equal(portada.querySelectorAll('.guia-resultado').length, 0);
+  assert.match(portada.querySelector('#gd-res').textContent, /No hay una materia con ese nombre/);
   q.value = ''; q.dispatchEvent(new Evento('input', {target: q}));
-  assert.equal(portada.querySelector('.gd-res').hidden, true);
-  // Camino 2: explorador por líneas de aprendizaje y niveles; la carrera del mapa (Biónica) viene elegida
+  assert.equal(portada.querySelector('#gd-res').hidden, true);
+  // El explorador por líneas: la carrera del mapa (Biónica) viene elegida
   const exp = portada.querySelector('#gd-explorar');
   assert.ok(exp, 'sección del explorador');
   assert.equal(exp.querySelector('#gd-carrera').value, 'bionica');
@@ -318,12 +330,15 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(portada.querySelectorAll('.gd-fila').length, filas.length + 1, 'una fila por línea más el encabezado de niveles');
   assert.ok(filas.at(-1).nombre === null && filas.at(-1).items.length > 0, 'las optativas van al final, en su propia fila');
   assert.ok(filas.every(f => f.items.every((i, k) => k === 0 || f.items[k - 1].v <= i.v)), 'cada línea ordenada por nivel');
+  const hijosExp = exp.children.map(n => n.getAttribute('class'));
+  assert.ok(hijosExp.indexOf('gd-inspector') < hijosExp.indexOf('gd-mapa'), 'el resultado va ARRIBA del mapa, donde se ve sin buscarlo');
   assert.match(portada.querySelector('.gd-inspector').textContent, /Elige una materia/);
   const chipAlgebra = portada.querySelector('.gd-chip[data-clave=B103]');
   assert.match(chipAlgebra.getAttribute('class'), /gd-n1\b/, 'el chip va en la columna de su nivel');
   chipAlgebra.click();
   const insp = portada.querySelector('.gd-inspector');
   assert.equal(insp.querySelector('h4').textContent, 'Álgebra lineal');
+  assert.equal(insp.classList.contains('sate-resalte'), true, 'el resultado se resalta al elegir');
   assert.equal(insp.querySelector('.btn').getAttribute('href'), '#/upiita/guia/programas/bionica/B103');
   const rel = T_.relaciones(indice.materias, 'B103');
   igual(insp.querySelectorAll('.gd-mini').length, 1, 'B103 es una base: solo desbloquea');
@@ -337,34 +352,60 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(insp.querySelector('.gd-quees').hidden, false);
   assert.equal(insp.querySelector('.gd-quees').textContent, bionica.find(r => r.clave === 'B103').descripcion, 'qué es: la descripción de la ficha');
   assert.doesNotMatch(insp.textContent, /Para qué sirve|trabajo/i, 'sin dato no se inventa');
-  // elegir una materia desbloqueada desde el inspector
   insp.querySelector('.gd-mini button').click();
   assert.equal(portada.querySelector('.gd-inspector h4').textContent, indice.materias[rel.despues[0]].n);
-  // otra carrera
   const selC = portada.querySelector('#gd-carrera');
   selC.value = 'telematica'; selC.dispatchEvent(new Evento('change', {target: selC}));
   assert.equal(portada.querySelectorAll('.gd-chip').length, 71);
   assert.match(portada.querySelector('.gd-inspector').textContent, /Elige una materia/, 'al cambiar de carrera se limpia la selección');
   selC.value = 'bionica'; selC.dispatchEvent(new Evento('change', {target: selC}));
-  // especializaciones (líneas de data/especialidades.json)
-  const modos = portada.querySelectorAll('.gd-seg button');
+  // «Líneas de aprendizaje» y «Especializaciones»: control segmentado común, con el resalte dentro de su marco
+  const modos = portada.querySelectorAll('.sate-segmentado button');
   assert.equal(modos.length, 2);
+  assert.equal(modos[0].getAttribute('aria-pressed'), 'true'); assert.equal(modos[1].getAttribute('aria-pressed'), 'false');
   modos[1].click();
-  assert.equal(portada.querySelector('.gd-esp').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true);
+  assert.equal(portada.querySelector('.gd-esp').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true); assert.equal(portada.querySelector('.gd-inspector').hidden, true);
   assert.equal(portada.querySelectorAll('.gd-esp-linea').length, 6);
   assert.equal(portada.querySelectorAll('.gd-esp-area').length, 3);
   assert.ok(portada.querySelector('.gd-esp-linea a').getAttribute('href').startsWith('#/upiita/guia/programas/bionica/B'));
   modos[0].click();
   assert.equal(portada.querySelector('.gd-mapa').hidden, false);
-  // «¿No sabes por dónde empezar?»: bibliotecas del IPN desde datos
-  assert.match(portada.querySelector('.gd-ayuda h3').textContent, /¿No sabes por dónde empezar\?/);
-  const bib = portada.querySelectorAll('.gd-biblio a');
-  igual(bib.map(a => a.getAttribute('href')), ['https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b-0', 'https://www.ipn.mx/bibliotecas-publicaciones/recursos-digitales/biblioteca-digital.html']);
-  for (const a of bib) { assert.equal(a.getAttribute('target'), '_blank'); assert.equal(a.getAttribute('rel'), 'noopener noreferrer'); }
-  assert.equal(portada.querySelectorAll('.gd-pasos li').length, 4);
-  // Lo demás, discreto y marcado como próximamente
-  igual(portada.querySelectorAll('.gd-pronto li strong').map(x => x.textContent), ['Normativa', 'Tu unidad académica', 'Historia y organización del IPN']);
-  assert.equal(portada.querySelectorAll('.guia-icono').length, 3);
+  assert.equal(portada.querySelector('.gd-seg'), null, 'ya no hay un menú propio de la Guía: es el componente común');
+  const cssComun = leer('web/sate/componentes.css');
+  assert.match(cssComun, /\.sate-segmentado\{[^}]*border-radius:var\(--ipn-radio\)/, 'marco rectangular redondeado, no una píldora que recorte el resalte');
+  assert.doesNotMatch(leer('web/sate/temarios.css'), /gd-seg/);
+  // Selector: ventana amplia con la trayectoria visual, buscador, áreas y orden
+  T.abrirSelector({carrera: 'bionica'});
+  const dlg = document.querySelector('dialog');
+  assert.equal(dlg.open, true); assert.equal(dlg.classList.contains('sate-modal--amplio'), true);
+  assert.equal(dlg.querySelector('.sate-modal__titulo').textContent, 'Elegir una unidad de aprendizaje');
+  igual(dlg.querySelectorAll('.sel-col h3').map(x => x.textContent), ['Nivel 1', 'Nivel 2', 'Nivel 3', 'Nivel 4', 'Nivel 5']);
+  assert.equal(dlg.querySelectorAll('.sel-materia').length, 72);
+  assert.equal(dlg.querySelector('.sel-estado').textContent, 'Ordenadas por nivel. 72 unidades de aprendizaje', 'el orden se dice y se muestra');
+  assert.equal(dlg.querySelector('[data-id=nivel]').getAttribute('aria-pressed'), 'true');
+  const areasSel = dlg.querySelectorAll('.sel-area');
+  assert.equal(areasSel[0].textContent, 'Todas las áreas');
+  igual(areasSel.slice(1).map(b => b.textContent), indice.carreras.bionica.areas.map(a => a.nombre).filter((n, i, t) => t.indexOf(n) === i && Object.values(indice.materias).some(m => m.c === 'bionica' && m.a === n)));
+  areasSel[1].click();
+  const deArea = Object.values(indice.materias).filter(x => x.c === 'bionica' && x.a === areasSel[1].textContent).length;
+  assert.equal(dlg.querySelectorAll('.sel-materia').length, deArea);
+  assert.equal(dlg.querySelectorAll('.sel-area').filter(b => b.getAttribute('aria-pressed') === 'true').length, 1);
+  dlg.querySelectorAll('.sel-area')[0].click();
+  dlg.querySelector('[data-id=az]').click();
+  assert.match(dlg.querySelector('.sel-estado').textContent, /^Ordenadas de la A a la Z\. 72 unidades de aprendizaje$/);
+  const nombresAz = dlg.querySelectorAll('.sel-lista .sel-materia span').map(x => x.textContent);
+  igual(nombresAz, nombresAz.slice().sort((x, y) => x.localeCompare(y, 'es')), 'orden alfabético');
+  dlg.querySelector('[data-id=nivel]').click();
+  const entradaSel = dlg.querySelector('input[type=search]');
+  entradaSel.value = 'algebra'; entradaSel.dispatchEvent(new Evento('input', {target: entradaSel}));
+  await dormir(40);
+  assert.ok(dlg.querySelector('.sel-materia[data-clave=B103]') && dlg.querySelectorAll('.sel-materia').length < 72);
+  dlg.querySelector('.sel-materia[data-clave=B103]').click();
+  assert.equal(dlg.open, false, 'al elegir, la ventana se cierra');
+  assert.equal(c.location.hash, '#/upiita/guia/programas/bionica/B103');
+  T.abrirSelector({carrera: 'bionica'});
+  assert.equal(document.querySelector('dialog').querySelectorAll('.sel-materia').length, 72, 'cada vez que se abre, sin la búsqueda anterior');
+  document.querySelector('dialog').dispatchEvent(new Evento('cancel'));
   const fetchOriginal = c.fetch;
   c.fetch = async url => url.endsWith('/recursos/bionica.json') ? {ok:true,json:async()=>({B101:[{titulo:'Vectores de prueba',url:'https://example.org/estudio',fuente:'Academia ficticia',idioma:'es',tipo:'Curso',licencia:'CC0'}]})} : fetchOriginal(url);
   await T.preparar();
@@ -412,17 +453,16 @@ function el(document, tag, attrs = {}, hijos = []) {
   panel.style.setProperty = (k, v) => { estilos[k] = v; };
   await T.abrir('B101', caja1);
   assert.equal(estilos['--tmr-area'], bionica.find(r => r.clave === 'B101').area.color);
-  assert.equal(panel.querySelector('.tmr-recurso').getAttribute('href'),'https://example.org/estudio');
-  assert.match(panel.querySelector('.tmr-recurso').textContent,/Academia ficticia/);
-  assert.equal(panel.querySelector('.tmr-recurso').getAttribute('rel'), 'noopener noreferrer');
-  assert.equal(panel.querySelector('.tmr-oficial').getAttribute('href'), '#/upiita/guia/programas/bionica/B101/objetivo');
+  assert.equal(panel.querySelector('.tmr-recurso'), null, 'el vistazo no lista recursos: eso es de la ficha completa');
+  assert.equal(panel.querySelector('.tmr-oficial'), null, 'ya no hay una tercera vista «Leer el programa completo aquí»');
+  assert.equal(panel.querySelector('.tmr-completa').getAttribute('href'), '#/upiita/guia/programas/bionica/B101');
+  assert.equal(panel.querySelector('.tmr-completa').textContent, 'Ver ficha completa');
   const pdf = panel.querySelector('.tmr-pdf'), regB101 = bionica.find(r => r.clave === 'B101');
   assert.equal(pdf.textContent, 'Ver programa original (PDF)');
   assert.equal(pdf.getAttribute('href'), regB101.pdf);
   assert.match(pdf.getAttribute('href'), /^https:\/\/cloud\.upiita\.ipn\.mx\/public\.php\/dav\/files\/73kqMKWfwDNAd2r\/NIVEL_I\/BIOLOG%C3%8DA%20CELULAR\.pdf$/);
   assert.equal(pdf.getAttribute('target'), '_blank'); assert.equal(pdf.getAttribute('rel'), 'noopener noreferrer');
-  assert.ok(panel.querySelector('.tmr-biblio li'), 'la ficha trae la bibliografía del programa');
-  assert.ok(panel.querySelector('.tmr-catalogo').getAttribute('href').includes('dirbibliotecas.ipn.mx'));
+  assert.equal(panel.querySelector('.tmr-biblio'), null, 'la bibliografía y las bibliotecas están en la ficha completa');
   assert.match(panel.textContent, /pendiente de revisión por la academia/);
   assert.match(panel.querySelector('.tmr-rel-enlace').getAttribute('href'), /^#\/upiita\/guia\/programas\/bionica\/B\d+$/, 'antes y después enlazan a sus fichas');
   assert.equal(document.activeElement, panel);
@@ -469,102 +509,55 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(T.enlaceHtml('B102'), '');
   assert.equal(T.enlaceHtml('XXX'), '');
 
-  /* ----- Explorador independiente ----- */
-  const caja2 = document.getElementById('sate-temarios');
-  const m = modulos.temarios; assert.ok(m, 'registra la vista temarios');
-  await m.mostrar({partes: []});
-  assert.equal(caja2.querySelector('.tmr').getAttribute('data-vista'), 'lista');
-  assert.equal(caja2.querySelector('h2').textContent, 'Programas de estudio de unidades de aprendizaje');
-  assert.equal(caja2.querySelector('.tmr-elegir').textContent, 'Elige una unidad de aprendizaje de la lista para leer su temario.');
-  const items = () => caja2.querySelectorAll('.tmr-item');
-  assert.equal(items().length, 72, 'la carrera del mapa (Biónica) viene seleccionada');
-  assert.equal(caja2.querySelector('.tmr-resumen').textContent, '72 unidades de aprendizaje');
-  igual(caja2.querySelectorAll('.tmr-grupo h3').map(h => h.textContent), ['Nivel 1', 'Nivel 2', 'Nivel 3', 'Nivel 4', 'Nivel 5']);
-  assert.equal(items()[0].getAttribute('href').startsWith('#/upiita/guia/programas/bionica/B'), true);
-  const selCarrera = caja2.querySelectorAll('select')[0];
-  assert.equal(selCarrera.querySelectorAll('option').length, 4, 'Todas + 3 carreras');
-  // Filtros
-  selCarrera.value = '*'; selCarrera.dispatchEvent(new Evento('change', {target: selCarrera}));
-  assert.equal(items().length, 240);
-  assert.equal(almacen.tmFiltros.carrera, '*');
-  selCarrera.value = 'telematica'; selCarrera.dispatchEvent(new Evento('change', {target: selCarrera}));
-  assert.equal(items().length, 71); assert.ok(items().every(a => a.dataset.clave.startsWith('T')));
-  const selTipo = caja2.querySelectorAll('select')[2];
-  selTipo.value = 'elegible'; selTipo.dispatchEvent(new Evento('change', {target: selTipo}));
-  assert.equal(items().length, 8);
-  selTipo.value = '*'; selTipo.dispatchEvent(new Evento('change', {target: selTipo}));
-  const selNivel = caja2.querySelectorAll('select')[1];
-  selNivel.value = '4'; selNivel.dispatchEvent(new Evento('change', {target: selNivel}));
-  assert.equal(items().length, 5); selNivel.value = '*'; selNivel.dispatchEvent(new Evento('change', {target: selNivel}));
-  selCarrera.value = 'bionica'; selCarrera.dispatchEvent(new Evento('change', {target: selCarrera}));
-  // Búsqueda: nombre al instante, contenido después de cargar los temarios
-  const buscar = caja2.querySelector('.tmr-buscar');
-  buscar.value = 'algebra'; buscar.dispatchEvent(new Evento('input', {target: buscar}));
-  await dormir(400);
-  assert.ok(items().length >= 1 && items().length < 72);
-  assert.ok(items().some(a => a.dataset.clave === 'B103'));
-  assert.match(caja2.querySelector('.tmr-resumen').textContent, /unidad(es)? de aprendizaje$/);
-  assert.equal(caja2.querySelector('mark.tmr-marca').textContent.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''), 'algebra', 'resalta sin acentos');
-  buscar.value = 'gauss'; buscar.dispatchEvent(new Evento('input', {target: buscar}));
-  await dormir(400);
-  const gauss = items().find(a => a.dataset.clave === 'B103');
-  assert.ok(gauss, 'busca también en el objetivo');
-  assert.match(gauss.textContent, /Coincide en: objetivo/);
-  assert.ok(estado.fetches.some(u => u.endsWith('telematica.json')), 'la búsqueda de contenido descargó todas las carreras');
-  buscar.value = 'zzzxyz'; buscar.dispatchEvent(new Evento('input', {target: buscar}));
-  await dormir(200);
-  assert.equal(items().length, 0);
-  assert.equal(caja2.querySelector('.tmr-resumen').textContent, 'Ninguna unidad de aprendizaje coincide');
-  assert.equal(caja2.querySelector('.tmr-vacio').textContent, 'Prueba con otro nombre o quita algún filtro.');
-  buscar.value = ''; buscar.dispatchEvent(new Evento('input', {target: buscar})); await dormir(200);
-  assert.equal(items().length, 72);
-  // Enlaces profundos
-  await m.mostrar({partes: ['bionica', 'B103', 'contenidos']});
-  assert.equal(caja2.querySelector('.tmr').getAttribute('data-vista'), 'lector');
-  assert.equal(caja2.querySelector('.tmr-lector .pc-titulo').textContent, indice.materias.B103.n);
-  assert.equal(document.scrolled.getAttribute('data-pc-seccion'), 'contenidos');
-  assert.equal(caja2.querySelector('.tmr-item[aria-current=page]').dataset.clave, 'B103');
-  assert.equal(caja2.querySelector('.pc-lector').getAttribute('data-pc-modo'), 'pagina');
-  const hijos = caja2.querySelector('.tmr-lector');
-  const montaje = hijos.querySelector('.pc-lector');
-  await m.mostrar({partes: ['bionica', 'B103', 'evaluacion']});
-  assert.equal(hijos.querySelector('.pc-lector'), montaje, 'misma materia: no se vuelve a montar');
-  assert.equal(document.scrolled.getAttribute('data-pc-seccion'), 'evaluacion');
-  caja2.querySelector('.pc-copiar[data-id=objetivo]').dispatchEvent(new Evento('click'));
-  await dormir(5);
-  assert.equal(estado.copiados.at(-1), 'https://sitio.test/sate/index.html#/upiita/guia/programas/bionica/B103/objetivo');
-  caja2.querySelector('.pc-indice-a[data-id=bibliografia]').dispatchEvent(new Evento('click'));
-  assert.equal(estado.urls.at(-1), '/sate/index.html#/upiita/guia/programas/bionica/B103/bibliografia', 'la sección abierta actualiza la dirección sin recargar');
-  assert.equal(caja2.querySelector('.tmr-volver').getAttribute('href'), '#/upiita/guia/programas/bionica/B103', 'desde el programa completo se vuelve a la ficha');
-  // Ficha en el panel grande (no es modal): mismo componente, datos grandes, recursos, bibliografía y PDF
-  const modalAntes = T.estado.panel.hidden;
+  /* ----- Vista única de la unidad de aprendizaje ----- */
+  const reg103 = bionica.find(r => r.clave === 'B103');
   await m.mostrar({partes: ['bionica', 'B103']});
-  assert.equal(caja2.querySelector('.tmr').getAttribute('data-vista'), 'lector');
-  const fichaPanel = caja2.querySelector('.tmr-lector .tmr-ficha');
-  assert.ok(fichaPanel, 'la ficha va en el panel de la derecha');
-  assert.equal(T.estado.panel.hidden, modalAntes, 'no se abre el modal');
-  assert.equal(fichaPanel.querySelector('h2').textContent, indice.materias.B103.n);
-  assert.equal(fichaPanel.querySelectorAll('.tmr-cifras strong').length, 3);
-  assert.equal(fichaPanel.querySelector('.tmr-descripcion').textContent, bionica.find(r => r.clave === 'B103').descripcion);
-  assert.equal(fichaPanel.querySelectorAll('.tmr-pasos li').length, bionica.find(r => r.clave === 'B103').contenidos.length);
-  assert.equal(fichaPanel.querySelector('.tmr-pdf').getAttribute('href'), bionica.find(r => r.clave === 'B103').pdf);
-  assert.equal(fichaPanel.querySelector('.tmr-oficial').getAttribute('href'), '#/upiita/guia/programas/bionica/B103/objetivo');
-  assert.equal(caja2.querySelector('.tmr-item[aria-current=page]').dataset.clave, 'B103');
-  assert.equal(caja2.querySelector('.tmr-volver').getAttribute('href'), '#/upiita/guia/programas');
-  assert.equal(c.PoliCORE.lector.activos(), 0, 'la ficha breve no monta el lector oficial');
-  // Las tres carreras tienen recurso compartido
-  assert.ok(Object.values(indice.carreras).length === 3 && registros('mecatronica').every(r => r.pdf) && registros('telematica').every(r => r.pdf) && bionica.every(r => r.pdf), 'las tres carreras tienen enlace al PDF');
+  const ficha = caja2.querySelector('.tmr-ficha');
+  assert.ok(ficha, 'la ficha completa es una sola vista');
+  igual(caja2.querySelectorAll('.sate-migas li').map(x => x.textContent), ['Guía politécnica', 'Programas de estudio', indice.materias.B103.n]);
+  assert.equal(caja2.querySelector('.sate-migas__volver').getAttribute('href'), '#/upiita/guia/programas');
+  assert.equal(T.estado.panel.hidden, true, 'no se abre el modal');
+  assert.equal(ficha.querySelector('h2').textContent, indice.materias.B103.n);
+  assert.equal(ficha.querySelectorAll('.tmr-cifras strong').length, 3);
+  assert.equal(ficha.querySelector('.tmr-descripcion').textContent, reg103.descripcion);
+  assert.equal(ficha.querySelector('.tmr-pdf').getAttribute('href'), reg103.pdf);
+  assert.equal(ficha.querySelector('.tmr-oficial'), null, 'sin «Leer el programa completo aquí»');
+  assert.equal(caja2.querySelector('.tmr-col-lista'), null, 'sin lista larga que recorrer');
+  assert.equal(ficha.querySelectorAll('.tmr-pasos li').length, reg103.contenidos.length);
+  const totalSubtemas = reg103.contenidos.reduce((n, u) => n + (u.subtemas || []).length, 0);
+  assert.equal(ficha.querySelectorAll('.tmr-pasos p').length, totalSubtemas, 'unidades completas, con todos sus temas');
+  assert.doesNotMatch(ficha.textContent, /y \d+ más/);
+  const secciones = ficha.querySelectorAll('.tmr-indice a').map(a => a.getAttribute('data-seccion'));
+  for (const id of ['objetivo', 'contenidos', 'evaluacion', 'relaciones', 'bibliografia']) assert.ok(secciones.includes(id), id);
+  assert.equal(ficha.querySelector('#ficha-objetivo p').textContent, reg103.objetivo.split(/\n+/)[0].trim());
+  assert.ok(ficha.querySelector('#ficha-bibliografia .tmr-biblio li'), 'la bibliografía del programa');
+  // Buscar en bibliotecas, prellenado con el nombre de la materia
+  const panelBib = ficha.querySelector('.sate-biblio');
+  assert.ok(panelBib);
+  assert.equal(panelBib.querySelector('input[type=search]').value, indice.materias.B103.n);
+  const destinos = panelBib.querySelectorAll('.sate-biblio__destinos a');
+  assert.equal(destinos.length, 3);
+  const termino = encodeURIComponent(indice.materias.B103.n);
+  assert.equal(destinos[0].getAttribute('href'), 'https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b&request=' + termino + '&find_code=WRD');
+  assert.equal(destinos[1].getAttribute('href'), 'https://searchbox.ebsco.com/search/?schemaId=search&custid=s3753448&groupid=main&profid=eds&authtype=ip&scope=site&site=eds-live&direct=true&bquery=' + termino);
+  assert.equal(destinos[2].getAttribute('href'), 'https://tesis.ipn.mx/discover?query=' + termino);
+  for (const a of destinos) { assert.equal(a.getAttribute('target'), '_blank'); assert.equal(a.getAttribute('rel'), 'noopener noreferrer'); }
+  // Misma ficha: un clic en el índice solo se desplaza a la sección
+  await m.mostrar({partes: ['bionica', 'B103', 'evaluacion']});
+  assert.equal(caja2.querySelector('.tmr-ficha'), ficha, 'misma materia: no se vuelve a construir');
+  assert.equal(document.scrolled.getAttribute('id'), 'ficha-evaluacion');
+  // «Elegir otra unidad» abre el selector
+  ficha.querySelector('.tmr-cambiar').click();
+  assert.equal(document.querySelector('dialog').open, true);
+  document.querySelector('dialog').dispatchEvent(new Evento('cancel'));
   await m.mostrar({partes: ['bionica', 'B999']});
-  assert.equal(caja2.querySelector('.tmr-lector').textContent, 'No encontramos ese temario. Puede que la clave haya cambiado.');
+  assert.equal(caja2.querySelector('h2').textContent, 'Programa no encontrado');
+  assert.match(caja2.textContent, /No encontramos ese programa/);
   await m.mostrar({partes: ['telematica', 'B103']});
-  assert.match(caja2.querySelector('.tmr-lector').textContent, /No encontramos ese temario/);
+  assert.equal(caja2.querySelector('h2').textContent, 'Programa no encontrado');
   await m.mostrar({partes: []});
-  assert.equal(caja2.querySelector('.tmr').getAttribute('data-vista'), 'lista');
-  assert.equal(c.PoliCORE.lector.activos(), 0);
-  // Enlaces de lista abren la misma ficha y no montan el texto oficial.
-  const primero = items()[0], clic = new Evento('click',{target:primero}); primero.dispatchEvent(clic);
-  assert.equal(clic.defaultPrevented, false, 'el enlace de la lista navega; la ficha se muestra en el panel grande');
-  assert.match(primero.getAttribute('href'), /^#\/upiita\/guia\/programas\/[a-z]+\/[BMT]\d+$/);
+  assert.equal(caja2.querySelector('h2').textContent, 'Programas de estudio');
+  assert.equal(caja2.querySelector('.tmr-ficha'), null);
   // Sin datos en la unidad: mensaje, sin errores
   const sin = contexto();
   const sinModulos = {};
@@ -573,25 +566,22 @@ function el(document, tag, attrs = {}, hijos = []) {
   const cajaSin = sin.document.body.appendChild(el(sin.document, 'section', {id: 'sate-temarios'}));
   await sinModulos.temarios.mostrar({partes: []});
   assert.equal(cajaSin.textContent, 'Aún no hay programas de estudio de esta unidad');
-  const portadaSin = sin.document.body.appendChild(el(sin.document,'section',{id:'sate-guia'}));
-  await sinModulos.guia.mostrar();
-  assert.equal(portadaSin.querySelectorAll('.gd-camino').length,0);
-  assert.equal(portadaSin.querySelectorAll('.gd-pronto li').length,3);
-  assert.match(portadaSin.textContent,/Aún no hay programas de estudio de esta unidad/);
-  assert.equal(sin.estado.fetches.length,0,'la Guía sin programas no solicita datos inexistentes');
+  assert.equal(sin.estado.fetches.length,0,'una unidad sin programas no solicita datos inexistentes');
 }
 
-/* Catálogo real del piloto: carga y tarjetas en la ficha sin montar el mapa. */
+/* Catálogo real del piloto: carga y tarjetas en la ficha completa sin montar el mapa. */
 {
   const {c, document} = contexto();
+  const modulos = {};
   Object.assign(c, {
     SATE_CONFIG: config, SATE_UNIDAD: 'upiita',
-    SATE: {texto, pestana() {}, cargarTemarios: async () => {}}
+    SATE: {texto, pestana: (id, m) => { modulos[id] = m; }, error: e => { throw e; }, cargarTemarios: async () => {}}
   });
-  vm.runInContext(leer('web/policore/lector.js'), c);
+  vm.runInContext(leer('web/sate/bibliotecas.js'), c);
   vm.runInContext(leer('web/sate/temarios.js'), c);
+  document.body.appendChild(el(document, 'section', {id: 'sate-temarios'}));
   await c.SATE.temarios.preparar();
-  await c.SATE.temarios.abrir('B103');
+  await modulos.temarios.mostrar({partes: ['bionica', 'B103']});
   const tarjetas = document.querySelectorAll('.tmr-recurso');
   assert.equal(tarjetas.length, 3);
   assert.ok(tarjetas.some(a => a.getAttribute('href').endsWith('_(Kuttler)')));
@@ -645,13 +635,21 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(R.ruta('#/upiita/guia/programas/a b', 'upiita', cfg), null);
   assert.equal(R.ruta('#/upiita/guia/programas/..%2f', 'upiita', cfg), null);
   assert.equal(R.ruta('#/upiita/mapa/algo', 'upiita', cfg), null, 'las pestañas normales no aceptan partes');
+  // Apartados de la Guía: #/<unidad>/guia/<apartado>[/<pregunta>]
+  const rg = R.ruta('#/upiita/guia/situacion/que-es-dictamen', 'upiita', cfg);
+  assert.equal(rg.pestana, 'guia'); igual(rg.partes, ['situacion', 'que-es-dictamen']); assert.equal(rg.hash, '#/upiita/guia/situacion/que-es-dictamen');
+  igual(R.ruta('#/upiita/guia', 'upiita', cfg).partes, []);
+  assert.equal(R.ruta('#/upiita/guia/a/b/c', 'upiita', cfg), null, 'demasiadas partes');
+  assert.equal(R.ruta('#/upiita/guia/a%20b', 'upiita', cfg), null);
   for (const u of Object.keys(cfg).filter(u => u !== 'upiita')) {
     assert.equal(R.ruta('#/' + u + '/guia', u, cfg).pestana, 'guia');
     assert.equal(R.ruta('#/' + u + '/temarios', u, cfg).hash, '#/' + u + '/guia/programas');
     igual(cfg[u].vistas, [], u);
+    assert.equal(cfg[u].guiaDatos, false, u + ': sin contenido de la Guía propio');
     assert.equal(existsSync('web/dist/sate/datos/' + u + '/temarios'), false, u + ': no se copian temarios');
   }
   igual(cfg.upiita.vistas, [{id: 'temarios', padre: 'guia'}]);
+  assert.equal(cfg.upiita.guiaDatos, true);
   assert.equal(R.redireccion('upiita', '', '#/temarios/bionica'), 'sate/index.html#/upiita/guia/programas/bionica');
   // Datos compilados
   assert.equal(Object.keys(indice.materias).length, 240);
@@ -690,4 +688,4 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.ok(document.getElementById('temario').querySelectorAll('mark.pc-resalte').length > 0, 'q= resalta desde el enlace');
   assert.equal(c.PoliCORE.lector.activos(), 3);
 }
-console.log('OK temarios: adaptador, lector de PoliCORE reutilizable, mapa dedicado a planear, panel/hoja, explorador, enlaces profundos y unidades sin temarios.');
+console.log('OK temarios: adaptador, lector de PoliCORE reutilizable, mapa dedicado a planear, vistazo, selector con trayectoria visual, vista única, enlaces profundos y unidades sin temarios.');
