@@ -789,3 +789,5 @@ body.sate-flotante .sate-barra{display:flex}
   .wrap>header.top #sate-avisos-globales:empty{display:none}
   .wrap>header.top>.sate-navegacion{grid-area:auto;grid-column:1 / -1;grid-row:5;margin-top:var(--ipn-esp-1);padding-block:var(--ipn-esp-2)}
 }
+/* Teléfonos de 320–359 px: logos más bajos para que el ▾ de unidad no desborde la fila 1. */
+@media(max-width:359px){.wrap>header.top .inst-in img,.wrap>header.top .inst-in .unit img{height:22px}}
