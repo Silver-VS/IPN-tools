@@ -67,6 +67,12 @@
       "electivas": {
         "texto": "sate.electivas.acreditacion_actividades",
         "tramite": "electivas"
+      },
+      "biblioteca": "UPITA",
+      "guiaTramites": {
+        "dictamen": "situacion/que-es-dictamen",
+        "baja_temporal": "tramites/baja-temporal",
+        "baja_definitiva": "tramites/baja-definitiva"
       }
     },
     "escom": {
@@ -164,28 +170,53 @@
   ],
   "guia": [
     {
+      "id": "situacion",
+      "titulo": "sate.guia.situacion",
+      "descripcion": "sate.guia.situacion_descripcion",
+      "icono": "⚖",
+      "datos": "faq"
+    },
+    {
+      "id": "tramites",
+      "titulo": "sate.guia.tramites",
+      "descripcion": "sate.guia.tramites_descripcion",
+      "icono": "✎",
+      "datos": "faq"
+    },
+    {
+      "id": "reglamentos",
+      "titulo": "sate.guia.reglamentos",
+      "descripcion": "sate.guia.reglamentos_descripcion",
+      "icono": "§",
+      "datos": "documentos"
+    },
+    {
       "id": "programas",
       "titulo": "sate.guia.programas",
       "descripcion": "sate.guia.programas_descripcion",
-      "icono": "▤"
+      "icono": "▤",
+      "vista": "temarios"
     },
     {
-      "id": "normativa",
-      "titulo": "sate.guia.normativa",
-      "descripcion": "sate.guia.normativa_descripcion",
-      "icono": "§"
+      "id": "acudir",
+      "titulo": "sate.guia.acudir",
+      "descripcion": "sate.guia.acudir_descripcion",
+      "icono": "⌂",
+      "datos": "acudir"
     },
     {
       "id": "unidad",
       "titulo": "sate.guia.unidad",
       "descripcion": "sate.guia.unidad_descripcion",
-      "icono": "⌂"
+      "icono": "◉",
+      "pronto": true
     },
     {
       "id": "historia",
       "titulo": "sate.guia.historia",
       "descripcion": "sate.guia.historia_descripcion",
-      "icono": "◷"
+      "icono": "◷",
+      "pronto": true
     }
   ],
   "bibliotecas": [
@@ -193,13 +224,54 @@
       "id": "catalogo",
       "titulo": "sate.guia.biblio_catalogo",
       "descripcion": "sate.guia.biblio_catalogo_texto",
-      "url": "https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b-0"
+      "url": "https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b&request={termino}&find_code={campo}",
+      "campos": {
+        "todo": {
+          "codigo": "WRD"
+        },
+        "titulo": {
+          "codigo": "WTI"
+        },
+        "autor": {
+          "codigo": "WAU"
+        },
+        "tema": {
+          "codigo": "WSU"
+        }
+      },
+      "filtroUnidad": "&filter_code_5=WSL&filter_request_5={biblioteca}",
+      "inicio": "https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b-0"
     },
     {
       "id": "digital",
       "titulo": "sate.guia.biblio_digital",
       "descripcion": "sate.guia.biblio_digital_texto",
-      "url": "https://www.ipn.mx/bibliotecas-publicaciones/recursos-digitales/biblioteca-digital.html"
+      "aviso": "sate.guia.biblio_digital_aviso",
+      "url": "https://searchbox.ebsco.com/search/?schemaId=search&custid=s3753448&groupid=main&profid=eds&authtype=ip&scope=site&site=eds-live&direct=true&bquery={termino}",
+      "campos": {
+        "todo": {
+          "prefijo": ""
+        },
+        "titulo": {
+          "prefijo": "TI "
+        },
+        "autor": {
+          "prefijo": "AU "
+        },
+        "tema": {
+          "prefijo": "SU "
+        }
+      },
+      "inicio": "https://www.ipn.mx/bibliotecas-publicaciones/recursos-digitales/biblioteca-digital.html"
+    },
+    {
+      "id": "tesis",
+      "titulo": "sate.guia.biblio_tesis",
+      "descripcion": "sate.guia.biblio_tesis_texto",
+      "url": "https://tesis.ipn.mx/discover?query={termino}",
+      "inicio": "https://tesis.ipn.mx/"
     }
-  ]
+  ],
+  "_guia": "Apartados de la Guía politécnica en el orden de la portada. `datos`: faq (preguntas), documentos (reglamentos) o acudir (a quién acudo), de data/guia/<unidad>.json; `vista`: ruta propia (temarios). `pronto`: aún sin contenido. La compilación marca `guiaDatos` en las unidades que tienen data/guia/<unidad>.json. `guiaTramites` (por unidad) enlaza un trámite de Ventanilla con su respuesta apartado/pregunta; `biblioteca` es el código de la biblioteca de la unidad en el catálogo del IPN.",
+  "_bibliotecas": "Buscadores oficiales del IPN que SATE abre en pestaña nueva (web/sate/bibliotecas.js). `url` lleva {termino} (se codifica con encodeURIComponent) y, si hay, {campo}; `campos` dice cómo se busca por título, autor o tema (`codigo` para {campo}, `prefijo` antepuesto al término); `filtroUnidad` se añade con el código `biblioteca` de la unidad; `inicio` es la portada del buscador."
 }

@@ -44,7 +44,9 @@ Los textos se consultan por clave; no se duplican componentes para cambiar infor
 |---|---|
 | `web/sate/` | Implementación, componentes y diseño comunes |
 | `web/policore/` | Lector de documentos de PoliCORE (`lector.js`, `lector.css`), sin dependencias; formato y API en `docs/POLICORE-LECTOR.md` |
-| `web/sate/temarios.js` | Adaptador de temarios al lector, modo «Explorar unidades de aprendizaje» del mapa, panel/hoja y vista `#/<unidad>/temarios` (se activa con `vistas` en `data/sate.json` y datos en `data/temarios/<unidad>/`) |
+| `web/sate/temarios.js` | Programas de estudio: vista única de cada unidad de aprendizaje (`#/<unidad>/guia/programas/<carrera>/<clave>`), vistazo modal del Mapa, selector con la trayectoria visual y explorador por líneas (se activa con `vistas` en `data/sate.json` y datos en `data/temarios/<unidad>/`) |
+| `web/sate/guia.js`, `web/sate/guia.css`, `data/guia/<unidad>.json` | Guía politécnica: portada de apartados, preguntas frecuentes buscables con fuente, reglamentos y a quién acudo (`#/<unidad>/guia[/<apartado>[/<id>]]`); se activa con el archivo de datos (`guiaDatos`) y los apartados de `data/sate.json` (`guia`); la Ventanilla enlaza a su respuesta con `guiaTramites` |
+| `web/sate/bibliotecas.js` | Búsqueda en las bibliotecas del IPN (catálogo, Biblioteca Digital, tesis); los buscadores y su biblioteca de unidad (`biblioteca`) están en `data/sate.json` |
 | `data/temarios/<u>/nube/fuentes.json`, `tools/urls_pdf_temarios.py` | Recursos compartidos de la nube de la UPIITA (Nextcloud) por carrera y generador de la URL del PDF original de cada programa (`pdf` en los temarios compilados); `python tools/urls_pdf_temarios.py` imprime todas las URL para verificarlas |
 | `data/sate.json` | Unidad predeterminada, pestañas, trámites y capacidades: carga, carrerasSemestrales, electivas (texto y trámite), cargaCalculada, planDosPeriodos y miSemana |
 | `data/unidades/<u>/` | Oferta, planes, mapas y configuración de cada unidad |

@@ -13,6 +13,12 @@
       return {unidad, pestana:'temarios', vista:true, padre:'guia', partes:detalle, tramite:null,
         hash:'#/' + unidad + '/guia/programas' + detalle.map(p => '/' + p).join('') + (hash.includes('?') ? '?' + hash.split('?').slice(1).join('?') : '')};
     }
+    // Apartados de la Guía: #/<unidad>/guia[/<apartado>[/<pregunta o instancia>]]
+    if (pestaña === 'guia' && config[unidad]?.pestanas.includes('guia')) {
+      if (partes.length > 2 || !partes.every(p => /^[A-Za-z0-9_-]+$/.test(p))) return null;
+      return {unidad, pestana:'guia', tramite:null, partes:partes.slice(),
+        hash:'#/' + unidad + '/guia' + partes.map(p => '/' + p).join('') + (hash.includes('?') ? '?' + hash.split('?').slice(1).join('?') : '')};
+    }
     // Los enlaces de Ventanilla previos a esta publicación siguen siendo navegables.
     if (pestaña === 'tramites' && config[unidad]?.pestanas.includes('trayectoria') && (!config[unidad].pestanas.includes('tramites') || partes[0]==='reinscripcion')) {
       pestaña = 'trayectoria';

@@ -81,7 +81,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
     location.hash='#/upiita/temarios/bionica/B103/objetivo';eventos.hashchange();await vaciar();
     assert.equal(c.SATE.actual.pestana,'temarios');assert.equal(c.SATE.actual.partes.join('/'),'bionica/B103/objetivo');
     assert.equal(location.hash,'#/upiita/guia/programas/bionica/B103/objetivo');
-    assert.ok(archivos.includes('../policore/lector.js')&&archivos.includes('temarios.js'));
+    assert.ok(archivos.includes('bibliotecas.js')&&archivos.includes('temarios.js'));
     assert.equal(archivos.filter(a=>a==='temarios.js').length,1);
     assert.equal(seleccionados.slice(n).join(),'guia','la vista marca la Guía, sin navegar a ella');
     assert.equal(document.getElementById('sate-temarios').hidden,false);assert.equal(document.getElementById('v-tray').hidden,true);

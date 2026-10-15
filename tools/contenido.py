@@ -124,6 +124,16 @@ def validar_sate(claves, errores, ruta=SATE):
             errores.append(f"data/sate.json: unidades.{u}: leyenda desconocida")
         if c.get("leyenda") and "sate.leyenda." + c["leyenda"] not in claves:
             errores.append(f"data/sate.json: unidades.{u}: falta la clave sate.leyenda.{c['leyenda']}")
+    for a in d.get("guia", []):
+        for campo in ("titulo", "descripcion"):
+            if a.get(campo) not in claves:
+                errores.append(f"data/sate.json: guia.{a.get('id')}: falta la clave {a.get(campo)}")
+    for b in d.get("bibliotecas", []):
+        for campo in ("titulo", "descripcion", "aviso"):
+            if b.get(campo) is not None and b[campo] not in claves:
+                errores.append(f"data/sate.json: bibliotecas.{b.get('id')}: falta la clave {b[campo]}")
+        if "{termino}" not in b.get("url", "") or not b.get("url", "").startswith("https://"):
+            errores.append(f"data/sate.json: bibliotecas.{b.get('id')}: la url debe ser https y llevar {{termino}}")
 
 
 def validar(directorio=TEXTOS, sate=SATE):

@@ -98,8 +98,8 @@
     if (id === 'calendario') await script('calendario.js');
     if (id === 'horarios' && cfg.cupos) { await script('cupos.js'); await script('cupos-vista.js'); }
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
-    if (id === 'guia') await script('temarios.js');
-    if (id === 'temarios') await Promise.all([script('../policore/lector.js'), script('temarios.js')]);
+    if (id === 'guia') await Promise.all([script('bibliotecas.js'), script('guia.js')]);
+    if (id === 'temarios') await Promise.all([script('bibliotecas.js'), script('temarios.js')]);
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
@@ -116,7 +116,7 @@
   // Los temarios son una vista con ruta propia (data/sate.json: vistas); sin datos en la unidad, esta carga no existe.
   function cargarTemarios() {
     if (!cfg.vistas?.some(v => v.id === 'temarios')) return null;
-    return temariosListos ||= Promise.all([script('../policore/lector.js'), script('temarios.js')])
+    return temariosListos ||= Promise.all([script('bibliotecas.js'), script('temarios.js')])
       .then(() => SATE.temarios.preparar()).catch(e => { temariosListos = null; console.debug('SATE: temarios no disponibles', e.message); });
   }
   function ir(id) { location.hash = '#/' + u + '/' + id; }
