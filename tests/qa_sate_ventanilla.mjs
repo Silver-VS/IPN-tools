@@ -383,7 +383,8 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
 
 // VEN1: bajas con el mismo asistente, portada por grupos y pasos navegables.
 {
-  vm.runInContext('window.print=()=>{globalThis.__impresiones=(globalThis.__impresiones||0)+1}',c);
+  const bajasEstampadas=[];
+  c.PdfBajas={generar:async d=>{bajasEstampadas.push(d);return new Uint8Array([37,80,68,70])}};
   vm.runInContext(readFileSync('web/sate/bajas.js','utf8'),c);
   const B=c.SateBajas,codigoBajas=readFileSync('web/sate/bajas.js','utf8');
   almacen.set('saes.alumno',JSON.stringify({upiita_saes:1,unidad:'upiita',periodo_actual:'27/1'}));
@@ -425,22 +426,22 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.ok(box.todos().some(n=>n.tagName==='aside'&&n.className==='tramite-aviso'));
   const radios=box.todos().filter(n=>n.type==='radio');assert.deepEqual(radios.map(r=>r.value),plano(B.MOTIVOS.temporal));
   assert.equal(box.todos().filter(n=>n.tagName==='select').length,2,'Periodo de inicio y periodos solicitados');
+  assert.deepEqual(box.todos().filter(n=>n.tagName==='select')[1].children.map(n=>n.value),['1','2'],'Ambas duraciones disponibles');
   assert.deepEqual(box.todos().filter(n=>n.tagName==='option').slice(0,3).map(n=>n.value),['27/1','27/2','28/1']);
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
   assert.match(box.querySelector('[data-pdf-estado]').textContent,/Elige el motivo/,'No avanza sin motivo y lo explica');
   radios[0].checked=true;radios[0].onchange();
   box.todos().find(n=>n.tagName==='textarea').value='Texto ficticio sensible';box.todos().find(n=>n.tagName==='textarea').onblur();
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
-  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa e imprime'));
+  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa y descarga el PDF'));
   const guardado=almacen.get('hu.tramite.baja_temporal');
   assert.ok(!guardado.includes('salud')&&!guardado.includes('sensible'),'Motivo y explicación solo viven en memoria');
   assert.ok(guardado.includes('27/1'),'El periodo sí se guarda');
   assert.ok(box.todos().some(n=>n.tagName==='dd'&&n.textContent==='Salud'),'El resumen muestra el motivo');
   assert.ok(box.todos().some(n=>n.tagName==='dd'&&n.textContent==='2099000000'));
-  assert.equal(box.querySelector('iframe'),null,'Sin PDF generado por SATE: no hay vista previa');
-  assert.equal(box.querySelector('[data-ver-formato]'),null);
-  const imprimible=box.todos().find(n=>n.className.includes('tramite-imprimible'));assert.ok(imprimible,'Resumen imprimible');
-  assert.ok(imprimible.todos().some(n=>n.className.includes('tramite-firmas')));
+  assert.ok(box.querySelector('iframe'),'Vista previa del formato oficial');
+  assert.ok(box.querySelector('[data-ver-formato]'));
+  assert.equal(box.todos().find(n=>n.className.includes('tramite-imprimible')),undefined,'El resumen no es la salida del trámite');
   const enlace=box.todos().find(n=>n.tagName==='a');
   assert.equal(enlace.href,B.urlFormato('temporal'));assert.equal(enlace.target,'_blank');assert.equal(enlace.rel,'noopener');assert.ok(!enlace.download,'Solo enlaza el formato; no lo descarga');
   assert.equal(box.todos().filter(n=>n.className.includes('sate-btn--primario')).length,1);
@@ -454,14 +455,19 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
   assert.equal(box.todos().find(n=>n.type==='radio'&&n.checked)?.value,'salud','Dentro de la sesión se conserva');
   assert.equal(t.modelo(B.definir('temporal')).datos.motivo,'','Al recargar, el motivo sensible se vuelve a preguntar');
-  // La impresión marca el trámite como listo; la lista ofrece «Ver resumen», no «Descargar».
-  c.__impresiones=0;
+  // La descarga marca el trámite como listo y la lista permite volver a descargar.
   const radiosOtra=box.todos().filter(n=>n.type==='radio');radiosOtra[1].checked=true;radiosOtra[1].onchange();
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar').click();
-  box.todos().find(n=>n.tagName==='button'&&n.textContent==='Imprimir resumen').click();
-  assert.equal(c.__impresiones,1);
+  const descargar=box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar PDF');
+  assert.ok(descargar);await aceptar(()=>descargar.onclick());
+  assert.equal(bajasEstampadas.at(-1).tipo,'temporal');
+  assert.equal(bajasEstampadas.at(-1).valores.periodos,'27/1');
+  const temporal=B.definir('temporal');
+  await temporal.generar({motivo:'salud',periodo:'27/2',periodos:'2'});
+  assert.equal(bajasEstampadas.at(-1).valores.periodos,'27/2, 28/1','Dos periodos cruzando año');
+  await assert.rejects(()=>temporal.generar({motivo:'salud',periodo:'27/2',periodos:'3'}));
   modulo.ocultar();t.mostrarLista(box);
-  assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Ver resumen'),'Sin PDF no se ofrece Descargar');
+  assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Descargar'),'PDF disponible desde la lista');
   assert.deepEqual(box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent),['En curso y terminados','Disponibles']);
 
   // Baja definitiva: mismo asistente, motivo propio y enlace a su formato.
@@ -477,11 +483,21 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   // Sin enlace en los datos, se explica en vez de mostrar un botón roto.
   const datosBajas=c.SATE_DATA.bajas;c.SATE_DATA.bajas=undefined;
   modulo.mostrar({tramite:'baja_temporal'});
-  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa e imprime'),'Reanuda en el último paso con lo capturado en esta sesión');
-  assert.equal(box.todos().find(n=>n.tagName==='a'),undefined);assert.ok(box.todos().some(n=>/no tenemos el enlace/.test(n.textContent)));
+  assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa y descarga el PDF'),'Reanuda en el último paso con lo capturado en esta sesión');
+  assert.equal(box.todos().find(n=>n.tagName==='a'),undefined);assert.ok(box.todos().some(n=>/No está disponible el formato/.test(n.textContent)));
+  assert.ok(box.querySelector('[data-descargar]').disabled,'Sin original no permite generar una hoja vacía');
   c.SATE_DATA.bajas=datosBajas;modulo.ocultar();
+  const definitiva=B.definir('definitiva');
+  await definitiva.generar({motivo:'personal',periodo:'27/1',explicacion:'Caso ficticio'});
+  assert.match(bajasEstampadas.at(-1).valores.motivos,/Periodo solicitado: 27\/1/,'La definitiva conserva el periodo en motivos');
+  const pantallaError=new Nodo('section');definitiva.revisar(pantallaError);
+  const bibliotecaBajas=c.PdfBajas;
+  c.PdfBajas={generar:async()=>{throw new Error(texto('sate.baja.exceso'))}};
+  await assert.rejects(()=>definitiva.generar({motivo:'personal',periodo:'27/1'}));
+  assert.equal(pantallaError.children[0].textContent,texto('sate.baja.exceso'),'El usuario ve la causa concreta del fallo');
+  c.PdfBajas=bibliotecaBajas;
   // CSS: pasos, tarjetas, impresión y foco con tokens.
   const cssV=readFileSync('web/sate/componentes.css','utf8');
   for(const regla of [/\.tramite-bloque\{/,/\.tramite-rejilla\{/,/\.tramite-fila\{/,/\.tramite-paso-ir\{/,/@media print\{/,/\.tramite-solo-impresion\{display:none\}/,/\.tramite-guardado\{/])assert.match(cssV,regla);
-  console.log('Ventanilla VEN1: portada por grupos, bajas temporal y definitiva, pasos navegables, tarjetas, privacidad y resumen imprimible correctos.');
+  console.log('Ventanilla BAJ2: bajas oficiales en PDF, uno o dos periodos, pasos, privacidad y descarga correctos.');
 }

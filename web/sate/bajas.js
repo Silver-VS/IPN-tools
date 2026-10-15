@@ -1,8 +1,5 @@
-/* Bajas temporal y definitiva: mismo asistente que Dictamen y Electivas (SateTramites.asistente).
-   SATE no genera el formato oficial: al final entrega un resumen imprimible y enlaza el formato que publica la
-   Gestión Escolar de la unidad (un solo dato: data/gestion_escolar/bajas.json, llega en SATE_DATA.bajas).
-   PENDIENTE: los textos de requisitos y plazos ([sate.baja] en contenido/textos/es.toml) están por contrastar con el
-   reglamento vigente; por eso se redactan en términos generales y remiten a Gestión Escolar. */
+/* Bajas: asistente común y estampado local sobre los originales de Gestión Escolar.
+   El límite y los plazos de baja temporal se fundamentan en el RGE, artículo 55. */
 (function(raiz){
   const tx=(k,v)=>SATE.texto('sate.baja.'+k,v);
   const el=(tag,texto,clase)=>{const n=document.createElement(tag);if(texto!=null)n.textContent=texto;if(clase)n.className=clase;return n};
@@ -43,6 +40,7 @@
       const aviso=el('aside',null,'tramite-aviso');aviso.appendChild(el('h4',tx('aviso_titulo')));
       const lista=el('ul');for(const n of [1,2,3])lista.appendChild(el('li',tx('aviso_'+tipo+'_'+n)));
       aviso.appendChild(lista);caja.appendChild(aviso);
+      if(tipo==='temporal'&&raiz.SATE_DATA?.bajas?.reglamento){const a=el('a',tx('fundamento'));a.href=raiz.SATE_DATA.bajas.reglamento;a.target='_blank';a.rel='noopener';aviso.appendChild(a)}
     }};
   }
   function opciones(caja,ctx,id,leyenda,lista){
@@ -93,20 +91,30 @@
   }
   function definir(tipo){
     const id='baja_'+tipo,url=urlFormato(tipo);
-    return {id,titulo:tx('titulo_'+tipo),lead:tx('lead_'+tipo),volver:true,imprimible:true,revisarTitulo:tx('revisar_titulo'),revisionAyuda:tx('revision_ayuda'),
+    let avisoPdf;
+    const faltante=d=>validarIdentidad()||(!raiz.SATE_DATA?.bajas?.pdfs?.[tipo]?tx('sin_formato'):'')||(!MOTIVOS[tipo].includes(d.motivo)?tx('motivo_error'):'')||(!periodoValido(d.periodo)?tx('periodo_error'):'')||(tipo==='temporal'&&!['1','2'].includes(String(d.periodos))?tx('periodos_error'):'')||(String(d.explicacion||'').length>600?tx('explicacion_error'):'');
+    async function generar(d){
+      if(avisoPdf)avisoPdf.textContent='';
+      try{
+        const falta=faltante(d);if(falta)throw new Error(falta);
+        await cargar();
+        const periodos=tipo==='temporal'?Array.from({length:+d.periodos},(_,i)=>deIndice(indice(d.periodo)+i)).join(', '):d.periodo;
+        return await PdfBajas.generar({tipo,pdfs:raiz.SATE_DATA.bajas.pdfs,texto:tx,valores:{...identidad(),fecha:new Date().toLocaleDateString('es-MX'),periodos,
+          motivos:[...(tipo==='definitiva'?[tx('pdf_periodo',{periodo:d.periodo})]:[]),tx('motivo_'+d.motivo),d.explicacion].filter(Boolean).join('. ')}});
+      }catch(error){
+        // El asistente común muestra un fallo genérico; conservar aquí la explicación concreta del PDF.
+        if(avisoPdf)avisoPdf.textContent=error.message;throw error;
+      }
+    }
+    return {id,titulo:tx('titulo_'+tipo),lead:tx('lead_'+tipo),volver:true,revisarTitulo:tx('revisar_titulo'),revisionAyuda:tx('revision_ayuda'),
       datos:{periodos:'1'},
       pasos:[
         {titulo:tx('paso_datos'),ayuda:tx('paso_datos_ayuda'),campos:[campoIdentidad()]},
         {titulo:tx('paso_motivo'),ayuda:tx('paso_motivo_ayuda_'+tipo),campos:[campoAviso(tipo),campoMotivo(tipo),campoExplicacion(),campoPeriodo(tipo),...(tipo==='temporal'?[campoPeriodos()]:[])]}
       ],
-      terminarTexto:tx('imprimir'),
-      alTerminar:()=>window.print(),
-      revisar(pantalla,datos,imprimible){
-        // Solo al imprimir: nota y espacios de firma dentro del resumen.
-        imprimible.appendChild(el('p',tx('nota_impresion'),'tramite-solo-impresion'));
-        const firmas=el('div',null,'tramite-firmas tramite-solo-impresion');
-        for(const k of ['firma_alumno','firma_gestion'])firmas.appendChild(el('span',tx(k)));
-        imprimible.appendChild(firmas);
+      descargaTexto:tx('descargar'),archivo:id+'.pdf',faltante,generar,previsualizar:generar,
+      revisar(pantalla){
+        avisoPdf=el('p');avisoPdf.setAttribute('role','status');pantalla.appendChild(avisoPdf);
         const oficial=el('section',null,'tramite-oficial');
         oficial.appendChild(el('h4',tx('oficial_titulo')));
         oficial.appendChild(el('p',tx(url?'oficial_ayuda':'sin_formato')));
@@ -114,7 +122,15 @@
         pantalla.appendChild(oficial);
       }};
   }
-  // La definición se arma al abrir el asistente (textos y periodos vigentes); `sinPdf` evita ofrecer «Descargar» en la lista.
-  for(const tipo of ['temporal','definitiva']){const f=()=>definir(tipo);f.sinPdf=true;SateTramites.registrar(f,'baja_'+tipo)}
+  let carga;
+  function cargar(){
+    if(!carga)carga=(async()=>{
+      await SATE.script('../assets/vendor/pdf-lib.min.js');
+      await SATE.script('../tramites/pdf-bajas.js');
+    })().catch(error=>{carga=null;console.error('Bajas: carga de PDF fallida',{etapa:'biblioteca',error:error.name});throw error});
+    return carga;
+  }
+  // La definición se arma al abrir para consultar los textos y periodos vigentes.
+  for(const tipo of ['temporal','definitiva'])SateTramites.registrar(()=>definir(tipo),'baja_'+tipo);
   raiz.SateBajas={definir,periodos,urlFormato,validarIdentidad,MOTIVOS};
 })(globalThis);
