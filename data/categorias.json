@@ -1,4 +1,5 @@
 {
+ "paleta": ["#8a98c7", "#a76987", "#577d63", "#4d6f8d", "#c9a36a", "#721e45"],
  "descripcion": "Catálogo común de categorías (áreas de conocimiento) para organizar los mapas de todas las carreras en columnas. Base: las áreas de las trayectorias de la UPIITA. Las categorías propias de una carrera se conservan con su nombre. Los nombres son cortos para caber en los encabezados del mapa; «sinonimos» traduce nombres anteriores y «cortos» abrevia áreas propias de una carrera.",
  "orden": [
   "fm",

@@ -27,7 +27,7 @@ for (const u of Object.keys(config)) {
   assert.equal(ruta('#/'+u+'/mapa/extra',u,config),null); pruebas++;
 }
 for(const u of Object.keys(config))for(const anterior of ['situacion','desempeno']){assert.equal(ruta('#/'+u+'/'+anterior+'?x=1','upiita',config).hash,'#/'+u+'/trayectoria?x=1');pruebas++}
-assert.equal(ruta('#/upibi/tramites','upiita',config).hash,'#/upibi/trayectoria');
+assert.equal(ruta('#/upibi/tramites','upiita',config).hash,'#/upibi/tramites');
 assert.equal(ruta('#/upiita/tramites/electivas?desde=mapa','upiita',config).hash,'#/upiita/tramites/electivas?desde=mapa');
 assert.equal(ruta('#/upiita/tramites/inventado','upiita',config),null);
 assert.equal(redireccion(null,'?x=1','#demo'),'sate/index.html?x=1#demo');
@@ -63,6 +63,8 @@ pruebas += 8;
 for (const unidad of Object.keys(config)) {
   const f = 'web/dist/horarios-'+unidad+'.html'; let destino;
   const c = vm.createContext({URLSearchParams,location:{search:'?demo=1',hash:'#code=x',replace:u=>destino=u}});
+  // Las redirecciones de HEAD incluyen la protección contra marcos ajenos.
+  vm.runInContext('window=globalThis; window.top=window.self=window;',c);
   for (const m of leer(f).matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)) vm.runInContext(m[1],c);
   assert.equal(destino,'sate/index.html?demo=1&sateUnidad='+unidad+'#code=x'); pruebas++;
 }

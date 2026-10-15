@@ -1,0 +1,352 @@
+{
+ "T115": {
+  "descripcion": "Estudia los principios teóricos de la administración, sus escuelas y su proceso, y las características de las organizaciones y su administración, para mejorar su eficiencia y productividad.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T104": {
+  "descripcion": "Aborda la administración de servicios y aplicaciones en sistemas operativos: funciones del administrador, sistemas de archivos y directorios, programación Shell, servicios avanzados y conectividad entre Unix y Windows.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T112": {
+  "descripcion": "Estudia los conceptos del álgebra lineal para la ingeniería en telemática: sistemas de ecuaciones y matrices, geometría del espacio euclidiano, espacios vectoriales, transformaciones lineales y diagonalización.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T102": {
+  "descripcion": "Aborda el análisis y diseño de sistemas de información con ingeniería de software y UML, e incluye fundamentos de programación en C++ y del paradigma orientado a objetos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T106": {
+  "descripcion": "Analiza los elementos de una computadora según su arquitectura: conjunto de instrucciones, memorias, entrada y salida, estructura y función de la CPU, y el diseño de un procesador de propósito específico en un lenguaje de descripción de hardware.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T117": {
+  "descripcion": "Desarrolla la comunicación efectiva oral y escrita en los ámbitos personal y profesional, de manera colaborativa y cooperativa, con unidades de comunicación y sociedad, comunicación escrita y comunicación oral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T110": {
+  "descripcion": "Desarrolla el cálculo diferencial e integral de una variable y sus aplicaciones: funciones y números reales, límites y continuidad, derivación, sucesiones y series, e integración.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T114": {
+  "descripcion": "Aplica el cálculo de funciones reales de varias variables y el cálculo vectorial a problemas matemáticos y físicos: derivación e integración de varias variables, funciones vectoriales y cálculo vectorial.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T105": {
+  "descripcion": "Estudia la implementación de diseños digitales de circuitos y sistemas con dispositivos lógicos programables y lenguajes descriptivos de hardware: circuitos combinacionales, secuenciales y máquinas de estado finito.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T108": {
+  "descripcion": "Estudia las ecuaciones diferenciales ordinarias para analizar la variación y el cambio de fenómenos de la ingeniería: ecuaciones de primer orden y de orden superior, series de potencias y sistemas lineales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T113": {
+  "descripcion": "Analiza los fenómenos electromagnéticos y las ecuaciones de Maxwell con herramientas matemáticas y de cómputo: campo electrostático, energía eléctrica, corrientes estacionarias, campo magnetostático y campos dinámicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T120": {
+  "descripcion": "Introduce la programación estructurada en lenguaje C: estructuras de control, arreglos, funciones, cadenas, apuntadores, estructuras, archivos y puertos, aplicadas a problemas de sistemas de información.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T121": {
+  "descripcion": "Analiza críticamente la ciencia y la tecnología en el contexto social actual: aspectos filosóficos, su desarrollo en el período contemporáneo, la globalización y la integración de la ingeniería telemática a la sociedad.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T103": {
+  "descripcion": "Estudia la programación con estructuras de datos: listas, pilas y colas, árboles y grafos, métodos de ordenamiento y algoritmos de búsqueda, aplicados a sistemas de información.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T107": {
+  "descripcion": "Estudia el movimiento en una, dos y tres dimensiones y los conceptos de fuerza, trabajo y energía, para resolver problemas de mecánica clásica en forma verbal y matemática.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T118": {
+  "descripcion": "Desarrolla la comunicación oral y escrita en inglés, en registro formal e informal, mediante la consolidación gramatical de los tiempos presente, pasado y futuro y de los verbos modales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T119": {
+  "descripcion": "Continúa el desarrollo de la comunicación oral y escrita en inglés con vocabulario y expresiones de mayor complejidad: verbos modales, infinitivo y gerundio, voz pasiva, discurso indirecto, condicionales y cláusulas relativas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T109": {
+  "descripcion": "Aplica los conceptos, la metodología y las técnicas de la teoría de la probabilidad a experimentos aleatorios: espacio muestra, variables aleatorias, esperanzas, teorema del límite central, funciones generadoras de momentos y procesos aleatorios.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T101": {
+  "descripcion": "Aborda la implementación de programas con la metodología orientada a objetos en Java: clases y herencia simple, interfaces y polimorfismo, archivos, entrada y salida, excepciones e interfaces gráficas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T111": {
+  "descripcion": "Aplica la teoría de funciones de una o varias variables complejas a modelos matemáticos del procesamiento digital de señales: números complejos, derivación, integración compleja y funciones de varias variables complejas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T116": {
+  "descripcion": "Analiza la necesidad de un comportamiento ético en el entorno profesional y social, y aplica un código de valores ante un dilema ético: campo de la ética, ingeniería telemática y sociedad, y ética profesional.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T215": {
+  "descripcion": "Aborda la creación de sistemas de bases de datos relacionales con el modelo relacional, la teoría de la normalización y SQL: modelo entidad-relación, transacciones, conectividad y explotación de un sistema de base de datos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T207": {
+  "descripcion": "Clasifica el funcionamiento de los sistemas de comunicaciones digitales con el proceso PCM y la detección y modulación de señales digitales: digitalización, transmisión en banda base y pasa-banda, multiplexaje y espectro disperso.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T203": {
+  "descripcion": "Aborda la construcción de circuitos electrónicos básicos con dispositivos semiconductores y sus modelos: diodos, transistores bipolares y de efecto de campo, optoelectrónica y amplificadores operacionales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T223": {
+  "descripcion": "Analiza sistemas telemáticos que hagan eficiente el manejo de recursos, procesos, información, señales digitales y bases de datos con base en la sustentabilidad: contaminación, desarrollo sustentable y alternativas tecnológicas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T224": {
+  "descripcion": "Analiza los problemas económicos de México con los fundamentos microeconómicos y macroeconómicos, a partir de una introducción a la economía y de los problemas de política económica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T225": {
+  "descripcion": "Desarrolla la comunicación en inglés técnico en contextos laborales y académicos, con consolidación gramatical relacionada con el vocabulario de computadoras, software e Internet, y de sistemas de comunicación y redes.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T220": {
+  "descripcion": "Aborda la resolución de problemas de la ingeniería telemática con métodos numéricos: análisis de errores, raíces de ecuaciones no lineales, interpolación y aproximación, derivación e integración numérica y ecuaciones diferenciales ordinarias.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T222": {
+  "descripcion": "Analiza la propagación de la luz en medios homogéneos y en estructuras dieléctricas de confinamiento: ondas ópticas, fronteras entre dieléctricos, guías de onda unidimensionales y modos de propagación en fibras ópticas de índice escalonado.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T217": {
+  "descripcion": "Valora la información financiera como herramienta para la toma de decisiones de una empresa, con técnicas que consideran y que no consideran el valor del dinero en el tiempo: estados financieros, su análisis e ingeniería económica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T213": {
+  "descripcion": "Aborda el diseño de sistemas de información Web con metodologías de la ingeniería de software y tecnologías de programación: modelado de aplicaciones, usabilidad, desempeño, seguridad y un caso de estudio.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T219": {
+  "descripcion": "Desarrolla la comunicación en inglés conforme al nivel B2 del Marco Común Europeo de Referencia, con consolidación gramatical y de vocabulario, lectura, escritura, práctica auditiva y expresión oral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T228": {
+  "descripcion": "Aborda la implementación de sistemas de procesamiento y extracción de información con la teoría de la lógica difusa: fundamentos, sistemas de inferencia difusa, agrupamiento difuso, teoría de evidencia difusa y aplicaciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T231": {
+  "descripcion": "Analiza la normatividad de telecomunicaciones e informática, la propiedad intelectual, los contratos de transferencia de tecnología y la gestión de la tecnología conforme a las leyes vigentes del país.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T230": {
+  "descripcion": "Aborda la generación de aplicaciones para dispositivos móviles con procesos de desarrollo estandarizados: soluciones móviles, entornos de desarrollo, lenguajes orientados a objetos, interfaces gráficas y conectividad a bases de datos y Bluetooth.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T226": {
+  "descripcion": "Aborda el diseño de redes de comunicaciones inalámbricas con protocolos de transmisión de datos: redes inalámbricas de área personal, de sensores, de área local y de área metropolitana.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T227": {
+  "descripcion": "Aborda la implementación de sistemas de extracción y procesamiento de información con redes neuronales artificiales monocapa y multicapa, e incluye una introducción y aplicaciones de las redes neuronales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T229": {
+  "descripcion": "Aborda el diseño de sistemas de información geográfica con modelos de datos estandarizados: modelos y tipos de datos espaciales, almacenamiento y análisis de datos geográficos y visualización de datos espaciales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T208": {
+  "descripcion": "Aborda el diseño de sistemas de tiempo discreto con el análisis de señales y sistemas en los dominios del tiempo y la frecuencia y la transformada Z: análisis de Fourier, filtros digitales y procesamiento de tasa múltiple.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T214": {
+  "descripcion": "Estudia el desarrollo de sistemas de cómputo cooperativo en paralelo con base en la sincronización y la comunicación de procesos: interrupciones, procesos, exclusión mutua y comunicación entre procesos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T202": {
+  "descripcion": "Analiza la propagación de la radiación electromagnética en el vacío y en la materia con las ecuaciones de Maxwell: movimiento ondulatorio, ondas en medios libres y con fronteras, potencia electromagnética y teorema de Poynting.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T211": {
+  "descripcion": "Estudia la estructura de las redes de datos basadas en la arquitectura TCP/IP con los protocolos de comunicación actuales, por capas: física y de acceso a la red, de red, de transporte y de aplicación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T201": {
+  "descripcion": "Analiza señales y sistemas de tiempo continuo en el dominio del tiempo, con la transformada de Fourier y con la transformada de Laplace, mediante unidades de señales y sistemas, análisis de Fourier y Laplace.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T210": {
+  "descripcion": "Analiza los parámetros de la configuración óptima de un sistema celular: propagación, concepto celular, técnicas de transmisión y acceso múltiple, evaluación del desempeño, transmisión de datos y estándares internacionales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T212": {
+  "descripcion": "Evalúa el diseño y funcionamiento de los sistemas distribuidos: modelos arquitectónicos, interconexión de redes, comunicación entre procesos, nombres, sincronización del reloj, seguridad y sistemas de archivos distribuidos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T209": {
+  "descripcion": "Caracteriza una red telefónica según los procesos de establecimiento, supervisión y liberación de una llamada y el dimensionamiento de la capacidad de tráfico: estructura de la red, conmutación, señalización, sincronización y análisis de tráfico.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T204": {
+  "descripcion": "Aborda el diseño de filtros eléctricos pasivos y activos con redes de elementos resistivos y reactivos y fuentes de tensión y de corriente: leyes de Ohm y Kirchhoff, circuitos RLC, estado estacionario sinusoidal y parámetros de dos puertos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T205": {
+  "descripcion": "Evalúa el desempeño de un sistema de comunicaciones con la teoría de la información: medida de la información, codificación de fuente, códigos de bloque y convolucionales, y aspectos avanzados de codificación de canal.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T206": {
+  "descripcion": "Estudia las técnicas de modulación analógica con el análisis de señales y sistemas en los dominios del tiempo y la frecuencia: modulación lineal, angular y de pulsos, procesos aleatorios y ruido en sistemas de comunicaciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T216": {
+  "descripcion": "Evalúa la estructura y el funcionamiento interno de las redes de comunicación con los principios de transmisión y recepción de la información: acceso al medio y redes de área local, metropolitana, personal y amplia (WAN).",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T307": {
+  "descripcion": "Evalúa la factibilidad económico-financiera de un proyecto de inversión con las técnicas de estudio de mercado, estudio técnico y estudio económico-financiero, que forman las tres unidades del programa.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T305": {
+  "descripcion": "Aborda el desarrollo de aplicaciones de bases de datos distribuidas en sistemas telemáticos: fundamentos, diseño, procesamiento y optimización de consultas distribuidas y administración de transacciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T308": {
+  "descripcion": "Desarrolla habilidades de liderazgo y de emprendimiento con base en los principios y valores del comportamiento humano: habilidades intra e interpersonales, trabajo en equipo, y plan de vida y carrera profesional.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T302": {
+  "descripcion": "Aborda la propuesta de enlaces de comunicaciones con líneas de transmisión y antenas: líneas de transmisión y guías de onda, fundamentos de radiación, parámetros y arreglos de antenas, y diseño de enlaces.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T306": {
+  "descripcion": "Aborda la elaboración de un protocolo de investigación y una publicación científica con el método científico: protocolo de investigación, productos de investigación científica y presentación formal de trabajos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T304": {
+  "descripcion": "Evalúa sistemas multimedia con las tecnologías de comunicaciones, procesamiento y presentación de información: análisis y diseño multimedia, multimedia clásica, medios emergentes, y su integración e interactividad.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T310": {
+  "descripcion": "Aborda la generación de sistemas informáticos seguros con algoritmos criptográficos en software y hardware y sus protocolos: criptografía de clave simétrica y asimétrica, y fundamentos matemáticos de funciones hash y firmas digitales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T316": {
+  "descripcion": "Aborda el diseño de filtros digitales con técnicas de procesamiento digital y de estimación espectral: filtrado adaptativo, estimación de la densidad espectral de potencia, bancos de filtros y procesamiento en arreglos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T311": {
+  "descripcion": "Aborda el diseño de sistemas de microondas según las características de los enlaces terrestres y satelitales: introducción a los sistemas de microondas, electrónica y dispositivos, y sistemas terrestres y satelitales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T312": {
+  "descripcion": "Aborda el procesamiento de imágenes digitales con herramientas matemáticas y computacionales: dominio espacial, señales bidimensionales, segmentación y análisis de imágenes, compresión y reconocimiento de formas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T315": {
+  "descripcion": "Estudia la implementación de codificadores y sistemas de reconocimiento de voz en aplicaciones telemáticas: procesamiento básico de la señal de voz, codificadores de forma de onda e híbridos, vocoders y reconocimiento de voz.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T314": {
+  "descripcion": "Estudia la aplicación de sistemas de calidad conforme a la normatividad asociada a la telemática: herramientas, modelos y normas de calidad, gestión de tecnologías de la información y calidad de procesos y productos de software.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T313": {
+  "descripcion": "Evalúa sistemas y señales de televisión digital con parámetros de banda base y radiofrecuencia: televisión analógica, imágenes en televisión digital, codificación y compresión, y transmisión de televisión digital.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T301": {
+  "descripcion": "Evalúa esquemas de control y señalización en la operación y administración de redes inteligentes con los estándares internacionales de telecomunicaciones: señalización, VoIP, redes inteligentes móviles y tendencias.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T303": {
+  "descripcion": "Evalúa estrategias de seguridad informática alrededor de una red de cómputo con algoritmos, metodologías y estándares: tecnología de seguridad, mecanismos de contención, detección y prevención de intrusiones y seguridad en aplicaciones en red.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T404": {
+  "descripcion": "Aborda la implementación de aplicaciones distribuidas en sistemas telemáticos con estándares y arquitecturas abiertas: introducción, modelos arquitectónicos distribuidos, y diseño e implementación de las aplicaciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T405": {
+  "descripcion": "Aborda la implementación de algoritmos y aplicaciones de procesamiento digital de señales en dispositivos programables: procesadores digitales de señales, entorno de desarrollo y programación, algoritmos y aplicaciones específicas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T401": {
+  "descripcion": "Desarrolla la propuesta de solución del proyecto terminal con los principios de los sistemas telemáticos: estado del arte y marco teórico, análisis de requerimientos, diseño detallado y documentación, y defensa del diseño.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T402": {
+  "descripcion": "Desarrolla la implementación de una solución a la propuesta del proyecto terminal con los principios de los sistemas telemáticos: análisis y diseño, implementación, pruebas y validación, y defensa del proyecto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "T403": {
+  "descripcion": "Evalúa las etapas de un sistema de comunicaciones de fibras ópticas con el estudio de la propagación de las ondas y las técnicas de transmisión y recepción: redes ópticas de transporte, su arquitectura y el equipamiento.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ }
+}

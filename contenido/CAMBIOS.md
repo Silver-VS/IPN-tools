@@ -7,6 +7,33 @@
 |---|---|
 | `cuenta.migracion.*` | Nuevas: pasos y avisos para pasar los datos guardados con Google a Microsoft. Google ya no se ofrece para iniciar sesión; se retiran los avisos de «fase de prueba» de Google (que estaban escritos en `tools/cuenta.py`). |
 
+## 2026-10-15 · Claude (DESC1)
+
+| Claves | Cambio |
+|---|---|
+| Descripciones de materias (`data/temarios/upiita/descripciones/*.json`) | La ficha muestra una descripción breve redactada por materia (no oficial; `revisada: false`, pendiente de revisión humana) en lugar del objetivo recortado; el objetivo completo sigue en «Ver programa oficial completo». Créditos y horas faltan: se toman del plan del SAES o se ocultan. |
+
+## 2026-10-15 · Codex (GUIA1)
+
+| Claves | Cambio |
+|---|---|
+| `sate.pestana.guia.*`, `sate.guia.*` | Guía politécnica, apartados desde datos, hoja «Más» y ficha breve de materia: tres datos, pasos temáticos, recursos opcionales y acceso al programa completo. |
+| `temarios.explorador.titulo`, `sate.ventanilla.sin_tramites` | Título formal de Programas de estudio y estado vacío de Ventanilla en unidades sin trámites disponibles. |
+
+## 2026-10-15 · Codex (LEC2)
+
+| Claves | Cambio |
+|---|---|
+| `temarios.modo.*`, `temarios.mapa.sin_temario/abrir_aria` | Retiradas al quitar del mapa el modo de exploración y el enlace general a temarios. |
+| `temarios.mapa.ver` | «Ver programa» en la ficha de la materia; conserva el enlace a su temario. |
+
+## 2026-10-14 · 2026.10.23 · Claude (LEC1)
+
+| Claves | Cambio |
+|---|---|
+| `policore.lector.*` | Textos del lector de documentos de PoliCORE (índice, búsqueda, copiar enlace, fuente). |
+| `sate.vista.temarios.*`, `temarios.*` | Modo «Explorar unidades de aprendizaje» del mapa, panel del temario, explorador de temarios y etiquetas del adaptador. |
+
 ## 2026-10-07 · 2026.10.20 · Codex
 
 | Claves | Cambio |

@@ -9,7 +9,7 @@ for(const [id,cfg] of Object.entries(config)){
 }
 for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#demo','#error=denied','']) {
  for(const personal of (hashInicial? [false]:[false,true])) {
-  const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [];
+  const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [], seleccionados = [];
   let cambioUnidad = 0;
   function nodo(id='') { return {id,hidden:false,textContent:'',dataset:{},style:{setProperty(){}},setAttribute(){},prepend(){},appendChild(){},addEventListener(){},replaceChildren(){},querySelector:sel=>nodo(sel)}; }
   const realces = {};
@@ -25,6 +25,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
         if(s.src==='nucleo.js') c.SATE.nucleoListo(api).catch(e=>{throw e});
         if(s.src==='mapa.js') c.SATE.pestana('mapa',{montar(){vistos.push('montar-mapa')},mostrar(){vistos.push('mapa')},ocultar(){vistos.push('ocultar-mapa')}});
         if(s.src==='situacion.js') c.SATE.presente={avisos(){vistos.push('avisos')},tramite(){vistos.push('procedimiento')}};
+        if(s.src==='temarios.js'){c.SATE.pestana('guia',{montar(){},mostrar(){vistos.push('guia')},ocultar(){}});c.SATE.temarios={preparar:async()=>{}};c.SATE.pestana('temarios',{montar(){vistos.push('montar-temarios')},mostrar(r){vistos.push('temarios:'+r.partes.join('/'))},ocultar(){vistos.push('ocultar-temarios')}})}
         if(s.src==='calendario.js') c.SATE.pestana('calendario',{montar(){vistos.push('montar-calendario')},mostrar(){vistos.push('mes')},ocultar(){vistos.push('ocultar-calendario')}});
         if(s.src==='desempeno.js') c.SATE.pestana('trayectoria',{montar(){vistos.push('montar-desempeno')},mostrar(){vistos.push('desempeno')},ocultar(){vistos.push('ocultar-desempeno')}});
         if(s.src==='horarios.js') c.SATE.pestana('horarios',{montar(){vistos.push('montar-hor')},mostrar(){vistos.push('hor')}});
@@ -39,7 +40,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
     situacionDatos(){return null},renderCalendario(){vistos.push('calendario')},
     fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url.includes('nucleo')?{mapas:{B:{}},unidad:'upiita'}:{}}},
     SateUI:{usarTextos(){},usarAlmacen(){},modal(){},cerrarModal(){},ayuda(){return nodo()},
-      pestanas(o){const n=nodo();n.seleccionar=id=>o.alCambiar(id);return n},barraInferior(){return {marcar(){}}}}
+      pestanas(o){const n=nodo();n.seleccionar=id=>{seleccionados.push(id);o.alCambiar(id)};return n},barraInferior(){return {marcar(){}}}}
   });
   vm.runInContext('window=globalThis',c);
   vm.runInContext(readFileSync('web/sate/rutas.js','utf8'),c);
@@ -74,6 +75,23 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   assert.equal(c.SATE.actual.pestana,'mapa');
   assert.equal(vistos.filter(v=>v==='montar-mapa').length,1);
   assert.equal(fetches.filter(u=>u.endsWith('oferta.json')).length,1);
+  // Vista con ruta propia: marca la pestaña de la que cuelga y no redirige al mapa
+  if(hashInicial==='#/upiita/mapa'){
+    const n=seleccionados.length;
+    location.hash='#/upiita/temarios/bionica/B103/objetivo';eventos.hashchange();await vaciar();
+    assert.equal(c.SATE.actual.pestana,'temarios');assert.equal(c.SATE.actual.partes.join('/'),'bionica/B103/objetivo');
+    assert.equal(location.hash,'#/upiita/guia/programas/bionica/B103/objetivo');
+    assert.ok(archivos.includes('../policore/lector.js')&&archivos.includes('temarios.js'));
+    assert.equal(archivos.filter(a=>a==='temarios.js').length,1);
+    assert.equal(seleccionados.slice(n).join(),'guia','la vista marca la Guía, sin navegar a ella');
+    assert.equal(document.getElementById('sate-temarios').hidden,false);assert.equal(document.getElementById('v-tray').hidden,true);
+    assert.ok(vistos.includes('temarios:bionica/B103/objetivo')&&vistos.includes('montar-temarios'));
+    location.hash='#/upiita/temarios/bionica/B103/contenidos';eventos.hashchange();await vaciar();
+    assert.ok(vistos.includes('temarios:bionica/B103/contenidos'));assert.equal(vistos.filter(v=>v==='montar-temarios').length,1);
+    location.hash='#/upiita/mapa';eventos.hashchange();await vaciar();
+    assert.ok(vistos.includes('ocultar-temarios'));assert.equal(document.getElementById('sate-temarios').hidden,true);
+    assert.equal(document.getElementById('v-tray').hidden,false);
+  }
   location.hash='#/upiita/tramites/reinscripcion';eventos.hashchange();await vaciar();
   assert.equal(c.SATE.actual.pestana,'trayectoria','El enlace legado abre Mi trayectoria');
   assert.equal(c.SATE.actual.tramite,null);

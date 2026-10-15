@@ -240,6 +240,8 @@
   /* pestanas({items:[{id, texto, panel:Element|id}], activa, etiqueta, segmentado, alCambiar}) → tablist con .seleccionar(id) */
   function iconoPestana(ident) {
     var trazos = {
+      guia: '<path d="M12 5C9 3 5 3 2 4v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-3-1-7-1-10 1Zm0 0v15"/>',
+      mas: '<circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/>',
       trayectoria: '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
       tramites: '<rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 10h16m-8 0v9"/>',
       mapa: '<path d="m3 5 6-2 6 2 6-2v16l-6 2-6-2-6 2Zm6-2v16m6-14v16"/>',
@@ -303,15 +305,31 @@
   /* ---------- Barra inferior (teléfono o pestañas sin espacio) ---------- */
   /* barraInferior({items:[{id, texto, titulo}], activa, alElegir}) → <nav> */
   function barraInferior(o) {
+    var restantes = o.items.filter(function (it) { return !['trayectoria','mapa','horarios','tramites'].includes(it.id); });
+    var principales = ['trayectoria','mapa','horarios','tramites'].map(function (id) { return o.items.find(function (it) { return it.id === id; }); }).filter(Boolean);
+    var items = restantes.length ? principales.concat([{id:'mas', texto:traducir('sate.guia.mas')}]) : principales;
     var nav = el('nav', { class: 'sate-barra', 'aria-label': traducir('componentes.barra.etiqueta') });
-    var bs = o.items.map(function (it, i) {
+    var bs = items.map(function (it, i) {
       var b = el('button', { type: 'button', class: 'sate-barra__btn', 'data-id': it.id });
       contenidoPestana(b, it);
-      b.addEventListener('click', function () { marcar(it.id); if (o.alElegir) o.alElegir(it.id); });
-      if (i && it.grupo != null && it.grupo !== o.items[i-1].grupo) b.className += ' sate-grupo-inicio';
+      if (it.id === 'mas') { b.setAttribute('aria-haspopup','dialog'); b.setAttribute('aria-expanded','false'); }
+      b.addEventListener('click', function () {
+        if (it.id !== 'mas') { marcar(it.id); if (o.alElegir) o.alElegir(it.id); return; }
+        var lista = el('div', {class:'sate-mas-lista'});
+        restantes.forEach(function (item) {
+          var a = el('button', {type:'button', class:'sate-btn', 'data-id':item.id});
+          contenidoPestana(a, Object.assign({}, item, {texto:item.titulo || item.texto}));
+          if (nav.activa === item.id) a.setAttribute('aria-current','page');
+          a.addEventListener('click', function () { cerrar(); marcar(item.id); if (o.alElegir) o.alElegir(item.id); });
+          lista.appendChild(a);
+        });
+        b.focus();
+        var m = modal(traducir('sate.guia.mas'), lista, {alCerrar:function () { b.setAttribute('aria-expanded','false'); m.elemento.classList.remove('sate-modal--mas'); }});
+        m.elemento.classList.add('sate-modal--mas'); b.setAttribute('aria-expanded','true');
+      });
       nav.appendChild(b); return b;
     });
-    function marcar(ident) { bs.forEach(function (b) { if (b.dataset.id === ident) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
+    function marcar(ident) { nav.activa = ident; bs.forEach(function (b) { if (b.dataset.id === ident || b.dataset.id === 'mas' && restantes.some(function (it) { return it.id === ident; })) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); }); }
     nav.marcar = marcar;
     marcar(o.activa || o.items[0].id);
     return nav;

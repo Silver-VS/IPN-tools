@@ -193,7 +193,7 @@ function renderAyudaPrimeraVisita(){
   if(!box.hidden)box.appendChild(SateUI.aviso({estado:'info',titulo:SATE.texto('sate.planeacion.primera_visita'),descartable:true,
     alDescartar(){store.set('mapAyudaDescartada',true);box.hidden=true}}));
 }
-SATE.pestana('mapa',{montar(){},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta()}});
+SATE.pestana('mapa',{montar(){SATE.cargarTemarios?.()},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta();SATE.temarios?.cerrar?.()}});
 
 /* ---------- resaltado al pasar el cursor, sin redibujar ----------
    Alterna clases en las cajas y flechas ya dibujadas (mismas reglas que el dibujo: resalteCaja y resalteArista). */

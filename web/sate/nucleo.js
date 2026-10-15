@@ -591,7 +591,7 @@ function inspParts(k){
   const l2=(st?`<p class="insp-st">${st}</p>`:'')+
     `<p><span class="tag-rel pre">Antes</span><b>Requisitos:</b> ${pre.length?pre.map(nm).join(', '):'ninguno registrado'}${all.size>pre.length?` <span class="muted">(${all.size} materias en toda su cadena)</span>`:''}</p>`+
     `<p><span class="tag-rel post">Después</span><b>Es requisito de:</b> ${post.length?post.map(nm).join(', '):'ninguna materia'}</p>`+
-    (off?'':'<p class="muted"><i>Sin grupos en el periodo consultado.</i></p>');
+    (off?'':'<p class="muted"><i>Sin grupos en el periodo consultado.</i></p>')+(SATE.temarios?.enlaceHtml?.(k)||'');
   return {l1,l2};
 }
 /* Materias del horario inscrito que no son de este plan (movilidad/flexibilidad académica, cambio de carrera u otra carrera de la
@@ -635,7 +635,7 @@ function leyendaMapa(completa=false){
 }
 function renderLegend(){$('#legend').innerHTML=leyendaMapa()}
 function renderSide(){const r=conSim(usaSim('sugg'),()=>conPlan(renderSide0));montarAyudasCreditos();return r}
-const AREA_COLORES=['#8a98c7','#a76987','#577d63','#4d6f8d','#c9a36a','#721e45'];
+const AREA_COLORES=DATA.areaColores || [];
 function requisitosElegidos(want){
   const c=cur(), done=new Set(tr().done), pedidos=new Map(), acreditados=new Set(), materias=new Set();
   // Conserva la seriación transitiva del mapa; cada requisito compartido ocupa una sola fila.

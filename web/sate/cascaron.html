@@ -146,7 +146,10 @@ input[type=number]{width:5rem}
 .areas{position:sticky;top:0;z-index:3;height:34px;background:var(--ipn-superficie);border-bottom:1px solid var(--ipn-linea)}
 .areas div{position:absolute;font-stretch:75%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--ipn-fuente-titulos);font-weight:600;letter-spacing:.02em;color:var(--ipn-tenue);border-left:1px solid var(--ipn-linea);line-height:1;padding:0 2px;overflow:hidden}
 .edge.prop{stroke-dasharray:5 4}
-.maptools{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;margin-bottom:10px}
+.maptools{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-3) var(--ipn-esp-4);align-items:flex-start;margin-bottom:var(--ipn-esp-4)}
+#map-primera-visita:not([hidden]){margin-bottom:var(--ipn-esp-4)}
+#v-tray .map-plan{margin-top:var(--ipn-esp-4)}
+.maptools>.seg{flex-shrink:0;max-width:100%}
 .legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:.82rem}
 .legend span{display:inline-flex;gap:6px;align-items:center}
 .legend i{width:14px;height:14px;border-radius:3px;border:1px solid var(--ipn-linea);display:inline-block}
@@ -730,7 +733,7 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--ipn-linea);co
 .sin-ubicar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
 .sin-ubicar-materia{padding:12px;border:1px solid var(--line);border-radius:var(--r);overflow-wrap:anywhere}
 .sin-ubicar-materia.want{border-color:var(--ipn-acento)}
-.sin-ubicar-materia>small{display:block;margin:6px 0;color:var(--muted)}
+.sin-ubicar-materia>small{display:block;margin:6px 0;color:var(--ipn-tenue)}
 .sin-ubicar-materia details{margin-top:10px}
 @media(max-width:639px){.plan-resumen{display:grid;gap:4px;font-size:.78rem}.plan-head .actions{margin-left:0}}
 .plan-grupos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
@@ -755,7 +758,6 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--ipn-linea);co
 .plan-leyenda .plan-2{border-color:var(--plan-segundo)}
 @media(max-width:639px){.plan-grupos{grid-template-columns:1fr}}
 
-.maptools{flex-wrap:wrap;gap:8px;align-items:flex-start}
 .maptools-derecha{margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px;min-width:0;max-width:100%}
 #plan-opciones{display:flex;align-items:center;gap:6px;white-space:nowrap}
 #map-ayuda{white-space:nowrap}
@@ -833,6 +835,8 @@ html[data-vista=cupos] .brand h1{font-size:1.5rem}
   <div id="sate-simulacion" class="tag sim" role="status" hidden><span id="sate-simulacion-texto"></span> <button class="link" type="button" id="sate-simulacion-quitar"></button></div>
   <section id="sate-tramites" class="card" hidden></section>
   <section id="sate-calendario" class="card" hidden></section>
+  <section id="sate-temarios" hidden></section>
+  <section id="sate-guia" hidden></section>
   <section id="sate-trayectoria" class="card" hidden>
     <h2 id="desempeno-titulo"></h2>
     <div id="sate-presente"></div>

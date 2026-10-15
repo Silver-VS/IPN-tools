@@ -1149,6 +1149,8 @@ busqueda_limitada = "Búsqueda limitada por el número de combinaciones; reduce 
 
 [sate.ventanilla]
 apellidos_aviso = "Tus apellidos deben coincidir con los del SAES."
+
+sin_tramites = "Aún no hay trámites disponibles para esta unidad académica."
 entrega_firmados = "Entrega tus formatos firmados en las ventanillas de Gestión Escolar."
 generar_pdf = "Generar PDF"
 cancelar = "Cancelar"
@@ -1225,3 +1227,159 @@ listo = "Listo: tus datos están en tu OneDrive. Ya no usaremos Google."
 recargar = "Recargar para verlos"
 cerrar = "Cerrar aviso"
 borrar_archivo = "No borramos nada de tu Google Drive. Si quieres eliminar el archivo: en drive.google.com abre Configuración, luego Administrar aplicaciones, busca la aplicación y elige «Eliminar datos ocultos de la app»."
+
+# ---------------------------------------------------------------------------
+# PoliCORE · lector de documentos (web/policore/lector.js). Común a temarios y, después, a reglamentos.
+[policore.lector]
+# Sin secciones con contenido.
+vacio = "Este documento no tiene secciones para mostrar."
+
+[policore.lector.indice]
+# Texto del botón que despliega las secciones en pantallas angostas.
+titulo = "Ir a una sección"
+# Nombre accesible de la lista de secciones.
+etiqueta = "Secciones del documento"
+
+[policore.lector.buscar]
+marcador = "Buscar en este documento"
+etiqueta = "Buscar en este documento"
+anterior = "Coincidencia anterior"
+siguiente = "Coincidencia siguiente"
+limpiar = "Borrar la búsqueda"
+resultados = "{n, plural, =0 {Sin coincidencias} one {# coincidencia} other {# coincidencias}}"
+posicion = "Coincidencia {i} de {n}"
+en_seccion = "{n, plural, one {# coincidencia} other {# coincidencias}} en esta sección"
+
+[policore.lector.seccion]
+copiar = "Copiar enlace"
+copiar_aria = "Copiar el enlace a la sección «{seccion}»"
+copiado = "Enlace copiado"
+copiar_error = "No se pudo copiar"
+
+[policore.lector.fuente]
+titulo = "Fuente:"
+abrir = "Abrir la fuente"
+
+# ---------------------------------------------------------------------------
+# Temarios de unidades de aprendizaje (web/sate/temarios.js)
+[sate.vista.temarios]
+titulo = "Temarios"
+corto = "Temarios"
+
+[temarios.mapa]
+ver = "Ver programa"
+
+[temarios.panel]
+etiqueta = "Temario de {materia}"
+cerrar = "Cerrar el temario"
+abrir_explorador = "Abrir en Temarios"
+cargando = "Cargando el temario…"
+error = "No se pudo cargar el temario. Revisa tu conexión e inténtalo de nuevo."
+reintentar = "Reintentar"
+
+[temarios.explorador]
+titulo = "Programas de estudio de unidades de aprendizaje"
+intro = "Consulta el programa de cada materia: objetivo, contenido, evaluación y bibliografía."
+volver = "Volver a la lista"
+elegir = "Elige una unidad de aprendizaje de la lista para leer su temario."
+no_encontrado = "No encontramos ese temario. Puede que la clave haya cambiado."
+sin_datos = "Esta unidad académica aún no tiene temarios en SATE."
+cargando = "Cargando temarios…"
+
+[temarios.buscar]
+etiqueta = "Buscar una unidad de aprendizaje"
+marcador = "Nombre, clave o tema"
+ayuda = "También busca dentro del objetivo y de los contenidos."
+buscando = "Buscando en los temarios…"
+
+[temarios.filtro]
+carrera = "Carrera"
+carrera_todas = "Todas las carreras"
+nivel = "Nivel"
+nivel_todos = "Todos los niveles"
+tipo = "Tipo"
+tipo_todos = "Todos los tipos"
+
+[temarios.tipo]
+obligatoria = "Obligatoria"
+optativa = "Optativa"
+elegible = "Elegible"
+
+[temarios.lista]
+etiqueta = "Unidades de aprendizaje"
+nivel = "Nivel {n}"
+resultados = "{n, plural, =0 {Ninguna unidad de aprendizaje coincide} one {# unidad de aprendizaje} other {# unidades de aprendizaje}}"
+sin_resultados = "Prueba con otro nombre o quita algún filtro."
+coincide = "Coincide en: {donde}"
+
+[temarios.donde]
+nombre = "nombre"
+objetivo = "objetivo"
+contenidos = "contenido"
+
+[temarios.seccion]
+objetivo = "Objetivo"
+contenidos = "Contenido"
+orientacion = "Orientación didáctica"
+evaluacion = "Evaluación"
+bibliografia = "Bibliografía"
+
+[temarios.meta]
+carrera = "Carrera"
+nivel = "Nivel"
+tipo = "Tipo"
+tepic = "Créditos TEPIC"
+satca = "Créditos SATCA"
+horas_semana = "Horas por semana"
+horas_semestre = "Horas por semestre"
+vigencia = "Vigencia"
+academia = "Academia"
+horas_semana_valor = "{teoria} de teoría · {practica} de práctica"
+
+[temarios.documento]
+subtitulo = "{clave} · {carrera}"
+unidad = "Unidad"
+fuente = "Programa sintético de la unidad de aprendizaje, plan {plan}."
+
+[qa.temarios]
+# Página de revisión local web/qa-temarios.html (no se publica).
+titulo = "Lector de documentos de PoliCORE (prueba)"
+ancho = "Ancho del marco"
+seccion_temario = "Un temario real, en página"
+seccion_panel = "El mismo temario en un panel angosto"
+seccion_otro = "Otro documento: un reglamento ficticio"
+
+[temarios.biblio]
+basica = "Básica"
+complementaria = "Complementaria"
+
+[sate.pestana.guia]
+titulo = "Guía politécnica"
+corto = "Guía"
+
+[sate.guia]
+intro = "Conoce tus materias y encuentra tu camino en el IPN."
+programas = "Programas de estudio"
+normativa = "Normativa"
+unidad = "Tu unidad académica"
+historia = "Historia y organización del IPN"
+programas_descripcion = "Qué se ve en cada materia y con qué estudiarla"
+normativa_descripcion = "Reglas y derechos para tu vida académica"
+unidad_descripcion = "Conoce los servicios de tu unidad académica"
+historia_descripcion = "Conoce el origen y la organización del Instituto"
+explorar = "Explorar unidades de aprendizaje"
+sin_programas = "Aún no hay programas de estudio de esta unidad"
+proximamente = "Próximamente"
+mas = "Más"
+oficial = "Ver programa oficial completo"
+creditos = "Créditos"
+horas = "Horas por semana"
+tipo = "Tipo"
+veras = "Qué vas a ver"
+recursos = "Recursos para estudiar"
+mas_temas = "y {n} más"
+nota = "Transcripción automática del programa sintético; cotéjala con el documento oficial"
+
+[temarios.aviso]
+ocr = "Transcripción automática del programa sintético; cotéjalo con el documento oficial."
+coincidencia = "La clave del SAES se asoció a este programa por la semejanza de sus nombres; confirma que sea la unidad de aprendizaje correcta."

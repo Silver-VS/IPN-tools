@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Recursos opcionales de estudio por clave de unidad de aprendizaje",
+  "type": "object",
+  "additionalProperties": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "required": ["titulo", "url", "fuente", "idioma", "tipo", "licencia"],
+      "properties": {
+        "titulo": {"type": "string", "minLength": 1},
+        "url": {"type": "string", "pattern": "^https?://[^\\s]+$"},
+        "fuente": {"type": "string", "minLength": 1},
+        "idioma": {"type": "string", "minLength": 1},
+        "tipo": {"type": "string", "minLength": 1},
+        "licencia": {"type": "string", "minLength": 1},
+        "unidades": {"type": "array", "items": {"type": "integer", "minimum": 1}}
+      }
+    }
+  }
+}

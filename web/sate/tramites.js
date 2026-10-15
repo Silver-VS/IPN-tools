@@ -205,6 +205,7 @@
   const definiciones=new Map();let activo;
   function mostrarLista(box){
     box.replaceChildren();box.appendChild(el('h2',tx('titulo')));box.appendChild(el('p',tx('guardado_ayuda')));
+    if(!SATE_CONFIG.unidades[SATE_UNIDAD].tramites.length){box.replaceChildren(el('h2',tx('titulo')),el('p',tx('sin_tramites')));return}
     const lista=el('div',null,'tramite-lista');
     for(const id of SATE_CONFIG.unidades[SATE_UNIDAD].tramites){
       const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica),tarjeta=el('section',null,'tramite-tarjeta');

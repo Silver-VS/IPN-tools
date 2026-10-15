@@ -1,0 +1,462 @@
+{
+ "M101": {
+  "descripcion": "Estudia las herramientas de los espacios vectoriales para modelar y resolver problemas de la ingeniería mecatrónica: números complejos, matrices y sistemas lineales, transformaciones lineales, valores y vectores propios, con apoyo de software matemático.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M102": {
+  "descripcion": "Aborda el diseño de sistemas de información bajo un paradigma de programación, mediante ingeniería de software, paradigma estructurado, fundamentos del paradigma orientado a objetos y lenguaje de modelado unificado.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M106": {
+  "descripcion": "Analiza circuitos eléctricos monofásicos y trifásicos en corriente alterna mediante mallas y nodos, superposición y los teoremas de Thevenin y Norton: circuitos de primer orden, estado estacionario senoidal, potencia y circuitos acoplados magnéticamente.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M105": {
+  "descripcion": "Estudia el análisis de circuitos eléctricos en corriente directa: mediciones eléctricas, ley de Ohm y leyes de Kirchhoff, métodos de análisis y modelos equivalentes de componentes eléctricos, aplicados a un proyecto final.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M111": {
+  "descripcion": "Desarrolla la comunicación efectiva oral y escrita en los ámbitos personal y profesional, de manera colaborativa y cooperativa, con unidades de comunicación y sociedad, comunicación escrita y comunicación oral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M103": {
+  "descripcion": "Desarrolla el cálculo diferencial e integral de una variable y sus aplicaciones, desde los axiomas de los números reales, las funciones, los límites y la continuidad, e incluye sucesiones y series.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M104": {
+  "descripcion": "Aplica el cálculo de funciones reales de varias variables y el cálculo vectorial a problemas matemáticos y físicos: derivación e integración de varias variables, funciones vectoriales y cálculo vectorial.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M107": {
+  "descripcion": "Aborda el diseño de modelos mecánicos tridimensionales con herramientas computacionales para el diseño y la simulación de sistemas mecatrónicos: piezas sólidas, de lámina y soldadas, ensambles y planos para manufactura.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M108": {
+  "descripcion": "Estudia las ecuaciones diferenciales ordinarias para modelar fenómenos de la ingeniería: ecuaciones de primer orden y de orden superior, series de potencias, sistemas lineales e introducción a las ecuaciones diferenciales parciales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M109": {
+  "descripcion": "Analiza las leyes de los campos eléctricos y magnéticos estacionarios con herramientas analíticas e informáticas: fuerzas y campos eléctricos, potencial y capacitancia, corriente y resistencia, y campos magnetostáticos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M110": {
+  "descripcion": "Estudia la relación entre microestructura, procesamiento y propiedades de los materiales para seleccionarlos en el diseño de sistemas mecatrónicos: estructura cristalina, diagramas de fase, materiales de ingeniería, corrosión y selección de materiales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M112": {
+  "descripcion": "Aborda la implementación de fuentes de alimentación reguladas, circuitos de conmutación y amplificadores con diodos, fotodetectores, transistores BJT y MOSFET y amplificadores operacionales, a partir de sus modelos y hojas características.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M113": {
+  "descripcion": "Introduce la programación en un lenguaje científico: funciones y comandos, sentencias de control, arreglos, cadenas y estructuras, gráficas en 2D y 3D, interfaces gráficas e interacción con periféricos y ambientes de simulación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M114": {
+  "descripcion": "Desarrolla la comunicación oral y escrita en inglés, en registro formal e informal, mediante la consolidación gramatical de los tiempos presente, pasado y futuro y de los verbos modales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M115": {
+  "descripcion": "Continúa el desarrollo de la comunicación oral y escrita en inglés con vocabulario y expresiones de mayor complejidad: verbos modales, infinitivo y gerundio, voz pasiva, discurso indirecto, condicionales y cláusulas relativas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M116": {
+  "descripcion": "Introduce las estrategias de diseño de sistemas mecatrónicos para identificar sus elementos y funciones, mediante el análisis de casos reales y ejemplos de sistemas mecatrónicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M117": {
+  "descripcion": "Introduce la programación estructurada en lenguaje C: estructuras de control, arreglos, funciones, cadenas, apuntadores, estructuras, archivos y puertos, aplicadas a problemas de sistemas de información.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M118": {
+  "descripcion": "Analiza las leyes de Newton y los principios de la mecánica de la partícula para describir el movimiento de los cuerpos: cinemática, trabajo y energía, momento lineal y dinámica rotacional.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M119": {
+  "descripcion": "Estudia la estática y el movimiento del cuerpo rígido con las leyes de la mecánica newtoniana: estática, cinemática plana y cinética plana del cuerpo rígido.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M120": {
+  "descripcion": "Aborda la fabricación de elementos de máquinas mediante procesos de manufactura: corte de metales, operaciones básicas en máquinas herramienta y análisis de maquinado, procesos de conformado y procesos de unión y ensamble.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M201": {
+  "descripcion": "Introduce las herramientas administrativas para coordinar las actividades de una empresa, con unidades de introducción a la administración, proceso administrativo y administración del recurso humano.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M202": {
+  "descripcion": "Analiza señales y sistemas continuos y discretos mediante la transformada de Laplace, la transformada de Fourier y la transformada Z, a partir de los sistemas lineales invariantes en el tiempo.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M203": {
+  "descripcion": "Aborda el diseño de mecanismos de sistemas mecatrónicos con métodos y técnicas matemáticas: clasificación, análisis cinemático y dinámico en dos dimensiones, trenes de engranes y levas, y síntesis de mecanismos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M204": {
+  "descripcion": "Estudia la implementación de control digital con dispositivos lógicos programables y lenguajes descriptivos de hardware: diseño y ensamble de circuitos combinacionales, secuenciales y máquinas de estado finito.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M205": {
+  "descripcion": "Estudia el diseño de elementos de máquinas con criterios del diseño mecánico: concentración de esfuerzos, teorías de falla estáticas, soldadura y pernos, resortes, transmisiones de potencia con elementos flexibles y acoplamientos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M206": {
+  "descripcion": "Aborda la implementación de sistemas de medición y control digital con lenguaje descriptivo de hardware y FPGA: tarjetas de desarrollo, circuitos combinacionales y secuenciales, periféricos, módulos externos y tópicos de diseño.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M207": {
+  "descripcion": "Aborda la implementación de circuitos analógicos de filtrado, amplificación, generación de señales y acondicionamiento de cargas de corriente alterna: filtros activos, amplificadores con transistores, osciladores, PLL y tiristores.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M208": {
+  "descripcion": "Desarrolla la comunicación en inglés conforme al nivel B2 del Marco Común Europeo de Referencia, con consolidación gramatical y de vocabulario, lectura, escritura, práctica auditiva y expresión oral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M209": {
+  "descripcion": "Evalúa el papel del líder y del emprendedor mediante las teorías de liderazgo, el desarrollo de habilidades intra e interpersonales, el trabajo en equipo, el manejo de conflictos y la negociación, y el plan de vida y carrera.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M210": {
+  "descripcion": "Evalúa los elementos de un sistema de manufactura y los tipos de mantenimiento: automatización y modelado de sistemas de manufactura, y organización, principios, análisis y aplicación del mantenimiento.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M212": {
+  "descripcion": "Resuelve problemas de mecánica de fluidos con los principios de la física y la termodinámica: estática de fluidos, movimiento de los fluidos, ecuaciones básicas en forma integral y flujo incompresible en tuberías.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M213": {
+  "descripcion": "Estudia la implementación de sistemas de cómputo embebido con microcontroladores o microprocesadores: arquitectura de computadoras, representación digital de datos, memorias e interfaces, y sistemas embebidos basados en procesador o microcontrolador.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M211": {
+  "descripcion": "Evalúa la conversión de energía eléctrica en mecánica y viceversa en sistemas mecatrónicos: criterios de selección, circuitos magnéticos, máquinas de corriente continua, transformadores, máquinas de inducción y máquinas sincrónicas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M214": {
+  "descripcion": "Estudia la implementación de circuitos neumáticos, hidráulicos, electroneumáticos y electrohidráulicos con los principios y normas de la neumática y la hidráulica: física de los fluidos, dispositivos y circuitos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M215": {
+  "descripcion": "Analiza sistemas oscilatorios lineales de un grado de libertad y la propagación e interacción de la luz con la materia: oscilaciones amortiguadas y forzadas, óptica geométrica y ondas monocromáticas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M216": {
+  "descripcion": "Analiza conjuntos de datos reales de ingeniería con apoyo de software: estadística descriptiva, probabilidad, variables aleatorias y distribuciones, regresión lineal simple y múltiple e introducción al control de calidad.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M217": {
+  "descripcion": "Aborda la implementación de sistemas de aplicación informática con programación orientada a objetos e interfaces gráficas de usuario, e incluye puertos y comunicaciones y visión.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M218": {
+  "descripcion": "Estudia la implementación de sensores y circuitos de acondicionamiento de señal con elementos discretos e integrados: sensores resistivos, magnéticos y de reactancia variable, sensores generadores y otros sensores.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M219": {
+  "descripcion": "Aborda la implementación de circuitos de corriente directa y alterna con modelos Spice y técnicas de manufactura de circuitos impresos: ambiente de simulación, simulación de circuitos y consideraciones de diseño de PCB.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M220": {
+  "descripcion": "Aborda la implementación de sistemas de automatización y control inteligentes con lógica difusa y redes neuronales artificiales: relaciones difusas, controladores lógicos difusos y redes neuronales monocapa y multicapa.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M221": {
+  "descripcion": "Analiza los campos electromagnéticos variables en el tiempo, los parámetros constitutivos y las condiciones de frontera con las ecuaciones de Maxwell: ley de Faraday, ecuación de onda y propagación de ondas electromagnéticas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M222": {
+  "descripcion": "Estudia el cálculo de la eficiencia de procesos de la ingeniería mecatrónica con las leyes de la termodinámica: primera ley, ecuaciones de estado, diagramas de fase de sustancias puras, y segunda y tercera leyes.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M305": {
+  "descripcion": "Estudia la automatización de sistemas industriales con controladores lógicos programables: fundamentos de automatización, automatización básica y avanzada con estos controladores, y servoposicionamiento controlado desde el mismo dispositivo.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M301": {
+  "descripcion": "Estudia el diseño de controladores analógicos proporcional, integral, derivativo y compensadores con el lugar geométrico de las raíces y el diagrama de Bode, tras revisar estabilidad, linealización y respuesta temporal.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M306": {
+  "descripcion": "Evalúa elementos de máquina de transmisión de potencia y fuerza de sistemas mecatrónicos con las teorías del diseño mecánico: fatiga, vibraciones, engranes y tornillos de potencia, rodamientos, y diseño de ejes y sistemas de transmisión.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M307": {
+  "descripcion": "Estudia las decisiones financieras de una entidad económica a partir del análisis de los estados financieros y de las técnicas de evaluación económica, con unidades de ingeniería económica y decisiones financieras.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M309": {
+  "descripcion": "Evalúa tecnologías de menor impacto ambiental con base en la ecotoxicología: problemática ambiental e industria, impacto, riesgo y vulnerabilidad, gestión y auditoría ambiental, y soluciones ambientales en ingeniería.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M303": {
+  "descripcion": "Estudia la implementación de instrumentos virtuales para el análisis y monitoreo de variables: programación de instrumentos virtuales, envío y recepción de datos, comunicación con instrumentos tradicionales y aplicación en sistemas mecatrónicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M304": {
+  "descripcion": "Aborda el modelado de sistemas mecatrónicos con herramientas matemáticas y computacionales, a partir de los principios de modelado, e incluye diagramas de enlace e identificación de sistemas dinámicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M316": {
+  "descripcion": "Aplica en casos prácticos la automatización de una línea de producción: fundamentos, configuración de los sistemas de producción, sistemas lineales de transportación y automatización de la línea.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M315": {
+  "descripcion": "Aborda el diseño de robots de al menos un grado de libertad, de cinemática abierta o cerrada, con métodos algebraicos lineales y variacionales: cinemática de robots móviles y manipuladores, y diseño y programación de robots industriales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M311": {
+  "descripcion": "Estudia la construcción de sistemas SCADA con los principios del control distribuido: conceptos de automatización en sistemas de control industrial, sistemas de control distribuido y sistemas SCADA.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M318": {
+  "descripcion": "Analiza el desarrollo empresarial con base en la administración estratégica, la administración de la calidad y los sistemas administrativos: componentes del desarrollo empresarial y mejora continua.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M313": {
+  "descripcion": "Aborda el uso de herramientas computacionales en el diseño y la manufactura de un producto: fundamentos del diseño avanzado, optimización del diseño, manufactura asistida por computadora y casos de estudio.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M310": {
+  "descripcion": "Estudia el proceso logístico de una empresa según las variables microeconómicas y macroeconómicas de su entorno, con unidades de fundamentos de microeconomía, fundamentos de macroeconomía y proceso logístico.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M321": {
+  "descripcion": "Aborda la generación de interfaces gráficas de usuario con conceptos de graficación en 3D: API de programación de gráficos, implementación de herramientas matemáticas, conceptos avanzados y diseño de interfaces.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M322": {
+  "descripcion": "Evalúa los procesos industriales según el tipo de industria: conceptos de producción y las industrias farmacéutica, de alimentos, maderera, minera, del cemento, de generación de energía eléctrica, química y petrolera.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M323": {
+  "descripcion": "Aborda el diseño de una estrategia integrada de aprovechamiento de materias y energía para la prevención ambiental, con la metodología de producción más limpia, competitividad, buenas prácticas de manufactura y aplicaciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M328": {
+  "descripcion": "Estudia la implementación de protocolos de comunicación en dispositivos programables con estándares industriales: RS-232 y USB, ISP e I²C, y comandos estándar para instrumentos programables.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M319": {
+  "descripcion": "Evalúa el entorno de procesos productivos o de servicio con la cultura de prevención, el control de riesgos, la seguridad e higiene y la normatividad vigente, y elabora un plan de seguridad e higiene.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M327": {
+  "descripcion": "Estudia la aplicación de sistemas de calidad en la manufactura según la normatividad vigente: herramientas de la calidad, análisis, implantación y evaluación de sistemas de calidad y certificación de un producto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M320": {
+  "descripcion": "Estudia la creación de aplicaciones de tipo industrial con sistemas operativos en tiempo real: introducción, programación concurrente, tareas, interrupciones, reloj en tiempo real y planificación de procesos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M317": {
+  "descripcion": "Aborda la construcción de sistemas embebidos a partir de sensores avanzados, con unidades dedicadas a los sensores avanzados de posición, los sensores MEMS y los sensores inteligentes.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M312": {
+  "descripcion": "Aborda la implementación de convertidores analógico-digital, digital-analógico y de frecuencia-voltaje-frecuencia, y de circuitos microelectrónicos con dispositivos MOSFET y CMOS, con aplicaciones de la microelectrónica y temas selectos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M324": {
+  "descripcion": "Aborda la propuesta de un programa de mantenimiento de herramientas de conformado, sujeción y corte según el proceso de manufactura: tolerancias, troquelado, herramental para plásticos y herramental de sujeción, ensamble e inspección.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M308": {
+  "descripcion": "Evalúa rutinas computacionales en un procesador digital de señales según sus características y arquitectura: programación en distintos ambientes de desarrollo, periféricos y aplicaciones específicas de este tipo de procesador.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M314": {
+  "descripcion": "Desarrolla la planeación de un proyecto con una metodología mecatrónica, mediante unidades de conceptualización, diseño detallado, validación computacional del diseño y documentación completa del proyecto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M302": {
+  "descripcion": "Evalúa el código de valores y el sentido social de la ingeniería desde los fundamentos axiológicos y éticos: ética y axiología, ingeniería mecatrónica y sociedad, y ética profesional del ingeniero en mecatrónica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M401": {
+  "descripcion": "Aborda el diseño de esquemas de control de sistemas mecatrónicos con la teoría de control: análisis en variables de estado, diseño en el espacio de estados e introducción al control digital.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M402": {
+  "descripcion": "Estudia la construcción de sistemas de conversión y control de energía eléctrica con dispositivos semiconductores: semiconductores de potencia y convertidores CD-CD, CD-CA, CA-CA y CA-CD.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M404": {
+  "descripcion": "Aborda la elaboración de un protocolo de investigación y una publicación científica con base en el método científico: protocolo, productos de investigación y presentación formal de trabajos científicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M419": {
+  "descripcion": "Estudia la implementación de arquitecturas de control en procesos industriales con controladores industriales típicos: introducción a los controladores, controladores industriales y arquitecturas de control de lazos múltiples.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M413": {
+  "descripcion": "Estudia la implementación de esquemas de control de robots manipuladores y móviles con las propiedades del modelo dinámico y estrategias de control lineal y no lineal: dinámica, planificación de trayectorias y control.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M420": {
+  "descripcion": "Estudia la implementación de esquemas de control inteligente en sistemas mecatrónicos con sistemas adaptables y control difuso: control adaptable, esquemas y estimación difusos, control difuso adaptable y controladores supervisados.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M421": {
+  "descripcion": "Aborda el diseño del manejo de los activos físicos de la industria con estudios de tiempos y movimientos, restricciones espaciales, capacidad instalada y de producción: distribución de planta y equipos para manejo de materiales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M422": {
+  "descripcion": "Aborda el diseño de dispositivos y sistemas de ingeniería mecatrónica con factores humanos y medioambientales y herramientas computacionales: antropometría, biomecánica, espacio de trabajo y diseño ergonómico de productos, herramental y maquinaria.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M409": {
+  "descripcion": "Estudia la integración de una celda de trabajo robotizada en procesos de producción: introducción a los sistemas robóticos, criterios de integración, seguridad y aplicaciones en tareas específicas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M408": {
+  "descripcion": "Aborda el diseño de las estrategias de mercadotecnia de una empresa según el entorno de mercado y la mezcla de mercadotecnia: fundamentos, sistema de información y estrategias de mercadotecnia.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M407": {
+  "descripcion": "Evalúa los periféricos e interfaces de entrada y salida de un microcontrolador de 8 bits según las necesidades de los sistemas mecatrónicos, e introduce los microcontroladores de 16 y 32 bits.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M412": {
+  "descripcion": "Estudia la implementación de procesos avanzados de manufactura con energía eléctrica, térmica y química: maquinado abrasivo, arranque de viruta especializado, electroerosión, corte por plasma, metalurgia de polvos y prototipado rápido.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M423": {
+  "descripcion": "Aborda la automatización de sistemas mecatrónicos con protocolos de comunicación industrial: introducción a las comunicaciones en entornos industriales, redes de área local y buses de campo.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M424": {
+  "descripcion": "Aborda el diseño de sistemas mecatrónicos mediante sistemas embebidos, con unidades de introducción a los sistemas embebidos, sistemas operativos para estos sistemas e implementación de un sistema embebido.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M425": {
+  "descripcion": "Estudia la implementación de interfaces de usuario que describen la geometría, el comportamiento y la interacción de objetos y escenarios con ambientes de programación de realidad virtual y juegos: mundos virtuales, eventos y animación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M426": {
+  "descripcion": "Aborda el diseño de sistemas de procesamiento digital de señales en sistemas mecatrónicos con herramientas computacionales, con aplicaciones con sonido, con imágenes y en control.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M417": {
+  "descripcion": "Aborda la automatización de sistemas mecatrónicos con técnicas de control automático: elementos de la automatización avanzada, implementación en dispositivos industriales de control automático y técnicas avanzadas de automatización.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M427": {
+  "descripcion": "Estudia la construcción de elementos mecánicos unidos con técnicas estandarizadas de soldadura: soldadura por combustión y por arco eléctrico, procesos especiales y pruebas en uniones soldadas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M410": {
+  "descripcion": "Estudia la implementación de un sistema de visión artificial para el control de sistemas mecatrónicos: código legible por computadora, control de calidad geométrico, análisis de movimiento y aplicaciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M405": {
+  "descripcion": "Evalúa proyectos de inversión de un negocio con los estudios de mercado, técnico, ecológico y económico: introducción a los proyectos de inversión y evaluación económica del proyecto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M406": {
+  "descripcion": "Estudia la implementación de un sistema de visión artificial con programación de alto nivel: adquisición y segmentación de imágenes, imágenes como estructuras de datos, filtrado y compresión de datos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M501": {
+  "descripcion": "Estudia la implementación de esquemas de control de motores eléctricos con las leyes de conservación de la energía y la teoría de circuitos: control electrónico de motores de corriente continua y alterna, y control discreto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M503": {
+  "descripcion": "Desarrolla la propuesta del trabajo terminal con los principios del diseño de sistemas mecatrónicos: estado del arte y marco teórico, análisis de requerimientos, diseño detallado y documentación, y presentación del diseño propuesto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "M504": {
+  "descripcion": "Desarrolla la implementación del proyecto de trabajo terminal según el diseño de Trabajo Terminal I y el protocolo del proyecto, con administración y documentación del proyecto, análisis de resultados y preparación de la defensa oral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ }
+}

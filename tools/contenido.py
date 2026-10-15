@@ -110,6 +110,11 @@ def validar_sate(claves, errores, ruta=SATE):
             for suf in ("titulo", "corto"):
                 if f"sate.pestana.{p}.{suf}" not in claves:
                     errores.append(f"data/sate.json: unidades.{u}: falta la clave sate.pestana.{p}.{suf}")
+        for v in c.get("vistas", []):
+            if f"sate.vista.{v.get('id')}.titulo" not in claves:
+                errores.append(f"data/sate.json: unidades.{u}: falta la clave sate.vista.{v.get('id')}.titulo")
+            if v.get("padre") not in c.get("pestanas", []):
+                errores.append(f"data/sate.json: unidades.{u}: la vista {v.get('id')} tiene un padre que no es pestana")
         for t in c.get("tramites", []):
             if f"sate.tramite.{t}.titulo" not in claves:
                 errores.append(f"data/sate.json: unidades.{u}: falta la clave sate.tramite.{t}.titulo")

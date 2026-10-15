@@ -651,3 +651,9 @@ body.sate-flotante .sate-barra{display:flex}
 }
 
 @media(hover:none){.calendario-linea-pista,.calendario-linea-meses,.calendario-linea-hoy-capa{display:none}.calendario-linea-lista{display:grid;gap:var(--ipn-esp-2)}.calendario-linea-lista button{white-space:normal;text-align:left;margin-block:var(--ipn-esp-1)}}
+/* Más comparte cierre, foco y teclado con el modal común. */
+.sate-mas-lista{display:grid;gap:var(--ipn-esp-4)}
+.sate-mas-lista button{display:flex;align-items:center;gap:var(--ipn-esp-3);min-height:3rem}
+.sate-mas-lista .sate-pestana__texto--corto{display:none}
+.sate-modal.sate-modal--mas{inset:auto 0 0;margin:0 auto;width:min(100%,36rem);height:auto;max-height:80dvh;border-radius:var(--ipn-radio) var(--ipn-radio) 0 0}
+.sate-mas-lista button[aria-current=page]{background:var(--ipn-acento-suave);border-color:var(--ipn-acento);font-weight:600}

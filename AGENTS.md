@@ -43,6 +43,8 @@ Los textos se consultan por clave; no se duplican componentes para cambiar infor
 | Ruta | Responsabilidad |
 |---|---|
 | `web/sate/` | Implementación, componentes y diseño comunes |
+| `web/policore/` | Lector de documentos de PoliCORE (`lector.js`, `lector.css`), sin dependencias; formato y API en `docs/POLICORE-LECTOR.md` |
+| `web/sate/temarios.js` | Adaptador de temarios al lector, modo «Explorar unidades de aprendizaje» del mapa, panel/hoja y vista `#/<unidad>/temarios` (se activa con `vistas` en `data/sate.json` y datos en `data/temarios/<unidad>/`) |
 | `data/sate.json` | Unidad predeterminada, pestañas, trámites y capacidades: carga, carrerasSemestrales, electivas (texto y trámite), cargaCalculada, planDosPeriodos y miSemana |
 | `data/unidades/<u>/` | Oferta, planes, mapas y configuración de cada unidad |
 | `data/calendario*.json` | Calendarios institucionales y actividades locales |
