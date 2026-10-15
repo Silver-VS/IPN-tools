@@ -820,6 +820,9 @@ def main():
                     extra.setdefault(c[0], {})[syn[key]] = [asig[c[4]], 0.0, c[2], "O"]
                 c[8], c[7], c[9] = syn[key], 0.0, "O"
     data["mapas"] = load_maps(d, upiita, extra)
+    from materias_sin_ubicar import clasificar
+    for car, mapa in data['mapas'].items():
+        mapa['sinUbicar'] = [k for k, estado in clasificar(mapa).items() if estado in ('sin_ubicar', 'sin_selector')]
     # salones: PDF de horarios por aula de la unidad (tools/salones.py) -> solo el periodo actual; el próximo aún no
     # los tiene. Se toma el archivo data/salones_*.json más reciente y se aplica si coincide con la oferta del SAES.
     import salones

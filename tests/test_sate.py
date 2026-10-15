@@ -15,6 +15,20 @@ sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_alcance_mapa_sin_depender_del_avance(self):
+        from materias_sin_ubicar import clasificar
+        cur = {k: [k, 6, nivel, tipo] for k, nivel, tipo in
+               [('A', 1, 'O'), ('B', 3, 'P'), ('C', 4, 'P'), ('D', 3, 'P'), ('E', 1, 'O')]}
+        cur['EL'] = ['ELECTIVA II', 6, 2, 'P']
+        mapa = {'cur': cur, 'lineas': [{'claves': ['D']}], 'layout': {'boxes': [
+            [0, 0, 1, 1, 'A', '', 1], [0, 0, 1, 1, '', 'Optativa', 7, 3]]}}
+        self.assertEqual(clasificar(mapa), {'A': 'ubicada', 'B': 'sin_selector',
+                         'C': 'sin_ubicar', 'D': 'ubicada', 'E': 'sin_ubicar', 'EL': 'electiva'})
+        mapa['layout']['boxes'][1].pop()
+        self.assertEqual(clasificar(mapa)['C'], 'sin_selector')
+        mapa.pop('layout')
+        self.assertEqual(clasificar(mapa)['B'], 'ubicada')
+
     def test_creditos_por_escala(self):
         from build_sate import creditos_materia
         self.assertEqual(creditos_materia('B', '09', 'B101', '7.50', '3', '1.5'),

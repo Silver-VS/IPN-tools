@@ -681,6 +681,12 @@ footer{margin-top:32px;padding-top:14px;border-top:1px solid var(--line);color:v
 .insp[hidden],.mapnote[hidden]{display:none}
 .map-plan .mapwrap{border:0;border-radius:0}
 .map-plan .tlist{margin:0;padding:12px}
+.sin-ubicar{margin:12px;border:1px solid var(--line);border-radius:var(--r)}
+.sin-ubicar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px}
+.sin-ubicar-materia{padding:12px;border:1px solid var(--line);border-radius:var(--r);overflow-wrap:anywhere}
+.sin-ubicar-materia.want{border-color:var(--accent)}
+.sin-ubicar-materia>small{display:block;margin:6px 0;color:var(--muted)}
+.sin-ubicar-materia details{margin-top:10px}
 @media(max-width:720px){.plan-resumen{display:grid;gap:4px;font-size:.78rem}.plan-head .actions{margin-left:0}}
 .plan-grupos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
 .plan-grupo{min-width:0;border-top:3px solid var(--accent);padding-top:8px}
@@ -778,6 +784,7 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(96px + env(safe-ar
     <div class="map-plan">
     <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
     <div class="tlist" id="tlist" hidden></div>
+    <details class="sate-desp sin-ubicar" id="sin-ubicar" hidden><summary id="sin-ubicar-titulo"></summary><div id="sin-ubicar-materias"></div></details>
     <ul class="mapnote" id="mapnote" hidden></ul>
     <section class="plan-panel" id="plan-panel">
       <div class="insp" id="insp" aria-live="polite" hidden></div>
