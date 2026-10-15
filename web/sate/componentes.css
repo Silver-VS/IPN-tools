@@ -737,3 +737,41 @@ body.sate-flotante .sate-barra{display:flex}
 .sate-mas-lista .sate-pestana__texto--corto{display:none}
 .sate-modal.sate-modal--mas{inset:auto 0 0;margin:0 auto;width:min(100%,36rem);height:auto;max-height:80dvh;border-radius:var(--ipn-radio) var(--ipn-radio) 0 0}
 .sate-mas-lista button[aria-current=page]{background:var(--ipn-acento-suave);border-color:var(--ipn-acento);font-weight:600}
+/* ===== Encabezado unificado (GUIA4) =====
+   Una sola pieza: logos IPN y de la unidad | SATE + nombre de la unidad | acciones (Opinar, tema, cuenta) y estado del
+   SAES a la derecha; debajo, avisos y la fila de pestañas con la carrera. Cuadrícula con áreas: `.brand`, `.title-row`,
+   `.inst` y `.sate-fila-avisos` pasan a `display:contents` para que sus hijos se alineen en la misma cuadrícula.
+   Escalones por ancho: completo (>=1024) -> corto (640-1023: nombre de la unidad recortado con puntos suspensivos, acciones
+   solo con ícono) -> teléfono (<640: logos pequeños, SAES en su propia fila y barra inferior de cuatro pestañas + Más).
+   Nada se parte: las columnas de texto son minmax(0,1fr) y el texto largo se recorta, no se envuelve. */
+.wrap>header.top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logos ident acciones" "logos nombre datos" "avisos avisos avisos" "nav nav nav";align-items:center;column-gap:var(--ipn-esp-4);row-gap:0;margin-top:var(--ipn-esp-3);padding:var(--ipn-esp-4) var(--ipn-esp-5) 0;border:1px solid var(--ipn-linea);border-top:3px solid var(--sate-realce,var(--ipn-acento));border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+.wrap>header.top>.brand,.wrap>header.top .title-row,.wrap>header.top>.inst,.wrap>header.top .sate-fila-avisos{display:contents}
+.wrap>header.top .sate-fila-avisos[hidden],.wrap>header.top>.sate-navegacion[hidden]{display:none}
+.wrap>header.top .inst-in{grid-area:logos;display:flex;flex-wrap:nowrap;align-items:center;gap:var(--ipn-esp-3);max-width:none;margin:0;padding:0}
+.wrap>header.top .inst-in img{height:44px;width:auto}
+.wrap>header.top .inst-in .unit{margin-left:0;display:inline-flex}
+.wrap>header.top .inst-in .unit img{height:44px}
+.wrap>header.top .inst-in>span:first-child{display:inline-flex}
+.wrap>header.top .inst-name{grid-area:nombre;max-width:none;margin:0;padding:0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--ipn-tamano-xs);font-weight:400;color:var(--ipn-tenue)}
+.wrap>header.top:has(.inst) #sate-nombre{display:none}
+.wrap>header.top:has(.inst-in .unit) .sate-logo-halo{display:none}
+.wrap>header.top .sate-identidad{grid-area:ident;min-width:0}
+.wrap>header.top .header-actions{grid-area:acciones;justify-self:end}
+.wrap>header.top .sate-datos{grid-area:datos;justify-self:end;margin-left:0}
+.wrap>header.top #sate-avisos-globales{grid-area:avisos;min-width:0}
+.wrap>header.top #sate-avisos-globales:not(:empty){margin-top:var(--ipn-esp-3)}
+.wrap>header.top #cupos-resumen{grid-column:1 / -1}
+.wrap>header.top>.sate-navegacion{grid-area:nav;margin:var(--ipn-esp-3) 0 0;padding-block:var(--ipn-esp-3);border-top:1px solid var(--ipn-linea)}
+.wrap>header.top .sate-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media(max-width:1023.98px){
+  .wrap>header.top{padding-inline:var(--ipn-esp-4);column-gap:var(--ipn-esp-3)}
+  .wrap>header.top .header-actions .enc-btn span,.wrap>header.top .header-actions .ipnt-btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+}
+@media(max-width:639.98px){
+  .wrap>header.top{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"logos ident acciones" "datos datos datos" "avisos avisos avisos" "nav nav nav";margin-top:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-3) 0;column-gap:var(--ipn-esp-2)}
+  .wrap>header.top .inst-in img,.wrap>header.top .inst-in .unit img{height:32px}
+  .wrap>header.top .inst-in{gap:var(--ipn-esp-2)}
+  .wrap>header.top .inst-name{display:none}
+  .wrap>header.top .sate-datos{justify-self:stretch;justify-content:space-between;margin-top:var(--ipn-esp-2)}
+  .wrap>header.top>.sate-navegacion{margin-top:var(--ipn-esp-2);padding-block:var(--ipn-esp-2)}
+}

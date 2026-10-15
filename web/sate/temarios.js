@@ -109,7 +109,26 @@
     const oracion = n.toLocaleLowerCase('es').replace(/\p{L}+/gu, p => conocidas.has(p.toUpperCase()) ? p.toUpperCase() : p);
     return oracion.charAt(0).toUpperCase() + oracion.slice(1);
   }
-  raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace, recursosValidos, tituloTema };
+  // Requisitos directos (r) y materias que desbloquea una materia del índice, ordenados por nivel y nombre.
+  function relaciones(materias, clave) {
+    const k = claveNorm(clave), orden = (a, b) => (materias[a].v ?? 99) - (materias[b].v ?? 99) || materias[a].n.localeCompare(materias[b].n, 'es');
+    const antes = (materias[k]?.r || []).filter(x => materias[x]).sort(orden);
+    const despues = Object.keys(materias).filter(c => (materias[c].r || []).includes(k)).sort(orden);
+    return { antes, despues };
+  }
+  // Líneas de aprendizaje de una carrera: una fila por área (en el orden de las columnas del mapa) con sus materias por nivel.
+  // Las materias sin área (optativas y especialidad) van al final en una fila con nombre null.
+  function lineasDeAprendizaje(materias, carreraId, areas) {
+    const filas = (areas || []).map(a => ({ nombre: a.nombre, color: a.color, items: [] })), otras = { nombre: null, color: null, items: [] };
+    for (const [clave, m] of Object.entries(materias)) {
+      if (m.c !== carreraId) continue;
+      (filas.find(f => f.nombre === m.a) || otras).items.push({ clave, ...m });
+    }
+    if (otras.items.length) filas.push(otras);
+    for (const f of filas) f.items.sort((a, b) => (a.v ?? 99) - (b.v ?? 99) || a.n.localeCompare(b.n, 'es') || a.clave.localeCompare(b.clave));
+    return filas.filter(f => f.items.length);
+  }
+  raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace, recursosValidos, tituloTema, relaciones, lineasDeAprendizaje };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -234,22 +253,51 @@
       E.cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra);
     }
   }
-  function pintarFicha(r, recursos) {
-    const m = r.registro;
-    // El compilador resuelve el área con el mismo layout y paleta del mapa, aunque esa vista no se haya cargado.
-    const color = m.area?.color || 'var(--ipn-acento)';
-    E.panel.style.setProperty('--tmr-area', color);
-    const oficial = h('a', {'class':'btn tmr-oficial', href:ir(r.carreraId, m.clave, 'objetivo'), texto:t('sate.guia.oficial')});
-    oficial.addEventListener('click', () => cerrar({foco:true}));
-    const dato = (valor, etiqueta) => h('div', {}, [h('strong', {texto:valor}), h('small', {texto:t('sate.guia.' + etiqueta)})]);
+  /* ---------- ficha de materia: un solo componente para el modal del mapa y el panel grande de la Guía ---------- */
+  const bibliotecaUrl = id => (raiz.SATE_CONFIG?.bibliotecas || []).find(b => b.id === id)?.url || null;
+  const enlaceExterno = (clase, href, hijos, texto) => h('a', { 'class': clase, href, target: '_blank', rel: 'noopener noreferrer', texto }, hijos);
+  function fichaRelacion(titulo, claves, ninguna, alIr) {
+    const lista = claves.length ? h('div', { 'class': 'tmr-rel-lista' }, claves.map(k => {
+      const a = h('a', { 'class': 'tmr-rel-enlace', href: ir(E.indice.materias[k].c, k), texto: E.indice.materias[k].n });
+      if (alIr) a.addEventListener('click', alIr);
+      return a;
+    })) : h('p', { 'class': 'tmr-nota', texto: ninguna });
+    return h('div', { 'class': 'tmr-rel' }, [h('h4', { texto: titulo }), lista]);
+  }
+  function construirFicha(r, recursos, op) {
+    const m = r.registro, alIr = op && op.alIr;
+    const dato = (valor, etiqueta) => h('div', {}, [h('strong', { texto: valor }), h('small', { texto: t('sate.guia.' + etiqueta) })]);
     const horas = m.horas || {}, cr = m.creditos || {};
-    E.cuerpo.replaceChildren(...[
-      h('header', {'class':'tmr-ficha-enc'}, [h('h2', {texto:m.nombre}), h('p', {'class':'tmr-meta', texto:[m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel',{n:m.nivel}) : null].filter(Boolean).join(' · ')}), m.descripcion ? h('p', {'class':'tmr-descripcion', texto:m.descripcion}) : null].filter(Boolean)),
-      h('div', {'class':'tmr-cifras'}, [cr.tepic != null || cr.satca != null ? dato(num(cr.tepic ?? cr.satca),'creditos') : null, horas.teoria_semana != null || horas.practica_semana != null ? dato(num((horas.teoria_semana || 0) + (horas.practica_semana || 0)),'horas') : null, m.tipo ? dato(t('temarios.tipo.' + m.tipo),'tipo') : null].filter(Boolean)),
-      h('section', {'class':'tmr-bloque'}, [h('h3', {texto:t('sate.guia.veras')}), h('ol', {'class':'tmr-pasos'}, (m.contenidos || []).map((u, i) => h('li', {}, [h('span', {'class':'tmr-paso', texto:String(i+1)}), h('div', {}, [h('h4',{texto:tituloTema(u.titulo)}), ...(u.subtemas || []).slice(0,5).map(s => h('p', {texto:tituloTema(s)})), (u.subtemas || []).length > 5 ? h('small', {texto:t('sate.guia.mas_temas', {n:u.subtemas.length-5})}) : null])])))]),
-      recursos.length ? h('section', {'class':'tmr-bloque'}, [h('h3',{texto:t('sate.guia.recursos')}), ...recursos.map(x => h('a', {'class':'tmr-recurso', href:x.url, target:'_blank', rel:'noopener noreferrer'}, [h('small', {texto:[x.fuente,x.idioma,x.tipo].join(' · ')}), h('span',{texto:x.titulo+' ↗'})]))]) : null,
-      h('footer', {'class':'tmr-bloque'}, [oficial, h('p', {'class':'tmr-nota', texto:t('sate.guia.nota')})])
+    const rel = relaciones(E.indice.materias, m.clave);
+    const oficial = h('a', { 'class': 'btn tmr-oficial', href: ir(r.carreraId, m.clave, 'objetivo'), texto: t('sate.guia.oficial') });
+    if (alIr) oficial.addEventListener('click', alIr);
+    const pdf = m.pdf ? enlaceExterno('btn primary tmr-pdf', m.pdf, null, t('sate.guia.pdf')) : null;
+    if (pdf) pdf.setAttribute('title', t('sate.guia.pdf_ayuda'));
+    const catalogo = bibliotecaUrl('catalogo');
+    const notas = [m.descripcion && m.descripcion_revisada === false ? t('sate.guia.descripcion_pendiente') : null, t('sate.guia.nota')].filter(Boolean);
+    const ficha = h('div', { 'class': 'tmr-ficha' }, [
+      h('header', { 'class': 'tmr-ficha-enc' }, [
+        h('h2', { texto: m.nombre, tabindex: '-1' }),
+        h('p', { 'class': 'tmr-meta', texto: [m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel', { n: m.nivel }) : null].filter(Boolean).join(' · ') }),
+        m.descripcion ? h('p', { 'class': 'tmr-descripcion', texto: m.descripcion }) : null,
+        h('div', { 'class': 'tmr-acciones' }, [pdf, oficial])]),
+      h('div', { 'class': 'tmr-cifras' }, [cr.tepic != null || cr.satca != null ? dato(num(cr.tepic ?? cr.satca), 'creditos') : null, horas.teoria_semana != null || horas.practica_semana != null ? dato(num((horas.teoria_semana || 0) + (horas.practica_semana || 0)), 'horas') : null, m.tipo ? dato(t('temarios.tipo.' + m.tipo), 'tipo') : null]),
+      (m.contenidos || []).length ? h('section', { 'class': 'tmr-bloque' }, [h('h3', { texto: t('sate.guia.veras') }), h('ol', { 'class': 'tmr-pasos' }, m.contenidos.map((u, i) => h('li', {}, [h('span', { 'class': 'tmr-paso', texto: String(i + 1) }), h('div', {}, [h('h4', { texto: tituloTema(u.titulo) }), ...(u.subtemas || []).slice(0, 5).map(x => h('p', { texto: tituloTema(x) })), (u.subtemas || []).length > 5 ? h('small', { texto: t('sate.guia.mas_temas', { n: u.subtemas.length - 5 }) }) : null])])))]) : null,
+      recursos.length ? h('section', { 'class': 'tmr-bloque' }, [h('h3', { texto: t('sate.guia.recursos') }), ...recursos.map(x => enlaceExterno('tmr-recurso', x.url, [h('small', { texto: [x.fuente, x.idioma, x.tipo].join(' · ') }), h('span', { texto: x.titulo + ' ↗' })]))]) : null,
+      rel.antes.length || rel.despues.length ? h('section', { 'class': 'tmr-bloque' }, [h('h3', { texto: t('sate.guia.relaciones') }),
+        fichaRelacion(t('sate.guia.antes'), rel.antes, t('sate.guia.antes_ninguna'), alIr), fichaRelacion(t('sate.guia.despues'), rel.despues, t('sate.guia.despues_ninguna'), alIr)]) : null,
+      (m.bibliografia || []).length ? h('section', { 'class': 'tmr-bloque' }, [h('h3', { texto: t('sate.guia.bibliografia') }),
+        h('ul', { 'class': 'tmr-biblio' }, m.bibliografia.map(b => h('li', { texto: String(b.texto || '').trim() }))),
+        catalogo ? enlaceExterno('tmr-catalogo', catalogo, [h('span', { texto: t('sate.guia.buscar_catalogo') + ' ↗' })]) : null]) : null,
+      h('footer', { 'class': 'tmr-bloque' }, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))
     ].filter(Boolean));
+    if (ficha.style && ficha.style.setProperty) ficha.style.setProperty('--tmr-area', m.area?.color || 'var(--ipn-acento)');
+    return ficha;
+  }
+  function pintarFicha(r, recursos) {
+    // El compilador resuelve el área con el mismo layout y paleta del mapa, aunque esa vista no se haya cargado.
+    E.panel.style.setProperty('--tmr-area', r.registro.area?.color || 'var(--ipn-acento)');
+    E.cuerpo.replaceChildren(construirFicha(r, recursos, { alIr: () => cerrar({ foco: false }) }));
   }
   function cerrar(op) {
     const p = E.panel;
@@ -333,7 +381,6 @@
           const donde = terms.length && !m.donde.includes('nombre') ? h('small', { 'class': 'tmr-donde', texto: t('temarios.lista.coincide', { donde: m.donde.map(d => t('temarios.donde.' + d)).join(', ') }) }) : null;
           const sel = F.sel && F.sel.clave === m.clave;
           const a = h('a', { 'class': 'tmr-item', href: ir(m.c, m.clave), 'aria-current': sel ? 'page' : null, 'data-clave': m.clave }, [nombre, h('small', { 'class': 'tmr-meta', texto: meta }), donde]);
-          a.addEventListener('click', e => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; e.preventDefault(); abrir(m.clave, a); });
           return h('li', {}, [a]);
         }))]));
     }
@@ -364,10 +411,16 @@
     }
     if (F.sel !== sel) return;
     if (!r || r.carreraId !== sel.carr) { L.desmontar(X.lector); F.inst = null; X.lector.replaceChildren(h('p', { 'class': 'tmr-vacio', role: 'alert', texto: t('temarios.explorador.no_encontrado') })); return; }
+    X.volver.setAttribute('href', sel.seccion ? ir(r.carreraId, clave) : ir());
+    for (const a of X.lista.querySelectorAll('.tmr-item')) { if (a.dataset.clave === clave) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); }
     if (!sel.seccion) {
       L.desmontar(X.lector); F.inst = null; F.instClave = null;
-      X.raiz.setAttribute('data-vista','lista');
-      await abrir(clave, X.lista.querySelector('[data-clave="' + clave + '"]') || document.activeElement);
+      const recursos = await cargarRecursos(r.carreraId);
+      if (F.sel !== sel) return;
+      X.lector.replaceChildren(construirFicha(r, recursos[clave] || [], {}));
+      X.raiz.setAttribute('data-vista', 'lector');
+      const titulo = X.lector.querySelector('.tmr-ficha-enc h2');
+      if (titulo && !lateral()) { titulo.focus({ preventScroll: true }); if (raiz.scrollTo) raiz.scrollTo(0, 0); }
       return;
     }
     F.inst = L.montar(X.lector, documentoDe(r), { texto: t, modo: 'pagina', nivelTitulo: 2, consulta: F.q, seccion: sel.seccion || null,
@@ -408,17 +461,179 @@
     if (tiene(clave)) { e.preventDefault(); abrir(clave, a); }
   });
   SATE.pestana('temarios', { montar() {}, mostrar(r) { return mostrarExplorador(r).catch(e => SATE.error(e)); }, ocultar() { cerrar(); } });
-  SATE.pestana('guia', { montar() {}, mostrar() {
+  /* ---------- Portada de la Guía: dos caminos, explorador de la carrera y ayuda para empezar ---------- */
+  const G = { carrera: null, sel: null, modo: 'lineas', token: 0 };
+  const hayProgramas = () => !!SATE_CONFIG.unidades[unidad()]?.vistas?.some(v => v.id === 'temarios');
+  function carreraPropia() {
+    const letra = typeof S !== 'undefined' ? S.car : null;
+    return Object.entries(E.indice.carreras).find(([, c]) => c.letra === letra)?.[0] || Object.keys(E.indice.carreras)[0];
+  }
+  const claseNivel = v => 'gd-n' + Math.min(Math.max(+v || 1, 1), 9);
+
+  function caminoConsultar() {
+    const entrada = h('input', { type: 'search', 'class': 'tmr-buscar gd-buscar', autocomplete: 'off', spellcheck: 'false', placeholder: t('sate.guia.buscar_marcador'), 'aria-label': t('sate.guia.buscar_etiqueta'), 'aria-controls': 'gd-res' });
+    const res = h('ul', { 'class': 'gd-res', id: 'gd-res', hidden: true });
+    const aviso = h('p', { 'class': 'sate-sr', role: 'status', 'aria-live': 'polite' });
+    let primero = null;
+    function pintar() {
+      const q = entrada.value.trim(), terms = terminos(q);
+      primero = null;
+      if (!terms.length) { res.hidden = true; res.replaceChildren(); aviso.textContent = ''; return; }
+      const nq = norm(q);
+      const lista = filtrar(E.indice.materias, { q, carrera: '*', nivel: '*', tipo: '*' }, null)
+        .sort((a, b) => (norm(b.n).startsWith(nq) - norm(a.n).startsWith(nq)) || (a.v ?? 99) - (b.v ?? 99) || a.n.localeCompare(b.n, 'es'));
+      const mostrados = lista.slice(0, 8), varias = Object.keys(E.indice.carreras).length > 1;
+      res.hidden = false;
+      res.replaceChildren(...(mostrados.length ? mostrados.map(m => {
+        const meta = [varias ? E.indice.carreras[m.c]?.nombre : null, m.v != null ? t('temarios.lista.nivel', { n: m.v }) : null].filter(Boolean).join(' · ');
+        const a = h('a', { 'class': 'gd-res-item', href: ir(m.c, m.clave) }, [h('span', { 'class': 'gd-res-clave', texto: m.clave }), h('span', { 'class': 'gd-res-nombre', texto: m.n }), h('small', { texto: meta })]);
+        primero ||= a;
+        return h('li', {}, [a]);
+      }) : [h('li', { 'class': 'tmr-vacio', texto: t('sate.guia.buscar_sin_resultados') })]));
+      aviso.textContent = t('temarios.lista.resultados', { n: lista.length });
+    }
+    entrada.addEventListener('input', pintar);
+    entrada.addEventListener('keydown', e => { if (e.key === 'Enter' && primero) { e.preventDefault(); raiz.location.hash = primero.getAttribute('href'); } });
+    return h('div', { 'class': 'gd-camino' }, [
+      h('header', {}, [h('h3', { texto: t('sate.guia.consultar_titulo') }), h('p', { texto: t('sate.guia.consultar_texto') })]),
+      entrada, aviso, res,
+      h('a', { 'class': 'gd-todos', href: ir(), texto: t('sate.guia.ver_todos') })]);
+  }
+  function caminoExplorar(alIr) {
+    const ir2 = h('button', { type: 'button', 'class': 'btn primary', texto: t('sate.guia.explorar_boton') });
+    ir2.addEventListener('click', alIr);
+    return h('div', { 'class': 'gd-camino gd-camino--dos' }, [
+      h('header', {}, [h('h3', { texto: t('sate.guia.explorar_titulo') }), h('p', { texto: t('sate.guia.explorar_texto') })]),
+      h('ul', { 'class': 'gd-puntos' }, [1, 2, 3].map(i => h('li', { texto: t('sate.guia.explorar_punto_' + i) }))),
+      ir2]);
+  }
+  // Explorador por líneas de aprendizaje (áreas del mapa) y niveles; al elegir una materia: qué es, qué se necesita antes
+  // y qué desbloquea (seriación real), con enlace a su ficha. «Para qué sirve» y «trabajo» no se muestran sin dato.
+  function explorador() {
+    const ind = E.indice, ids = Object.keys(ind.carreras);
+    if (!G.carrera || !ind.carreras[G.carrera]) G.carrera = carreraPropia();
+    const selCarrera = h('select', { id: 'gd-carrera' });
+    selCarrera.replaceChildren(...ids.map(id => h('option', { value: id, texto: ind.carreras[id].nombre })));
+    selCarrera.value = G.carrera;
+    const mapa = h('div', { 'class': 'gd-mapa' }), insp = h('aside', { 'class': 'gd-inspector', 'aria-live': 'polite' }), esp = h('div', { 'class': 'gd-esp' });
+    const botones = {};
+    const seg = h('div', { 'class': 'gd-seg', role: 'group', 'aria-label': t('sate.guia.explorar_modo') }, ['lineas', 'esp'].map(modo => {
+      const b = h('button', { type: 'button', 'data-modo': modo, texto: t('sate.guia.modo_' + modo) });
+      b.addEventListener('click', () => { G.modo = modo; pintar(); });
+      return (botones[modo] = b);
+    }));
+    function elegir(clave) { G.sel = claveNorm(clave); pintar(); }
+    function chips(claves, ninguna) {
+      if (!claves.length) return h('span', { 'class': 'tmr-nota', texto: ninguna });
+      return h('span', { 'class': 'gd-mini' }, claves.map(k => {
+        const b = h('button', { type: 'button', 'data-clave': k, texto: ind.materias[k].n });
+        b.addEventListener('click', () => elegir(k));
+        return b;
+      }));
+    }
+    function pintarInspector() {
+      const k = G.sel, m = k && ind.materias[k], token = ++G.token;
+      if (!m || m.c !== G.carrera) { insp.replaceChildren(h('p', { 'class': 'tmr-nota', texto: t('sate.guia.inspector_vacio') })); return; }
+      const rel = relaciones(ind.materias, k);
+      const quees = h('dd', { 'class': 'gd-quees', hidden: true });
+      insp.replaceChildren(
+        h('header', {}, [h('small', { texto: [k, t('temarios.lista.nivel', { n: m.v })].join(' · ') }), h('h4', { texto: m.n }),
+          h('a', { 'class': 'btn primary', href: ir(m.c, k), texto: t('sate.guia.abrir_ficha') })]),
+        h('dl', { 'class': 'gd-def' }, [
+          h('div', { 'class': 'gd-def-quees', hidden: true }, [h('dt', { texto: t('sate.guia.que_es') }), quees]),
+          h('div', {}, [h('dt', { texto: t('sate.guia.despues') }), h('dd', {}, [chips(rel.despues, t('sate.guia.despues_ninguna'))])]),
+          h('div', {}, [h('dt', { texto: t('sate.guia.antes') }), h('dd', {}, [chips(rel.antes, t('sate.guia.antes_ninguna'))])])]));
+      registro(k).then(r => {
+        if (token !== G.token || !r || !r.registro.descripcion) return;
+        quees.textContent = r.registro.descripcion; quees.hidden = false;
+        insp.querySelector('.gd-def-quees').hidden = false;
+      }).catch(e => console.debug('SATE: descripción no disponible', e.message));
+    }
+    function pintarMapa() {
+      const filas = lineasDeAprendizaje(ind.materias, G.carrera, ind.carreras[G.carrera].areas);
+      const niveles = [...new Set(filas.flatMap(f => f.items.map(i => i.v)))].filter(v => v != null).sort((a, b) => a - b);
+      const rel = G.sel ? relaciones(ind.materias, G.sel) : { antes: [], despues: [] }, relacionadas = new Set([...rel.antes, ...rel.despues]);
+      mapa.setAttribute('data-niveles', String(niveles.length));
+      mapa.replaceChildren(
+        h('div', { 'class': 'gd-fila gd-fila--enc', 'aria-hidden': 'true' }, [h('span', { 'class': 'gd-quien', texto: t('sate.guia.columna_linea') }),
+          h('div', { 'class': 'gd-cols' }, niveles.map(v => h('span', { 'class': claseNivel(v), texto: t('temarios.lista.nivel', { n: v }) })))]),
+        ...filas.map(f => {
+          const fila = h('div', { 'class': 'gd-fila', role: 'group', 'aria-label': f.nombre || t('sate.guia.linea_otras') }, [
+            h('div', { 'class': 'gd-quien' }, [h('h4', { texto: f.nombre || t('sate.guia.linea_otras') })]),
+            h('div', { 'class': 'gd-cols' }, f.items.map(i => {
+              const b = h('button', { type: 'button', 'class': 'gd-chip ' + claseNivel(i.v) + (relacionadas.has(i.clave) ? ' gd-rel' : ''), 'data-clave': i.clave, 'aria-pressed': G.sel === i.clave ? 'true' : 'false' },
+                [h('span', { 'class': 'gd-chip-nivel', texto: t('temarios.lista.nivel', { n: i.v }) }), h('span', { texto: i.n })]);
+              b.addEventListener('click', () => elegir(i.clave));
+              return b;
+            }))]);
+          if (f.color && fila.style && fila.style.setProperty) fila.style.setProperty('--gd-area', f.color);
+          return fila;
+        }));
+    }
+    function pintarEsp() {
+      const lineas = ind.carreras[G.carrera].lineas || [], porArea = new Map();
+      for (const l of lineas) { if (!porArea.has(l.area)) porArea.set(l.area, []); porArea.get(l.area).push(l); }
+      esp.replaceChildren(...[...porArea].map(([area, ls]) => h('div', { 'class': 'gd-esp-area' }, [h('h4', { texto: area }),
+        ...ls.map(l => h('div', { 'class': 'gd-esp-linea' }, [h('small', { texto: l.linea }),
+          h('ul', {}, l.claves.filter(k => ind.materias[k]).map(k => h('li', {}, [h('a', { href: ir(ind.materias[k].c, k), texto: ind.materias[k].n })])))]))])));
+    }
+    function pintar() {
+      const hayEsp = (ind.carreras[G.carrera].lineas || []).length > 0;
+      if (!hayEsp) G.modo = 'lineas';
+      seg.hidden = !hayEsp;
+      for (const [modo, b] of Object.entries(botones)) b.setAttribute('aria-pressed', G.modo === modo ? 'true' : 'false');
+      const lin = G.modo === 'lineas';
+      mapa.hidden = !lin; insp.hidden = !lin; esp.hidden = lin;
+      if (lin) { pintarMapa(); pintarInspector(); } else pintarEsp();
+    }
+    selCarrera.addEventListener('change', () => { G.carrera = selCarrera.value; G.sel = null; pintar(); });
+    pintar();
+    const campo = ids.length > 1 ? h('label', { 'class': 'tmr-campo gd-campo' }, [h('span', { texto: t('temarios.filtro.carrera') }), selCarrera]) : null;
+    const seccion = h('section', { 'class': 'gd-explorar', id: 'gd-explorar', 'aria-labelledby': 'gd-explorar-titulo' }, [
+      h('header', { 'class': 'gd-explorar-enc' }, [h('div', {}, [h('h3', { id: 'gd-explorar-titulo', texto: t('sate.guia.explorar_seccion') }), h('p', { texto: t('sate.guia.explorar_intro') })]), campo, seg]),
+      mapa, insp, esp,
+      h('p', { 'class': 'tmr-nota', texto: t('sate.guia.explorar_nota') })]);
+    return { seccion, foco: () => (ids.length > 1 ? selCarrera : mapa.querySelector('.gd-chip'))?.focus() };
+  }
+  function seccionAyuda() {
+    const bibliotecas = SATE_CONFIG.bibliotecas || [];
+    return h('section', { 'class': 'gd-ayuda', 'aria-labelledby': 'gd-ayuda-titulo' }, [
+      h('header', {}, [h('h3', { id: 'gd-ayuda-titulo', texto: t('sate.guia.ayuda_titulo') }), h('p', { texto: t('sate.guia.ayuda_texto') })]),
+      h('div', { 'class': 'gd-ayuda-cols' }, [
+        hayProgramas() ? h('ol', { 'class': 'gd-pasos' }, [1, 2, 3, 4].map(i => h('li', {}, [h('h4', { texto: t('sate.guia.ayuda_' + i + '_titulo') }), h('p', { texto: t('sate.guia.ayuda_' + i + '_texto') })]))) : null,
+        bibliotecas.length ? h('div', { 'class': 'gd-biblios' }, bibliotecas.map(b => h('div', { 'class': 'gd-biblio' }, [
+          h('div', {}, [h('h4', { texto: t(b.titulo) }), h('p', { texto: t(b.descripcion) })]),
+          enlaceExterno('btn', b.url, null, t('sate.guia.abrir_externo') + ' ↗')]))) : null].filter(Boolean))]);
+  }
+  function seccionProximamente() {
+    const resto = (SATE_CONFIG.guia || []).filter(a => a.id !== 'programas');
+    if (!resto.length) return null;
+    return h('section', { 'class': 'gd-pronto', 'aria-label': t('sate.guia.proximamente') }, [
+      h('h3', { texto: t('sate.guia.proximamente') }),
+      h('ul', {}, resto.map(a => h('li', {}, [h('span', { 'class': 'guia-icono', 'aria-hidden': 'true', texto: a.icono }), h('span', {}, [h('strong', { texto: t(a.titulo) }), h('small', { texto: t(a.descripcion) })])])))]);
+  }
+  async function mostrarPortada() {
     const caja = document.getElementById('sate-guia');
-    const disponible = SATE_CONFIG.unidades[unidad()]?.vistas?.some(v => v.id === 'temarios');
-    caja.replaceChildren(h('div', {'class':'tmr guia'}, [h('header', {'class':'tmr-enc'}, [h('h2', {texto:t('sate.pestana.guia.titulo')}), h('p', {'class':'tmr-intro', texto:t('sate.guia.intro')})]),
-      h('div', {'class':'guia-apartados'}, (SATE_CONFIG.guia || []).map(a => {
-        const activa = a.id === 'programas' && disponible;
-        return h(activa ? 'a' : 'article', {'class':'guia-tarjeta' + (activa ? '' : ' guia-tarjeta--pendiente'), href:activa ? ir() : null}, [
-          h('span', {'class':'guia-icono', 'aria-hidden':'true', texto:a.icono}),
-          h('h3', {texto:t(a.titulo)}), h('p', {texto:t(a.descripcion)}),
-          activa ? null : h('small', {texto:t(a.id === 'programas' ? 'sate.guia.sin_programas' : 'sate.guia.proximamente')})
-        ]);
-      })) ]));
-  }, ocultar() {} });
+    const encabezado = h('header', { 'class': 'tmr-enc' }, [h('h2', { texto: t('sate.pestana.guia.titulo') }), h('p', { 'class': 'tmr-intro', texto: t('sate.guia.intro') })]);
+    const raizGuia = h('div', { 'class': 'tmr guia' }, [encabezado]);
+    caja.replaceChildren(raizGuia);
+    if (hayProgramas()) {
+      try { await preparar(); } catch (e) {
+        raizGuia.appendChild(h('p', { 'class': 'tmr-vacio', role: 'alert', texto: t('temarios.explorador.sin_datos') }));
+        raizGuia.appendChild(seccionAyuda());
+        return;
+      }
+      const exp = explorador();
+      raizGuia.appendChild(h('section', { 'class': 'gd-caminos', 'aria-label': t('sate.guia.caminos') }, [
+        caminoConsultar(),
+        caminoExplorar(() => { exp.seccion.scrollIntoView({ behavior: 'smooth', block: 'start' }); exp.foco(); })]));
+      raizGuia.appendChild(exp.seccion);
+    } else {
+      raizGuia.appendChild(h('p', { 'class': 'tmr-vacio', texto: t('sate.guia.sin_programas') }));
+    }
+    raizGuia.appendChild(seccionAyuda());
+    const pronto = seccionProximamente();
+    if (pronto) raizGuia.appendChild(pronto);
+  }
+  SATE.pestana('guia', { montar() {}, mostrar() { return mostrarPortada().catch(e => SATE.error(e)); }, ocultar() {} });
 })(typeof window !== 'undefined' ? window : globalThis);

@@ -8,6 +8,7 @@ import unittest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
 import temarios_extraer as te
+import urls_pdf_temarios as up
 
 
 class TestTemarios(unittest.TestCase):
@@ -160,6 +161,74 @@ class TestTemarios(unittest.TestCase):
                 ruta = f'data/temarios/upiita/{carrera}.json'
                 self.assertEqual((root / ruta).read_bytes(), (te.ROOT / ruta).read_bytes())
             self.assertEqual((root / 'docs/TEMARIOS.md').read_bytes(), (te.ROOT / 'docs/TEMARIOS.md').read_bytes())
+
+
+class TestEnlacesPdf(unittest.TestCase):
+    """El PDF original vive en la nube pública de la UPIITA (recurso compartido de Nextcloud por carrera)."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.fuentes = up.cargar_fuentes('upiita')
+
+    def test_los_recursos_compartidos_viven_en_un_solo_archivo_de_datos(self):
+        self.assertEqual(set(self.fuentes['carreras']), {'bionica', 'mecatronica', 'telematica'})
+        self.assertEqual(self.fuentes['carreras']['bionica']['compartido'], '73kqMKWfwDNAd2r')
+        self.assertEqual(self.fuentes['carreras']['mecatronica']['compartido'], 'WbEkK2p7LY6jfaz')
+        self.assertEqual(self.fuentes['carreras']['telematica']['compartido'], '9tA4wYgYwezEcPW')
+        codigo = (Path(up.__file__).read_text(encoding='utf-8'))
+        for token in ('73kqMKWfwDNAd2r', 'WbEkK2p7LY6jfaz', '9tA4wYgYwezEcPW'):
+            self.assertNotIn(token, codigo, 'los recursos compartidos no se escriben en el código')
+
+    def test_patron_de_descarga_con_codificacion(self):
+        base = 'https://cloud.upiita.ipn.mx/public.php/dav/files/'
+        self.assertEqual(up.url_pdf('bionica', 'bionica/NIVEL_I/ALGEBRA LINEAL.pdf', self.fuentes),
+                         base + '73kqMKWfwDNAd2r/NIVEL_I/ALGEBRA%20LINEAL.pdf')
+        self.assertEqual(up.url_pdf('telematica', 'telematica/Nivel I/ANÁLISIS Y DISEÑO DE SISTEMAS.pdf', self.fuentes),
+                         base + '9tA4wYgYwezEcPW/Nivel%20I/AN%C3%81LISIS%20Y%20DISE%C3%91O%20DE%20SISTEMAS.pdf')
+        self.assertEqual(up.url_pdf('mecatronica', 'mecatronica/NIVEL_II/A&B #1.pdf', self.fuentes),
+                         base + 'WbEkK2p7LY6jfaz/NIVEL_II/A%26B%20%231.pdf')
+
+    def test_sin_recurso_o_con_ruta_peligrosa_no_hay_enlace(self):
+        self.assertIsNone(up.url_pdf('otra', 'otra/N/a.pdf', self.fuentes))
+        self.assertIsNone(up.url_pdf('bionica', None, self.fuentes))
+        self.assertIsNone(up.url_pdf('bionica', 'bionica/../secreto.pdf', self.fuentes))
+        self.assertIsNone(up.url_pdf('bionica', 'bionica', self.fuentes))
+
+    def test_una_url_por_materia_y_ninguna_repetida(self):
+        urls = [u for _, _, u in up.todas('upiita')]
+        total = sum(len(json.loads((te.ROOT / f'data/temarios/upiita/{c}.json').read_text(encoding='utf-8'))['materias']) for c in te.CARRERAS)
+        self.assertEqual(len(urls), total)
+        self.assertEqual(len(set(urls)), len(urls))
+        for u in urls:
+            self.assertRegex(u, r'^https://cloud\.upiita\.ipn\.mx/public\.php/dav/files/[A-Za-z0-9]{15}/[^ ?&#]+\.pdf$')
+
+
+class TestSeriacionDirecta(unittest.TestCase):
+    def test_reduccion_transitiva(self):
+        import build_sate
+        req = {'C': ['A', 'B'], 'B': ['A'], 'D': ['A', 'B', 'C', 'X'], 'E': ['E', 'A']}
+        r = build_sate.requisitos_directos(req)
+        self.assertEqual(r['C'], ['B'])
+        self.assertEqual(r['B'], ['A'])
+        self.assertEqual(r['D'], ['C', 'X'])
+        self.assertEqual(r['E'], ['A'], 'una materia no se requiere a sí misma')
+
+    def test_tolera_ciclos_y_datos_que_no_son_listas(self):
+        import build_sate
+        r = build_sate.requisitos_directos({'A': ['B'], 'B': ['A'], 'C': {'x': 1}})
+        self.assertEqual(set(r), {'A', 'B'})
+
+    def test_el_indice_publica_requisitos_directos_y_areas(self):
+        indice = json.loads((te.ROOT / 'web/dist/sate/datos/upiita/temarios/indice.json').read_text(encoding='utf-8'))
+        self.assertEqual(indice['materias']['B105']['r'], ['B104'])
+        self.assertNotIn('r', indice['materias']['B103'])
+        for carrera in indice['carreras'].values():
+            self.assertTrue(carrera['areas'])
+            for a in carrera['areas']:
+                self.assertTrue(a['nombre'] and a['color'].startswith('#'))
+        for clave, m in indice['materias'].items():
+            for r in m.get('r', []):
+                self.assertIn(r, indice['materias'], clave)
 
 
 if __name__ == '__main__':
