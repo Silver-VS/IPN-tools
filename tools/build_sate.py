@@ -1028,6 +1028,11 @@ def escribir_temarios(data, datos):
                                   "plan": d["plan"], "total": len(salida), "areas": columnas, "lineas": lineas}
         (destino / (d["carrera"] + ".json")).write_text(json.dumps(
             {"carrera": d["carrera"], "plan": d["plan"], "materias": salida}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
+    for m in materias.values():   # el explorador solo enlaza materias que tienen ficha
+        if "r" in m:
+            m["r"] = [x for x in m["r"] if x in materias]
+            if not m["r"]:
+                del m["r"]
     recursos = sorted(p.stem for p in (ROOT / "data/recursos" / UNIDAD).glob("*.json"))
     (destino / "indice.json").write_text(json.dumps({"unidad": UNIDAD, "carreras": carreras, "materias": materias, "recursos": recursos},
                                                     ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
