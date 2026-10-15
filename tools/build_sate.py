@@ -13,7 +13,7 @@ CUR = ROOT / "data" / "mapa_curricular_saes.json"
 TPL = ROOT / "web" / "horarios.template.html"
 OUT = ROOT / "web" / "horarios.html"
 DAYS = ["Lun", "Mar", "Mie", "Jue", "Vie", "Sab"]
-import os
+import os, html as _html
 UNIDAD = os.environ.get("UNIDAD", "upiita").lower()
 UNI_DIR = ROOT / "data" / "unidades" / UNIDAD
 UCONF = (json.loads((UNI_DIR / "unidad.json").read_text(encoding="utf-8")) if (UNI_DIR / "unidad.json").exists()
@@ -1238,7 +1238,9 @@ def escribir_sate(data):
     site = os.environ.get("UPIITA_SITE", "")
     html = saes.inject(html, "horarios", site + "horarios-upiita.html" if site else "")
     # Solo SATE separa la acción del indicador; el diálogo compartido conserva sus ids.
+    sin_datos = _html.escape(textos['sate.encabezado.sin_datos'], quote=True)
     html = html.replace('<span>Traer mis datos del SAES</span>',
+        '<span class="sate-estado-dato" id="sate-saes-indicador" role="img" aria-label="' + sin_datos + '" title="' + sin_datos + '"></span>'
         '<span class="sate-texto-largo">' + textos['sate.encabezado.cargar'] + '</span><span class="sate-texto-corto">' + textos['sate.encabezado.cargar_corto'] + '</span>', 1)
     html = re.sub(r'<button class="link demo-open"[^>]*>.*?</button>', '', html, count=1)
     # El marcador completo y las instrucciones del SAES solo se descargan al abrirlos.

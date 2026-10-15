@@ -7,10 +7,19 @@ medida mínima digital de 2 cm) y el Manual de Diseño Web IPN 2025 (título "| 
 Los archivos de logotipo NO se incluyen: deben ser los oficiales que entrega la Coordinación de
 Imagen Institucional (www.ipn.mx/imageninstitucional/identidad-institucional.html) y la propia unidad.
 """
-import pathlib, re
+import json, pathlib, re
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DIST = ROOT / "web" / "dist"
+# Logo del IPN del encabezado de SATE: la ruta vive solo en data/identidad/logo_ipn.json
+LOGO_IPN = json.loads((ROOT / "data" / "identidad" / "logo_ipn.json").read_text(encoding="utf-8"))
+
+
+def logo_ipn_sate():
+    """Pieza del logo del IPN para el encabezado de SATE (dos versiones, según el tema)."""
+    d = LOGO_IPN
+    img = lambda clase, ruta: (f'<img class="{clase}" src="{ruta}" alt="{d["alt"]}" width="{d["ancho"]}" height="{d["alto"]}">')
+    return f'<span class="sate-logo-ipn">{img("logo-lt", d["claro"])}{img("logo-dk", d["oscuro"])}</span>'
 
 HEADER = """<style>
 .inst{background:transparent;border:0;border-radius:0;border-bottom:3px solid var(--sate-realce,var(--accent));padding-inline:16px}
@@ -78,8 +87,7 @@ def write_dist(name, html, title_suffix=" | UPIITA IPN", unidad=None):
     head = head.replace('/*__UNIDAD_NOMBRE__*/', identidad.get('nombre', (unidad or {}).get('nombre', identidad.get('siglas', ''))))
     if "<!--__INST_EN_ENCABEZADO__-->" in html:
         # SATE: la pieza institucional va dentro de su encabezado (una sola pieza, sin dos <header role=banner>)
-        dentro = head.replace('<header class="inst" role="banner">', '<div class="inst">').replace("</header>", "</div>")
-        html = html.replace("<!--__INST_EN_ENCABEZADO__-->", dentro, 1)
+        html = html.replace("<!--__INST_EN_ENCABEZADO__-->", logo_ipn_sate(), 1)
     html = html.replace("<!--__INST_HEADER__-->", head, 1)
     html = html.replace("<!--__IPNT_HOME__-->", HOME, 1)   # regreso a la página principal de GuindaLabs
     # pleca SEP | IPN al pie: retirada a petición del equipo (2026-10-01); FOOTER se conserva por si se vuelve a requerir

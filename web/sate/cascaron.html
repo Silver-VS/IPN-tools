@@ -67,12 +67,6 @@ small,.muted{color:var(--ipn-tenue)}
 h2{font-family:var(--ipn-fuente-titulos);font-stretch:87.5%;font-weight:600;font-size:1.35rem;margin:0;letter-spacing:.01em}
 h3.sub{font-family:var(--ipn-fuente-titulos);font-weight:600;font-size:1.1rem;margin:0 0 6px}
 
-header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:20px 0;border-bottom:2px solid var(--ipn-acento)}
-.top>.brand{flex:1 1 100%;min-width:0}
-.brand .title-row{display:grid;grid-template-columns:auto auto 1fr auto;align-items:center;gap:12px}
-.header-actions{grid-column:4;display:flex;align-items:center;gap:12px}
-.top>.tabs{margin-left:auto}
-@media(max-width:639px){.brand .title-row{grid-template-columns:1fr auto;gap:10px}.header-actions{grid-column:2;grid-row:1;gap:8px}.unit-switch{grid-column:1 / -1;grid-row:2;justify-self:start}}
 .brand h1{font-family:var(--ipn-fuente-titulos);font-stretch:87.5%;font-weight:700;font-size:2.1rem;line-height:1;margin:0;letter-spacing:.01em;text-wrap:balance}
 .brand p{margin:4px 0 12px;color:var(--ipn-tenue);font-size:.9rem}
 .tabs{display:flex;gap:2px;align-self:flex-end}
@@ -122,7 +116,7 @@ input[type=number]{width:5rem}
 .btn:disabled{opacity:.5;cursor:default}
 .link{border:0;background:none;color:var(--ipn-acento);cursor:pointer;font-weight:600;font-size:.84rem;padding:0;white-space:nowrap}
 .card{background:var(--ipn-superficie);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:12px 14px}
-[data-view-panel]{padding-top:16px}
+[data-view-panel]{padding-top:0}   /* el respiro bajo el encabezado es un token común (componentes.css) */
 
 /* ---------- mapa ---------- */
 .chosenbar{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
@@ -773,7 +767,7 @@ body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(var(--ipn-barra-al
 html[data-vista=cupos] .sate-navegacion,html[data-vista=cupos] .sate-barra,
 html[data-vista=cupos] .bar-top,html[data-vista=cupos] .sate-fila-avisos,
 html[data-vista=cupos] #sate-nombre,html[data-vista=cupos] #v-hor,
-html[data-vista=cupos] .inst{display:none!important}
+html[data-vista=cupos] .sate-logo-ipn,html[data-vista=cupos] #sate-logo-unidad,html[data-vista=cupos] .sate-boton-flota{display:none!important}
 html[data-vista=cupos] body{padding-bottom:24px}
 html[data-vista=cupos] .wrap{max-width:1024px}
 html[data-vista=cupos] header.top{padding-block:14px 10px}
@@ -855,10 +849,15 @@ html[data-vista=cupos] .brand h1{font-size:1.5rem}
     <!--__INST_EN_ENCABEZADO__-->
     <div class="brand">
       <!--__IPNT_HOME__-->
-      <div class="title-row"><div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/</h1><button class="btn unit-switch" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/">▾</button><span id="sate-leyenda"></span></div><div class="header-actions"><button class="enc-btn" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button><!--__THEME_BTN__--><!--__CUENTA_BTN__--></div></div>
+      <div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/ <button class="sate-unidad-btn" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/" hidden></button></h1><span id="sate-leyenda"></span></div>
       <p id="sate-nombre">/*__SATE_NOMBRE__*/</p>
-      <div class="sate-fila-avisos"><div id="sate-avisos-globales"></div><div class="sate-datos"><!--__SAES_CARD__--><span id="sate-saes-indicador" role="status" aria-label="/*__SATE_SIN_DATOS__*/" title="/*__SATE_SIN_DATOS__*/"><span aria-hidden="true">/*__SATE_INDICADOR__*/</span></span></div></div>
     </div>
+    <div class="sate-lado">
+      <span id="sate-logo-unidad" class="sate-logo-slot"></span>
+      <div class="header-actions"><!--__SAES_CARD__--><!--__CUENTA_BTN__--><!--__THEME_BTN__--></div>
+    </div>
+    <button class="enc-btn sate-boton-flota" type="button" data-encuesta hidden title="Responde la encuesta o reporta un error"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Opinar</span></button>
+    <div class="sate-fila-avisos"><div id="sate-avisos-globales"></div></div>
     <div class="sate-navegacion"><div id="sate-tabs"></div><button id="t-tray" hidden></button>
       <div class="sate-controles">
         <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
