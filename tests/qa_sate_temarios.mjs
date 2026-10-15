@@ -414,7 +414,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   const pdf = panel.querySelector('.tmr-pdf'), regB101 = bionica.find(r => r.clave === 'B101');
   assert.equal(pdf.textContent, 'Ver programa original (PDF)');
   assert.equal(pdf.getAttribute('href'), regB101.pdf);
-  assert.match(pdf.getAttribute('href'), /^https:\/\/cloud\.upiita\.ipn\.mx\/s\/73kqMKWfwDNAd2r\/download\?path=%2FNIVEL_I&files=BIOLOG%C3%8DA%20CELULAR\.pdf$/);
+  assert.match(pdf.getAttribute('href'), /^https:\/\/cloud\.upiita\.ipn\.mx\/public\.php\/dav\/files\/73kqMKWfwDNAd2r\/NIVEL_I\/BIOLOG%C3%8DA%20CELULAR\.pdf$/);
   assert.equal(pdf.getAttribute('target'), '_blank'); assert.equal(pdf.getAttribute('rel'), 'noopener noreferrer');
   assert.ok(panel.querySelector('.tmr-biblio li'), 'la ficha trae la bibliografía del programa');
   assert.ok(panel.querySelector('.tmr-catalogo').getAttribute('href').includes('dirbibliotecas.ipn.mx'));
@@ -655,7 +655,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   const crudo = readFileSync(dist + 'bionica.json', 'utf8');
   assert.doesNotMatch(crudo, /"fuente":"(?:bionica|mecatronica|telematica)\//, 'la ruta local del PDF no viaja en el sitio');
   for (const id of Object.keys(indice.carreras)) for (const r of registros(id)) {
-    assert.match(r.pdf, /^https:\/\/cloud\.upiita\.ipn\.mx\/s\/[A-Za-z0-9]{15}\/download\?path=%2F[^&\/]+&files=[^&\/]+\.pdf$/i, r.clave + ': enlace al PDF original');
+    assert.match(r.pdf, /^https:\/\/cloud\.upiita\.ipn\.mx\/public\.php\/dav\/files\/[A-Za-z0-9]{15}\/[^?&#\s]+\.pdf$/i, r.clave + ': enlace al PDF original');
   }
   for (const f of ['web/dist/policore/lector.js', 'web/dist/policore/lector.css', 'web/dist/sate/temarios.js', 'web/dist/sate/temarios.css']) assert.ok(existsSync(f), f);
   assert.ok(config.textos['temarios.aviso.ocr'] && config.textos['policore.lector.buscar.marcador']);

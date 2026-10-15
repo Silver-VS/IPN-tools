@@ -180,13 +180,13 @@ class TestEnlacesPdf(unittest.TestCase):
             self.assertNotIn(token, codigo, 'los recursos compartidos no se escriben en el código')
 
     def test_patron_de_descarga_con_codificacion(self):
-        base = 'https://cloud.upiita.ipn.mx/s/'
+        base = 'https://cloud.upiita.ipn.mx/public.php/dav/files/'
         self.assertEqual(up.url_pdf('bionica', 'bionica/NIVEL_I/ALGEBRA LINEAL.pdf', self.fuentes),
-                         base + '73kqMKWfwDNAd2r/download?path=%2FNIVEL_I&files=ALGEBRA%20LINEAL.pdf')
+                         base + '73kqMKWfwDNAd2r/NIVEL_I/ALGEBRA%20LINEAL.pdf')
         self.assertEqual(up.url_pdf('telematica', 'telematica/Nivel I/ANÁLISIS Y DISEÑO DE SISTEMAS.pdf', self.fuentes),
-                         base + '9tA4wYgYwezEcPW/download?path=%2FNivel%20I&files=AN%C3%81LISIS%20Y%20DISE%C3%91O%20DE%20SISTEMAS.pdf')
+                         base + '9tA4wYgYwezEcPW/Nivel%20I/AN%C3%81LISIS%20Y%20DISE%C3%91O%20DE%20SISTEMAS.pdf')
         self.assertEqual(up.url_pdf('mecatronica', 'mecatronica/NIVEL_II/A&B #1.pdf', self.fuentes),
-                         base + 'WbEkK2p7LY6jfaz/download?path=%2FNIVEL_II&files=A%26B%20%231.pdf')
+                         base + 'WbEkK2p7LY6jfaz/NIVEL_II/A%26B%20%231.pdf')
 
     def test_sin_recurso_o_con_ruta_peligrosa_no_hay_enlace(self):
         self.assertIsNone(up.url_pdf('otra', 'otra/N/a.pdf', self.fuentes))
@@ -200,7 +200,7 @@ class TestEnlacesPdf(unittest.TestCase):
         self.assertEqual(len(urls), total)
         self.assertEqual(len(set(urls)), len(urls))
         for u in urls:
-            self.assertRegex(u, r'^https://cloud\.upiita\.ipn\.mx/s/[A-Za-z0-9]{15}/download\?path=%2F[^&/ ]+&files=[^&/ ]+\.pdf$')
+            self.assertRegex(u, r'^https://cloud\.upiita\.ipn\.mx/public\.php/dav/files/[A-Za-z0-9]{15}/[^ ?&#]+\.pdf$')
 
 
 class TestSeriacionDirecta(unittest.TestCase):

@@ -2,7 +2,7 @@
 
 Los recursos compartidos viven en data/temarios/<unidad>/nube/fuentes.json; el campo `fuente` de cada temario trae la ruta
 relativa del PDF (p. ej. «bionica/NIVEL_I/ALGEBRA LINEAL.pdf»). Patrón de Nextcloud:
-    <nube><compartido>/download?path=/<subcarpeta>&files=<archivo>
+    <nube><compartido>/<carpeta>/.../<archivo>   (WebDAV público; cada segmento codificado)
 Sin argumentos imprime todas las URL (una por línea) para que se verifiquen en línea:
     python tools/urls_pdf_temarios.py [unidad]
 """
@@ -29,8 +29,7 @@ def url_pdf(carrera, fuente, fuentes):
         partes = partes[1:]
     if not partes or ".." in partes:
         return None
-    archivo, carpeta = partes[-1], "/" + "/".join(partes[:-1])
-    return f"{fuentes['nube']}{cfg['compartido']}/download?path={quote(carpeta, safe='')}&files={quote(archivo, safe='')}"
+    return fuentes['nube'] + cfg['compartido'] + "/" + "/".join(quote(p, safe='') for p in partes)
 
 
 def todas(unidad="upiita"):
