@@ -817,5 +817,784 @@
         2
       ]
     }
+  ],
+  "B301": [
+    {
+      "titulo": "Computación Científica (Chasnov) - I: Métodos numéricos",
+      "url": "https://espanol.libretexts.org/Bookshelves/Matematicas/Computacion_Cientifica_Simulaciones_y_Modelado/Computaci%C3%B3n_Cient%C3%ADfica_(Chasnov)/I%3A_M%C3%A9todos_num%C3%A9ricos",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Unidad / Lecturas con código MATLAB",
+      "licencia": "CC BY 3.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Introduction to Numerical Analysis",
+      "url": "https://ocw.mit.edu/courses/18-330-introduction-to-numerical-analysis-spring-2012/",
+      "fuente": "MIT OpenCourseWare (Course 18.330)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas, problem sets, exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B302": [
+    {
+      "titulo": "Microelectronic Devices and Circuits",
+      "url": "https://ocw.mit.edu/courses/6-012-microelectronic-devices-and-circuits-fall-2009/",
+      "fuente": "MIT OpenCourseWare (Course 6.012)",
+      "idioma": "en",
+      "tipo": "Curso (notas de clase, exámenes y ejercicios)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Dispositivos semiconductores",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-semiconductor-devices",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad (videos, lecturas y problemas resueltos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1
+      ]
+    },
+    {
+      "titulo": "Amplificadores",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-amplifiers",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad (videos y lecturas explicativas)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        3
+      ]
+    }
+  ],
+  "B303": [
+    {
+      "titulo": "Computation Structures",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare (Course 6.004)",
+      "idioma": "en",
+      "tipo": "Curso (videos, presentaciones, hojas de ejercicios interactivos y laboratorios de diseño)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B304": [
+    {
+      "titulo": "Libro: Introducción a los Sistemas de Control (Iqbal)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Industrial_y_de_Sistemas/Libro%3A_Introducci%C3%B3n_a_los_Sistemas_de_Control_(Iqbal)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo (10 capítulos con ejercicios)",
+      "licencia": "CC BY-NC-SA 3.0 / 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Systems and Controls",
+      "url": "https://ocw.mit.edu/courses/2-04a-systems-and-controls-spring-2013/",
+      "fuente": "MIT OpenCourseWare (Course 2.04A)",
+      "idioma": "en",
+      "tipo": "Curso (notas, diagramas de bloques, respuesta transitoria)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "B305": [
+    {
+      "titulo": "Materials for Biomedical Applications",
+      "url": "https://ocw.mit.edu/courses/3-051j-materials-for-biomedical-applications-spring-2006/",
+      "fuente": "MIT OpenCourseWare (Course 3.051J / 20.340)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas, presentaciones temáticas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Biomaterials-Tissue Interactions",
+      "url": "https://ocw.mit.edu/courses/20-441j-biomaterials-tissue-interactions-fall-2009/",
+      "fuente": "MIT OpenCourseWare (Course 20.441J)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas avanzadas, casos de estudio)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B306": [
+    {
+      "titulo": "Artificial Intelligence",
+      "url": "https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/",
+      "fuente": "MIT OpenCourseWare (Course 6.034)",
+      "idioma": "en",
+      "tipo": "Curso (videos y notas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2
+      ]
+    }
+  ],
+  "B308": [
+    {
+      "titulo": "Grammar",
+      "url": "https://www.khanacademy.org/humanities/grammar",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, lecturas y ejercicios de práctica interactiva)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "Writing Guide with Handbook",
+      "url": "https://openstax.org/details/books/writing-guide",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto (lecturas, guías y manual de redacción)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "B309": [
+    {
+      "titulo": "Power Electronics",
+      "url": "https://ocw.mit.edu/courses/6-622-power-electronics-spring-2023/",
+      "fuente": "MIT OpenCourseWare (Course 6.622)",
+      "idioma": "en",
+      "tipo": "Curso (videos, notas y tareas de diseño)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "Introductory Analog Electronics Laboratory",
+      "url": "https://ocw.mit.edu/courses/6-101-introductory-analog-electronics-laboratory-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course 6.101)",
+      "idioma": "en",
+      "tipo": "Curso (guías de laboratorio, notas sobre transistores y filtros)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B310": [
+    {
+      "titulo": "Biomedical Signal and Image Processing",
+      "url": "https://ocw.mit.edu/courses/hst-582j-biomedical-signal-and-image-processing-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course HST.582J / 6.555J)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas teóricas, algoritmos y laboratorios MATLAB)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B311": [
+    {
+      "titulo": "Principles of Medical Imaging",
+      "url": "https://ocw.mit.edu/courses/22-058-principles-of-medical-imaging-fall-2002/",
+      "fuente": "MIT OpenCourseWare (Course 22.058)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas y notas sobre resonancia magnética nuclear y gradientes magnéticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        4
+      ]
+    }
+  ],
+  "B312": [
+    {
+      "titulo": "Engineering Dynamics",
+      "url": "https://ocw.mit.edu/courses/2-003sc-engineering-dynamics-fall-2011/",
+      "fuente": "MIT OpenCourseWare (Course 2.003SC)",
+      "idioma": "en",
+      "tipo": "Curso (videos, notas completas y problemas resueltos paso a paso)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4
+      ]
+    }
+  ],
+  "B313": [
+    {
+      "titulo": "Biomedical Devices Design Laboratory",
+      "url": "https://ocw.mit.edu/courses/2-996-biomedical-devices-design-laboratory-fall-2007/",
+      "fuente": "MIT OpenCourseWare (Course 2.996 / 6.971)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas de acondicionamiento de señal, sensores biomédicos, diseño de PCB y proyectos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "titulo": "Quantitative Physiology: Cells and Tissues",
+      "url": "https://ocw.mit.edu/courses/6-021j-quantitative-physiology-cells-and-tissues-fall-2004/",
+      "fuente": "MIT OpenCourseWare (Course 6.021J / 2.791J)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas teóricas, modelado electrofisiológico)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "B314": [
+    {
+      "titulo": "Biomedical Signal and Image Processing",
+      "url": "https://ocw.mit.edu/courses/hst-582j-biomedical-signal-and-image-processing-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course HST.582J)",
+      "idioma": "en",
+      "tipo": "Curso (notas de fisiología de señales ECG/EEG/EMG, diseño de filtros FIR/IIR y análisis espectral)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B315": [
+    {
+      "titulo": "Design and Fabrication of Microelectromechanical Devices",
+      "url": "https://ocw.mit.edu/courses/6-777j-design-and-fabrication-of-microelectromechanical-devices-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course 6.777J / 2.372J)",
+      "idioma": "en",
+      "tipo": "Curso (presentaciones, notas de diseño de sensores y actuadores MEMS)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Biomedical Devices Design Laboratory",
+      "url": "https://ocw.mit.edu/courses/2-996-biomedical-devices-design-laboratory-fall-2007/",
+      "fuente": "MIT OpenCourseWare (Course 2.996)",
+      "idioma": "en",
+      "tipo": "Curso (acondicionamiento de señal, interfaces electrónicas para sensores biomédicos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3,
+        5
+      ]
+    }
+  ],
+  "B316": [
+    {
+      "titulo": "Dynamics of Nonlinear Systems",
+      "url": "https://ocw.mit.edu/courses/6-243j-dynamics-of-nonlinear-systems-fall-2003/",
+      "fuente": "MIT OpenCourseWare (Course 6.243J)",
+      "idioma": "en",
+      "tipo": "Curso (notas de clase avanzadas y problem sets)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1
+      ]
+    }
+  ],
+  "B317": [
+    {
+      "titulo": "Special Topics at Edgerton Center: Developing World Prosthetics",
+      "url": "https://ocw.mit.edu/courses/ec-722-special-topics-at-edgerton-center-developing-world-prosthetics-spring-2010/",
+      "fuente": "MIT OpenCourseWare (Course EC.722)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas de biomecánica de la marcha, diseño y prototipado protésico)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        5
+      ]
+    }
+  ],
+  "B318": [
+    {
+      "titulo": "Machine Vision",
+      "url": "https://ocw.mit.edu/courses/6-801-machine-vision-fall-2020/",
+      "fuente": "MIT OpenCourseWare (Course 6.801 / 6.866 - Prof. Berthold Horn)",
+      "idioma": "en",
+      "tipo": "Curso (videoclases, notas, tareas de procesamiento y reconocimiento)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B319": [
+    {
+      "titulo": "Biomedical Devices Design Laboratory",
+      "url": "https://ocw.mit.edu/courses/2-996-biomedical-devices-design-laboratory-fall-2007/",
+      "fuente": "MIT OpenCourseWare (Course 2.996)",
+      "idioma": "en",
+      "tipo": "Curso (guías de diseño, notas de precisión de sensores, acondicionamiento y calibración)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B320": [
+    {
+      "titulo": "Artificial Intelligence",
+      "url": "https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/",
+      "fuente": "MIT OpenCourseWare (Course 6.034 - Prof. Patrick Winston)",
+      "idioma": "en",
+      "tipo": "Curso completo (videoclases, notas, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B321": [
+    {
+      "titulo": "Introduction to Robotics",
+      "url": "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/",
+      "fuente": "MIT OpenCourseWare (Course 2.12)",
+      "idioma": "en",
+      "tipo": "Curso (notas de clase, cinemática de robots móviles, laboratorios embebidos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Autonomous Robot Design Competition",
+      "url": "https://ocw.mit.edu/courses/6-270-autonomous-robot-design-competition-january-iap-2005/",
+      "fuente": "MIT OpenCourseWare (Course 6.270)",
+      "idioma": "en",
+      "tipo": "Curso / Taller práctico (arquitectura embebida de robots autónomos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3,
+        4
+      ]
+    }
+  ],
+  "B322": [
+    {
+      "titulo": "Finite Element Analysis of Solids and Fluids I",
+      "url": "https://ocw.mit.edu/courses/2-092-finite-element-analysis-of-solids-and-fluids-i-fall-2009/",
+      "fuente": "MIT OpenCourseWare (Course 2.092 / 2.093 - Prof. K.J. Bathe)",
+      "idioma": "en",
+      "tipo": "Curso (notas de métodos de elementos finitos, formulación computacional y análisis estructural)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Mecánica de Materiales (Roylance)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Mecanica/Mec%C3%A1nica_de_Materiales_(Roylance)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro abierto / Lecturas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "B324": [
+    {
+      "titulo": "Aerospace Biomedical and Life Support Engineering",
+      "url": "https://ocw.mit.edu/courses/16-423j-aerospace-biomedical-and-life-support-engineering-spring-2006/",
+      "fuente": "MIT OpenCourseWare (Course 16.423J / HST.515J)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas y notas técnicas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2
+      ]
+    }
+  ],
+  "B401": [
+    {
+      "titulo": "Dynamic Systems and Control",
+      "url": "https://ocw.mit.edu/courses/6-241j-dynamic-systems-and-control-spring-2011/",
+      "fuente": "MIT OpenCourseWare (Course 6.241J / 16.338J)",
+      "idioma": "en",
+      "tipo": "Curso (notas de posgrado, análisis multivariable)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B402": [
+    {
+      "titulo": "2.1: Uso básico del microcontrolador para medición y control",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Biologica/Introducci%C3%B3n_a_la_Ingenier%C3%ADa_de_Biosystems_(Holden_et_al.)/02%3A_Tecnolog%C3%ADa_de_la_informaci%C3%B3n%2C_sensores_y_sistemas_de_control/2.01%3A_Uso_b%C3%A1sico_del_microcontrolador_para_medici%C3%B3n_y_control",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Capítulo de libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "B403": [
+    {
+      "titulo": "Mechanics & Materials I",
+      "url": "https://ocw.mit.edu/courses/2-001-mechanics-materials-i-fall-2006/",
+      "fuente": "MIT OpenCourseWare (Course 2.001)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas, diagramas de cortante y momento, problemas y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Mecánica de Materiales (Roylance)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Mecanica/Mec%C3%A1nica_de_Materiales_(Roylance)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B404": [
+    {
+      "titulo": "Design and Manufacturing II",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare (Course 2.008)",
+      "idioma": "en",
+      "tipo": "Curso (notas de clase completas, guías de maquinado CNC, moldeo y prototipado)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4,
+        5
+      ]
+    }
+  ],
+  "B405": [
+    {
+      "titulo": "Machine Learning",
+      "url": "https://ocw.mit.edu/courses/6-867-machine-learning-fall-2006/",
+      "fuente": "MIT OpenCourseWare (Course 6.867 - Prof. Tommi Jaakkola)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas teóricas avanzadas, notas estadísticas y tareas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "B407": [
+    {
+      "titulo": "2: Tecnología de la información, sensores y sistemas de control",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Biologica/Introducci%C3%B3n_a_la_Ingenier%C3%ADa_de_Biosystems_(Holden_et_al.)/02%3A_Tecnolog%C3%ADa_de_la_informaci%C3%B3n%2C_sensores_y_sistemas_de_control",
+      "fuente": "LibreTexts Español (Ingeniería de Biosistemas)",
+      "idioma": "es",
+      "tipo": "Unidad / Capítulos de lectura",
+      "licencia": "CC BY 4.0"
+    }
+  ],
+  "B408": [
+    {
+      "titulo": "Materials for Biomedical Applications",
+      "url": "https://ocw.mit.edu/courses/3-051j-materials-for-biomedical-applications-spring-2006/",
+      "fuente": "MIT OpenCourseWare (Course 3.051J)",
+      "idioma": "en",
+      "tipo": "Curso (presentaciones y lecturas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Design and Fabrication of Microelectromechanical Devices",
+      "url": "https://ocw.mit.edu/courses/6-777j-design-and-fabrication-of-microelectromechanical-devices-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course 6.777J)",
+      "idioma": "en",
+      "tipo": "Curso (notas de BioMEMS)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        5
+      ]
+    }
+  ],
+  "B409": [
+    {
+      "titulo": "Human Supervisory Control of Automated Systems",
+      "url": "https://ocw.mit.edu/courses/16-422-human-supervisory-control-of-automated-systems-spring-2004/",
+      "fuente": "MIT OpenCourseWare (Course 16.422)",
+      "idioma": "en",
+      "tipo": "Curso (notas, lecturas de modelado humano en el lazo de control)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "B412": [
+    {
+      "titulo": "Design and Fabrication of Microelectromechanical Devices",
+      "url": "https://ocw.mit.edu/courses/6-777j-design-and-fabrication-of-microelectromechanical-devices-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course 6.777J)",
+      "idioma": "en",
+      "tipo": "Curso (notas de principios de sensado físico y óptico)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2
+      ]
+    }
+  ],
+  "B414": [
+    {
+      "titulo": "Introduction to EECS II: Digital Communication Systems",
+      "url": "https://ocw.mit.edu/courses/6-02-introduction-to-eecs-ii-digital-communication-systems-fall-2012/",
+      "fuente": "MIT OpenCourseWare (Course 6.02)",
+      "idioma": "en",
+      "tipo": "Curso (libro de texto descargable, notas y laboratorios Python)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        5
+      ]
+    }
+  ],
+  "B415": [
+    {
+      "titulo": "Principles of Medical Imaging",
+      "url": "https://ocw.mit.edu/courses/22-058-principles-of-medical-imaging-fall-2002/",
+      "fuente": "MIT OpenCourseWare (Course 22.058 - Prof. David Cory)",
+      "idioma": "en",
+      "tipo": "Curso (syllabus detallado, notas de lectura sobre la física de radiación, RMN, US y TAC)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Biomedical Signal and Image Processing",
+      "url": "https://ocw.mit.edu/courses/hst-582j-biomedical-signal-and-image-processing-spring-2007/",
+      "fuente": "MIT OpenCourseWare (Course HST.582J)",
+      "idioma": "en",
+      "tipo": "Curso (algoritmos de reconstrucción tomográfica por retroproyección)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        5
+      ]
+    }
+  ],
+  "B501": [
+    {
+      "titulo": "Introduction to Robotics",
+      "url": "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/",
+      "fuente": "MIT OpenCourseWare (Course 2.12)",
+      "idioma": "en",
+      "tipo": "Curso (notas de cinemática y dinámica de robots)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3
+      ]
+    }
+  ],
+  "B502": [
+    {
+      "titulo": "Quantitative Physiology: Cells and Tissues",
+      "url": "https://ocw.mit.edu/courses/6-021j-quantitative-physiology-cells-and-tissues-fall-2004/",
+      "fuente": "MIT OpenCourseWare (Course 6.021J)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas y notas sobre excitabilidad de membranas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Biomedical Devices Design Laboratory",
+      "url": "https://ocw.mit.edu/courses/2-996-biomedical-devices-design-laboratory-fall-2007/",
+      "fuente": "MIT OpenCourseWare (Course 2.996)",
+      "idioma": "en",
+      "tipo": "Curso (diseño de circuitos analógicos de interfaz y acondicionamiento)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        4
+      ]
+    }
+  ],
+  "B503": [
+    {
+      "titulo": "Molecular, Cellular, and Tissue Biomechanics",
+      "url": "https://ocw.mit.edu/courses/20-310j-molecular-cellular-and-tissue-biomechanics-spring-2015/",
+      "fuente": "MIT OpenCourseWare (Course 20.310J / 2.798J)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas, formulaciones de mecánica de medios continuos y reología)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "titulo": "Special Topics at Edgerton Center: Developing World Prosthetics",
+      "url": "https://ocw.mit.edu/courses/ec-722-special-topics-at-edgerton-center-developing-world-prosthetics-spring-2010/",
+      "fuente": "MIT OpenCourseWare (Course EC.722)",
+      "idioma": "en",
+      "tipo": "Curso (lecturas sobre cinemática y cinética articular de la marcha)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3
+      ]
+    }
+  ],
+  "B504": [
+    {
+      "titulo": "Writing Guide with Handbook",
+      "url": "https://openstax.org/details/books/writing-guide",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto (lecturas y guías estructuradas)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "El método científico",
+      "url": "https://es.khanacademy.org/science/biology/intro-to-biology/science-of-biology/a/the-scientific-method",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad / Lecturas con ejercicios",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2
+      ]
+    }
   ]
 }

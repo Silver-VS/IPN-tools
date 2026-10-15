@@ -1,0 +1,1672 @@
+{
+  "M101": [
+    {
+      "titulo": "Álgebra lineal",
+      "url": "https://es.khanacademy.org/math/linear-algebra",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso completo (videos, lecturas, ejercicios)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Números complejos",
+      "url": "https://es.khanacademy.org/math/precalculus/x9e81a4f98381481a:complex-numbers",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad temática (videos y ejercicios interactivos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1
+      ]
+    },
+    {
+      "titulo": "18.06SC Linear Algebra (Prof. Gilbert Strang)",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (video-clases magistrales, notas, exámenes con solución)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M102": [
+    {
+      "titulo": "6.0001 Introduction to Computer Science and Programming in Python",
+      "url": "https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas, asignaciones, ejercicios de laboratorio)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M103": [
+    {
+      "titulo": "Cálculo diferencial",
+      "url": "https://es.khanacademy.org/math/differential-calculus",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso completo (videos, artículos, práctica interactiva)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Cálculo integral",
+      "url": "https://es.khanacademy.org/math/integral-calculus",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso completo (videos, problemas de práctica y exámenes de unidad)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Cálculo Volumen 1",
+      "url": "https://openstax.org/details/books/c%C3%A1lculo-volumen-1",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Cálculo Volumen 2",
+      "url": "https://openstax.org/details/books/c%C3%A1lculo-volumen-2",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        4,
+        5
+      ]
+    }
+  ],
+  "M104": [
+    {
+      "titulo": "Cálculo multivariable",
+      "url": "https://es.khanacademy.org/math/multivariable-calculus",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo completo",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Cálculo Volumen 3",
+      "url": "https://openstax.org/details/books/c%C3%A1lculo-volumen-3",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "18.02SC Multivariable Calculus",
+      "url": "https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, notas, ejercicios resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M105": [
+    {
+      "titulo": "Análisis de circuitos",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-circuit-analysis-topic",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad temática interactiva (videos, lecturas guiadas, problemas)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "6.002 Circuits and Electronics",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, notas de clase, tareas resueltas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M106": [
+    {
+      "titulo": "Análisis de CA y Respuesta en el tiempo",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-circuit-analysis-topic/ee-ac-analysis",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad temática (videos y artículos analíticos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "6.002 Circuits and Electronics (Módulos de AC y Redes Dinámicas)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas y problemas avanzados)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M107": [
+    {
+      "titulo": "2.007 Design and Manufacturing I (CAD & Drafting Tools)",
+      "url": "https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso/Laboratorio (tutoriales de modelado 3D, ensambles y diseño para manufactura)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Engineering Graphics and CAD",
+      "url": "https://eng.libretexts.org/Bookshelves/Mechanical_Engineering",
+      "fuente": "LibreTexts",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY-NC-SA 3.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "M108": [
+    {
+      "titulo": "Ecuaciones diferenciales",
+      "url": "https://es.khanacademy.org/math/differential-equations",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso completo (videos, lecturas y problemas)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "18.03SC Differential Equations",
+      "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, notas de lectura, sesiones de recitación)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M109": [
+    {
+      "titulo": "Física Universitaria Volumen 2",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-2",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "8.02 Physics II: Electricity and Magnetism",
+      "url": "https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (clases, animaciones TEAL, notas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Campos magnéticos y fuerzas magnéticas",
+      "url": "https://es.khanacademy.org/science/physics/magnetic-forces-and-magnetic-fields",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad interactiva",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        4
+      ]
+    }
+  ],
+  "M110": [
+    {
+      "titulo": "3.091SC Introduction to Solid State Chemistry",
+      "url": "https://ocw.mit.edu/courses/3-091sc-introduction-to-solid-state-chemistry-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, notas y guías de autoestudio)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "3.012 Fundamentals of Materials Science",
+      "url": "https://ocw.mit.edu/courses/3-012-fundamentals-of-materials-science-fall-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas y problemas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "M111": [
+    {
+      "titulo": "Writing Guide with Handbook",
+      "url": "https://openstax.org/details/books/writing-guide",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto (lecturas y ejercicios)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "M112": [
+    {
+      "titulo": "Dispositivos semiconductores y diodos",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-semiconductor-devices",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad interactiva (videos y lecturas explicativas)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1
+      ]
+    },
+    {
+      "titulo": "Amplificadores y circuitos con amplificadores operacionales",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-amplifiers",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad temática interactiva",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        4
+      ]
+    },
+    {
+      "titulo": "6.002 Circuits and Electronics (Módulos de Transistores MOSFET y Fuentes)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3
+      ]
+    }
+  ],
+  "M113": [
+    {
+      "titulo": "6.0001 Introduction to Computer Science and Programming in Python",
+      "url": "https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (entornos de programación científica, funciones, control y estructuras)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M114": [
+    {
+      "titulo": "Grammar: Parts of Speech and Verb Tenses",
+      "url": "https://www.khanacademy.org/humanities/grammar",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Curso completo (videos y ejercicios interactivos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M115": [
+    {
+      "titulo": "Grammar: Modals, Conditionals and Complex Syntax",
+      "url": "https://www.khanacademy.org/humanities/grammar/parts-of-speech-the-modifier/modal-verbs",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Unidad temática",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M116": [
+    {
+      "titulo": "2.007 Design and Manufacturing I (Mecatrónica y Sistemas Integrados)",
+      "url": "https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso/Laboratorio",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "M117": [
+    {
+      "titulo": "Programación de computadoras",
+      "url": "https://es.khanacademy.org/computing/computer-programming",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo con consola en vivo",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "6.0001 Introduction to Computer Science and Programming in Python",
+      "url": "https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M118": [
+    {
+      "titulo": "Fuerzas y las leyes del movimiento de Newton",
+      "url": "https://es.khanacademy.org/science/physics/forces-newtons-laws",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad interactiva",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Física Universitaria Volumen 1",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-1",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "8.01SC Classical Mechanics",
+      "url": "https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, notas, soluciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M119": [
+    {
+      "titulo": "Estática de Ingeniería (Baker & Haynes)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Mecanica",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto interactivo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1
+      ]
+    },
+    {
+      "titulo": "2.003SC Engineering Dynamics",
+      "url": "https://ocw.mit.edu/courses/2-003sc-engineering-dynamics-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de conferencias y recitaciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M120": [
+    {
+      "titulo": "2.008 Design and Manufacturing II",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (notas, presentaciones, casos prácticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M121": [
+    {
+      "titulo": "Mecánica de Materiales (David Roylance / MIT)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Ingenieria/Ingenieria_Mecanica/Mec%C3%A1nica_de_Materiales_(Roylance)",
+      "fuente": "LibreTexts Español",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY-NC-SA 3.0"
+    }
+  ],
+  "M201": [
+    {
+      "titulo": "Principles of Management",
+      "url": "https://openstax.org/details/books/principles-management",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M202": [
+    {
+      "titulo": "6.003 Signals and Systems",
+      "url": "https://ocw.mit.edu/courses/6-003-signals-and-systems-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, notas, laboratorios)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M203": [
+    {
+      "titulo": "2.003SC Engineering Dynamics",
+      "url": "https://ocw.mit.edu/courses/2-003sc-engineering-dynamics-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (análisis dinámico y cinemático de eslabonamientos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "titulo": "Kinematics and Dynamics of Mechanical Systems",
+      "url": "https://eng.libretexts.org/Bookshelves/Mechanical_Engineering",
+      "fuente": "LibreTexts",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY-NC-SA 3.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M204": [
+    {
+      "titulo": "6.004 Computation Structures",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas interactivas, laboratorios de diseño)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M205": [
+    {
+      "titulo": "2.007 Design and Manufacturing I",
+      "url": "https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (diseño de componentes mecánicos, uniones y actuadores)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M206": [
+    {
+      "titulo": "6.111 Introductory Digital Systems Laboratory",
+      "url": "https://ocw.mit.edu/courses/6-111-introductory-digital-systems-laboratory-spring-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso/Laboratorio completo (diseño avanzado con FPGA y Verilog)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M207": [
+    {
+      "titulo": "6.002 Circuits and Electronics",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Amplificadores Operacionales y Filtros Activos",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-amplifiers",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad interactiva",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1
+      ]
+    }
+  ],
+  "M208": [
+    {
+      "titulo": "Reading and Vocabulary Development",
+      "url": "https://www.khanacademy.org/ela",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Curso completo de lectura y comprensión",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M209": [
+    {
+      "titulo": "Entrepreneurship",
+      "url": "https://openstax.org/details/books/entrepreneurship",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M210": [
+    {
+      "titulo": "2.008 Design and Manufacturing II (Manufacturing Systems & Quality Operations)",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M211": [
+    {
+      "titulo": "6.685 Electric Machines",
+      "url": "https://ocw.mit.edu/courses/6-685-electric-machines-fall-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (apuntes detallados de cada máquina y circuitos magnéticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M212": [
+    {
+      "titulo": "2.06 Fluid Dynamics",
+      "url": "https://ocw.mit.edu/courses/2-06-fluid-dynamics-spring-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas, problemas prácticos y exámenes resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Física Universitaria Volumen 1 (Capítulo 14: Mecánica de fluidos)",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-1",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M213": [
+    {
+      "titulo": "6.004 Computation Structures",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (arquitectura de procesadores RISC, buses, memorias y periféricos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M214": [
+    {
+      "titulo": "2.06 Fluid Dynamics (Fundamentos de Hidrostática y Presión)",
+      "url": "https://ocw.mit.edu/courses/2-06-fluid-dynamics-spring-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Lecturas/Unidades teóricas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1
+      ]
+    }
+  ],
+  "M215": [
+    {
+      "titulo": "Física Universitaria Volumen 3",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-3",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "8.03SC Physics III: Vibrations and Waves",
+      "url": "https://ocw.mit.edu/courses/8-03sc-physics-iii-vibrations-and-waves-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos y notas de clase)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "M216": [
+    {
+      "titulo": "Introducción a la Estadística",
+      "url": "https://openstax.org/details/books/introducci%C3%B3n-estad%C3%ADstica",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Probabilidad y estadística",
+      "url": "https://es.khanacademy.org/math/statistics-probability",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso completo (videos y práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "18.05 Introduction to Probability and Statistics",
+      "url": "https://ocw.mit.edu/courses/18-05-introduction-to-probability-and-statistics-spring-2014/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo con enfoque ingenieril",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M217": [
+    {
+      "titulo": "6.0001 Introduction to Computer Science and Programming in Python",
+      "url": "https://ocw.mit.edu/courses/6-0001-introduction-to-computer-science-and-programming-in-python-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "6.801 Machine Vision (Módulo de Visión Computacional)",
+      "url": "https://ocw.mit.edu/courses/6-801-machine-vision-fall-2020/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso avanzado",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        4
+      ]
+    }
+  ],
+  "M218": [
+    {
+      "titulo": "6.071J Introduction to Electronics, Signals, and Measurement",
+      "url": "https://ocw.mit.edu/courses/6-071j-introduction-to-electronics-signals-and-measurement-spring-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso/Laboratorio (transductores y acondicionamiento con op-amps e instrumentación)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M219": [
+    {
+      "titulo": "6.002 Circuits and Electronics (Módulos de simulación SPICE y laboratorio)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (análisis SPICE en régimen transitorio y AC)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "M220": [
+    {
+      "titulo": "6.034 Artificial Intelligence",
+      "url": "https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos y asignaciones de redes neuronales y clasificadores)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4
+      ]
+    }
+  ],
+  "M221": [
+    {
+      "titulo": "Física Universitaria Volumen 2 (Ondas Electromagnéticas y Ecuaciones de Maxwell)",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-2",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "8.02 Physics II: Electricity and Magnetism",
+      "url": "https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M222": [
+    {
+      "titulo": "Física Universitaria Volumen 2 (Capítulos 1 a 4)",
+      "url": "https://openstax.org/details/books/f%C3%ADsica-universitaria-volumen-2",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto completo",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M301": [
+    {
+      "titulo": "2.004 Dynamics and Control II",
+      "url": "https://ocw.mit.edu/courses/2-004-dynamics-and-control-ii-spring-2008/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (modelado en frecuencia, PID y respuesta temporal)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "16.06 Principles of Automatic Control",
+      "url": "https://ocw.mit.edu/courses/16-06-principles-of-automatic-control-fall-2012/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo con exámenes resueltos",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M302": [
+    {
+      "titulo": "Business Ethics",
+      "url": "https://openstax.org/details/books/business-ethics",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M304": [
+    {
+      "titulo": "2.004 Dynamics and Control II",
+      "url": "https://ocw.mit.edu/courses/2-004-dynamics-and-control-ii-spring-2008/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3
+      ]
+    },
+    {
+      "titulo": "2.003SC Engineering Dynamics",
+      "url": "https://ocw.mit.edu/courses/2-003sc-engineering-dynamics-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (dinámica de Lagrange y sistemas acoplados)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1
+      ]
+    }
+  ],
+  "M306": [
+    {
+      "titulo": "2.007 Design and Manufacturing I",
+      "url": "https://ocw.mit.edu/courses/2-007-design-and-manufacturing-i-spring-2009/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M307": [
+    {
+      "titulo": "Principles of Finance",
+      "url": "https://openstax.org/details/books/principles-finance",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "14.01SC Principles of Microeconomics",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (análisis de costos y toma de decisiones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3
+      ]
+    }
+  ],
+  "M308": [
+    {
+      "titulo": "RES.6-008 Digital Signal Processing (Prof. Alan V. Oppenheim)",
+      "url": "https://ocw.mit.edu/courses/res-6-008-digital-signal-processing-spring-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo en video con notas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        5
+      ]
+    },
+    {
+      "titulo": "6.341 Discrete-Time Signal Processing",
+      "url": "https://ocw.mit.edu/courses/6-341-discrete-time-signal-processing-fall-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso avanzado",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4,
+        5
+      ]
+    }
+  ],
+  "M310": [
+    {
+      "titulo": "Principles of Microeconomics 3e",
+      "url": "https://openstax.org/details/books/principles-microeconomics-3e",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1
+      ]
+    },
+    {
+      "titulo": "Principles of Macroeconomics 3e",
+      "url": "https://openstax.org/details/books/principles-macroeconomics-3e",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        2
+      ]
+    }
+  ],
+  "M312": [
+    {
+      "titulo": "6.002 Circuits and Electronics (Módulos de MOSFET, CMOS y Convertidores)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M313": [
+    {
+      "titulo": "2.008 Design and Manufacturing II",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M315": [
+    {
+      "titulo": "2.12 Introduction to Robotics",
+      "url": "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (capítulos del libro de robótica de H. Asada, tareas y diseño)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M316": [
+    {
+      "titulo": "2.008 Design and Manufacturing II (Líneas y Celdas Automatizadas)",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M317": [
+    {
+      "titulo": "6.071J Introduction to Electronics, Signals, and Measurement",
+      "url": "https://ocw.mit.edu/courses/6-071j-introduction-to-electronics-signals-and-measurement-spring-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M318": [
+    {
+      "titulo": "Principles of Management",
+      "url": "https://openstax.org/details/books/principles-management",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M320": [
+    {
+      "titulo": "6.828 Operating System Engineering",
+      "url": "https://ocw.mit.edu/courses/6-828-operating-system-engineering-fall-2012/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (arquitectura de kernel, traps, concurrencia y planificación)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M321": [
+    {
+      "titulo": "6.837 Computer Graphics",
+      "url": "https://ocw.mit.edu/courses/6-837-computer-graphics-fall-2012/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (algoritmos matemáticos de transformación 3D, shaders, render y APIs gráficas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M324": [
+    {
+      "titulo": "2.008 Design and Manufacturing II (Tooling and Forming Processes)",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M327": [
+    {
+      "titulo": "2.008 Design and Manufacturing II (Quality Control and Statistical Process Control)",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Unidad temático-práctica",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "M401": [
+    {
+      "titulo": "16.30 Feedback Control Systems",
+      "url": "https://ocw.mit.edu/courses/16-30-feedback-control-systems-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (espacio de estados, observadores, LQR y control discreto)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M402": [
+    {
+      "titulo": "6.334 Power Electronics",
+      "url": "https://ocw.mit.edu/courses/6-334-power-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (semiconductores, convertidores conmutados y análisis armónico)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M404": [
+    {
+      "titulo": "Writing Guide with Handbook (Research and Argumentation)",
+      "url": "https://openstax.org/details/books/writing-guide",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M405": [
+    {
+      "titulo": "Principles of Finance (Capital Budgeting and Valuation)",
+      "url": "https://openstax.org/details/books/principles-finance",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        4,
+        5
+      ]
+    }
+  ],
+  "M406": [
+    {
+      "titulo": "6.801 Machine Vision (Prof. Berthold Horn)",
+      "url": "https://ocw.mit.edu/courses/6-801-machine-vision-fall-2020/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo con notas y tareas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "M407": [
+    {
+      "titulo": "6.004 Computation Structures",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "M408": [
+    {
+      "titulo": "Principles of Marketing",
+      "url": "https://openstax.org/details/books/principles-marketing",
+      "fuente": "OpenStax",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M409": [
+    {
+      "titulo": "2.12 Introduction to Robotics",
+      "url": "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (integración de sensores, efectores finales y seguridad)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M410": [
+    {
+      "titulo": "6.801 Machine Vision",
+      "url": "https://ocw.mit.edu/courses/6-801-machine-vision-fall-2020/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M412": [
+    {
+      "titulo": "2.008 Design and Manufacturing II",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "M413": [
+    {
+      "titulo": "2.12 Introduction to Robotics (Capítulos de Cinemática y Dinámica de Asada)",
+      "url": "https://ocw.mit.edu/courses/2-12-introduction-to-robotics-fall-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (formulaciones de Newton-Euler y Lagrange en robots)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M414": [
+    {
+      "titulo": "6.111 Introductory Digital Systems Laboratory",
+      "url": "https://ocw.mit.edu/courses/6-111-introductory-digital-systems-laboratory-spring-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "M416": [
+    {
+      "titulo": "2.008 Design and Manufacturing II (CIM Systems & Computer Operations)",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Unidad temática",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1
+      ]
+    }
+  ],
+  "M418": [
+    {
+      "titulo": "2.008 Design and Manufacturing II",
+      "url": "https://ocw.mit.edu/courses/2-008-design-and-manufacturing-ii-spring-2025/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "M419": [
+    {
+      "titulo": "2.004 Dynamics and Control II",
+      "url": "https://ocw.mit.edu/courses/2-004-dynamics-and-control-ii-spring-2008/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M420": [
+    {
+      "titulo": "6.034 Artificial Intelligence",
+      "url": "https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        4
+      ]
+    }
+  ],
+  "M422": [
+    {
+      "titulo": "Human Factors Engineering and Design",
+      "url": "https://eng.libretexts.org/Bookshelves/Industrial_and_Systems_Engineering",
+      "fuente": "LibreTexts",
+      "idioma": "en",
+      "tipo": "Lecturas de ingeniería",
+      "licencia": "CC BY-NC-SA 3.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "M424": [
+    {
+      "titulo": "6.004 Computation Structures",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso/Laboratorio",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M425": [
+    {
+      "titulo": "6.837 Computer Graphics",
+      "url": "https://ocw.mit.edu/courses/6-837-computer-graphics-fall-2012/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4
+      ]
+    }
+  ],
+  "M426": [
+    {
+      "titulo": "RES.6-008 Digital Signal Processing",
+      "url": "https://ocw.mit.edu/courses/res-6-008-digital-signal-processing-spring-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "M501": [
+    {
+      "titulo": "6.685 Electric Machines",
+      "url": "https://ocw.mit.edu/courses/6-685-electric-machines-fall-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ]
+}

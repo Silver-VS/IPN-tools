@@ -1,0 +1,1548 @@
+{
+  "T101": [
+    {
+      "titulo": "6.092 Introduction to Programming in Java (January IAP 2010)",
+      "url": "https://ocw.mit.edu/courses/6-092-introduction-to-programming-in-java-january-iap-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (diapositivas, lecturas teóricas, tareas de programación y soluciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T102": [
+    {
+      "titulo": "6.005 Software Construction (Spring 2016)",
+      "url": "https://ocw.mit.edu/courses/6-005-software-construction-spring-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas técnicas, especificaciones y proyectos de diseño)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "6.096 Introduction to C++ (January IAP 2011)",
+      "url": "https://ocw.mit.edu/courses/6-096-introduction-to-c-january-iap-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (diapositivas, lecturas y tareas de código)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3
+      ]
+    }
+  ],
+  "T103": [
+    {
+      "titulo": "Algoritmos",
+      "url": "https://es.khanacademy.org/computing/computer-science/algorithms",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad temática interactiva (videos, lecturas y retos de código)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "6.006 Introduction to Algorithms (Spring 2020)",
+      "url": "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-spring-2020/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de clase de Erik Demaine y Jason Ku, notas de clase, conjuntos de problemas y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T104": [
+    {
+      "titulo": "Introduction to Linux (LFS101x)",
+      "url": "https://www.edx.org/learn/linux/the-linux-foundation-introduction-to-linux",
+      "fuente": "The Linux Foundation / edX",
+      "idioma": "en",
+      "tipo": "Curso en línea (auditoría gratuita con videos, lecturas y prácticas en terminal)",
+      "licencia": "Gratuito para auditar (Free to Audit / Contenido educativo abierto de The Linux Foundation)",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T105": [
+    {
+      "titulo": "6.004 Computation Structures (Spring 2017)",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos, lecturas, laboratorios y herramientas de simulación)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "6.111 Introductory Digital Systems Laboratory (Spring 2006)",
+      "url": "https://ocw.mit.edu/courses/6-111-introductory-digital-systems-laboratory-spring-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso de laboratorio (notas técnicas, prácticas y proyectos digitales en Verilog)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T106": [
+    {
+      "titulo": "6.004 Computation Structures (Spring 2017)",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de clase, notas, laboratorios de diseño y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "6.823 Computer System Architecture (Fall 2005)",
+      "url": "https://ocw.mit.edu/courses/6-823-computer-system-architecture-fall-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (lecturas avanzadas, conjuntos de problemas y soluciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        4,
+        5
+      ]
+    }
+  ],
+  "T107": [
+    {
+      "titulo": "Física universitaria volumen 1",
+      "url": "https://openstax.org/details/books/fisica-universitaria-volumen-1",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (lecturas, ejemplos y problemas)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Física en línea",
+      "url": "https://es.khanacademy.org/science/physics",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos y ejercicios prácticos de mecánica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "8.01SC Classical Mechanics (Fall 2016)",
+      "url": "https://ocw.mit.edu/courses/8-01sc-classical-mechanics-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de clase, notas, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T108": [
+    {
+      "titulo": "Ecuaciones diferenciales",
+      "url": "https://es.khanacademy.org/math/differential-equations",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "18.03SC Differential Equations (Fall 2011)",
+      "url": "https://ocw.mit.edu/courses/18-03sc-differential-equations-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de Arthur Mattuck, notas, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T109": [
+    {
+      "titulo": "Probabilidad y estadística",
+      "url": "https://es.khanacademy.org/math/statistics-probability",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "6.041SC Probabilistic Systems Analysis and Applied Probability (Fall 2013)",
+      "url": "https://ocw.mit.edu/courses/6-041sc-probabilistic-systems-analysis-and-applied-probability-fall-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de John Tsitsiklis, notas, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T110": [
+    {
+      "titulo": "Cálculo diferencial",
+      "url": "https://es.khanacademy.org/math/differential-calculus",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Cálculo integral",
+      "url": "https://es.khanacademy.org/math/integral-calculus",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "18.01SC Single Variable Calculus (Fall 2010)",
+      "url": "https://ocw.mit.edu/courses/18-01sc-single-variable-calculus-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de David Jerison, notas, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T111": [
+    {
+      "titulo": "Variables complejas con aplicaciones (Orloff)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Matematicas/Analisis/Variables_complejas_con_aplicaciones_(Orloff)",
+      "fuente": "LibreTexts Español (Traducción autorizada de MIT OCW)",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto / curso",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "18.04 Complex Variables with Applications (Spring 2018)",
+      "url": "https://ocw.mit.edu/courses/18-04-complex-variables-with-applications-spring-2018/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (notas interactivas, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T112": [
+    {
+      "titulo": "Álgebra lineal",
+      "url": "https://es.khanacademy.org/math/linear-algebra",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso (videos conceptuales, lecturas interactivas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "18.06SC Linear Algebra (Fall 2011)",
+      "url": "https://ocw.mit.edu/courses/18-06sc-linear-algebra-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de clase de Gilbert Strang, notas resumen, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T113": [
+    {
+      "titulo": "Física universitaria volumen 2",
+      "url": "https://openstax.org/details/books/fisica-universitaria-volumen-2",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (lecturas, ejemplos paso a paso y banco de problemas)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "8.02 Physics II: Electricity and Magnetism (Spring 2007)",
+      "url": "https://ocw.mit.edu/courses/8-02-physics-ii-electricity-and-magnetism-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de clase, notas TEAL, tareas y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T114": [
+    {
+      "titulo": "Cálculo multivariable",
+      "url": "https://es.khanacademy.org/math/multivariable-calculus",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos de Grant Sanderson / 3Blue1Brown, lecturas y ejercicios)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "18.02SC Multivariable Calculus (Fall 2010)",
+      "url": "https://ocw.mit.edu/courses/18-02sc-multivariable-calculus-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de Denis Auroux, notas de lectura, sesiones de problemas y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T115": [
+    {
+      "titulo": "Libro: Principios de Gestión (OpenStax)",
+      "url": "https://espanol.libretexts.org/Bookshelves/Negocio/Gerencia/Libro%3A_Principios_de_Gesti%C3%B3n_(OpenStax)",
+      "fuente": "LibreTexts Español / OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (lecturas capitulares y casos de estudio)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Principles of Management",
+      "url": "https://openstax.org/details/books/principles-management",
+      "fuente": "OpenStax (Rice University)",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto (lecturas, autoevaluaciones y ejercicios)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T116": [
+    {
+      "titulo": "ESD.932 Engineering Ethics (Spring 2006)",
+      "url": "https://ocw.mit.edu/courses/esd-932-engineering-ethics-spring-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (grabaciones de clase, lecturas de casos de estudio y debates)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "24.231 Ethics (Fall 2009)",
+      "url": "https://ocw.mit.edu/courses/24-231-ethics-fall-2009/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (notas de lectura y guías de discusión)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3
+      ]
+    }
+  ],
+  "T117": [
+    {
+      "titulo": "21W.747 Rhetoric (Spring 2005)",
+      "url": "https://ocw.mit.edu/courses/21w-747-rhetoric-spring-2005/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (lecturas, asignaciones de redacción y oratoria)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T118": [
+    {
+      "titulo": "Grammar: Parts of speech - The verb",
+      "url": "https://www.khanacademy.org/humanities/grammar",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Unidad interactiva (videos, lecciones y ejercicios)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T119": [
+    {
+      "titulo": "Grammar: Syntax - Conventions of standard English",
+      "url": "https://www.khanacademy.org/humanities/grammar",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Unidad interactiva (videos, lecturas y ejercicios prácticos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T120": [
+    {
+      "titulo": "6.087 Practical Programming in C (January IAP 2010)",
+      "url": "https://ocw.mit.edu/courses/6-087-practical-programming-in-c-january-iap-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (diapositivas, lecturas, tareas de codificación y proyectos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T121": [
+    {
+      "titulo": "STS.004 Science, Technology, & World (Fall 2013)",
+      "url": "https://ocw.mit.edu/courses/sts-004-science-technology-world-fall-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (programa, lecturas y guías de discusión)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T201": [
+    {
+      "titulo": "Signals and Systems (RES.6-007)",
+      "url": "https://ocw.mit.edu/courses/res-6-007-signals-and-systems-spring-2011/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Alan V. Oppenheim)",
+      "idioma": "en",
+      "tipo": "Curso completo en video (videoclases magistrales, notas de clase, ejercicios y problemas resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Signals and Systems (Baraniuk et al.)",
+      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Signal_Processing_and_Modeling/Signals_and_Systems_(Baraniuk_et_al.)",
+      "fuente": "Engineering LibreTexts / Rice University OpenStax CNX",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto (lecturas, ejemplos y problemas)",
+      "licencia": "CC BY 3.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T202": [
+    {
+      "titulo": "Electromagnetics and Applications (6.013)",
+      "url": "https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. David H. Staelin)",
+      "idioma": "en",
+      "tipo": "Curso completo (libro de texto de cátedra en PDF, notas de clase, tareas resueltas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T203": [
+    {
+      "titulo": "6.012 Microelectronic Devices and Circuits (Fall 2009)",
+      "url": "https://ocw.mit.edu/courses/6-012-microelectronic-devices-and-circuits-fall-2009/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (notas de clase, tareas de diseño y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "titulo": "6.002 Circuits and Electronics (Spring 2007)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de Anant Agarwal, notas, problemas resueltos y laboratorios)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "T204": [
+    {
+      "titulo": "Análisis de circuitos (Ingeniería Eléctrica)",
+      "url": "https://es.khanacademy.org/science/electrical-engineering/ee-circuit-analysis-topic",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Unidad curricular interactiva (videos pedagógicos, artículos detallados, ejercicios resueltos paso a paso)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Circuits and Electronics (6.002)",
+      "url": "https://ocw.mit.edu/courses/6-002-circuits-and-electronics-spring-2007/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Anant Agarwal)",
+      "idioma": "en",
+      "tipo": "Curso universitario completo (videoclases, notas de curso, laboratorios y tareas resueltas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "T205": [
+    {
+      "titulo": "Introduction to EECS II: Digital Communication Systems (6.02)",
+      "url": "https://ocw.mit.edu/courses/6-02-introduction-to-eecs-ii-digital-communication-systems-fall-2012/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Hari Balakrishnan)",
+      "idioma": "en",
+      "tipo": "Curso completo (apuntes en PDF organizados por módulo, código en Python, problemas resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Information Theory (6.441)",
+      "url": "https://ocw.mit.edu/courses/6-441-information-theory-spring-2016/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Yury Polyanskiy)",
+      "idioma": "en",
+      "tipo": "Curso avanzado (notas de clase especializadas y conjuntos de problemas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        5
+      ]
+    }
+  ],
+  "T206": [
+    {
+      "titulo": "Principles of Digital Communications I (6.450)",
+      "url": "https://ocw.mit.edu/courses/6-450-principles-of-digital-communications-i-fall-2006/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Robert Gallager & Lizhong Zheng)",
+      "idioma": "en",
+      "tipo": "Curso completo (videoclases magistrales de Robert Gallager, libro de texto en PDF, exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Introduction to EECS II: Digital Communication Systems (6.02) - Channel & Noise Modules",
+      "url": "https://ocw.mit.edu/courses/6-02-introduction-to-eecs-ii-digital-communication-systems-fall-2012/",
+      "fuente": "MIT OpenCourseWare (MIT OCW)",
+      "idioma": "en",
+      "tipo": "Curso / Módulos de comunicaciones",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3,
+        5
+      ]
+    }
+  ],
+  "T207": [
+    {
+      "titulo": "6.450 Principles of Digital Communications I (Fall 2006)",
+      "url": "https://ocw.mit.edu/courses/6-450-principles-of-digital-communications-i-fall-2006/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de Robert Gallager, libro de texto en PDF, problemas resueltos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T208": [
+    {
+      "titulo": "Discrete-Time Signal Processing (6.341)",
+      "url": "https://ocw.mit.edu/courses/6-341-discrete-time-signal-processing-fall-2005/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Alan V. Oppenheim)",
+      "idioma": "en",
+      "tipo": "Curso universitario completo (notas de clase magistrales, tareas resueltas, exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Digital Signal Processing 1: Basic Concepts and Algorithms",
+      "url": "https://www.coursera.org/learn/dsp1",
+      "fuente": "Coursera / École Polytechnique Fédérale de Lausanne (EPFL)",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos explicativos, lecturas y notebooks en Python)",
+      "licencia": "Gratuito bajo modalidad de auditoría (*Free Audit*)",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T210": [
+    {
+      "titulo": "Fundamentals of Wireless Communication - Chapter 3: Cellular Systems & Chapter 2: Fading",
+      "url": "https://web.stanford.edu/~dntse/wireless_book.html",
+      "fuente": "Stanford University / Cambridge University Press (D. Tse & P. Viswanath)",
+      "idioma": "en",
+      "tipo": "Capítulos de libro abierto en PDF",
+      "licencia": "Acceso libre educativo autorizado por Cambridge University Press",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Microwave and RF Design I: Radio Systems - Section 5.3: Cellular Communications",
+      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Microwave_and_RF_Design_I_-_Radio_Systems_(Steer)/05%3A_RF_Systems/5.03%3A_Cellular_Communications",
+      "fuente": "Engineering LibreTexts (Prof. Michael Steer, North Carolina State University)",
+      "idioma": "en",
+      "tipo": "Unidad temática de libro abierto",
+      "licencia": "CC BY-NC 4.0",
+      "unidades": [
+        1,
+        3,
+        4
+      ]
+    }
+  ],
+  "T211": [
+    {
+      "titulo": "Los bits y bytes de las redes informáticas",
+      "url": "https://www.coursera.org/learn/computer-networking",
+      "fuente": "Coursera / Google Career Certificates",
+      "idioma": "es",
+      "tipo": "Curso virtual (videos doblados y subtitulados al español, lecturas, laboratorios)",
+      "licencia": "Gratuito bajo modalidad de auditoría (*Free Audit*)",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Computer Networks (6.829)",
+      "url": "https://ocw.mit.edu/courses/6-829-computer-networks-fall-2002/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Hari Balakrishnan)",
+      "idioma": "en",
+      "tipo": "Curso universitario (lecturas y notas técnicas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T212": [
+    {
+      "titulo": "Distributed Computer Systems Engineering (6.824)",
+      "url": "https://ocw.mit.edu/courses/6-824-distributed-computer-systems-engineering-spring-2006/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Robert Morris)",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas teóricas, tareas de diseño, guías de proyecto)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Computer System Engineering (6.033) - Unit 3: Distributed Systems",
+      "url": "https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/pages/lecture-notes/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Hari Balakrishnan)",
+      "idioma": "en",
+      "tipo": "Unidad temática (notas de clase magistrales en PDF)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    }
+  ],
+  "T213": [
+    {
+      "titulo": "6.170 Software Studio (Spring 2013)",
+      "url": "https://ocw.mit.edu/courses/6-170-software-studio-spring-2013/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas, asignaciones de diseño y proyectos web reales)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Introducción a HTML/CSS: creación de páginas web",
+      "url": "https://es.khanacademy.org/computing/computer-programming/html-css",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas guiadas y desafíos en vivo de código)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        3
+      ]
+    }
+  ],
+  "T214": [
+    {
+      "titulo": "Operating System Engineering (6.828)",
+      "url": "https://ocw.mit.edu/courses/6-828-operating-system-engineering-fall-2012/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Frans Kaashoek & Robert Morris)",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas teóricas, código fuente del núcleo xv6, laboratorios)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Operating Systems: Three Easy Pieces (OSTEP) - Part II: Concurrency",
+      "url": "https://pages.cs.wisc.edu/~remzi/OSTEP/",
+      "fuente": "University of Wisconsin-Madison (Remzi H. Arpaci-Dusseau & Andrea C. Arpaci-Dusseau)",
+      "idioma": "en",
+      "tipo": "Libro de texto abierto (capítulos individuales en PDF con código en C)",
+      "licencia": "Acceso libre para lectura educativa en línea (*Free online book chapters*)",
+      "unidades": [
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T215": [
+    {
+      "titulo": "Introducción a SQL: consulta y gestión de datos",
+      "url": "https://es.khanacademy.org/computing/computer-programming/sql",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas guiadas y desafíos en vivo de SQL)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "6.830 Database Systems (Fall 2010)",
+      "url": "https://ocw.mit.edu/courses/6-830-database-systems-fall-2010/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas, asignaciones de desarrollo de motor de base de datos y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T216": [
+    {
+      "titulo": "Introduction to EECS II: Digital Communication Systems (6.02) - MAC and Network Modules",
+      "url": "https://ocw.mit.edu/courses/6-02-introduction-to-eecs-ii-digital-communication-systems-fall-2012/",
+      "fuente": "MIT OpenCourseWare (MIT OCW)",
+      "idioma": "en",
+      "tipo": "Curso universitario",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T217": [
+    {
+      "titulo": "15.511 Financial Accounting (Summer 2004)",
+      "url": "https://ocw.mit.edu/courses/15-511-financial-accounting-summer-2004/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (notas de lectura, lecturas de casos contables y problemas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "1.011 Project Evaluation (Spring 2011)",
+      "url": "https://ocw.mit.edu/courses/1-011-project-evaluation-spring-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (diapositivas, lecturas y problemas prácticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3
+      ]
+    },
+    {
+      "titulo": "Finanzas y capital de los mercados",
+      "url": "https://es.khanacademy.org/economics-finance-domain/core-finance",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos explicativos y artículos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        3
+      ]
+    }
+  ],
+  "T219": [
+    {
+      "titulo": "Grammar",
+      "url": "https://www.khanacademy.org/humanities/grammar",
+      "fuente": "Khan Academy",
+      "idioma": "en",
+      "tipo": "Curso interactivo (videos, notas y ejercicios prácticos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "T220": [
+    {
+      "titulo": "Computación Científica (Chasnov) - I: Métodos numéricos",
+      "url": "https://espanol.libretexts.org/Bookshelves/Matematicas/Computacion_Cientifica_Simulaciones_y_Modelado/Computaci%C3%B3n_Cient%C3%ADfica_(Chasnov)/I%3A_M%C3%A9todos_num%C3%A9ricos",
+      "fuente": "LibreTexts Español (Traducción del texto de Jeffrey R. Chasnov, HKUST)",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (lecturas capitulares y ejemplos computacionales)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "18.330 Introduction to Numerical Analysis (Spring 2012)",
+      "url": "https://ocw.mit.edu/courses/18-330-introduction-to-numerical-analysis-spring-2012/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (notas de clase, asignaciones de código y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T221": [
+    {
+      "titulo": "6.101 Introductory Analog Electronics Laboratory (Spring 2007)",
+      "url": "https://ocw.mit.edu/courses/6-101-introductory-analog-electronics-laboratory-spring-2007/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso de laboratorio (guías de laboratorio, notas teóricas y proyectos de diseño analógico)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "T222": [
+    {
+      "titulo": "Física universitaria volumen 3",
+      "url": "https://openstax.org/details/books/fisica-universitaria-volumen-3",
+      "fuente": "OpenStax",
+      "idioma": "es",
+      "tipo": "Libro de texto abierto (lecturas, ejemplos ilustrados y ejercicios)",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "RES.6-005 Understanding Lasers and Fiberoptics (Spring 2008)",
+      "url": "https://ocw.mit.edu/courses/res-6-005-understanding-lasers-and-fiberoptics-spring-2008/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Recurso educativo audiovisual (videos de demostración experimental y guías conceptuales)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "8.03SC Physics III: Vibrations and Waves (Fall 2016)",
+      "url": "https://ocw.mit.edu/courses/8-03sc-physics-iii-vibrations-and-waves-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de clase, notas y problemas resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "T223": [
+    {
+      "titulo": "17.181 Sustainability: Political Economy, Science, and Policy (Fall 2016)",
+      "url": "https://ocw.mit.edu/courses/17-181-sustainability-political-economy-science-and-policy-fall-2016/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (programa, lecturas obligatorias, temas de debate y proyectos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T224": [
+    {
+      "titulo": "Microeconomía",
+      "url": "https://es.khanacademy.org/economics-finance-domain/microeconomics",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "Macroeconomía",
+      "url": "https://es.khanacademy.org/economics-finance-domain/macroeconomics",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Curso interactivo (videos, lecturas y ejercicios de práctica)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "14.01SC Principles of Microeconomics (Fall 2011)",
+      "url": "https://ocw.mit.edu/courses/14-01sc-principles-of-microeconomics-fall-2011/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso completo (videos de Jonathan Gruber, notas resumen, problemas y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    },
+    {
+      "titulo": "14.02 Principles of Macroeconomics (Spring 2023)",
+      "url": "https://ocw.mit.edu/courses/14-02-principles-of-macroeconomics-spring-2023/",
+      "fuente": "MIT OpenCourseWare",
+      "idioma": "en",
+      "tipo": "Curso (diapositivas, lecturas, tareas y exámenes)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        3,
+        4
+      ]
+    }
+  ],
+  "T226": [
+    {
+      "titulo": "Principles of Wireless Communications (6.452)",
+      "url": "https://ocw.mit.edu/courses/6-452-principles-of-wireless-communications-spring-2006/",
+      "fuente": "MIT OpenCourseWare (MIT OCW)",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas, notas en PDF, tareas y soluciones)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Fundamentals of Wireless Communication (Online Chapters)",
+      "url": "https://web.stanford.edu/~dntse/wireless_book.html",
+      "fuente": "Stanford University / Cambridge University Press (D. Tse & P. Viswanath)",
+      "idioma": "en",
+      "tipo": "Libro de texto digital abierto / Capítulos en PDF",
+      "licencia": "Acceso libre autorizado por autores / Cambridge University Press para fines académicos",
+      "unidades": [
+        1,
+        3,
+        4
+      ]
+    }
+  ],
+  "T227": [
+    {
+      "titulo": "Neural Networks and Deep Learning (DeepLearning.AI)",
+      "url": "https://www.coursera.org/learn/neural-networks-deep-learning",
+      "fuente": "Coursera / DeepLearning.AI (Prof. Andrew Ng)",
+      "idioma": "es",
+      "tipo": "Curso virtual interactivo (videos, lecturas, cuestionarios de práctica)",
+      "licencia": "Gratuito bajo modalidad de auditoría (*Free Audit*)",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Artificial Intelligence (6.034) - Chapter: Neural Nets",
+      "url": "https://ocw.mit.edu/courses/6-034-artificial-intelligence-fall-2010/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Patrick Winston)",
+      "idioma": "en",
+      "tipo": "Unidad / Clases en video y notas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T229": [
+    {
+      "titulo": "Manual de Aprendizaje de QGIS (QGIS Training Manual)",
+      "url": "https://docs.qgis.org/latest/es/docs/training_manual/",
+      "fuente": "QGIS Open Source Project Documentation",
+      "idioma": "es",
+      "tipo": "Manual tutorial interactivo y lecturas guiadas con conjuntos de datos prácticos",
+      "licencia": "CC BY-SA 3.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T230": [
+    {
+      "titulo": "Curso sobre los aspectos básicos de Android con Compose",
+      "url": "https://developer.android.com/courses/android-basics-compose/course?hl=es-419",
+      "fuente": "Google Developers / Android Training",
+      "idioma": "es",
+      "tipo": "Curso oficial interactivo (lecciones guiadas, codelabs paso a paso y proyectos prácticos)",
+      "licencia": "Contenido de texto: CC BY 4.0; Código de muestra: Apache 2.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T302": [
+    {
+      "titulo": "Electromagnetics and Applications (6.013) - Chapters 7 & 10: Transmission Lines and Antennas",
+      "url": "https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/",
+      "fuente": "MIT OpenCourseWare (MIT OCW)",
+      "idioma": "en",
+      "tipo": "Unidad / Lecturas especializadas de libro en PDF",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T303": [
+    {
+      "titulo": "Network and Computer Security (6.857)",
+      "url": "https://ocw.mit.edu/courses/6-857-network-and-computer-security-spring-2014/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Ronald L. Rivest)",
+      "idioma": "en",
+      "tipo": "Curso completo (apuntes en PDF, diapositivas y problemas prácticos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        5
+      ]
+    },
+    {
+      "titulo": "Computer Networks: A Systems Approach - Chapter 8: Network Security",
+      "url": "https://book.systemsapproach.org/security.html",
+      "fuente": "Systems Approach (Larry Peterson & Bruce Davie)",
+      "idioma": "en",
+      "tipo": "Capítulo de libro de texto interactivo abierto",
+      "licencia": "CC BY 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T304": [
+    {
+      "titulo": "Fundamentals of Digital Image and Video Processing",
+      "url": "https://www.coursera.org/learn/digital",
+      "fuente": "Coursera / Northwestern University (Prof. Aggelos Katsaggelos)",
+      "idioma": "es",
+      "tipo": "Curso completo (videoclases, lecturas y cuestionarios)",
+      "licencia": "Gratuito bajo modalidad de auditoría (*Free Audit*)",
+      "unidades": [
+        2
+      ]
+    }
+  ],
+  "T305": [
+    {
+      "titulo": "Database Systems (6.830)",
+      "url": "https://ocw.mit.edu/courses/6-830-database-systems-fall-2010/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Samuel Madden & Michael Stonebraker)",
+      "idioma": "en",
+      "tipo": "Curso completo (lecturas y notas técnicas, código de motor de bases de datos, tareas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "T307": [
+    {
+      "titulo": "Finanzas y capital de mercado",
+      "url": "https://es.khanacademy.org/economics-finance-domain/core-finance",
+      "fuente": "Khan Academy en español",
+      "idioma": "es",
+      "tipo": "Módulo interactivo (lecciones en video, textos conceptuales y ejercicios prácticos)",
+      "licencia": "CC BY-NC-SA 3.0 US",
+      "unidades": [
+        3
+      ]
+    }
+  ],
+  "T310": [
+    {
+      "titulo": "Cryptography I",
+      "url": "https://www.coursera.org/learn/crypto",
+      "fuente": "Coursera / Stanford University (Prof. Dan Boneh)",
+      "idioma": "es",
+      "tipo": "Curso universitario de referencia mundial (videoclases, lecturas guiadas, exámenes formativos)",
+      "licencia": "Gratuito bajo modalidad de auditoría (*Free Audit*)",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Cryptography and Cryptanalysis (6.875)",
+      "url": "https://ocw.mit.edu/courses/6-875-cryptography-and-cryptanalysis-spring-2005/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Silvio Micali)",
+      "idioma": "en",
+      "tipo": "Curso avanzado (notas matemáticas de clase, tareas teóricas)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T311": [
+    {
+      "titulo": "Microwave and RF Design I: Radio Systems",
+      "url": "https://eng.libretexts.org/Bookshelves/Electrical_Engineering/Electronics/Microwave_and_RF_Design_I_-_Radio_Systems_(Steer)",
+      "fuente": "Engineering LibreTexts (Prof. Michael Steer, North Carolina State University)",
+      "idioma": "en",
+      "tipo": "Libro de texto universitario abierto",
+      "licencia": "CC BY-NC 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "titulo": "Introduction to Radar Systems (RES.LL-001)",
+      "url": "https://ocw.mit.edu/courses/res-ll-001-introduction-to-radar-systems-spring-2007/",
+      "fuente": "MIT OpenCourseWare (MIT Lincoln Laboratory)",
+      "idioma": "en",
+      "tipo": "Serie de videoclases especializadas y diapositivas",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T312": [
+    {
+      "titulo": "Fundamentals of Digital Image and Video Processing",
+      "url": "https://www.coursera.org/learn/digital",
+      "fuente": "Coursera / Northwestern University (Prof. Aggelos Katsaggelos)",
+      "idioma": "es",
+      "tipo": "Curso interactivo completo (clases en video, lecturas y problemas)",
+      "licencia": "Gratuito bajo modalidad de auditoría (*Free Audit*)",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    }
+  ],
+  "T315": [
+    {
+      "titulo": "Automatic Speech Recognition (6.345)",
+      "url": "https://ocw.mit.edu/courses/6-345-automatic-speech-recognition-spring-2003/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Jim Glass & Victor Zue)",
+      "idioma": "en",
+      "tipo": "Curso completo (apuntes detallados de clase en PDF, tareas y guías de laboratorio)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Speech Communication (6.541J)",
+      "url": "https://ocw.mit.edu/courses/6-541j-speech-communication-spring-2004/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Kenneth Stevens)",
+      "idioma": "en",
+      "tipo": "Curso universitario (lecturas y notas de cátedra)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "T316": [
+    {
+      "titulo": "Stochastic Processes, Detection, and Estimation (6.432)",
+      "url": "https://ocw.mit.edu/courses/6-432-stochastic-processes-detection-and-estimation-spring-2004/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Alan Willsky & Gregory Wornell)",
+      "idioma": "en",
+      "tipo": "Curso de posgrado (notas de lectura especializadas en PDF, problemas resueltos)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Discrete-Time Signal Processing (6.341) - Multirate and Filter Bank Modules",
+      "url": "https://ocw.mit.edu/courses/6-341-discrete-time-signal-processing-fall-2005/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Alan V. Oppenheim)",
+      "idioma": "en",
+      "tipo": "Unidad temática",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        4
+      ]
+    }
+  ],
+  "T403": [
+    {
+      "titulo": "Electromagnetics and Applications (6.013) - Section 11.1: Optical Fibers and Waveguides",
+      "url": "https://ocw.mit.edu/courses/6-013-electromagnetics-and-applications-spring-2009/",
+      "fuente": "MIT OpenCourseWare (MIT OCW)",
+      "idioma": "en",
+      "tipo": "Unidad de lectura especializada en PDF",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ],
+  "T404": [
+    {
+      "titulo": "Computer System Engineering (6.033)",
+      "url": "https://ocw.mit.edu/courses/6-033-computer-system-engineering-spring-2018/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Frans Kaashoek & Hari Balakrishnan)",
+      "idioma": "en",
+      "tipo": "Curso completo (notas temáticas de ingeniería de sistemas en PDF, tareas de diseño)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "titulo": "Distributed Computer Systems Engineering (6.824)",
+      "url": "https://ocw.mit.edu/courses/6-824-distributed-computer-systems-engineering-spring-2006/",
+      "fuente": "MIT OpenCourseWare (MIT OCW)",
+      "idioma": "en",
+      "tipo": "Curso universitario",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3
+      ]
+    }
+  ],
+  "T405": [
+    {
+      "titulo": "Introductory Digital Systems Laboratory (6.111)",
+      "url": "https://ocw.mit.edu/courses/6-111-introductory-digital-systems-laboratory-spring-2006/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Don Troxel)",
+      "idioma": "en",
+      "tipo": "Curso práctico de laboratorio (guías de laboratorio, notas teóricas en PDF, código Verilog)",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "titulo": "Computation Structures (6.004) - Arithmetic & Processor Modules",
+      "url": "https://ocw.mit.edu/courses/6-004-computation-structures-spring-2017/",
+      "fuente": "MIT OpenCourseWare (MIT OCW - Prof. Chris Terman)",
+      "idioma": "en",
+      "tipo": "Curso universitario interactivo",
+      "licencia": "CC BY-NC-SA 4.0",
+      "unidades": [
+        1,
+        2
+      ]
+    }
+  ]
+}
