@@ -259,6 +259,7 @@ class SateBuild(unittest.TestCase):
                               'cupos.html', 'cupos.js', 'cupos-comun.js', 'cupos-receptor.js', '../cupos.js',
                               'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js', 'bajas.js',
                               '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js',
+                              '../tramites/pdf-bajas.js', '../assets/vendor/pdf-lib.min.js',
                               'temarios.js', 'temarios.css', '../policore/lector.js', '../policore/lector.css'))
                 config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', html, re.S)[1])
                 for unidad, cfg in config['unidades'].items():

@@ -1100,6 +1100,14 @@ def oferta_electivas():
     return rows, curric, h["capturado"]
 
 
+def datos_bajas():
+    import base64
+    datos = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
+    datos['pdfs'] = {tipo: base64.b64encode((ROOT / 'data/gestion_escolar' / datos[tipo]).read_bytes()).decode()
+                     for tipo in ('temporal', 'definitiva')}
+    return datos
+
+
 def datos_dictamen():
     import base64, contenido
     mapa = json.loads((ROOT / 'data/mapa_curricular_saes.json').read_text(encoding='utf-8'))
@@ -1123,7 +1131,7 @@ def escribir_sate(data):
             d['areaColores'] = CATS['paleta']
         if UNIDAD == 'upiita' and nombre == 'tramites':
             d['dictamen'] = datos_dictamen()
-            d['bajas'] = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
+            d['bajas'] = datos_bajas()
         (datos / (nombre + ".json")).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     if UNIDAD == 'upiita':
         import base64
