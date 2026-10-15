@@ -5,11 +5,11 @@
 .insp-temario a{color:var(--ipn-acento);text-decoration:underline}
 
 /* Ficha centrada; en teléfono ocupa la pantalla con cabecera fija. */
-.tmr-panel{position:fixed;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 3rem));max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);border:1px solid var(--ipn-linea);border-top:6px solid var(--tmr-area,var(--ipn-acento));border-radius:var(--ipn-radio);box-shadow:0 1rem 3rem color-mix(in srgb,var(--ipn-texto) 20%,transparent);overflow:hidden}
+.tmr-panel{position:fixed;z-index:60;top:50%;left:50%;transform:translate(-50%,-50%);width:min(720px,calc(100vw - 3rem));max-height:90vh;max-height:90dvh;display:flex;flex-direction:column;background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);border:1px solid var(--ipn-linea);border-radius:12px;box-shadow:0 24px 60px -16px rgba(0,0,0,.45);overflow:hidden}
 .tmr-panel[hidden],.tmr-velo[hidden]{display:none}
-.tmr-velo{position:fixed;inset:0;z-index:59;background:rgba(0,0,0,.45)}
-.tmr-panel-enc{display:flex;align-items:center;justify-content:space-between;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-5);border-bottom:1px solid var(--ipn-linea);color:var(--ipn-tenue)}
-.tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:1.5rem;cursor:pointer}
+.tmr-velo{position:fixed;inset:0;z-index:59;background:rgba(20,12,16,.45)}
+.tmr-panel-enc{display:flex;align-items:center;justify-content:flex-end;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-5);color:var(--ipn-tenue)}
+.tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font:inherit;font-size:1.5rem;cursor:pointer}
 .tmr-panel-cuerpo{overflow:auto;overscroll-behavior:contain;padding:var(--ipn-esp-5);display:grid;gap:calc(var(--ipn-esp-5) * 1.5);line-height:1.6}
 .tmr-panel :focus-visible{outline:2px solid var(--ipn-acento);outline-offset:3px}
 .tmr-panel h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}

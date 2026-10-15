@@ -186,10 +186,9 @@
   function construirPanel() {
     if (E.panel) return E.panel;
     const x = h('button', { type: 'button', 'class': 'tmr-panel-x', 'aria-label': t('temarios.panel.cerrar'), texto: '×' });
-    const abrirEn = h('span', { texto: t('sate.guia.ficha') });
     const cuerpo = h('div', { 'class': 'tmr-panel-cuerpo' });
     const p = h('section', { 'class': 'tmr-panel', role: 'dialog', 'aria-modal': 'true', tabindex: '-1', hidden: true },
-      [h('div', { 'class': 'tmr-panel-enc' }, [abrirEn, x]), cuerpo]);
+      [h('div', { 'class': 'tmr-panel-enc' }, [x]), cuerpo]);
     const velo = h('div', { 'class': 'tmr-velo', hidden: true });
     x.addEventListener('click', () => cerrar({ foco: true }));
     velo.addEventListener('click', () => cerrar({ foco: true }));
@@ -202,7 +201,7 @@
     });
     // Fuera del <body>: no hereda el zoom de interfaz (--ui-zoom), igual que el globo de ayuda.
     document.documentElement.appendChild(velo); document.documentElement.appendChild(p);
-    E.panel = p; E.velo = velo; E.cuerpo = cuerpo; E.abrirEn = abrirEn;
+    E.panel = p; E.velo = velo; E.cuerpo = cuerpo;
     return p;
   }
   function ajustarPanel() {
