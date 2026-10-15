@@ -15,7 +15,7 @@
 .tmr-panel h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}
 .tmr-panel h3{margin:0 0 var(--ipn-esp-4);font-size:var(--ipn-tamano-l)}
 .tmr-ficha-enc p{margin:var(--ipn-esp-3) 0 0}
-.tmr-cifras{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-4)}
+.tmr-cifras{display:grid;grid-template-columns:repeat(auto-fit,minmax(6rem,1fr));gap:var(--ipn-esp-4)}
 .tmr-cifras div{display:grid;align-content:start;gap:var(--ipn-esp-1)}
 .tmr-cifras strong{font-size:var(--ipn-tamano-l);white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .tmr-cifras small{color:var(--ipn-tenue)}

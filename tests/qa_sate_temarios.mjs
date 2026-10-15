@@ -72,7 +72,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   igual(doc.secciones.map(s => s.id), ['objetivo', 'contenidos', 'orientacion', 'evaluacion', 'bibliografia']);
   igual(doc.secciones.map(s => s.tipo), ['texto', 'unidades', 'texto', 'texto', 'bibliografia']);
   assert.equal(doc.secciones[1].rotulo, 'Unidad');
-  igual(doc.metadatos.map(m => m.etiqueta), ['Nivel', 'Tipo'], 'sin horas ni créditos en el OCR no hay chips vacíos');
+  igual(doc.metadatos.map(m => m.etiqueta), ['Nivel', 'Tipo', 'Créditos TEPIC', 'Horas por semana'], 'créditos y horas faltantes se completan con el plan del SAES; no hay chips vacíos');
   assert.equal(doc.metadatos[1].valor, 'Obligatoria');
   assert.equal(doc.avisos[0].tipo, 'ocr');
   assert.match(doc.avisos[0].texto, /Transcripción automática del programa sintético/);
@@ -130,8 +130,26 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(Object.values(piloto).flat().length, 55);
   for (const clave of ['B213', 'B211', 'B215']) assert.equal(piloto[clave], undefined);
   assert.ok(piloto.B103.some(r => r.url.endsWith('_(Kuttler)')), 'conserva el paréntesis de LibreTexts');
-  assert.equal(T.frase('Primera oración. Segunda oración.'),'Primera oración.');
-  assert.ok(T.frase('Objetivo '.repeat(100)).length <= 260);
+}
+
+/* ---------- 1b. Descripciones redactadas (DESC1) ---------- */
+{
+  for (const carrera of ['bionica', 'mecatronica', 'telematica']) {
+    const desc = JSON.parse(leer(`data/temarios/upiita/descripciones/${carrera}.json`));
+    const compilado = registros(carrera), claves = new Set(compilado.map(r => r.clave.toUpperCase()));
+    for (const [clave, d] of Object.entries(desc)) {
+      assert.ok(claves.has(clave), `${carrera}: la descripción ${clave} no tiene temario`);
+      const n = d.descripcion.trim().split(/\s+/).length;
+      assert.ok(n >= 25 && n <= 45, `${clave}: ${n} palabras`);
+      assert.doesNotMatch(d.descripcion, /aprender[aá]s|te ayudar[aá]|necesarios para/i, clave);
+      assert.equal(typeof d.revisada, 'boolean'); assert.ok(d.base);
+      assert.equal(compilado.find(r => r.clave === clave).descripcion, d.descripcion, `${clave}: no llegó a la ficha`);
+    }
+    assert.ok(Object.keys(desc).length > 60, carrera + ': descripciones incompletas');
+  }
+  // Créditos y horas de respaldo desde el plan del SAES
+  const b101 = bionica.find(r => r.clave === 'B101');
+  assert.equal(b101.creditos.tepic, 7.5); assert.equal(b101.horas.teoria_semana, 3); assert.equal(b101.horas.practica_semana, 1.5);
 }
 
 /* ---------- 2. Lector de PoliCORE con un documento que no es temario ---------- */
@@ -311,6 +329,8 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(panel.querySelector('.tmr-ficha-enc h2').textContent, indice.materias.B101.n);
   assert.equal(panel.querySelector('.pc-lector'), null, 'la ficha breve no monta el lector oficial');
   assert.equal(panel.querySelectorAll('.tmr-cifras strong').length, 3);
+  assert.equal(panel.querySelector('.tmr-ficha-enc .tmr-descripcion').textContent, bionica.find(r => r.clave === 'B101').descripcion);
+  assert.ok(!/Comprender, a través/.test(panel.textContent.split('Ver programa')[0]), 'la ficha no muestra el objetivo en bruto');
   assert.equal(c.SATE_DATA, undefined, 'abre desde la Guía sin cargar los datos del mapa');
   assert.ok(bionica.find(r => r.clave === 'B101').area?.color, 'el compilador proporciona el acento');
   const estilos = {};

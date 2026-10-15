@@ -22,6 +22,7 @@ from cuenta import identidades
 UCONF.update({k: v for k, v in identidades()[UNIDAD].items() if k in ('siglas', 'nombre')})
 if UNIDAD != "upiita":
     SRC, CUR, OUT = UNI_DIR / "horarios_saes.json", UNI_DIR / "mapa_curricular_saes.json", ROOT / "web" / f"horarios-{UNIDAD}.html"
+HORAS_PLAN = {}   # (carrera, clave) -> (teoría, práctica) por semana según el plan del SAES (solo cifras semanales)
 PLANES = {}   # carrera -> plan vigente (otras unidades: el más frecuente en la oferta)
 OPTA = json.loads((UNI_DIR / "optativas.json").read_text(encoding="utf-8")) if (UNI_DIR / "optativas.json").exists() else {}
 CREDITOS_OFICIALES = json.loads((ROOT / "data/creditos_oficiales.json").read_text(encoding="utf-8"))["unidades"].get(UNIDAD, {})
@@ -695,6 +696,8 @@ def load_maps(offer, upiita=True, extra=None):
         c = carrera_plan(c, p)
         if plan.get(c) == p:
             cur.setdefault(c, {})[clave.upper()] = [nom, dato["cr"], int(niv), tipo_letra(tipo), dato]
+            if float(_ht) <= 10 and float(_hp) <= 10:
+                HORAS_PLAN[(c, clave.upper())] = (float(_ht), float(_hp))
             if dato.get("cr_calculado"):
                 print(f"créditos {UNIDAD} {c}/{p} {clave}: SAES/SATCA={cred}; T={_ht}, P={_hp} h/semestre; TEPIC={dato['cr']:.8f} (18 semanas)")
     for c, extra_c in (extra or {}).items():
@@ -946,9 +949,20 @@ def escribir_temarios(data, datos):
         cur = mapa.get("cur", {})
         layout = mapa.get("layout", {})
         salida = []
+        # Descripciones redactadas aparte (no oficiales): el extractor de temarios no las toca.
+        arch_desc = ROOT / "data/temarios" / UNIDAD / "descripciones" / archivo.name
+        descripciones = json.loads(arch_desc.read_text(encoding="utf-8")) if arch_desc.exists() else {}
         for m in d["materias"]:
             clave = m["clave"].upper()
             m = {**m, "clave": clave}
+            desc = descripciones.get(clave, {}).get("descripcion")
+            if desc:
+                m["descripcion"] = desc
+            if clave in cur and not any(k in (m.get("creditos") or {}) for k in ("tepic", "satca")) and cur[clave][1] > 0:
+                m["creditos"] = {**(m.get("creditos") or {}), "tepic": cur[clave][1], "fuente": "plan"}
+            horas = HORAS_PLAN.get((letra, clave))
+            if horas and not any(k in (m.get("horas") or {}) for k in ("teoria_semana", "practica_semana")) and sum(horas) > 0:
+                m["horas"] = {**(m.get("horas") or {}), "teoria_semana": horas[0], "practica_semana": horas[1], "fuente": "plan"}
             area = layout.get("cat", {}).get(clave)
             if "cat" not in layout:
                 caja = next((b for b in layout.get("boxes", []) if b[4] == clave), None)

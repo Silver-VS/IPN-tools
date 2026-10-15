@@ -102,11 +102,6 @@
       r && ['titulo','url','fuente','idioma','tipo','licencia'].every(k => typeof r[k] === 'string' && r[k].trim()) &&
       /^https?:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(r.url) && (r.unidades === undefined || Array.isArray(r.unidades) && r.unidades.every(n => Number.isInteger(n) && n > 0))));
   }
-  function frase(objetivo) {
-    const s = String(objetivo || '').replace(/\s+/g, ' ').trim().split(/(?<=[.!?])\s/)[0];
-    if (s.length <= 260) return s;
-    return s.slice(0, 257).replace(/\s+\S*$/, '') + '…';
-  }
   function tituloTema(s, siglas = raiz.SATE_CONFIG?.siglasTemarios || []) {
     const n = String(s || '').trim().replace(/[.\s]+$/, '');
     if (n !== n.toLocaleUpperCase('es')) return n;
@@ -114,7 +109,7 @@
     const oracion = n.toLocaleLowerCase('es').replace(/\p{L}+/gu, p => conocidas.has(p.toUpperCase()) ? p.toUpperCase() : p);
     return oracion.charAt(0).toUpperCase() + oracion.slice(1);
   }
-  raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace, recursosValidos, frase, tituloTema };
+  raiz.SateTemarios = { norm, claveNorm, documento, terminos, buscarEnRegistro, filtrar, agrupar, enlace, recursosValidos, tituloTema };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -250,8 +245,8 @@
     const dato = (valor, etiqueta) => h('div', {}, [h('strong', {texto:valor}), h('small', {texto:t('sate.guia.' + etiqueta)})]);
     const horas = m.horas || {}, cr = m.creditos || {};
     E.cuerpo.replaceChildren(...[
-      h('header', {'class':'tmr-ficha-enc'}, [h('h2', {texto:m.nombre}), h('p', {'class':'tmr-meta', texto:[m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel',{n:m.nivel}) : null].filter(Boolean).join(' · ')}), h('p', {texto:frase(m.objetivo)})]),
-      h('div', {'class':'tmr-cifras'}, [dato(cr.tepic != null || cr.satca != null ? num(cr.tepic ?? cr.satca) : '—','creditos'), dato(horas.teoria_semana != null || horas.practica_semana != null ? num((horas.teoria_semana || 0) + (horas.practica_semana || 0)) : '—','horas'), dato(m.tipo ? t('temarios.tipo.' + m.tipo) : '—','tipo')]),
+      h('header', {'class':'tmr-ficha-enc'}, [h('h2', {texto:m.nombre}), h('p', {'class':'tmr-meta', texto:[m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel',{n:m.nivel}) : null].filter(Boolean).join(' · ')}), m.descripcion ? h('p', {'class':'tmr-descripcion', texto:m.descripcion}) : null].filter(Boolean)),
+      h('div', {'class':'tmr-cifras'}, [cr.tepic != null || cr.satca != null ? dato(num(cr.tepic ?? cr.satca),'creditos') : null, horas.teoria_semana != null || horas.practica_semana != null ? dato(num((horas.teoria_semana || 0) + (horas.practica_semana || 0)),'horas') : null, m.tipo ? dato(t('temarios.tipo.' + m.tipo),'tipo') : null].filter(Boolean)),
       h('section', {'class':'tmr-bloque'}, [h('h3', {texto:t('sate.guia.veras')}), h('ol', {'class':'tmr-pasos'}, (m.contenidos || []).map((u, i) => h('li', {}, [h('span', {'class':'tmr-paso', texto:String(i+1)}), h('div', {}, [h('h4',{texto:tituloTema(u.titulo)}), ...(u.subtemas || []).slice(0,5).map(s => h('p', {texto:tituloTema(s)})), (u.subtemas || []).length > 5 ? h('small', {texto:t('sate.guia.mas_temas', {n:u.subtemas.length-5})}) : null])])))]),
       recursos.length ? h('section', {'class':'tmr-bloque'}, [h('h3',{texto:t('sate.guia.recursos')}), ...recursos.map(x => h('a', {'class':'tmr-recurso', href:x.url, target:'_blank', rel:'noopener noreferrer'}, [h('small', {texto:[x.fuente,x.idioma,x.tipo].join(' · ')}), h('span',{texto:x.titulo+' ↗'})]))]) : null,
       h('footer', {'class':'tmr-bloque'}, [oficial, h('p', {'class':'tmr-nota', texto:t('sate.guia.nota')})])

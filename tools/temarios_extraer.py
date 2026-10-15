@@ -337,7 +337,9 @@ def generar(recursos=RECURSOS, root=ROOT):
                'Se asigna clave con puntuación ≥ 0.86 y margen al segundo candidato ≥ 0.035; se revisan puntuaciones < 0.98. No es una probabilidad estadística.',
                'El tipo de carpeta (optativa/elegible) prevalece sobre el SAES; los desacuerdos se registran. El resto usa el tipo SAES. Créditos y horas proceden exclusivamente del OCR.',
                'Bibliografía sin columnas inequívocas B/C mantiene tipo vacío. Una línea OCR por entrada puede conservar referencias partidas; requiere cotejo editorial. Los contenidos sin numeración conservan número vacío.',
-               'Ingeniería en Energía queda fuera: no hay fuente disponible.', '']
+               'Ingeniería en Energía queda fuera: no hay fuente disponible.', '',
+               '## 1b. Descripciones breves (DESC1)', '',
+               '`data/temarios/upiita/descripciones/<carrera>.json` guarda, por clave, una descripción de 25 a 45 palabras redactada a partir del objetivo y de los títulos de unidades del programa sintético (`base`). **No son textos oficiales del IPN y están pendientes de revisión humana** (`revisada: false`). El extractor no las sobrescribe; `tools/build_sate.py` las une a cada materia. Se omiten las materias con temario parcial o vacío (B207, B412, M121, M414, M415, M416, M418, T221). Si una materia no tiene descripción, la ficha no muestra el objetivo en bruto. Créditos y horas ausentes en el temario se completan con el plan del SAES (cifras semanales) o se ocultan.', '']
     resumen = []
     for numero, (carrera, letra) in enumerate(CARRERAS.items(), 2):
         rutas = sorted((recursos / carrera / '_ocr').rglob('*.md'))

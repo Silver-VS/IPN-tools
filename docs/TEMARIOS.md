@@ -14,6 +14,10 @@ El tipo de carpeta (optativa/elegible) prevalece sobre el SAES; los desacuerdos 
 Bibliografía sin columnas inequívocas B/C mantiene tipo vacío. Una línea OCR por entrada puede conservar referencias partidas; requiere cotejo editorial. Los contenidos sin numeración conservan número vacío.
 Ingeniería en Energía queda fuera: no hay fuente disponible.
 
+## 1b. Descripciones breves (DESC1)
+
+`data/temarios/upiita/descripciones/<carrera>.json` guarda, por clave, una descripción de 25 a 45 palabras redactada a partir del objetivo y de los títulos de unidades del programa sintético (`base`). **No son textos oficiales del IPN y están pendientes de revisión humana** (`revisada: false`). El extractor no las sobrescribe; `tools/build_sate.py` las une a cada materia. Se omiten las materias con temario parcial o vacío (B207, B412, M121, M414, M415, M416, M418, T221). Si una materia no tiene descripción, la ficha no muestra el objetivo en bruto. Créditos y horas ausentes en el temario se completan con el plan del SAES (cifras semanales) o se ocultan.
+
 ## 2. Bionica
 
 Plan 09: **72 / 79** materias SAES con temario; 74 OCR de entrada.

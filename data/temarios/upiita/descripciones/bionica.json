@@ -1,0 +1,352 @@
+{
+ "B103": {
+  "descripcion": "Estudia los sistemas de ecuaciones lineales, los espacios vectoriales y las transformaciones lineales, con énfasis en la eliminación de Gauss-Jordan, los valores y vectores propios y los espacios con producto interior.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B111": {
+  "descripcion": "Introduce el conocimiento de las partes del cuerpo humano mediante modelos anatómicos y material audiovisual, con unidades de osteología, artrología, miología, sistema nervioso y corazón con grandes vasos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B108": {
+  "descripcion": "Introduce los métodos estadísticos para tomar decisiones a partir de una muestra de datos: probabilidad, bioestadística, inferencia estadística, análisis de varianza y regresión lineal, aplicados a problemas de la ingeniería biónica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B101": {
+  "descripcion": "Estudia la organización estructural y funcional de la célula: sus bases físicas y químicas, el almacenamiento y la expresión de la información genética, y su relación con la fisiología y la anatomía de los organismos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B114": {
+  "descripcion": "Analiza el campo teórico de la bioética, los dilemas bioéticos, la relación con el medioambiente y la cultura tecnocientífica, mediante lectura y debate crítico de textos sobre el impacto social, ético y tecnológico de la profesión.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B104": {
+  "descripcion": "Desarrolla el cálculo diferencial e integral de una variable y sus aplicaciones, a partir de los números reales y complejos, las funciones, los límites y la continuidad, e incluye sucesiones y series.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B105": {
+  "descripcion": "Aborda el cálculo de funciones reales de varias variables, su derivación e integración, las funciones vectoriales de variable real y el cálculo vectorial, para plantear y resolver problemas de ingeniería.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B115": {
+  "descripcion": "Analiza los principios y las estrategias del desarrollo sustentable: la relación entre población, suelo, agua y agricultura, la contaminación, los recursos naturales y el marco legal con los sistemas de gestión ambiental.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B106": {
+  "descripcion": "Aplica la mecánica clásica al modelado de sistemas en problemas de la biónica: cinemática, leyes de Newton, leyes de conservación, sistemas de partículas y aplicaciones de la mecánica a la biónica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B107": {
+  "descripcion": "Estudia los conceptos de la electrostática, la corriente eléctrica y la magnetostática, y los aplica a problemas de la ingeniería biónica en los niveles macroscópico y microscópico.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B112": {
+  "descripcion": "Introduce la programación con Matlab y el diseño asistido por computadora: dibujo, CAD, CAM y CAE, diseño en dos y tres dimensiones, y documentación y ensamble de elementos mecánicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B116": {
+  "descripcion": "Desarrolla la comunicación oral y escrita en inglés, en registro formal e informal, mediante la consolidación gramatical de los tiempos presente, pasado y futuro y de los verbos modales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B109": {
+  "descripcion": "Estudia las generalidades de la metrología, las mediciones eléctricas, mecánicas y de temperatura, y el manejo de la incertidumbre para obtener mediciones confiables y presentar adecuadamente datos y resultados.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B110": {
+  "descripcion": "Introduce la programación orientada a objetos: estructura de un programa, sentencias de control, arreglos, cadenas, estructuras y apuntadores, objetos y clases, herencia, polimorfismo y paradigmas de programación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B209": {
+  "descripcion": "Analiza el funcionamiento de las estructuras biológicas del ser humano mediante la biofísica y la simulación computacional: fenómenos bioeléctricos, biofísica de los sentidos, física médica y biofísica cardiaca y respiratoria.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B213": {
+  "descripcion": "Aborda la simulación de modelos matemáticos de sistemas físicos y biológicos, y la metodología para estudiar sistemas biológicos con el fin de generar y validar sistemas biomiméticos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B210": {
+  "descripcion": "Estudia los mecanismos moleculares de la herencia y de la síntesis de proteínas: replicación del ADN, expresión y regulación genética en células procarióticas y eucarióticas, bioinformática y técnicas de biología molecular.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B206": {
+  "descripcion": "Estudia la composición y las transformaciones químicas de los seres vivos: estructura y metabolismo de aminoácidos, proteínas, carbohidratos, lípidos y ácidos nucleicos, y su relación con la bioenergética.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B201": {
+  "descripcion": "Estudia las ecuaciones diferenciales de primer orden y de orden superior, su resolución por series de potencias, la transformada de Laplace y los sistemas de ecuaciones diferenciales, aplicados a problemas de ingeniería biónica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B205": {
+  "descripcion": "Estudia los fenómenos bioquímicos desde las leyes de la fisicoquímica: la primera ley de la termodinámica y la termoquímica, la segunda y tercera leyes, el equilibrio químico, las soluciones y la electroquímica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B208": {
+  "descripcion": "Analiza las funciones de los órganos, aparatos y sistemas del cuerpo humano: medio interno y sangre, función cardiaca y renal, fisiología de la respiración y fisiología muscular y nerviosa.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B202": {
+  "descripcion": "Estudia las funciones de variable compleja, su derivación e integración, el cálculo de integrales y las series y transformadas de Fourier y Zeta, para resolver problemas aplicados a la ingeniería.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B204": {
+  "descripcion": "Evalúa los fenómenos presentes en dispositivos ópticos y optoelectrónicos mediante la óptica geométrica, la propagación de la luz, la polarización, la interferencia y la difracción, e introduce la física moderna.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B216": {
+  "descripcion": "Continúa el desarrollo de la comunicación oral y escrita en inglés con vocabulario y expresiones de mayor complejidad: verbos modales, infinitivo y gerundio, voz pasiva, discurso indirecto, condicionales y cláusulas relativas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B211": {
+  "descripcion": "Aborda la formulación de proyectos de biónica a partir del estudio de mercado, las características y la localización de la planta, los estudios del proceso de investigación y el desarrollo de un proyecto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B215": {
+  "descripcion": "Evalúa el papel del líder y del emprendedor mediante las teorías de liderazgo, el desarrollo de habilidades intra e interpersonales, el trabajo en equipo, el manejo de conflictos y la negociación, y el plan de vida y carrera.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B203": {
+  "descripcion": "Analiza las ondas electromagnéticas y la radiación de sistemas a partir de la ley de inducción de Faraday y las ecuaciones de Maxwell, con unidades sobre ondas electromagnéticas y radiación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B212": {
+  "descripcion": "Estudia la mejora de la calidad en procesos productivos mediante técnicas estadísticas de control, la administración orientada a procesos Kaizen, la reingeniería y la certificación ISO 9000-2008.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B301": {
+  "descripcion": "Analiza métodos numéricos según sus criterios de convergencia y estabilidad: solución de ecuaciones no lineales, sistemas de ecuaciones, interpolación, diferenciación e integración numéricas y ecuaciones diferenciales ordinarias.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B313": {
+  "descripcion": "Aborda la generación de instrumentos biomédicos con base en la fisioanatomía humana: técnicas de medición, instrumentos para variables bioeléctricas y biomecánicas, y para la generación de tensiones, corrientes o vibraciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B311": {
+  "descripcion": "Evalúa la interacción de la radiación de baja y alta frecuencia con los tejidos biológicos: parámetros magnéticos de sustancias biológicas, efectos de los campos electromagnéticos, imagenología y aplicaciones terapéuticas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B305": {
+  "descripcion": "Evalúa la biocompatibilidad de los biomateriales a partir de su estructura y propiedades: caracterización, sustitución de tejidos y tópicos selectos, tras una introducción a los materiales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B306": {
+  "descripcion": "Aborda la generación de sistemas de control inteligentes con base en la lógica difusa, las redes neuronales artificiales y los sistemas neurodifusos, con unidades de sistemas difusos, sistemas neuronales y control neurodifuso.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B302": {
+  "descripcion": "Estudia el control de la energía eléctrica en aplicaciones electrónicas: diodos, transistores BJT, JFET y MOSFET, amplificadores operacionales, optoelectrónica y circuitos integrados de uso específico.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B309": {
+  "descripcion": "Aborda el diseño de circuitos electrónicos para filtros activos, amplificación y acondicionamiento de señales: optotiristores, circuitos de potencia, amplificadores con BJT y MOSFET, y aplicaciones de amplificadores operacionales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B303": {
+  "descripcion": "Estudia el diseño de circuitos digitales en dispositivos lógicos programables: sistemas digitales, circuitos combinatorios y secuenciales, máquinas de estado finito e introducción al diseño a nivel de transferencia de registros (RTL).",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B308": {
+  "descripcion": "Desarrolla la comunicación en inglés conforme al nivel B2 del Marco Común Europeo de Referencia, con consolidación gramatical y de vocabulario, lectura, escritura, práctica auditiva y expresión oral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B312": {
+  "descripcion": "Evalúa los mecanismos biomiméticos con base en los principios de la mecánica, con unidades de análisis cinemático, estático y dinámico de mecanismos y de transmisión de potencia.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B307": {
+  "descripcion": "Desarrolla la comunicación oral y escrita asertiva a partir de los fundamentos de emisor, receptor y mensaje: comunicación, ciencia y sociedad, y estrategias de comunicación escrita, oral y profesional.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B316": {
+  "descripcion": "Aborda la construcción de controladores para sistemas biónicos en dispositivos programables: sistemas de control no lineal, controladores embebidos, sistemas en tiempo real y casos de estudio.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B323": {
+  "descripcion": "Estudia el diseño de entornos de trabajo con base en factores humanos: antropometría, ergonomía para el diseño, carga física y mental, y ergonomía y biodinámica laboral.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B319": {
+  "descripcion": "Evalúa los instrumentos usados en ciencias de la salud según guías de práctica clínica, gestión y utilidad: desarrollo de instrumentos biomédicos, características dinámicas, propagación de errores, calibración y compensación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B324": {
+  "descripcion": "Aborda el diseño de instrumentos para medir y monitorear parámetros biológicos en clínica y laboratorio y para rehabilitación: señales bioquímicas, manutención de vida, educación motora y arquitectura clínica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B320": {
+  "descripcion": "Introduce la implementación de algoritmos computacionales inteligentes en el área de la biónica mediante herramientas matemáticas rigurosas, con unidades de introducción a la inteligencia artificial, conocimiento y razonamiento, aprendizaje y aplicaciones.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B317": {
+  "descripcion": "Aborda el diseño de prótesis externas de miembro superior e inferior con base en la biomecánica del movimiento humano: dinámica inversa y directa, biodinámica y electromiografía en sistemas protésicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B321": {
+  "descripcion": "Estudia la construcción de robots bioinspirados o biomiméticos: conceptos básicos de robótica, cinemática y control de robots móviles, sistemas embebidos de control y control de aprendizaje evolutivo.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B322": {
+  "descripcion": "Estudia la validación de elementos mecánicos de transmisión en sistemas biomiméticos mediante simulación asistida por computadora, con cargas axiales, combinadas y térmicas, y teorías de falla dinámica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B318": {
+  "descripcion": "Aborda la implementación de sistemas de visión artificial con algoritmos de análisis de imágenes: reconocimiento automático de formas, técnicas de reconocimiento, elementos de adquisición de imagen y aplicaciones específicas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B310": {
+  "descripcion": "Analiza escenas de sistemas biológicos o industriales con técnicas de procesamiento digital de imágenes: preprocesamiento y filtrado, transformaciones, extracción y restauración de regiones, y análisis de imágenes.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B314": {
+  "descripcion": "Evalúa técnicas de procesamiento de señales biológicas en sistemas digitales: fundamentos del procesamiento de señales biológicas, filtros digitales, análisis en los dominios del tiempo y la frecuencia, y análisis multidimensional.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B315": {
+  "descripcion": "Aborda la implementación de sensores y actuadores en sistemas biónicos: transductores, actuadores, circuitos de interfaz y acondicionamiento de señal, principios físicos del sensado y clasificación de los sensores.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B304": {
+  "descripcion": "Estudia el diseño de controladores y compensadores analógicos y digitales en sistemas de control retroalimentado mediante técnicas de control clásico, con fundamentos de sistemas de control y de control digital.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B403": {
+  "descripcion": "Estudia el diseño de elementos biomecánicos con criterios de resistencia y rigidez de la mecánica de materiales: bioestática, carga axial, esfuerzos de corte, flexión y cargas combinadas.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B402": {
+  "descripcion": "Estudia la implementación de aplicaciones electrónicas en un microcontrolador con código optimizado, a partir de su estructura y operación y de sus unidades de interfaz, temporización, convertidor analógico-digital y protocolos de comunicación.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B404": {
+  "descripcion": "Aborda la construcción de elementos biomiméticos mediante procesos de manufactura, recubrimiento y acabado: maquinado con programación CNC, tratamientos térmicos, moldeado y unión, y prototipado rápido.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B401": {
+  "descripcion": "Valora controladores para sistemas biónicos con herramientas de control robusto, a partir del análisis dimensional y de las relaciones dimensionales, e incluye el diseño de controladores robustos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B406": {
+  "descripcion": "Analiza la normatividad vigente en biónica, la propiedad intelectual y los contratos de transferencia de tecnología, con base en la gestión tecnológica y en casos de legislación en biónica.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B408": {
+  "descripcion": "Estudia el diseño de biosensores según su aplicación y su elemento sensor: clasificación por respuesta físico-química y por elemento sensor, biosensores enzimáticos, biochips y microarreglos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B415": {
+  "descripcion": "Aborda la manipulación digital de imágenes médicas o biotecnológicas para resaltar o cuantificar características, mediante tomografía axial computarizada, radiología, ecografía y ultrasonido, resonancia magnética y tópicos de imagenología.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B409": {
+  "descripcion": "Estudia la ingeniería del factor humano en ambientes de trabajo mediante el modelado de sistemas de control biológicos: ingeniería ergonómica, análisis y diseño de sistemas de control humano.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B407": {
+  "descripcion": "Aborda la instrumentación y las condiciones requeridas en la nutrición, el metabolismo y el crecimiento de microorganismos que manipulan materiales orgánicos e inorgánicos, según las necesidades de productores de bienes y servicios.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B413": {
+  "descripcion": "Aborda el diseño de sistemas de control de robots con base en modelos neuronales biológicos: introducción a la neurorobótica, planeación de trayectorias, neurocomputación básica y osciladores neuronales.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B414": {
+  "descripcion": "Estudia el diseño de sistemas de telemetría inalámbrica según las características de las señales fisiológicas y biotecnológicas: protocolos de transmisión, ZigBee, Bluetooth, banda ultraancha (UWB) y Wi-Fi.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B405": {
+  "descripcion": "Estudia la implementación de algoritmos de reconocimiento de objetos, personas y señales a partir de sus descriptores: diseño de un reconocedor de patrones, clasificadores lineales y no lineales, métodos estocásticos y clustering.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B502": {
+  "descripcion": "Evalúa las condiciones de sistemas biológicos con procedimientos biotecnológicos y clínicos: origen y tipos de bioseñales, estimulación eléctrica funcional, potenciales evocados, interfaces electrónicas y procesos biotecnológicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B503": {
+  "descripcion": "Evalúa las herramientas metodológicas de la biomecánica en el movimiento de los seres vivos con base en la física newtoniana: biomecánica articular, del movimiento y de fluidos corporales, y diseño de espacios de trabajo.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B501": {
+  "descripcion": "Aborda la construcción de robots biomiméticos con base en sistemas biológicos motrices: principios de diseño biológico motriz, cinemática y dinámica de un robot biomimético, técnicas de locomoción y tópicos emergentes.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B504": {
+  "descripcion": "Aborda la elaboración de un protocolo de investigación con base en el método científico: planteamiento del problema, protocolo del proyecto de trabajo terminal y presentación de trabajos científicos.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B505": {
+  "descripcion": "Desarrolla el diseño del trabajo terminal en su contexto profesional: estado del arte y marco teórico, normas internacionales, análisis de requerimientos, diseño detallado y documentación, y defensa del diseño propuesto.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ },
+ "B506": {
+  "descripcion": "Desarrolla la construcción de un prototipo biónico a partir del proyecto diseñado en Trabajo Terminal I, con administración y documentación del proyecto, preparación de la defensa oral y análisis de resultados.",
+  "base": "objetivo y unidades del programa sintético",
+  "revisada": false
+ }
+}

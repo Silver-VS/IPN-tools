@@ -1,6 +1,12 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-15 · Claude (DESC1)
+
+| Claves | Cambio |
+|---|---|
+| Descripciones de materias (`data/temarios/upiita/descripciones/*.json`) | La ficha muestra una descripción breve redactada por materia (no oficial; `revisada: false`, pendiente de revisión humana) en lugar del objetivo recortado; el objetivo completo sigue en «Ver programa oficial completo». Créditos y horas faltan: se toman del plan del SAES o se ocultan. |
+
 ## 2026-10-15 · Codex (GUIA1)
 
 | Claves | Cambio |
