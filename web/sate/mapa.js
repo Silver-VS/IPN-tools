@@ -1,4 +1,4 @@
-function renderMap(){const r=conSim(usaSim('mapa'),()=>conPlan(renderMap0));SATE.temarios?.pintarModo?.();return r}
+function renderMap(){const r=conSim(usaSim('mapa'),()=>conPlan(renderMap0));return r}
 /* Cadena de requisitos y dependientes de la materia bajo el cursor (o de la fila elegida en «requisitos»).
    Devuelve null sin resaltado, o un Set con .pre (antes) y .post (después). Pura: solo usa sus argumentos. */
 function calcHot(mapHover,reqHover,pre){
@@ -161,7 +161,6 @@ function renderList(){
         `<span class="tl-acciones">${ayudaCreditos(k)}<button type="button" class="tl-want" data-lwant="${k}" aria-pressed="${w}"${(done||ob)&&!(PLAN_DOS_PERIODOS&&paso!=null&&paso!==S.planPaso)||isElec(k)?' disabled':''} aria-label="${PLAN_DOS_PERIODOS&&paso!=null&&paso!==S.planPaso?'Ver acciones de':w?'Quitar':'Agregar'} ${esc(pretty(c[k][0]))}">${paso!=null?(PLAN_DOS_PERIODOS?(paso===0&&S.planPaso===1?'en ':'')+esc(planEtiqueta(paso)):'✓'):'+'}</button></span>`+
         (open?`<div class="tl-more">${inspParts(k).l2}${PLAN_DOS_PERIODOS?`<div class="insp-act">${planAcciones(k)}</div>`:''}</div>`:'')+'</div>'}).join('')+'</div></section>').join('');
   montarAyudasCreditos();
-  SATE.temarios?.pintarModo?.();
 }
 
 function renderAyudaPrimeraVisita(){

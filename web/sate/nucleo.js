@@ -1063,18 +1063,13 @@ document.addEventListener('click',e=>{
   if((S.mapFocus||S.reqHover)&&!e.target.closest('#map,#insp,#lineas,#chosen-req')){S.mapFocus=false;S.mapHover=null;S.reqHover=null;resaltarMapa()}
   const requisito=e.target.closest('[data-req]');
   if(requisito){S.mapHover=requisito.dataset.req;S.reqHover=requisito.dataset.piden.split(' ');S.mapFocus=true;resaltarMapa();return}
-  // Modo «Explorar unidades de aprendizaje»: abrir el temario no selecciona nada para el horario (web/sate/temarios.js).
-  const explorar=SATE.temarios?.explorando?.();
-  const bx=e.target.closest('[data-box]');if(bx){S.reqHover=null;if(explorar)SATE.temarios.abrir(bx.dataset.box,bx);else toggleBox(bx.dataset.box);return}
-  const ob=e.target.closest('[data-obox]');if(ob){S.reqHover=null;if(explorar)SATE.temarios.abrir(ob.dataset.obox,ob);else toggleBox(ob.dataset.obox);return}
+  const bx=e.target.closest('[data-box]');if(bx){S.reqHover=null;toggleBox(bx.dataset.box);return}
+  const ob=e.target.closest('[data-obox]');if(ob){S.reqHover=null;toggleBox(ob.dataset.obox);return}
   // táctil: tocar un grupo de la oferta muestra (o retira) su vista previa en el horario
   const op=e.target.closest('#offer .opt');if(op&&tactil()&&!e.target.closest('button,input,a,label,select,textarea,summary')){S.hover=S.hover===op.dataset.k?null:op.dataset.k;renderCal();return}
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
   if(d.expand!==undefined){const k=+d.expand;S.expand.has(k)?S.expand.delete(k):S.expand.add(k);renderOffer();return}
-  if(d.mmodo){SATE.temarios?.fijarModo(d.mmodo);return}
-  if(d.lfocus&&explorar){SATE.temarios.abrir(d.lfocus,t);return}
-  if(d.lwant&&explorar)return;
   if(d.lfocus){S.lfocus=S.lfocus===d.lfocus?null:d.lfocus;conSim(usaSim('mapa'),()=>conPlan(renderList));return}
   if(d.lwant){toggleBox(d.lwant);return}
   if(d.fwant){toggleBox(d.fwant);return}
@@ -1109,7 +1104,7 @@ document.addEventListener('click',e=>{
   else if(d.useg!==undefined){const r=S.gen.top[+d.useg], to=d.to==='+'?nextPlan():d.to;ws().plans[to]=ws().plans[to]||{sel:[],own:JSON.parse(JSON.stringify(plan().own))};ws().plans[to].sel=r.cs.map(keyOf);ws().plan=to;refresh();renderGen()}
   else if(d.peekg!==undefined){const r=S.gen.top[+d.peekg];S.hover=null;const keep=plan().sel;plan().sel=r.cs.map(keyOf);renderCal();plan().sel=keep;$('#stats').insertAdjacentHTML('afterbegin','<span class="warn">Vista previa, no guardada.</span>')}
 });
-document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const k=bx.dataset.box;if(SATE.temarios?.explorando?.()){SATE.temarios.abrir(k,bx);return}toggleBox(k);document.querySelector(`[data-box="${CSS.escape(k)}"]`)?.focus()}});
+document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const k=bx.dataset.box;toggleBox(k);document.querySelector(`[data-box="${CSS.escape(k)}"]`)?.focus()}});
 document.addEventListener('change',e=>{if(e.target.dataset.note){const k=e.target.dataset.note,m=ws().marks;m[k]={...(m[k]||{}),n:e.target.value.trim()};save()}});
 $('#chosen-req').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const fila=e.target.closest('[data-req]');if(fila){S.mapHover=fila.dataset.req;S.reqHover=fila.dataset.piden.split(' ');S.mapFocus=false;pedirResalte()}});
 $('#chosen-req').addEventListener('focusin',e=>{const fila=e.target.closest('[data-req]');if(fila){S.mapHover=fila.dataset.req;S.reqHover=fila.dataset.piden.split(' ');S.mapFocus=false;pedirResalte()}});

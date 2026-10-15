@@ -1,6 +1,13 @@
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 # Cambios de textos
 
+## 2026-10-15 · Codex (LEC2)
+
+| Claves | Cambio |
+|---|---|
+| `temarios.modo.*`, `temarios.mapa.sin_temario/abrir_aria` | Retiradas al quitar del mapa el modo de exploración y el enlace general a temarios. |
+| `temarios.mapa.ver` | «Ver programa» en la ficha de la materia; conserva el enlace a su temario. |
+
 ## 2026-10-14 · 2026.10.23 · Claude (LEC1)
 
 | Claves | Cambio |

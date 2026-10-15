@@ -1,4 +1,4 @@
-// Temarios: adaptador, lector de PoliCORE, modo «Explorar unidades de aprendizaje» del mapa, panel, explorador y rutas.
+// Temarios: adaptador, lector de PoliCORE, planeación del mapa, panel, explorador y rutas.
 // DOM en memoria (tests/dom_minimo.mjs): sin navegador ni red. Requiere haber compilado: python tools/build_horarios.py
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
@@ -209,21 +209,21 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(L.activos(), 0);
 }
 
-/* ---------- 3. Mapa: modo Explorar, panel y explorador ---------- */
+/* ---------- 3. Mapa: planeación, enlace al programa, panel y explorador ---------- */
 {
   const {c, document, Evento, estado} = contexto();
   const modulos = {};
-  const toggles = [], almacen = {};
+  const toggles = [], almacen = {mmodo: {B: 'explorar'}};
   const tr = {want: ['B106']};
   Object.assign(c, {
     SATE: {texto, pestana: (id, m) => { modulos[id] = m; }, error: e => { throw e; }, cargarTemarios: async () => {}},
     SATE_CONFIG: {unidades: {upiita: {vistas: [{id: 'temarios', padre: 'mapa'}]}}}, SATE_UNIDAD: 'upiita',
     S: {car: 'B', mapHover: null, mapFocus: false, reqHover: null, lfocus: null},
-    store: {get: (k, d) => almacen[k] ?? d, set: (k, v) => { almacen[k] = v; }},
+    store: {get: (k, d) => { assert.notEqual(k, 'mmodo', 'el modo antiguo no se consulta'); return almacen[k] ?? d; }, set: (k, v) => { almacen[k] = v; }},
     toggleBox: k => { toggles.push(k); tr.want.push(k); }, conSim: (a, f) => f(), conPlan: f => f(), usaSim: () => false, renderList() {}, tr: () => tr,
     resaltarMapa() {}, $: s => document.querySelector(s), pick() {}, tactil: () => false
   });
-  c.renderTray = () => c.SATE.temarios.pintarModo();
+  c.renderTray = () => {};
   vm.runInContext(leer('web/policore/lector.js'), c);
   vm.runInContext(leer('web/sate/temarios.js'), c);
   const nucleo = leer('web/sate/nucleo.js');
@@ -233,57 +233,43 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.ok(click.length > 200 && tecla.length > 100, 'no se encontraron los manejadores reales de nucleo.js');
   vm.runInContext(click + tecla, c);
 
-  const caja = el(document, 'div', {id: 'mapa-modo-caja'}); caja.hidden = true;
-  const botonPlan = el(document, 'button', {'data-mmodo': 'planear', 'aria-pressed': 'true'}), botonExp = el(document, 'button', {'data-mmodo': 'explorar', 'aria-pressed': 'false'});
-  caja.appendChild(el(document, 'div', {id: 'mapa-modo'}, [botonPlan, botonExp])); caja.appendChild(el(document, 'a', {id: 'mapa-modo-enlace', href: '#'}));
-  const leyenda = el(document, 'p', {id: 'mapa-modo-leyenda'}); leyenda.hidden = true;
   const caja1 = el(document, 'div', {'class': 'box pend', 'data-box': 'B101', role: 'button', 'aria-pressed': 'false', 'aria-label': 'B101 · original', title: 'B101 · original'});
   const sinTem = el(document, 'div', {'class': 'box pend', 'data-box': 'B102', role: 'button', 'aria-pressed': 'false', 'aria-label': 'B102 · original'});
   const fila = el(document, 'div', {'class': 'tl-row'}, [el(document, 'button', {'class': 'tl-name', 'data-lfocus': 'B101', 'aria-expanded': 'false'}, [el(document, 'small')]), el(document, 'button', {'class': 'tl-want', 'data-lwant': 'B101'})]);
   const filaSin = el(document, 'div', {'class': 'tl-row'}, [el(document, 'button', {'class': 'tl-name', 'data-lfocus': 'B102', 'aria-expanded': 'false'}, [el(document, 'small')])]);
-  const vista = el(document, 'section', {id: 'v-tray'}, [caja, leyenda, el(document, 'div', {id: 'map'}, [caja1, sinTem]), el(document, 'div', {id: 'tlist'}, [fila, filaSin]), el(document, 'div', {id: 'plan-panel'})]);
+  const vista = el(document, 'section', {id: 'v-tray'}, [el(document, 'div', {id: 'map'}, [caja1, sinTem]), el(document, 'div', {id: 'tlist'}, [fila, filaSin]), el(document, 'div', {id: 'plan-panel'})]);
   document.body.appendChild(vista);
   document.body.appendChild(el(document, 'section', {id: 'sate-temarios'}));
 
   const T = c.SATE.temarios;
-  T.pintarModo();
-  assert.equal(caja.hidden, true, 'antes de saber si hay temarios el selector no aparece');
   await T.preparar();
-  assert.equal(caja.hidden, false, 'Biónica tiene temarios');
-  assert.equal(T.modo(), 'planear');
-  assert.equal(vista.classList.contains('modo-explorar'), false);
-  assert.equal(botonPlan.getAttribute('aria-pressed'), 'true');
-  assert.equal(botonPlan.querySelector('.tmr-largo').textContent, 'Planear horario');
-  assert.equal(botonExp.querySelector('.tmr-largo').textContent, 'Explorar unidades de aprendizaje');
-  assert.equal(botonExp.getAttribute('aria-label'), 'Explorar unidades de aprendizaje');
-  assert.equal(caja.querySelector('#mapa-modo-enlace').getAttribute('href'), '#/upiita/temarios');
+  // Incluso con la preferencia antigua guardada, clic y teclado solo planean.
+  caja1.dispatchEvent(new Evento('click', {target: caja1}));
+  sinTem.dispatchEvent(new Evento('click', {target: sinTem}));
+  const optativa = el(document, 'div', {'data-obox': 'B106'});
+  vista.appendChild(optativa);
+  optativa.dispatchEvent(new Evento('click', {target: optativa}));
+  for (const key of ['Enter', ' ']) caja1.dispatchEvent(new Evento('keydown', {key, target: caja1}));
+  fila.querySelector('.tl-name').dispatchEvent(new Evento('click', {target: fila.querySelector('.tl-name')}));
+  assert.equal(c.S.lfocus, 'B101', 'el nombre expande la ficha de la lista');
+  fila.querySelector('.tl-want').dispatchEvent(new Evento('click', {target: fila.querySelector('.tl-want')}));
+  igual(toggles, ['B101', 'B102', 'B106', 'B101', 'B101', 'B101']);
+  assert.equal(T.estado.panel, null, 'el mapa no abre el lector');
+  igual(almacen, {mmodo: {B: 'explorar'}}, 'no se lee ni se escribe el modo antiguo');
+  assert.equal(caja1.getAttribute('aria-label'), 'B101 · original');
   assert.equal(caja1.getAttribute('aria-pressed'), 'false');
-
-  // Planear: el clic elige la materia para el horario
-  caja1.dispatchEvent(new Evento('click', {target: caja1}));
-  igual(toggles, ['B101']); assert.equal(T.estado.panel, null);
-
-  // Explorar: el clic abre el temario y no toca la selección
+  assert.equal(sinTem.classList.contains('sin-temario'), false);
+  assert.equal(filaSin.querySelector('[data-tm-tag]'), null);
+  for (const f of ['web/sate/cascaron.html', 'web/sate/nucleo.js', 'web/sate/mapa.js', 'web/sate/temarios.js', 'web/sate/temarios.css']) {
+    assert.doesNotMatch(leer(f), /mmodo|mapa-modo|modo-explorar|pintarModo|explorando/, f);
+  }
+  const html = leer('web/sate/cascaron.html');
+  assert.match(html, /#map-primera-visita:not\(\[hidden\]\)\{margin-bottom:var\(--ipn-esp-4\)\}/);
+  assert.match(html, /#v-tray \.map-plan\{margin-top:var\(--ipn-esp-4\)\}/);
+  assert.match(html, /\.maptools>\.seg\{flex-shrink:0;max-width:100%\}/);
+  // El panel conserva su API, independiente de los clics del mapa.
   const antes = JSON.stringify(tr);
-  botonExp.dispatchEvent(new Evento('click', {target: botonExp}));
-  igual(almacen.mmodo, {B: 'explorar'}, 'recordado por carrera');
-  assert.equal(T.modo(), 'explorar');
-  assert.equal(vista.classList.contains('modo-explorar'), true);
-  assert.equal(leyenda.hidden, false);
-  assert.match(leyenda.textContent, /En este modo no se elige nada para tu horario/);
-  assert.equal(botonExp.getAttribute('aria-pressed'), 'true');
-  assert.equal(caja1.hasAttribute('aria-pressed'), false);
-  assert.equal(caja1.getAttribute('aria-label'), 'Leer el temario de ' + indice.materias.B101.n);
-  assert.equal(caja1.classList.contains('sin-temario'), false);
-  assert.equal(sinTem.classList.contains('sin-temario'), true, 'B102 no tiene temario');
-  assert.match(sinTem.getAttribute('aria-label'), /B102 · original · Sin temario disponible/);
-  assert.equal(filaSin.classList.contains('sin-temario'), true);
-  assert.equal(filaSin.querySelector('[data-tm-tag]').textContent, 'Sin temario disponible');
-  assert.equal(fila.querySelector('[data-tm-tag]'), null);
-  assert.equal(fila.querySelector('.tl-name').hasAttribute('aria-expanded'), false);
-  caja1.dispatchEvent(new Evento('click', {target: caja1}));
-  await dormir(20);
-  igual(toggles, ['B101'], 'el modo Explorar no selecciona nada para el horario');
+  await T.abrir('B101', caja1);
   assert.equal(JSON.stringify(tr), antes);
   const panel = T.estado.panel;
   assert.equal(panel.hidden, false);
@@ -296,41 +282,31 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(document.body.classList.contains('tmr-lateral'), true, 'escritorio: panel al lado');
   assert.equal(estado.resize, 1, 'el mapa se reajusta una sola vez');
   assert.equal(panel.getAttribute('aria-modal'), 'false');
-  // Otro clic cambia el contenido sin abrir un segundo panel; una caja sin temario no abre nada
+  // Otra llamada cambia el contenido sin abrir un segundo panel; una caja sin temario no abre nada
   const otra = el(document, 'div', {'class': 'box', 'data-box': 'B106', role: 'button'});
   document.querySelector('#map').appendChild(otra);
-  otra.dispatchEvent(new Evento('click', {target: otra}));
+  await T.abrir('B106', otra);
   await dormir(20);
   assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B106.n);
   assert.equal(c.PoliCORE.lector.activos(), 1);
-  sinTem.dispatchEvent(new Evento('click', {target: sinTem}));
+  await T.abrir('B102', sinTem);
   await dormir(10);
   assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B106.n, 'B102 no cambia el panel');
-  igual(toggles, ['B101']);
-  // Teclado: Enter abre en explorar; Esc cierra y devuelve el foco
+  assert.equal(JSON.stringify(tr), antes);
+  // Esc cierra el panel y devuelve el foco
   caja1.focus();
-  caja1.dispatchEvent(new Evento('keydown', {key: 'Enter', target: caja1}));
-  await dormir(20);
+  await T.abrir('B101', caja1);
   assert.equal(panel.querySelector('.pc-titulo').textContent, indice.materias.B101.n);
-  igual(toggles, ['B101']);
+  assert.equal(JSON.stringify(tr), antes);
   document.dispatchEvent(new Evento('keydown', {key: 'Escape', target: document.body}));
   assert.equal(panel.hidden, true);
   assert.equal(document.activeElement, caja1, 'el foco vuelve a la materia');
   assert.equal(c.PoliCORE.lector.activos(), 0);
   assert.equal(document.body.classList.contains('tmr-lateral'), false);
   assert.equal(estado.resize, 2);
-  // Vista de lista: abrir desde el nombre, sin controles de selección
-  fila.querySelector('.tl-name').dispatchEvent(new Evento('click', {target: fila.querySelector('.tl-name')}));
-  await dormir(20);
-  assert.equal(panel.hidden, false);
-  assert.equal(c.S.lfocus, null, 'no se expande la fila de la lista');
-  fila.querySelector('.tl-want').dispatchEvent(new Evento('click', {target: fila.querySelector('.tl-want')}));
-  igual(toggles, ['B101'], 'el botón de agregar no actúa en este modo');
-  T.cerrar();
   // Teléfono: hoja con velo, modal y sin desplazamiento del fondo
   estado.lateral = false;
-  caja1.dispatchEvent(new Evento('click', {target: caja1}));
-  await dormir(20);
+  await T.abrir('B101', caja1);
   assert.equal(panel.getAttribute('aria-modal'), 'true');
   assert.equal(T.estado.velo.hidden, false);
   assert.equal(document.documentElement.classList.contains('sate-sin-scroll'), true);
@@ -338,24 +314,8 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(panel.hidden, true); assert.equal(T.estado.velo.hidden, true);
   assert.equal(document.documentElement.classList.contains('sate-sin-scroll'), false);
   estado.lateral = true;
-  // Otra carrera con temarios conserva su propio modo; una sin temarios oculta el selector
-  c.S.car = 'M'; T.pintarModo();
-  assert.equal(caja.hidden, false); assert.equal(T.modo(), 'planear'); assert.equal(vista.classList.contains('modo-explorar'), false);
-  assert.equal(sinTem.classList.contains('sin-temario'), false, 'al volver a Planear se retiran las marcas');
-  assert.equal(caja1.getAttribute('aria-label'), 'B101 · original');
-  c.S.car = 'E'; T.pintarModo();
-  assert.equal(caja.hidden, true, 'una carrera sin temarios no ofrece el modo');
-  assert.equal(T.explorando(), false);
-  c.S.car = 'B'; T.pintarModo();
-  assert.equal(T.modo(), 'explorar'); assert.equal(vista.classList.contains('modo-explorar'), true);
-  // Volver a Planear cierra el panel y restaura las etiquetas
-  caja1.dispatchEvent(new Evento('click', {target: caja1})); await dormir(20);
-  botonPlan.dispatchEvent(new Evento('click', {target: botonPlan}));
-  assert.equal(panel.hidden, true); assert.equal(vista.classList.contains('modo-explorar'), false);
-  assert.equal(caja1.getAttribute('aria-label'), 'B101 · original');
-  igual(almacen.mmodo, {B: 'planear'});
   // Enlace desde la ficha de la materia (inspector)
-  assert.match(T.enlaceHtml('B101'), /href="#\/upiita\/temarios\/bionica\/B101"[^>]*>Ver temario</);
+  assert.match(T.enlaceHtml('B101'), /href="#\/upiita\/temarios\/bionica\/B101"[^>]*>Ver programa</);
   assert.equal(T.enlaceHtml('B102'), '');
   assert.equal(T.enlaceHtml('XXX'), '');
 
@@ -497,4 +457,4 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.ok(document.getElementById('temario').querySelectorAll('mark.pc-resalte').length > 0, 'q= resalta desde el enlace');
   assert.equal(c.PoliCORE.lector.activos(), 3);
 }
-console.log('OK temarios: adaptador, lector de PoliCORE reutilizable, modo Explorar sin tocar el horario, panel/hoja, explorador, enlaces profundos y unidades sin temarios.');
+console.log('OK temarios: adaptador, lector de PoliCORE reutilizable, mapa dedicado a planear, panel/hoja, explorador, enlaces profundos y unidades sin temarios.');

@@ -1060,20 +1060,8 @@ abrir = "Abrir la fuente"
 titulo = "Temarios"
 corto = "Temarios"
 
-[temarios.modo]
-# Selector del mapa curricular. «corto» se usa en teléfono.
-etiqueta = "Modo del mapa"
-planear = "Planear horario"
-planear_corto = "Planear"
-explorar = "Explorar unidades de aprendizaje"
-explorar_corto = "Explorar"
-leyenda = "Toca o haz clic en una materia para leer su temario. En este modo no se elige nada para tu horario."
-ayuda_enlace = "Ver todos los temarios"
-
 [temarios.mapa]
-sin_temario = "Sin temario disponible"
-abrir_aria = "Leer el temario de {materia}"
-ver = "Ver temario"
+ver = "Ver programa"
 
 [temarios.panel]
 etiqueta = "Temario de {materia}"

@@ -129,7 +129,7 @@ for(const a of [encb,encbHorario]){
 assert.deepEqual(encbHorario.acreditadas,encb.acreditadas,'El horario no cambia el historial de seis periodos');
 assert.deepEqual(encbHorario.kardex_reprobadas,encb.kardex_reprobadas);
 assert.ok(encbHorario.en_curso.every(k=>!encbHorario.acreditadas.some(r=>r[0]===k)),'Inscritas pendientes para el siguiente periodo 26/2');
-for(const ancho of [1440,375])for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','encb-viejo','encb-curso-sin-horario','demo','demo-horario']){
+for(const ancho of [1440,1024,768,414,375])for(const modo of ['actual','viejo','periodos','vacio','encb','encb-horario','encb-viejo','encb-curso-sin-horario','demo','demo-horario']){
   const unidad=modo.startsWith('encb')||modo.startsWith('demo')?'encb':'esimez';
   const p=structuredClone(unidad==='encb'?(modo.endsWith('horario')?encbHorario:encb):perfil);
   if(modo==='encb-curso-sin-horario'){Object.assign(p,structuredClone(encbHorario));p.horario_inscrito=[];}
@@ -336,4 +336,4 @@ for(const u of ['upiita','escom','upibi','esimez']){
   vm.runInContext(destino,c);
   assert.equal(c.TOOL,'https://ejemplo.invalid/upiita/'+(u==='esimez'?'sate/index.html?sateUnidad=esimez':'horarios-'+u+'.html'));
 }
-console.log('SATE genérico: Lector, analítica y componentes compartidos, simulación sin persistencia, mapa/lista/zoom/pendientes, horario compacto y contraste AA; DOM a 1440 y 375 px, sin navegador ni red.');
+console.log('SATE genérico: Lector, analítica y componentes compartidos, simulación sin persistencia, mapa/lista/zoom/pendientes, horario compacto y contraste AA; DOM a 1440, 1024, 768, 414 y 375 px, sin navegador ni red; no mide desborde visual.');

@@ -1,21 +1,6 @@
-/* Temarios en SATE: selector de modo del mapa, panel o hoja con el lector y explorador independiente.
+/* Temarios en SATE: panel o hoja con el lector y explorador independiente.
    Solo tokens --ipn-*; el lector (web/policore/lector.css) pone su propio estilo al documento. */
 
-/* ---------- modo del mapa ---------- */
-.mapa-modo{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ipn-esp-2) var(--ipn-esp-3);min-width:0}
-.mapa-modo[hidden]{display:none}
-.mapa-modo .tmr-corto{display:none}
-.mapa-modo .link{min-height:2.75rem;display:inline-flex;align-items:center}
-.mapa-modo-leyenda{margin:0 0 var(--ipn-esp-3);padding:.55rem .8rem;border:1px solid var(--ipn-linea);border-left:4px solid var(--ipn-acento);border-radius:calc(var(--ipn-radio) - .25rem);background:var(--ipn-acento-suave);color:var(--ipn-texto);font-size:var(--ipn-tamano-s)}
-.mapa-modo-leyenda[hidden]{display:none}
-@media(max-width:720px){.mapa-modo .tmr-largo{display:none}.mapa-modo .tmr-corto{display:inline}.mapa-modo .link{font-size:.7rem}}
-/* En este modo no se planea: nada del horario se elige. */
-.modo-explorar #plan-opciones,.modo-explorar #plan-panel,.modo-explorar .plan-bandeja,.modo-explorar #sug-tgl,.modo-explorar .tl-want{display:none!important}
-.modo-explorar .box[data-box]:not(.sin-temario),.modo-explorar .box[data-obox]:not(.sin-temario){cursor:pointer}
-.modo-explorar .box.sin-temario{opacity:.42;filter:saturate(.35);cursor:default}
-.modo-explorar .tl-row.sin-temario{opacity:.6}
-.modo-explorar .tl-row .tl-name{cursor:pointer}
-.modo-explorar .tl-row.sin-temario .tl-name{cursor:default}
 .insp-temario{margin:.4rem 0 0}
 .insp-temario a{color:var(--ipn-acento);text-decoration:underline}
 

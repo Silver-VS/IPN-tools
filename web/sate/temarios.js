@@ -1,7 +1,7 @@
 /* Temarios de unidades de aprendizaje en SATE.
    A. Funciones puras (adaptador de un registro de data/temarios/<unidad>/<carrera>.json al documento genérico del lector
       de PoliCORE, búsqueda y agrupación): se prueban en Node y las usa la página de revisión.
-   B. Integración (solo con SATE): modo «Explorar unidades de aprendizaje» del mapa, panel o hoja con el lector y la vista
+   B. Integración (solo con SATE): enlace desde la ficha de materia, panel o hoja con el lector y la vista
       #/<unidad>/temarios (explorador independiente). Todo se activa por datos: sin temarios en la unidad, nada de esto existe. */
 (function (raiz) {
   'use strict';
@@ -103,7 +103,6 @@
 
   /* ===================== B. Integración con SATE ===================== */
   const t = (c, v) => SATE.texto(c, v);
-  const q = s => document.querySelector(s);
   const E = { indice: null, pIndice: null, carreras: {}, pCarreras: {}, panel: null, token: 0, origen: null, origenClave: null };
   const BASE = (document.currentScript && document.currentScript.src || '').replace(/[^\/]*$/, '');
   const mq = s => (raiz.matchMedia ? raiz.matchMedia(s) : { matches: false, addEventListener() {} });
@@ -137,7 +136,7 @@
     return r.json();
   });
   function preparar() {
-    return E.pIndice ||= traer('indice').then(d => { E.indice = d; pintarModo(); return d; }).catch(e => { E.pIndice = null; throw e; });
+    return E.pIndice ||= traer('indice').then(d => { E.indice = d; return d; }).catch(e => { E.pIndice = null; throw e; });
   }
   function carreraDatos(id) {
     return E.pCarreras[id] ||= traer(id).then(d => {
@@ -158,69 +157,7 @@
   const documentoDe = r => documento(r.registro, { t, carrera: E.indice.carreras[r.carreraId]?.nombre, plan: r.plan });
   const lector = () => raiz.PoliCORE && raiz.PoliCORE.lector;
 
-  /* ---------- modo del mapa ---------- */
-  const modos = () => { const m = typeof store !== 'undefined' ? store.get('mmodo', {}) : {}; return m && typeof m === 'object' ? m : {}; };
-  const hayEnMapa = () => !!E.indice && Object.values(E.indice.carreras).some(c => c.letra === S.car);
-  const modo = () => (hayEnMapa() && modos()[S.car] === 'explorar' ? 'explorar' : 'planear');
-  const explorando = () => modo() === 'explorar';
-  function fijarModo(m) {
-    store.set('mmodo', { ...modos(), [S.car]: m === 'explorar' ? 'explorar' : 'planear' });
-    if (m !== 'explorar') cerrar();
-    renderTray();
-  }
   function nombreDe(k) { const e = E.indice?.materias?.[claveNorm(k)]; return e ? e.n : k; }
-  function rotular(boton, largo, corto) {
-    if (boton.dataset.tmRotulo) return;
-    boton.dataset.tmRotulo = '1'; boton.textContent = '';
-    boton.appendChild(h('span', { 'class': 'tmr-largo', texto: t(largo) }));
-    boton.appendChild(h('span', { 'class': 'tmr-corto', 'aria-hidden': 'true', texto: t(corto) }));
-    boton.setAttribute('aria-label', t(largo));
-  }
-  function pintarModo() {
-    const caja = q('#mapa-modo-caja');
-    if (!caja) return;
-    const hay = hayEnMapa(), ex = hay && modo() === 'explorar', vista = q('#v-tray'), ley = q('#mapa-modo-leyenda');
-    caja.hidden = !hay;
-    if (vista) vista.classList.toggle('modo-explorar', ex);
-    if (!hay) { if (ley) ley.hidden = true; cerrar(); return; }
-    const bp = q('#mapa-modo [data-mmodo="planear"]'), be = q('#mapa-modo [data-mmodo="explorar"]');
-    rotular(bp, 'temarios.modo.planear', 'temarios.modo.planear_corto');
-    rotular(be, 'temarios.modo.explorar', 'temarios.modo.explorar_corto');
-    bp.setAttribute('aria-pressed', String(!ex)); be.setAttribute('aria-pressed', String(ex));
-    q('#mapa-modo').setAttribute('aria-label', t('temarios.modo.etiqueta'));
-    const enlaceTodos = q('#mapa-modo-enlace');
-    enlaceTodos.textContent = t('temarios.modo.ayuda_enlace'); enlaceTodos.setAttribute('href', ir());
-    if (ley) { ley.hidden = !ex; ley.textContent = ex ? t('temarios.modo.leyenda') : ''; }
-    const mapa = q('#v-tray');
-    if (!mapa) return;
-    for (const n of mapa.querySelectorAll('[data-box],[data-obox]')) {
-      const k = n.dataset.box || n.dataset.obox;
-      if (n.dataset.tmEtiqueta === undefined) { n.dataset.tmEtiqueta = n.getAttribute('aria-label') || ''; n.dataset.tmTitulo = n.getAttribute('title') || ''; }
-      if (!ex) {
-        n.classList.remove('sin-temario');
-        if (n.dataset.tmEtiqueta) n.setAttribute('aria-label', n.dataset.tmEtiqueta);
-        if (n.dataset.tmTitulo) n.setAttribute('title', n.dataset.tmTitulo);
-        continue;
-      }
-      const ok = tiene(k), sin = t('temarios.mapa.sin_temario');
-      n.classList.toggle('sin-temario', !ok);
-      n.removeAttribute('aria-pressed');
-      n.setAttribute('aria-label', ok ? t('temarios.mapa.abrir_aria', { materia: nombreDe(k) }) : (n.dataset.tmEtiqueta ? n.dataset.tmEtiqueta + ' · ' : '') + sin);
-      n.setAttribute('title', ok ? (n.dataset.tmTitulo || nombreDe(k)) : (n.dataset.tmTitulo ? n.dataset.tmTitulo + ' · ' : '') + sin);
-    }
-    for (const fila of mapa.querySelectorAll('.tl-row')) {
-      const boton = fila.querySelector('.tl-name'), k = boton && boton.dataset.lfocus;
-      for (const viejo of fila.querySelectorAll('[data-tm-tag]')) viejo.remove();
-      fila.classList.remove('sin-temario');
-      if (!ex || !k) continue;
-      boton.removeAttribute('aria-expanded');
-      if (!tiene(k)) {
-        fila.classList.add('sin-temario');
-        const sub = boton.querySelector('small');
-        if (sub) sub.appendChild(h('span', { 'class': 'tl-tag', 'data-tm-tag': '', texto: t('temarios.mapa.sin_temario') }));
-      }
-    }
-  }
   const enlaceHtml = k => (tiene(k) ? '<p class="insp-temario"><a href="' + esc(ir(E.indice.materias[claveNorm(k)].c, claveNorm(k))) + '">' + esc(t('temarios.mapa.ver')) + '</a></p>' : '');
 
   /* ---------- panel lateral (escritorio) u hoja inferior (teléfono) ---------- */
@@ -413,6 +350,6 @@
     await pintarLector();
   }
 
-  SATE.temarios = { preparar, tiene, modo, explorando, fijarModo, pintarModo, abrir, cerrar, enlaceHtml, documento: documentoDe, estado: E };
+  SATE.temarios = { preparar, tiene, abrir, cerrar, enlaceHtml, documento: documentoDe, estado: E };
   SATE.pestana('temarios', { montar() {}, mostrar(r) { return mostrarExplorador(r).catch(e => SATE.error(e)); }, ocultar() {} });
 })(typeof window !== 'undefined' ? window : globalThis);
