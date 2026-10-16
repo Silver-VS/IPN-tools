@@ -729,7 +729,7 @@ function renderSide0(){
   $('#b-sugg').textContent=tx('agregar');$('#b-go').hidden=false;
   const periodoConocido=planInicio()!=null;
   etiqueta('#b-go',tx(periodoConocido?'horarios':'horarios_neutro',{periodo:planEtiqueta(0)}),tx('horarios_corto'));etiqueta('#b-none',tx(periodoConocido?'quitar_activo':'quitar_corto',{periodo:planEtiqueta(PLAN_PASO)}),tx('quitar_corto'));
-  if(PLAN_DOS_PERIODOS)etiqueta('#b-go',tx('horarios',{periodo:planEtiqueta(0)}),`Horarios de ${planEtiqueta(0)}`);
+  if(PLAN_DOS_PERIODOS)etiqueta('#b-go',tx(planInicio()==null?'horarios_neutro':'horarios',{periodo:planEtiqueta(0)}),`Horarios de ${planEtiqueta(0)}`);
   $('#plan-activo').hidden=$('#plan-leyenda').hidden=true;
   $('#plan-periodos').hidden=!PLAN_DOS_PERIODOS;$('#plan-vista-etiqueta').hidden=!PLAN_DOS_PERIODOS;
   $('#chosen').classList.toggle('un-periodo',!PLAN_DOS_PERIODOS);
@@ -826,13 +826,14 @@ function renderTop(){
   
   const cars=Object.entries(DATA.carreras).filter(([k])=>DATA.mapas[k]);
   if(!cars.some(([k])=>k===S.car)) S.car=cars[0][0];
-  $('#f-carrera').innerHTML=cars.map(([k,v])=>`<option value="${esc(k)}"${k===S.car?' selected':''}>${esc(v)}</option>`).join('');
+  $('#f-carrera').innerHTML=cars.map(([k,v])=>`<option value="${esc(k)}"${k===S.car?' selected':''}>${esc(v.toLocaleLowerCase('es-MX').replace(/\p{L}+/gu,(palabra,indice)=>indice>0&&/^(de|del|la|las|los|y|en|e)$/.test(palabra)?palabra:palabra[0].toLocaleUpperCase('es-MX')+palabra.slice(1)))}</option>`).join('');
   ajustarCarrera();
   const f=new Date(DATA.capturado).toLocaleString('es-MX',{dateStyle:'long',timeStyle:'short'});
   const n=new Set(classes().filter(c=>c[0]===S.car).map(c=>c[3])).size;
-  $('#notice').innerHTML=`<span>Captura del SAES: <b>${esc(f)}</b></span><span><b>${n}</b> grupos de esta carrera</span>`+
-    (!hasOffer('proximo')?'<span>El SAES aún no publica la oferta del próximo periodo; se muestra el periodo actual.</span>':S.per==='proximo'?'<span>La oferta del próximo periodo está en captura y puede estar incompleta.</span>':'')+
-    (n===0?'<span class="bad">Esta carrera no tiene grupos publicados en este periodo.</span>':'')+(DATA.salones?.fuente==='saes'?'<span>Salones según el SAES.</span>':S.per==='actual'&&DATA.salones?`<span>Salones según el horario por aula de la unidad (ciclo ${esc(DATA.salones.periodo)}).</span>`:'<span>Salones aún sin asignar para este periodo.</span>');
+  const nota=(clave,datos)=>SATE.texto('sate.horarios.'+clave,datos);
+  $('#notice').textContent=[nota('captura_fecha',{fecha:f}),nota('captura_grupos',{n}),
+    !hasOffer('proximo')?nota('captura_sin_proximo'):S.per==='proximo'?nota('captura_incompleta'):'',
+    n===0?nota('captura_sin_grupos'):'',DATA.salones?.fuente==='saes'?nota('captura_salones_saes'):S.per==='actual'&&DATA.salones?nota('captura_salones_aula',{periodo:DATA.salones.periodo}):nota('captura_sin_salones')].filter(Boolean).join(' · ');
 }
 /* Vista en lista (teléfono): materias por semestre propuesto con su estado y un botón para agregarlas */
 /* ---------- estadísticas del kárdex (solo con datos del SAES; se calculan en el navegador) ----------

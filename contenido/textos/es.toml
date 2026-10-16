@@ -1006,6 +1006,14 @@ error_plan = "El plan elegido no corresponde a esta carrera. Se cargaron sus pla
 error_red = "No se pudo consultar el SAES. Revisa tu conexión y vuelve a pulsar «Actualizar»."
 
 [sate.horarios]
+captura_fecha = "Captura del SAES: {fecha}"
+captura_grupos = "{n} grupos de esta carrera"
+captura_sin_proximo = "El SAES aún no publica la oferta del próximo periodo; se muestra el periodo actual"
+captura_incompleta = "La oferta del próximo periodo está en captura y puede estar incompleta"
+captura_sin_grupos = "Esta carrera no tiene grupos publicados en este periodo"
+captura_salones_saes = "Salones según el SAES"
+captura_salones_aula = "Salones según el horario por aula de la unidad (ciclo {periodo})"
+captura_sin_salones = "Salones aún sin asignar para este periodo"
 simbologia = "Simbología"
 generador_limite_modesto = "Para mantener ágil tu dispositivo, se recortó la búsqueda. Se muestran las opciones encontradas. Reduce las materias o ajusta los filtros para explorar otras opciones."
 generar = "Generar horarios"

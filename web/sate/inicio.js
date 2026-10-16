@@ -275,7 +275,8 @@
     const aviso=document.createElement('div');aviso.className='sate-recorrido-invitacion';
     aviso.id='sate-recorrido-invitacion';
     for(const [clave,acepta] of [['si',true],['ahora_no',false]]){
-      const b=document.createElement('button');b.type='button';b.className='sate-enlace';b.textContent=texto('sate.recorrido.'+(acepta?'invitacion_breve':clave));
+      const b=document.createElement('button');b.type='button';b.className='sate-btn';b.textContent=acepta?texto('sate.recorrido.invitacion_breve'):'×';
+      if(!acepta)b.setAttribute('aria-label',texto('sate.recorrido.'+clave));
       b.onclick=()=>{SateUI.recorridoDecidir((k,v)=>IPNT.set(k,v),acepta);aviso.remove();if(acepta)iniciarRecorrido()};aviso.appendChild(b);
     }
     // Fuera del encabezado: los repintados de avisos conservan la decisión pendiente.

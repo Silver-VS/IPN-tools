@@ -71,6 +71,14 @@ for(const hash of ['#/upiita/tramites','#/upiita/tramites/dictamen?origen=viejo'
 }
 assert.equal(c.SateRutas.ruta('#/upiita/tramites/ets','upiita',config.unidades),null);
 const css=leer('web/sate/componentes.css');
+// DIS8: las frases se leen completas; los recortes de materias son independientes.
+for(const selector of ['.sate-aviso__cuerpo','.sate-recorte-calendario__texto','.calendario-ficha>span:last-child']){
+  const regla=css.slice(css.indexOf(selector+'{')).split('}')[0];
+  assert.doesNotMatch(regla,/line-clamp|text-overflow|overflow:hidden|white-space:nowrap/,selector);
+  assert.match(regla,/overflow-wrap:anywhere/,selector);
+}
+assert.match(css,/\.calendario-linea-nombre\{display:none\}/);
+assert.match(css,/\.sate-recorrido-invitacion\{[^}]*align-items:center;[^}]*gap:var\(--ipn-esp-1\)/);
 assert.match(css,/\[data-pestanas=v3\] \.sate-pestana__icono\{display:none/);
 assert.match(css,/\[data-pestanas\] \.sate-barra \.sate-pestana__icono\{display:inline-flex/);
 assert.match(css,/aria-selected=true\]::after.*background:var\(--sate-realce\)/);
@@ -330,6 +338,23 @@ for(const d of ['border:0','background:transparent','box-shadow:none'])assert.ok
 assert.doesNotMatch(cabeceraDis5,/border-top:/);
 assert.match(css,/\[id\^="sate-tab-2-"\]\[role=tabpanel\][^{]*\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
 const movilDis5=css.slice(css.lastIndexOf('@media(max-width:639px)'));
+assert.match(movilDis5,/\.brand h1#sate-titulo\{[^}]*flex-wrap:nowrap;white-space:nowrap/,'DIS7: marca móvil en un renglón');
+assert.match(movilDis5,/grid-template-areas:"t l";[^}]*white-space:nowrap/,'DIS7: ayuda en la fila de la marca');
+assert.match(css,/#g-n\{display:flex;flex-wrap:wrap;min-width:0;max-width:100%\}/,'DIS7: paginador adaptable al ancho disponible');
+const nucleoDis7=leer('web/sate/nucleo.js');
+const opcionesDis7={};
+vm.runInNewContext(nucleoDis7.split('\n').find(l=>l.includes("$('#f-carrera').innerHTML=cars.map")),{
+  cars:[['tel','INGENIERÍA TELEMÁTICA'],['otra','INGENIERÍA DE LA COMPUTACIÓN Y EN REDES']],
+  S:{car:'tel'},esc:s=>s,$:()=>opcionesDis7,
+});
+assert.equal(opcionesDis7.innerHTML,'<option value="tel" selected>Ingeniería Telemática</option><option value="otra">Ingeniería de la Computación y en Redes</option>');
+const capturaDis7={};
+vm.runInNewContext(nucleoDis7.slice(nucleoDis7.indexOf('  const f=new Date(DATA.capturado)'),nucleoDis7.indexOf('\n}\n/* Vista en lista')) ,{
+  DATA:{capturado:'2026-10-16T12:00:00Z'},S:{car:'tel',per:'proximo'},classes:()=>[['tel',0,0,'1']],hasOffer:()=>true,
+  $:()=>capturaDis7,SATE:{texto:(k,v={})=>config.textos[k].replace(/\{(\w+)\}/g,(_,n)=>v[n])},
+});
+assert.equal(capturaDis7.textContent.split(' · ').length,4,'DIS7: captura, grupos, oferta y salones en un bloque');
+assert.match(capturaDis7.textContent,/1 grupos de esta carrera · La oferta del próximo periodo/);
 assert.match(movilDis5,/#sate-avisos-globales \.sate-chips\{[^}]*overflow-x:auto;[^}]*scroll-snap-type:x proximity;[^}]*mask-image:/);
 const invitacionDis5=leer('web/sate/inicio.js').split('  function invitarRecorrido()')[1].split('  window.SATE')[0];
 assert.ok(invitacionDis5.includes("aviso.id='sate-recorrido-invitacion'"));
@@ -347,11 +372,15 @@ for(const acepta of [true,false]){
     SateUI:{recorridoOfrecer:()=>decidido===undefined,recorridoDecidir(guardar,v){decidido=v;guardar('decision',v)}},
     iniciarRecorrido(){inicios++},document:{
       querySelector:()=>({after(n){ofrecida=n}}),getElementById:()=>ofrecida&&!ofrecida.retirada?ofrecida:null,
-      createElement:()=>({children:[],appendChild(n){this.children.push(n)},remove(){this.retirada=true}})
+      createElement:()=>({children:[],attrs:{},setAttribute(k,v){this.attrs[k]=v},appendChild(n){this.children.push(n)},remove(){this.retirada=true}})
     }};
   vm.runInNewContext('function invitarRecorrido()'+invitacionDis5+'\ninvitarRecorrido();',c);
   assert.equal(ofrecida.className,'sate-recorrido-invitacion');
   assert.equal(ofrecida.children[0].textContent,config.textos['sate.recorrido.invitacion_breve']);
+  assert.equal(ofrecida.children[0].className,'sate-btn');
+  assert.equal(ofrecida.children[1].className,'sate-btn');
+  assert.equal(ofrecida.children[1].textContent,'×');
+  assert.equal(ofrecida.children[1].attrs['aria-label'],config.textos['sate.recorrido.ahora_no']);
   ofrecida.children[acepta?0:1].onclick();
   assert.equal(ofrecida.retirada,true);assert.equal(decidido,acepta);assert.equal(escritura[1],acepta);
   assert.equal(inicios,acepta?1:0);
