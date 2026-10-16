@@ -212,7 +212,7 @@
   function fichaRelacion(titulo, claves, ninguna, alIr) {
     const lista = claves.length ? h('div', { 'class': 'tmr-rel-lista' }, claves.map(k => {
       const a = h('a', { 'class': 'tmr-rel-enlace', href: ir(E.indice.materias[k].c, k), texto: E.indice.materias[k].n });
-      if (alIr) a.addEventListener('click', alIr);
+      if (alIr) a.addEventListener('click', e => alIr(e, k));
       return a;
     })) : h('p', { 'class': 'tmr-nota', texto: ninguna });
     return h('div', { 'class': 'tmr-rel' }, [h('h4', { texto: titulo }), lista]);
@@ -220,7 +220,7 @@
   const parrafos = texto => String(texto || '').split(/\n+/).map(x => x.trim()).filter(Boolean);
   function construirFicha(r, recursos, op) {
     op = op || {};
-    const m = r.registro, alIr = op.alIr, vistazo = op.modo === 'vistazo';
+    const m = r.registro, alIr = op.alIr, vistazo = op.modo === 'vistazo', dialogo = !!op.dialogo;   // dialogo: el título lo pone la ventana
     const dato = (valor, etiqueta) => h('div', {}, [h('strong', { texto: valor }), h('small', { texto: t('sate.guia.' + etiqueta) })]);
     const horas = m.horas || {}, cr = m.creditos || {};
     const rel = relaciones(E.indice.materias, m.clave);
@@ -233,7 +233,7 @@
     const notas = [m.descripcion && m.descripcion_revisada === false ? t('sate.guia.descripcion_pendiente') : null, t('sate.guia.nota')].filter(Boolean);
     const cifras = h('div', { 'class': 'tmr-cifras' }, [cr.tepic != null || cr.satca != null ? dato(num(cr.tepic ?? cr.satca), 'creditos') : null, horas.teoria_semana != null || horas.practica_semana != null ? dato(num((horas.teoria_semana || 0) + (horas.practica_semana || 0)), 'horas') : null, m.tipo ? dato(t('temarios.tipo.' + m.tipo), 'tipo') : null]);
     const enc = h('header', { 'class': 'tmr-ficha-enc' }, [
-      h('h2', { texto: m.nombre, tabindex: '-1' }),
+      dialogo ? null : h('h2', { texto: m.nombre, tabindex: '-1' }),
       h('p', { 'class': 'tmr-meta', texto: [m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel', { n: m.nivel }) : null].filter(Boolean).join(' · ') }),
       m.descripcion ? h('p', { 'class': 'tmr-descripcion', texto: m.descripcion }) : null,
       h('div', { 'class': 'tmr-acciones' }, vistazo ? [completa, pdf] : [pdf, cambiar])]);
@@ -254,7 +254,11 @@
       const secciones = [['objetivo', t('temarios.seccion.objetivo'), texto('objetivo', t('temarios.seccion.objetivo'), m.objetivo)], ['contenidos', t('sate.guia.veras'), unidades],
         ['orientacion', t('temarios.seccion.orientacion'), texto('orientacion', t('temarios.seccion.orientacion'), m.orientacion)], ['evaluacion', t('temarios.seccion.evaluacion'), texto('evaluacion', t('temarios.seccion.evaluacion'), m.evaluacion)],
         ['recursos', t('sate.guia.recursos'), rec], ['relaciones', t('sate.guia.relaciones'), relaciones_], ['bibliografia', t('sate.guia.bibliografia'), biblio]].filter(x => x[2]);
-      const indice = h('nav', { 'class': 'tmr-indice', 'aria-label': t('temarios.ficha.indice') }, secciones.map(([id, titulo]) => h('a', { href: ir(r.carreraId, m.clave, id), 'data-seccion': id, texto: titulo })));
+      const indice = h('nav', { 'class': 'tmr-indice', 'aria-label': t('temarios.ficha.indice') }, secciones.map(([id, titulo]) => {
+        const a = h('a', { href: ir(r.carreraId, m.clave, id), 'data-seccion': id, texto: titulo });
+        if (dialogo) a.addEventListener('click', e => { e.preventDefault(); const n = document.getElementById('ficha-' + id); if (n && n.scrollIntoView) n.scrollIntoView({ behavior: reducido() ? 'auto' : 'smooth', block: 'start' }); });   // dentro de la ventana, sin cambiar de ruta
+        return a;
+      }));
       cuerpo = [enc, cifras, indice, ...secciones.map(x => x[2]), h('footer', { 'class': 'tmr-bloque' }, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))];
     }
     const ficha = h('div', { 'class': 'tmr-ficha' + (vistazo ? ' tmr-ficha--vistazo' : '') }, cuerpo.filter(Boolean));
@@ -397,7 +401,7 @@
 
   /* ---------- Programas de estudio: #/<unidad>/guia/programas[/<carrera>/<clave>[/<seccion>]] ---------- */
   const P = { token: 0, clave: null };
-  const G = { carrera: null, sel: null, modo: 'lineas', token: 0 };
+  const G = { carrera: null, modo: 'trayectoria', token: 0 };
   const claseNivel = v => 'gd-n' + Math.min(Math.max(+v || 1, 1), 9);
   const reducido = () => !!(raiz.matchMedia && raiz.matchMedia('(prefers-reduced-motion:reduce)').matches);
 
@@ -430,47 +434,52 @@
       h('div', {}, [h('h3', { id: 'gd-consultar-titulo', texto: t('sate.guia.consultar_titulo') }), h('p', { 'class': 'guia-resumen', texto: t('sate.guia.consultar_texto') })]),
       buscar.raiz, aviso, res, h('div', {}, [elegir])]);
   }
-  // Explorador por líneas de aprendizaje (áreas del mapa) y especializaciones. El resultado de elegir una materia va ARRIBA del mapa
-  // y se lleva a la vista con un resalte, para que nunca quede fuera de la pantalla.
+  // Programas de estudio con tres vistas (trayectoria escolar, líneas de aprendizaje, especializaciones). Elegir una materia abre su ficha
+  // única en una ventana emergente (SateUI.modal): la página no cambia de ruta ni se desplaza, y al cerrar el foco vuelve a la materia.
+  async function abrirFicha(clave) {
+    const k = claveNorm(clave), token = ++G.token, nombre = nombreDe(k);
+    SateUI.modal(nombre, h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }), { amplio: true });
+    try {
+      const r = await registro(k);
+      if (token !== G.token) return;
+      if (!r) throw new Error('sin registro ' + k);
+      const recursos = await cargarRecursos(r.carreraId);
+      if (token !== G.token) return;
+      const ficha = construirFicha(r, recursos[k] || [], { modo: 'completa', dialogo: true, alIr: (e, destino) => { e.preventDefault(); abrirFicha(destino); } });
+      SateUI.modal(r.registro.nombre, h('div', { 'class': 'tmr tmr-dialogo' }, [ficha]), { amplio: true });
+    } catch (e) {
+      if (token !== G.token) return;
+      console.warn('SATE: ficha no disponible', { unidad: unidad(), clave: k, mensaje: e.message });
+      const otra = h('button', { type: 'button', 'class': 'btn', texto: t('temarios.panel.reintentar') });
+      otra.addEventListener('click', () => abrirFicha(k));
+      SateUI.modal(nombre, h('div', {}, [h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra]), { amplio: true });
+    }
+  }
   function explorador() {
     const ind = E.indice, ids = Object.keys(ind.carreras);
     if (!G.carrera || !ind.carreras[G.carrera]) G.carrera = carreraPropia();
     const selCarrera = h('select', { id: 'gd-carrera' });
     selCarrera.replaceChildren(...ids.map(id => h('option', { value: id, texto: ind.carreras[id].nombre })));
     selCarrera.value = G.carrera;
-    const mapa = h('div', { 'class': 'gd-mapa' }), insp = h('aside', { 'class': 'gd-inspector', 'aria-live': 'polite' }), esp = h('div', { 'class': 'gd-esp' });
-    const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'lineas', texto: t('sate.guia.modo_lineas') }, { id: 'esp', texto: t('sate.guia.modo_esp') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
-    function elegir(clave) { G.sel = claveNorm(clave); pintar(); SateUI.revelar(insp); }
-    function chips(claves, ninguna) {
-      if (!claves.length) return h('span', { 'class': 'tmr-nota', texto: ninguna });
-      return h('span', { 'class': 'gd-mini' }, claves.map(k => {
-        const b = h('button', { type: 'button', 'data-clave': k, texto: ind.materias[k].n });
-        b.addEventListener('click', () => elegir(k));
-        return b;
-      }));
+    const tray = h('div', { 'class': 'gd-tray' }), mapa = h('div', { 'class': 'gd-mapa' }), esp = h('div', { 'class': 'gd-esp' });
+    const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria'), corto: t('sate.guia.modo_trayectoria_corto') }, { id: 'lineas', texto: t('sate.guia.modo_lineas'), corto: t('sate.guia.modo_lineas_corto') }, { id: 'esp', texto: t('sate.guia.modo_esp'), corto: t('sate.guia.modo_esp_corto') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
+    // Una materia es siempre un botón: clic, Enter o espacio abren su ficha en la ventana emergente.
+    function chip(i, clase, hijos, color) {
+      const b = h('button', { type: 'button', 'class': 'gd-chip ' + clase, 'data-clave': i.clave, 'aria-haspopup': 'dialog' }, hijos);
+      if (color && b.style && b.style.setProperty) b.style.setProperty('--gd-area', color);
+      b.addEventListener('click', () => abrirFicha(i.clave));
+      return b;
     }
-    function pintarInspector() {
-      const k = G.sel, m = k && ind.materias[k], token = ++G.token;
-      if (!m || m.c !== G.carrera) { insp.replaceChildren(h('p', { 'class': 'tmr-nota', texto: t('sate.guia.inspector_vacio') })); return; }
-      const rel = relaciones(ind.materias, k);
-      const quees = h('dd', { 'class': 'gd-quees', hidden: true });
-      insp.replaceChildren(
-        h('header', {}, [h('small', { texto: [k, t('temarios.lista.nivel', { n: m.v })].join(' · ') }), h('h4', { texto: m.n }),
-          h('a', { 'class': 'btn primary', href: ir(m.c, k), texto: t('sate.guia.abrir_ficha') })]),
-        h('dl', { 'class': 'gd-def' }, [
-          h('div', { 'class': 'gd-def-quees', hidden: true }, [h('dt', { texto: t('sate.guia.que_es') }), quees]),
-          h('div', {}, [h('dt', { texto: t('sate.guia.despues') }), h('dd', {}, [chips(rel.despues, t('sate.guia.despues_ninguna'))])]),
-          h('div', {}, [h('dt', { texto: t('sate.guia.antes') }), h('dd', {}, [chips(rel.antes, t('sate.guia.antes_ninguna'))])])]));
-      registro(k).then(r => {
-        if (token !== G.token || !r || !r.registro.descripcion) return;
-        quees.textContent = r.registro.descripcion; quees.hidden = false;
-        insp.querySelector('.gd-def-quees').hidden = false;
-      }).catch(e => console.debug('SATE: descripción no disponible', e.message));
+    function pintarTrayectoria() {
+      const colores = new Map((ind.carreras[G.carrera].areas || []).map(a => [a.nombre, a.color]));
+      const grupos = agrupar(filtrar(ind.materias, { carrera: G.carrera, nivel: '*', tipo: '*' }, null));
+      tray.replaceChildren(...grupos.map(g => h('section', { 'class': 'gd-sem' }, [
+        h('h4', { texto: g.nivel ? t('temarios.lista.nivel', { n: g.nivel }) : t('sate.guia.linea_otras') }),
+        h('ul', {}, g.items.map(i => h('li', {}, [chip(i, 'gd-chip--sem', [h('span', { texto: i.n }), h('small', { texto: i.clave })], colores.get(i.a))])))])));
     }
     function pintarMapa() {
       const filas = lineasDeAprendizaje(ind.materias, G.carrera, ind.carreras[G.carrera].areas);
       const niveles = [...new Set(filas.flatMap(f => f.items.map(i => i.v)))].filter(v => v != null).sort((a, b) => a - b);
-      const rel = G.sel ? relaciones(ind.materias, G.sel) : { antes: [], despues: [] }, relacionadas = new Set([...rel.antes, ...rel.despues]);
       mapa.setAttribute('data-niveles', String(niveles.length));
       mapa.replaceChildren(
         h('div', { 'class': 'gd-fila gd-fila--enc', 'aria-hidden': 'true' }, [h('span', { 'class': 'gd-quien', texto: t('sate.guia.columna_linea') }),
@@ -479,10 +488,9 @@
           const fila = h('div', { 'class': 'gd-fila', role: 'group', 'aria-label': f.nombre || t('sate.guia.linea_otras') }, [
             h('div', { 'class': 'gd-quien' }, [h('h4', { texto: f.nombre || t('sate.guia.linea_otras') })]),
             h('div', { 'class': 'gd-cols' }, f.items.map(i => {
-              const b = h('button', { type: 'button', 'class': 'gd-chip ' + claseNivel(i.v) + (relacionadas.has(i.clave) ? ' gd-rel' : ''), 'data-clave': i.clave, 'aria-pressed': G.sel === i.clave ? 'true' : 'false' },
-                [h('span', { 'class': 'gd-chip-nivel', texto: t('temarios.lista.nivel', { n: i.v }) }), h('span', { texto: i.n })]);
-              b.addEventListener('click', () => elegir(i.clave));
-              return b;
+              const antes = relaciones(ind.materias, i.clave).antes;   // la seriación: qué materias van antes
+              return chip(i, claseNivel(i.v), [h('span', { 'class': 'gd-chip-nivel', texto: t('temarios.lista.nivel', { n: i.v }) }), h('span', { texto: i.n }),
+                antes.length ? h('small', { 'class': 'gd-chip-antes', texto: t('sate.guia.chip_antes', { claves: antes.join(', ') }) }) : null]);
             }))]);
           if (f.color && fila.style && fila.style.setProperty) fila.style.setProperty('--gd-area', f.color);
           return fila;
@@ -491,25 +499,22 @@
     function pintarEsp() {
       const lineas = ind.carreras[G.carrera].lineas || [], porArea = new Map();
       for (const l of lineas) { if (!porArea.has(l.area)) porArea.set(l.area, []); porArea.get(l.area).push(l); }
+      if (!porArea.size) { esp.replaceChildren(h('p', { 'class': 'tmr-nota', texto: t('sate.guia.esp_vacia') })); return; }
       esp.replaceChildren(...[...porArea].map(([area, ls]) => h('div', { 'class': 'gd-esp-area' }, [h('h4', { texto: area }),
         ...ls.map(l => h('div', { 'class': 'gd-esp-linea' }, [h('small', { texto: l.linea }),
-          h('ul', {}, l.claves.filter(k => ind.materias[k]).map(k => h('li', {}, [h('a', { href: ir(ind.materias[k].c, k), texto: ind.materias[k].n })])))]))])));
+          h('ul', {}, l.claves.filter(k => ind.materias[k]).map(k => h('li', {}, [chip({ clave: k }, 'gd-chip--esp', [h('span', { texto: ind.materias[k].n }), h('small', { texto: k })])])))]))])));
     }
     function pintar() {
-      const hayEsp = (ind.carreras[G.carrera].lineas || []).length > 0;
-      if (!hayEsp) G.modo = 'lineas';
-      seg.raiz.hidden = !hayEsp;
       seg.fijar(G.modo);
-      const lin = G.modo === 'lineas';
-      mapa.hidden = !lin; insp.hidden = !lin; esp.hidden = lin;
-      if (lin) { pintarMapa(); pintarInspector(); } else pintarEsp();
+      tray.hidden = G.modo !== 'trayectoria'; mapa.hidden = G.modo !== 'lineas'; esp.hidden = G.modo !== 'esp';
+      if (G.modo === 'trayectoria') pintarTrayectoria(); else if (G.modo === 'lineas') pintarMapa(); else pintarEsp();
     }
-    selCarrera.addEventListener('change', () => { G.carrera = selCarrera.value; G.sel = null; pintar(); });
+    selCarrera.addEventListener('change', () => { G.carrera = selCarrera.value; pintar(); });
     pintar();
     const campo = ids.length > 1 ? h('label', { 'class': 'tmr-campo gd-campo' }, [h('span', { texto: t('temarios.filtro.carrera') }), selCarrera]) : null;
     return h('section', { 'class': 'gd-explorar', id: 'gd-explorar', 'aria-labelledby': 'gd-explorar-titulo' }, [
       h('header', { 'class': 'gd-explorar-enc' }, [h('div', {}, [h('h3', { id: 'gd-explorar-titulo', texto: t('sate.guia.explorar_seccion') }), h('p', { texto: t('sate.guia.explorar_intro') })]), campo, seg.raiz]),
-      insp, mapa, esp,
+      tray, mapa, esp,
       h('p', { 'class': 'tmr-nota', texto: t('sate.guia.explorar_nota') })]);
   }
   function cabeceraPagina(migas, titulo, intro) {

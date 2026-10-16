@@ -289,13 +289,13 @@
     fijar(o.valor);
     return { raiz: raizB, entrada: entrada, fijar: fijar };
   }
-  /* segmentado({etiqueta, opciones:[{id, texto}], valor, alCambiar(id)}) → {raiz, fijar(id)}: control de una sola elección. */
+  /* segmentado({etiqueta, opciones:[{id, texto, corto?}], valor, alCambiar(id)}) → {raiz, fijar(id)}: control de una sola elección. */
   function segmentado(o) {
     var botones = {};
     var raizS = el('div', { class: 'sate-segmentado', role: 'group', 'aria-label': o.etiqueta });
     function fijar(id) { Object.keys(botones).forEach(function (k) { botones[k].setAttribute('aria-pressed', k === id ? 'true' : 'false'); }); }
     o.opciones.forEach(function (op) {
-      var b = el('button', { type: 'button', 'data-id': op.id, texto: op.texto });
+      var b = op.corto ? el('button', { type: 'button', 'data-id': op.id }, [el('span', { class: 'sate-segmentado__largo', texto: op.texto }), el('span', { class: 'sate-segmentado__corto', 'aria-hidden': 'true', texto: op.corto })]) : el('button', { type: 'button', 'data-id': op.id, texto: op.texto });
       b.addEventListener('click', function () { fijar(op.id); if (o.alCambiar) o.alCambiar(op.id); });
       botones[op.id] = b; raizS.appendChild(b);
     });
