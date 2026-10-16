@@ -2903,7 +2903,7 @@ async function exportPng(){
   if(!selected().length&&!plan().own.length)return 'Agrega materias a tu horario para exportarlo.';
   const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-upiita.png`,await toBlob(cv));
 }
-async function loadPdfLib(){if(window.PDFLib)return window.PDFLib;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js';s.integrity='sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ==';s.crossOrigin='anonymous';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de PDF.'));document.head.appendChild(s)});return window.PDFLib}
+async function loadPdfLib(){if(!window.PDFLib)await SATE.script('../assets/vendor/pdf-lib.min.js');return window.PDFLib}
 // agrega una hoja carta al PDF con el horario dibujado (horizontal en colorido, vertical en minimalista)
 async function pdfPage(doc,rgb){
   const cv=await drawFor('all',3), png=await doc.embedPng(new Uint8Array(await (await toBlob(cv)).arrayBuffer()));

@@ -99,12 +99,13 @@ for(const archivo of ['web/sate/cascaron.html','web/sate/cupos.html','web/index.
     assert.equal(!!raiz.hidden,!propio);
   }
 }
-// Los exportadores reales fijan SRI en el elemento que se entrega al DOM.
-for(const [funcion,global] of [['loadExcelJS','ExcelJS'],['loadPdfLib','PDFLib']]){
+// Los exportadores fijan SRI para dependencias externas; pdf-lib usa el cargador local compartido.
+for(const [funcion,global] of [['loadExcelJS','ExcelJS']]){
   let script;const c=vm.createContext({document:{createElement:()=>({}),head:{appendChild(s){script=s;s.onload()}}}});
   vm.runInContext('window=globalThis;'+leer('web/sate/exportacion.js').match(new RegExp('async function '+funcion+'\\(\\)[^\\n]+'))[0],c);
   await c[funcion]();assert.match(script.integrity,/^sha512-/);assert.equal(script.crossOrigin,'anonymous');
 }
+assert.match(leer('web/sate/exportacion.js'),/SATE\.script\('\.\.\/assets\/vendor\/pdf-lib\.min\.js'\)/);
 const captura=leer('tools/captura_saes.js');
 const consulta=captura.slice(captura.indexOf('  var consultar ='),captura.indexOf('  var post ='));
 for(const codigo of [200,429,503,'lenta','abortada']){
