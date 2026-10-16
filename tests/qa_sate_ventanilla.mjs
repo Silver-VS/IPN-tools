@@ -258,16 +258,15 @@ const buscarNovena=contMaterias.todos().find(n=>n.type==='search');buscarNovena.
 const novena=contMaterias.todos().find(n=>n.tagName==='input'&&n.type==='checkbox'&&!n.checked);novena.checked=true;novena.onchange();
 assert.equal(ctxMaterias.datos.filas.length,8);assert.equal(novena.checked,false);
 assert.ok(contMaterias.todos().some(n=>n.textContent.includes('Quita una materia')));
-const pasoMotivos=dd.pasos[3],ctxGuia={datos:{paso:'',acciones:'',compromiso:'',motivos:''}},contGuia=new Nodo('div');
-for(const id of ['paso','acciones','compromiso','motivos']){
- const f=pasoMotivos.campos.find(c=>c.id===id);f.pintar(contGuia,{datos:ctxGuia.datos,cambiar(v){ctxGuia.datos[id]=v}});
-}
-contGuia.todos().find(n=>n.tagName==='textarea').value='Situación ficticia';contGuia.todos().find(n=>n.tagName==='textarea').oninput();
-assert.equal(contGuia.querySelector('#dictamen-motivos').value,'Por medio de la presente expongo los motivos de mi solicitud de dictamen.\n\nSituación ficticia');
-assert.deepEqual(contGuia.todos().filter(n=>n.tagName==='textarea').slice(0,3).map(n=>n.placeholder),['Durante el periodo … ','Para regularizarme, he … ','Me comprometo a … ']);
-ctxGuia.datos.compromiso='estudiar cada día';contGuia.todos().find(n=>n.textContent==='Armar la carta con mis respuestas').click();
-assert.match(ctxGuia.datos.motivos,/Me comprometo a estudiar cada día$/);
-ctxGuia.datos.compromiso='Me comprometo a cumplir';contGuia.todos().find(n=>n.textContent==='Armar la carta con mis respuestas').click();assert.ok(!ctxGuia.datos.motivos.includes('Me comprometo a Me comprometo'));
+const pasoMotivos=dd.pasos[3],ctxGuia={datos:{...dd.datos,motivos:'Texto ficticio propio'}},contGuia=new Nodo('div');
+pasoMotivos.campos.find(f=>f.id==='motivos').pintar(contGuia,{datos:ctxGuia.datos,cambiar(v){ctxGuia.datos.motivos=v}});
+assert.ok(contGuia.todos().some(n=>n.tagName==='summary'&&n.textContent==='Ayúdame a redactarla'));
+assert.equal(contGuia.todos().filter(n=>n.tagName==='textarea').length,1,'Solo el editor está siempre visible');
+contGuia.todos().find(n=>n.tagName==='button').click();assert.equal(ctxGuia.datos.motivos,'Texto ficticio propio','Sin respuestas se conserva la carta');
+Object.assign(dm.datos,{carta_respuestas:{causas:['salud'],acciones:'ACCIONES-SENSIBLES-FICTICIAS'}});dm.guardar();
+assert.equal(pasoMotivos.campos.find(f=>f.id==='carta_respuestas').sensible,true);
+assert.ok(!almacen.get('hu.tramite.dictamen').includes('ACCIONES-SENSIBLES'));
+assert.equal(t.modelo({...dd,id:'dictamen-carta-recarga'},JSON.parse(almacen.get('hu.tramite.dictamen'))).datos.carta_respuestas,'','Las respuestas no se recuperan del almacenamiento');
 const ex=t.modelo({...dd,id:'dictamen-externo-prueba'},null);Object.assign(ex.datos,{tipo:'externo',filas:dd.datos.filas,periodo:'27/1',peticion:'Solicito revisión de mi situación escolar.',motivos:'Motivos ficticios.',organo:'cgc',dependientes:'no_contestar',embarazo:'no_contestar',situacion:['s5'],causas:['salud'],anexos:['carta_anexo']});
 await dd.generar(ex.datos);assert.equal(estampados.at(-2).tipo,'externo');assert.equal(estampados.at(-2).valores.organo[0],'cgc');
 assert.equal(uniones.at(-1).op,undefined);assert.equal(uniones.at(-1).pdfs.length,2);

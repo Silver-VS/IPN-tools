@@ -31,9 +31,33 @@
     return [...filas.values()];
   }
   function ingreso(a){return [...new Set([...(a.acreditadas||[]).map(r=>periodo(r[2])),...(a.kardex_reprobadas||[]).map(r=>periodo(r[2])),...(a.reprobadas_periodo||[]).map(r=>periodo(r[1]))].filter(Boolean))].sort()[0]||''}
-  function carta(d){
-    const compromiso=String(d.compromiso||'').trim();
-    return ['Por medio de la presente expongo los motivos de mi solicitud de dictamen.',String(d.paso||'').trim(),String(d.acciones||'').trim(),compromiso?(/^Me comprometo\b/i.test(compromiso)?compromiso:'Me comprometo a '+compromiso):''].filter(Boolean).join('\n\n');
+  const causasCarta=['salud','trabajo','familiar','economica','academica','cambio','otra'];
+  const planesCarta=['asesorias','tutorias','reducida','compatible'];
+  const nombreCarta=s=>String(s).split(/(\s+)/).map((p,i)=>{
+    const baja=p.toLocaleLowerCase('es');
+    if(i&&['y','de','en','del','la','las','los','el','a','con','para','por'].includes(baja))return baja;
+    return /^(?:IPN|TIC|IA|CAD|CAM|[BCDFGHJKLMNÑPQRSTVWXYZ]{2,3})$/.test(p)?p:baja.charAt(0).toLocaleUpperCase('es')+baja.slice(1);
+  }).join('');
+  function carta(d,r){
+    if(!r||![r.causas?.length,r.acciones?.trim(),r.planes?.length,r.plan?.trim(),r.documentos?.trim(),r.peticion?.trim()].some(Boolean))return '';
+    const partes=[d.tipo==='externo'?tx('destino_externo')+':':tx('borrador_destino_interno',{unidad:SATE_CONFIG.unidades[SATE_UNIDAD].siglas})];
+    const periodos=String(r.periodos||'').split(/\s*(?:,|;|\by\b)\s*/).filter(Boolean);
+    if(r.causas?.length)partes.push(tx('borrador_contexto',{causas:enumerar(r.causas.filter(k=>causasCarta.includes(k)).map(k=>tx('carta_causa_'+k).toLocaleLowerCase('es'))),periodos:periodos.length?tx(periodos.length===1?'carta_periodo_uno':'carta_periodo_varios',{lista:enumerar(periodos)}):tx('carta_periodo_sin_dato')}));
+    if(r.acciones?.trim())partes.push(tx('borrador_acciones',{acciones:r.acciones.trim()}));
+    const peticion=r.peticion?.trim()||d.peticion?.trim();
+    const normalizar=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es').replace(/\s+/g,' ').trim();
+    const materias=[...new Set((d.filas||[]).map(f=>f.nombre).filter(Boolean))].filter(n=>!normalizar(peticion||'').includes(normalizar(n)));
+    if(materias.length)partes.push(tx('borrador_materias',{materias:enumerar(materias.map(nombreCarta))}));
+    const plan=[...(r.planes||[]).filter(k=>planesCarta.includes(k)).map(k=>tx('carta_plan_'+k).toLocaleLowerCase('es')),r.plan?.trim()].filter(Boolean);
+    if(plan.length)partes.push(tx('borrador_plan',{plan:enumerar(plan)}));
+    if(r.documentos?.trim())partes.push(tx('borrador_documentos',{documentos:r.documentos.trim()}));
+    partes.push(tx('borrador_peticion'));
+    return partes.join('\n\n');
+  }
+  function aplicarCarta(d,r,confirmar){
+    const nuevo=carta(d,r);
+    if(!nuevo||(String(d.motivos||'').trim()&&!confirmar(tx('carta_confirmar'))))return false;
+    d.motivos=nuevo;return true;
   }
   // La petición propuesta se arma con las materias y los periodos reales del kárdex; sin materias no hay texto.
   const enumerar=l=>l.length>1?l.slice(0,-1).join(', ')+' '+tx('pet_y')+' '+l.at(-1):l[0]||'';
@@ -47,7 +71,7 @@
   let carga,font;
   async function cargar(){
     if(!carga)carga=(async()=>{
-      await SATE.script('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
+      await SATE.script('../assets/vendor/pdf-lib.min.js');
       await SATE.script('../tramites/pdf-comun.js');await SATE.script('../tramites/pdf-dictamen.js');
       const doc=await PDFLib.PDFDocument.create();font=await doc.embedFont(PDFLib.StandardFonts.Helvetica);
     })().catch(e=>{carga=null;console.error('Dictamen: carga de PDF fallida',{etapa:'biblioteca',error:e.name});throw e});
@@ -147,15 +171,28 @@
         if(detectado)for(const [op,t] of [['inscribir','peticion_proponer_inscribir'],['tiempo','peticion_proponer_tiempo']]){const b=el('button',tx(t));b.type='button';b.className='sate-btn';b.onclick=()=>{n.value=propuesta(d,op);d.propuesta=n.value;ctx.cambiar(n.value);actualizar()};box.appendChild(b)}
         actualizar();cargar().then(actualizar).catch(()=>{contador.textContent=tx('medidor_error')});
       }};
-    const guias=[['paso','¿Qué pasó?','Durante el periodo … '],['acciones','¿Qué has hecho para regularizarte?','Para regularizarme, he … '],['compromiso','¿Qué te comprometes a hacer?','Me comprometo a … ']].map(([id,texto,placeholder])=>({id,texto,sensible:true,pintar(box,ctx){
-      const l=el('label'),n=el('textarea');l.className='tramite-campo';l.appendChild(el('span',texto));n.value=ctx.datos[id];n.placeholder=placeholder;l.appendChild(n);box.appendChild(l);
-      n.oninput=()=>{const anterior=carta(ctx.datos);ctx.cambiar(n.value);
-        if(!ctx.datos.motivos||ctx.datos.motivos===anterior){ctx.datos.motivos=carta(ctx.datos);const vista=box.querySelector('#dictamen-motivos');if(vista)vista.value=ctx.datos.motivos}
-      };
-    }}));
-    const motivos={id:'motivos',texto:'Vista previa editable de tu carta de motivos',tipo:'textarea',sensible:true,requerido:true,ayuda:'Sugerimos una página. La carta puede ocupar varias páginas.',pintar(box,ctx){
-      const b=el('button','Armar la carta con mis respuestas');b.type='button';b.className='sate-btn';const l=el('label'),n=el('textarea');n.id='dictamen-motivos';l.className='tramite-campo';l.appendChild(el('span',motivos.texto));n.value=ctx.datos.motivos;l.appendChild(n);box.appendChild(el('p',motivos.ayuda));box.appendChild(b);box.appendChild(l);
-      b.onclick=()=>{n.value=carta(ctx.datos);ctx.cambiar(n.value)};n.oninput=()=>ctx.cambiar(n.value);
+    const motivos={id:'motivos',texto:tx('carta_editor'),sensible:true,requerido:true,pintar(box,ctx){
+      const d=ctx.datos,l=el('label'),n=el('textarea');l.className='tramite-campo';n.id='dictamen-motivos';n.value=d.motivos||'';
+      l.appendChild(el('span',motivos.texto));l.appendChild(n);box.appendChild(l);n.oninput=()=>ctx.cambiar(n.value);
+      const asistente=el('details');asistente.appendChild(el('summary',tx('carta_asistente')));asistente.appendChild(el('p',tx('carta_aviso')));
+      // El campo carta_respuestas es sensible: se excluye del autoguardado y se limpia al salir.
+      const r=d.carta_respuestas||(d.carta_respuestas={periodos:[...new Set((d.filas||[]).flatMap(f=>[f.cursada,...String(f.recursada||'').split(', ')])).values()].filter(Boolean).join(', ')});
+      function chips(clave,ids,prefijo){
+        const f=el('fieldset');f.className='dictamen-opciones';f.appendChild(el('legend',tx('carta_'+clave)));
+        for(const id of ids){const etiqueta=el('label'),entrada=el('input');entrada.type='checkbox';entrada.checked=(r[clave]||[]).includes(id);
+          entrada.onchange=()=>{r[clave]=entrada.checked?[...(r[clave]||[]),id]:(r[clave]||[]).filter(k=>k!==id)};
+          etiqueta.appendChild(entrada);etiqueta.appendChild(el('span',tx(prefijo+id)));f.appendChild(etiqueta)}asistente.appendChild(f);
+      }
+      function breve(clave,contenedor=asistente){const etiqueta=el('label'),entrada=el('input');etiqueta.className='tramite-campo';etiqueta.appendChild(el('span',tx('carta_'+clave)));entrada.value=r[clave]||'';entrada.maxLength=800;entrada.oninput=()=>r[clave]=entrada.value;etiqueta.appendChild(entrada);contenedor.appendChild(etiqueta)}
+      chips('causas',causasCarta,'carta_causa_');breve('periodos');breve('acciones');
+      const f=el('fieldset');f.className='dictamen-opciones';f.appendChild(el('legend',tx('carta_peticion')));
+      // Se reutilizan las propuestas calculadas por Dictamen, sin inventar autorizaciones.
+      const peticiones=[d.peticion,plantilla(d.tipo,d.periodo,d.filas),plantilla(d.tipo,d.periodo,d.filas,'tiempo')].filter((v,i,a)=>v&&a.indexOf(v)===i);
+      for(const t of peticiones){const etiqueta=el('label'),entrada=el('input');entrada.type='radio';entrada.name='carta-peticion';entrada.checked=r.peticion===t;entrada.onchange=()=>r.peticion=t;etiqueta.appendChild(entrada);etiqueta.appendChild(el('span',t));f.appendChild(etiqueta)}asistente.appendChild(f);
+      chips('planes',planesCarta,'carta_plan_');breve('plan');breve('documentos');
+      const b=el('button',tx('carta_armar')),estado=el('p');b.type='button';b.className='sate-btn';estado.setAttribute('role','status');
+      b.onclick=()=>{if(aplicarCarta(d,r,t=>window.confirm(t))){n.value=d.motivos;ctx.cambiar(n.value);estado.textContent=tx('carta_lista');n.focus()}else estado.textContent=tx('carta_sin_cambios')};
+      asistente.appendChild(b);asistente.appendChild(estado);box.appendChild(asistente);
     }};
     const adjuntos={id:'adjuntos',texto:tx('anexos_titulo'),sensible:true,
       resumen:v=>Array.isArray(v)&&v.length?v.map(a=>a.nombre).join(', '):tx('anexos_ninguno'),
@@ -227,11 +264,11 @@
     return {id:'dictamen',titulo:'Solicitud de dictamen',lead:SATE.texto('sate.ventanilla.dictamen_para'),datos:{tipo:sugerencia.tipo,filas:pre.slice(0,8),ingreso:ingreso(alumno),periodo:periodo(alumno.periodo_actual||alumno.periodo||SATE_DATA.calendario?.periodo)},
       pasos:[{titulo:'¿Qué necesitas?',campos:[{id:'datos',texto:'Tus datos',resumen:()=>Object.values(compartido()||{}).filter(Boolean).join(' · '),validar:()=>!compartido()?'Guarda tus datos aquí para continuar.':['paterno','nombres','boleta','carrera','plan','correo'].map(k=>SateTramites.validarDatos(k,compartido()[k]||'',true)).find(Boolean)||'',pintar(box,ctx){SateTramites.datosInline(box,()=>{ctx.cambiar();ctx.repintar()},['celular','telefono'])}},tipo]},
         {titulo:'Tus materias',campos:[filas,{id:'periodo',texto:'Periodo que solicitas',requerido:true,validar:v=>!periodo(v)?'Escribe el periodo como YY/P, por ejemplo 27/1.':''}]},
-        {titulo:'Tu situación',ayuda:d=>d.tipo==='externo'?'Estos datos no se guardan; si recargas la página tendrás que volver a llenarlos':'Revisa tus dictámenes anteriores y el ciclo en que ingresaste al IPN.',campos:camposSituacion},{titulo:'Tu petición y tus motivos',ayuda:'Las respuestas guía y la carta de motivos se mantienen solo en memoria.',campos:[peticion,{id:'propuesta',visible:()=>false},{id:'peticion_origen',visible:()=>false},...guias,motivos,adjuntos]}],
+        {titulo:'Tu situación',ayuda:d=>d.tipo==='externo'?'Estos datos no se guardan; si recargas la página tendrás que volver a llenarlos':'Revisa tus dictámenes anteriores y el ciclo en que ingresaste al IPN.',campos:camposSituacion},{titulo:'Tu petición y tus motivos',ayuda:'Las respuestas guía y la carta de motivos se mantienen solo en memoria.',campos:[peticion,{id:'propuesta',visible:()=>false},{id:'peticion_origen',visible:()=>false},{id:'carta_respuestas',sensible:true,visible:()=>false},motivos,adjuntos]}],
       preparar(d,p){if(!inicializado){if(!d.ultimo)d.ultimo=alumno.ultimo_semestre||'';inicializado=true}if(p===3){if(!d.peticion_origen)d.peticion_origen=d.filas?.length?'detectado':'otro';if(d.peticion_origen==='detectado'&&(!d.peticion||d.peticion===d.propuesta)){d.peticion=propuesta(d);d.propuesta=d.peticion}}},
       revisar(box){box.appendChild(el('p','Estos datos no se guardan; si recargas la página tendrás que volver a llenarlos'))},
       volver:true,faltante,confirmacion:'Confirmo que la información es verdadera',descargaTexto:'Descargar mi solicitud (PDF)',archivo:d=>`dictamen-${d.tipo}-${compartido()?.boleta||''}.pdf`,generar:d=>generar(d),previsualizar:d=>generar(d,true)};
   }
-  raiz.SateDictamen={definir,sugerir,pendientes,plantilla,medir,cargar};
+  raiz.SateDictamen={definir,sugerir,pendientes,plantilla,medir,cargar,carta,aplicarCarta};
   SateTramites.registrar(definir,'dictamen');
 })(globalThis);
