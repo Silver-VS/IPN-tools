@@ -75,6 +75,7 @@ class Extraccion(unittest.TestCase):
     def test_verificar_detecta_cambios_sin_sustituir_datos(self):
         fuente = r.fuentes()['rge']
         pdf = b'%PDF-prueba-ficticia'
+        r.CACHE.mkdir(parents=True, exist_ok=True)  # en un clon limpio la caché aún no existe
         with tempfile.TemporaryDirectory(dir=r.CACHE) as carpeta:
             destino = Path(carpeta)
             archivo = destino / 'rge.json'
