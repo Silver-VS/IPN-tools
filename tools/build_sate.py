@@ -1178,6 +1178,8 @@ def escribir_sate(data):
     shutil.copytree(ROOT / 'web/assets/vendor', dist / 'assets/vendor', dirs_exist_ok=True)
     shutil.copytree(ROOT / 'web/policore', dist / 'policore', dirs_exist_ok=True)   # lector de documentos de PoliCORE
     cfg = json.loads((ROOT / "data/sate.json").read_text(encoding="utf-8"))
+    shutil.copy(fuente / 'recorrido.js', destino / 'recorrido.js')
+    shutil.copy(ROOT / 'data/recorrido.json', destino / 'recorrido.json')
     identidad_unidades = cuenta.identidades()
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():

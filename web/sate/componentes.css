@@ -1,4 +1,13 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
+.sate-recorrido{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--ipn-texto);overflow:hidden;box-sizing:border-box}
+.sate-recorrido::backdrop{background:transparent}
+.sate-recorrido__marco{position:fixed;box-sizing:border-box;border:3px solid var(--ipn-acento);border-radius:var(--ipn-radio);box-shadow:0 0 0 100vmax rgba(9,9,11,.55);pointer-events:none}
+.sate-recorrido__tarjeta{position:fixed;bottom:max(12px,env(safe-area-inset-bottom));right:12px;width:min(24rem,calc(100% - 24px));box-sizing:border-box;padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);max-height:48dvh;overflow:auto;overflow-wrap:anywhere}
+.sate-recorrido__tarjeta h2{font-size:var(--ipn-tamano-s);margin:0}
+.sate-recorrido__tarjeta p{margin-block:var(--ipn-esp-2)}
+.sate-recorrido__acciones{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+.sate-recorrido__acciones button{min-width:0;min-height:44px;white-space:normal;flex:1 1 auto}
+@media(max-width:639px){.sate-recorrido__tarjeta{left:12px;right:12px;width:auto}}
 :root{--sate-realce:var(--sate-acento-base);--sate-sobre-realce:var(--sate-sobre-base)}
 .sate-unidad{color:var(--sate-realce)}
 #sate-titulo{display:flex;align-items:center;gap:.3rem;overflow:visible}

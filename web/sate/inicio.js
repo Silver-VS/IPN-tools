@@ -258,7 +258,26 @@
     document.getElementById('notice').hidden=cfg.generica||actual.pestana!=='horarios';
     document.getElementById('mobnote').hidden=true;
   }
+  async function iniciarRecorrido() {
+    try { await script('recorrido.js'); await SateRecorrido.iniciar(); }
+    catch(e) { console.error('SATE: recorrido fallido',{mensaje:e.message,pila:e.stack}); SateUI.modal(texto('sate.recorrido.boton'),texto('sate.recorrido.error'),{pequeno:true}); }
+  }
+  function invitarRecorrido() {
+    const a=SATE.alumno?.();
+    if(cuposReducida || !a || a.demo || !SateUI.recorridoOfrecer(leer))return;
+    const caja=document.getElementById('sate-avisos-globales');
+    if(document.getElementById('sate-recorrido-invitacion'))return;
+    const aviso=SateUI.aviso({estado:'info',titulo:texto('sate.recorrido.boton'),cuerpo:texto('sate.recorrido.invitacion')});
+    aviso.id='sate-recorrido-invitacion';
+    for(const [clave,acepta] of [['si',true],['ahora_no',false]]){
+      const b=document.createElement('button');b.type='button';b.className='sate-btn';b.textContent=texto('sate.recorrido.'+clave);
+      b.onclick=()=>{SateUI.recorridoDecidir((k,v)=>IPNT.set(k,v),acepta);aviso.remove();if(acepta)iniciarRecorrido()};aviso.appendChild(b);
+    }
+    // Fuera del resumen: sus repintados no deben borrar la invitación pendiente.
+    caja.after(aviso);
+  }
   window.SATE = {texto, modulos, error, script, identidadSaes, cargarTemarios, get actual(){return actual}, get almacen(){return api?.store}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
+    async visitar(id) { const r=SateRutas.ruta('#/'+u+'/'+id,u,config);if(!r)return;history.replaceState(null,'',location.pathname+location.search+r.hash);await activar(r); },
     async nucleoListo(a) {
       api = a; if (!cfg.generica) await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta((cuposReducida||location.hash==='#cupos')&&cfg.cupos?'#/'+u+'/horarios':location.hash, u, config) ||
@@ -269,6 +288,9 @@
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
       await activar(r);
+      const recorrido=document.createElement('button');recorrido.type='button';recorrido.className='sate-btn';recorrido.textContent=texto('sate.recorrido.boton');recorrido.onclick=()=>{SateUI.recorridoDecidir((k,v)=>IPNT.set(k,v),true);document.getElementById('sate-recorrido-invitacion')?.remove();iniciarRecorrido()};
+      document.getElementById('foot').appendChild(recorrido);
+      invitarRecorrido();addEventListener('sate-saes-actualizado',invitarRecorrido);
       if(cuposReducida&&cfg.cupos){await script('cupos-vista.js');await SateCuposVista.montar();await script('cupos-receptor.js')}
     }, actualizarPestanas
   };

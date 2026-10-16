@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.26"
+version = "2026.10.27"
 
 [sate.creditos]
 rotulo = "créditos"
@@ -1641,3 +1641,21 @@ ver_completa = "Ver ficha completa"
 cambiar = "Elegir otra unidad"
 indice = "En esta ficha"
 bibliotecas_titulo = "Buscar los libros de este programa"
+[sate.recorrido]
+boton = "Recorrido guiado"
+invitacion = "¿Te muestro en 1 minuto qué puedes hacer con tus datos?"
+si = "Sí"
+ahora_no = "Ahora no"
+anterior = "Anterior"
+siguiente = "Siguiente"
+salir = "Salir"
+paso = "Paso {n} de {total}"
+error = "No se pudo cargar el recorrido. Puedes volver a intentarlo desde el botón Recorrido guiado."
+trayectoria = "En Mi trayectoria ves tu avance. Trae tus datos del SAES para conocer tu situación."
+trayectoria_personal = "Llevas {avance} de los créditos de tu carrera. Aquí consultas tu avance y tu situación actual."
+pendientes = "Aquí revisas tus pendientes y las opciones para resolverlos."
+pendientes_personal = "Has acreditado {n} materias según tu SAES. Aquí revisas tus pendientes y si necesitas recursar o presentar ETS."
+mapa = "En el Mapa eliges las materias que quieres cursar y planeas tu siguiente periodo."
+horarios = "En Horarios armas tu horario con los grupos de la oferta disponible."
+tramites = "En la Ventanilla encuentras los trámites disponibles y preparas sus formatos en PDF, como dictamen, bajas o electivas."
+guia = "En la Guía resuelves dudas y consultas sus fuentes y reglamentos."

@@ -1,0 +1,8 @@
+[
+  {"pestana":"trayectoria","selector":"#desempeno-titulo","texto":"trayectoria","personal":"trayectoria_personal","condicion":"siempre"},
+  {"pestana":"trayectoria","selector":"#sate-presente .sate-aviso","texto":"pendientes","personal":"pendientes_personal","condicion":"personal"},
+  {"pestana":"mapa","selector":"#h-chosen","texto":"mapa","condicion":"siempre"},
+  {"pestana":"horarios","selector":"#b-horario","texto":"horarios","condicion":"siempre"},
+  {"pestana":"tramites","selector":"#sate-tramites h2","texto":"tramites","condicion":"siempre"},
+  {"pestana":"guia","selector":"#sate-guia .guia-cab","texto":"guia","condicion":"siempre"}
+]
