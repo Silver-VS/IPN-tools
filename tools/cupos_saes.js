@@ -103,6 +103,8 @@ window.IPNCuposMontar=function(revision){
   'use strict';
   window.IPNCuposCerrar?.();
   const contenedor=revision?.contenedor||window.IPNTSateContenedor;delete window.IPNTSateContenedor;
+  const leerAlumno=window.IPNTSateLeer;
+  let alumno,lectorError=false,lecturaAlumno=0;
   const URL_SATE='__CUPOS_URL__',textos=__CUPOS_TEXTOS__;
   const C=window.IPNCupos,tx=(k,v)=>C.texto(textos,k,v),esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   if(document.getElementById('ipnt-cupos')){document.getElementById('ipnt-cupos').focus();return}
@@ -154,7 +156,7 @@ window.IPNCuposMontar=function(revision){
   panel.focus();const el=k=>panel.querySelector('[data-c="'+k+'"]');
   function enviar(d){if(sate&&!sate.closed)sate.postMessage(d,origin)}
   function preferencias(){enviar({tipo:'ipnt.cupos.avisos',v:1,unidad,hasta:automatico?hasta:0,notificacion:automatico})}
-  function enviarDatos(){if(datos&&conectado&&(modo==='ventana'||envioPendiente)){enviar(C.limpiar(datos));envioPendiente=false}}
+  function enviarDatos(completar=false){if(datos&&conectado&&(modo==='ventana'||envioPendiente||completar)){enviar({...C.limpiar(datos),...(alumno?{alumno}:{}),...(lectorError?{lectorError:true}:{})});envioPendiente=false}}
   function pintar(){
     panel.setAttribute('data-modo',modo);el('hoja').hidden=modo==='saes'&&plegada;el('plegar').hidden=modo!=='saes';panel.setAttribute('data-plegada',String(plegada));el('cabecera').hidden=modo==='saes'&&plegada;el('plegar').setAttribute?.('aria-expanded',String(!plegada));el('plegar').setAttribute?.('aria-label',tx(plegada?'desplegar':'plegar'));
     el('permitir').hidden=typeof window.Notification!=='function'||window.Notification.permission!=='default';
@@ -204,12 +206,22 @@ window.IPNCuposMontar=function(revision){
     if(revision||busy||destruido||!permitido||!estado()||modo==='ventana'&&!conectado)return;
     if(ultima!==null&&Date.now()-ultima<15000){cuenta();return}
     busy=true;ultima=Date.now();window.IPNCuposUltimaConsulta=ultima;proxima=ultima+60000;el('actualizar').disabled=true;el('estado').textContent=tx('consultando');
+    alumno=undefined;lectorError=false;
+    const lectura=++lecturaAlumno;
+    // La lectura personal no retrasa los cupos. Si termina después, completa la misma consulta.
+    let cuposListos=false;
+    if(leerAlumno)Promise.resolve().then(leerAlumno).then(d=>{
+      if(destruido||lectura!==lecturaAlumno)return;alumno=d;lectorError=!d;
+      if(lectorError)el('aviso').textContent=tx('alumno_error');
+      if(cuposListos)enviarDatos(true);
+    }).catch(e=>{if(destruido||lectura!==lecturaAlumno)return;lectorError=true;console.warn('SATE Cupos: lectura del alumno fallida',{unidad,error:e.message,pila:e.stack});el('aviso').textContent=tx('alumno_error');if(cuposListos)enviarDatos(true)});
     try{
       const r=await C.consultar({fetch:window.fetch.bind(window),parser:s=>new DOMParser().parseFromString(s,'text/html'),url:location.origin+'/Academica/Ocupabilidad_grupos.aspx',carrera,plan,
         opciones(doc){const opciones=Object.fromEntries(['carrera','plan'].map(k=>{const s=doc.querySelector('[name="ctl00$mainCopy$dpd'+k+'"]');return [k,s?[...s.options].map(o=>({valor:o.value,texto:o.textContent,elegido:o.value===s.value})):[]]}));for(const k of ['carrera','plan']){el(k).innerHTML=opciones[k].map(o=>`<option value="${esc(o.valor)}">${esc(o.texto)}</option>`).join('');el(k).value=opciones[k].find(o=>o.elegido)?.valor||''}enviar({tipo:'ipnt.cupos.opciones',v:1,unidad,opciones})}});
       if(destruido)return;
       const nuevos={tipo:'ipnt.cupos.datos',v:1,unidad,...r,hora:new Date().toISOString()};
       const antes=datos;datos=nuevos;carrera=r.carrera;plan=r.plan;pintar();alertar(antes);
+      cuposListos=true;
       enviarDatos();if(estado())el('estado').textContent=modo==='saes'?'':tx('conectada',{hora:new Date(datos.hora).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit'})});
     }catch(e){console.warn('IPN Cupos: consulta fallida',{unidad,carrera,plan,codigo:e.message,etapa:e.etapa,estado:e.estado,pila:e.stack});el('estado').textContent=tx('error_'+(textos['sate.cupos.error_'+e.message]?e.message:'red'))}
     finally{busy=false;if(!destruido)cuenta()}

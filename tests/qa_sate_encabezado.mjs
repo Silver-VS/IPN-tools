@@ -128,7 +128,7 @@ for (const datos of [null,{leido:'2026-10-07T12:00:00Z'},{leido:'2026-10-08T15:0
   const usando=!!datos&&!datos.demo;
   c.estado(datos);assert.equal(clases.on,usando);assert.equal(span.textContent,usando?'Actualizar datos SAES':'Traer datos SAES');
   assert.equal(corto.textContent,usando?'Actualizar':'Traer datos');
-  const esperado=usando?texto('sate.encabezado.usando_datos',{fecha:new Date(datos.leido).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'})}):texto('sate.encabezado.sin_datos');
+  const esperado=usando?texto('sate.cupos.alumno_actualizado',{hora:new Date(datos.leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false})}):texto('sate.encabezado.sin_datos');
   assert.equal(indicador.title,esperado);assert.equal(indicador['aria-label'],esperado);
 }
 const core=leer('web/dist/sate/nucleo.js');

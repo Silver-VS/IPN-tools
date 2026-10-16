@@ -31,6 +31,7 @@ const motor=leer('web/sate/horarios.js');
 vm.runInContext(motor.slice(motor.indexOf('let generacion=null;'),motor.indexOf('function renderGen(')),c);
 vm.runInContext(leer('web/sate/cupos-vista.js'),c);
 const vista=c.SateCuposVista;await vista.montar();
+assert.ok([...nodos.values()].some(n=>/id="cupos-alumno" role="status" aria-live="polite"/.test(n.innerHTML)),'La vista monta el estado de actualización del alumno');
 // CUP11: función pura; los bloques y el resto de la selección no se modifican.
 const materia=(materia,grupo,horas,nombre=materia)=>({materia,grupo,horas,nombre});
 const retirada=materia('A','G1',[[0,600,660]]),otra=horas=>materia('B','G2',horas);
@@ -74,6 +75,14 @@ vista.restaurar();assert.deepEqual(w.plans.A.sel,original);
 vista.aplicar([oferta[1]]);w.plans.A.sel=[key(oferta[2])];vista.restaurar();assert.deepEqual(w.plans.A.sel,[key(oferta[2])]);
 // Reemplazos de otra materia, usando los filtros y recomendaciones reales del núcleo.
 const core=leer('web/sate/nucleo.js');
+// CUP12: recepción en memoria y desde otra pestaña, sin cargar oferta ni alterar clases.
+const eventosAlumno={},perfilCupos={upiita_saes:1,unidad:'unidad-ficticia',acreditadas:[],horario_inscrito:[]};
+let estadoAlumno,repintadosAlumno=0;
+const ctxAlumno=vm.createContext({DEMO:false,SAES:{KEY:'saes.alumno',load:()=>perfilCupos,status:d=>estadoAlumno=d},window:{addEventListener:(k,f)=>eventosAlumno[k]=f},
+  renderTop:()=>repintadosAlumno++,renderAviso(){},renderOffer(){},renderCal(){},fetch(){throw Error('No se debe recargar la oferta')}});
+vm.runInContext('let ALUMNO=null,T={anterior:{}},PLAN_CACHE={};'+core.slice(core.indexOf('function actualizarAlumnoCupos('),core.indexOf('SAES.wire(d=>'))+';globalThis.alumnoCupos=()=>ALUMNO;',ctxAlumno);
+eventosAlumno['sate-saes-actualizado']();assert.equal(ctxAlumno.alumnoCupos(),perfilCupos);assert.equal(estadoAlumno,perfilCupos);
+eventosAlumno.storage({key:'saes.alumno'});assert.equal(repintadosAlumno,2);
 w.plans.A.sel=original.slice();trayectoria={want:['K0'],done:['K7'],curso:[],oblig:[],fail:[]};
 for(let i=5;i<=12;i++)oferta.push(['X','M',1,'R'+i,i,[],[[0,540,630]],i===6?70:4,'K'+i]);
 oferta.at(-3)[6]=[[1,540,630]]; // K10 choca con K1.
