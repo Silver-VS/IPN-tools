@@ -1230,6 +1230,13 @@ const mobNote=()=>{$('#mobnote').hidden=true};
 mobNote();MQ_PHONE.addEventListener('change',()=>{mobNote();render()});
 $('#b-unidad').addEventListener('click',()=>SATE.elegirUnidad());   // primera visita: unidad, carrera o inicio de sesión
 SAES.status(ALUMNO);
+function actualizarAlumnoCupos(){
+  if(DEMO)return;
+  ALUMNO=SAES.load();for(const k in T)delete T[k];PLAN_CACHE=null;
+  SAES.status(ALUMNO);renderTop();renderAviso();renderOffer();renderCal();
+}
+window.addEventListener('sate-saes-actualizado',actualizarAlumnoCupos);
+window.addEventListener('storage',e=>{if(e.key===SAES.KEY)actualizarAlumnoCupos()});
 SAES.wire(d=>{ALUMNO=d;for(const k in T)delete T[k];if(d&&DATA.mapas[carreraPerfil(d)]){S.car=carreraPerfil(d);store.set('car',S.car)}S.tab='tray';render();SAES.status(d)});
 
 // Alumno activo (respeta el modo demostración): lo usan los trámites de Ventanilla.

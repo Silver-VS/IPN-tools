@@ -3,6 +3,23 @@
   const C=window.IPNCupos,cfg=window.CUPOS_CONFIG,u=(window.SATE_UNIDAD||new URL(location.href).searchParams.get('unidad')),conf=cfg.unidades[u];
   const tx=(k,v)=>C.texto(cfg.textos,k,v),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const resumen=document.getElementById('cupos-resumen'),estado=document.getElementById('cupos-nube');
+  const alumnoEstado=document.getElementById('cupos-alumno');
+  function pintarAlumno(error=false){
+    if(!alumnoEstado)return;
+    const a=typeof SAES!=='undefined'?SAES.load():null;
+    alumnoEstado.textContent=error?tx('alumno_error'):a&&Number.isFinite(Date.parse(a.leido))?tx('alumno_actualizado',{hora:new Date(a.leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false})}):'';
+  }
+  function guardarAlumno(d){
+    try{
+      if(d.lectorError){pintarAlumno(true);return}
+      if(!d.alumno)return;
+      const a=SAES.parse(JSON.stringify(d.alumno));
+      if(!a||a.unidad!==u||!Number.isFinite(Date.parse(a.leido))){console.warn('SATE Cupos: datos del alumno rechazados',{unidad:u});pintarAlumno(true);return}
+      const anterior=SAES.load();
+      if(anterior&&Date.parse(anterior.leido)>=Date.parse(a.leido)){pintarAlumno();return}
+      SAES.save(a);window.dispatchEvent(new Event('sate-saes-actualizado'));pintarAlumno();
+    }catch(e){console.warn('SATE Cupos: datos del alumno no guardados',{unidad:u,error:e.message,pila:e.stack});pintarAlumno(true)}
+  }
   const enSaes=new URL(location.href).searchParams.get('modo')==='saes';
   document.getElementById('cupos-dejar').textContent=tx(enSaes?'detalle_unico':'dejar_abierta');
   document.title=tx('titulo');
@@ -119,13 +136,13 @@
       hasta=Math.min(d.hasta,Date.now()+30*60000);notificacion=d.notificacion&&el('notificacion').checked;permiso()}
     else if(d.tipo==='ipnt.cupos.opciones'&&d.v===1&&d.opciones){for(const k of ['carrera','plan']){const opciones=d.opciones[k];if(!Array.isArray(opciones)||opciones.length>200||!opciones.every(o=>typeof o.valor==='string'&&typeof o.texto==='string'))continue;el(k).innerHTML=opciones.map(o=>`<option value="${esc(o.valor)}">${esc(o.texto)}</option>`).join('');el(k).value=opciones.find(o=>o.elegido)?.valor||opciones[0]?.valor||''}}
     else if(d.tipo==='ipnt.cupos.ritmo'&&d.v===1&&Number.isInteger(d.n)&&d.n>=0&&d.n<=15){el('consultar').textContent=tx(d.n?'cuenta':'consultar',{n:d.n});el('consultar').disabled=enSaes||d.busy===true||d.n>0}
-    else if(C.validar(d)){conectado=true;const antes=datos;if(guardar(d))alertar(antes,d);seleccion();nube()}
+    else if(C.validar(d)){conectado=true;const antes=datos;if(guardar(d))alertar(antes,d);guardarAlumno(d);seleccion();nube()}
   });
-  window.addEventListener('storage',e=>{if(e.key===conf.prefijo+'cuposContexto')seleccion();if(e.key===clave){try{guardar(JSON.parse(e.newValue))}catch(err){}}});
+  window.addEventListener('storage',e=>{if(e.key==='saes.alumno')pintarAlumno();if(e.key===conf.prefijo+'cuposContexto')seleccion();if(e.key===clave){try{guardar(JSON.parse(e.newValue))}catch(err){}}});
   window.addEventListener('ipnt-sincronizado',nube);
   window.addEventListener('sate-cupos-seleccion',seleccion);
   window.addEventListener('ipnt-cuenta',nube);
   if(canal)canal.onmessage=e=>{if(e.data?.unidad!==u)return;if(e.data.tipo==='contexto'){if(e.data.contexto)IPNT.set(conf.prefijo+'cuposContexto',JSON.stringify(e.data.contexto));seleccion()}else if(e.data.tipo==='consulta'&&e.data.datos)guardar(e.data.datos)};
   try{guardar(JSON.parse((window.IPNT?.almacen||localStorage).getItem(clave)))}catch(e){}
-  seleccion();pintar();nube();if(!window.SATE)cargarOferta();
+  seleccion();pintar();pintarAlumno();nube();if(!window.SATE)cargarOferta();
 })();

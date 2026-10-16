@@ -1305,8 +1305,8 @@ def escribir_sate(data):
       btn.querySelector('.sate-texto-largo').textContent=SATE.texto(clave);
       btn.querySelector('.sate-texto-corto').textContent=SATE.texto(clave+'_corto')}
     if(indicador){
-      const fecha=usando?new Date(d.leido).toLocaleString('es-MX',{dateStyle:'medium',timeStyle:'short'}):'';
-      const texto=SATE.texto(usando?'sate.encabezado.usando_datos':'sate.encabezado.sin_datos',{fecha});
+      const hora=usando?new Date(d.leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
+      const texto=SATE.texto(usando?'sate.cupos.alumno_actualizado':'sate.encabezado.sin_datos',{hora});
       indicador.classList.toggle('on',usando);indicador.setAttribute('aria-label',texto);indicador.title=texto;
     }
 """)

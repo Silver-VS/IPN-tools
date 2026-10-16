@@ -33,13 +33,14 @@ const c=vm.createContext({console,location:{hostname:'saes.demo.ipn.mx'},navigat
   document:{body,createElement:tag=>new Nodo(tag),getElementById:id=>body.querySelector('#'+id),execCommand:()=>true},
   localStorage:{getItem:k=>preferencias.get(k),setItem:(k,v)=>preferencias.set(k,v)},matchMedia:()=>({matches:false})});
 c.window=c;c.open=(...args)=>abiertas.push(args);
-c.leerFicticio=()=>{lecturas++;c.IPNTSateResultado(c.perfil,'https://sate.invalid/','DEMO')};c.perfil=perfil;
+c.leerFicticio=(receptor=c.IPNTSateResultado)=>{lecturas++;receptor(undefined,'https://sate.invalid/','DEMO');receptor(c.perfil,'https://sate.invalid/','DEMO')};c.perfil=perfil;
 c.montarFicticio=()=>{montajes++;assert.equal(c.IPNTSateContenedor,el('panel'));delete c.IPNTSateContenedor;c.IPNCuposCerrar=()=>{cierres++;delete c.IPNCuposCerrar};c.IPNCuposCambiarModo=m=>modo=m};
-const fuente=leer('tools/sate_saes.js').replace('__CUPOS_TEXTOS__',JSON.stringify(config.textos)).replace('/*__SATE_LECTOR__*/','window.leerFicticio();').replace('/*__SATE_CUPOS__*/','window.montarFicticio();');
+const fuente=leer('tools/sate_saes.js').replace('__CUPOS_TEXTOS__',JSON.stringify(config.textos)).replace('/*__SATE_LECTOR__*/','window.leerFicticio(resultadoSate);').replace('/*__SATE_CUPOS__*/','window.montarFicticio();');
 const box=()=>body.querySelector('#ipnt-sate').shadowRoot.querySelector('#ipnt-sate'),el=k=>box().querySelector('[data-s="'+k+'"]'),funciones=()=>el('funciones').hijos;
 vm.runInContext(fuente,c);
 assert.equal(body.hijos.length,1);assert.equal(lecturas,1);assert.equal(el('saludo').textContent,'Hola, Alex');
 assert.equal(el('estado').textContent,'Boleta 2099000001 · tus datos del SAES están listos');
+assert.deepEqual(await c.IPNTSateLeer(),perfil);assert.equal(lecturas,2);
 assert.deepEqual(funciones().map(n=>n.attrs['data-funcion']),['copiar','abrir','cupos']);
 assert.doesNotMatch(box().innerHTML,/<table|Promedio|Créditos|ipnt-sate-menu/);
 await funciones()[0].onclick();assert.equal(copiado,JSON.stringify(perfil));assert.deepEqual(JSON.parse(copiado),perfil);
@@ -47,7 +48,7 @@ assert.match(el('mensaje').textContent,/Copiado.*Ctrl\+V.*Pegar/);
 funciones()[1].onclick();assert.equal(abiertas[0][0],'https://sate.invalid/');
 funciones()[2].onclick();assert.equal(body.hijos.length,1);assert.equal(montajes,1);assert.equal(el('inicio').hidden,true);assert.equal(el('cupos').hidden,false);
 el('modos').querySelectorAll('button')[1].onclick();assert.equal(modo,'ventana');assert.equal(preferencias.get('ipnt.cupos.modo'),'ventana');
-el('volver').onclick();assert.equal(cierres,1);assert.equal(el('inicio').hidden,false);assert.equal(el('cupos').hidden,true);assert.equal(lecturas,1);
+el('volver').onclick();assert.equal(cierres,1);assert.equal(el('inicio').hidden,false);assert.equal(el('cupos').hidden,true);assert.equal(lecturas,2);
 for(const nombre of ['', '   ']){c.perfil={...perfil,nombre};c.IPNTSate();assert.equal(body.hijos.length,1);assert.equal(el('saludo').textContent,'');assert.match(el('estado').textContent,/2099000001/)}
 c.perfil=null;c.IPNTSate();assert.equal(el('saludo').textContent,'');assert.match(el('estado').textContent,/No se encontraron datos/);assert.deepEqual(funciones().map(n=>n.attrs['data-funcion']),['abrir','cupos']);
 funciones()[0].onclick();assert.equal(abiertas.length,2);funciones()[1].onclick();el('volver').onclick();assert.equal(el('inicio').hidden,false);
@@ -61,4 +62,11 @@ c.document.execCommand=()=>false;await funciones()[0].onclick();assert.match(el(
 c.document.execCommand=()=>{throw Error('Copia alternativa ficticia bloqueada')};await funciones()[0].onclick();assert.match(el('mensaje').textContent,/No se pudieron copiar/);
 assert.match(fuente,/repeat\(2,minmax\(0,1fr\)\)/);assert.match(fuente,/@media\(max-width:599px\)/);assert.match(fuente,/border-radius:12px/);assert.match(fuente,/prefers-color-scheme:dark/);
 const revision=leer('web/qa-cupos-hoja.html');assert.match(revision,/Ventana del marcador/);assert.match(revision,/revision_sin_nombre/);assert.match(revision,/revision_sin_datos/);
+// CUP12: ejecutar el estado del encabezado compilado, con la misma hora que Cupos.
+let verde=false,titulo,etiqueta;
+const indicador={classList:{toggle(k,v){assert.equal(k,'on');verde=v}},setAttribute(k,v){etiqueta=v},set title(v){titulo=v}};
+const estadoCompilado=leer('web/dist/sate/nucleo.js').match(/const SAES=\{[\s\S]*?\n\};/)[0];
+const leido='2026-10-15T18:25:00Z',hora=new Date(leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false});
+vm.runInNewContext(estadoCompilado+';SAES.status(perfil)',{perfil:{...perfil,leido},document:{getElementById:id=>id==='sate-saes-indicador'?indicador:null},SATE:{texto:(k,v)=>config.textos[k].replace('{hora}',v.hora)}});
+assert.equal(verde,true);assert.equal(titulo,'Datos del SAES actualizados a las '+hora);assert.equal(etiqueta,titulo);
 console.log('CUP9: ventana única, saludo, funciones, cupos, vuelta, entradas compatibles y copia JSON verificados.');

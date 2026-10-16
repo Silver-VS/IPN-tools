@@ -776,6 +776,8 @@ pegado_manual = "No se pudo leer el portapapeles. Pega los datos en el recuadro.
 tactil = "Instalar en teléfono"
 
 [sate.cupos]
+alumno_actualizado = "Datos del SAES actualizados a las {hora}"
+alumno_error = "No se pudieron actualizar tus datos del SAES. Los cupos siguen disponibles; vuelve a consultar para reintentar."
 resumen_titulo = "Unidades de aprendizaje elegidas"
 resumen_riesgo = "{n} de tus grupos están llenos o con pocos lugares · Ver sugerencias"
 sugerencias = "Ver sugerencias de reemplazo"

@@ -1,7 +1,7 @@
 /* Ventana común del marcador; extracción y cupos conservan sus implementaciones. */
 (()=>{
   const textos=__CUPOS_TEXTOS__,tx=k=>textos['sate.cupos.'+k]||k;
-  function leer(){/*__SATE_LECTOR__*/}
+  function leer(resultadoSate=window.IPNTSateResultado){/*__SATE_LECTOR__*/}
   function cupos(){/*__SATE_CUPOS__*/}
   window.IPNTSate=accion=>{
     window.IPNCuposCerrar?.();document.getElementById('ipnt-sate')?.remove();
@@ -67,6 +67,8 @@
       const nombre=String(d?.nombre||'').trim();el('saludo').textContent=nombre?tx('ventana_saludo').replace('{nombre}',nombre.split(/\s+/)[0]):'';
       el('estado').textContent=d===undefined?tx('ventana_leyendo'):d?tx('ventana_listos').replace('{boleta}',d.boleta||tx('ventana_sin_boleta')):tx('ventana_sin_datos');botones();
     };
+    const resultado=window.IPNTSateResultado;
+    window.IPNTSateLeer=()=>new Promise(resolve=>leer((d,tool,sig)=>{resultado(d,tool,sig);if(d!==undefined)resolve(d)}));
     raiz.appendChild(box);document.body.appendChild(host);botones();mostrar();box.focus();if(vista)consultar();leer();
   };
   window.IPNTSate(window.IPNTSateAccion);delete window.IPNTSateAccion;

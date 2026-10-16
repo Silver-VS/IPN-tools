@@ -6,6 +6,7 @@ const leer=p=>readFileSync(p,'utf8'), fuente=leer('tools/cupos_saes.js');
 const c=vm.createContext({URL,URLSearchParams,Date});
 vm.runInContext(fuente.split('/*__CUPOS_PANEL__*/')[0],c);
 const C=c.IPNCupos, fixture=leer('tests/fixtures/ocupabilidad_ficticio.html');
+const saesJS=leer('tools/saes.py').split('JS = r"""')[1].split('"""')[0];
 const propias=[{materia:'M214',grupo:'2BM3'}],base=n=>({carrera:'B',plan:'09',filas:[{...propias[0],disponibles:n}]});
 for(const [a,b,esperado] of [[0,2,1],[4,0,1],[5,3,1],[3,2,1],[2,2,0],[4,5,0],[0,4,1],[2,4,0]]){
   assert.equal(C.cambios(base(a),base(b),propias).length,esperado,`${a} → ${b}`);
@@ -90,11 +91,12 @@ for(const unidad of ['upiita','escom','upibi']){
   const ipnt={get cuenta(){return sesion?{}:null},get proveedor(){return sesion?'ms':null},set:(k,v)=>storage.set(k,v),cupos:async(u,d)=>{graph.push({u,d});if(d)nube=d;return nube}};
   const intervalos=[];
   const ctx=vm.createContext({URL,URLSearchParams,Date:class extends Date{static now(){return t}},console,setInterval(f,ms){intervalos.push({f,ms});return intervalos.length},clearInterval(){},location:{href:'https://sate.test/sate/cupos.html?unidad='+unidad},
+    IPNT_UNIDAD:unidad,Event:class{constructor(tipo){this.type=tipo}},dispatchEvent:e=>eventos[e.type]?.(),
     CUPOS_CONFIG:{textos:config.textos,unidades:{[unidad]:{saes:config.unidades[unidad].saes,prefijo:prefix}}},
     fetch:async ruta=>({ok:true,json:async()=>ruta.endsWith('nucleo.json')?{opciones_plan:{B:{carrera:'B',plan:'09'}}}:{asig:['Oferta ficticia'],prof:['Docente de oferta'],periodos:{actual:[['B','M',1,'1BM3',0,[0],[[0,630,690]],4,'B105']]}}}),
     SateUI:{usarTextos(){},modal:(...args)=>modales.push(args)},document:{getElementById:nodo},localStorage:{getItem:k=>storage.get(k)},IPNT:ipnt,BroadcastChannel:class{constructor(n){assert.equal(n,'ipnt-cupos')}postMessage(d){difundidos.push(d)}}});
   ctx.window=ctx;ctx.opener=opener;ctx.addEventListener=(k,f)=>eventos[k]=f;
-  vm.runInContext(comun+leer('web/sate/cupos-receptor.js'),ctx);
+  vm.runInContext(saesJS+comun+leer('web/sate/cupos-receptor.js'),ctx);
   const d={...payload,unidad};
   const mensaje=(origin,source,data)=>eventos.message({origin,source,data});
   const veneno={get unidad(){throw Error('No interpretar origen ajeno')}};
@@ -105,6 +107,19 @@ for(const unidad of ['upiita','escom','upibi']){
   mensaje(origin,opener,d);await new Promise(ok=>setImmediate(ok));
   assert.equal(JSON.parse(storage.get(prefix+'cupos')).hora,d.hora);assert.equal(difundidos.length,1);
   assert.equal(graph.length,0);assert.match(nodo('cupos-resumen').textContent,/Última consulta:.*conectado al SAES/);
+  assert.equal(storage.has('saes.alumno'),false,'Sin alumno conserva el flujo de cupos');
+  const alumno={upiita_saes:1,unidad,leido:new Date(t).toISOString(),boleta:'2099000001',acreditadas:[['X101',8,'26/1','ORD']],avance:{obtenidos:4},en_curso:['X102'],horario_inscrito:[['1XM1','X102','Materia ficticia','Docente ficticio',[[0,540,600]]]]};
+  let actualizaciones=0;eventos['sate-saes-actualizado']=()=>actualizaciones++;
+  mensaje(origin,opener,{...d,alumno});
+  assert.deepEqual(JSON.parse(storage.get('saes.alumno')),alumno);assert.equal(actualizaciones,1);
+  assert.match(nodo('cupos-alumno').textContent,/Datos del SAES actualizados a las \d{2}:\d{2}/);
+  assert.equal(JSON.parse(storage.get(prefix+'cupos')).alumno,undefined,'La consulta compartida no contiene el perfil');
+  assert.ok(difundidos.every(d=>!d.datos?.alumno),'No difunde identidad por el canal compartido');
+  for(const invalido of [{...alumno,unidad:'ajena'},{...alumno,acreditadas:null},{...alumno,leido:'inválido'}])mensaje(origin,opener,{...d,alumno:invalido});
+  assert.equal(actualizaciones,1);assert.deepEqual(JSON.parse(storage.get('saes.alumno')),alumno);
+  mensaje(origin,opener,{...d,lectorError:true});assert.match(nodo('cupos-alumno').textContent,/Los cupos siguen disponibles/);
+  assert.equal(JSON.parse(storage.get(prefix+'cupos')).hora,d.hora);
+  await new Promise(ok=>setImmediate(ok));
   assert.match(nodo('cupos-tabla').innerHTML,/<table/);
   assert.match(nodo('cupos-tabla').innerHTML,/Docente ficticio/);
   assert.ok(nodo('cupos-tabla').innerHTML.includes(nombreLargo));
@@ -238,13 +253,17 @@ const nodes=new Map(),node=k=>{if(!nodes.has(k))nodes.set(k,{value:'',innerHTML:
 const atributos={};const panel={setAttribute(k,v){atributos[k]=v},focus(){},addEventListener(){},querySelector:s=>node(s),style:{setProperty(){}},remove(){}};
 const sesionPanel=new Map(),preferenciaPanel=new Map();let anchoFino=true;
 let receptor={closed:false,postMessage(){}};
+const datosEnviados=[];
+let resolverAlumno,fallarAlumno=false;
+const perfilPanel={upiita_saes:1,unidad:'upiita',leido:new Date(tiempo).toISOString(),acreditadas:[]};
 const mc=vm.createContext({URL,URLSearchParams,Date:class extends Date{static now(){return tiempo}},console,
   matchMedia:q=>{assert.equal(q,'(min-width: 900px) and (pointer: fine)');return {matches:anchoFino}},
   localStorage:{getItem:k=>preferenciaPanel.get(k),setItem:(k,v)=>preferenciaPanel.set(k,v)},sessionStorage:{getItem:k=>sesionPanel.get(k),setItem:(k,v)=>sesionPanel.set(k,v)},
   location:{origin:new URL(url).origin,hostname:new URL(url).hostname,pathname:'/Inicio.aspx'},
   document:{hidden:false,addEventListener:(k,f)=>{visibilidad=f},removeEventListener(){},getElementById:()=>null,createElement:k=>k==='style'?{remove(){}}:panel,head:{appendChild(){}},body:{appendChild(){}},querySelector:()=>null},
   setInterval:(f,ms)=>{assert.equal(ms,1000);intervalos.push(f);return intervalos.length},clearInterval(){},DOMParser:class{parseFromString(s){return documento(s)}}});
-mc.window=mc;mc.open=(u,n,o)=>{aperturas++;assert.match(u,/cupos.html\?unidad=upiita/);assert.equal(n,'sate-cupos');return receptor};
+mc.IPNTSateLeer=()=>fallarAlumno?Promise.reject(Error('Fallo ficticio del Lector')):new Promise(ok=>{resolverAlumno=ok});
+mc.window=mc;mc.open=(u,n,o)=>{aperturas++;assert.match(u,/cupos.html\?unidad=upiita/);assert.equal(n,'sate-cupos');receptor.postMessage=d=>datosEnviados.push(d);return receptor};
 mc.addEventListener=(k,f)=>panelMessage=f;mc.removeEventListener=()=>{};
 let panelCar='B',panelPlan='09';
 mc.fetch=async(u,o)=>{assert.equal(u,url);peticionesPanel++;if(o.body){const b=new URLSearchParams(o.body),target=b.get('__EVENTTARGET');if(target.endsWith('dpdcarrera'))panelCar=b.get(target);if(target.endsWith('dpdplan'))panelPlan=b.get(target)}return {ok:true,url,text:async()=>conSeleccion(panelCar,panelPlan)}};
@@ -255,11 +274,18 @@ ejecutar();assert.equal(peticionesPanel,0);assert.equal(aperturas,1);
 assert.equal(atributos['data-modo'],'ventana');assert.equal(node('[data-c="hoja"]').hidden,false);
 mensaje({tipo:'ipnt.cupos.hola'});mensaje({tipo:'ipnt.cupos.seleccion',v:1,carrera:'B',plan:'09',grupos:seleccion});await esperar();
 assert.equal(peticionesPanel,3);assert.match(node('[data-c="estado"]').textContent,/conectado a SATE/);
+const consultaSinAlumno=datosEnviados.filter(d=>d.tipo==='ipnt.cupos.datos').at(-1);
+assert.equal(consultaSinAlumno.alumno,undefined,'Cupos no espera al Lector');
+resolverAlumno(perfilPanel);await esperar();
+const consultaConAlumno=datosEnviados.filter(d=>d.tipo==='ipnt.cupos.datos').at(-1);
+assert.deepEqual(consultaConAlumno.alumno,perfilPanel);assert.equal(consultaConAlumno.hora,consultaSinAlumno.hora,'Completa el mismo mensaje de cupos');
 await node('[data-c="actualizar"]').onclick();assert.equal(peticionesPanel,3);
 assert.match(node('[data-c="actualizar"]').textContent,/15 segundos/);
 tiempo+=14000;await intervalos[0]();assert.match(node('[data-c="actualizar"]').textContent,/1 segundo$/);
 tiempo+=1000;await intervalos[0]();assert.equal(node('[data-c="actualizar"]').disabled,false);
-await node('[data-c="actualizar"]').onclick();assert.equal(peticionesPanel,6);
+fallarAlumno=true;await node('[data-c="actualizar"]').onclick();await esperar();assert.equal(peticionesPanel,6);
+assert.equal(datosEnviados.filter(d=>d.tipo==='ipnt.cupos.datos').at(-1).lectorError,true);
+assert.match(node('[data-c="aviso"]').textContent,/Los cupos siguen disponibles/);fallarAlumno=false;
 panelMessage({origin:'https://evil.test',source:receptor,data:{get tipo(){throw Error('origen ajeno')}}});
 receptor.closed=true;await intervalos[0]();assert.match(node('[data-c="estado"]').textContent,/Ventana de SATE cerrada/);
 assert.equal(node('[data-c="abrir"]').hidden,false);assert.equal(aperturas,1);
