@@ -18,6 +18,7 @@ data/gestion_escolar/render/
 # Datos capturados del SAES de otra unidad (cada quien los genera con el capturador)
 data/horarios_saes.json
 # Entorno
+.cache/reglamentos/
 .claude/
 __pycache__/
 *.pyc
