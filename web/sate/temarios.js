@@ -249,7 +249,7 @@
       const rec = recursos.length ? h('section', { 'class': 'tmr-bloque', id: 'ficha-recursos' }, [h('h3', { texto: t('sate.guia.recursos') }), ...recursos.map(x => enlaceExterno('tmr-recurso', x.url, [h('small', { texto: [x.fuente, x.idioma, x.tipo].join(' · ') }), h('span', { texto: x.titulo + ' ↗' })]))]) : null;
       const biblio = h('section', { 'class': 'tmr-bloque', id: 'ficha-bibliografia' }, [
         (m.bibliografia || []).length ? h('h3', { texto: t('sate.guia.bibliografia') }) : h('h3', { texto: t('temarios.ficha.bibliotecas_titulo') }),
-        (m.bibliografia || []).length ? h('ul', { 'class': 'tmr-biblio' }, m.bibliografia.map(b => h('li', { texto: String(b.texto || '').trim() }))) : null,
+        (m.bibliografia || []).length ? h('ul', { 'class': 'tmr-biblio' }, m.bibliografia.map(b => SateBibliotecas.referencia(String(b.texto || '').trim()))) : null,
         raiz.SateBibliotecas && raiz.SateBibliotecas.panel ? raiz.SateBibliotecas.panel({ termino: m.nombre, titulo: t('temarios.ficha.bibliotecas_titulo') }) : null]);
       const secciones = [['objetivo', t('temarios.seccion.objetivo'), texto('objetivo', t('temarios.seccion.objetivo'), m.objetivo)], ['contenidos', t('sate.guia.veras'), unidades],
         ['orientacion', t('temarios.seccion.orientacion'), texto('orientacion', t('temarios.seccion.orientacion'), m.orientacion)], ['evaluacion', t('temarios.seccion.evaluacion'), texto('evaluacion', t('temarios.seccion.evaluacion'), m.evaluacion)],

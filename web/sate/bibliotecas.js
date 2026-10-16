@@ -6,6 +6,31 @@
 
   /* ===================== A. Funciones puras ===================== */
   const CAMPOS = ['todo', 'titulo', 'autor', 'tema'];
+  // El OCR mezcla APA, comillas y listas separadas por coma o punto y coma.
+  // Solo se descarta el prefijo de autor cuando hay un delimitador reconocible.
+  function tituloDeReferencia(texto) {
+    const original = String(texto == null ? '' : texto).replace(/\s+/g, ' ').trim();
+    const citado = original.match(/[“"]([^”"]+)[”"]/);
+    const fecha = original.match(/\((?:18|19|20)\d{2}[a-z]?\)\.?\s*(.+)/i);
+    let s = citado ? citado[1] : fecha ? fecha[1] : original;
+    if (!citado && !fecha) {
+      // Iniciales como «T.D.» no son límites de título.
+      s = s.replace(/\b(\p{L})\.(?=\p{L}\.)/gu, '$1');
+      const autor = /^(?:[^.]+)\.\s+(?:Editorial|Ed\.|ISBN)/i.test(s) ? null : s.match(/^([^.;]+)\.\s+(.+)/);
+      if (autor && /[,]|\s/.test(autor[1]) && /\p{L}{2,}$|\b[A-Z]{1,3}$/u.test(autor[1])) s = autor[2].replace(/^[;,\s]+/, '');
+      const partes = s.split(/\s*[;,]\s*|\.\s+/).filter(Boolean);
+      const candidato = partes.findIndex((p, i) => i > 0 && p.replace(/\b\p{L}\.?\b/gu, '').trim().split(/\s+/).filter(Boolean).length >= 1 &&
+        !/^[A-Z]{1,4}\.?$/.test(partes[i + 1] || '') &&
+        !/^(?:[A-Z]{1,4}\.?|y|and)$/u.test(p) && !/\b\p{L}\.?$/u.test(p) && !/^(?:ISBN|Ed\b|Editorial|\d)/i.test(p));
+      if (!autor && candidato > 0) s = partes[candidato];
+    }
+    if (!citado) s = s.split(/\.\s+/)[0];
+    s = s.replace(/\b(?:ISBN|ISSN)\b.*$/i, '')
+      .replace(/(?:[,;]\s*|\s+)(?:(?:\d+(?:[.ªºa-z]+)?|primera|segunda|tercera|cuarta|quinta|sexta|séptima|octava|novena)\s*(?:edici[oó]n|edition|ed\b)|editorial\b|edit\.|ed\.|Mc\.?\s*Graw|Prentice\b|Pearson\b).*$/i, '')
+      .replace(/\b(?:18|19|20)\d{2}\b.*$/, '').replace(/[.;,\s–-]+$/, '').trim();
+    // Conservar conectores y subtítulos; ocho palabras acotan la consulta sin inventar términos.
+    return (s && /\p{L}{3}/u.test(s) ? s : original).split(/\s+/).slice(0, 8).join(' ');
+  }
   // URL de un buscador: el término se codifica con encodeURIComponent; sin término se abre la portada del buscador.
   // op: {campo: 'todo'|'titulo'|'autor'|'tema', biblioteca: código de la biblioteca de la unidad (solo el catálogo lo filtra)}
   function url(fuente, termino, op) {
@@ -21,7 +46,7 @@
     return u;
   }
   const destinos = (fuentes, termino, op) => (fuentes || []).map(f => ({ id: f.id, titulo: f.titulo, descripcion: f.descripcion, aviso: f.aviso || null, href: url(f, termino, op) }));
-  raiz.SateBibliotecas = { CAMPOS, url, destinos };
+  raiz.SateBibliotecas = { CAMPOS, url, destinos, tituloDeReferencia };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -38,6 +63,15 @@
     return n;
   };
   let contador = 0;
+  function referencia(texto) {
+    const titulo = tituloDeReferencia(texto);
+    const catalogo = (SATE_CONFIG.bibliotecas || []).find(f => f.id === 'catalogo');
+    return h('li', { 'class': 'sate-biblio__referencia' }, [
+      h('span', { texto }), catalogo && titulo ? h('a', { 'class': 'sate-btn sate-btn--chico',
+        href: url(catalogo, titulo, { campo: 'titulo' }), target: '_blank', rel: 'noopener',
+        'aria-label': t('sate.biblio.disponibilidad_titulo', { titulo }), texto: t('sate.biblio.disponibilidad') }) : null]);
+  }
+  raiz.SateBibliotecas.referencia = referencia;
   // panel({termino, titulo?}) → Element. La biblioteca de la unidad sale de data/sate.json (unidades.<id>.biblioteca).
   function panel(op) {
     op = op || {};
