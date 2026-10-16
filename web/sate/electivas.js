@@ -11,7 +11,7 @@
   let fuente,recursos,carga;
   async function preparar(){
     if(!carga)carga=(async()=>{
-      await SATE.script('https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js');
+      await SATE.script('../assets/vendor/pdf-lib.min.js');
       await SATE.script('../tramites/pdf-comun.js');await SATE.script('../tramites/pdf-electivas.js');
       const r=await fetch('datos/'+SATE_UNIDAD+'/electivas.json');if(!r.ok)throw new Error('Electivas: HTTP '+r.status);
       recursos=await r.json();const doc=await PDFLib.PDFDocument.create();fuente=await doc.embedFont(PDFLib.StandardFonts.Helvetica);

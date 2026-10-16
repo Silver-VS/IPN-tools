@@ -69,9 +69,7 @@
     if (!cargas.has(src)) cargas.set(src, new Promise((ok, no) => {
       const s = document.createElement('script'); s.src = src;
       if(/^https?:/.test(src)){
-        const integridad={
-          'https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js':'sha512-z8IYLHO8bTgFqj+yrPyIJnzBDf7DDhWwiEsk4sY+Oe6J2M+WQequeGS7qioI5vT6rXgVRb4K1UVQC5ER7MKzKQ=='
-        };
+        const integridad={};
         if(!integridad[src]){cargas.delete(src);no(new Error('Biblioteca externa sin integridad: '+src));return}
         s.integrity=integridad[src];s.crossOrigin='anonymous';
       }
