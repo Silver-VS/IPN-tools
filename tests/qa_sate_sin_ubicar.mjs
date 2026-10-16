@@ -12,7 +12,7 @@ for(const unidad of ['upiita','escom','upibi']){
   for(const [car,m] of Object.entries(data.mapas)){
     carreras++;
     const nodos=new Map(), $=id=>{if(!nodos.has(id))nodos.set(id,{hidden:true,innerHTML:'',textContent:''});return nodos.get(id)};
-    const estado={done:[],curso:[],oblig:[],want:[]}, S={car,per:'actual',planPaso:0};
+    const estado={done:[],curso:[],oblig:[],want:[],adeudos:[],elecciones:{}}, S={car,per:'actual',planPaso:0};
     const c=vm.createContext({S,PLAN_DOS_PERIODOS:false,PLAN_PASO:0,PLAN_CACHE:null,
       MAP:()=>m,cur:()=>m.cur,$,esc:s=>String(s),pretty:s=>s,
       SATE:{texto:(k,v={})=>config.textos[k]?.replace(/\{(\w+)\}/g,(_,p)=>v[p]??'')||k},

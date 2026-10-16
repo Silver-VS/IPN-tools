@@ -156,7 +156,7 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
       if(!$('#plan-resumen').innerHTML.includes('Elige en el mapa'))throw new Error('Créditos sin materias en bandeja');
       ALUMNO.reprobadas_periodo=[[primero,perName(planInicio()-4),1]];
       for(const k in T)delete T[k];renderTray();
-      if(!tr().want.includes(primero)||!$('#chosen').innerHTML.includes('wchip'))throw new Error('Obligatoria no se muestra como materia');
+      if(tr().want.includes(primero)||!$('#sugg').innerHTML.includes('data-desfase'))throw new Error('Adeudo sin elección debe mostrar opciones sin asignar periodo');
       ALUMNO=null;store.set('t.'+S.car,{want:[]});for(const k in T)delete T[k];
       clearTimeout(PLAN_UNDO_TIMER);PLAN_UNDO=null;
     `,contexto,{filename:'un-periodo-'+unidad});
@@ -301,6 +301,7 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
     ALUMNO.carga={min:0,media:40,max:80};ALUMNO.reprobadas_periodo=[[requisitos[0],'26/1',1]];
     for(const k in T)delete T[k];
     if(cargaInfo(0).ret!==cur()[requisitos[0]][1])throw new Error('C: retenidos de N incorrectos');
+    elegirDesfase(requisitos[0],'actual');
     renderTray();
     const resumenCarga=$('#plan-resumen').innerHTML;
     if(!resumenCarga.includes(' cr')||!$('#chosen').innerHTML.includes(' de '+fmtCr(cargaInfo(0).tope)+' créditos'))throw new Error('Vista: resumen compacto o detalle de carga incompleto');

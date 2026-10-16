@@ -136,6 +136,17 @@
       if (t.oblig.some(k => t.curso.includes(k))) return 'una materia en curso aparece como obligatoria';
       return true;
     }, ctx);
+    revisar('desfase requiere elección explícita', () => {
+      const base=conPlan(()=>tr(),0);
+      for(const k of base.adeudos){
+        const e=desfaseEleccion(k,base), paso=planAsignado(k);
+        if(!e&&paso!=null)return 'adeudo asignado sin elección: '+k;
+        if(e==='ets'&&paso!=null)return 'ETS asignado a un periodo de clases: '+k;
+        if(e==='actual'&&paso!==0)return 'elección de este periodo no respetada: '+k;
+        if(e==='siguiente'&&paso!==1)return 'elección del siguiente periodo no respetada: '+k;
+      }
+      return true;
+    }, ctx);
     revisar('situación real independiente de simulación', () => {
       const on=SIM.on, d=situacionDatos();
       if(SIM.on!==on)return 'Situación cambió la simulación';
@@ -241,6 +252,7 @@
         const ya = new Set([...tr().done, ...tr().curso]), avoid = S.gavoid.map(norm);
         for (const o of g.top || []) {
           const cs = o.cs;
+          if(cs.some(c=>!desfaseHorario(c[8])))return 'horario incluye adeudo sin elegir este periodo';
           if(typeof semanaOk==='function'&&!semanaOk(cs))return 'horario incompatible con Mi semana';
           if(typeof presupuestoSemana==='function'){
             const p=presupuestoSemana(cs),s=Object.values(p.horas).reduce((a,b)=>a+b,0);

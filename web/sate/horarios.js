@@ -477,6 +477,7 @@ function* generarPasos(run,materias,rescate=false){
   // El rescate conserva exactamente las materias del horario, incluidas las inscritas.
   if(!rescate){tr().oblig.forEach(k=>{if(!want.includes(k))want.unshift(k)});
     const ya=new Set([...tr().done,...tr().curso]);want=want.filter(k=>!ya.has(k))}
+  const t=tr();want=want.filter(k=>!t.adeudos?.includes(k)||t.elecciones[k]==='actual');
   const marks=ws().marks, own=ownAsClasses();
   const pref=S.gpref.map(norm), avoid=S.gavoid.map(norm);
   const pscore=c=>c[5].reduce((s,i)=>s+(pref.some(p=>norm(DATA.prof[i]).includes(p))?4:0),0);
@@ -520,7 +521,7 @@ function* generarPasos(run,materias,rescate=false){
   return conAviso({top,subj,trunc:run.limited,minDays:minDays===Infinity?null:minDays,maxD});
 }
 /* Banco de materias: horarios con exactamente N materias tomadas de las seleccionadas. Recorre subconjuntos en orden
-   de prioridad (obligatoria por desfase siempre incluida; luego reprobadas, atrasadas, sugeridas y marcadas «Sí»),
+   de prioridad (adeudos elegidos para este periodo siempre incluidos; luego reprobadas, atrasadas, sugeridas y marcadas «Sí»),
    descarta los que exceden la carga permitida y, para cada subconjunto, busca la mejor combinación de grupos.
    Se muestran opciones con materias distintas (la mejor de cada subconjunto). */
 /* Calidad de un horario (modo Automático). Criterios basados en recomendaciones sobre sueño, atención y descanso:
@@ -596,14 +597,14 @@ function* generateBank(subj,N,{marks,pscore,oq,run}){
 function renderGen(){
   const g=S.gen;
   $('#b-gen-clear').hidden=!g?.top?.length;
-  if(!g){$('#genres').innerHTML='';return}
-  if(g.msg){$('#genres').innerHTML=`<p class="empty">${esc(g.msg)}</p>`;return}
+  if(!g){$('#genres').innerHTML=desfaseAvisos();return}
+  if(g.msg){$('#genres').innerHTML=desfaseAvisos()+`<p class="empty">${esc(g.msg)}</p>`;return}
   const dmsg=g.bank?.auto?`<p class="gdays-msg">${txH('generador_auto',{n:g.bank.M,meta:fmtCr(g.bank.meta),tope:g.bank.tope!=null?txH('generador_tope',{n:fmtCr(g.bank.tope)}):''})}</p>${g.bank.relajado?`<p class="gdays-msg warn">${esc(txH('generador_relajado'))}</p>`:''}${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">${txH('generador_carga_menor',{n:fmtCr(g.bank.best)})}</p>`:''}`:g.bank?`<p class="gdays-msg">${txH('generador_numero',{n:g.bank.N,total:g.bank.M,tope:g.bank.tope!=null?txH('generador_carga_tope',{n:fmtCr(g.bank.tope)}):''})}</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">${txH('generador_dias',{n:g.minDays})}${g.maxD&&g.minDays>g.maxD?' '+esc(txH('generador_dias_imposible',{n:g.maxD})):g.maxD?' '+esc(txH('generador_dias_posible',{n:g.maxD})):''}</p>`:'';
   const oex=g.optExceso?Object.entries(g.optExceso).map(([v,x])=>x.libre<=0?txH('optativas_cubiertas',{n:x.total,nivel:v}):txH('optativas_libres',{n:x.libre,nivel:v,elegidas:x.n})):[];
   const oexMsg=oex.length?`<p class="gdays-msg warn">${esc(txH('optativas_aviso',{detalle:oex.join('; ')}))}</p>`:'';
   const none=g.subj.filter(s=>!s.opts.length).map(s=>s.k), mustNone=g.subj.filter(s=>s.must&&!s.opts.length).map(s=>s.k);
   const must=g.subj.filter(s=>s.must&&s.opts.length).map(s=>s.k);
-  const omsg=(mustNone.length?`<p class="gdays-msg warn">${txH('obligatoria_sin_grupos',{nombre:mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'')+
+  const omsg=desfaseAvisos()+(mustNone.length?`<p class="gdays-msg warn">${txH('obligatoria_sin_grupos',{nombre:mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'')+
     (must.length?`<p class="gdays-msg">${txH('obligatoria_incluida',{nombre:must.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'');
   if(!g.top.length){$('#genres').innerHTML=dmsg+omsg+oexMsg+`<p class="empty">${esc(txH(g.trunc?'generador_limite':'generador_sin_resultados'))}</p>`;return}
   $('#genres').innerHTML=dmsg+omsg+oexMsg+

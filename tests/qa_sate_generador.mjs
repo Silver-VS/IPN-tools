@@ -23,7 +23,7 @@ const c=vm.createContext({console:{error:(...args)=>errores.push(args)},setTimeo
   S:{car:'X',per:'actual',fit:false,gap:null,onlyWant:true,chips:[],gpref:[],gavoid:[],gt:'*',gen:null},
   GT:{src:'todo',n:'',days:'',breaks:[]},DATA:{prof:[]},MARK:{sug:[]},
   classes:()=>{if(fallo)throw Error('fallo ficticio');return oferta},filtered:()=>oferta,
-  tr:()=>tray,ws:()=>workspace,plan:()=>plan,ownAsClasses:()=>[],cur:()=>Object.fromEntries(oferta.map(x=>[x[8],[x[8],6]])),
+  tr:()=>tray,desfaseAvisos:()=>'',ws:()=>workspace,plan:()=>plan,ownAsClasses:()=>[],cur:()=>Object.fromEntries(oferta.map(x=>[x[8],[x[8],6]])),
   keyOf:c=>c[3]+'|'+c[8],norm:s=>s.toLowerCase(),tmin:()=>null,overlaps:()=>false,
   optCupo:()=>({}),optExceso:()=>({}),nivOpt:()=>null,cargaInfo:()=>null,statusOf:()=>'',
   breaksOk:()=>true,semanaOk:()=>true,semanaPena:()=>0,
