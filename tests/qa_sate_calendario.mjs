@@ -384,7 +384,7 @@ assert.match(css,/\[data-theme=dark\] #sate-calendario\{/);assert.match(css,/@me
 assert.match(css,/grid-template-columns:repeat\(7,minmax\(0,1fr\)\)/);
 assert.match(css,/\.calendario-arriba\{display:grid;grid-template-columns:minmax\(0,1fr\) 300px/);
 assert.match(css,/@media\(max-width:639px\)\{\.calendario-arriba,\.calendario-abajo\{grid-template-columns:minmax\(0,1fr\)\}/);
-assert.match(css,/\.calendario-centro\{bottom:16%/);assert.match(css,/\.calendario-centro-largo\{display:none\}/);assert.match(css,/\.calendario-svg-mes,\.calendario-svg-extremo\{font-size:21px\}/);
+assert.match(css,/\.calendario-centro\{bottom:16%/);assert.match(css,/\.calendario-centro-largo\{display:none\}/);assert.match(css,/\.calendario-svg-mes,\.calendario-svg-extremo\{font-size:var\(--ipn-tamano-l\)\}/);
 assert.match(css,/\.calendario-lado\{position:sticky/);assert.match(css,/\.calendario-tarjeta\[hidden\]\{display:none\}/);
 assert.match(css,/\.calendario-linea-fila\{[^}]*min-height:34px/);
 assert.doesNotMatch(css,/carril/,'Sin restos de los carriles');

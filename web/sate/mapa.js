@@ -65,6 +65,7 @@ function renderMap0(){
     const w=lw+cols*(bw+gx)+10, h=Object.keys(by).length*(bh+gy)+gy;
     const sc=ZOOM??Math.min(1.2,Math.max(.6,(wrap.clientWidth-4)/w));MAPSC=sc;
     let html=`<svg width="${w*sc}" height="${h*sc}" aria-hidden="true">`;
+  /* escala del mapa */
     Object.keys(by).sort((a,b)=>a-b).forEach((n,i)=>{const y=gy/2+i*(bh+gy);html+=`<rect class="band" x="0" y="${y*sc}" width="${w*sc}" height="${(bh+gy/2)*sc}"/><text class="rowlbl" x="${12*sc}" y="${(y+bh/2+5)*sc}" font-size="${16*sc}">${n}</text>`});
     html+='</svg>';
     Object.keys(by).sort((a,b)=>a-b).forEach((n,i)=>by[n].forEach((k,j)=>{
@@ -122,6 +123,7 @@ function renderMap0(){
   const Y=y=>{if(!bands.length||y<=bands[0][2])return y;const i=bandOf(y);const [,,a,b]=bands[i];return y>=b&&i===bands.length-1?tops[i]+(b-a)*kOf(i)+(y-b):tops[i]+(y-a)*kOf(i)};
   const H=Y(L.h);
   let svg=`<svg width="${L.w*sc}" height="${H*sc}" viewBox="0 0 ${L.w} ${H}" aria-hidden="true"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--edge)"/></marker><marker id="ahh" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--ipn-acento)"/></marker><marker id="ahpre" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--rel-pre)"/></marker><marker id="ahpost" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--rel-post)"/></marker></defs>`;
+  /* escala del mapa */
   bands.forEach(([n,y,a,b],i)=>{const k=kOf(i);if(!k)return;if(i%2===0)svg+=`<rect class="band" x="0" y="${Y(a)}" width="${L.w}" height="${(b-a)*k}"/>`;svg+=`<text class="rowlbl" x="12" y="${Y(y)+6*k}" font-size="${18*Math.max(k,.7)}">${n}</text>`});
   /* Flechas lejanas (saltan filas o cruzan varias columnas) no se dibujan: su requisito se cursa muchas materias antes.
      Aparecen completas al resaltar una de sus materias, junto con toda la cadena. */
@@ -137,19 +139,23 @@ function renderMap0(){
   svg+='</svg>';
   let html=svg;
   // caja en fila compacta: misma posición relativa, menos alto y letra más chica
+  /* escala del mapa */
   const compacta=(h0,y0,h)=>{const k=kOf(bandOf(y0+h/2));if(k===1)return h0;if(!k)return '';return h0.replace(/font-size:([\d.]+)px/,(m,v)=>`font-size:${(+v*Math.max(k,.62)).toFixed(2)}px`).replace('class="box ','class="box compact ')};
   L.boxes.forEach(([x,y0,w,h0,k,slot,sem],i)=>{
     const f=FILL.get(i), y=Y(y0), h=h0*kOf(bandOf(y0+h0/2));
     if(!k&&f?.k){html+=compacta(boxHtml(f.k,x,y,w,h,sc,want,off,hot,sem,req).replace('class="box ','class="box optfill '),y0,h0);return}
     if(!kOf(bandOf(y0+h0/2)))return;   // fila plegada
+  /* escala del mapa */
     if(!k&&f?.sigue){html+=`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9*sc}px" title="${esc(slot)}: continúa tu línea con ${esc(cur()[f.sigue][0])}">${esc(slot)}<small class="slot-sig">sigue: ${esc(pretty(cur()[f.sigue][0]).replace(/\s*\(.*\)$/,''))}</small></div>`;return}
     if(k) html+=compacta(boxHtml(k,x,y,w,h,sc,want,off,hot,sem,req),y0,h0);
+  /* escala del mapa */
     else html+=compacta(`<div class="box slot${hot?' dim':''}" style="left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${9.5*sc}px" title="${esc(slot)}: ${/^electiva/i.test(slot)?SATE.texto('sate.electivas.acreditacion_breve'):'cualquiera de las ofertadas'}">${esc(slot)}</div>`,y0,h0);
   });
   el.style.width=L.w*sc+'px';el.style.height=H*sc+'px';el.innerHTML=html;
   if(FOCO&&ZOOM==null){const c=((FOCO.x0+FOCO.x1)/2)*sc-wrap.clientWidth/2;requestAnimationFrame(()=>{wrap.scrollLeft=Math.max(0,c)})}
   const ar=$('#areas');ar.hidden=!L.cols;ar.style.width=L.w*sc+'px';
   // columnas que agrupan áreas pequeñas («A · B»): un renglón por área y letra un poco menor
+  /* escala del mapa */
   ar.innerHTML=(L.cols||[]).map(([n,a,b],i)=>{const k=n.includes(' · ')?.82:1;return `<div style="left:${a*sc}px;width:${(b-a)*sc}px;font-size:${Math.max(8,Math.min(14,13*sc*1.4)*k)}px;white-space:pre-line;border-bottom:3px solid ${AREA_COLORES[i%AREA_COLORES.length]}" title="${esc(n)}">${esc(n.replaceAll(' · ','\n'))}</div>`}).join('');
   // La ayuda conserva las notas específicas del plan fuera del flujo del mapa.
   const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v), notas=[];

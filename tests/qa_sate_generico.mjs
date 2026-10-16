@@ -287,7 +287,7 @@ for(const ancho of [1440,1024,768,414,375])for(const modo of ['actual','viejo','
 const css=leer('web/sate/componentes.css'), shell=leer('web/sate/cascaron.html');
 assert.match(css,/@media\(max-width:639px\)\{\.horario-inscrito/);
 assert.doesNotMatch(css,/\[data-sate-generico\] \.trayectoria-minimapa\{/,'Sin sustituir el acomodo compartido');
-assert.match(css,/\.trayectoria-datos\{[^}]*grid-column:1;grid-row:2 \/ span 4;align-self:start;display:grid;gap:\.35rem/);
+assert.match(css,/\.trayectoria-datos\{[^}]*grid-column:1;grid-row:2 \/ span 4;align-self:start;display:grid;gap:var\(--ipn-esp-1\)/);
 assert.match(css,/\.trayectoria-datos p\{margin:0;line-height:1\.6\}/);
 assert.match(css,/@media\(max-width:639px\)\{\.trayectoria-datos\{grid-row:3\}\}/);
 const acreditada=shell.match(/\.box\.done\{([^}]+)\}/)[1];

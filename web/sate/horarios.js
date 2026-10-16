@@ -669,9 +669,9 @@ function loadInscrito(){
 function renderPlans(){
   $('#b-saeshor').hidden=!(isPersonal()&&ALUMNO.horario_inscrito?.length);
   const ids=planIds();
-  $('#plans').innerHTML=`<span class="lbl" style="margin-right:4px">${esc(txH('version'))}</span>`+ids.map(p=>{const pl=ws().plans[p];const cr=pl.sel.map(byKey).filter(Boolean).reduce((s,c)=>s+c[7],0);
+  $('#plans').innerHTML=`<span class="lbl" style="margin-right:var(--ipn-esp-1)">${esc(txH('version'))}</span>`+ids.map(p=>{const pl=ws().plans[p];const cr=pl.sel.map(byKey).filter(Boolean).reduce((s,c)=>s+c[7],0);
     return `<span class="plan-tab"><button class="chip" data-plan="${esc(p)}" aria-pressed="${ws().plan===p}">${esc(txH('horario',{version:p}))}<small>${pl.sel.length?fmtCr(cr)+' créditos':esc(txH('vacio'))}</small></button>${ids.length>1&&ws().plan===p?`<button class="x" data-delplan="${esc(p)}" aria-label="${esc(txH('eliminar_horario',{version:p}))}" title="${esc(txH('eliminar_horario',{version:p}))}">×</button>`:''}</span>`}).join('')+
-    `<button class="chip plan-new" data-newplan="1" title="${esc(txH('nuevo_ayuda'))}">${esc(txH('nuevo'))}</button><button class="link" data-dup style="margin-left:8px">${esc(txH('duplicar',{version:ws().plan}))}</button>`;
+    `<button class="chip plan-new" data-newplan="1" title="${esc(txH('nuevo_ayuda'))}">${esc(txH('nuevo'))}</button><button class="link" data-dup style="margin-left:var(--ipn-esp-2)">${esc(txH('duplicar',{version:ws().plan}))}</button>`;
 }
 function agendaHorario(items,soloLectura=false){const by={};items.forEach(b=>(by[b.d]=by[b.d]||[]).push(b));
   return Object.keys(by).length?Object.keys(by).sort((a,b)=>a-b).map(d=>`<section class="ag-day"><h4>${DAYN[d]}</h4>`+by[d].sort((x,y)=>x.a-y.a).map(b=>b.c.own?

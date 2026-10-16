@@ -2,7 +2,7 @@
    Solo tokens --ipn-*; los componentes que se reutilizan (migas, tarjeta de navegación, buscador, pregunta desplegable)
    viven en web/sate/componentes.css. */
 .guia-cab{display:grid;gap:var(--ipn-esp-4);min-width:0}
-.guia-cab h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.2;overflow-wrap:anywhere}
+.guia-cab h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}
 .guia-cab .tmr-intro{margin:0}
 .guia-buscar{display:grid;gap:var(--ipn-esp-3);max-width:42rem}
 .guia-buscar>label{font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
@@ -17,7 +17,7 @@
 .guia-resumen{margin:0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
 .guia-respuesta{max-width:66ch}
 .guia-bloque{display:grid;gap:var(--ipn-esp-3);min-width:0}
-.guia-bloque>h4{font-size:var(--ipn-tamano-s);font-weight:700;letter-spacing:.02em;color:var(--ipn-tenue)}
+.guia-bloque>h4{font-size:var(--ipn-tamano-m);font-weight:600;letter-spacing:.02em;color:var(--ipn-tenue);line-height:1.25}
 .guia-pasos{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-3);counter-reset:gp}
 .guia-pasos li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--ipn-esp-3);align-items:start;max-width:66ch;counter-increment:gp}
 .guia-pasos li::before{content:counter(gp);display:grid;place-items:center;width:2rem;height:2rem;border:1.5px solid var(--ipn-acento);border-radius:50%;color:var(--ipn-acento);font-size:var(--ipn-tamano-xs);font-weight:600}
@@ -31,15 +31,15 @@
 .guia-fuentes a{display:inline-flex;align-items:center;min-height:2.25rem;color:var(--ipn-acento);overflow-wrap:anywhere}
 .guia-lista-acudir{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-4)}
 .guia-lista-acudir>li{display:grid;gap:var(--ipn-esp-2);padding:var(--ipn-esp-5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);scroll-margin-top:var(--ipn-esp-5)}
-.guia-lista-acudir h3{font-size:var(--ipn-tamano-m)}
+.guia-lista-acudir h3{font-size:var(--ipn-tamano-l);line-height:1.25}
 .guia-lista-acudir p{max-width:66ch}
 .guia-lista-acudir small{color:var(--ipn-tenue)}
 .guia-pronto{display:grid;gap:var(--ipn-esp-3);padding-top:var(--ipn-esp-4);border-top:1px dashed var(--ipn-linea)}
-.guia-pronto h3{font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.guia-pronto h3{font-size:var(--ipn-tamano-l);color:var(--ipn-tenue);line-height:1.25}
 .guia-pronto ul{margin:0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:var(--ipn-esp-3)}
 .guia-pronto li{display:flex;gap:var(--ipn-esp-3);align-items:flex-start;color:var(--ipn-tenue);opacity:.8}
 .guia-pronto small{display:block}
-@media(max-width:639.98px){.guia-cab h2{font-size:var(--ipn-tamano-l)}.guia-lista-acudir>li{padding:var(--ipn-esp-4)}}
+@media(max-width:639.98px){.guia-cab h2{font-size:var(--ipn-tamano-xl);line-height:1.25}.guia-lista-acudir>li{padding:var(--ipn-esp-4)}}
 .guia-portal{display:inline-flex;align-items:center;min-height:2.75rem;justify-self:start}
 .guia-enlace{display:inline;padding:0;border:0;background:transparent;color:var(--ipn-acento);font:inherit;text-decoration:underline;cursor:pointer}
 .guia-enlace:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}

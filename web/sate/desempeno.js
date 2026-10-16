@@ -165,7 +165,7 @@ async function renderStatsVista(){
   prepararSeccion($('#trayectoria-escenario'),'escenario');
   prepararSeccion($('#trayectoria-observaciones'),'observaciones',()=>conSim(usaSim('obs'),()=>renderAnalisis(statsDatos())));
   const cs=getComputedStyle(document.documentElement), tok=n=>cs.getPropertyValue(n).trim();
-  const base=el=>({width:$(el).clientWidth,style:{background:'transparent',color:tok('--ipn-texto'),fontSize:'11px',fontFamily:'inherit'},marginLeft:40,marginBottom:32});
+  const base=el=>({width:$(el).clientWidth,style:{background:'transparent',color:tok('--ipn-texto'),fontSize:'var(--ipn-tamano-xs)',fontFamily:'inherit'},marginLeft:40,marginBottom:32});
   const put=(id,fig)=>montarGrafica($(id),fig);
   const tickPer=d=>perName(d);
   // 1) camino en la carrera: regla del plan completo con lo acreditado, lo que está en curso y la estimación por periodo

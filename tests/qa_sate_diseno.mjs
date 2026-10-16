@@ -286,3 +286,40 @@ assert.equal((institucional.match(/border-bottom:/g)||[]).length,1);
 assert.match(institucional,/border:0;border-radius:0;border-bottom:3px solid var\(--sate-realce,var\(--accent\)\)/);
 assert.match(css,/\.tramite-acciones\{justify-content:flex-end\}/);
 assert.match(css,/\.tramite-campo input:not\(\[type=checkbox\]\),\.tramite-campo select\{min-height:2\.25rem/);
+
+// DIS4: cinco escalones; las excepciones se restringen a selectores y valores exactos.
+const excepcionesMapa=new Map([
+  ['.box.slot .slot-sig','.85em'], // escala del mapa: continúa la línea dentro de la caja.
+  ['.box.want::after','.95em'], // escala del mapa: marca en coordenadas de la caja.
+  ['.box .plan-marca','.95em'], // escala del mapa: periodo sobre la unidad de aprendizaje.
+]);
+// No hay botones con 1em/100% en estas fuentes. Agregar aquí su selector exacto si se requiere herencia.
+const botonesHeredados=new Set();
+function validarEscala(fuente,archivo){
+  assert.doesNotMatch(fuente,/--ipn-tamano-xxl\b/,archivo+': no admite un sexto escalón');
+  for(const regla of fuente.matchAll(/([^{}]+)\{([^{}]*)\}/g)){
+    const selector=regla[1].replace(/\/\*[\s\S]*?\*\//g,'').trim();
+    for(const declaracion of regla[2].matchAll(/\bfont-size\s*:\s*([^;}]+)/g)){
+      const valor=declaracion[1].replace(/\/\*[\s\S]*?\*\//g,'').replace(/\s*!important\s*$/,'').trim();
+      if(excepcionesMapa.get(selector)===valor){
+        assert.match(declaracion[1],/\/\* escala del mapa \*\//,archivo+': excepción documentada');
+        continue;
+      }
+      const valido=/^(?:var\(--ipn-tamano-(?:xs|s|m|l|xl)\)|inherit)$/.test(valor)
+        || botonesHeredados.has(selector)&&/^(?:1em|100%)$/.test(valor);
+      assert.ok(valido,`${archivo}: ${selector}: font-size:${valor}`);
+    }
+  }
+}
+for(const archivo of ['web/sate/componentes.css','web/horarios.template.html','web/sate/cascaron.html']){
+  const fuente=leer(archivo);
+  const estilos=archivo.endsWith('.html')?[...fuente.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(m=>m[1]).join('\n'):fuente;
+  validarEscala(estilos,archivo);
+}
+for(const valor of ['.78rem','13.6px','1.1em','var(--ipn-tamano-xxl)','1em','100%','0'])
+  assert.throws(()=>validarEscala(`.intruso{font-size:${valor}}`,'regresión'),assert.AssertionError);
+assert.throws(()=>validarEscala('.box2{font-size:.85em}','regresión'),assert.AssertionError);
+validarEscala('.control{font-size:inherit}.nota{font-size:var(--ipn-tamano-xs)!important}','escala válida');
+assert.match(leer('web/sate/inicio.js'),/boton\.replaceChildren\(etiqueta\)/);
+assert.match(css,/#sate-leyenda \.sate-ayuda__btn>span\{display:none\}/,'La leyenda móvil se oculta sin font-size:0');
+console.log('DIS4: cinco tamaños, excepciones del mapa documentadas y leyenda móvil sin tamaño cero. OK.');

@@ -320,7 +320,10 @@
   if (cfg.leyenda) {
     const ayuda = SateUI.ayuda('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas});
     const boton = ayuda.querySelector('button');
-    boton.textContent = texto('sate.encabezado.prueba');
+    // El texto largo se oculta en móvil sin cambiar la escala tipográfica.
+    const etiqueta = document.createElement('span');
+    etiqueta.textContent = texto('sate.encabezado.prueba');
+    boton.replaceChildren(etiqueta);
     boton.setAttribute('aria-label', texto('sate.encabezado.prueba')); boton.dataset.corto = texto('sate.encabezado.prueba_corto');
     document.getElementById('sate-leyenda').appendChild(ayuda);
   }

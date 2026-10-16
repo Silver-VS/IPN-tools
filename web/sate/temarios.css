@@ -1,7 +1,7 @@
 /* Programas en SATE: vista única de la unidad de aprendizaje, vistazo del Mapa curricular, selector y explorador por líneas.
    Solo tokens --ipn-*; los componentes comunes (migas, buscador, segmentado, tarjeta de navegación) viven en componentes.css. */
 
-.insp-temario{margin:.4rem 0 0}
+.insp-temario{margin:var(--ipn-esp-2) 0 0}
 .insp-temario a{color:var(--ipn-acento);text-decoration:underline}
 
 /* Ficha centrada; en teléfono ocupa la pantalla con cabecera fija. */
@@ -9,14 +9,14 @@
 .tmr-panel[hidden],.tmr-velo[hidden]{display:none}
 .tmr-velo{position:fixed;inset:0;z-index:59;background:rgba(20,12,16,.45)}
 .tmr-panel-enc{position:absolute;top:var(--ipn-esp-2);right:var(--ipn-esp-3);z-index:1;display:flex;color:var(--ipn-tenue)}
-.tmr-panel-cuerpo>:first-child{padding-right:2.5rem}
-.tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font:inherit;font-size:1.5rem;cursor:pointer}
-.tmr-panel-cuerpo{overflow:auto;overscroll-behavior:contain;padding:var(--ipn-esp-5);display:grid;gap:calc(var(--ipn-esp-5) * 1.5);line-height:1.6}
+.tmr-panel-cuerpo>:first-child{padding-right:var(--ipn-esp-7)}
+.tmr-panel-x{flex:none;width:2.75rem;height:2.75rem;border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font:inherit;font-size:var(--ipn-tamano-xl);cursor:pointer}
+.tmr-panel-cuerpo{overflow:auto;overscroll-behavior:contain;padding:var(--ipn-esp-5);display:grid;gap:var(--ipn-esp-6);line-height:1.6}
 .tmr-panel :focus-visible,.tmr-ficha :focus-visible{outline:2px solid var(--ipn-acento);outline-offset:3px}
 .tmr [hidden],.tmr-ficha [hidden]{display:none!important}
-.tmr-ficha{display:grid;gap:calc(var(--ipn-esp-5) * 1.5);line-height:1.6;min-width:0;color:var(--ipn-texto);font-family:var(--ipn-fuente-texto)}
+.tmr-ficha{display:grid;gap:var(--ipn-esp-6);line-height:1.6;min-width:0;color:var(--ipn-texto);font-family:var(--ipn-fuente-texto)}
 .tmr-ficha h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}
-.tmr-ficha h3{margin:0 0 var(--ipn-esp-4);font-size:var(--ipn-tamano-l)}
+.tmr-ficha h3{margin:0 0 var(--ipn-esp-4);font-size:var(--ipn-tamano-l);line-height:1.25}
 .tmr-ficha-enc p{margin:var(--ipn-esp-3) 0 0}
 .tmr-ficha-enc h2:focus{outline:none}
 .tmr-descripcion{max-width:64ch}
@@ -25,7 +25,7 @@
 .tmr-acciones a.btn.primary{color:var(--ipn-sobre-acento)}
 .tmr-acciones a.btn:not(.primary){color:var(--ipn-texto)}
 .tmr-rel{display:grid;gap:var(--ipn-esp-2);margin-top:var(--ipn-esp-3)}
-.tmr-rel h4{margin:0;font-size:var(--ipn-tamano-s);color:var(--ipn-tenue);font-weight:700}
+.tmr-rel h4{margin:0;font-size:var(--ipn-tamano-m);color:var(--ipn-tenue);font-weight:600;line-height:1.25}
 .tmr-rel-lista{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
 .tmr-rel-enlace{display:inline-flex;align-items:center;min-height:2.25rem;padding:0 var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:999px;color:var(--ipn-texto);text-decoration:none;font-size:var(--ipn-tamano-s)}
 .tmr-rel-enlace:hover{border-color:var(--ipn-acento);color:var(--ipn-acento)}
@@ -35,12 +35,12 @@
 .tmr-ficha footer p{margin:0}
 .tmr-cifras{display:grid;grid-template-columns:repeat(auto-fit,minmax(6rem,1fr));gap:var(--ipn-esp-4)}
 .tmr-cifras div{display:grid;align-content:start;gap:var(--ipn-esp-1)}
-.tmr-cifras strong{font-size:var(--ipn-tamano-l);white-space:nowrap;word-break:normal;overflow-wrap:normal}
+.tmr-cifras strong{font-size:var(--ipn-tamano-xl);white-space:nowrap;word-break:normal;overflow-wrap:normal}
 .tmr-cifras small{color:var(--ipn-tenue)}
 .tmr-pasos{display:grid;gap:var(--ipn-esp-5);list-style:none;padding:0;margin:0}
 .tmr-pasos li{display:grid;grid-template-columns:2rem minmax(0,1fr);gap:var(--ipn-esp-3)}
 .tmr-paso{display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;border:2px solid var(--tmr-area);background:color-mix(in srgb,var(--tmr-area) 18%,var(--ipn-superficie));color:var(--ipn-texto)}
-.tmr-pasos h4{margin:0 0 var(--ipn-esp-2);font-weight:400;font-size:1rem}
+.tmr-pasos h4{margin:0 0 var(--ipn-esp-2);font-weight:600;font-size:var(--ipn-tamano-m);line-height:1.25}
 .tmr-pasos p{margin:var(--ipn-esp-1) 0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
 .tmr-recurso{display:grid;gap:var(--ipn-esp-3);padding:var(--ipn-esp-5);margin-top:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);color:var(--ipn-texto);text-decoration:none}
 .tmr-recurso small{color:var(--ipn-tenue)}
@@ -54,23 +54,23 @@
 
 /* ---------- página de programas ---------- */
 .tmr{--pc-fondo:var(--ipn-fondo);min-width:0;font-family:var(--ipn-fuente-texto);color:var(--ipn-texto)}
-.tmr-enc h2{margin:0 0 var(--ipn-esp-1);font-size:var(--ipn-tamano-xl);line-height:1.2}
+.tmr-enc h2{margin:0 0 var(--ipn-esp-1);font-size:var(--ipn-tamano-xl);line-height:1.25}
 .tmr-intro{margin:0 0 var(--ipn-esp-4);color:var(--ipn-tenue)}
-.tmr-campo{display:grid;gap:.2rem;font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
-.tmr-campo select{width:100%;min-width:0;min-height:2.75rem;padding:.4rem .7rem;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-s)}
+.tmr-campo{display:grid;gap:var(--ipn-esp-1);font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.tmr-campo select{width:100%;min-width:0;min-height:2.75rem;padding:var(--ipn-esp-2) var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-s)}
 .tmr-campo select:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .tmr-nota{color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs)}
 .tmr-meta{color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs)}
 .tmr-vacio{margin:0;color:var(--ipn-tenue)}
-@media(max-width:30rem){.tmr-enc h2{font-size:var(--ipn-tamano-l)}}
+@media(max-width:30rem){.tmr-enc h2{font-size:var(--ipn-tamano-xl);line-height:1.25}}
 
 /* ---------- vista única: la ficha completa es una tarjeta de página ---------- */
-.tmr-pagina>.tmr-ficha{padding:calc(var(--ipn-esp-5) * 1.5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
-.tmr-pagina .tmr-cifras strong{font-size:2rem;line-height:1.1}
+.tmr-pagina>.tmr-ficha{padding:var(--ipn-esp-6);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+.tmr-pagina .tmr-cifras strong{font-size:var(--ipn-tamano-xl);line-height:1.1}
 @media(max-width:639.98px){.tmr-pagina>.tmr-ficha{padding:var(--ipn-esp-4)}.tmr-pagina .tmr-cifras strong{font-size:var(--ipn-tamano-l)}}
 
 /* ---------- explorador por líneas de aprendizaje ---------- */
-.guia{display:grid;gap:calc(var(--ipn-esp-5) * 2)}
+.guia{display:grid;gap:var(--ipn-esp-7)}
 .guia h3,.guia h4,.guia p{margin:0}
 .gd-explorar-enc p{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s);max-width:56ch}
 .gd-explorar{display:grid;gap:var(--ipn-esp-5);scroll-margin-top:var(--ipn-esp-5)}
@@ -83,18 +83,18 @@
 .gd-fila+.gd-fila{border-top:1px solid var(--ipn-linea)}
 .gd-fila--enc{background:var(--ipn-hundido);font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .gd-quien{padding:var(--ipn-esp-4);border-left:4px solid var(--gd-area,transparent)}
-.gd-quien h4{font-size:var(--ipn-tamano-s)}
+.gd-quien h4{font-size:var(--ipn-tamano-m);line-height:1.25;font-weight:600}
 .gd-cols{display:grid;grid-template-columns:repeat(var(--gd-niveles,5),minmax(0,1fr));gap:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-4);grid-auto-flow:row dense;align-content:start}
 .gd-mapa[data-niveles="3"]{--gd-niveles:3}.gd-mapa[data-niveles="4"]{--gd-niveles:4}.gd-mapa[data-niveles="5"]{--gd-niveles:5}.gd-mapa[data-niveles="6"]{--gd-niveles:6}
 .gd-n1{grid-column:1}.gd-n2{grid-column:2}.gd-n3{grid-column:3}.gd-n4{grid-column:4}.gd-n5{grid-column:5}.gd-n6{grid-column:6}.gd-n7{grid-column:7}.gd-n8{grid-column:8}.gd-n9{grid-column:9}
-.gd-chip{display:grid;gap:2px;min-width:0;min-height:2.75rem;padding:var(--ipn-esp-2) var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio-sm,8px);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-xs);line-height:1.3;cursor:pointer;overflow-wrap:anywhere}
+.gd-chip{display:grid;gap:var(--ipn-esp-1);min-width:0;min-height:2.75rem;padding:var(--ipn-esp-2) var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio-sm,8px);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-xs);line-height:1.3;cursor:pointer;overflow-wrap:anywhere}
 .gd-chip:hover{border-color:var(--ipn-acento)}
 .gd-chip small{color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs)}
 .gd-chip--sem,.gd-chip--esp{width:100%;border-left:4px solid var(--gd-area,var(--ipn-linea))}
 .gd-chip-nivel{display:none;color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs)}
 .gd-esp{display:grid;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));gap:var(--ipn-esp-5)}
 .gd-esp-area{display:grid;align-content:start;gap:var(--ipn-esp-3)}
-.gd-esp-area>h4{padding-bottom:var(--ipn-esp-2);border-bottom:2px solid var(--ipn-acento)}
+.gd-esp-area>h4{padding-bottom:var(--ipn-esp-2);border-bottom:2px solid var(--ipn-acento);line-height:1.25;font-weight:600}
 .gd-esp-linea{display:grid;gap:var(--ipn-esp-2);padding:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
 .gd-esp-linea>small{color:var(--ipn-tenue);font-weight:700}
 .gd-esp-linea ul{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-1);font-size:var(--ipn-tamano-s)}
@@ -124,10 +124,10 @@
 .sel-estado{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
 .sel-mapa{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:var(--ipn-esp-4) var(--ipn-esp-3);align-items:start}
 .sel-col{display:grid;gap:var(--ipn-esp-2);align-content:start;min-width:0}
-.sel-col h3{padding-bottom:var(--ipn-esp-1);border-bottom:1px solid var(--ipn-linea);font-size:var(--ipn-tamano-xs);font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ipn-tenue)}
+.sel-col h3{padding-bottom:var(--ipn-esp-1);border-bottom:1px solid var(--ipn-linea);font-size:var(--ipn-tamano-l);font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ipn-tenue);line-height:1.25}
 .sel-items{display:grid;gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}
 .sel-lista{display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}
-.sel-materia{box-sizing:border-box;display:grid;gap:2px;width:100%;min-height:2.75rem;padding:var(--ipn-esp-2) var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-left:4px solid var(--sel-area,var(--ipn-linea));border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-xs);line-height:1.3;cursor:pointer;overflow-wrap:anywhere}
+.sel-materia{box-sizing:border-box;display:grid;gap:var(--ipn-esp-1);width:100%;min-height:2.75rem;padding:var(--ipn-esp-2) var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-left:4px solid var(--sel-area,var(--ipn-linea));border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-xs);line-height:1.3;cursor:pointer;overflow-wrap:anywhere}
 .sel-materia:hover{border-color:var(--ipn-acento);border-left-color:var(--sel-area,var(--ipn-acento))}
 .sel-materia[aria-current=true]{background:var(--ipn-acento-suave)}
 .sel-materia small{color:var(--ipn-tenue)}
@@ -144,7 +144,7 @@
 /* Trayectoria escolar: una columna por semestre; ficha en ventana emergente */
 .gd-tray{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:var(--ipn-esp-4);align-items:start}
 .gd-sem{display:grid;gap:var(--ipn-esp-2);align-content:start;min-width:0}
-.gd-sem>h4{padding-bottom:var(--ipn-esp-2);border-bottom:2px solid var(--ipn-acento);font-size:var(--ipn-tamano-s)}
+.gd-sem>h4{padding-bottom:var(--ipn-esp-2);border-bottom:2px solid var(--ipn-acento);font-size:var(--ipn-tamano-m);line-height:1.25;font-weight:600}
 .gd-sem ul{display:grid;gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}
 .tmr-dialogo{min-width:0}
 .tmr-dialogo .tmr-ficha{gap:var(--ipn-esp-5)}

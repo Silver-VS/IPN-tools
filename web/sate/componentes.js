@@ -490,11 +490,13 @@ function cajaMateria(ctx,k,x,y,w,h,sc,want,off,hot,sem,req){
   const st=statusOf(k), paso=planAsignado(k);
   if(ctx.soloLectura){
     const tip=k+' · '+n+' · '+ctx.etiqueta(k);
+  /* escala del mapa */
     return `<div class="box ${st}" data-estado="${st}" style="--nv:var(--sate-realce);left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}" aria-label="${esc(tip)}">${esc(n)}</div>`;
   }
   const el=isElec(k);
   const cls=`box ${st}${el?' elec':''}${MARK.avail.has(k)?' avail':''}${MARK.sug.has(k)?' sug':''}${paso!=null?' want plan-'+(paso+1)+(PLAN_DOS_PERIODOS&&paso!==S.planPaso?' plan-otra':''):req&&req.has(k)?' req':''}${resalteCaja(hot,k,S.mapHover,S.reqHover)}${off.has(k)||el?'':' offered-no'}`;
   const tip=`${k} · ${n} · ${ctx.textoCreditos?ctx.textoCreditos(k,cr,true):fmtCr(cr)+' créditos'} · nivel ${niv}${sem&&!porNiveles()?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · '+SATE.texto('sate.planeacion.desfase_aviso'):st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
+  /* escala del mapa */
   return `<div class="${cls}" data-box="${esc(k)}" role="button" tabindex="0" aria-pressed="${paso===S.planPaso}" aria-label="${esc(tip+(paso==null?'':' · '+SATE.texto('sate.planeacion.periodo_elegido',{marca:paso+1,periodo:planEtiqueta(paso)})))}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}${paso==null||!PLAN_DOS_PERIODOS?'':`<span class="plan-marca" aria-hidden="true">${paso===0&&S.planPaso===1?'en ':''}${esc(planEtiqueta(paso))}</span>`}</div>`;
 }
 function lanes(items){

@@ -103,11 +103,11 @@ assert.doesNotMatch(estilosIdentidad,/\.sate-logo-unidad\{[^}]*radial-gradient/)
 assert.match(estilosIdentidad,/\.sate-selector-unidad \.sate-logo-unidad\{max-height:24px;max-width:24px\}/);
 const interaccion = inicio.slice(inicio.indexOf('  if (cfg.leyenda) {'), inicio.indexOf('  // Logo de la unidad, hasta la derecha'));
 for (const unidad of Object.keys(config.unidades)) {
-  const boton = {dataset:{},setAttribute(k,v){this[k]=v}};
+  const boton = {dataset:{},setAttribute(k,v){this[k]=v},replaceChildren(n){this.children=[n];this.textContent=n.textContent}};
   const ayuda = {querySelector:()=>boton};
   const leyenda = {appendChild(n){this.ayuda=n}};
   let clave, variables;
-  const c = {cfg:config.unidades[unidad], texto, document:{getElementById:()=>leyenda},
+  const c = {cfg:config.unidades[unidad], texto, document:{getElementById:()=>leyenda,createElement:tag=>({tag})},
     SateUI:{ayuda(k,v){clave=k;variables=v;return ayuda}}};
   vm.runInNewContext(interaccion,c);
   if (c.cfg.leyenda) {
@@ -115,6 +115,8 @@ for (const unidad of Object.keys(config.unidades)) {
     assert.equal(variables.unidad,c.cfg.siglas);
     assert.equal(leyenda.ayuda,ayuda);
     assert.equal(boton.textContent,texto('sate.encabezado.prueba'));
+    assert.equal(boton.children[0].tag,'span');
+    assert.equal(boton.dataset.corto,texto('sate.encabezado.prueba_corto'));
     assert.equal(boton['aria-label'],boton.textContent);
   } else assert.equal(leyenda.ayuda,undefined);
 }

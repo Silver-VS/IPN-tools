@@ -41,7 +41,7 @@ assert.match(hor,/class="gbrk-horas"><label class="field"/);
 const piso=css.slice(css.lastIndexOf('@media(max-width:639px){'));
 for(const selector of ['.cal-b','.k-regla em','.ticks','.an-tag','.marks button','.dpill','.blk','#map-ayuda'])
   assert.ok(piso.includes(selector),selector+': piso tipográfico en teléfono');
-assert.match(piso,/font-size:\.75rem!important/);
+assert.match(piso,/font-size:var\(--ipn-tamano-xs\)!important/);
 assert.match(css,/\.info:focus-visible\{outline:2px solid var\(--sate-realce\)/);
 assert.match(shell,/id="map-simbologia"[^>]*data-htexto="simbologia"/);
 assert.match(core,/\$\('#map-simbologia'\).addEventListener\('click'/);
