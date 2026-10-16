@@ -15,8 +15,13 @@
     }
     // Apartados de la Guía: #/<unidad>/guia[/<apartado>[/<pregunta o instancia>]]
     if (pestaña === 'guia' && config[unidad]?.pestanas.includes('guia')) {
-      if (partes.length > 2 || !partes.every(p => /^[A-Za-z0-9_-]+$/.test(p))) return null;
-      return {unidad, pestana:'guia', tramite:null, partes:partes.slice(),
+      let ancla;
+      if (partes[0] === 'reglamentos' && partes.length === 3) {
+        try { ancla = decodeURIComponent(partes[2]); } catch { return null; }
+        if (!/^(?:art-[\w -]+|cap-\d+|transitorios|texto)$/.test(ancla)) return null;
+      }
+      if (partes.length > (partes[0] === 'reglamentos' ? 3 : 2) || !partes.slice(0, ancla ? 2 : partes.length).every(p => /^[A-Za-z0-9_-]+$/.test(p))) return null;
+      return {unidad, pestana:'guia', tramite:null, partes:ancla ? [...partes.slice(0, 2), ancla] : partes.slice(),
         hash:'#/' + unidad + '/guia' + partes.map(p => '/' + p).join('') + (hash.includes('?') ? '?' + hash.split('?').slice(1).join('?') : '')};
     }
     // Los enlaces de Ventanilla previos a esta publicación siguen siendo navegables.

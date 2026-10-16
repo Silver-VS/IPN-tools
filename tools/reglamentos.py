@@ -24,7 +24,10 @@ LOG = logging.getLogger(__name__)
 
 
 def fuentes():
-    documentos = json.loads((ROOT / 'data/guia/upiita.json').read_text(encoding='utf-8'))['documentos']
+    fuente = ROOT / 'data/guia/comun.json'
+    if not fuente.exists():
+        fuente = ROOT / 'data/guia/upiita.json'
+    documentos = json.loads(fuente.read_text(encoding='utf-8'))['documentos']
     return {k: v for k, v in documentos.items() if v.get('reglamento') and k != 'calendario'}
 
 

@@ -1119,16 +1119,36 @@ def datos_dictamen():
         'textos': {k: v for k, v in contenido.objeto_t().items() if k.startswith('dictamen.')}}
 
 
+def fusionar_guia(comun, propia):
+    """La unidad sustituye entradas por id sin perder el contenido compartido."""
+    guia = {**comun, **propia}
+    for clave in ('documentos', 'glosario'):
+        guia[clave] = {**comun.get(clave, {}), **propia.get(clave, {})}
+    for clave in ('preguntas', 'acudir'):
+        entradas = {x['id']: dict(x, **({'ambito': 'ipn'} if clave == 'acudir' else {}))
+                    for x in comun.get(clave, [])}
+        entradas.update({x['id']: dict(x, **({'ambito': 'unidad'} if clave == 'acudir' else {}))
+                         for x in propia.get(clave, [])})
+        guia[clave] = list(entradas.values())
+    return guia
+
+
+def tiene_guia(unidad):
+    return any((ROOT / 'data/guia' / (nombre + '.json')).exists() for nombre in ('comun', unidad))
+
+
 def escribir_guia(datos):
     """Copia el contenido de la Guía politécnica de la unidad (data/guia/<u>.json) a datos/<u>/guia.json.
     Los formatos oficiales de baja se resuelven aquí desde data/gestion_escolar/bajas.json (una sola fuente de verdad):
     `formato: {"ref": "bajas.temporal"}` pasa a `formato: {"texto", "url"}`."""
     from urllib.parse import quote
     fuente = ROOT / 'data/guia' / (UNIDAD + '.json')
-    if not fuente.exists():
+    compartida = ROOT / 'data/guia/comun.json'
+    if not tiene_guia(UNIDAD):
         (datos / 'guia.json').unlink(missing_ok=True)
         return
-    guia = json.loads(fuente.read_text(encoding='utf-8'))
+    leer = lambda ruta: json.loads(ruta.read_text(encoding='utf-8')) if ruta.exists() else {}
+    guia = fusionar_guia(leer(compartida), leer(fuente))
     bajas = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
     for p in guia['preguntas']:
         formato = p.get('formato')
@@ -1164,6 +1184,7 @@ def escribir_sate(data):
     escribir_temarios(data, datos)
     escribir_recursos(datos)
     escribir_guia(datos)
+    shutil.copytree(ROOT / 'data/reglamentos', destino / 'datos/reglamentos', dirs_exist_ok=True)
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
@@ -1182,7 +1203,7 @@ def escribir_sate(data):
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():
         c["vistas"] = [v for v in c.get("vistas", []) if DATOS_VISTAS.get(v["id"], lambda _u: True)(u)]
-        c["guiaDatos"] = (ROOT / "data/guia" / (u + ".json")).exists()
+        c["guiaDatos"] = tiene_guia(u)
         c["siglas"] = unidades[u]["siglas"]
         c["nombre"] = unidades[u]["nombre"]
         c["realce"] = identidad_unidades[u]['realce']
