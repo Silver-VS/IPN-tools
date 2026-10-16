@@ -397,6 +397,12 @@ button.sate-chip{cursor:pointer}
 .sate-enlace{display:inline-block;margin-top:var(--ipn-esp-2);padding:0;border:0;background:none;color:var(--ipn-acento);text-decoration:underline;cursor:pointer;font-size:var(--ipn-tamano-s)}
 
 /* botones */
+.sate-btn--chico{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-height:2rem;max-width:100%;text-decoration:none;color:var(--ipn-texto);text-align:center;overflow-wrap:anywhere}
+.sate-biblio__referencia{display:flex;align-items:start;gap:var(--ipn-esp-3);justify-content:space-between;min-width:0}
+.sate-biblio__referencia>span{min-width:0;overflow-wrap:anywhere}
+.sate-biblio__referencia>a{flex-shrink:0}
+.sate-biblio__referencia>a:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+@media(max-width:639.98px){.sate-biblio__referencia{flex-direction:column}.sate-biblio__referencia>a{flex-shrink:1}}
 .sate-btn{min-height:2.5rem;padding:0 var(--ipn-esp-4);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);cursor:pointer;font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
 .sate-btn--primario{background:var(--ipn-acento);border-color:var(--ipn-acento);color:var(--sate-sobre-realce)}
 

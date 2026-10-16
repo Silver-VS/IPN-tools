@@ -1571,6 +1571,8 @@ ocr = "Transcripción automática del programa sintético; cotéjalo con el docu
 coincidencia = "La clave del SAES se asoció a este programa por la semejanza de sus nombres; confirma que sea la unidad de aprendizaje correcta."
 
 [sate.biblio]
+disponibilidad = "Consultar disponibilidad"
+disponibilidad_titulo = "Consultar disponibilidad: {titulo}"
 titulo = "Buscar en las bibliotecas del IPN"
 ayuda = "Escribe un tema, un título o un autor. Los resultados se abren en el sitio oficial, en una pestaña nueva."
 etiqueta = "Qué buscar"
