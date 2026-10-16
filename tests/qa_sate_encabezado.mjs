@@ -11,15 +11,15 @@ assert.match(encabezado, /<h1 id="sate-titulo">SATE <button class="sate-unidad-b
 assert.match(encabezado, /<p id="sate-nombre">Sistema de Apoyo a la Trayectoria Escolar<\/p>/);
 assert.ok(!encabezado.includes('unit-switch'), 'sin selector de unidad aparte');
 assert.match(encabezado, /<span id="sate-leyenda"><\/span>/);
-assert.match(encabezado, /class="sate-navegacion"[\s\S]*id="sate-tabs"[\s\S]*class="sate-controles"/);
+assert.match(encabezado, /class="sate-controles"[\s\S]*class="sate-navegacion"[\s\S]*id="sate-tabs"/);
 assert.match(encabezado, /<label class="field"><span class="sate-sr">Carrera<\/span><select id="f-carrera">/);
 assert.equal((html.match(/id="f-carrera"/g) || []).length, 1);
 assert.equal((html.match(/id="saes-open"/g) || []).length, 1);
-const acciones = encabezado.slice(encabezado.indexOf('class="header-actions"'), encabezado.indexOf('class="enc-btn sate-boton-flota"'));
+const acciones = encabezado.slice(encabezado.indexOf('class="header-actions"'), encabezado.indexOf('class="enc-btn sate-opinar"'));
 // De derecha a izquierda: tema, sesión, SAES (en el HTML, de izquierda a derecha).
 assert.ok(acciones.indexOf('id="saes-open"') < acciones.indexOf('id="ipnt-open"') && acciones.indexOf('id="ipnt-open"') < acciones.indexOf('id="theme-btn"'), 'orden: SAES, sesión, tema');
-assert.match(acciones, /id="saes-open"[^>]*data-saes-open[\s\S]*id="sate-saes-indicador"[^>]*role="img"[^>]*aria-label="Sin datos del SAES: puedes usar el mapa y los horarios"[\s\S]*Traer datos SAES/);
-assert.match(encabezado, /class="enc-btn sate-boton-flota" type="button" data-encuesta hidden/, 'Opinar es el botón flotante');
+assert.match(acciones, /id="saes-open"[^>]*data-saes-open[\s\S]*id="sate-saes-indicador"[^>]*role="img"[^>]*aria-label="Sin datos del SAES: consulta el mapa o arma tu horario"[\s\S]*Traer datos SAES/);
+assert.match(encabezado, /class="enc-btn sate-opinar" type="button" data-encuesta hidden/, 'DIS5: Opinar conserva el gancho dentro de las acciones');
 assert.ok(encabezado.indexOf('sate-logo-ipn') < encabezado.indexOf('class="brand"') && encabezado.indexOf('class="brand"') < encabezado.indexOf('class="sate-lado"'));
 assert.ok(!encabezado.slice(encabezado.indexOf('class="sate-navegacion"')).includes('saes-open'));
 // Ruta del logo del IPN: un solo lugar (data/identidad/logo_ipn.json)
@@ -218,40 +218,18 @@ completo=1100;corto=1050;fuentes();frame();assert.equal(tabs.dataset.escalon,'fl
 completo=600;corto=400;mutacion();frame();assert.equal(tabs.dataset.escalon,'completo');
 assert.equal(medicion.inert,true);
 }
-// Encabezado v2 (ENC2): isologo del IPN | SATE {unidad} + nombre | logo de la unidad y controles; respiro común bajo la barra.
+// DIS5 sustituye la caja y el botón colgante de ENC2; conserva identidad, foco y acciones.
 {
-  assert.equal((html.match(/<header\b/g) || []).length, 1, 'un solo <header>');
-  assert.ok(!html.includes('<!--__INST_'), 'sin marcadores sin sustituir');
-  const css = leer('web/sate/componentes.css'), bloque = css.slice(css.indexOf('/* ===== Encabezado v2 (ENC2)'));
-  assert.ok(bloque.length > 500);
-  assert.match(bloque, /grid-template-areas:"ipn marca lado" "avisos avisos avisos" "nav nav nav"/);
-  // El logo del IPN es siempre más alto que el de la unidad, en cada escalón
-  for (const [m, ipn, uni] of [[bloque.match(/:root\{\s*--ipn-espacio[\s\S]*?\}/)[0], 3.5, 2.5], [bloque.match(/@media\(max-width:1023\.98px\)\{\s*:root\{([^}]*)\}/)[1], 3, 2.25], [bloque.match(/@media\(max-width:639\.98px\)\{\s*:root\{([^}]*)\}/)[1], 2.5, 1.75]]) {
-    assert.equal(Number(m.match(/--sate-logo-ipn-alto:([\d.]+)rem/)[1]), ipn); assert.equal(Number(m.match(/--sate-logo-unidad-alto:([\d.]+)rem/)[1]), uni); assert.ok(ipn > uni);
-  }
-  // Un solo token de respiro bajo el encabezado, usado por el encabezado y no por cada pestaña
-  assert.match(bloque, /--ipn-espacio-bajo-encabezado:calc\(/);
-  assert.match(bloque, /margin:var\(--ipn-esp-3\) 0 var\(--ipn-espacio-bajo-encabezado\)/);
-  assert.match(leer('web/sate/cascaron.html'), /\[data-view-panel\]\{padding-top:0\}/);
-  // Unidad subrayada con el color de la unidad
-  assert.match(bloque, /\.sate-unidad-btn\{[^}]*color:var\(--sate-realce\)[^}]*text-decoration:underline;text-decoration-color:var\(--sate-realce\)/);
-  // Opinar flota bajo la barra, dentro del respiro
-  assert.match(bloque, /\.sate-boton-flota\{position:absolute;right:[^;]+;top:100%/);
-  // Estado del SAES con forma y color
-  assert.match(bloque, /\.sate-estado-dato\.on\{background:var\(--ipn-ok\)\}/);
-  assert.match(bloque, /\.sate-estado-dato\{[^}]*background:var\(--ipn-error\)/);
-  // Escalones: medio (SAES abreviado, leyenda bajo el nombre) y teléfono (controles en su fila, nombre largo oculto <480)
-  assert.match(bloque, /@media\(max-width:899\.98px\)\{[\s\S]*saes-open \.sate-texto-corto\{display:inline\}/);
-  const telefono = bloque.match(/@media\(max-width:639\.98px\)\{([\s\S]*?)\n\}/)[1];
-  assert.match(telefono, /grid-template-areas:"ipn marca unidad" "acciones acciones acciones"/);
-  assert.match(telefono, /grid-template-areas:"t l"\}\s*\.brand #sate-nombre\{display:none\}/, "teléfono: título e insignia en una fila, sin nombre largo");
-  assert.match(telefono, /\.sate-lado\{display:contents\}/);
-  // Nada se parte: columnas flexibles y nombre largo recortado
-  for (const m of bloque.matchAll(/grid-template-columns:([^;}]+)/g)) assert.match(m[1], /minmax\(0,1fr\)|auto minmax/, m[1]);
-  assert.match(bloque, /#sate-nombre\{[^}]*text-overflow:ellipsis;white-space:nowrap/);
-  // Paleta común: el bloque solo usa tokens --ipn-* y --sate-realce, sin colores sueltos
-  assert.doesNotMatch(bloque, /#[0-9a-fA-F]{3,8}\b|rgba?\(/);
-  assert.match(bloque, /border-top:3px solid var\(--sate-realce,var\(--ipn-acento\)\)/);
+  assert.equal((html.match(/<header\b/g) || []).length, 1);
+  assert.ok(!html.includes('<!--__INST_'));
+  const css = leer('web/sate/componentes.css');
+  assert.match(css, /grid-template-areas:"ipn marca carrera lado" "nav nav nav nav"/);
+  assert.match(css, /grid-template-areas:"ipn marca acciones" "nav nav nav" "carrera carrera carrera"/);
+  assert.match(css, /\.header-actions>\.sate-opinar\{position:static/);
+  assert.match(css, /\.sate-unidad-btn\{[^}]*color:var\(--sate-realce\)[^}]*text-decoration:underline/);
+  assert.match(css, /\.sate-estado-dato\.on\{background:var\(--ipn-ok\)\}/);
+  assert.match(css, /\.sate-estado-dato\{[^}]*background:var\(--ipn-error\)/);
+  assert.match(css, /:is\(\.sate-unidad-btn,\.sate-controles select,\.header-actions button/);
   assert.match(css, /body\.sate-flotante \.sate-barra\{display:flex\}/);
   assert.equal(config.unidades.upiita.pestanas.length, 6);
 }

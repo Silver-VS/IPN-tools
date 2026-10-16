@@ -323,3 +323,37 @@ validarEscala('.control{font-size:inherit}.nota{font-size:var(--ipn-tamano-xs)!i
 assert.match(leer('web/sate/inicio.js'),/boton\.replaceChildren\(etiqueta\)/);
 assert.match(css,/#sate-leyenda \.sate-ayuda__btn>span\{display:none\}/,'La leyenda móvil se oculta sin font-size:0');
 console.log('DIS4: cinco tamaños, excepciones del mapa documentadas y leyenda móvil sin tamaño cero. OK.');
+
+// DIS5: contratos de superficie y desborde sin iniciar navegador.
+const cabeceraDis5=css.match(/\.wrap>header\.top\{([^}]+)\}/)[1];
+for(const d of ['border:0','background:transparent','box-shadow:none'])assert.ok(cabeceraDis5.includes(d),d);
+assert.doesNotMatch(cabeceraDis5,/border-top:/);
+assert.match(css,/\[id\^="sate-tab-2-"\]\[role=tabpanel\][^{]*\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
+const movilDis5=css.slice(css.lastIndexOf('@media(max-width:639px)'));
+assert.match(movilDis5,/#sate-avisos-globales \.sate-chips\{[^}]*overflow-x:auto;[^}]*scroll-snap-type:x proximity;[^}]*mask-image:/);
+const invitacionDis5=leer('web/sate/inicio.js').split('  function invitarRecorrido()')[1].split('  window.SATE')[0];
+assert.ok(invitacionDis5.includes("aviso.id='sate-recorrido-invitacion'"));
+assert.doesNotMatch(invitacionDis5,/SateUI\.aviso|sate-aviso/);
+assert.ok(invitacionDis5.includes('SateUI.recorridoDecidir'));
+assert.match(css,/#f-nivel,#plan-opciones\{display:flex;flex-wrap:wrap\}/);
+assert.match(css,/env\(safe-area-inset-bottom,0px\)/);
+console.log('DIS5: encabezado y paneles abiertos, chips desplazables, filas numéricas adaptables y recorrido sin aviso. OK.');
+
+// Integración del ofrecimiento real con persistencia y arranque, para ambas decisiones.
+for(const acepta of [true,false]){
+  let ofrecida,decidido,inicios=0,escritura;
+  const c={cuposReducida:false,leer(){},texto:k=>config.textos[k],
+    SATE:{alumno:()=>({demo:false})},IPNT:{set:(k,v)=>{escritura=[k,v]}},
+    SateUI:{recorridoOfrecer:()=>decidido===undefined,recorridoDecidir(guardar,v){decidido=v;guardar('decision',v)}},
+    iniciarRecorrido(){inicios++},document:{
+      querySelector:()=>({after(n){ofrecida=n}}),getElementById:()=>ofrecida&&!ofrecida.retirada?ofrecida:null,
+      createElement:()=>({children:[],appendChild(n){this.children.push(n)},remove(){this.retirada=true}})
+    }};
+  vm.runInNewContext('function invitarRecorrido()'+invitacionDis5+'\ninvitarRecorrido();',c);
+  assert.equal(ofrecida.className,'sate-recorrido-invitacion');
+  assert.equal(ofrecida.children[0].textContent,config.textos['sate.recorrido.invitacion_breve']);
+  ofrecida.children[acepta?0:1].onclick();
+  assert.equal(ofrecida.retirada,true);assert.equal(decidido,acepta);assert.equal(escritura[1],acepta);
+  assert.equal(inicios,acepta?1:0);
+  const anterior=ofrecida;c.invitarRecorrido();assert.equal(ofrecida,anterior,'No vuelve a ofrecerse tras decidir');
+}

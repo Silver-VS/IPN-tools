@@ -182,7 +182,7 @@ button.tramite-paso-ir .tramite-paso-t{text-decoration:underline;text-underline-
 #sate-avisos-globales{min-width:0}
 .bar-top{border-bottom:0;padding-block:0;align-items:center}
 .bar-top:has(>#sate-oferta-periodo[hidden]):has(>#notice[hidden]){display:none}
-:is(.sate-unidad-btn,.sate-controles select,.header-actions button,.sate-boton-flota):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
+:is(.sate-unidad-btn,.sate-controles select,.header-actions button,.sate-opinar):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 /* El ancho natural decide cuándo separar controles, abreviar y usar la barra inferior. */
 .sate-navegacion[data-controles-separados=true]>#sate-tabs{flex-basis:100%}
 .sate-navegacion[data-controles-separados=true]>.sate-controles{flex-basis:100%}
@@ -796,16 +796,13 @@ body.sate-flotante .sate-barra{display:flex}
 .sate-mas-lista button[aria-current=page]{background:var(--ipn-acento-suave);border-color:var(--ipn-acento);font-weight:600}
 
 /* ===== Encabezado v2 (ENC2) =====
-   Una pieza: isologo del IPN (siempre el más grande) | «SATE {unidad}» con la unidad subrayada en su color (abre el cambio de
-   unidad) y el nombre completo de la plataforma | logo de la unidad arriba y, debajo, de derecha a izquierda: tema, sesión y
-   estado de los datos del SAES. «Opinar» cuelga bajo la barra, en el espacio común. Escalones: completo (>=1024) -> medio
-   (640-1023: logos menores, SAES abreviado, «Fase de prueba» bajo el nombre) -> teléfono (<640: SAES, sesión y tema en la
-   segunda fila; el nombre largo se oculta bajo 480 px). Columnas minmax(0,1fr): nada se parte, el texto largo se recorta. */
+   DIS5: marca, carrera y acciones; navegación de texto en el segundo renglón.
+   El recorrido se ofrece fuera del encabezado y Opinar comparte las acciones. */
 :root{
   --ipn-espacio-bajo-encabezado:calc(var(--ipn-esp-6) + var(--ipn-esp-2));   /* respiro común bajo el encabezado, igual en todas las pestañas */
   --sate-logo-ipn-alto:3.5rem;--sate-logo-unidad-alto:2.5rem;
 }
-.wrap>header.top{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ipn marca lado" "avisos avisos avisos" "nav nav nav";align-items:center;column-gap:var(--ipn-esp-4);row-gap:0;margin:var(--ipn-esp-3) 0 var(--ipn-espacio-bajo-encabezado);padding:var(--ipn-esp-4) var(--ipn-esp-5) 0;border:1px solid var(--ipn-linea);border-top:3px solid var(--sate-realce,var(--ipn-acento));border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+.wrap>header.top{position:relative;display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;grid-template-areas:"ipn marca carrera lado" "nav nav nav nav" "avisos avisos avisos avisos";align-items:center;column-gap:var(--ipn-esp-4);row-gap:0;margin:var(--ipn-esp-3) 0 var(--ipn-espacio-bajo-encabezado);padding:var(--ipn-esp-2) 0 0;border:0;border-radius:0;background:transparent;box-shadow:none}
 /* Logos: versión según el tema (sistema o selector de la página). */
 .sate-logo-ipn,.sate-logo-slot a.unit{display:inline-flex;align-items:center;flex:none}
 .sate-logo-ipn .logo-dk,.sate-logo-slot .logo-dk{display:none}
@@ -847,9 +844,9 @@ body.sate-flotante .sate-barra{display:flex}
 .sate-estado-dato.on{background:var(--ipn-ok)}
 .sate-estado-dato.on::before{content:"✓"}
 /* «Opinar»: botón flotante común, colgado bajo la barra dentro del respiro del encabezado (no tapa contenido). */
-.wrap>header.top>.sate-boton-flota{position:absolute;right:var(--ipn-esp-5);top:100%;margin-top:-1px;/* unión del borde */display:inline-flex;align-items:center;gap:var(--ipn-esp-1);min-height:1.75rem;padding:0 var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-top:0;border-radius:0 0 var(--ipn-radio) var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-xs);font-weight:600;cursor:pointer}
-.sate-boton-flota svg{color:var(--sate-realce)}
-.sate-boton-flota:hover{background:var(--ipn-acento-suave)}
+.header-actions>.sate-opinar{position:static;display:inline-flex;align-items:center;gap:var(--ipn-esp-1);min-height:1.75rem;padding:0 var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-top:0;border-radius:0 0 var(--ipn-radio) var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-xs);font-weight:600;cursor:pointer}
+.sate-opinar svg{color:var(--sate-realce)}
+.sate-opinar:hover{background:var(--ipn-acento-suave)}
 .wrap>header.top>.sate-fila-avisos{grid-area:avisos;min-width:0}
 .wrap>header.top #sate-avisos-globales:not(:empty){margin-top:var(--ipn-esp-3)}
 .wrap>header.top>.sate-navegacion{grid-area:nav;margin:var(--ipn-esp-3) 0 0;padding-block:var(--ipn-esp-3);border-top:1px solid var(--ipn-linea)}
@@ -865,7 +862,7 @@ body.sate-flotante .sate-barra{display:flex}
 }
 @media(max-width:639.98px){
   :root{--ipn-espacio-bajo-encabezado:var(--ipn-esp-6);--sate-logo-ipn-alto:2.5rem;--sate-logo-unidad-alto:1.75rem}
-  .wrap>header.top{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ipn marca unidad" "acciones acciones acciones" "avisos avisos avisos" "nav nav nav";margin-top:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-3) 0;column-gap:var(--ipn-esp-2);row-gap:var(--ipn-esp-2)}
+  .wrap>header.top{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ipn marca acciones" "nav nav nav" "carrera carrera carrera" "avisos avisos avisos";margin-top:var(--ipn-esp-2);padding:var(--ipn-esp-3) var(--ipn-esp-3) 0;column-gap:var(--ipn-esp-2);row-gap:var(--ipn-esp-2)}
   .sate-lado{display:contents}
   .sate-logo-slot{grid-area:unidad;align-self:center}
   .sate-unidad-nombre{display:none}
@@ -877,8 +874,72 @@ body.sate-flotante .sate-barra{display:flex}
   #sate-leyenda .sate-ayuda__btn{min-height:1.5rem!important;height:1.5rem!important;min-width:0!important;padding:0 var(--ipn-esp-2);font-size:var(--ipn-tamano-xs)}
   #sate-leyenda .sate-ayuda__btn>span{display:none}
   #sate-leyenda .sate-ayuda__btn::after{content:attr(data-corto);font-size:var(--ipn-tamano-xs)}
-  .wrap>header.top>.sate-boton-flota{right:var(--ipn-esp-3);padding-inline:var(--ipn-esp-2)}
-  .sate-boton-flota span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .header-actions>.sate-opinar{padding-inline:var(--ipn-esp-2)}
+  .sate-opinar span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
   .wrap>header.top>.sate-navegacion{margin-top:var(--ipn-esp-1);padding-block:var(--ipn-esp-2)}
 }
 @media(max-width:359.98px){.brand h1#sate-titulo{font-size:var(--ipn-tamano-l);line-height:1.25}#sate-leyenda .sate-ayuda__btn{padding:0 var(--ipn-esp-1)!important}#sate-leyenda .sate-ayuda__btn::after{content:"ⓘ"}}
+
+/* DIS5: una superficie, secciones por proximidad y filas con divisor. */
+.wrap>[role=tabpanel],[id^="sate-tab-2-"][role=tabpanel],#sate-trayectoria,#sate-tramites,#sate-calendario{min-width:0;max-width:100%;padding-inline:0;border:0;border-radius:0;background:transparent;box-shadow:none}
+.charts figure.ch-wide,section.meta-panel,.trayectoria-plegable,.mapcut,.tramite-filas,.calendario-tarjeta{border:0;border-radius:0;background:transparent;box-shadow:none;padding-inline:0}
+.charts{row-gap:var(--ipn-esp-7)}
+section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
+.trayectoria-plegable>summary,.trayectoria-plegable>div{padding-inline:0}
+.charts figcaption{min-height:0;flex-wrap:wrap;gap:var(--ipn-esp-3)}
+.charts figure.ch-wide figcaption b{font-size:var(--ipn-tamano-l)}
+.charts figure.ch-wide figcaption h3{margin:0;font-size:var(--ipn-tamano-l)}
+.kx,#ch-kx{border:0;background:transparent;box-shadow:none}
+.simrows{grid-template-columns:minmax(0,1fr);gap:0}
+.simrow,.pm-fila{border:0;border-top:1px solid var(--ipn-linea);border-radius:0;background:transparent;padding:var(--ipn-esp-3) 0}
+.tramite-fila{padding-inline:0}
+.sate-enlace{display:inline-flex;align-items:center;min-height:44px;padding:0;border:0;background:transparent;color:var(--sate-realce);font:inherit;font-size:var(--ipn-tamano-s);text-decoration:underline;text-underline-offset:.18em;cursor:pointer}
+.sate-enlace:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
+.sate-recorrido-invitacion{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-4);margin-top:calc(-1 * var(--ipn-esp-5));margin-bottom:var(--ipn-esp-5);border:0;background:transparent;box-shadow:none}
+.calendario-audiencia{margin:0}
+.calendario-item{border:0;border-top:1px solid var(--ipn-linea);border-radius:0;background:transparent}
+.calendario-item[aria-pressed=true]{box-shadow:inset 2px 0 var(--sate-realce)}
+.sate-tarjeta-nav__icono{width:auto;height:auto;border:0;border-radius:0;background:transparent}
+.maptools{align-items:center;gap:var(--ipn-esp-3);padding-block:var(--ipn-esp-3)}
+#v-tray{padding-bottom:var(--ipn-esp-7)}
+#plan-opciones{flex-wrap:wrap;max-width:100%}
+/* Carrera fuera de la navegación: la medición de pestañas conserva su ancho real. */
+.wrap>header.top>.sate-controles{grid-area:carrera;justify-self:start;max-width:100%}
+.wrap>header.top>.brand{grid-template-columns:minmax(0,1fr);grid-template-areas:"t" "l"}
+.brand #sate-nombre,.sate-lado>.sate-logo-slot{display:none}
+.sate-controles select{text-transform:none;width:100%}
+.wrap>header.top>.sate-navegacion{border:0;margin:0;padding:0}
+:is(#sate-tabs,.sate-medicion) .sate-pestanas{border:0;border-radius:0;background:transparent;box-shadow:none;padding:0}
+:is(#sate-tabs,.sate-medicion) .sate-pestana{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;box-shadow:none;min-height:44px}
+:is(#sate-tabs,.sate-medicion) .sate-pestana[aria-selected=true]{border-bottom-color:var(--sate-realce);background:transparent;color:var(--sate-realce)}
+#sate-tabs .sate-pestana svg{display:none}
+.header-actions>.sate-opinar{border:0;border-radius:0;background:transparent;box-shadow:none;min-height:44px}
+#sate-leyenda .sate-ayuda__btn{border:0;background:transparent;padding:0}
+.header-actions :is(.theme-btn,.ipnt-btn,.saes-open){border:0;background:transparent;min-height:44px;min-width:44px}
+.header-actions .saes-open{color:var(--ipn-texto)}
+@media(max-width:1023px){.calendario-arriba,.calendario-estado{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:639px){
+  .wrap>header.top{padding:0;grid-template-columns:auto minmax(0,1fr) auto;column-gap:var(--ipn-esp-1)}
+  :root{--sate-logo-ipn-alto:2.5rem}
+  .wrap>header.top>.brand{grid-template-columns:minmax(0,1fr);grid-template-areas:"t" "l";gap:0}
+  .brand h1#sate-titulo{font-size:var(--ipn-tamano-s)}
+  .brand h1#sate-titulo{min-width:0;flex-wrap:wrap;white-space:normal;row-gap:0}
+  .header-actions{gap:0}
+  .header-actions :is(.theme-btn,.ipnt-btn,.saes-open),.header-actions>.sate-opinar{width:44px;min-width:44px;padding:0}
+  .header-actions .saes-open :is(.sate-texto-largo,.sate-texto-corto){display:none!important}
+  #sate-avisos-globales .sate-chips{flex-wrap:nowrap;max-width:100%;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;mask-image:linear-gradient(to right,transparent,black var(--ipn-esp-2),black calc(100% - var(--ipn-esp-4)),transparent)}
+  #sate-avisos-globales .sate-chips::-webkit-scrollbar{display:none}
+  #sate-avisos-globales .sate-chips__item{flex:none;scroll-snap-align:start;max-width:100%}
+  body.sate-flotante .wrap>[role=tabpanel],.wrap>[role=tabpanel]{padding-bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+  #v-tray{padding-bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-7) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+}
+
+/* Las filas numéricas comparten el mismo contrato que los filtros. */
+.filters>.field,#f-nivel,#plan-opciones{min-width:0;max-width:100%}
+#f-nivel,#plan-opciones{display:flex;flex-wrap:wrap}
+.tmr .gd-chip,.tmr .sel-materia{border:0;border-radius:0;background:transparent;box-shadow:none}
+.tmr .gd-chip:hover,.tmr .sel-materia:hover{background:var(--ipn-hundido);text-decoration:underline}
+.tmr .sel-materia{padding-block:var(--ipn-esp-2)}
+.mapwrap{padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7));scroll-padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7))}
+body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}

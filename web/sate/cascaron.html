@@ -855,17 +855,15 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       <div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/ <button class="sate-unidad-btn" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/" hidden></button></h1><span id="sate-leyenda"></span></div>
       <p id="sate-nombre">/*__SATE_NOMBRE__*/</p>
     </div>
+    <div class="sate-controles">
+      <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
+    </div>
     <div class="sate-lado">
       <span id="sate-logo-unidad" class="sate-logo-slot"><span id="sate-unidad-nombre" class="sate-unidad-nombre"></span></span>
-      <div class="header-actions"><!--__SAES_CARD__--><!--__CUENTA_BTN__--><!--__THEME_BTN__--></div>
+      <div class="header-actions"><!--__SAES_CARD__--><!--__CUENTA_BTN__--><!--__THEME_BTN__--><button class="enc-btn sate-opinar" type="button" data-encuesta hidden title="/*__SATE_OPINAR_TITULO__*/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>/*__SATE_OPINAR__*/</span></button></div>
     </div>
-    <button class="enc-btn sate-boton-flota" type="button" data-encuesta hidden title="/*__SATE_OPINAR_TITULO__*/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>/*__SATE_OPINAR__*/</span></button>
     <div class="sate-fila-avisos"><div id="sate-avisos-globales"></div></div>
-    <div class="sate-navegacion"><div id="sate-tabs"></div><button id="t-tray" hidden></button>
-      <div class="sate-controles">
-        <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
-      </div>
-    </div>
+    <div class="sate-navegacion"><div id="sate-tabs"></div><button id="t-tray" hidden></button></div>
   </header>
 
   <section id="sate-entrada" class="card sate-entrada" aria-labelledby="sate-entrada-titulo" hidden></section>
@@ -972,7 +970,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       <div class="active" id="active"></div>
     </section>
 
-    <button type="button" class="btn primary horario-flotante" id="b-horario" data-htexto="horario_ver" aria-haspopup="dialog">Ver horario</button>
+    <button type="button" class="btn horario-flotante" id="b-horario" data-htexto="horario_ver" aria-haspopup="dialog">Ver horario</button>
     <div class="hlayout">
       <section aria-labelledby="h-offer">
         <details class="box2" id="mi-semana" hidden>
@@ -1034,7 +1032,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
           <div class="actions">
             <div class="seg calview" role="group" aria-label="Vista del horario"><button type="button" data-cview="semana">Semana</button><button type="button" data-cview="dia">Por día</button></div>
             <label class="check"><input type="checkbox" id="f-weekend"> Mostrar fin de semana</label>
-            <button class="btn primary" id="b-export" type="button" aria-haspopup="dialog">Exportar horario</button>
+            <button class="btn" id="b-export" type="button" aria-haspopup="dialog">Exportar horario</button>
             <button class="btn" id="b-saeshor" hidden title="Carga en la versión seleccionada el horario inscrito según el SAES">Traer horario inscrito (SAES)</button>
             <button class="btn" id="b-clear">Vaciar</button>
           </div>
@@ -1087,7 +1085,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       <div class="field"><span>Actividades extracurriculares</span>
         <label class="expcolor"><input type="color" id="exp-own" aria-label="Color de las actividades extracurriculares"><span>Color de resalte</span></label></div>
       <div class="field"><span>Formato</span>
-        <div class="exp-actions"><button class="btn primary" id="b-png" type="button">Imagen (PNG)</button><button class="btn primary" id="b-pdf" type="button">PDF</button><button class="btn" id="b-pdfall" type="button" hidden>PDF con todos los horarios</button><button class="btn primary" id="b-xlsx" type="button">Excel</button><button class="btn" id="b-copy" type="button">Copiar texto</button></div></div>
+        <div class="exp-actions"><button class="btn primary" id="b-png" type="button">Imagen (PNG)</button><button class="btn" id="b-pdf" type="button">PDF</button><button class="btn" id="b-pdfall" type="button" hidden>PDF con todos los horarios</button><button class="btn" id="b-xlsx" type="button">Excel</button><button class="btn" id="b-copy" type="button">Copiar texto</button></div></div>
     </div>
     <p class="saes-note" id="exp-dmsg" aria-live="polite" style="margin:var(--ipn-esp-3) 0 0;min-height:1.3em"></p>
   </dialog>

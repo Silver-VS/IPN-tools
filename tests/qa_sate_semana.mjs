@@ -6,7 +6,7 @@ const leer=p=>readFileSync(p,'utf8'),fuente=leer('web/sate/horarios.js'),nucleo=
 const shell=leer('web/sate/cascaron.html');
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 assert.ok(shell.indexOf('id="mi-semana"')<shell.indexOf('id="gen"'));
-assert.equal(config.textos['sate.horarios.semana_titulo'],'Extras');
+assert.equal(config.textos['sate.horarios.semana_titulo'],'Otras actividades');
 assert.equal(config.textos['sate.horarios.semana_subtitulo'],'Trabajo, traslado y otras actividades que también ocupan tu semana');
 assert.equal(config.textos['sate.horarios.semana_agregar'],'Agregar actividad fija');
 assert.equal(config.textos['sate.horarios.semana_solo_horas'],'Contar horas sin mostrar en el horario');
@@ -15,7 +15,7 @@ assert.match(fuente,/for\(const id of \['#cal','#agenda'\]\)\$\(id\)\.addEventLi
 assert.match(shell,/id="semana-presupuesto" aria-live="polite"/);
 assert.match(shell,/<details id="semana-opciones">[\s\S]*?semana_mas_opciones[\s\S]*?id="semana-secundarios"/);
 assert.ok(!shell.includes('data-htexto="semana_borrado_ayuda"'));
-assert.equal(config.textos['sate.horarios.semana_privacidad'],'Todo es opcional y se guarda solo en tu navegador o tu nube.');
+assert.equal(config.textos['sate.horarios.semana_privacidad'],'Opcional. Se guarda solo en tu navegador o tu nube.');
 assert.match(leer('web/sate/nucleo.js'),/IPNT.set\(HU\+k,JSON.stringify\(v\)\)/);
 assert.match(leer('tools/cuenta.py'),/SYNC=/);
 const bloque=(d,a,b)=>['B','M',1,'DEMO-'+d+'-'+a,0,[],[[d,a,b]],4,'A'];
@@ -64,16 +64,16 @@ for(const unidad of ['upiita','escom','upibi'])for(const activa of [true,false])
   if(activa)check('presupuesto condicional y resumen cerrado',()=>{
     sel=[];c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,true);
     assert.equal(nodo('#semana-presupuesto').innerHTML,'');
-    assert.equal(nodo('#semana-resumen').textContent,'Extras');
+    assert.equal(nodo('#semana-resumen').textContent,'Otras actividades');
     ms.dias='2';ms.ida='30';ms.vuelta='30';ms.antes='08:00';
     c.renderSemana();assert.equal(nodo('#semana-presupuesto').hidden,false);
-    assert.equal(nodo('#semana-resumen').textContent,'Extras · 2 días máx. · traslado 1 h · no antes de 8:00');
+    assert.equal(nodo('#semana-resumen').textContent,'Otras actividades · 2 días máx. · traslado 1 h · no antes de 8:00');
     assert.ok(nodo('#semana-presupuesto').innerHTML.includes('Libre: 168 h'));
     assert.ok(!nodo('#semana-presupuesto').innerHTML.includes('Clases: 0 h'));
     assert.ok(!nodo('#semana-presupuesto').innerHTML.includes(config.textos['sate.horarios.semana_supuestos']));
     assert.equal(nodo('#semana-presupuesto-titulo').children.at(-1).ayuda,'sate.horarios.semana_supuestos');
     nodo('#mi-semana').open=true;nodo('#mi-semana').eventos.toggle();
-    assert.equal(nodo('#semana-resumen').textContent,'Extras');
+    assert.equal(nodo('#semana-resumen').textContent,'Otras actividades');
     nodo('#mi-semana').open=false;nodo('#mi-semana').eventos.toggle();
     assert.ok(nodo('#semana-resumen').textContent.includes('2 días máx.'));
     for(const k of Object.keys(ms))delete ms[k];

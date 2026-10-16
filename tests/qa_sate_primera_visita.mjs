@@ -12,7 +12,7 @@ assert.match(vacio,/class="btn primary"[^>]*id="desempeno-lector"/);
 assert.match(vacio,/id="desempeno-explorar"/);
 assert.doesNotMatch(vacio,/onclick=/);
 assert.equal(texto('sate.planeacion.oferta_vacia'),'Aún no eliges materias en el Mapa curricular. Elígelas allá o consulta toda la oferta.');
-assert.match(texto('sate.trayectoria.sin_datos'),/SATE.*sin datos puedes explorar el mapa y armar tu horario/);
+assert.match(texto('sate.trayectoria.sin_datos'),/SAES.*Sin ellos puedes explorar el mapa y armar tu horario/);
 const nodos=new Map();
 const nodo=id=>{if(!nodos.has(id))nodos.set(id,{eventos:{},addEventListener(k,f){this.eventos[k]=f}});return nodos.get(id)};
 const desempe=leer('web/dist/sate/desempeno.js');
@@ -31,7 +31,7 @@ const c=vm.createContext({$:()=>box,ALUMNO:null,SATE:{texto},SateUI:{aviso(o){av
   store:{get:(k,d)=>guardado.get(k)??d,set:(k,v)=>guardado.set(k,v)}});
 vm.runInContext(ayuda,c);
 c.renderAyudaPrimeraVisita();assert.equal(box.hidden,false);assert.equal(aviso.descartable,true);
-assert.equal(aviso.titulo,'Toca o haz clic en las materias que quieres cursar; luego arma tu horario en Horarios de clase.');
+assert.equal(aviso.titulo,'Elige en el mapa las materias que quieres cursar y arma tu horario en Horarios.');
 aviso.alDescartar();assert.equal(box.hidden,true);c.renderAyudaPrimeraVisita();assert.equal(box.aviso,null);
 guardado.clear();c.ALUMNO={leido:'2026-10-07'};c.renderAyudaPrimeraVisita();assert.equal(box.hidden,true);
 c.ALUMNO=null;c.renderAyudaPrimeraVisita();assert.equal(box.hidden,false);
@@ -49,7 +49,7 @@ assert.doesNotMatch(dialogo,/saes-aviso/);
 assert.doesNotMatch(dialogo,/<details[^>]*\bopen\b/,'Las ayudas y los videos empiezan cerrados');
 assert.match(dialogo,/<details><summary>¿Prefieres verlo\? Video paso a paso<\/summary>/);
 for(const dispositivo of ['pc','ios','android'])assert.ok(dialogo.includes('data-dev="'+dispositivo+'"'));
-assert.match(dialogo,/<ol start="3"><li><b>Pega aquí<\/b> <button[^>]*id="saes-paste-clip"[^>]*>Pegar datos copiados<\/button><\/li><\/ol>/);
+assert.match(dialogo,/<ol start="3"><li><b>Pega aquí<\/b> <button[^>]*id="saes-paste-clip"[^>]*>Pegar datos del SAES<\/button><\/li><\/ol>/);
 assert.ok(dialogo.indexOf('id="saes-reminder"')>dialogo.indexOf('id="saes-paste"'),'Recordatorio discreto al final');
 for(const modo of ['ok','ausente','denegado','invalido','sin-contrato','otra-unidad']){
   const elementos=new Map();let cargado,guardadoSaes,cierres=0;

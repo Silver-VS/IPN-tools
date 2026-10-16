@@ -17,6 +17,7 @@ Elemento.prototype.prepend = function (n) { this.insertBefore(n, this.firstChild
 document.createElementNS = (_, tag) => document.createElement(tag);
 const datos = fixture('comun'), reg = fixture('demo'), solicitudes = [], scripts = [], desplazamientos = [];
 datos.acudir = datos.acudir.map(a => ({...a, ambito:'ipn'})); // Contrato de la compilación.
+datos.acudir[0].para = 'Consulta [[a:demo:1|art. 1]]. Conserva [[g:credito|crédito]] y el texto normativo.';
 const config = JSON.parse(leer('data/sate.json'));
 config.unidades.ficticia = {guiaDatos:true, siglas:'Unidad ficticia', pestanas:['guia']};
 let pestana, movil = false;
@@ -83,6 +84,14 @@ assert.ok(caja.querySelector('[data-pc-seccion="transitorios"]'));
 await pestana.mostrar({partes:['acudir']});
 assert.ok(caja.textContent.includes('sate.guia.acudir_ipn'));
 assert.ok(caja.textContent.includes('sate.guia.fuente_pagina'));
+const instancia = caja.querySelector('#acudir-central'), funciones = instancia.querySelector('details');
+assert.equal(instancia.querySelector('p').textContent, 'Consulta art. 1.');
+assert.equal(funciones.querySelector('summary').textContent.trim(), 'sate.guia.funciones_manual');
+assert.equal(!!funciones.open, false);
+assert.equal(funciones.querySelector('p').textContent, ' Conserva crédito y el texto normativo.');
+assert.ok(funciones.querySelector('a[href="https://example.org/demo.pdf"]'));
+assert.ok(instancia.querySelector('.guia-enlace'));
+assert.ok(funciones.querySelector('.sate-termino'));
 await pestana.mostrar({partes:['reglamentos']});
 assert.ok(caja.querySelector('a[href="#/ficticia/guia/reglamentos/demo"]'));
 assert.ok(caja.textContent.includes('sate.guia.numero_articulos 1'));

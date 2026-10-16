@@ -35,7 +35,7 @@ class TestContenido(unittest.TestCase):
         import saes
         textos = contenido.objeto_t()
         clave = 'sate.lector.mismo_marcador'
-        self.assertEqual(textos[clave], 'Es el mismo marcador SATE que usas para traer tus datos del SAES; si ya lo tienes, no necesitas agregarlo otra vez.')
+        self.assertEqual(textos[clave], 'Es el mismo marcador SATE; si ya lo tienes, no lo agregues otra vez.')
         self.assertIn(textos[clave], saes.card('javascript:void(0)', 'horarios'))
         raiz = pathlib.Path(__file__).resolve().parent.parent
         self.assertIn("SATE.texto('" + clave + "')", (raiz / 'web/sate/cupos.js').read_text(encoding='utf-8'))

@@ -147,7 +147,9 @@ mostrar();cambiar('27/1');
 // 1. Acomodo común: encabezado, resumen + mes arriba, bloque principal debajo, agenda + detalle al final.
 api.hoy=()=> '2026-10-20';mostrar();cambiar('27/1');
 const clasesBox=box.children.map(n=>n.className);
-assert.deepEqual(clasesBox,['calendario-cabecera','calendario-audiencia','calendario-arriba','calendario-principal','calendario-abajo']);
+// DIS5 reúne periodo, vista y audiencia en una barra; conserva la casilla y su etiqueta accesible.
+assert.deepEqual(clasesBox,['calendario-cabecera','calendario-arriba','calendario-principal','calendario-abajo']);
+assert.ok(nodos('calendario-controles')[0].all().some(n=>n.id==='cal-audiencia'));
 const arriba=nodos('calendario-arriba')[0];
 assert.deepEqual(arriba.children.map(n=>n.className),['calendario-tarjeta calendario-estado','calendario-tarjeta calendario-mes-chico'],'Resumen a la izquierda y mes chico a la derecha');
 const cabecera=nodos('calendario-cabecera')[0];
@@ -246,7 +248,7 @@ assert.equal(document.getElementById('cal-vista-carriles').getAttribute('aria-pr
 assert.equal(nodos('calendario-semicirculo').length,0);assert.equal(nodos('calendario-centro').length,0);
 assert.equal(nodos('calendario-linea').length,1);assert.deepEqual(box.children.map(n=>n.className),clasesBox,'Mismo acomodo en ambas vistas');
 assert.equal(nodos('calendario-principal')[0].all().filter(n=>n.className==='calendario-linea').length,1);
-assert.match(nodos('calendario-linea-tarjeta')[0].textContent,/Todo el periodo de un vistazo/);
+assert.match(nodos('calendario-linea-tarjeta')[0].textContent,/Línea de tiempo del periodo/);
 const filas=nodos('calendario-linea-fila');
 assert.deepEqual(filas.map(n=>n.getAttribute('data-fila')),['tramites','evaluaciones','ets','becas','tt','sin_clases','dias_clave']);
 assert.deepEqual(filas.map(n=>n.children[0].textContent),['Trámites','Evaluaciones','ETS','Becas','Trabajo terminal','Sin clases','Días clave']);

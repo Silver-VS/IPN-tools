@@ -38,7 +38,8 @@ assert.ok(shell.indexOf('id="b-horario"')<shell.indexOf('<div class="hlayout">')
 assert.match(css,/\.tramite-datos:focus-within \.tramite-acciones\{position:static/);
 assert.match(css,/\.gbrk-horas\{display:grid;grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(hor,/class="gbrk-horas"><label class="field"/);
-const piso=css.slice(css.lastIndexOf('@media(max-width:639px){'));
+// DIS5 añade otro bloque móvil: localizar el piso por sus selectores, no por ser el último @media.
+const piso=css.match(/@media\(max-width:639px\)\{\s*(\.field>span,\.lbl,[\s\S]*?)\n\}/)[1];
 for(const selector of ['.cal-b','.k-regla em','.ticks','.an-tag','.marks button','.dpill','.blk','#map-ayuda'])
   assert.ok(piso.includes(selector),selector+': piso tipográfico en teléfono');
 assert.match(piso,/font-size:var\(--ipn-tamano-xs\)!important/);
@@ -52,7 +53,7 @@ for(const m of shell.matchAll(/<button\b([^>]*\bdata-g(?:t|src|days|n)="[^"]*"[^
 assert.equal(config.textos['sate.ventanilla.apellidos_aviso'],'Tus apellidos deben coincidir con los del SAES.');
 assert.match(leer('web/sate/tramites.js'),/tx\('apellidos_aviso'\)/);
 assert.match(leer('web/sate/situacion.js'),/config\(\).tramites.includes\(principal.tramite\)\?'que_hacer':'ver_detalles'/);
-assert.equal(config.textos['sate.planeacion.elegidas'],'Unidades de aprendizaje que quieres cursar');
+assert.equal(config.textos['sate.planeacion.elegidas'],'Unidades de aprendizaje elegidas');
 assert.match(leer('web/index.html'),/--ipn-radio:0.75rem;--r:var\(--ipn-radio\)/);
 assert.match(leer('tools/sate_saes.js'),/@media\(prefers-color-scheme:dark\)/,'CUP9 ya proporciona el tema oscuro');
 const dlg=leer('tools/cuenta.py').split('id="ipnt-privacidad"')[1].split('</dialog>')[0];

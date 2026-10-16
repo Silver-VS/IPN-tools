@@ -278,7 +278,7 @@
             finally{accion.disabled=false}
           });
           accion.setAttribute('aria-label',tx('accion_aria',{accion:tx(verbo),tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));
-          if(e.id==='progreso')accion.className+=' sate-btn--primario';
+          // Acciones de fila secundarias; la acción primaria pertenece al asistente abierto.
           lateral.appendChild(accion);
           // Un trámite terminado se puede revisar (vuelve al asistente) o reiniciar.
           if(e.id==='listo'){
@@ -292,7 +292,7 @@
           }
         }
         const guia=enlaceGuia(id);
-        if(guia){const g=el('a',tx('ver_guia'),'sate-btn tramite-ver-guia');g.href=guia;g.setAttribute('aria-label',tx('ver_guia_aria',{tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));lateral.appendChild(g)}
+        if(guia){const g=el('a',tx('ver_guia'),'sate-enlace tramite-ver-guia');g.href=guia;g.setAttribute('aria-label',tx('ver_guia_aria',{tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));lateral.appendChild(g)}
         fila.appendChild(lateral);lista.appendChild(fila);
       }
       grupo.appendChild(lista);box.appendChild(grupo);

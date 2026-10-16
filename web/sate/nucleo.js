@@ -188,14 +188,22 @@ function desfaseLimpiarHorario(k){
     store.set('w.'+p,W[p]);
   }
 }
-function desfaseAcciones(k){
+function desfaseAcciones(k,resumida=false){
   const b=conPlan(()=>tr(),0);if(!b.adeudos.includes(k))return '';
   const tx=(s,v)=>SATE.texto('sate.planeacion.desfase_'+s,v), e=desfaseEleccion(k,b), siguiente=desfaseSiguiente(k,b);
   const aviso=!siguiente?'sin_plazo':planInicio()+1>b.failP[k]+2?'siguiente_desfase':'plazo';
-  return `<div class="sate-desfase"><p role="status">${esc(tx(e?'elegida':'pendiente',{opcion:e?tx(e):''}))}</p><p>${esc(tx(aviso,{periodo:perName(b.failP[k]==null?null:b.failP[k]+2)}))}</p><div class="sate-chips">`+
+  return `<div class="sate-desfase">${resumida?'':`<p role="status">${esc(tx(e?'elegida':'pendiente',{opcion:e?tx(e):''}))}</p><p>${esc(tx(aviso,{periodo:perName(b.failP[k]==null?null:b.failP[k]+2)}))}</p>`}<div class="sate-chips">`+
     ['actual','siguiente','ets'].map(o=>`<button type="button" class="sate-chip sate-chip--reemplazo" data-estado="${e===o?'ok':'aviso'}" data-desfase="${esc(k)}" data-opcion="${o}" aria-pressed="${e===o}"${o==='siguiente'&&!siguiente?' disabled':''}>${esc(tx(o))}</button>`).join('')+'</div></div>';
 }
-function desfaseAvisos(){const b=conPlan(()=>tr(),0);return b.adeudos.map(k=>`<section><b>${esc(pretty(cur()[k][0]))}</b>${desfaseAcciones(k)}</section>`).join('')}
+function desfaseAvisos(){
+  const b=conPlan(()=>tr(),0), tx=(s,v)=>SATE.texto('sate.planeacion.desfase_'+s,v), avisos=new Set();
+  if(b.adeudos.some(k=>!desfaseEleccion(k,b)))avisos.add(tx('pendiente'));
+  for(const k of b.adeudos){
+    const aviso=!desfaseSiguiente(k,b)?'sin_plazo':planInicio()+1>b.failP[k]+2?'siguiente_desfase':'plazo';
+    avisos.add(tx(aviso,{periodo:perName(b.failP[k]==null?null:b.failP[k]+2)}));
+  }
+  return [...avisos].map(a=>`<p>${esc(a)}</p>`).join('')+b.adeudos.map(k=>`<section><b>${esc(pretty(cur()[k][0]))}</b>${desfaseAcciones(k,true)}</section>`).join('');
+}
 /* "dd/mm/aaaa hh:mm:ss p. m." del SAES → ¿la cita (fin) ya pasó? */
 /* recordatorio para volver a usar el Lector: los datos son una copia del SAES y no se actualizan solos */
 function avisoActualizar(A){

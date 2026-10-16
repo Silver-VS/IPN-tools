@@ -621,7 +621,7 @@ function renderOffer(){
   renderMasFiltros();
   if(S.onlyWant&&!tr().want.length){
     $('#offer-count').textContent='';
-    $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn primary" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;
+    $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;
   }
   const list=filtered(), sel=selected();
   let html='';

@@ -200,7 +200,7 @@
     }));
   }
   function seccionProximamente() {
-    const resto = (SATE_CONFIG.guia || []).filter(a => a.pronto);
+    const resto = (SATE_CONFIG.guia || []).filter(a => a.pronto && a.descripcion && t(a.descripcion).trim());
     if (!resto.length) return null;
     return h('section', { 'class': 'guia-pronto', 'aria-label': t('sate.guia.proximamente') }, [
       h('h3', { texto: t('sate.guia.proximamente') }),
@@ -336,7 +336,12 @@
     const items = new Map();
     const lista = h('ul', { 'class': 'guia-lista-acudir' }, d.acudir.map(a => {
       const f = fuente(d, a.fuente, t);
-      const li = h('li', { id: 'acudir-' + a.id }, [h('h3', { texto: a.nombre }), h('p', {}, enLinea(a.para, d)), f ? h('small', {}, [enlaceExterno('', f.url, f.texto)]) : null]);
+      // Las marcas pueden contener abreviaturas (art.); la oración se corta solo fuera de ellas.
+      const oracion = a.para.match(/^(?:\[\[[\s\S]*?\]\]|[^.!?])*[.!?](?=\s|$)/);
+      const inicio = oracion ? oracion[0] : a.para, resto = a.para.slice(inicio.length);
+      const li = h('li', { id: 'acudir-' + a.id }, [h('h3', { texto: a.nombre }), h('p', {}, enLinea(inicio, d)),
+        h('details', {}, [h('summary', { texto: t('sate.guia.funciones_manual') }), resto ? h('p', {}, enLinea(resto, d)) : null,
+          f ? h('small', {}, [enlaceExterno('', f.url, f.texto)]) : null])]);
       items.set(a.id, li);
       return li;
     }));

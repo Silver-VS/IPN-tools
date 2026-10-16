@@ -77,7 +77,7 @@ const chip=texto('Oficio');chip.click();assert.equal(chip.getAttribute('aria-pre
 assert.equal(JSON.parse(almacen.get('hu.tramite.electivas')).datos.actividades[0].ev,'oficio');
 const horas=box.todos().find(n=>n.tagName==='label'&&n.children[0]?.textContent==='¿Cuántas horas dice tu constancia?').children[1];
 horas.value='0';horas.oninput();assert.equal(horas.getAttribute('aria-invalid'),null);horas.onblur();assert.equal(horas.getAttribute('aria-invalid'),'true');
-horas.value='40';horas.oninput();horas.onblur();texto('Continuar').click();
+horas.value='40';horas.oninput();horas.onblur();texto('Continuar trámite').click();
 assert.ok(box.todos().some(n=>n.textContent==='¿Estuviste inscrito este semestre o el anterior?'));
 const primera=box.todos().find(n=>n.tagName==='section'&&n.children[0]?.textContent==='¿Te quedaron créditos sobrantes de un trámite anterior?');
 primera.todos().find(n=>n.textContent==='Sí').click();
@@ -115,7 +115,7 @@ assert.equal(JSON.parse(almacen.get('hu.tramite.electivas')).listo,true);
 await new Promise(r=>setTimeout(r,360));assert.match(box.querySelector('iframe').src,/^blob:/);
 modulo.ocultar();
 let preparadoDesdeLista=0;T.registrar({...E.def,preparar:async()=>{preparadoDesdeLista++;await E.preparar()}});
-T.mostrarLista(box);await cancelar(()=>texto('Descargar').onclick());assert.equal(preparadoDesdeLista,0);await aceptar(()=>texto('Descargar').onclick());assert.equal(preparadoDesdeLista,1);assert.equal(descargas.at(-1),'electivas-2099000000.pdf');
+T.mostrarLista(box);await cancelar(()=>texto('Descargar formato').onclick());assert.equal(preparadoDesdeLista,0);await aceptar(()=>texto('Descargar formato').onclick());assert.equal(preparadoDesdeLista,1);assert.equal(descargas.at(-1),'electivas-2099000000.pdf');
 modulo.mostrar({tramite:'electivas'});texto('Cambiar').click();assert.ok(texto('Editar'));
 assert.equal(box.querySelector('form'),null);texto('Editar').click();assert.ok(box.querySelector('form'));
 box.querySelector('form').onsubmit({preventDefault(){}});assert.ok(box.todos().some(n=>n.textContent==='Tus electivas'),'Guardar inline conserva el asistente en la misma ruta');

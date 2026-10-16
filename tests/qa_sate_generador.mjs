@@ -34,7 +34,7 @@ const ejecutar=s=>vm.runInContext(s,c);
 ejecutar(fuente.slice(fuente.indexOf('let generacion=null;'),fuente.indexOf('\nfunction renderOffer()')));
 ejecutar(fuente.slice(fuente.indexOf("$('#b-gen').addEventListener"),fuente.indexOf("$('#offer').addEventListener('pointerover'")));
 const generar=()=>ejecutar('iniciarGeneracion()');
-function listo(){assert.equal(nodo('#b-gen').disabled,false);assert.equal(nodo('#b-gen').textContent,'Generar');assert.equal(nodo('#genres').attrs['aria-busy'],undefined);assert.equal(ejecutar('generacion'),null)}
+function listo(){assert.equal(nodo('#b-gen').disabled,false);assert.equal(nodo('#b-gen').textContent,'Generar horarios');assert.equal(nodo('#genres').attrs['aria-busy'],undefined);assert.equal(ejecutar('generacion'),null)}
 // Excepción y recuperación sin recargar.
 fallo=true;await generar();listo();assert.equal(errores.length,1);assert.match(nodo('#gen-status').textContent,/No se pudo/);
 fallo=false;await generar();listo();assert.equal(c.S.gen.top.length,6);assert.equal(nodo('#b-gen-clear').hidden,false);
@@ -43,7 +43,7 @@ const elegidas=[...tray.want], seleccionado=[...plan.sel];
 nodo('#b-gen-clear').eventos.click();assert.equal(c.S.gen,null);assert.equal(nodo('#genres').innerHTML,'');assert.equal(nodo('#b-gen-clear').hidden,true);
 assert.deepEqual(tray.want,elegidas);assert.deepEqual(plan.sel,seleccionado);assert.equal(nodo('#b-gen').enfocado,true);
 assert.equal(calendarios,1,'Borrar también retira la vista previa de una opción sin cambiar la selección');
-tray.want=[];await generar();listo();assert.match(nodo('#genres').innerHTML,/Selecciona materias/);
+tray.want=[];await generar();listo();assert.match(nodo('#genres').innerHTML,/Elige materias/);
 tray.want=elegidas;c.semanaOk=()=>false;await generar();listo();assert.equal(c.S.gen.top.length,0);assert.match(nodo('#genres').innerHTML,/No hay combinaciones/);
 c.semanaOk=()=>true;
 // Un clic nuevo invalida la corrida anterior, que no puede limpiar el estado de su sucesora.

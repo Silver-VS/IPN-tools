@@ -40,6 +40,16 @@ assert.equal(run("planAsignado('B204')"),null);
 assert.equal(run("tr().oblig.includes('B204')"),false);
 assert.equal(run("conPlan(()=>tr().oblig.includes('B204'),1)"),false);
 assert.match(run("desfaseAcciones('B204')"),/siguiente periodo ya sería desfase/);
+// DIS6: la lista comparte la explicación y cada materia conserva únicamente sus opciones.
+const avisos = run('desfaseAvisos()');
+assert.equal((avisos.match(/Aún no tiene un periodo asignado/g)||[]).length,1);
+assert.equal((avisos.match(/siguiente periodo ya sería desfase/g)||[]).length,1);
+assert.ok(avisos.indexOf('Aún no tiene un periodo asignado') < avisos.indexOf('<section>'));
+for(const seccion of avisos.match(/<section>[\s\S]*?<\/section>/g)||[]){
+  assert.doesNotMatch(seccion,/<p[ >]/);
+  assert.equal((seccion.match(/<button /g)||[]).length,3);
+}
+assert.match(run("desfaseAcciones('B203',true)"),/data-opcion="siguiente"[^>]* disabled/);
 assert.equal(run("elegirDesfase('B204','siguiente')"),true);
 assert.equal(run("planAsignado('B204')"),1,'Solo elegir siguiente la incluye en N+1');
 assert.equal(run("conPlan(()=>tr().oblig.includes('B204'),1)"),true);
