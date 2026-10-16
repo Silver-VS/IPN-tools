@@ -46,6 +46,7 @@
 .guia-fuentes .guia-enlace{margin-inline-start:var(--ipn-esp-3);min-height:2.75rem}
 .guia-articulo{display:grid;gap:var(--ipn-esp-3)}
 .guia-articulo .pc-oficial{display:block;width:auto;padding:0}
+.guia-aviso-ocr{margin:0;padding:var(--ipn-esp-2) var(--ipn-esp-3);border-left:3px solid var(--ipn-aviso);background:var(--ipn-aviso-suave);color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
 .guia-glosario{display:grid;gap:var(--ipn-esp-4)}
 .guia-glosario dt{font-weight:700}
 .guia-glosario dd{margin:var(--ipn-esp-2) 0 0}

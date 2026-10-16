@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTEOS = {'rge': (77, 7), 'ri': (295, 6), 'ro': (103, 4), 'lo': (34, 4),
            'titulacion': (46, 3), 'servicio_social': (51, 5), 'becas': (42, 5),
            'subcomite_becas': (45, 6), 'equivalencias': (0, 0),
-           'cambio_carrera': (0, 0), 'honor': (45, 2), 'etica': (0, 0), 'cgc': (0, 0)}
+           'cambio_carrera': (19, 3), 'honor': (45, 2), 'etica': (0, 0), 'cgc': (0, 0)}
 
 
 class Extraccion(unittest.TestCase):
@@ -151,9 +151,18 @@ class DatosOficiales(unittest.TestCase):
     def test_escaneados_y_codigo_sin_numeracion_se_declaran(self):
         por_id = {x['id']: x for x in self.indice}
         for id_ in ('equivalencias', 'cambio_carrera'):
-            self.assertTrue(por_id[id_]['sin_texto'])
-            self.assertTrue(self.datos[id_]['sin_texto'])
-            self.assertEqual(self.datos[id_]['articulos'], [])
+            with self.subTest(id=id_):
+                if self.datos[id_].get('ocr'):
+                    # PDF escaneado con transcripción OCR revisable del mismo PDF (data/reglamentos/ocr/<id>.txt)
+                    self.assertTrue(por_id[id_]['ocr'])
+                    self.assertNotIn('sin_texto', self.datos[id_])
+                    self.assertTrue(self.datos[id_]['articulos'] or self.datos[id_].get('texto'))
+                    cabecera = (r.OCR / f'{id_}.txt').read_text(encoding='utf-8').split('\n', 1)[0]
+                    self.assertEqual(cabecera, f"sha256: {self.datos[id_]['sha256']}")
+                else:
+                    self.assertTrue(por_id[id_]['sin_texto'])
+                    self.assertTrue(self.datos[id_]['sin_texto'])
+                    self.assertEqual(self.datos[id_]['articulos'], [])
         self.assertTrue(por_id['etica']['sin_articulado'])
         self.assertGreater(len(self.datos['etica']['texto']), 10000)
 

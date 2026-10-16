@@ -56,7 +56,8 @@
     }
     if (d.transitorios?.length) secciones.push({ id: 'transitorios', titulo: t('sate.guia.transitorios'), tipo: 'lista', contenido: d.transitorios.map(a => a.n + '. ' + a.texto) });
     if (d.texto && !secciones.length) secciones.push({ id: 'texto', titulo: d.titulo, tipo: 'texto', contenido: d.texto });
-    return { titulo: d.titulo, subtitulo: d.gaceta, secciones, fuente: { texto: t('sate.guia.pdf_oficial'), url: d.url } };
+    return { titulo: d.titulo, subtitulo: d.gaceta, secciones, fuente: { texto: t('sate.guia.pdf_oficial'), url: d.url },
+      avisos: d.ocr ? [{ tipo: 'ocr', texto: t('sate.guia.aviso_ocr') }] : [] };
   }
   raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, documentoReglamento };
 
@@ -139,6 +140,7 @@
       h('div', { 'class': 'pc-lector pc-oficial' }, [h('p', { texto: inicioFracciones >= 0 ? a.texto.slice(0, inicioFracciones) : a.texto }),
         a.fracciones?.length ? h('ol', {}, a.fracciones.map(f => h('li', { texto: f.fr + '. ' + f.texto }))) : null])
     ] : [h('p', { role: 'status', texto: t(error ? 'sate.guia.error_articulo' : 'sate.guia.sin_articulo') })]);
+    if (a && reg.ocr) cuerpo.appendChild(h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }));
     const leer = h('a', { href: rutaReglamento(doc, 'art-' + n), texto: t('sate.guia.leer_reglamento') });
     leer.addEventListener('click', () => SateUI.cerrarModal());
     cuerpo.appendChild(leer);

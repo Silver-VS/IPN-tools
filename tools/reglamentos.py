@@ -1,9 +1,11 @@
-"""Extrae las fuentes oficiales declaradas en la Guía, sin OCR ni paráfrasis.
+"""Extrae las fuentes oficiales declaradas en la Guía, sin paráfrasis.
 
 python tools/reglamentos.py reutiliza los PDF de .cache/reglamentos/.
 --verificar descarga las mismas URL y compara SHA-256 sin sustituir la caché.
 Requiere pdfplumber. sin_texto identifica PDF escaneados; sin_articulado
 conserva en texto los documentos que no tienen artículos numerados.
+Un PDF escaneado usa su transcripción OCR de data/reglamentos/ocr/<id>.txt (tools/ocr_reglamentos.py,
+Ollama local) solo si esa transcripción declara el mismo SHA-256 del PDF; el documento queda marcado `ocr`.
 Los márgenes corresponden a las ediciones enlazadas, no a futuros PDF:
 un cambio de SHA requiere revisar la extracción antes de sustituir los datos.
 """
@@ -20,7 +22,20 @@ import urllib.request
 ROOT = Path(__file__).resolve().parents[1]
 CACHE = ROOT / '.cache/reglamentos'
 DESTINO = ROOT / 'data/reglamentos'
+OCR = DESTINO / 'ocr'
 LOG = logging.getLogger(__name__)
+
+
+def transcripcion_ocr(id_, digest):
+    """Páginas de la transcripción OCR revisable si corresponde a este PDF (primera línea `sha256: <hex>`)."""
+    ruta = OCR / f'{id_}.txt'
+    if not ruta.exists():
+        return None
+    cabecera, _, cuerpo = ruta.read_text(encoding='utf-8').partition('\n')
+    if cabecera.strip() != f'sha256: {digest}':
+        LOG.warning('%s: la transcripción OCR es de otro PDF; se ignora', id_)
+        return None
+    return cuerpo.split('\n\f\n')
 
 
 def fuentes():
@@ -262,12 +277,20 @@ def main():
         textos = paginas(ruta)
         (CACHE / f'{id_}.txt').write_text('\n\f\n'.join(textos), encoding='utf-8')
         LOG.info('%s: %s páginas, %s caracteres', id_, len(textos), sum(map(len, textos)))
+        con_ocr = False
+        if sum(len(re.findall(r'[a-záéíóúñ]{3,}', t, re.I)) for t in textos) < 20:
+            ocr = transcripcion_ocr(id_, hashlib.sha256(ruta.read_bytes()).hexdigest())
+            if ocr:
+                textos, con_ocr = ocr, True
+                LOG.info('%s: se usa la transcripción OCR (%s páginas)', id_, len(textos))
         articulos, transitorios, estructura = extraer(textos)
         documento = {k: fuente[k] for k in ('titulo', 'url', 'gaceta')}
         documento.update(id=id_, sha256=hashlib.sha256(ruta.read_bytes()).hexdigest(),
                          extraido_el=date.today().isoformat(), estructura=estructura,
                          articulos=articulos, transitorios=transitorios)
         entrada = {'id': id_, 'titulo': fuente['titulo'], 'articulos': len(articulos), 'url': fuente['url']}
+        if con_ocr:
+            documento['ocr'] = entrada['ocr'] = True
         if sum(len(re.findall(r'[a-záéíóúñ]{3,}', t, re.I)) for t in textos) < 20:
             documento['sin_texto'] = entrada['sin_texto'] = True
             LOG.warning('%s: sin texto normativo extraíble; no se usa OCR', id_)
