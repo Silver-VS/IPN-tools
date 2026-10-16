@@ -136,6 +136,37 @@ assert.match(core,/if\(location.hash==='#demo'\)/);
 assert.match(core,/Modo demostración[\s\S]*Salir del modo demostración/);
 assert.match(core,/sessionStorage.removeItem\('ipnt.demo'\)/);
 const css=leer('web/sate/componentes.css');
+assert.match(css,/\.sate-unidad-nombre\{[^}]*margin-right:var\(--ipn-esp-4\);padding-right:var\(--ipn-esp-4\);border-right:1px solid var\(--ipn-tenue\)/);
+assert.match(css,/\.sate-controles select\{field-sizing:content;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap/);
+// El respaldo mide solo la opción elegida, también después de cambiar carrera.
+{
+  const fuente=leer('web/sate/nucleo.js');
+  const funcion=fuente.slice(fuente.indexOf('function ajustarCarrera(){'),fuente.indexOf('if(document.fonts)'));
+  const selector={selectedOptions:[{textContent:'Biónica'}],style:{}};
+  let nativo=false,mediciones=0;
+  const contexto={CSS:{supports:()=>nativo},$:()=>selector,
+    getComputedStyle:()=>({font:'12px sans-serif',paddingLeft:'10px',paddingRight:'10px',borderLeftWidth:'1px',borderRightWidth:'1px',getPropertyValue:()=> '24px'}),
+    document:{createElement:()=>({getContext:()=>({measureText(t){mediciones++;return {width:t.length*8}}})})}};
+  vm.runInNewContext(funcion+';globalThis.ajustar=ajustarCarrera',contexto);
+  {
+    selector.selectedOptions[0].textContent='Ingeniería Biónica';contexto.ajustar();
+    const largo=Number(selector.style.width.match(/\d+/)[0]);
+    selector.selectedOptions[0].textContent='Biónica';contexto.ajustar();
+    assert.ok(Number(selector.style.width.match(/\d+/)[0])<largo,'se contrae al cambiar');
+    assert.match(selector.style.width,/\+ var\(--ipn-esp-6\)\)/);
+  }
+  nativo=true;const antes=mediciones;contexto.ajustar();assert.equal(mediciones,antes);
+  assert.match(fuente,/innerHTML=cars\.map[^\n]*\n  ajustarCarrera\(\)/);
+}
+const catalogo=leer('contenido/textos/es.toml');
+for(const clave of ['lead_temporal','aviso_temporal_1','periodos_ayuda']){
+  const linea=catalogo.split('\n').find(l=>l.startsWith(clave+' ='));
+  assert.match(linea,/dos periodos semestrales completos/);
+  assert.match(linea,/no tienen que ser seguidos/);
+  assert.doesNotMatch(linea,/un año|consecutivos/);
+}
+const baja=JSON.parse(leer('data/guia/upiita.json'));
+assert.ok(JSON.stringify(baja).includes('dos periodos semestrales completos en toda tu trayectoria; no tienen que ser seguidos'));
 assert.match(acciones,/class="sate-texto-corto">Traer datos/,'H: etiqueta móvil inicial en catálogo');
 assert.match(css,/#sate-avisos-globales \.sate-chips\{flex-wrap:nowrap/);
 assert.match(css,/\.bar-top\{border-bottom:0/);
@@ -175,7 +206,8 @@ function comprobar(w, escalon, separado) {
 }
 // Límites exactos, reducción, recuperación desde barra oculta y ráfagas del observador.
 for (const [w,e,s] of [[854,'completo',false],[853,'completo',true],[602,'completo',true],
-  [601,'corto',true],[402,'corto',true],[401,'flotante',true],[1000,'completo',false]]) comprobar(w,e,s);
+  [601,'corto',true],[402,'corto',true],[401,'flotante',true],[1000,'completo',false],
+  [1440,'completo',false],[1024,'completo',false],[768,'completo',true],[375,'flotante',true]]) comprobar(w,e,s);
 doc.activeElement=boton;comprobar(300,'flotante',true);assert.equal(doc.activeElement,inferior);
 comprobar(1000,'completo',false);assert.equal(doc.activeElement,boton);
 const antes=frames;observador();observador();mutacion();fuentes();assert.equal(frames,antes+1);frame();

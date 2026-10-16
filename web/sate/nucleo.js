@@ -753,6 +753,18 @@ function renderLineas(){
    ========================================================= */
 /* ---------- render general ---------- */
 const hasOffer=p=>(DATA.periodos[p]||[]).length>0;
+function ajustarCarrera(){
+  if(globalThis.CSS?.supports?.('field-sizing','content')||typeof getComputedStyle!=='function')return;
+  const selector=$('#f-carrera'),estilo=getComputedStyle(selector);
+  const medida=document.createElement('canvas').getContext?.('2d');
+  if(!medida)return;
+  medida.font=estilo.font;
+  // Reserva para la flecha nativa; el máximo CSS limita el ancho en teléfono.
+  const ancho=medida.measureText(selector.selectedOptions[0]?.textContent||'').width;
+  selector.style.width='calc('+Math.ceil(ancho+parseFloat(estilo.paddingLeft)+parseFloat(estilo.paddingRight)+
+    parseFloat(estilo.borderLeftWidth)+parseFloat(estilo.borderRightWidth))+'px + var(--ipn-esp-6))';
+}
+if(document.fonts){document.fonts.ready.then(ajustarCarrera);document.fonts.addEventListener('loadingdone',ajustarCarrera)}
 function renderTop(){
   renderSimGlobal();
   if(!hasOffer(S.per)&&hasOffer('actual'))S.per='actual';
@@ -764,6 +776,7 @@ function renderTop(){
   const cars=Object.entries(DATA.carreras).filter(([k])=>DATA.mapas[k]);
   if(!cars.some(([k])=>k===S.car)) S.car=cars[0][0];
   $('#f-carrera').innerHTML=cars.map(([k,v])=>`<option value="${esc(k)}"${k===S.car?' selected':''}>${esc(v)}</option>`).join('');
+  ajustarCarrera();
   const f=new Date(DATA.capturado).toLocaleString('es-MX',{dateStyle:'long',timeStyle:'short'});
   const n=new Set(classes().filter(c=>c[0]===S.car).map(c=>c[3])).size;
   $('#notice').innerHTML=`<span>Captura del SAES: <b>${esc(f)}</b></span><span><b>${n}</b> grupos de esta carrera</span>`+
