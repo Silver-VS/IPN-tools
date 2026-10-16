@@ -87,6 +87,11 @@ los bloques con `tipo` de las versiones del periodo consultado, conservando los 
 Sin ese campo, `want` se interpreta como la selección del periodo N; al editar,
 se conserva `want` como espejo de N para lectores anteriores y se preservan
 campos desconocidos. Al avanzar el horizonte se recupera la selección por su periodo.
+Los adeudos requieren una elección explícita en
+`desfasePorPeriodo`, por ejemplo `{"27/1":{"B204":"siguiente","B203":"ets"}}`.
+Los valores son `actual`, `siguiente` y `ets`; sin elección se muestra un aviso sin
+asignar clases. ETS no supone acreditación. Al avanzar el horizonte, la elección
+`siguiente` del periodo anterior se recupera como `actual`.
 La pestaña seleccionada es estado transitorio de pantalla, no cambia `ipnt` ni el
 periodo del armado de horarios. N+1 se calcula suponiendo acreditadas las materias
 de N y excluye las de N y las acreditadas reales o simuladas; no modifica el SAES.

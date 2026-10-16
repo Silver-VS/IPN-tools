@@ -124,10 +124,14 @@ const trayectoriaBase=()=>{
     const pm=perMeta();simFail.forEach(k=>{if(failP[k]==null)failP[k]=pm!=null?pm-1:null;veces[k]=(veces[k]||0)+1});
     const curso=sim?[]:enCurso;
     const desfS=me?(ALUMNO.desfasadas_saes||[]).map(r=>r[0]).filter(k=>cur()[k]&&!doneS.has(k)):[];
-    // desfasada oficial (más de 2 periodos reprobada): sin ella el SAES no permite reinscribirse -> obligatoria
-    const pmeta=perMeta(), oblig=[...new Set([...Object.keys(failP).filter(k=>failP[k]!=null&&pmeta!=null&&pmeta>failP[k]+2),...desfS])].filter(k=>!curso.includes(k));
+    // El plazo genera un aviso, nunca una inscripción ni una acreditación supuesta por ETS.
     const periodo=planClave(0), wantPorPeriodo=t.wantPorPeriodo||{};
-    T[S.car]={want:[...new Set([...(wantPorPeriodo[periodo]||t.want||[]),...oblig])].filter(k=>cur()[k]&&!isElec(k)),wantPorPeriodo,oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,encEqv,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
+    // La elección de N+1 sigue siendo explícita cuando ese periodo se convierte en N.
+    const previas=t.desfasePorPeriodo?.[perName(planInicio()==null?null:planInicio()-1)]||{};
+    const elecciones={...Object.fromEntries(Object.entries(previas).filter(([,e])=>e==='siguiente').map(([k])=>[k,'actual'])),...t.desfasePorPeriodo?.[periodo]}, adeudos=[...new Set([...Object.keys(failP),...desfS])].filter(k=>!curso.includes(k));
+    const want=[...new Set([...(wantPorPeriodo[periodo]||t.want||[]).filter(k=>!adeudos.includes(k)),...adeudos.filter(k=>elecciones[k]==='actual')])].filter(k=>cur()[k]&&!isElec(k));
+    const oblig=adeudos.filter(k=>elecciones[k]==='actual');
+    T[S.car]={want,wantPorPeriodo,elecciones,adeudos,oblig,desfS,done,fail:Object.keys(failP),failP,veces,curso,enCurso,encEqv,pendRep,sim,simOk,simRec,cursados:me?ALUMNO.avance?.cursados??null:null};
   }
   return T[S.car];
 };
@@ -142,9 +146,9 @@ const tr=()=>{
   if(!PLAN_PASO)return base;
   if(PLAN_CACHE?.base===base)return PLAN_CACHE.t;
   const done=[...new Set([...base.done,...base.want])], ya=new Set(done);
-  const fail=base.fail.filter(k=>!ya.has(k)), meta=planInicio();
-  const oblig=[...new Set([...base.oblig,...fail.filter(k=>base.failP[k]!=null&&meta!=null&&meta+1>base.failP[k]+2)])].filter(k=>!ya.has(k)&&!base.curso.includes(k));
-  const want=[...new Set([...(base.wantPorPeriodo[planClave(1)]||base.wantPorPeriodo.siguiente||[]),...oblig])]
+  const fail=base.fail.filter(k=>!ya.has(k));
+  const oblig=base.adeudos.filter(k=>base.elecciones[k]==='siguiente'&&desfaseSiguiente(k,base)&&!ya.has(k));
+  const want=[...new Set([...(base.wantPorPeriodo[planClave(1)]||base.wantPorPeriodo.siguiente||[]).filter(k=>!base.adeudos.includes(k)),...oblig])]
     .filter(k=>cur()[k]&&!isElec(k)&&!ya.has(k));
   const t={...base,want,done,fail,oblig,desfS:base.desfS.filter(k=>!ya.has(k)),
     failP:Object.fromEntries(Object.entries(base.failP).filter(([k])=>!ya.has(k))),
@@ -154,6 +158,44 @@ const tr=()=>{
 // Cada vista conserva su selección; la segunda supone acreditadas las materias de la primera.
 function planElegidas(){return new Set(planPasos().flatMap(p=>conPlan(()=>tr().want,p)))}
 function planAsignado(k){return conPlan(()=>tr().want.includes(k),0)?0:PLAN_DOS_PERIODOS&&conPlan(()=>tr().want.includes(k),1)?1:null}
+// Se permite llegar al primer periodo de desfase con aviso; un adeudo ya desfasado no se pospone.
+function desfaseSiguiente(k,base=conPlan(()=>tr(),0)){
+  return PLAN_DOS_PERIODOS&&!base.desfS.includes(k)&&base.failP[k]!=null&&planInicio()!=null&&planInicio()<=base.failP[k]+2;
+}
+function desfaseEleccion(k,base=conPlan(()=>tr(),0)){
+  const e=base.elecciones[k];return e==='siguiente'&&!desfaseSiguiente(k,base)?null:e||null;
+}
+function desfaseHorario(k){const b=conPlan(()=>tr(),0);return !b.adeudos.includes(k)||desfaseEleccion(k,b)==='actual'}
+function elegirDesfase(k,opcion){
+  const base=conPlan(()=>tr(),0);
+  if(!base.adeudos.includes(k)||!['actual','siguiente','ets'].includes(opcion)||opcion==='siguiente'&&!desfaseSiguiente(k,base)){
+    console.debug('SATE: elección de desfase rechazada',{carrera:S.car,clave:k,opcion,periodo:planClave(0)});return false;
+  }
+  base.elecciones={...base.elecciones,[k]:opcion};
+  base.want=base.want.filter(x=>x!==k);if(opcion==='actual')base.want.push(k);
+  base.wantPorPeriodo={...base.wantPorPeriodo,[planClave(1)]:(base.wantPorPeriodo[planClave(1)]||[]).filter(x=>x!==k)};
+  if(opcion==='siguiente')base.wantPorPeriodo[planClave(1)].push(k);
+  conPlan(saveT,0);
+  // Cambiar a ETS o N+1 retira grupos anteriores para que el horario respete la decisión.
+  if(opcion!=='actual')desfaseLimpiarHorario(k);
+  S.gen=null;
+  console.debug('SATE: elección de desfase',{unidad:UNIDAD,carrera:S.car,clave:k,opcion,periodo:planClave(0)});
+  return true;
+}
+function desfaseLimpiarHorario(k){
+  for(const p of Object.keys(W)){
+    for(const pl of Object.values(W[p].plans))pl.sel=pl.sel.filter(x=>KEYMAP[p]?.get(x)?.[8]!==k);
+    store.set('w.'+p,W[p]);
+  }
+}
+function desfaseAcciones(k){
+  const b=conPlan(()=>tr(),0);if(!b.adeudos.includes(k))return '';
+  const tx=(s,v)=>SATE.texto('sate.planeacion.desfase_'+s,v), e=desfaseEleccion(k,b), siguiente=desfaseSiguiente(k,b);
+  const aviso=!siguiente?'sin_plazo':planInicio()+1>b.failP[k]+2?'siguiente_desfase':'plazo';
+  return `<div class="sate-desfase"><p role="status">${esc(tx(e?'elegida':'pendiente',{opcion:e?tx(e):''}))}</p><p>${esc(tx(aviso,{periodo:perName(b.failP[k]==null?null:b.failP[k]+2)}))}</p><div class="sate-chips">`+
+    ['actual','siguiente','ets'].map(o=>`<button type="button" class="sate-chip sate-chip--reemplazo" data-estado="${e===o?'ok':'aviso'}" data-desfase="${esc(k)}" data-opcion="${o}" aria-pressed="${e===o}"${o==='siguiente'&&!siguiente?' disabled':''}>${esc(tx(o))}</button>`).join('')+'</div></div>';
+}
+function desfaseAvisos(){const b=conPlan(()=>tr(),0);return b.adeudos.map(k=>`<section><b>${esc(pretty(cur()[k][0]))}</b>${desfaseAcciones(k)}</section>`).join('')}
 /* "dd/mm/aaaa hh:mm:ss p. m." del SAES → ¿la cita (fin) ya pasó? */
 /* recordatorio para volver a usar el Lector: los datos son una copia del SAES y no se actualizan solos */
 function avisoActualizar(A){
@@ -349,7 +391,7 @@ const saveT=()=>{
   const wantPorPeriodo={...base.wantPorPeriodo,[planClave(0)]:[...base.want],[planClave(PLAN_PASO)]:[...t.want]};
   if(PLAN_DOS_PERIODOS&&!PLAN_PASO)wantPorPeriodo[planClave(1)]=(wantPorPeriodo[planClave(1)]||wantPorPeriodo.siguiente||[]).filter(k=>!base.want.includes(k));
   // Conservar campos desconocidos y el espejo legado de N para lectores ipnt 1.
-  store.set('t.'+S.car,{...anterior,want:[...base.want],wantPorPeriodo});
+  store.set('t.'+S.car,{...anterior,want:[...base.want],wantPorPeriodo,desfasePorPeriodo:{...anterior.desfasePorPeriodo,[planClave(0)]:base.elecciones}});
   for(const k in T)delete T[k];PLAN_CACHE=null;
 };
 
@@ -364,7 +406,7 @@ let KEYMAP={};
 function actualizarOferta(){for(const p in DATA.periodos){const m=new Map();DATA.periodos[p].forEach(c=>m.set(keyOf(c),c));KEYMAP[p]=m}}
 actualizarOferta();
 const byKey=k=>KEYMAP[S.per].get(k);
-const selected=()=>plan().sel.map(byKey).filter(Boolean);
+const selected=()=>plan().sel.map(byKey).filter(c=>c&&desfaseHorario(c[8]));
 const ownAsClasses=()=>plan().own.map((o,i)=>o.oculto?null:{own:true,i,n:o.n,tipo:o.tipo,h:o.d.map(d=>[d,o.a,o.b])}).filter(Boolean);
 const ownVis=()=>plan().own.filter(o=>!o.oculto);
 const slots=x=>x.own?x.h:x[6];
@@ -609,6 +651,7 @@ function renderEqvHorario(A){
 function planAcciones(k){
   const paso=planAsignado(k), base=conPlan(()=>tr(),0);
   if(isElec(k)||base.done.includes(k)||base.curso.includes(k))return '';
+  if(base.adeudos.includes(k))return desfaseAcciones(k);
   const ob=paso!=null&&conPlan(()=>tr().oblig.includes(k),paso);
   const boton=(clave,texto,atributos='')=>`<button class="btn primary" type="button" data-${clave}="${esc(k)}"${atributos}>${esc(texto)}</button>`;
   if(paso==null)return boton('fwant',`Agregar a ${planEtiqueta(S.planPaso)}`);
@@ -711,7 +754,7 @@ function renderSide0(){
   $('#h-sugg').innerHTML=esc(tx('sugeridas',{periodo:planEtiqueta(PLAN_PASO)}))+' '+simTag('sugg');
   const propuestas=suggestions();
   const yaElegidas=new Set(tr().want);   // las sugeridas que ya están en el plan del periodo activo llevan ✓
-  $('#sugg').innerHTML=propuestas.list.map(k=>`<label${yaElegidas.has(k)?' class="ya"':''}><span class="grp">${esc(k)}</span><span>${esc(pretty(c[k][0]))}${yaElegidas.has(k)?' <span class="ya-marca" aria-label="ya elegida">✓</span>':''}</span><span class="cr">${esc(textoCreditos(k,c[k][1]))} ${ayudaCreditos(k)}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
+  $('#sugg').innerHTML=desfaseAvisos()+propuestas.list.filter(k=>!conPlan(()=>tr().adeudos.includes(k),0)).map(k=>`<label${yaElegidas.has(k)?' class="ya"':''}><span class="grp">${esc(k)}</span><span>${esc(pretty(c[k][0]))}${yaElegidas.has(k)?' <span class="ya-marca" aria-label="ya elegida">✓</span>':''}</span><span class="cr">${esc(textoCreditos(k,c[k][1]))} ${ayudaCreditos(k)}</span></label>`).join('')+`<small>${esc(tx('meta',{creditos:fmtCr(propuestas.cr),meta:fmtCr(propuestas.target),retenidos:fmtCr(propuestas.ret)}))}</small>`;
   document.querySelectorAll('[data-personal]').forEach(e=>e.hidden=!isPersonal());
   if(isPersonal()){
     const situacion=situacionDatos();
@@ -988,7 +1031,7 @@ function renderTray(){
   if(SATE.actual?.pestana==='trayectoria'){renderStats();return}
   if(SATE.modulos.mapa){renderMap();conSim(usaSim('mapa'),()=>conPlan(renderList))}renderSide();
 }
-function renderHor(){cancelarGeneracion();if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv();montarAyudasCreditos()}
+function renderHor(){cancelarGeneracion();$('#hor-desfase').innerHTML=desfaseAvisos();if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv();montarAyudasCreditos()}
 /* Equivalencias con otras carreras de la misma unidad (tabla «Equivalencia de Materias» del SAES): solo consulta.
    Cada unidad decide cómo aplicarlas; no cambian el avance, la seriación ni el generador de horarios. */
 function renderEquiv(){
@@ -1025,7 +1068,7 @@ function render(){return SATE.repintar()}
 // perfil del SAES de otra carrera: se avisa y se ofrece volver; nada del perfil se aplica aquí
 function renderAviso(){SAES.mismatch(S.car,k=>DATA.carreras[k],c=>{if(!DATA.carreras[c])return;S.car=c;store.set('car',c);S.chips=[];S.gen=null;ZOOM=null;render()},carreraPerfil)}
 function refresh(){save();renderOffer();renderPlans();renderCal();if((S.gen||typeof generacion!=='undefined'&&generacion)&&typeof iniciarGeneracion==='function')iniciarGeneracion()}
-function addClass(c){const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
+function addClass(c){if(!desfaseHorario(c[8])){S.mapHover=c[8];S.mapFocus=true;$('#insp').innerHTML=desfaseAcciones(c[8]);$('#insp').hidden=false;return}const pl=plan();pl.sel=pl.sel.filter(x=>byKey(x)?.[4]!==c[4]);pl.sel.push(keyOf(c))}
 function toggle(k){const pl=plan(),i=pl.sel.indexOf(k);if(i>=0)pl.sel.splice(i,1);else{const c=byKey(k);addClass(c);
     avisoOptativa(c[8],pl.sel.map(x=>byKey(x)?.[8]).filter(Boolean));
     // desde "llenar hueco": la materia pasa a las elegidas (para poder cambiar de grupo) y se suelta el hueco
@@ -1035,7 +1078,7 @@ let PLAN_UNDO=null, PLAN_UNDO_TIMER=null;
 function planOlvidar(){PLAN_UNDO=null;clearTimeout(PLAN_UNDO_TIMER);$('#plan-deshacer').hidden=true}
 function planRecordar(k,agregada){
   const base=conPlan(()=>tr(),0);
-  PLAN_UNDO={car:S.car,clave:planClave(0),sim:usaSim('sugg'),want:[...base.want],wantPorPeriodo:structuredClone(base.wantPorPeriodo)};
+  PLAN_UNDO={car:S.car,clave:planClave(0),sim:usaSim('sugg'),want:[...base.want],wantPorPeriodo:structuredClone(base.wantPorPeriodo),elecciones:{...base.elecciones}};
   clearTimeout(PLAN_UNDO_TIMER);
   PLAN_UNDO_TIMER=setTimeout(()=>{PLAN_UNDO=null;$('#plan-deshacer').hidden=true},6000);
   $('#plan-anuncio').textContent=SATE.texto('sate.planeacion.'+(agregada?'agregada':'quitada'),{materia:pretty(cur()[k][0]),periodo:planEtiqueta(PLAN_PASO)});
@@ -1045,7 +1088,7 @@ $('#plan-deshacer').addEventListener('click',()=>{
   const previo=PLAN_UNDO;if(!previo)return;
   planOlvidar();
   if(previo.car===S.car&&previo.clave===planClave(0))conSim(previo.sim,()=>conPlan(()=>{
-    const base=tr();base.want=previo.want;base.wantPorPeriodo=previo.wantPorPeriodo;saveT();
+    const base=tr();base.want=previo.want;base.wantPorPeriodo=previo.wantPorPeriodo;base.elecciones=previo.elecciones;saveT();
     $('#plan-anuncio').textContent=SATE.texto('sate.planeacion.deshecho');
   },0));
   renderTray();
@@ -1054,7 +1097,19 @@ function toggleBox(k){return conSim(usaSim('sugg'),()=>conPlan(()=>toggleBox0(k)
 function toggleBox0(k,mover=false){
   if(isElec(k)){S.mapHover=k;S.mapFocus=true;resaltarMapa();if(mview()==='lista'){S.lfocus=k;renderList()}return}   // se explica en el inspector
   const paso=PLAN_PASO, base=conPlan(()=>tr(),0), otro=planAsignado(k);
-  // El vencimiento en N+1 la asigna automáticamente allí; elegirla en N debe poder adelantarla.
+  if(base.adeudos.includes(k)){
+    // Un clic en la materia equivale a elegir el periodo activo; quitarla vuelve a pedir decisión.
+    if(otro===paso){
+      base.elecciones[k]=null;base.want=base.want.filter(x=>x!==k);
+      base.wantPorPeriodo={...base.wantPorPeriodo,[planClave(1)]:(base.wantPorPeriodo[planClave(1)]||[]).filter(x=>x!==k)};
+      conPlan(saveT,0);
+      desfaseLimpiarHorario(k);S.gen=null;
+    }else{
+      planRecordar(k,true);elegirDesfase(k,paso?'siguiente':'actual');
+    }
+    renderTray();return;
+  }
+  // La elección explícita de N+1 puede adelantarse a N.
   const adelantarObligatoria=otro===1&&paso===0&&conPlan(()=>tr().oblig.includes(k),1);
   if(PLAN_DOS_PERIODOS&&otro!=null&&otro!==paso&&!mover&&!adelantarObligatoria){S.mapHover=k;S.mapFocus=true;S.lfocus=k;resaltarMapa();conPlan(renderList);return}
   if(mover&&(!PLAN_DOS_PERIODOS||otro==null||otro===paso))return;
@@ -1092,6 +1147,7 @@ document.addEventListener('click',e=>{
   const op=e.target.closest('#offer .opt');if(op&&tactil()&&!e.target.closest('button,input,a,label,select,textarea,summary')){S.hover=S.hover===op.dataset.k?null:op.dataset.k;renderCal();return}
   const t=e.target.closest('button');if(!t)return;
   const d=t.dataset;
+  if(d.desfase){planOlvidar();conSim(['trayectoria','tramites'].includes(SATE.actual?.pestana)?false:usaSim('sugg'),()=>elegirDesfase(d.desfase,d.opcion));if(typeof cancelarGeneracion==='function')cancelarGeneracion();render();return}
   if(d.expand!==undefined){const k=+d.expand;S.expand.has(k)?S.expand.delete(k):S.expand.add(k);renderOffer();return}
   if(d.lfocus){S.lfocus=S.lfocus===d.lfocus?null:d.lfocus;conSim(usaSim('mapa'),()=>conPlan(renderList));return}
   if(d.lwant){toggleBox(d.lwant);return}
@@ -1160,8 +1216,8 @@ $('#mapvista').addEventListener('click',e=>{const b=e.target.closest('[data-vist
   if(b.dataset.vista==='sigue'&&!SHOWSUG){SHOWSUG=true;store.set('verSug',true)}renderMap()});
 $('#minimap').addEventListener('click',()=>{store.set('mapVista',mapVista()==='todo'?'sigue':'todo');renderMap();$('#mapwrap').scrollIntoView({block:'nearest'})});
 $('#f-carrera').addEventListener('change',e=>{S.car=e.target.value;store.set('car',S.car);S.chips=[];S.gen=null;ZOOM=null;if(DEMO){ALUMNO=perfilDemo();for(const k in T)delete T[k]}render()});
-$('#b-all').addEventListener('click',()=>{planOlvidar();conSim(usaSim('sugg'),()=>conPlan(()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&(PLAN_PASO||off.has(k)))])];saveT()}));renderTray()});
-$('#b-sugg').addEventListener('click',()=>{planOlvidar();conSim(usaSim('sugg'),()=>conPlan(()=>{tr().want=[...new Set([...tr().want,...suggestions().list])];saveT()}));renderTray()});
+$('#b-all').addEventListener('click',()=>{planOlvidar();conSim(usaSim('sugg'),()=>conPlan(()=>{const off=offeredClaves();tr().want=[...new Set([...tr().want,...Object.keys(cur()).filter(k=>available(k)&&(PLAN_PASO||off.has(k))&&!tr().adeudos.includes(k))])];saveT()}));renderTray()});
+$('#b-sugg').addEventListener('click',()=>{planOlvidar();conSim(usaSim('sugg'),()=>conPlan(()=>{tr().want=[...new Set([...tr().want,...suggestions().list.filter(k=>!tr().adeudos.includes(k))])];saveT()}));renderTray()});
 $('#sug-on').addEventListener('change',e=>{SHOWSUG=e.target.checked;store.set('verSug',SHOWSUG);
   if(SHOWSUG)store.set('mapVista','sigue');else if(mapVista()==='sigue')store.set('mapVista','pend');renderMap()});
 // simulación de fin de semestre: recalcula mapa, sugerencias, créditos y desfase

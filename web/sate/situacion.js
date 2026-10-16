@@ -68,6 +68,7 @@
     box.appendChild(el('h3',tx('pendientes')));
     box.appendChild(SateUI.chips(lista.filter(x=>x!==principal&&x.estado!=='ok').map(x=>({id:x.id,estado:x.estado,texto:x.titulo+' ⓘ',abre:()=>detalle(x)}))));
     const planear=el('button',SATE.texto('sate.planeacion.titulo'),'sate-enlace');planear.type='button';planear.onclick=()=>SATE.ir('mapa');box.appendChild(planear);
+    const decisiones=el('div');decisiones.innerHTML=conPlan(()=>conSim(false,desfaseAvisos),0);box.appendChild(decisiones);
   }
   function tramite(box,id) {
     if(!isPersonal())return;
@@ -83,6 +84,7 @@
         const f=d.fis.find(f=>f.k===k),tipo=d.rd?.por[k];
         const section=el('section');section.appendChild(el('h3',pretty(cur()[k][0])));
         section.appendChild(el('p',tx(f?.curso?'opcion_recurse':tipo==='agotada'?'opcion_agotada':tipo==='dictamen'?'opcion_dictamen':f?.estado==='desfasada'?'opcion_desfasada':f?.limite!=null?'opcion_plazo':'opcion_actualizar',{periodo:perName(f?.limite)})));
+        const decisiones=el('div');decisiones.innerHTML=conPlan(()=>conSim(false,()=>desfaseAcciones(k)),0);section.appendChild(decisiones);
         box.appendChild(section);
       }
     }
