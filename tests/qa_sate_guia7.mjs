@@ -36,6 +36,16 @@ const caja = document.createElement('div'); caja.setAttribute('id','sate-guia');
 await pestana.mostrar({partes:['situacion','consulta']});
 // El contenido de respuestas se crea al abrir su details.
 const det = caja.querySelector('details'); det.open = true; det.dispatchEvent(new Evento('toggle'));
+datos.preguntas[0].ventanilla = 'dictamen';
+async function comprobarVentanilla(tramites, visible) {
+  config.unidades.ficticia.tramites = tramites;
+  await pestana.mostrar({partes:['situacion','consulta']});
+  const pregunta = caja.querySelector('details'); pregunta.open = true; pregunta.dispatchEvent(new Evento('toggle'));
+  assert.equal(!!caja.querySelector('a[href="#/ficticia/tramites/dictamen"]'), visible);
+}
+await comprobarVentanilla([], false);
+await comprobarVentanilla(['dictamen'], true);
+await comprobarVentanilla([], false);
 assert.ok(caja.textContent.includes('<img src=x>'));
 assert.equal(caja.querySelector('img'), null);
 assert.ok(caja.querySelectorAll('.guia-enlace').length >= 3);

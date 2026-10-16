@@ -99,87 +99,20 @@
  "preguntas": [
   {
    "id": "que-es-dictamen",
-   "apartado": "situacion",
-   "pregunta": "¿Qué es un dictamen y para qué sirve?",
-   "respuesta": "Un [[g:dictamen|dictamen]] es la [[g:resolucion|resolución]] por escrito con la que una Comisión de Situación Escolar autoriza (o no) algo que las [[g:reglas_reinscripcion|reglas ordinarias de reinscripción]] no te permiten por sí solas. Lo necesitas, por ejemplo, si te falta acreditar materias en los casos del [[a:ri:98|art. 98 del Reglamento Interno]], si quieres reinscribirte con menos créditos que la [[g:carga_minima|carga mínima]] o si ya no alcanzas a terminar en el [[g:tiempo_maximo|tiempo máximo]] ([[a:rge:52|art. 52 del RGE]]). También se usa para las situaciones que el reglamento no prevé ([[a:rge:60|art. 60 del RGE]]).",
    "pasos": [
     "Revisa en tu [[g:kardex|kárdex]] qué materias adeudas y cuántos créditos te faltan.",
     "Identifica tu caso: adeudo en los términos del art. 98, carga menor a la mínima o tiempo máximo agotado.",
     "Prepara la solicitud en la Ventanilla digital y entrégala firmada en [[g:gestion_escolar|Gestión Escolar]]."
-   ],
-   "acudir": [
-    "gestion_escolar",
-    "cosie_ctce"
-   ],
-   "fuentes": [
-    {
-     "doc": "ri",
-     "articulo": "98",
-     "arts": [
-      "98"
-     ]
-    },
-    {
-     "doc": "rge",
-     "articulo": "52 y 60",
-     "arts": [
-      "52",
-      "60"
-     ]
-    }
-   ],
-   "palabras": [
-    "dictamen",
-    "situación escolar",
-    "COSIE",
-    "fuera de reglamento",
-    "irregular",
-    "comisión",
-    "resolución",
-    "me dieron de baja",
-    "no me deja reinscribir"
    ],
    "reemplaza": true,
    "ventanilla": "dictamen"
   },
   {
    "id": "formato-dictamen",
-   "apartado": "tramites",
-   "pregunta": "¿Qué formato lleno para pedir un dictamen y cómo lo presento?",
-   "respuesta": "Hay dos caminos según quién resuelve: el [[g:dictamen|dictamen]] interno, ante la [[g:cosie_ctce|Comisión de Situación Escolar]] del [[g:ctce|CTCE]] de tu unidad, y el externo, ante la [[g:cosie_cgc|Comisión de Situación Escolar del CGC]]. Cada uno tiene su formato y una lista de documentos que se anexan. Primero confirma en [[g:gestion_escolar|Gestión Escolar]] cuál corresponde a tu caso ([[a:rge:52|art. 52 del RGE]]); en el caso del CGC, el proceso y las fechas límite de entrega los publica el propio Consejo.",
    "pasos": [
     "Abre «Dictamen» en la Ventanilla digital y elige el tipo que corresponde a tu caso (interno o externo).",
     "Revisa el formato y los anexos que te pide; genera el PDF.",
     "Imprímelo, fírmalo y entrégalo en [[g:gestion_escolar|Gestión Escolar]] antes de la fecha límite."
-   ],
-   "acudir": [
-    "gestion_escolar",
-    "cosie_ctce",
-    "cgc"
-   ],
-   "fuentes": [
-    {
-     "doc": "rge",
-     "articulo": "52",
-     "arts": [
-      "52"
-     ]
-    },
-    {
-     "doc": "proceso_cgc"
-    },
-    {
-     "doc": "calendario_cgc"
-    }
-   ],
-   "palabras": [
-    "formato",
-    "solicitud",
-    "dictamen",
-    "carta",
-    "anexos",
-    "presentar",
-    "entregar"
    ],
    "reemplaza": true,
    "ventanilla": "dictamen",
@@ -190,36 +123,10 @@
   },
   {
    "id": "baja-temporal",
-   "apartado": "tramites",
-   "pregunta": "¿Cómo y cuándo tramito una baja temporal?",
-   "respuesta": "Puedes darte de [[g:baja_temporal|baja temporal]] hasta dos periodos semestrales completos en toda tu trayectoria; no tienen que ser seguidos ([[a:rge:55|art. 55 del RGE]]). La pides por escrito durante el primer mes del periodo escolar o, en cualquier momento, si hay una causa de fuerza mayor comprobada. La dirección de tu unidad debe informarte la baja dentro de los 10 días hábiles siguientes. Esos periodos no cuentan para tu [[g:tiempo_maximo|tiempo máximo]] ([[a:rge:49|art. 49]]).",
    "pasos": [
     "Prepara tu solicitud en la Ventanilla digital y revisa el resumen.",
     "Imprímelo, fírmalo y entrégalo en [[g:gestion_escolar|Gestión Escolar]] con el formato oficial.",
     "Guarda tu acuse y confirma la fecha en que podrás reinscribirte: si no pides reinscripción ni baja temporal, causas baja ([[a:rge:57|art. 57, fracc. II, del RGE]])."
-   ],
-   "acudir": [
-    "gestion_escolar"
-   ],
-   "fuentes": [
-    {
-     "doc": "rge",
-     "articulo": "49, 55 y 57",
-     "arts": [
-      "49",
-      "55",
-      "57"
-     ]
-    }
-   ],
-   "palabras": [
-    "baja temporal",
-    "pausar",
-    "suspender estudios",
-    "fuerza mayor",
-    "dos periodos",
-    "congelar semestre",
-    "darme de baja"
    ],
    "reemplaza": true,
    "ventanilla": "baja_temporal",
@@ -230,33 +137,10 @@
   },
   {
    "id": "baja-definitiva",
-   "apartado": "tramites",
-   "pregunta": "¿Cómo solicito una baja definitiva y qué implica?",
-   "respuesta": "La [[g:baja_definitiva|baja definitiva]] procede cuando tú la solicitas por escrito al titular de tu unidad o por resolución fundada y motivada de un consejo ([[a:rge:59|art. 59 del RGE]]). Implica dejar el programa en el que estás inscrito: antes de decidirlo, revisa si una baja temporal resuelve tu situación, porque esos periodos no cuentan para tu tiempo máximo ([[a:rge:49|art. 49]]).",
    "pasos": [
     "Revisa si la baja temporal te sirve para pausar sin salir del programa.",
     "Si decides la baja definitiva, prepara tu solicitud en la Ventanilla digital.",
     "Entrega el resumen firmado y el formato oficial en [[g:gestion_escolar|Gestión Escolar]] y guarda tu acuse."
-   ],
-   "acudir": [
-    "gestion_escolar"
-   ],
-   "fuentes": [
-    {
-     "doc": "rge",
-     "articulo": "49 y 59",
-     "arts": [
-      "49",
-      "59"
-     ]
-    }
-   ],
-   "palabras": [
-    "baja definitiva",
-    "dejar la carrera",
-    "renuncia",
-    "baja del programa",
-    "abandonar la carrera"
    ],
    "reemplaza": true,
    "ventanilla": "baja_definitiva",

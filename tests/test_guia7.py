@@ -17,6 +17,14 @@ exec(compile(funciones, 'tools/build_sate.py', 'exec'), ns)
 
 
 class TestGuia7(unittest.TestCase):
+    def test_reemplazo_parcial_sin_mutar_origen(self):
+        comun = leer('comun.json')
+        original = json.loads(json.dumps(comun))
+        cambio = {'id': 'consulta', 'reemplaza': True, 'ventanilla': 'dictamen', 'formato': None}
+        fusion = ns['fusionar_guia'](comun, {'preguntas': [cambio]})
+        self.assertEqual(fusion['preguntas'][0], {**comun['preguntas'][0], **cambio})
+        self.assertEqual(comun, original)
+
     def test_fusion(self):
         comun, unidad = leer('comun.json'), leer('unidad.json')
         fusion = ns['fusionar_guia'](comun, unidad)

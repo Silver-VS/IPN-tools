@@ -680,7 +680,8 @@
     "externo",
     "tiempo de respuesta",
     "quién decide"
-   ]
+   ],
+   "ventanilla": "dictamen"
   },
   {
    "id": "despues-de-ets",
@@ -801,7 +802,8 @@
     "plazo",
     "semestres",
     "cuánto puedo tardar"
-   ]
+   ],
+   "ventanilla": "dictamen"
   },
   {
    "id": "no-me-reinscribi",
@@ -838,7 +840,8 @@
     "no me inscribí",
     "me pasé de fecha",
     "dejé de ir"
-   ]
+   ],
+   "ventanilla": "baja_temporal"
   },
   {
    "id": "carga-creditos",

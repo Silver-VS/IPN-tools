@@ -1120,15 +1120,18 @@ def datos_dictamen():
 
 
 def fusionar_guia(comun, propia):
-    """La unidad sustituye entradas por id sin perder el contenido compartido."""
+    """La unidad amplía por campos las preguntas marcadas con reemplaza."""
     guia = {**comun, **propia}
     for clave in ('documentos', 'glosario'):
         guia[clave] = {**comun.get(clave, {}), **propia.get(clave, {})}
     for clave in ('preguntas', 'acudir'):
         entradas = {x['id']: dict(x, **({'ambito': 'ipn'} if clave == 'acudir' else {}))
                     for x in comun.get(clave, [])}
-        entradas.update({x['id']: dict(x, **({'ambito': 'unidad'} if clave == 'acudir' else {}))
-                         for x in propia.get(clave, [])})
+        for x in propia.get(clave, []):
+            entrada = {**entradas.get(x['id'], {}), **x} if clave == 'preguntas' and x.get('reemplaza') else dict(x)
+            if clave == 'acudir':
+                entrada['ambito'] = 'unidad'
+            entradas[x['id']] = entrada
         guia[clave] = list(entradas.values())
     return guia
 

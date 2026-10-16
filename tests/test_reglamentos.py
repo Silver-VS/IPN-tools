@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CONTEOS = {'rge': (77, 7), 'ri': (295, 6), 'ro': (103, 4), 'lo': (34, 4),
            'titulacion': (46, 3), 'servicio_social': (51, 5), 'becas': (42, 5),
            'subcomite_becas': (45, 6), 'equivalencias': (0, 0),
-           'cambio_carrera': (0, 0), 'honor': (45, 2), 'etica': (0, 0)}
+           'cambio_carrera': (0, 0), 'honor': (45, 2), 'etica': (0, 0), 'cgc': (0, 0)}
 
 
 class Extraccion(unittest.TestCase):

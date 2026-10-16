@@ -6,9 +6,12 @@ citado exista en el texto literal de data/reglamentos/<doc>.json. Formato: coord
 import json
 import re
 import unittest
+import sys
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(RAIZ / 'tools'))
+from build_sate import fusionar_guia
 UNIDADES = ('upiita', 'escom', 'upibi')
 HTTPS = re.compile(r'^https://[^\s/]+(?:/[^\s]*)?$')
 KEBAB = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
@@ -23,6 +26,7 @@ def cargar(ruta):
 COMUN = cargar('data/guia/comun.json')
 GUIAS = {u: cargar('data/guia/%s.json' % u) for u in UNIDADES}
 ARCHIVOS = {'comun': COMUN, **GUIAS}
+FUSIONADAS = {'comun': COMUN, **{u: fusionar_guia(COMUN, g) for u, g in GUIAS.items()}}
 
 
 def reglamento(doc):
@@ -100,7 +104,7 @@ class TestGlosario(unittest.TestCase):
 
     def test_cada_termino_se_usa(self):
         usados = set()
-        for g in ARCHIVOS.values():
+        for g in FUSIONADAS.values():
             for p in g['preguntas']:
                 for t in textos(p):
                     usados |= {m.group(2) for m in MARCA.finditer(t) if m.group(1) == 'g'}
@@ -124,7 +128,7 @@ class TestMarcas(unittest.TestCase):
                 verificar_articulo(self, doc, n)
 
     def test_marcas_en_respuestas_pasos_y_acudir(self):
-        for nombre, g in ARCHIVOS.items():
+        for nombre, g in FUSIONADAS.items():
             for p in g['preguntas']:
                 for t in textos(p):
                     self._revisar(t, '%s/%s' % (nombre, p['id']))
@@ -134,7 +138,7 @@ class TestMarcas(unittest.TestCase):
 
 class TestPreguntas(unittest.TestCase):
     def test_estructura_y_fuentes(self):
-        for nombre, g in ARCHIVOS.items():
+        for nombre, g in FUSIONADAS.items():
             ids = set()
             for p in g['preguntas']:
                 with self.subTest(archivo=nombre, pregunta=p['id']):

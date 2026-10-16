@@ -659,7 +659,8 @@ function el(document, tag, attrs = {}, hijos = []) {
     assert.equal(R.ruta('#/' + u + '/guia', u, cfg).pestana, 'guia');
     assert.equal(R.ruta('#/' + u + '/temarios', u, cfg).hash, '#/' + u + '/guia/programas');
     igual(cfg[u].vistas, [], u);
-    assert.equal(cfg[u].guiaDatos, false, u + ': sin contenido de la Guía propio');
+    assert.equal(cfg[u].guiaDatos, true, u + ': contenido común y propio de la Guía');
+    assert.ok(existsSync('web/dist/sate/datos/' + u + '/guia.json'), u + ': Guía compilada');
     assert.equal(existsSync('web/dist/sate/datos/' + u + '/temarios'), false, u + ': no se copian temarios');
   }
   igual(cfg.upiita.vistas, [{id: 'temarios', padre: 'guia'}]);

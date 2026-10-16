@@ -165,7 +165,7 @@ for(const clave of ['lead_temporal','aviso_temporal_1','periodos_ayuda']){
   assert.match(linea,/no tienen que ser seguidos/);
   assert.doesNotMatch(linea,/un año|consecutivos/);
 }
-const baja=JSON.parse(leer('data/guia/upiita.json'));
+const baja=JSON.parse(leer('web/dist/sate/datos/upiita/guia.json'));
 assert.ok(JSON.stringify(baja).includes('dos periodos semestrales completos en toda tu trayectoria; no tienen que ser seguidos'));
 assert.match(acciones,/class="sate-texto-corto">Traer datos/,'H: etiqueta móvil inicial en catálogo');
 assert.match(css,/#sate-avisos-globales \.sate-chips\{flex-wrap:nowrap/);
