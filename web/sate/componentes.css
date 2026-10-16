@@ -460,7 +460,7 @@ button.sate-chip{cursor:pointer}
 .sate-segmentado__corto{display:none}
 @media(max-width:559.98px){.sate-segmentado button:has(.sate-segmentado__corto){padding-inline:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs)}.sate-segmentado__largo{display:none}.sate-segmentado__corto{display:inline}}   /* etiqueta corta cuando no cabe la completa: nunca se parte una palabra */
 .sate-segmentado button:focus-visible{outline:2px solid var(--ipn-texto);outline-offset:-3px}
-@media(max-width:479.98px){.sate-segmentado{display:grid;width:100%}.sate-segmentado button{line-height:1.25;padding-block:var(--ipn-esp-1)}}
+@media(max-width:479.98px){.sate-segmentado{display:flex;flex-wrap:wrap;width:100%}.sate-segmentado button{flex:1 1 auto;min-width:min-content;line-height:1.25;padding-block:var(--ipn-esp-1)}}   /* si no caben en un renglón, el segmento pasa completo al siguiente: nunca se corta */
 
 .sate-preguntas{display:grid;gap:var(--ipn-esp-3);margin:0;padding:0;list-style:none}
 .sate-pregunta{border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);scroll-margin-top:var(--ipn-esp-5)}

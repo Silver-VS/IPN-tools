@@ -75,7 +75,7 @@
 .gd-explorar-enc p{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s);max-width:56ch}
 .gd-explorar{display:grid;gap:var(--ipn-esp-5);scroll-margin-top:var(--ipn-esp-5)}
 .gd-explorar-enc{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:var(--ipn-esp-4)}
-.gd-explorar-enc>div{display:grid;gap:var(--ipn-esp-1);min-width:min(100%,20rem);flex:1 1 20rem}
+.gd-explorar-enc>div:not(.sate-segmentado){display:grid;gap:var(--ipn-esp-1);min-width:min(100%,20rem);flex:1 1 20rem}
 .gd-campo{min-width:12rem}
 .gd-chip:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .gd-mapa{border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);overflow:hidden}
