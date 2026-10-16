@@ -609,3 +609,21 @@ function leyendaGrafica(items,esc){
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior,
     volver: volver, migas: migas, tarjetaNav: tarjetaNav, buscador: buscador, segmentado: segmentado, pregunta: pregunta, revelar: revelar };
 })(typeof window !== 'undefined' ? window : globalThis);
+
+/* Preferencia independiente del perfil: no vuelve a preguntar al actualizar el SAES. */
+(function(raiz){
+  const clave='ipnt.recorrido.decision';
+  raiz.SateUI.recorridoOfrecer=leer=>leer(clave)==null;
+  raiz.SateUI.recorridoDecidir=(guardar,acepta)=>guardar(clave,acepta?'si':'ahora_no');
+  raiz.SateUI.recorridoTarjeta=function(salir){
+    const d=document.createElement('dialog');d.className='sate-recorrido';d.setAttribute('aria-labelledby','sate-recorrido-titulo');
+    const marco=document.createElement('div');marco.className='sate-recorrido__marco';marco.setAttribute('aria-hidden','true');
+    const tarjeta=document.createElement('section');tarjeta.className='sate-recorrido__tarjeta';
+    const titulo=document.createElement('h2');titulo.id='sate-recorrido-titulo';
+    const texto=document.createElement('p');texto.id='sate-recorrido-texto';texto.setAttribute('aria-live','polite');texto.setAttribute('aria-atomic','true');d.setAttribute('aria-describedby',texto.id);
+    // Fuera del body para no heredar el zoom de la interfaz en coordenadas del viewport.
+    const acciones=document.createElement('div');acciones.className='sate-recorrido__acciones';tarjeta.append(titulo,texto,acciones);d.append(marco,tarjeta);document.documentElement.appendChild(d);
+    d.addEventListener('cancel',e=>{e.preventDefault();salir()});
+    return {elemento:d,tarjeta,titulo,texto,acciones,marco};
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
