@@ -326,7 +326,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.ok(exp, 'sección del explorador');
   assert.equal(exp.querySelector('#gd-carrera').value, 'bionica');
   const modos = portada.querySelectorAll('.sate-segmentado button');
-  igual(modos.map(b => b.textContent), ['Trayectoria escolar', 'Líneas de aprendizaje', 'Especializaciones']);
+  igual(modos.map(b => b.querySelector('.sate-segmentado__largo').textContent), ['Trayectoria escolar', 'Líneas de aprendizaje', 'Especializaciones']);
   igual(modos.map(b => b.getAttribute('aria-pressed')), ['true', 'false', 'false'], 'la trayectoria escolar es la vista por omisión');
   assert.equal(portada.querySelector('.gd-tray').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true); assert.equal(portada.querySelector('.gd-esp').hidden, true);
   assert.equal(portada.querySelectorAll('.gd-tray .gd-chip').length, 72, 'trayectoria: todas las materias de la carrera, una vez');

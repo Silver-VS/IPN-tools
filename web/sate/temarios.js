@@ -462,7 +462,7 @@
     selCarrera.replaceChildren(...ids.map(id => h('option', { value: id, texto: ind.carreras[id].nombre })));
     selCarrera.value = G.carrera;
     const tray = h('div', { 'class': 'gd-tray' }), mapa = h('div', { 'class': 'gd-mapa' }), esp = h('div', { 'class': 'gd-esp' });
-    const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria') }, { id: 'lineas', texto: t('sate.guia.modo_lineas') }, { id: 'esp', texto: t('sate.guia.modo_esp') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
+    const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria'), corto: t('sate.guia.modo_trayectoria_corto') }, { id: 'lineas', texto: t('sate.guia.modo_lineas'), corto: t('sate.guia.modo_lineas_corto') }, { id: 'esp', texto: t('sate.guia.modo_esp'), corto: t('sate.guia.modo_esp_corto') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
     // Una materia es siempre un botón: clic, Enter o espacio abren su ficha en la ventana emergente.
     function chip(i, clase, hijos, color) {
       const b = h('button', { type: 'button', 'class': 'gd-chip ' + clase, 'data-clave': i.clave, 'aria-haspopup': 'dialog' }, hijos);
