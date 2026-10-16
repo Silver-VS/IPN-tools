@@ -3,9 +3,10 @@
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+import {execFileSync} from 'node:child_process';
 const leer = f => readFileSync(f, 'utf8');
 const sate = JSON.parse(leer('data/sate.json'));
-const guia = JSON.parse(leer('data/guia/upiita.json'));
+const guia = JSON.parse(execFileSync('python', ['-c', 'import json,sys;from pathlib import Path;sys.path.insert(0,"tools");from build_sate import fusionar_guia;leer=lambda n:json.loads(Path("data/guia/"+n+".json").read_text(encoding="utf-8"));print(json.dumps(fusionar_guia(leer("comun"),leer("upiita")),ensure_ascii=False))'], {encoding: 'utf8', env: {...process.env, PYTHONIOENCODING: 'utf-8'}}));
 const c = vm.createContext({});
 vm.runInContext(leer('web/sate/bibliotecas.js'), c);
 vm.runInContext(leer('web/sate/guia.js'), c);
@@ -76,7 +77,6 @@ assert.equal(G.fuente(guia, {doc: 'saes'}, tx).texto, 'SAES de la UPIITA');
 assert.equal(G.fuente(guia, {doc: 'inexistente'}, tx), null);
 for (const p of guia.preguntas) for (const x of p.fuentes) assert.ok(G.fuente(guia, x, tx).url.startsWith('https://'), p.id);
 // textos: todas las claves nuevas existen
-import {execFileSync} from 'node:child_process';
 const textos = JSON.parse(execFileSync('python', ['-c', 'import sys,json;sys.path.insert(0,"tools");import contenido;print(json.dumps(contenido.objeto_t(),ensure_ascii=False))'], {encoding: 'utf8', maxBuffer: 1 << 26, env: {...process.env, PYTHONIOENCODING: 'utf-8'}}));
 for (const k of ['sate.guia.situacion', 'sate.guia.acudir', 'sate.guia.fuente_articulo', 'sate.guia.revisado', 'sate.biblio.titulo', 'sate.biblio.solo_unidad', 'componentes.migas', 'componentes.volver_a', 'sate.ventanilla.ver_guia', 'temarios.selector.titulo']) assert.ok(k in textos, k);
 for (const a of sate.guia) { assert.ok(a.titulo in textos && a.descripcion in textos, a.id); }

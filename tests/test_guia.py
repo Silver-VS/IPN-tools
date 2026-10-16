@@ -4,19 +4,60 @@ import json
 import re
 import sys
 import unittest
+from copy import deepcopy
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / 'tools'))
 
 SATE = json.loads((RAIZ / 'data/sate.json').read_text(encoding='utf-8'))
-GUIA = json.loads((RAIZ / 'data/guia/upiita.json').read_text(encoding='utf-8'))
+from build_sate import fusionar_guia
+
+COMUN = json.loads((RAIZ / 'data/guia/comun.json').read_text(encoding='utf-8'))
+GUIAS = {u: fusionar_guia(COMUN, json.loads((RAIZ / f'data/guia/{u}.json').read_text(encoding='utf-8')))
+         for u in SATE['unidades']}
+GUIA = GUIAS['upiita']
 BAJAS = json.loads((RAIZ / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
 HTTPS = re.compile(r'^https://[^\s/]+(?:/[^\s]*)?$')
 KEBAB = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
 
 
 class TestDatosGuia(unittest.TestCase):
+    def test_contratos_en_todas_las_unidades(self):
+        for u, guia in GUIAS.items():
+            with self.subTest(unidad=u):
+                instancias = {a['id'] for a in guia['acudir']}
+                for a in guia['acudir']:
+                    self.assertRegex(guia['documentos'][a['fuente']['doc']]['url'], HTTPS)
+                preguntas = {p['id']: p for p in guia['preguntas']}
+                self.assertEqual(len(preguntas), len(guia['preguntas']))
+                for p in guia['preguntas']:
+                    self.assertTrue(p['fuentes'], p['id'])
+                    for f in p['fuentes']:
+                        self.assertRegex(guia['documentos'][f['doc']]['url'], HTTPS)
+                    self.assertTrue(set(p.get('acudir', [])) <= instancias, p['id'])
+                    f = p.get('formato')
+                    if f:
+                        self.assertTrue(f['texto'].strip())
+                        if f.get('ref'):
+                            origen, clave = f['ref'].split('.')
+                            self.assertEqual(origen, 'bajas')
+                            self.assertRegex(BAJAS['base'], HTTPS)
+                            self.assertIn(clave, BAJAS)
+                        elif f.get('doc'):
+                            self.assertRegex(guia['documentos'][f['doc']]['url'], HTTPS)
+                        else:
+                            self.assertRegex(f['url'], HTTPS)
+                    if p.get('ventanilla'):
+                        self.assertTrue(p['ventanilla'] in SATE['unidades'][u]['tramites'] or
+                                        any(c['id'] == p['id'] and c.get('ventanilla') == p['ventanilla']
+                                            for c in COMUN['preguntas']), p['id'])
+                for tramite, destino in SATE['unidades'][u].get('guiaTramites', {}).items():
+                    apartado, pid = destino.split('/')
+                    self.assertIn(tramite, SATE['unidades'][u]['tramites'])
+                    self.assertEqual(preguntas[pid]['apartado'], apartado)
+                    self.assertEqual(preguntas[pid]['ventanilla'], tramite)
+
     def test_encabezado_y_documentos(self):
         self.assertRegex(GUIA['version'], r'^\d{4}\.\d{2}\.\d+$')
         self.assertRegex(GUIA['revisado'], r'^\d{4}-\d{2}-\d{2}$')
@@ -46,7 +87,10 @@ class TestDatosGuia(unittest.TestCase):
                     self.assertRegex(GUIA['documentos'][f['doc']]['url'], HTTPS)
                     if f['doc'] in ('rge', 'ri', 'ro', 'servicio_social'):
                         self.assertTrue(f.get('articulo'), 'un reglamento se cita con su artículo')
-                self.assertLessEqual(len(p['respuesta'].split()), 95, 'respuesta breve: sin muros de texto')
+                # GUIA7 (dueño, 2026-10-15): respuestas explicativas para quien no conoce la jerga, pero sin muros de texto;
+                # se cuenta solo el texto visible (las marcas [[g:…|texto]] y [[a:…|texto]] muestran su «texto»).
+                visible = re.sub(r'\[\[[ga]:[^|\]]*\|([^\]]*)\]\]', r'\1', p['respuesta'])
+                self.assertLessEqual(len(visible.split()), 130, 'respuesta clara: sin muros de texto')
                 for x in p.get('acudir', []):
                     self.assertIn(x, {a['id'] for a in GUIA['acudir']})
 
@@ -151,8 +195,16 @@ class TestCompilacion(unittest.TestCase):
                     self.assertRegex(f['url'], HTTPS)
         temporal = next(p for p in d['preguntas'] if p['id'] == 'baja-temporal')['formato']['url']
         self.assertEqual(temporal, 'https://www.upiita.ipn.mx/adjuntos/gestion_escolar/2026/BAJA%20TEMPORAL%2026-2_2.pdf')
-        for u in ('escom', 'upibi'):
-            self.assertFalse((RAIZ / 'web/dist/sate/datos' / u / 'guia.json').exists(), u)
+        from urllib.parse import quote
+        for u, guia in GUIAS.items():
+            esperado = deepcopy(guia)
+            esperado.pop('_fuente', None)
+            for p in esperado['preguntas']:
+                f = p.get('formato')
+                if f and f.get('ref'):
+                    _, clave = f['ref'].split('.')
+                    p['formato'] = {'texto': f['texto'], 'url': BAJAS['base'] + quote(BAJAS[clave])}
+            self.assertEqual(json.loads((RAIZ / f'web/dist/sate/datos/{u}/guia.json').read_text(encoding='utf-8')), esperado, u)
 
 
 if __name__ == '__main__':

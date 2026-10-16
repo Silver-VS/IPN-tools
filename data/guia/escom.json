@@ -1,0 +1,94 @@
+{
+ "_fuente": "Guía politécnica, lo propio de la ESCOM: áreas de la unidad con su función según el Manual de Organización (MAN1-acudir; página del archivo PDF) y respuestas que dependen de la unidad. Lo genérico del IPN está en comun.json. Formato: coordinacion-wt/ipt-estado/ipn-tools/diseno/FORMATO-GUIA7.md.",
+ "version": "2026.10.2",
+ "revisado": "2026-10-16",
+ "documentos": {
+  "mo_escom": {
+   "titulo": "Manual de Organización de la ESCOM",
+   "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/MOP/NS/ESCOM/MO_ESCOM.pdf",
+   "resumen": "Áreas de la ESCOM, sus funciones y a qué dependencia pertenecen.",
+   "reglamento": false
+  },
+  "escom": {
+   "titulo": "Portal de la ESCOM",
+   "url": "https://www.escom.ipn.mx/",
+   "resumen": "Sitio oficial de la unidad académica.",
+   "reglamento": false
+  }
+ },
+ "acudir": [
+  {
+   "id": "gestion_escolar",
+   "nombre": "Departamento de Gestión Escolar",
+   "para": "Registra y controla inscripciones, reinscripciones, altas, bajas y cambios de los alumnos, y elabora y entrega la documentación comprobatoria de tu situación escolar; registra grupos y horarios en el [[g:saes|SAES]] y atiende la ventanilla de información.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 68
+   }
+  },
+  {
+   "id": "cosie_ctce",
+   "nombre": "Comisión de Situación Escolar del Consejo Técnico Consultivo Escolar (CTCE)",
+   "para": "Participa, con las comisiones de Honor y de Becas del [[g:ctce|CTCE]], en el seguimiento de la trayectoria académica del alumnado. Pregunta en [[g:gestion_escolar|Gestión Escolar]] cómo presentar tu solicitud.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 65
+   }
+  },
+  {
+   "id": "subdireccion_academica",
+   "nombre": "Subdirección Académica",
+   "para": "Coordina los exámenes departamentales, extraordinarios y a título de suficiencia, atiende la revisión de calificaciones, promueve la titulación a través de la oficina de titulación y supervisa el programa de tutorías.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 35
+   }
+  },
+  {
+   "id": "sseis",
+   "nombre": "Subdirección de Servicios Educativos e Integración Social",
+   "para": "Coordina el registro y control escolar, los estudios socioeconómicos de becas y el seguimiento de la trayectoria académica con las comisiones del [[g:ctce|CTCE]]. Recibe las solicitudes de baja de materias.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 65
+   }
+  },
+  {
+   "id": "extension_apoyos",
+   "nombre": "Departamento de Extensión y Apoyos Educativos",
+   "para": "Hace los estudios socioeconómicos de becas, asesora y tramita las constancias de servicio social, registra y tramita el programa de titulación y coordina las prácticas y visitas escolares.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 72
+   }
+  },
+  {
+   "id": "servicios_estudiantiles",
+   "nombre": "Departamento de Servicios Estudiantiles",
+   "para": "Atiende los talleres culturales, las actividades deportivas, los servicios de biblioteca, el seguro facultativo del IMSS, la orientación educativa y el Comité de Seguridad y Contra la Violencia.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 70
+   }
+  },
+  {
+   "id": "unidad_informatica",
+   "nombre": "Unidad de Informática",
+   "para": "Asesora y brinda soporte técnico a la comunidad de la unidad en aspectos informáticos y de comunicaciones.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 33
+   }
+  },
+  {
+   "id": "upis",
+   "nombre": "Unidad Politécnica de Integración Social",
+   "para": "Fomenta la movilidad y la cooperación académica del alumnado, la bolsa de trabajo y la cultura emprendedora.",
+   "fuente": {
+    "doc": "mo_escom",
+    "pagina": 74
+   }
+  }
+ ],
+ "preguntas": []
+}

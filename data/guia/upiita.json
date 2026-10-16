@@ -1,391 +1,237 @@
 {
-  "_fuente": "Contenido de la Guía politécnica (UPIITA). Una respuesta por pregunta, con fuente. Redactado a partir de coordinacion-wt/ipt-estado/ipn-tools/investigacion/G-GUIA1-documento.md, G-NORM1.md y VERIFICACION-RGE-BANORTE.md; solo lo verificado ([V]). Los documentos se declaran una vez en `documentos` y las preguntas los citan por id; el formato de baja se resuelve en la compilación desde data/gestion_escolar/bajas.json (`ref`).",
-  "version": "2026.10.1",
-  "revisado": "2026-10-15",
-  "documentos": {
-    "rge": {"titulo": "Reglamento General de Estudios del IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/rge-13-06-2011.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 866 (13 de junio de 2011)", "resumen": "Evaluaciones, ETS, recursamiento, bajas, cargas de créditos y tiempo máximo para concluir.", "reglamento": true},
-    "ri": {"titulo": "Reglamento Interno del IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-interno.pdf", "gaceta": "Gaceta Politécnica, Número 599 (reforma integral de 2004)", "resumen": "Derechos y obligaciones del alumnado, integración de los consejos técnicos consultivos escolares y causales del artículo 98.", "reglamento": true},
-    "ro": {"titulo": "Reglamento Orgánico del IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-organico-ipn-2020.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 1541 (2 de marzo de 2020)", "resumen": "Atribuciones de las dependencias que atienden al alumnado: DAE, Secretaría Académica y escuelas.", "reglamento": true},
-    "lo": {"titulo": "Ley Orgánica del IPN", "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/normativa/Leyes/1_LO_IPN.pdf", "gaceta": "Diario Oficial de la Federación (29 de diciembre de 1981)", "resumen": "Ley que define las finalidades, la autonomía académica y el gobierno del Instituto.", "reglamento": true},
-    "titulacion": {"titulo": "Reglamento de Titulación Profesional del IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-de-titulacion-profesional-del-ipn.pdf", "gaceta": "Gaceta Politécnica (edición especial de abril de 1992, con reformas de 2004)", "resumen": "Condición de pasante y modalidades para titularte.", "reglamento": true},
-    "servicio_social": {"titulo": "Reglamento de Servicio Social del IPN", "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Normatividad/carpeta4/GAC_EXT_932B_reglamento_serv_social.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 932 Bis (30 de abril de 2012)", "resumen": "Requisitos, duración y registro del servicio social.", "reglamento": true},
-    "becas": {"titulo": "Reglamento General de Becas para el Alumnado del IPN", "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Reglamentos/RGB-g-extra-1805.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 1805 (9 de julio de 2024)", "resumen": "Tipos de beca, incompatibilidades, comités y causales de cancelación.", "reglamento": true},
-    "subcomite_becas": {"titulo": "Lineamientos del Subcomité de Becas de las unidades académicas", "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Lineamientos-Reglas/g-extra-1864.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 1864 (21 de mayo de 2025)", "resumen": "Cómo opera el subcomité de becas de cada unidad para validar y dictaminar solicitudes.", "reglamento": true},
-    "equivalencias": {"titulo": "Lineamientos para la Equivalencia y Revalidación de Estudios en el IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/lineamientos/gac-969ext-bis.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 969 Bis (6 de noviembre de 2012)", "resumen": "Reglas para equiparar materias entre planes del IPN o de otras instituciones.", "reglamento": true},
-    "cambio_carrera": {"titulo": "Lineamientos para cambio de carrera en el Nivel Superior del IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/lineamientos/gac-1419ext.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 1419 (21 de junio de 2018)", "resumen": "Procedimiento para cambiar de carrera en nivel licenciatura.", "reglamento": true},
-    "honor": {"titulo": "Lineamientos de la Comisión de Honor de los consejos técnicos consultivos escolares", "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Lineamientos-Reglas/g-extra-1865.pdf", "gaceta": "Gaceta Politécnica, Número Extraordinario 1865 (23 de mayo de 2025)", "resumen": "Cómo se atienden las quejas de conducta escolar en cada unidad académica.", "reglamento": true},
-    "etica": {"titulo": "Código de Ética del IPN", "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/ce-ipn.pdf", "gaceta": "Comité de Ética y Prevención de Conflictos de Interés del IPN", "resumen": "Principios de honestidad académica, respeto e integridad.", "reglamento": true},
-    "calendario": {"titulo": "Calendario escolar del IPN, modalidad escolarizada", "url": "https://www.ipn.mx/assets/files/website/docs/inicio/calendarioipn-escolarizada.pdf", "gaceta": "Consejo General Consultivo del IPN", "resumen": "Fechas de periodos, evaluaciones, ETS y suspensiones.", "reglamento": true},
-    "normatividad": {"titulo": "Portal de Normatividad del IPN", "url": "https://www.ipn.mx/normatividad/", "resumen": "Índice oficial de la normatividad vigente.", "reglamento": false},
-    "calendario_cgc": {"titulo": "Calendario de sesiones del Consejo General Consultivo 2025-2026", "url": "https://www.ipn.mx/assets/files/esiqie/docs/estudiantes/gestion-escolar/26-1/dictamen-consejo-general-2025-2026.pdf", "resumen": "Fechas límite de entrega y de sesión de la Comisión de Situación Escolar del Consejo General Consultivo, publicado por la ESIQIE.", "reglamento": false},
-    "proceso_cgc": {"titulo": "Proceso de dictamen ante la Comisión de Situación Escolar del CGC", "url": "https://www.cecyt16.ipn.mx/assets/files/cecyt16/docs/2026/Gestion%20escolar/proceso-cosie-cgc-c26-1.pdf", "resumen": "Casos que atiende el CGC y cómo se presenta el expediente, publicado por el CECyT 16.", "reglamento": false},
-    "upiita": {"titulo": "Portal de la UPIITA", "url": "https://www.upiita.ipn.mx/", "resumen": "Sitio oficial de la unidad académica.", "reglamento": false},
-    "saes": {"titulo": "SAES de la UPIITA", "url": "https://www.saes.upiita.ipn.mx/", "resumen": "Sistema de Administración Escolar: kárdex, citas y calificaciones.", "reglamento": false},
-    "dae": {"titulo": "Dirección de Administración Escolar del IPN", "url": "https://www.ipn.mx/dae/", "resumen": "Trámites escolares institucionales.", "reglamento": false},
-    "defensoria": {"titulo": "Defensoría de los Derechos Politécnicos", "url": "https://www.ipn.mx/defensoria/", "resumen": "Quejas y orientación sobre derechos del alumnado.", "reglamento": false},
-    "siss": {"titulo": "Sistema Institucional de Servicio Social", "url": "https://serviciosocial.ipn.mx/", "resumen": "Plataforma de registro del servicio social.", "reglamento": false}
+ "_fuente": "Guía politécnica, lo propio de la UPIITA: áreas de la unidad con su función según el Manual de Organización (MAN1-acudir; página del archivo PDF) y respuestas que dependen de la unidad. Lo genérico del IPN está en comun.json. Formato: coordinacion-wt/ipt-estado/ipn-tools/diseno/FORMATO-GUIA7.md.",
+ "version": "2026.10.2",
+ "revisado": "2026-10-16",
+ "documentos": {
+  "upiita": {
+   "titulo": "Portal de la UPIITA",
+   "url": "https://www.upiita.ipn.mx/",
+   "resumen": "Sitio oficial de la unidad académica.",
+   "reglamento": false
   },
-  "acudir": [
-    {"id": "gestion_escolar", "nombre": "Gestión Escolar de la UPIITA", "para": "Recibe tus formatos, orienta sobre reinscripción, bajas y dictamen, y publica cada periodo su calendario de actividades.", "fuente": {"doc": "upiita"}},
-    {"id": "cosie_ctce", "nombre": "Comisión de Situación Escolar del CTCE", "para": "Resuelve el dictamen de tu unidad: adeudos que lo requieren, carga menor a la mínima y casos que el reglamento no prevé.", "fuente": {"doc": "rge", "articulo": "52, fracc. III, y 60"}},
-    {"id": "coordinacion_carrera", "nombre": "Subdirección Académica y Coordinación de tu carrera", "para": "Atiende la revisión de calificaciones y orienta sobre equivalencias y planes de estudio.", "fuente": {"doc": "rge", "articulo": "32, fracc. III, y 51"}},
-    {"id": "cgc", "nombre": "Comisión de Situación Escolar del Consejo General Consultivo", "para": "Resuelve ampliaciones de tiempo, revocaciones de baja definitiva y los casos que rebasan a tu unidad. Pregunta en Gestión Escolar por la fecha límite de entrega.", "fuente": {"doc": "rge", "articulo": "49, 52 y 73 a 77"}},
-    {"id": "dae", "nombre": "Dirección de Administración Escolar (DAE)", "para": "Opera trámites institucionales, como el cambio de carrera.", "fuente": {"doc": "dae"}},
-    {"id": "defensoria", "nombre": "Defensoría de los Derechos Politécnicos", "para": "Te orienta, de forma gratuita y confidencial, si crees que se vulneraron tus derechos escolares.", "fuente": {"doc": "defensoria"}}
-  ],
-  "preguntas": [
+  "saes": {
+   "titulo": "SAES de la UPIITA",
+   "url": "https://www.saes.upiita.ipn.mx/",
+   "resumen": "Sistema de Administración Escolar: kárdex, citas y calificaciones.",
+   "reglamento": false
+  },
+  "mo_upiita": {
+   "titulo": "Manual de Organización de la UPIITA",
+   "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/MOP/NS/UPIITA/MO_UPIITA.pdf",
+   "resumen": "Áreas de la UPIITA, sus funciones y a qué dependencia pertenecen.",
+   "reglamento": false
+  }
+ },
+ "acudir": [
+  {
+   "id": "gestion_escolar",
+   "nombre": "Departamento de Gestión Escolar",
+   "para": "Recibe tus formatos y coordina inscripciones, reinscripciones, altas, bajas y cambios de programa; expide constancias de inscripción, reinscripción y boletas certificadas; vigila la captura de calificaciones en el [[g:saes|SAES]]; coordina el trámite de [[g:dictamen|dictamen]] ante la comisión que corresponda y atiende la ventanilla de información.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 91
+   }
+  },
+  {
+   "id": "cosie_ctce",
+   "nombre": "Comisión de Situación Escolar del Consejo Técnico Consultivo Escolar (CTCE)",
+   "para": "Resuelve el [[g:dictamen|dictamen]] de tu unidad: adeudos que lo requieren, carga menor a la mínima y casos que el reglamento no prevé. La Subdirección de Servicios Educativos e Integración Social supervisa el trámite.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 33
+   }
+  },
+  {
+   "id": "subdireccion_academica",
+   "nombre": "Subdirección Académica",
+   "para": "Coordina las evaluaciones ordinarias, extraordinarias y a título de suficiencia; emite la convocatoria de la evaluación de saberes previamente adquiridos; atiende la revisión de calificaciones; promueve la titulación y designa a los tutores.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 42
+   }
+  },
+  {
+   "id": "sseis",
+   "nombre": "Subdirección de Servicios Educativos e Integración Social",
+   "para": "Coordina la gestión escolar, el proceso de becas, el servicio social y la bolsa de trabajo, y supervisa el trámite de dictámenes con la Comisión de Situación Escolar. Recibe las solicitudes de baja de materias.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 87
+   }
+  },
+  {
+   "id": "extension_apoyos",
+   "nombre": "Departamento de Extensión y Apoyos Educativos",
+   "para": "Hace los estudios socioeconómicos y tramita las becas; asesora sobre las opciones de servicio social y tramita las constancias; difunde la convocatoria de movilidad académica y apoya las prácticas profesionales.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 98
+   }
+  },
+  {
+   "id": "servicios_estudiantiles",
+   "nombre": "Departamento de Servicios Estudiantiles",
+   "para": "Atiende las actividades culturales y deportivas, los servicios de biblioteca, el seguro facultativo del IMSS y el servicio médico, el programa de orientación juvenil, la inducción de nuevo ingreso y el Comité de Seguridad y Contra la Violencia.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 94
+   }
+  },
+  {
+   "id": "unidad_informatica",
+   "nombre": "Unidad de Informática",
+   "para": "Da soporte técnico a alumnos y docentes, administra las aulas de cómputo y la red y gestiona con la Dirección de Sistemas Informáticos las cuentas de correo electrónico institucional.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 39
+   }
+  },
+  {
+   "id": "upis",
+   "nombre": "Unidad Politécnica de Integración Social",
+   "para": "Organiza los cursos de lenguas extranjeras (CELEX), el seguimiento de egresados y la bolsa de trabajo.",
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 101
+   }
+  }
+ ],
+ "preguntas": [
+  {
+   "id": "que-es-dictamen",
+   "pasos": [
+    "Revisa en tu [[g:kardex|kárdex]] qué materias adeudas y cuántos créditos te faltan.",
+    "Identifica tu caso: adeudo en los términos del art. 98, carga menor a la mínima o tiempo máximo agotado.",
+    "Prepara la solicitud en la Ventanilla digital y entrégala firmada en [[g:gestion_escolar|Gestión Escolar]]."
+   ],
+   "reemplaza": true,
+   "ventanilla": "dictamen"
+  },
+  {
+   "id": "formato-dictamen",
+   "pasos": [
+    "Abre «Dictamen» en la Ventanilla digital y elige el tipo que corresponde a tu caso (interno o externo).",
+    "Revisa el formato y los anexos que te pide; genera el PDF.",
+    "Imprímelo, fírmalo y entrégalo en [[g:gestion_escolar|Gestión Escolar]] antes de la fecha límite."
+   ],
+   "reemplaza": true,
+   "ventanilla": "dictamen",
+   "formato": {
+    "texto": "Proceso y requisitos del dictamen ante el CGC",
+    "doc": "proceso_cgc"
+   }
+  },
+  {
+   "id": "baja-temporal",
+   "pasos": [
+    "Prepara tu solicitud en la Ventanilla digital y revisa el resumen.",
+    "Imprímelo, fírmalo y entrégalo en [[g:gestion_escolar|Gestión Escolar]] con el formato oficial.",
+    "Guarda tu acuse y confirma la fecha en que podrás reinscribirte: si no pides reinscripción ni baja temporal, causas baja ([[a:rge:57|art. 57, fracc. II, del RGE]])."
+   ],
+   "reemplaza": true,
+   "ventanilla": "baja_temporal",
+   "formato": {
+    "texto": "Formato oficial de baja temporal",
+    "ref": "bajas.temporal"
+   }
+  },
+  {
+   "id": "baja-definitiva",
+   "pasos": [
+    "Revisa si la baja temporal te sirve para pausar sin salir del programa.",
+    "Si decides la baja definitiva, prepara tu solicitud en la Ventanilla digital.",
+    "Entrega el resumen firmado y el formato oficial en [[g:gestion_escolar|Gestión Escolar]] y guarda tu acuse."
+   ],
+   "reemplaza": true,
+   "ventanilla": "baja_definitiva",
+   "formato": {
+    "texto": "Formato oficial de baja definitiva",
+    "ref": "bajas.definitiva"
+   }
+  },
+  {
+   "id": "correo-institucional-upiita",
+   "apartado": "tramites",
+   "pregunta": "¿Cómo obtengo mi correo electrónico institucional?",
+   "respuesta": "En la UPIITA, la Unidad de Informática es el área que gestiona, con la Dirección de Sistemas Informáticos del IPN, los trámites de las cuentas de correo electrónico institucional que solicita la comunidad de la unidad. Acude con ella para pedir o recuperar tu cuenta.",
+   "pasos": [
+    "Pregunta en la Unidad de Informática qué datos y qué solicitud necesita para tu cuenta.",
+    "Guarda el acuse o el comprobante de tu solicitud.",
+    "Si tu cuenta falla, vuelve a la Unidad de Informática: da soporte técnico a alumnos y docentes."
+   ],
+   "acudir": [
+    "unidad_informatica"
+   ],
+   "fuentes": [
     {
-      "id": "que-es-dictamen",
-      "apartado": "situacion",
-      "pregunta": "¿Qué es un dictamen y para qué sirve?",
-      "respuesta": "Un dictamen es la resolución de una comisión de situación escolar sobre tu caso, cuando lo que necesitas no cabe en las reglas ordinarias de reinscripción. Se pide, por ejemplo, si adeudas materias en los supuestos del artículo 98 del Reglamento Interno, si necesitas inscribir menos créditos que la carga mínima o si ya no alcanzas a terminar en el tiempo máximo. También se usa para los casos que el reglamento no prevé.",
-      "pasos": [
-        "Revisa en tu kárdex qué materias adeudas y cuántos créditos te faltan.",
-        "Identifica tu caso: adeudo, carga menor a la mínima o tiempo máximo agotado.",
-        "Prepara la solicitud en la Ventanilla digital y entrégala firmada en Gestión Escolar."
-      ],
-      "acudir": ["gestion_escolar", "cosie_ctce"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "52, fracc. III, y 60"},
-        {"doc": "ri", "articulo": "98"}
-      ],
-      "ventanilla": "dictamen",
-      "palabras": ["dictamen", "situación escolar", "COSIE", "fuera de reglamento", "irregular"]
-    },
-    {
-      "id": "quien-dictamina",
-      "apartado": "situacion",
-      "pregunta": "¿Quién resuelve mi dictamen: mi unidad o el IPN?",
-      "respuesta": "Depende de tu caso. La Comisión de Situación Escolar del Consejo Técnico Consultivo Escolar (CTCE) de tu unidad resuelve los adeudos y las cargas menores a la mínima. Si ya no alcanzas a terminar dentro del tiempo máximo, o el caso es competencia del Consejo General Consultivo (CGC), lo resuelve la Comisión de Situación Escolar del CGC. Esa comisión sesiona según un calendario con fechas límite de entrega, así que entre la entrega y la sesión pasan semanas.",
-      "pasos": [
-        "Pregunta en Gestión Escolar si tu caso va al CTCE o al CGC.",
-        "Si va al CGC, confirma la fecha límite de entrega de la sesión que te toca.",
-        "Entrega tu expediente completo antes de esa fecha."
-      ],
-      "acudir": ["gestion_escolar", "cosie_ctce", "cgc"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "49 y 52, fracc. III y párrafo 4"},
-        {"doc": "proceso_cgc"},
-        {"doc": "calendario_cgc"}
-      ],
-      "ventanilla": "dictamen",
-      "palabras": ["CTCE", "CGC", "consejo", "comisión", "interno", "externo", "tiempo de respuesta"]
-    },
-    {
-      "id": "despues-de-ets",
-      "apartado": "situacion",
-      "pregunta": "Acredité una materia en ETS: ¿qué hago para no tener que dictaminar?",
-      "respuesta": "Si acreditaste la materia en una Evaluación a Título de Suficiencia (ETS), tu adeudo se cubre y tu kárdex debe mostrar la calificación aprobatoria, de 6 como mínimo. Primero confirma que se haya registrado: quien aplica la evaluación tiene hasta 3 días hábiles para subir la calificación. Si ya no adeudas materias de las que exigen dictamen, tu reinscripción sigue el camino ordinario. Si el SAES todavía te marca el adeudo, acude a Gestión Escolar.",
-      "pasos": [
-        "Revisa tu kárdex en el SAES y confirma la calificación de la materia.",
-        "Si pasaron más de 3 días hábiles y no aparece, avisa en Gestión Escolar.",
-        "Consulta el calendario de actividades que Gestión Escolar publica cada periodo para saber cuándo y cómo se reinscribe quien aprobó en ETS."
-      ],
-      "acudir": ["gestion_escolar"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "40, 48, fracc. I, 50 y 52, último párrafo"},
-        {"doc": "saes"}
-      ],
-      "ventanilla": null,
-      "palabras": ["ETS", "título de suficiencia", "recursamiento", "desfasada", "acreditar", "kárdex"]
-    },
-    {
-      "id": "oportunidades-reprobar",
-      "apartado": "situacion",
-      "pregunta": "Reprobé una materia: ¿qué opciones tengo y cuántas veces puedo recursarla?",
-      "respuesta": "Tienes tres caminos: presentar la ETS en tu unidad o en otra del IPN que la ofrezca, recursarla por una sola vez en la misma modalidad o, si repruebas ese recursamiento, recursarla una última vez en una modalidad distinta. Si agotas las oportunidades que marcan los artículos 48 y 52 sin acreditar, causas baja del programa.",
-      "pasos": [
-        "Consulta en Gestión Escolar cuándo se ofrece la materia.",
-        "Elige entre ETS y recursamiento según el calendario y tu carga de créditos.",
-        "Si reprobaste el recursamiento, pregunta por la última oportunidad en otra modalidad."
-      ],
-      "acudir": ["gestion_escolar", "cosie_ctce"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "48, fracc. I a III, 52 y 57, fracc. III"}
-      ],
-      "ventanilla": null,
-      "palabras": ["reprobar", "recursar", "recursamiento", "ETS", "oportunidades", "modalidad", "baja"]
-    },
-    {
-      "id": "tiempo-maximo",
-      "apartado": "situacion",
-      "pregunta": "¿Cuánto tiempo tengo como máximo para terminar mi carrera?",
-      "respuesta": "El tiempo máximo es la duración de tu plan más 50 %. Por ejemplo, un plan de 8 semestres admite hasta 12. Los periodos de baja temporal que te autorizaron no cuentan. Al agotar el plazo causas baja, pero puedes pedir una ampliación a la Comisión de Situación Escolar del Consejo General Consultivo.",
-      "pasos": [
-        "Cuenta los periodos que llevas, sin contar las bajas temporales autorizadas.",
-        "Si el plazo se acerca, pregunta en Gestión Escolar por el trámite de ampliación.",
-        "Entrega tu solicitud antes de la fecha límite de la sesión del CGC."
-      ],
-      "acudir": ["gestion_escolar", "cgc"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "49 y 57, fracc. IV"}
-      ],
-      "ventanilla": "dictamen",
-      "palabras": ["permanencia", "tiempo máximo", "1.5 veces", "ampliación", "plazo", "semestres"]
-    },
-    {
-      "id": "no-me-reinscribi",
-      "apartado": "situacion",
-      "pregunta": "¿Qué pasa si no me reinscribo?",
-      "respuesta": "Si no solicitas la reinscripción ni la baja temporal en el periodo que te corresponde, causas baja del programa. Si no puedes reinscribirte, el reglamento te permite presentar ETS, y esa evaluación cuenta en tu trayectoria. Si ya causaste baja definitiva, la revocación de la baja se solicita ante el Consejo General Consultivo.",
-      "pasos": [
-        "Antes de que cierre tu periodo de reinscripción, avisa en Gestión Escolar si no podrás hacerla.",
-        "Si necesitas pausar tus estudios, tramita la baja temporal a tiempo.",
-        "Si ya causaste baja, pregunta por el trámite de revocación y su fecha límite."
-      ],
-      "acudir": ["gestion_escolar", "cgc"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "52, último párrafo, 55 y 57, fracc. II"},
-        {"doc": "proceso_cgc"}
-      ],
-      "ventanilla": "baja_temporal",
-      "palabras": ["reinscripción", "abandono", "baja", "no me inscribí", "revocación"]
-    },
-    {
-      "id": "carga-creditos",
-      "apartado": "situacion",
-      "pregunta": "¿Cuántos créditos puedo inscribir en cada semestre?",
-      "respuesta": "Si eres regular, puedes inscribir cualquier combinación de materias cuya suma de créditos esté entre la carga mínima y la máxima de tu plan; salir de ese rango requiere autorización escrita de la dirección de tu unidad. Si tienes materias reprobadas, puedes inscribirlas junto con otras, desde la carga mínima hasta el tope de la carga media, siempre que no estés en alguno de los supuestos del artículo 98 del Reglamento Interno.",
-      "pasos": [
-        "Consulta en el Mapa curricular los créditos de cada materia.",
-        "Suma tu carga y compárala con la mínima, la media y la máxima de tu plan.",
-        "Si necesitas salir del rango, pide la autorización por escrito antes de tu cita."
-      ],
-      "acudir": ["gestion_escolar", "coordinacion_carrera"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "37 y 52, fracc. I y II"},
-        {"doc": "ri", "articulo": "98"}
-      ],
-      "ventanilla": null,
-      "palabras": ["carga", "créditos", "mínima", "media", "máxima", "regular", "irregular", "reinscripción"]
-    },
-    {
-      "id": "plan-desfasado",
-      "apartado": "situacion",
-      "pregunta": "Mi plan de estudios se actualizó y quedé desfasado: ¿qué pasa con mis materias?",
-      "respuesta": "El reglamento protege tu trayectoria: si tu plan se actualiza y quedas rezagado, el IPN debe garantizarte la oferta de las materias de tu plan original hasta que venza el tiempo máximo de la última generación que ingresó a ese plan.",
-      "pasos": [
-        "Pide en tu Coordinación de carrera la tabla de equivalencias del plan nuevo.",
-        "Pregunta cómo se ofrecerá la materia que te falta: grupo, tutoría o evaluación.",
-        "Si no hay oferta, solicítala por escrito a la Subdirección Académica."
-      ],
-      "acudir": ["coordinacion_carrera", "gestion_escolar"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "32, fracc. III"}
-      ],
-      "ventanilla": null,
-      "palabras": ["plan", "actualización", "desfase", "equivalencias", "liquidación", "oferta"]
-    },
-    {
-      "id": "formato-dictamen",
-      "apartado": "tramites",
-      "pregunta": "¿Qué formato lleno para pedir un dictamen y cómo lo presento?",
-      "respuesta": "Hay dos formatos: el del CTCE de tu unidad (dictamen interno) y el de la Comisión de Situación Escolar del CGC (dictamen externo). En la Ventanilla digital puedes llenar ambos, revisar los datos y generar el PDF. Después lo imprimes, lo firmas y lo entregas en la ventanilla de Gestión Escolar, con los documentos que pide el formato.",
-      "pasos": [
-        "Abre «Dictamen» en la Ventanilla digital y elige el tipo que corresponde a tu caso.",
-        "Revisa el formato y los anexos que te pide; genera el PDF.",
-        "Imprímelo, fírmalo y entrégalo en Gestión Escolar antes de la fecha límite."
-      ],
-      "acudir": ["gestion_escolar", "cosie_ctce"],
-      "formato": {"texto": "Proceso y requisitos del dictamen ante el CGC", "doc": "proceso_cgc"},
-      "fuentes": [
-        {"doc": "rge", "articulo": "52 y 60"},
-        {"doc": "proceso_cgc"}
-      ],
-      "ventanilla": "dictamen",
-      "palabras": ["formato", "solicitud", "dictamen", "carta", "anexos", "presentar", "entregar"]
-    },
-    {
-      "id": "baja-materia",
-      "apartado": "tramites",
-      "pregunta": "¿Cómo doy de baja una materia y qué condiciones debo cumplir?",
-      "respuesta": "Puedes dar de baja materias inscritas durante las primeras 3 semanas del semestre, siempre que conserves al menos la carga mínima de créditos. Una misma materia solo puede darse de baja hasta en 2 ocasiones, y no procede si la estás cursando como recursamiento.",
-      "pasos": [
-        "Calcula tus créditos restantes: deben seguir cumpliendo la carga mínima.",
-        "Solicita la baja en Gestión Escolar dentro de las primeras 3 semanas.",
-        "Confirma en tu comprobante de horario que la materia ya no aparece."
-      ],
-      "acudir": ["gestion_escolar"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "54"}
-      ],
-      "ventanilla": null,
-      "palabras": ["baja de materia", "dar de baja", "desinscribir", "carga mínima", "tres semanas"]
-    },
-    {
-      "id": "baja-temporal",
-      "apartado": "tramites",
-      "pregunta": "¿Cómo y cuándo tramito una baja temporal?",
-      "respuesta": "Puedes darte de baja temporal hasta dos periodos semestrales completos en toda tu trayectoria; no tienen que ser seguidos. Se solicita por escrito durante el primer mes del periodo, o en cualquier momento si hay una causa de fuerza mayor comprobada. Esos periodos no cuentan para tu tiempo máximo.",
-      "pasos": [
-        "Prepara tu solicitud en la Ventanilla digital y revisa el resumen.",
-        "Imprímelo, fírmalo y entrégalo en Gestión Escolar con el formato oficial.",
-        "Guarda tu acuse y confirma la fecha en que podrás reinscribirte."
-      ],
-      "acudir": ["gestion_escolar"],
-      "formato": {"texto": "Formato oficial de baja temporal", "ref": "bajas.temporal"},
-      "fuentes": [
-        {"doc": "rge", "articulo": "49 y 55"}
-      ],
-      "ventanilla": "baja_temporal",
-      "palabras": ["baja temporal", "pausar", "suspender estudios", "fuerza mayor", "dos periodos"]
-    },
-    {
-      "id": "baja-definitiva",
-      "apartado": "tramites",
-      "pregunta": "¿Cómo solicito una baja definitiva y qué implica?",
-      "respuesta": "La baja definitiva del programa procede a petición tuya, por escrito, o por resolución de un consejo en los casos que marca el reglamento. Implica dejar la carrera: antes de decidirlo, revisa si una baja temporal resuelve tu situación.",
-      "pasos": [
-        "Revisa si la baja temporal te sirve: conserva tus derechos y no cuenta para el tiempo máximo.",
-        "Si decides la baja definitiva, prepara tu solicitud en la Ventanilla digital.",
-        "Entrega el resumen firmado y el formato oficial en Gestión Escolar."
-      ],
-      "acudir": ["gestion_escolar"],
-      "formato": {"texto": "Formato oficial de baja definitiva", "ref": "bajas.definitiva"},
-      "fuentes": [
-        {"doc": "rge", "articulo": "57 y 59"}
-      ],
-      "ventanilla": "baja_definitiva",
-      "palabras": ["baja definitiva", "dejar la carrera", "renuncia", "baja del programa"]
-    },
-    {
-      "id": "que-son-ets",
-      "apartado": "tramites",
-      "pregunta": "¿Qué es la ETS y dónde puedo presentarla?",
-      "respuesta": "La Evaluación a Título de Suficiencia (ETS) es una evaluación para acreditar una materia que no aprobaste. Puedes presentarla en tu unidad o en otra unidad del IPN que ofrezca esa materia. Gestión Escolar publica cada periodo las fechas de inscripción, el pago y la aplicación; las fechas generales están en el calendario escolar.",
-      "pasos": [
-        "Consulta el calendario de actividades de Gestión Escolar y el calendario escolar del IPN.",
-        "Inscríbete y paga en las fechas que indique Gestión Escolar.",
-        "Presenta la evaluación y revisa tu kárdex unos días después."
-      ],
-      "acudir": ["gestion_escolar"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "48, fracc. I, y 52, último párrafo"},
-        {"doc": "calendario"}
-      ],
-      "ventanilla": null,
-      "palabras": ["ETS", "título de suficiencia", "examen extraordinario", "acreditar", "calendario"]
-    },
-    {
-      "id": "saberes-previos",
-      "apartado": "tramites",
-      "pregunta": "¿Puedo acreditar una materia que ya domino sin cursarla?",
-      "respuesta": "Sí: con la evaluación de saberes previamente adquiridos. La solicitas durante los primeros 10 días hábiles del semestre. Si la apruebas, se registra como evaluación ordinaria; si no, no afecta tu historial ni tu situación de regularidad, y la cursas con normalidad.",
-      "pasos": [
-        "Pregunta en Gestión Escolar por el formato y las fechas del periodo.",
-        "Solicítala dentro de los primeros 10 días hábiles.",
-        "Presenta la evaluación en la fecha que te indiquen."
-      ],
-      "acudir": ["gestion_escolar", "coordinacion_carrera"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "47"}
-      ],
-      "ventanilla": null,
-      "palabras": ["saberes previos", "saberes previamente adquiridos", "acreditar sin cursar", "examen de saberes"]
-    },
-    {
-      "id": "justificar-examen",
-      "apartado": "tramites",
-      "pregunta": "No pude presentar un examen por una causa justificada: ¿qué hago?",
-      "respuesta": "Tienes 5 días hábiles para solicitar por escrito a la dirección de tu unidad que te permitan presentarlo, con tus comprobantes. Si la escuela no te responde en 3 días hábiles, la solicitud se considera autorizada.",
-      "pasos": [
-        "Reúne un comprobante de la causa: médico, laboral o el que corresponda.",
-        "Entrega tu solicitud por escrito dentro de los 5 días hábiles siguientes al examen.",
-        "Pide un acuse y cuenta 3 días hábiles para la respuesta."
-      ],
-      "acudir": ["gestion_escolar"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "46"}
-      ],
-      "ventanilla": null,
-      "palabras": ["justificar", "examen", "enfermedad", "causa justificada", "afirmativa ficta", "falta"]
-    },
-    {
-      "id": "revision-calificacion",
-      "apartado": "tramites",
-      "pregunta": "No estoy de acuerdo con una calificación: ¿cómo la reviso?",
-      "respuesta": "Tienes 8 días hábiles para solicitar por escrito la revisión ante la Subdirección Académica. Dentro de 3 días hábiles se forma un jurado de docentes de la academia que revisa la evaluación.",
-      "pasos": [
-        "Pide por escrito la revisión a la Subdirección Académica dentro de 8 días hábiles.",
-        "Guarda tu acuse y tus evidencias de la evaluación.",
-        "Atiende la fecha de revisión que te indiquen."
-      ],
-      "acudir": ["coordinacion_carrera"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "51"}
-      ],
-      "ventanilla": null,
-      "palabras": ["revisión", "calificación", "inconformidad", "jurado", "profesor", "injusta"]
-    },
-    {
-      "id": "cambio-carrera",
-      "apartado": "tramites",
-      "pregunta": "¿Puedo cambiarme de carrera dentro del IPN?",
-      "respuesta": "Sí, por una sola vez en tu nivel educativo. El trámite no se hace de forma aislada: se presenta cuando la Secretaría Académica publica la convocatoria de cambio de carrera, que opera la DAE.",
-      "pasos": [
-        "Está atento a la convocatoria institucional de cambio de carrera.",
-        "Revisa los lineamientos para conocer los requisitos de tu caso.",
-        "Realiza el trámite en las fechas y por el medio que indique la convocatoria."
-      ],
-      "acudir": ["dae", "gestion_escolar"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "56"},
-        {"doc": "cambio_carrera"}
-      ],
-      "ventanilla": null,
-      "palabras": ["cambio de carrera", "cambiar de carrera", "convocatoria", "DAE", "otro programa"]
-    },
-    {
-      "id": "carrera-simultanea",
-      "apartado": "tramites",
-      "pregunta": "¿Puedo cursar dos carreras al mismo tiempo?",
-      "respuesta": "Sí, si eres alumno regular, tienes cubierto al menos el 60 % de los créditos de tu primera carrera y un promedio general mínimo de 8.0. Además, la unidad de la segunda carrera debe tener cupo.",
-      "pasos": [
-        "Revisa tu avance de créditos y tu promedio.",
-        "Pregunta en Gestión Escolar por la solicitud y las fechas.",
-        "Confirma que la unidad de la segunda carrera tenga cupo."
-      ],
-      "acudir": ["gestion_escolar", "dae"],
-      "fuentes": [
-        {"doc": "rge", "articulo": "12"}
-      ],
-      "ventanilla": null,
-      "palabras": ["doble carrera", "segunda carrera", "carrera simultánea", "promedio 8"]
-    },
-    {
-      "id": "servicio-social",
-      "apartado": "tramites",
-      "pregunta": "¿Qué necesito para empezar el servicio social?",
-      "respuesta": "En nivel superior necesitas tener cubierto al menos el 70 % de los créditos de tu plan y registrarte en el Sistema Institucional de Servicio Social (SISS). Dura 480 horas como mínimo, en un periodo no menor a 6 meses.",
-      "pasos": [
-        "Revisa tu avance de créditos: debes tener al menos el 70 %.",
-        "Registra tu servicio en la plataforma del SISS.",
-        "Conserva tus reportes y tu constancia de liberación."
-      ],
-      "acudir": ["gestion_escolar"],
-      "fuentes": [
-        {"doc": "servicio_social", "articulo": "5 y 7"},
-        {"doc": "siss"}
-      ],
-      "ventanilla": null,
-      "palabras": ["servicio social", "SISS", "480 horas", "70 por ciento", "liberación"]
-    },
-    {
-      "id": "titulacion",
-      "apartado": "tramites",
-      "pregunta": "¿Cómo me titulo?",
-      "respuesta": "El Reglamento de Titulación Profesional regula la condición de pasante y las modalidades para titularte: tesis, memoria, escolaridad, examen por áreas de conocimiento y créditos de posgrado. Los requisitos y los formatos dependen de la opción que elijas, así que confírmalos en tu unidad antes de comenzar.",
-      "pasos": [
-        "Lee el reglamento para conocer las opciones.",
-        "Elige la opción que se ajusta a tu caso.",
-        "Pregunta en Gestión Escolar por los requisitos y los formatos vigentes."
-      ],
-      "acudir": ["gestion_escolar", "coordinacion_carrera"],
-      "fuentes": [
-        {"doc": "titulacion"}
-      ],
-      "ventanilla": null,
-      "palabras": ["titulación", "titularme", "pasante", "tesis", "memoria", "escolaridad", "CENEVAL"]
+     "doc": "mo_upiita",
+     "pagina": 40
     }
-  ]
+   ],
+   "palabras": [
+    "correo",
+    "correo institucional",
+    "cuenta",
+    "email",
+    "ipn.mx",
+    "contraseña del correo"
+   ]
+  },
+  {
+   "id": "trabajo-terminal-upiita",
+   "apartado": "tramites",
+   "pregunta": "¿Con quién veo el Trabajo Terminal o Proyecto Terminal?",
+   "respuesta": "En la UPIITA, los departamentos académicos coordinan las unidades de aprendizaje de Trabajo Terminal o Proyecto Terminal y Metodología de la Investigación; el Departamento de Tecnologías Avanzadas lo menciona entre sus funciones, junto con la integración de jurados para la titulación. Pregunta en el departamento académico de tu carrera cómo y cuándo registrar tu proyecto.",
+   "pasos": [
+    "Identifica el departamento académico de tu carrera.",
+    "Pregunta por los requisitos, fechas y el registro de tu proyecto.",
+    "Si piensas titularte por proyecto o tesis, pregunta también en la Subdirección Académica por el registro de tu opción."
+   ],
+   "acudir": [
+    "subdireccion_academica"
+   ],
+   "fuentes": [
+    {
+     "doc": "mo_upiita",
+     "pagina": 59
+    }
+   ],
+   "palabras": [
+    "trabajo terminal",
+    "proyecto terminal",
+    "TT",
+    "metodología de la investigación",
+    "protocolo",
+    "titulación"
+   ]
+  },
+  {
+   "id": "idiomas-celex-upiita",
+   "apartado": "tramites",
+   "pregunta": "¿Dónde puedo estudiar idiomas en mi unidad?",
+   "respuesta": "En la UPIITA, la Unidad Politécnica de Integración Social organiza y promueve la formación en lenguas extranjeras mediante los Cursos Extracurriculares de Lenguas Extranjeras (CELEX). Acude con ella para conocer la oferta y las fechas de inscripción.",
+   "pasos": [
+    "Pregunta en la Unidad Politécnica de Integración Social por la oferta de idiomas del periodo.",
+    "Revisa requisitos y fechas de inscripción.",
+    "Guarda tu comprobante de inscripción."
+   ],
+   "acudir": [
+    "upis"
+   ],
+   "fuentes": [
+    {
+     "doc": "mo_upiita",
+     "pagina": 102
+    }
+   ],
+   "palabras": [
+    "idiomas",
+    "inglés",
+    "CELEX",
+    "lenguas extranjeras",
+    "cursos extracurriculares",
+    "francés"
+   ]
+  }
+ ]
 }

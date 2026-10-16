@@ -41,3 +41,12 @@
 .guia-pronto small{display:block}
 @media(max-width:639.98px){.guia-cab h2{font-size:var(--ipn-tamano-l)}.guia-lista-acudir>li{padding:var(--ipn-esp-4)}}
 .guia-portal{display:inline-flex;align-items:center;min-height:2.75rem;justify-self:start}
+.guia-enlace{display:inline;padding:0;border:0;background:transparent;color:var(--ipn-acento);font:inherit;text-decoration:underline;cursor:pointer}
+.guia-enlace:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.guia-fuentes .guia-enlace{margin-inline-start:var(--ipn-esp-3);min-height:2.75rem}
+.guia-articulo{display:grid;gap:var(--ipn-esp-3)}
+.guia-articulo .pc-oficial{display:block;width:auto;padding:0}
+.guia-glosario{display:grid;gap:var(--ipn-esp-4)}
+.guia-glosario dt{font-weight:700}
+.guia-glosario dd{margin:var(--ipn-esp-2) 0 0}
+.guia .pc-seccion.guia-articulo-activo{outline:2px solid var(--ipn-acento);outline-offset:var(--ipn-esp-2)}
