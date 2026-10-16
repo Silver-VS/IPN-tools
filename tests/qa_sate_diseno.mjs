@@ -89,6 +89,13 @@ assert.ok(css.includes('.trayectoria-minimapa{grid-column:2;grid-row:2 / span 4;
 assert.match(css,/@media\(max-width:639px\).*\.trayectoria-minimapa\{grid-column:1;grid-row:2/);
 // Contraste de texto AA y de puntos/foco ≥3:1 con los tokens efectivos de ambos temas.
 const fuente=leer('web/sate/cascaron.html');
+// DIS9: los cuerpos cerrados salen del layout, incluidos los controles flex de simulación.
+assert.ok(css.includes(':is(.sate-desp,.trayectoria-plegable):not([open])>:not(summary){display:none}'),
+  'Simulación y escenarios cerrados no reservan alto; abiertos conservan su layout');
+assert.match(fuente,/<details class="sate-desp" id="desempeno-simulacion" hidden><summary id="desempeno-sim-titulo"><\/summary><div class="sate-desp__cuerpo est-sim" id="est-sim"><\/div><\/details>/,
+  'Los controles de simulación permanecen dentro del details real');
+assert.match(leer('web/sate/desempeno.js'),/<details class="trayectoria-plegable" id="trayectoria-escenario"><summary id="trayectoria-escenario-titulo">[\s\S]*?<\/summary><div>[\s\S]*?<\/div><\/details>/,
+  'El contenido de escenarios permanece dentro del details real');
 const temas=[...fuente.matchAll(/(?:^:root|:root\[data-theme="dark"\]|:root:not\(\[data-theme="light"\]\))\{([^}]+)\}/gm)].map(m=>Object.fromEntries([...m[1].matchAll(/--([\w-]+):(#[\da-f]+);/g)].map(x=>[x[1],x[2]])));
 assert.equal(temas.length,3);
 for(const tema of temas)for(const [viejo,nuevo] of Object.entries({bg:'fondo',surface:'superficie',sunken:'hundido',fg:'texto',muted:'tenue',ok:'ok'}))tema[viejo]=tema['ipn-'+nuevo];

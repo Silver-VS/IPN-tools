@@ -625,6 +625,8 @@ body.sate-flotante .sate-barra{display:flex}
 .trayectoria-plegable>summary small{display:block;font-weight:400;color:var(--ipn-tenue);margin-top:var(--ipn-esp-1)}
 .trayectoria-plegable>summary:focus-visible,.plan-menu>summary:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .trayectoria-plegable>div{padding:var(--ipn-esp-3);min-width:0}
+/* El contenido cerrado no debe reservar espacio ni desbordar el details. */
+:is(.sate-desp,.trayectoria-plegable):not([open])>:not(summary){display:none}
 @media(max-width:639px){
   .sate-texto-largo{display:none!important}.sate-texto-corto{display:inline}
   #sate-avisos-globales{margin:0}
@@ -939,7 +941,7 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
   #sate-avisos-globales .sate-chips{flex-wrap:nowrap;max-width:100%;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:none;mask-image:linear-gradient(to right,transparent,black var(--ipn-esp-2),black calc(100% - var(--ipn-esp-4)),transparent)}
   #sate-avisos-globales .sate-chips::-webkit-scrollbar{display:none}
   #sate-avisos-globales .sate-chips__item{flex:none;scroll-snap-align:start;max-width:100%}
-  body.sate-flotante .wrap>[role=tabpanel],.wrap>[role=tabpanel]{padding-bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+  body.sate-flotante .wrap>[role=tabpanel],.wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
   #v-tray{padding-bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-7) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
 }
 
@@ -950,5 +952,5 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
 .tmr .gd-chip:hover,.tmr .sel-materia:hover{background:var(--ipn-hundido);text-decoration:underline}
 .tmr .sel-materia{padding-block:var(--ipn-esp-2)}
 .mapwrap{padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7));scroll-padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7))}
-body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
 body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
