@@ -516,17 +516,21 @@ function cuadriculaHorario(all,op){
   all=all.filter(c=>!c.own||!c.oculto);
   const maxDay=Math.max(4,...all.flatMap(c=>slots(c).map(b=>b[0])));
   const days=S.weekend?7:maxDay+1;
-  // bloques de 1:30 alineados a las 7:00 (si algo empieza antes, se agregan bloques completos hacia arriba)
-  const first=Math.min(START,...all.flatMap(c=>slots(c).map(b=>b[1])));
-  const lo=START-Math.ceil((START-first)/BLOCK)*BLOCK;
-  const hi=Math.max(14*60+30,...all.flatMap(c=>slots(c).map(b=>b[2])));
-  const end=lo+Math.ceil((hi-lo)/BLOCK)*BLOCK, h=(end-lo)/SLOT*SLOTPX;
+  const horas=all.flatMap(c=>slots(c)), minimo=5*BLOCK;
+  const first=horas.length?Math.min(...horas.map(b=>b[1])):START;
+  const last=horas.length?Math.max(...horas.map(b=>b[2])):START+minimo;
+  // El mínimo conserva el alto del estado vacío; el margen y el centro siguen a lo elegido, incluso de noche.
+  const span=horas.length?Math.min(1440,Math.max(minimo,Math.ceil((last-first+2*BLOCK)/BLOCK)*BLOCK)):minimo;
+  const lo=horas.length?Math.max(0,Math.min(1440-span,Math.floor((first+last-span)/2/SLOT)*SLOT)):START;
+  const end=lo+span, h=span/SLOT*SLOTPX;
   const cal=$('#cal');cal.style.setProperty('--days',days);cal.style.setProperty('--slot',SLOTPX+'px');
   let html='<div class="dh"></div>'+DAYS.slice(0,days).map(d=>`<div class="dh">${d}</div>`).join('');
   html+=`<div class="hours" style="height:${h}px">`;
   for(let m=lo;m<end;m+=BLOCK) html+=`<div style="top:${(m-lo)/SLOT*SLOTPX}px">${hm(m)}</div>`;
   html+='</div>';
   const items=lanes(all.flatMap(c=>slots(c).map(([d,a,b])=>({c,d,a,b,ghost:c===ghost}))));
+  // Una columna conserva espacio para la insignia incluso cuando hay grupos traslapados.
+  cal.style.setProperty('--ipn-horario-solapes',Math.max(1,...items.map(b=>b.n)));
   for(let d=0;d<days;d++){
     html+=`<div class="day" style="height:${h}px">`;
     if(!soloLectura)for(let m=lo;m<end;m+=BLOCK){const on=S.gap&&S.gap.d===d&&S.gap.a===m;
@@ -534,12 +538,19 @@ function cuadriculaHorario(all,op){
     items.filter(b=>b.d===d).forEach(b=>{
       const top=(b.a-lo)/SLOT*SLOTPX, ht=(b.b-b.a)/SLOT*SLOTPX-2, w=100/b.n, pos=`top:${top}px;height:${ht}px;left:calc(${b.lane*w}% + 2px);width:calc(${w}% - 4px)`;
       if(b.c.own) html+=`<div class="blk own${b.clash?' clash':''}"${b.c.tipo?` data-tipo="${esc(b.c.tipo)}"`:""}${!soloLectura&&b.c.i!=null?` data-own="${b.c.i}" tabindex="0" role="button" aria-label="${esc(txH('semana_abrir_bloque',{nombre:b.c.n}))}"`:''} style="${pos}" title="${esc(b.c.n)} · ${hm(b.a)}–${hm(b.b)}"><b>${esc(b.c.n)}</b><span class="t">${hm(b.a)}</span></div>`;
-      else html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}" style="--h:${hue(b.c)};${pos}"${soloLectura?'':` data-k="${esc(keyOf(b.c))}"`} title="${esc(b.c[3])} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}"><b>${esc(name(b.c))}</b><span class="t">${esc(b.c[3])} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></div>`;
-      if(insignia&&!b.c.own)html=html.replace(/<\/div>$/,insignia(b.c)+'</div>');
+      else {const cupo=insignia?insignia(b.c):'';
+        html+=`<div class="blk${b.clash?' clash':''}${b.ghost?' ghost':''}${cupo?' blk-cupo':''}" style="--h:${hue(b.c)};${pos}"${soloLectura?'':` data-k="${esc(keyOf(b.c))}"`} title="${esc(b.c[3])} · ${esc(name(b.c))} · ${esc(profs(b.c))} · ${hm(b.a)}–${hm(b.b)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}">${cupo}<span class="horario-contenido"><b>${esc(name(b.c))}</b><span class="t">${esc(b.c[3])} · ${hm(b.a)}${roomAt(b.c,b.d,b.a)?' · '+esc(roomAt(b.c,b.d,b.a)):''}</span></span></div>`;
+      }
     });
     html+='</div>';
   }
   cal.innerHTML=html;
+  if(cal.dataset){
+    const rango=lo+'|'+end,anterior=cal.dataset.horarioRango;cal.dataset.horarioRango=rango;
+    // La transición solo afecta la opacidad; las celdas mantienen las coordenadas de sus horas.
+    if(anterior&&anterior!==rango&&raiz.matchMedia?.('(prefers-reduced-motion:no-preference)').matches)
+      cal.animate?.([{opacity:.65},{opacity:1}],{duration:180,easing:'ease-out'});
+  }
   return items;
 }
 
