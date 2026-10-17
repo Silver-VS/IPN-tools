@@ -103,7 +103,7 @@
       const lead=typeof def.lead==='string'?def.lead:'';if(lead)box.appendChild(el('p',lead,'tramite-lead'));
       const guia=enlaceGuia(def.id);if(guia){const g=SateUI.tarjetaNav({href:guia,titulo:tx('guia_titulo'),detalle:tx('guia_detalle'),compacta:true});g.className+=' tramite-guia';box.appendChild(g)}
       // Los pasos ya hechos se pueden volver a abrir; el activo y los pendientes no son botones.
-      const pasos=el('ol',null,'tramite-pasos');pasos.setAttribute('aria-label',tx('pasos'));
+      const proceso=el('div',null,'tramite-proceso'),pasos=el('ol',null,'tramite-pasos');pasos.setAttribute('aria-label',tx('pasos'));
       nombres.forEach((nombre,i)=>{
         const li=el('li',null,'tramite-paso'+(i<m.paso?' hecho':i===m.paso?' activo':'')),hecho=i<m.paso;
         const cuerpo=el(hecho?'button':'span',null,'tramite-paso-ir');
@@ -111,7 +111,7 @@
         else if(i===m.paso)li.setAttribute('aria-current','step');
         cuerpo.appendChild(el('span',tx('paso_n',{n:i+1}),'tramite-paso-n'));cuerpo.appendChild(el('span',nombre,'tramite-paso-t'));
         li.appendChild(cuerpo);pasos.appendChild(li);
-      });box.appendChild(pasos);
+      });
       const conVista=ultimo&&!!def.generar;
       const layout=el('div',null,'tramite-asistente'+(conVista?' con-vista':'')),pantalla=el('div',null,'tramite-pantalla');layout.appendChild(pantalla);
       const cabecera=el('header',null,'tramite-paso-cabecera');cabecera.appendChild(el('h3',nombres[m.paso]));
@@ -175,8 +175,7 @@
         m.listo=true;m.guardar();def.alTerminar(m.datos);
       }));
       pantalla.appendChild(acciones);
-      box.appendChild(layout);if(def.generar)estadoFalta();
-      if(def.volver){const pie=el('div',null,'tramite-pie');pie.appendChild(regreso('tramite-volver-pie'));box.appendChild(pie)}
+      proceso.appendChild(pasos);proceso.appendChild(layout);box.appendChild(proceso);if(def.generar)estadoFalta();
     }
     pintar();return {modelo:m,descargar,destruir(){destruido=true;version++;clearTimeout(temporizador);revocar();for(const c of m.campos)if(c.sensible)m.datos[c.id]=''}};
   }
@@ -235,69 +234,50 @@
   }
   const definiciones=new Map();let activo;
   function mostrarLista(box){
-    box.replaceChildren();box.appendChild(el('h2',tx('titulo')));box.appendChild(el('p',tx('guardado_ayuda'),'tramite-lead'));
-    if(!SATE_CONFIG.unidades[SATE_UNIDAD].tramites.length){box.replaceChildren(el('h2',tx('titulo')),el('p',tx('sin_tramites')));return}
-    // Lo que ya tiene avance o está terminado va primero; lo demás queda como disponible.
-    const grupos={curso:[],disponibles:[]};
-    for(const id of SATE_CONFIG.unidades[SATE_UNIDAD].tramites){
-      const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica);
-      grupos[e.id==='progreso'||e.id==='listo'?'curso':'disponibles'].push({id,aplica,e});
-    }
-    const clases={listo:'ok',progreso:'curso',no_aplica:'',no_iniciado:''};
-    for(const [clave,filas] of Object.entries(grupos)){
-      if(!filas.length)continue;
-      const grupo=el('section',null,'tramite-grupo'),rotulo=el('h3',tx('grupo_'+clave),'tramite-grupo-rotulo'),lista=el('ul',null,'tramite-filas');
-      rotulo.id='tramite-grupo-'+clave;lista.setAttribute('aria-labelledby',rotulo.id);grupo.appendChild(rotulo);
-      for(const {id,aplica,e} of filas){
-        const fila=el('li',null,'tramite-fila'),texto=el('div',null,'tramite-fila-texto');
-        texto.appendChild(el('h4',SATE.texto('sate.tramite.'+id+'.titulo')));texto.appendChild(el('p',tx(id+'_para'),'tramite-fila-para'));
-        const meta=e.id==='progreso'?tx('avance',e):e.motivo?e.motivo:'';
-        if(meta)texto.appendChild(el('p',meta,'tramite-fila-meta'));
-        if(aplica?.aplica)texto.appendChild(el('p',tx('te_aplica')+' · '+aplica.motivo,'tramite-fila-meta tramite-aplica'));
-        const aviso=el('p','','tramite-fila-meta');aviso.setAttribute('role','status');texto.appendChild(aviso);
-        fila.appendChild(texto);
-        fila.appendChild(el('span',tx('estado_'+e.id),'tramite-estado'+(clases[e.id]?' '+clases[e.id]:'')));
-        const lateral=el('div',null,'tramite-fila-acciones');
-        if(e.accion){
-          const entrada0=definiciones.get(id);
-          // Un trámite sin PDF (bajas) se termina con un resumen imprimible: no hay nada que descargar.
-          const sinPdf=!!entrada0&&(entrada0.sinPdf||typeof entrada0!=='function'&&!entrada0.generar);
-          const verbo=e.accion==='descargar'&&sinPdf?'ver_resumen':e.accion;
-          const accion=boton(tx(verbo),async()=>{
-            const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada;
-            if(e.accion!=='descargar'||!def?.generar){SATE.ir('tramites/'+id);return}
-            if(!await confirmarDescarga())return;
-            accion.disabled=true;
-            try{
-              await SATE.prepararTramite?.(id);
-              const m=modelo(def);
-              await def.preparar?.(m.datos,m.paso);
-              if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}
-              bajar(await def.generar({...m.datos}),typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||id+'.pdf');
-            }
-            catch(error){console.error('Ventanilla: descarga guardada fallida',{tramite:id,error:error.name});aviso.textContent=tx('pdf_error')}
-            finally{accion.disabled=false}
-          });
-          accion.setAttribute('aria-label',tx('accion_aria',{accion:tx(verbo),tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));
-          // Acciones de fila secundarias; la acción primaria pertenece al asistente abierto.
-          lateral.appendChild(accion);
-          // Un trámite terminado se puede revisar (vuelve al asistente) o reiniciar.
-          if(e.id==='listo'){
-            const extra=el('div',null,'tramite-acciones-extra');
-            for(const [texto0,hacer] of [[tx('corregir'),()=>SATE.ir('tramites/'+id)],[tx('reiniciar'),()=>{
-              if(!confirm(tx('reiniciar_confirmar')))return;
-              const k='hu.tramite.'+id;try{IPNT.borrar?.(k);(IPNT.almacen||localStorage).removeItem(k)}catch(err){}
-              completados.delete(id);mostrarLista(box);
-            }]]){const b=boton(texto0,hacer);b.className+=' tramite-texto';b.setAttribute('aria-label',texto0+': '+SATE.texto('sate.tramite.'+id+'.titulo'));extra.appendChild(b)}
-            lateral.appendChild(extra);
-          }
-        }
-        const guia=enlaceGuia(id);
-        if(guia){const g=el('a',tx('ver_guia'),'sate-enlace tramite-ver-guia');g.href=guia;g.setAttribute('aria-label',tx('ver_guia_aria',{tramite:SATE.texto('sate.tramite.'+id+'.titulo')}));lateral.appendChild(g)}
-        fila.appendChild(lateral);lista.appendChild(fila);
+    box.replaceChildren(el('h2',tx('elige_resolver')));
+    const cfg=SATE_CONFIG.unidades[SATE_UNIDAD];
+    if(!cfg.tramites.length){box.replaceChildren(el('h2',tx('titulo')),el('p',tx('sin_tramites')));return}
+    const grupos=cfg.gruposVentanilla||[{id:'todos',titulo:'sate.ventanilla.titulo',tramites:cfg.tramites}];
+    for(const g of grupos){
+      const ids=g.tramites.filter(id=>cfg.tramites.includes(id));if(!ids.length)continue;
+      const grupo=el('section',null,'tramite-grupo'),rotulo=el('h3',SATE.texto(g.titulo),'tramite-grupo-rotulo'),lista=el('ul',null,'tramite-filas');
+      rotulo.id='tramite-grupo-'+g.id;lista.setAttribute('aria-labelledby',rotulo.id);grupo.appendChild(rotulo);
+      for(const id of ids){
+        const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica);
+        const fila=el('li',null,'tramite-fila'),accion=boton('',()=>{
+          const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada;
+          if(def)abrirResumen(id,def);
+        });
+        accion.className+=' tramite-fila-boton';accion.setAttribute('aria-haspopup','dialog');
+        accion.appendChild(el('span',SATE.texto('sate.tramite.'+id+'.titulo'),'tramite-fila-titulo'));
+        accion.appendChild(el('span',tx(id+'_para'),'tramite-fila-para'));
+        const estadoFila=el('span',tx('estado_'+e.id),'tramite-estado'+(e.id==='listo'?' ok':e.id==='progreso'?' curso':''));
+        estadoFila.setAttribute('role','status');accion.appendChild(estadoFila);
+        if(e.id==='progreso')accion.appendChild(el('span',tx('avance',e),'tramite-fila-meta'));
+        if(e.motivo)accion.appendChild(el('span',e.motivo,'tramite-fila-meta'));
+        if(aplica?.aplica)accion.appendChild(el('span',tx('te_aplica')+' · '+aplica.motivo,'tramite-fila-meta tramite-aplica'));
+        accion.setAttribute('aria-label',SATE.texto('sate.tramite.'+id+'.titulo')+'. '+tx(id+'_para'));
+        fila.appendChild(accion);lista.appendChild(fila);
       }
       grupo.appendChild(lista);box.appendChild(grupo);
     }
+  }
+  function abrirResumen(id,def){
+    const contenido=el('div',null,'tramite-resumen');
+    contenido.appendChild(el('p',tx(id+'_para'),'tramite-resumen__para'));
+    const pasos=el('ol',null,'tramite-resumen__pasos');
+    [...def.pasos.map(p=>p.titulo),def.revisarTitulo||tx('revisar')].forEach(t=>pasos.appendChild(el('li',t)));
+    contenido.appendChild(pasos);
+    const requisitos=typeof def.requisitos==='function'?def.requisitos(modelo(def).datos):def.requisitos;
+    if(requisitos?.length){
+      contenido.appendChild(el('h3',tx('requisitos'),'tramite-resumen__titulo'));
+      const lista=el('ul',null,'tramite-resumen__requisitos');
+      requisitos.forEach(r=>lista.appendChild(el('li',r)));
+      contenido.appendChild(lista);
+    }
+    SateUI.modal(SATE.texto('sate.tramite.'+id+'.titulo'),contenido,{acciones:[
+      {texto:tx('empezar'),primaria:true,onclick:()=>SATE.ir('tramites/'+id)}
+    ]});
   }
   function mostrar(r){return globalThis.SateMedicion?globalThis.SateMedicion.render('ventanilla',()=>mostrarVista(r)):mostrarVista(r)}
   function mostrarVista(r){

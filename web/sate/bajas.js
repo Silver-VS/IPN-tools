@@ -106,7 +106,7 @@
         if(avisoPdf)avisoPdf.textContent=error.message;throw error;
       }
     }
-    return {id,titulo:tx('titulo_'+tipo),lead:tx('lead_'+tipo),volver:true,revisarTitulo:tx('revisar_titulo'),revisionAyuda:tx('revision_ayuda'),
+    return {id,titulo:tx('titulo_'+tipo),lead:tx('lead_'+tipo),requisitos:()=>[tx('revision_ayuda')],volver:true,revisarTitulo:tx('revisar_titulo'),revisionAyuda:tx('revision_ayuda'),
       datos:{periodos:'1'},
       pasos:[
         {titulo:tx('paso_datos'),ayuda:tx('paso_datos_ayuda'),campos:[campoIdentidad()]},

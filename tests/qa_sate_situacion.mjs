@@ -156,11 +156,13 @@ assert.equal(pdfsGenerados,0);assert.equal(document.activeElement,descargar);
 pendiente=asistente.descargar();dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
 assert.equal(pdfsGenerados,1);assert.equal(dlg.open,false);asistente.destruir();
 c.SateTramites.registrar(tramite);SATE.presente.aplicaTramite=()=>null;c.SateTramites.mostrarLista(panel);
-const desdeLista=panel.querySelectorAll('button').find(n=>n.textContent==='Descargar formato');desdeLista.focus();
-pendiente=desdeLista.onclick();assert.equal(dlg.open,true);assert.equal(pdfsGenerados,1);
-dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
-assert.equal(pdfsGenerados,2);assert.equal(document.activeElement,desdeLista);
-console.log('Descarga: modal real accesible, Cancelar/Esc sin generación, foco restaurado y aceptación desde asistente/lista.');
+const desdePortada=panel.querySelectorAll('button').find(n=>n.className.includes('tramite-fila-boton')&&n.getAttribute('aria-label')?.startsWith('Electivas. '));desdePortada.focus();desdePortada.click();
+assert.equal(dlg.open,true);assert.equal(pdfsGenerados,1);assert.ok(dlg.textContent.includes('Empezar'));
+dlg.querySelectorAll('button').find(n=>n.className.includes('sate-modal__x')).click();
+assert.equal(dlg.open,false);assert.equal(document.activeElement,desdePortada);
+desdePortada.click();dlg.querySelectorAll('button').find(n=>n.textContent==='Empezar').click();
+assert.equal(destino,'tramites/electivas');assert.equal(pdfsGenerados,1);
+console.log('Ventanilla: diálogo de resumen, foco restaurado al cerrar y Empezar conserva la ruta del trámite.');
 
 // R2-PER: casos 1–4, sin huecos reservados para una lista de decisiones vacía.
 for(const archivo of ['primer-ingreso-bionica.json','regular-mecatronica.json','adeuda-telematica.json','desfase-dictamen-bionica.json']){

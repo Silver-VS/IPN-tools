@@ -20,6 +20,23 @@
         "baja_temporal",
         "baja_definitiva"
       ],
+      "gruposVentanilla": [
+        {
+          "id": "situacion",
+          "titulo": "sate.ventanilla.grupo_situacion",
+          "tramites": ["dictamen"]
+        },
+        {
+          "id": "bajas",
+          "titulo": "sate.ventanilla.grupo_bajas",
+          "tramites": ["baja_temporal", "baja_definitiva"]
+        },
+        {
+          "id": "electivas",
+          "titulo": "sate.ventanilla.grupo_electivas",
+          "tramites": ["electivas"]
+        }
+      ],
       "scriptsTramite": {
         "baja_temporal": "bajas.js",
         "baja_definitiva": "bajas.js"
