@@ -172,29 +172,29 @@
 .gd-metro{display:grid;gap:var(--ipn-esp-3);min-width:0}
 .gd-metro-caja{overflow-x:auto;overscroll-behavior-x:contain;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
 .gd-metro-caja:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
-.gd-metro-lienzo{display:grid;width:max-content;min-width:100%}
-.gd-metro-fila{display:flex;align-items:stretch}
-.gd-metro-fila+.gd-metro-fila{border-top:1px solid var(--ipn-linea)}
-.gd-metro-fila--enc{background:var(--ipn-hundido);color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);font-weight:700;letter-spacing:.04em;text-transform:uppercase}
-.gd-metro-quien{position:sticky;left:0;z-index:2;flex:none;box-sizing:border-box;width:10.5rem;padding:var(--ipn-esp-4);border-left:4px solid var(--gd-area,transparent);background:var(--ipn-superficie);box-shadow:1px 0 0 var(--ipn-linea)}
-.gd-metro-fila--enc .gd-metro-quien{background:var(--ipn-hundido);padding-block:var(--ipn-esp-2);display:flex;align-items:center}
-.gd-metro-quien h4{margin:0;font-size:var(--ipn-tamano-m);line-height:1.25;font-weight:600}
-.gd-metro-via{position:relative;flex:none}
-.gd-metro-via--enc{height:2.25rem}
-.gd-metro-nivel{position:absolute;top:0;bottom:0;display:flex;align-items:center;justify-content:center}
+.gd-metro-lienzo{display:flex;width:max-content;min-width:100%}
+.gd-metro-lineas{position:sticky;left:0;z-index:3;flex:none;width:10.5rem;background:var(--ipn-superficie);box-shadow:1px 0 0 var(--ipn-linea)}
+.gd-metro-pildora{position:absolute;left:var(--ipn-esp-3);right:var(--ipn-esp-3);transform:translateY(-50%);box-sizing:border-box;display:flex;align-items:center;min-height:2rem;padding:var(--ipn-esp-1) var(--ipn-esp-3);border-radius:999px;font-size:.8125rem;line-height:1.2;font-weight:700;overflow-wrap:break-word}
+.gd-metro-pildora--neutra{background:var(--ipn-tenue);color:var(--ipn-superficie)}
+.gd-metro-capa{position:relative;flex:none}
 .gd-metro-trazo{position:absolute;inset:0;pointer-events:none}
-.gd-metro-linea{stroke:var(--gd-area,var(--ipn-tenue));stroke-width:5;stroke-linecap:round;stroke-linejoin:round;opacity:.9}
-.gd-estacion{position:absolute;box-sizing:border-box;display:grid;justify-items:center;align-content:start;gap:2px;padding:0 var(--ipn-esp-1) var(--ipn-esp-1);border:0;border-radius:var(--ipn-radio-sm,8px);background:transparent;color:var(--ipn-texto);font:inherit;text-align:center;cursor:pointer}
+.gd-metro-banda{fill:var(--ipn-hundido);opacity:.6}
+.gd-metro-zona{fill:var(--ipn-tenue);font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-variant:small-caps}
+.gd-metro-linea{stroke-width:6;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gd-metro-trasbordo{stroke-width:5;stroke-linecap:round;stroke-linejoin:round;fill:none;opacity:.8}
+.gd-estacion{position:absolute;box-sizing:border-box;display:grid;justify-items:center;align-content:start;gap:5px;padding:3px 0 0;border:0;border-radius:var(--ipn-radio-sm,8px);background:transparent;color:var(--ipn-texto);font:inherit;text-align:center;cursor:pointer}
 .gd-estacion-punto{box-sizing:border-box;width:18px;height:18px;border:4px solid var(--gd-area,var(--ipn-tenue));border-radius:50%;background:var(--ipn-superficie)}
-.gd-estacion--cruce .gd-estacion-punto{box-shadow:0 0 0 3px var(--ipn-superficie),0 0 0 5px var(--gd-area,var(--ipn-tenue))}
-.gd-estacion small{margin-top:var(--ipn-esp-1);color:var(--ipn-tenue);font-size:.75rem;line-height:1.2;font-variant-numeric:tabular-nums}
-.gd-estacion-nombre{font-size:.75rem;line-height:1.25;font-weight:600;overflow-wrap:anywhere;min-width:0;max-width:100%}
-.gd-estacion::before{content:"";position:absolute;inset:-2px 0 0}
-.gd-estacion:hover .gd-estacion-nombre,.gd-estacion:focus-visible .gd-estacion-nombre{text-decoration:underline}
-.gd-estacion:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
-.gd-metro--foco .gd-estacion:not(.gd-estacion--rel){opacity:.45}
-.gd-estacion--rel .gd-estacion-punto{background:var(--gd-area,var(--ipn-acento))}
+.gd-estacion--cruce .gd-estacion-punto{width:22px;height:22px;margin:-2px 0;border-width:3px;box-shadow:inset 0 0 0 3px var(--ipn-superficie),inset 0 0 0 7px var(--gd-area,var(--ipn-tenue))}
+.gd-estacion-caja{box-sizing:border-box;display:grid;gap:1px;width:100%;padding:3px var(--ipn-esp-2);border:1px solid var(--ipn-linea);border-radius:6px;background:var(--ipn-superficie)}
+.gd-estacion small{color:var(--ipn-tenue);font-size:.75rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.gd-estacion-nombre{font-size:.75rem;line-height:1.25;font-weight:700;overflow-wrap:anywhere}
+.gd-estacion:hover .gd-estacion-caja{border-color:var(--gd-area,var(--ipn-acento))}
+.gd-estacion:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.gd-estacion:focus-visible .gd-estacion-caja,.gd-estacion--rel .gd-estacion-caja{border-color:var(--gd-area,var(--ipn-acento));border-width:2px}
+.gd-metro--foco .gd-estacion:not(.gd-estacion--rel){opacity:.4}
+.gd-metro--foco .gd-metro-trasbordo:not(.gd-metro-trasbordo--rel){opacity:.15}
+.gd-metro--foco .gd-metro-trasbordo--rel{opacity:1}
 .gd-metro-leyenda{margin:0}
-@media(max-width:639.98px){.gd-metro-quien{width:7.5rem;padding:var(--ipn-esp-3)}.gd-lin-barra{justify-content:stretch}.gd-lin-barra .sate-segmentado{width:100%}}
-@media(prefers-reduced-motion:no-preference){.gd-estacion{transition:opacity .15s}}
+@media(max-width:639.98px){.gd-metro-lineas{width:9rem}.gd-metro-pildora{left:6px;right:6px;padding:var(--ipn-esp-1) 10px;font-size:.75rem}.gd-lin-barra{justify-content:stretch}.gd-lin-barra .sate-segmentado{width:100%}}
+@media(prefers-reduced-motion:no-preference){.gd-estacion,.gd-metro-trasbordo{transition:opacity .15s}}
 .gd-tray[hidden],.gd-lin[hidden],.gd-metro[hidden],.gd-mapa[hidden],.gd-esp[hidden]{display:none}

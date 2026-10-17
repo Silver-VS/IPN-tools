@@ -473,75 +473,103 @@
       SateUI.modal(nombre, h('div', {}, [h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra]), { amplio: true });
     }
   }
-  /* Metro: una línea por área (mismo color que en el Mapa), una estación por unidad de aprendizaje y una columna por nivel.
-     Cada estación es un botón HTML sobre un lienzo con las vías en SVG; no hay panel lateral: elegirla abre la ficha. */
-  const METRO = { ancho: 148, alto: 74, caracteres: 17, tope: 4, margen: 14, arriba: 4 };
-  const subcolumnasDe = (filas, v) => Math.max(1, ...filas.map(f => Math.ceil(f.items.filter(i => i.v === v).length / METRO.tope)));
-  // Reparte las estaciones: cada nivel ocupa una o más subcolumnas de a lo más METRO.tope estaciones.
+  /* Metro: una vía gruesa por área (mismo color que en el Mapa), una estación (anillo) por unidad de aprendizaje y una zona por nivel.
+     Las vías y los transbordos se dibujan en un solo SVG; cada estación es un botón HTML encima. Si un nivel tiene varias unidades de la
+     misma línea, la vía se ramifica en sub-vías paralelas. No hay panel lateral: elegir una estación abre la ficha. */
+  const METRO = { col: 170, caja: 150, carril: 81, enc: 40, tope: 3, margen: 16, r: 14 };
+  const ROMANOS = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
+  const hexRgb = c => { const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(c || ''); return m ? [1, 2, 3].map(i => parseInt(m[i], 16) / 255) : null; };
+  const luz = c => { const v = hexRgb(c); if (!v) return null; const [r, g, b] = v.map(x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
+  // Texto de la píldora: blanco si contrasta ≥ 4.5 con el color de la línea; si no, casi negro.
+  const textoSobre = c => { const l = luz(c); return l == null || 1.05 / (l + 0.05) >= 4.5 ? '#fff' : '#17171c'; };
   function distribuirMetro(filas) {
     const niveles = [...new Set(filas.flatMap(f => f.items.map(i => i.v)))].filter(v => v != null).sort((a, b) => a - b);
+    const carriles = filas.map(f => Math.max(1, Math.min(METRO.tope, Math.max(0, ...niveles.map(v => f.items.filter(i => i.v === v).length)))));
+    const subs = new Map(niveles.map(v => [v, Math.max(1, ...filas.map((f, k) => Math.ceil(f.items.filter(i => i.v === v).length / carriles[k])))]));
     const inicio = new Map(); let x = METRO.margen;
-    for (const v of niveles) { inicio.set(v, x); x += subcolumnasDe(filas, v) * METRO.ancho; }
-    const lineas = filas.map(f => {
-      const pos = [], altos = new Map();
-      for (const v of niveles) {
-        f.items.filter(i => i.v === v).forEach((i, k) => {
-          const sub = Math.floor(k / METRO.tope), clave = v + ':' + sub, previo = altos.get(clave) || METRO.arriba;
-          const alto = METRO.alto + 15 * Math.max(0, Math.ceil(i.n.length / METRO.caracteres) - 2);
-          altos.set(clave, previo + alto);
-          pos.push({ item: i, x: inicio.get(v) + sub * METRO.ancho + METRO.ancho / 2, y: previo });
-        });
-      }
-      return { fila: f, pos, alto: Math.max(METRO.alto, ...altos.values()) + METRO.margen };
+    for (const v of niveles) { inicio.set(v, x); x += subs.get(v) * METRO.col; }
+    let y = METRO.enc;
+    const lineas = filas.map((f, k) => {
+      const nl = carriles[k], pos = [];
+      const lineasTxt = Math.max(2, ...f.items.map(i => Math.ceil(i.n.length / 17))), carril = METRO.carril + 15 * (lineasTxt - 2);
+      for (const v of niveles) f.items.filter(i => i.v === v).forEach((i, n) => {
+        const carrilN = n % nl, sub = Math.floor(n / nl);
+        pos.push({ item: i, carril: carrilN, x: inicio.get(v) + sub * METRO.col + METRO.col / 2, y: y + 6 + carrilN * carril + 12, top: y + 6 + carrilN * carril });
+      });
+      const l = { fila: f, pos, nl, carril, top: y, alto: nl * carril + 12 };
+      y += l.alto; return l;
     });
-    return { niveles, inicio, ancho: x + METRO.margen, lineas };
+    return { niveles, inicio, subs, ancho: x + METRO.margen, alto: y + METRO.margen, lineas };
   }
-  // Vía de una línea: recorre sus estaciones con ángulos rectos, como en un plano de metro.
-  function trazoMetro(pos) {
-    let d = '';
-    pos.forEach((p, k) => {
-      const cy = p.y + 9;
-      if (!k) { d += 'M' + p.x + ' ' + cy; return; }
-      const q = pos[k - 1];
-      if (q.x === p.x) d += ' V' + cy; else d += ' H' + (q.x + p.x) / 2 + ' V' + cy + ' H' + p.x;
-    });
-    return d;
+  // Vías de una línea: el tronco continuo y, por cada sub-vía, una rama que sale del tronco con esquinas redondeadas.
+  function viasMetro(l) {
+    const r = METRO.r, y0 = l.pos[0].y, vias = [];
+    const xs = l.pos.map(p => p.x), ramas = [];
+    for (let c = 1; c < l.nl; c++) {
+      const del = l.pos.filter(p => p.carril === c); if (!del.length) continue;
+      const xa = Math.min(...del.map(p => p.x)), xb = xa - METRO.col / 2 + 2, yc = del[0].y;
+      ramas.push({ xb, d: 'M' + xb + ' ' + y0 + ' V' + (yc - r) + ' Q' + xb + ' ' + yc + ' ' + (xb + r) + ' ' + yc + ' H' + Math.max(...del.map(p => p.x)) });
+    }
+    const x1 = Math.min(...xs, ...ramas.map(r_ => r_.xb)), x2 = Math.max(...xs);
+    vias.push('M' + x1 + ' ' + y0 + ' H' + x2, ...ramas.map(r_ => r_.d));
+    return vias;
+  }
+  // Transbordo: tramo del color de la línea de origen que baja o sube hasta la estación que la pide como requisito.
+  function trasbordoMetro(a, b, desfase) {
+    const r = METRO.r, vx = b.x - METRO.col / 2 + 4 + desfase * 6, s = Math.sign(b.y - a.y) || 1;
+    return 'M' + a.x + ' ' + a.y + ' H' + (vx - r) + ' Q' + vx + ' ' + a.y + ' ' + vx + ' ' + (a.y + s * r) + ' V' + (b.y - s * r) + ' Q' + vx + ' ' + b.y + ' ' + (vx + r) + ' ' + b.y + ' H' + b.x;
   }
   function pintarMetro(destino, ind, carreraId, abrirFichaDe) {
     const car = ind.carreras[carreraId], filas = lineasDeAprendizaje(ind.materias, carreraId, car.areas);
     const veces = new Map();   // en cuántas especializaciones aparece cada materia
     for (const l of car.lineas || []) for (const k of new Set(l.claves)) veces.set(k, (veces.get(k) || 0) + 1);
-    const m = distribuirMetro(filas), lienzo = h('div', { 'class': 'gd-metro-lienzo' }), NS = 'http://www.w3.org/2000/svg';
-    lienzo.appendChild(h('div', { 'class': 'gd-metro-fila gd-metro-fila--enc', 'aria-hidden': 'true' }, [h('span', { 'class': 'gd-metro-quien', texto: t('sate.guia.columna_linea') }),
-      h('div', { 'class': 'gd-metro-via gd-metro-via--enc', style: 'width:' + m.ancho + 'px' }, m.niveles.map(v =>
-        h('span', { 'class': 'gd-metro-nivel', style: 'left:' + m.inicio.get(v) + 'px;width:' + subcolumnasDe(filas, v) * METRO.ancho + 'px', texto: t('temarios.lista.nivel', { n: v }) })))]));
-    for (const l of m.lineas) {
-      const f = l.fila, nombre = f.nombre || t('sate.guia.linea_otras');
-      const via = h('div', { 'class': 'gd-metro-via', style: 'width:' + m.ancho + 'px;height:' + l.alto + 'px' });
-      const svg = document.createElementNS(NS, 'svg'), tr = document.createElementNS(NS, 'path');
-      svg.setAttribute('class', 'gd-metro-trazo'); svg.setAttribute('width', String(m.ancho)); svg.setAttribute('height', String(l.alto)); svg.setAttribute('aria-hidden', 'true');
-      tr.setAttribute('d', trazoMetro(l.pos)); tr.setAttribute('class', 'gd-metro-linea'); tr.setAttribute('fill', 'none');
-      svg.appendChild(tr); via.appendChild(svg);
-      for (const p of l.pos) {
-        const i = p.item, n = veces.get(i.clave) || 0;
-        const e = h('button', { type: 'button', 'class': 'gd-estacion' + (n > 1 ? ' gd-estacion--cruce' : ''), 'data-clave': i.clave, 'aria-haspopup': 'dialog',
-          'aria-label': t('sate.guia.metro_estacion', { materia: i.n, clave: i.clave, linea: nombre, nivel: i.v }) + (n > 1 ? '. ' + t('sate.guia.metro_correspondencia', { n }) : ''),
-          style: 'left:' + (p.x - METRO.ancho / 2) + 'px;top:' + p.y + 'px;width:' + METRO.ancho + 'px' },
-          [h('span', { 'class': 'gd-estacion-punto', 'aria-hidden': 'true' }), h('small', { texto: i.clave, 'aria-hidden': 'true' }), h('span', { 'class': 'gd-estacion-nombre', texto: i.n, 'aria-hidden': 'true' })]);
-        e.addEventListener('click', () => abrirFichaDe(i.clave));
-        via.appendChild(e);
-      }
-      const fila = h('div', { 'class': 'gd-metro-fila', role: 'group', 'aria-label': nombre }, [h('div', { 'class': 'gd-metro-quien' }, [h('h4', { texto: nombre })]), via]);
-      if (f.color && fila.style && fila.style.setProperty) fila.style.setProperty('--gd-area', f.color);
-      lienzo.appendChild(fila);
+    const m = distribuirMetro(filas), NS = 'http://www.w3.org/2000/svg';
+    const por = new Map(); m.lineas.forEach((l, k) => l.pos.forEach(p => por.set(p.item.clave, { ...p, k })));
+    const nodo = (tag, attrs, hijos) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); for (const x of hijos || []) n.appendChild(x); return n; };
+    const color = l => l.fila.color || 'var(--ipn-tenue)';
+    const svg = nodo('svg', { 'class': 'gd-metro-trazo', width: m.ancho, height: m.alto, 'aria-hidden': 'true' });
+    m.niveles.forEach((v, k) => {
+      const x = m.inicio.get(v), w = m.subs.get(v) * METRO.col;
+      if (k % 2) svg.appendChild(nodo('rect', { 'class': 'gd-metro-banda', x: x, y: 8, width: w, height: m.alto - 16, rx: 10 }));
+      const tx = nodo('text', { 'class': 'gd-metro-zona', x: x + w / 2, y: 26, 'text-anchor': 'middle' }); tx.textContent = t('temarios.lista.nivel', { n: ROMANOS[v] || v });
+      svg.appendChild(tx);
+    });
+    // Transbordos (requisitos que vienen de otra línea), debajo de las vías propias.
+    const destinos = new Map();
+    for (const [clave, b] of por) for (const rq of ind.materias[clave].r || []) {
+      const a = por.get(rq); if (!a || a.k === b.k || a.x >= b.x) continue;
+      const j = destinos.get(clave) || 0; destinos.set(clave, j + 1);
+      svg.appendChild(nodo('path', { 'class': 'gd-metro-trasbordo', d: trasbordoMetro(a, b, j % 3), 'data-a': rq, 'data-b': clave, style: 'stroke:' + color(m.lineas[a.k]), fill: 'none' }));
     }
-    // Al enfocar o pasar sobre una estación se resaltan las que van antes y después en la seriación.
+    m.lineas.forEach(l => { for (const d of viasMetro(l)) svg.appendChild(nodo('path', { 'class': 'gd-metro-linea', d, style: 'stroke:' + color(l), fill: 'none', 'data-linea': String(m.lineas.indexOf(l)) })); });
+    const capa = h('div', { 'class': 'gd-metro-capa', style: 'width:' + m.ancho + 'px;height:' + m.alto + 'px' }, []);
+    capa.appendChild(svg);
+    for (const l of m.lineas) {
+      const nombre = l.fila.nombre || t('sate.guia.linea_otras');
+      for (const p of l.pos) {
+        const i = p.item, n = veces.get(i.clave) || 0, sale = (i.r || []).some(r_ => por.get(r_) && por.get(r_).k !== por.get(i.clave).k) || [...por.keys()].some(c => (ind.materias[c].r || []).includes(i.clave) && por.get(c).k !== por.get(i.clave).k);
+        const e = h('button', { type: 'button', 'class': 'gd-estacion' + (n > 1 || sale ? ' gd-estacion--cruce' : ''), 'data-clave': i.clave, 'aria-haspopup': 'dialog',
+          'aria-label': t('sate.guia.metro_estacion', { materia: i.n, clave: i.clave, linea: nombre, nivel: i.v }) + (n > 1 ? '. ' + t('sate.guia.metro_correspondencia', { n }) : ''),
+          style: 'left:' + (p.x - METRO.caja / 2) + 'px;top:' + p.top + 'px;width:' + METRO.caja + 'px;--gd-area:' + color(l) },
+          [h('span', { 'class': 'gd-estacion-punto', 'aria-hidden': 'true' }), h('span', { 'class': 'gd-estacion-caja', 'aria-hidden': 'true' }, [h('small', { texto: i.clave }), h('span', { 'class': 'gd-estacion-nombre', texto: i.n })])]);
+        e.addEventListener('click', () => abrirFichaDe(i.clave));
+        capa.appendChild(e);
+      }
+    }
+    const pildoras = h('div', { 'class': 'gd-metro-lineas', role: 'group', 'aria-label': t('sate.guia.columna_linea'), style: 'height:' + m.alto + 'px' }, m.lineas.map(l => {
+      const f = l.fila, p = h('span', { 'class': 'gd-metro-pildora' + (f.color ? '' : ' gd-metro-pildora--neutra'), texto: f.nombre || t('sate.guia.linea_otras'), style: 'top:' + l.pos[0].y + 'px' });
+      if (f.color) { p.style.background = f.color; p.style.color = textoSobre(f.color); }
+      return p;
+    }));
+    const lienzo = h('div', { 'class': 'gd-metro-lienzo' }, [pildoras, capa]);
+    // Al enfocar o pasar sobre una estación se ilumina su cadena de seriación (requisitos y materias que dependen de ella).
     const marcar = clave => {
       lienzo.classList.toggle('gd-metro--foco', !!clave);
       for (const e of lienzo.querySelectorAll('.gd-estacion')) {
         const c = e.getAttribute('data-clave');
         e.classList.toggle('gd-estacion--rel', !!clave && (c === clave || (ind.materias[clave].r || []).includes(c) || (ind.materias[c].r || []).includes(clave)));
       }
+      for (const p of lienzo.querySelectorAll('.gd-metro-trasbordo')) p.classList.toggle('gd-metro-trasbordo--rel', !!clave && (p.getAttribute('data-a') === clave || p.getAttribute('data-b') === clave));
     };
     const estacion = ev => ev.target && ev.target.closest && ev.target.closest('.gd-estacion');
     for (const [entra, sale] of [['focusin', 'focusout'], ['mouseover', 'mouseout']]) {
@@ -549,7 +577,7 @@
       lienzo.addEventListener(sale, ev => { if (estacion(ev)) marcar(null); });
     }
     const caja = h('div', { 'class': 'gd-metro-caja', role: 'region', tabindex: '0', 'aria-label': t('sate.guia.metro_etiqueta') }, [lienzo]);
-    destino.replaceChildren(caja, (car.lineas || []).length ? h('p', { 'class': 'tmr-nota gd-metro-leyenda', texto: t('sate.guia.metro_leyenda_correspondencia') }) : null);
+    destino.replaceChildren(caja, h('p', { 'class': 'tmr-nota gd-metro-leyenda', texto: t('sate.guia.metro_leyenda_correspondencia') }));
   }
   const VISTA_CLAVE = 'ipnt.programasVista';
   function vistaGuardada() {
