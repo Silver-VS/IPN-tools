@@ -852,11 +852,12 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
     <!--__INST_EN_ENCABEZADO__-->
     <div class="brand">
       <!--__IPNT_HOME__-->
-      <div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/ <button class="sate-unidad-btn" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/" hidden></button></h1><span id="sate-leyenda"></span></div>
+      <div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/ <button class="sate-unidad-btn" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/" hidden></button></h1></div>
       <p id="sate-nombre">/*__SATE_NOMBRE__*/</p>
     </div>
     <div class="sate-controles">
       <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
+      <span id="sate-leyenda"></span>
     </div>
     <div class="sate-lado">
       <span id="sate-logo-unidad" class="sate-logo-slot"><span id="sate-unidad-nombre" class="sate-unidad-nombre"></span></span>
@@ -946,7 +947,6 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
   <section id="v-hor" data-view-panel="hor" role="tabpanel" aria-labelledby="t-hor" hidden>
     <div hidden><p id="cupos-ayuda"></p><a id="cupos-instalar" class="saes-bm" href="/*__CUPOS_MARCADOR__*/" draggable="true" onclick="event.preventDefault()"></a></div>
     <div class="est-eqv" id="est-eqv" hidden></div>
-    <div id="hor-desfase"></div>
     <section class="filters" aria-label="Filtros">
       <div class="field"><span>Turno</span><div class="chips" id="f-turno"></div></div>
       <div class="field"><span>Nivel</span><div class="chips" id="f-nivel"></div></div>
@@ -1022,6 +1022,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
           <div id="equiv-body"></div>
         </details>
         <div class="colhead"><h2 id="h-offer">Oferta</h2><span class="count" id="offer-count"></span></div>
+        <div id="hor-desfase"></div>
         <div class="cupos-cabecera"><span id="cupos-estado" role="status"></span><button class="link" type="button" data-cupos-ayuda></button></div>
         <div class="offer" id="offer"></div>
       </section>

@@ -85,8 +85,15 @@ assert.match(css,/aria-selected=true\]::after.*background:var\(--sate-realce\)/)
 assert.match(css,/\.sate-grupo-inicio::before.*width:1px/);
 assert.match(css,/\.sate-pestana:focus-visible,\.sate-barra__btn:focus-visible,\.trayectoria-minimapa button:focus-visible/);
 assert.ok(css.includes('.trayectoria-resumen{grid-column:1 / -1}'));   // resumen a todo el ancho
-assert.ok(css.includes('.trayectoria-minimapa{grid-column:2;grid-row:2 / span 4;align-self:stretch'));   // minimapa a la derecha, misma altura que el contenido
-assert.match(css,/@media\(max-width:639px\).*\.trayectoria-minimapa\{grid-column:1;grid-row:2/);
+const perfilCss=css.slice(css.indexOf('/* R2-PER:'));
+assert.match(perfilCss,/\.trayectoria-minimapa\{grid-column:2;grid-row:2;align-self:start/);
+assert.match(perfilCss,/\.trayectoria-decisiones\{grid-column:1 \/ -1/,'Las decisiones no dejan una columna vacía bajo el minimapa');
+assert.match(perfilCss,/@media\(max-width:899px\)[\s\S]*?\.trayectoria-minimapa\{grid-column:1;grid-row:3/);
+assert.match(perfilCss,/\.mm-leg \.mm-fila\{justify-content:flex-start\}/);
+assert.match(perfilCss,/font-variant-numeric:tabular-nums/);
+assert.match(perfilCss,/#trayectoria-escenario:not\(\[open\]\)>div\{display:none\}/);
+assert.match(perfilCss,/#trayectoria-escenario section.meta-panel\{[^}]*margin:0/);
+assert.match(perfilCss,/\.wrap>header.top>\.sate-navegacion\{margin-top:var\(--ipn-esp-5\)/);
 // Contraste de texto AA y de puntos/foco ≥3:1 con los tokens efectivos de ambos temas.
 const fuente=leer('web/sate/cascaron.html');
 // DIS9: los cuerpos cerrados salen del layout, incluidos los controles flex de simulación.
@@ -233,7 +240,8 @@ assert.equal((mini.svg.match(/data-estado="late"/g)||[]).length,2,'Desfase tiene
 assert.match(mini.svg,/data-estado="fail"[^>]+fill="var\(--ipn-reprobada\)"/);
 assert.match(mini.svg,/data-estado="curso"[^>]+fill="var\(--sate-realce\)"/);
 assert.match(mini.svg,/data-estado="late"[^>]+fill="var\(--ipn-desfasada\)"/);
-assert.match(mini.leyenda,/2 desfasadas/);
+assert.match(mini.leyenda.replace(/<[^>]+>/g,''),/2 desfasadas/);
+assert.match(mini.leyenda,/<b class="mm-numero">2<\/b>/,'Los conteos tienen una columna numérica');
 assert.match(ctx.minimapaCurricular(null).svg,/<circle/,'También hay minimapa sin trazado PDF');
 personal=false;assert.equal(ctx.minimapaCurricular(),null);
 assert.ok(!leer('web/sate/mapa.js').includes('function slotFill('),'Optativas se resuelven una sola vez en núcleo');
@@ -344,9 +352,11 @@ const cabeceraDis5=css.match(/\.wrap>header\.top\{([^}]+)\}/)[1];
 for(const d of ['border:0','background:transparent','box-shadow:none'])assert.ok(cabeceraDis5.includes(d),d);
 assert.doesNotMatch(cabeceraDis5,/border-top:/);
 assert.match(css,/\[id\^="sate-tab-2-"\]\[role=tabpanel\][^{]*\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
-const movilDis5=css.slice(css.lastIndexOf('@media(max-width:639px)'));
-assert.match(movilDis5,/\.brand h1#sate-titulo\{[^}]*flex-wrap:nowrap;white-space:nowrap/,'DIS7: marca móvil en un renglón');
-assert.match(movilDis5,/grid-template-areas:"t l";[^}]*white-space:nowrap/,'DIS7: ayuda en la fila de la marca');
+const antesPerfil=css.slice(0,css.indexOf('/* R2-PER:'));
+const movilDis5=antesPerfil.slice(antesPerfil.lastIndexOf('@media(max-width:639px)'));
+assert.match(css,/\.brand h1#sate-titulo\{[^}]*flex-wrap:nowrap;white-space:nowrap/,'DIS7: marca móvil en un renglón');
+assert.match(shell,/<div class="sate-controles">\s*<label[^\n]+\n\s*<span id="sate-leyenda">/,'R2-PER: fase de prueba junto a la carrera, separada de la marca');
+assert.match(perfilCss,/@media\(max-width:639px\)[\s\S]*?grid-template-areas:"ipn marca" "lado lado" "carrera carrera"/,'R2-PER: acciones y contexto refluyen en móvil');
 assert.match(css,/#g-n\{display:flex;flex-wrap:wrap;min-width:0;max-width:100%\}/,'DIS7: paginador adaptable al ancho disponible');
 const nucleoDis7=leer('web/sate/nucleo.js');
 const opcionesDis7={};

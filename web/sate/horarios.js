@@ -597,14 +597,14 @@ function* generateBank(subj,N,{marks,pscore,oq,run}){
 function renderGen(){
   const g=S.gen;
   $('#b-gen-clear').hidden=!g?.top?.length;
-  if(!g){$('#genres').innerHTML=desfaseAvisos();return}
-  if(g.msg){$('#genres').innerHTML=desfaseAvisos()+`<p class="empty">${esc(g.msg)}</p>`;return}
+  if(!g){$('#genres').innerHTML='';return}
+  if(g.msg){$('#genres').innerHTML=`<p class="empty">${esc(g.msg)}</p>`;return}
   const dmsg=g.bank?.auto?`<p class="gdays-msg">${txH('generador_auto',{n:g.bank.M,meta:fmtCr(g.bank.meta),tope:g.bank.tope!=null?txH('generador_tope',{n:fmtCr(g.bank.tope)}):''})}</p>${g.bank.relajado?`<p class="gdays-msg warn">${esc(txH('generador_relajado'))}</p>`:''}${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">${txH('generador_carga_menor',{n:fmtCr(g.bank.best)})}</p>`:''}`:g.bank?`<p class="gdays-msg">${txH('generador_numero',{n:g.bank.N,total:g.bank.M,tope:g.bank.tope!=null?txH('generador_carga_tope',{n:fmtCr(g.bank.tope)}):''})}</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">${txH('generador_dias',{n:g.minDays})}${g.maxD&&g.minDays>g.maxD?' '+esc(txH('generador_dias_imposible',{n:g.maxD})):g.maxD?' '+esc(txH('generador_dias_posible',{n:g.maxD})):''}</p>`:'';
   const oex=g.optExceso?Object.entries(g.optExceso).map(([v,x])=>x.libre<=0?txH('optativas_cubiertas',{n:x.total,nivel:v}):txH('optativas_libres',{n:x.libre,nivel:v,elegidas:x.n})):[];
   const oexMsg=oex.length?`<p class="gdays-msg warn">${esc(txH('optativas_aviso',{detalle:oex.join('; ')}))}</p>`:'';
   const none=g.subj.filter(s=>!s.opts.length).map(s=>s.k), mustNone=g.subj.filter(s=>s.must&&!s.opts.length).map(s=>s.k);
   const must=g.subj.filter(s=>s.must&&s.opts.length).map(s=>s.k);
-  const omsg=desfaseAvisos()+(mustNone.length?`<p class="gdays-msg warn">${txH('obligatoria_sin_grupos',{nombre:mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'')+
+  const omsg=(mustNone.length?`<p class="gdays-msg warn">${txH('obligatoria_sin_grupos',{nombre:mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'')+
     (must.length?`<p class="gdays-msg">${txH('obligatoria_incluida',{nombre:must.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'');
   if(!g.top.length){$('#genres').innerHTML=dmsg+omsg+oexMsg+`<p class="empty">${esc(txH(g.trunc?'generador_limite':'generador_sin_resultados'))}</p>`;return}
   $('#genres').innerHTML=dmsg+omsg+oexMsg+
@@ -619,7 +619,16 @@ function renderGen(){
 function renderOffer(){
   if(typeof CUPOS!=='undefined')CUPOS.pintar();
   renderMasFiltros();
+  // Una explicación por materia, también al agrupar por grupo. Los adeudos sin
+  // renglón visible permanecen como materias por resolver junto a la oferta.
+  const avisadas=new Set();
+  const aviso=k=>{
+    if(avisadas.has(k)||!isPersonal())return '';
+    const html=desfaseAcciones(k);if(html)avisadas.add(k);return html;
+  };
+  const pendientes=()=>{$('#hor-desfase').innerHTML=isPersonal()?desfaseAvisos(avisadas):''};
   if(S.onlyWant&&!tr().want.length){
+    pendientes();
     $('#offer-count').textContent='';
     $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;
   }
@@ -633,7 +642,7 @@ function renderOffer(){
       const fl=cur()[c[8]]&&statusOf(c[8]).includes('fail');
       const etiqueta=st==='late'?(fl?(['agotada','dictamen'].includes(reglaDesfase()?.por[c[8]])?'desfasada_dictamen':'desfasada_recursar'):'desfasada'):st==='fail'?'recursar':st==='now'?'semestre':st==='curso'?'curso':st==='done'?'acreditada':(isPersonal()&&cur()[c[8]]&&available(c[8]))?'disponible':'';
       const badge=etiqueta?`<span class="tag ${['late','fail'].includes(st)?'bad':st==='now'||etiqueta==='disponible'?'good':'soft'}">${esc(txH(etiqueta))}</span> `:'';
-      return `<article class="subj"><header><h3>${badge}${esc(name(c))}</h3><span class="meta">${esc(c[8])} · ${esc(textoCreditos(c[8],c[7],true))} ${ayudaCreditos(c[8])} · ${esc(txH('nivel',{n:c[2]}))}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="${esc(txH('linea'))}">${esc(l)}</span>`).join('')}</span>`:''}</header>${(()=>{
+      return `<article class="subj"><header><h3>${badge}${esc(name(c))}</h3><span class="meta">${esc(c[8])} · ${esc(textoCreditos(c[8],c[7],true))} ${ayudaCreditos(c[8])} · ${esc(txH('nivel',{n:c[2]}))}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="${esc(txH('linea'))}">${esc(l)}</span>`).join('')}</span>`:''}</header>${aviso(c[8])}${(()=>{
         // con una opción marcada «Sí», la materia se colapsa a esa(s) opción(es) (y la que esté en el horario)
         const mk=ws().marks, keep=cs.filter(x=>mk[keyOf(x)]?.s==='si'||plan().sel.includes(keyOf(x)));
         const col=keep.length&&keep.some(x=>mk[keyOf(x)]?.s==='si')&&keep.length<cs.length, open=S.expand.has(c[4]);
@@ -644,10 +653,11 @@ function renderOffer(){
     const g=new Map();list.forEach(c=>{(g.get(c[3])||g.set(c[3],[]).get(c[3])).push(c)});
     const gp=cs=>Math.min(...cs.map(c=>prio(c[8])));
     const items=[...g.entries()].sort((a,b)=>gp(a[1])-gp(b[1])||a[0].localeCompare(b[0],'es',{numeric:true}));
-    html=items.map(([grp,cs])=>`<article class="subj"><header><h3 class="grp">${esc(grp)}</h3><span class="meta">${fmtCr(cs.reduce((s,c)=>s+c[7],0))} créditos ${ayudaCreditos()} <button class="link" data-group="${esc(grp)}">${esc(txH('agregar_grupo'))}</button></span></header>${cs.map(c=>optRow(c,sel,true)).join('')}</article>`).join('');
+    html=items.map(([grp,cs])=>`<article class="subj"><header><h3 class="grp">${esc(grp)}</h3><span class="meta">${fmtCr(cs.reduce((s,c)=>s+c[7],0))} créditos ${ayudaCreditos()} <button class="link" data-group="${esc(grp)}">${esc(txH('agregar_grupo'))}</button></span></header>${cs.map(c=>aviso(c[8])+optRow(c,sel,true)).join('')}</article>`).join('');
     $('#offer-count').textContent=txH('cuenta_grupos',{n:g.size,materias:list.length});
   }
   $('#offer').innerHTML=html||`<p class="empty">${esc(txH('oferta_sin_resultados'))}</p>`;
+  pendientes();
   montarAyudasCreditos();
 }
 /* horario inscrito (leído del SAES con el Lector): se carga en la versión seleccionada para exportarlo o compararlo */

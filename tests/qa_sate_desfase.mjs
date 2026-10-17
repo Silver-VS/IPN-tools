@@ -24,6 +24,7 @@ const c=vm.createContext({console:{debug:(...args)=>logs.push(args)},document,pe
   daysOf:cs=>[...new Set(cs.flatMap(c=>c[6].map(b=>b[0])))]});
 const run=s=>vm.runInContext(s,c);
 run('window=globalThis');
+run(leer('web/sate/componentes.js'));
 run(nucleo.slice(0,nucleo.indexOf('/* "dd/mm/aaaa')));
 run(nucleo.slice(nucleo.indexOf('const perIdx='),nucleo.indexOf('/* Desfase OFICIAL')));
 run(nucleo.slice(nucleo.indexOf('const saveT='),nucleo.indexOf('function pattern(')));
@@ -32,7 +33,8 @@ run(horarios.slice(horarios.indexOf('let generacion=null;'),horarios.indexOf('\n
 // Sin elección no se fija ningún periodo, tampoco para los adeudos ya desfasados.
 assert.deepEqual(Array.from(run('tr().oblig')),[]);
 for(const k of ['B203','B204'])assert.equal(run(`planAsignado('${k}')`),null);
-assert.match(run("desfaseAcciones('B204')"),/Aún no tiene un periodo asignado/);
+assert.match(run("desfaseAcciones('B204')"),/data-materia="B204"/);
+assert.doesNotMatch(run("desfaseAcciones('B203')"),/data-opcion="siguiente"|disabled/,'Una opción inválida desaparece');
 assert.equal(run("elegirDesfase('B203','siguiente')"),false,'Un adeudo ya desfasado no se pospone');
 // Variante solo en memoria: B204 se reprobó hace dos periodos y vencería en N+1.
 run("ALUMNO.reprobadas_periodo.find(r=>r[0]==='B204')[1]=perName(planInicio()-2);for(const k in T)delete T[k];PLAN_CACHE=null");
@@ -40,16 +42,17 @@ assert.equal(run("planAsignado('B204')"),null);
 assert.equal(run("tr().oblig.includes('B204')"),false);
 assert.equal(run("conPlan(()=>tr().oblig.includes('B204'),1)"),false);
 assert.match(run("desfaseAcciones('B204')"),/siguiente periodo ya sería desfase/);
-// DIS6: la lista comparte la explicación y cada materia conserva únicamente sus opciones.
+// R2-PER: cada motivo vive en su materia; no hay párrafos sueltos al inicio.
 const avisos = run('desfaseAvisos()');
-assert.equal((avisos.match(/Aún no tiene un periodo asignado/g)||[]).length,1);
 assert.equal((avisos.match(/siguiente periodo ya sería desfase/g)||[]).length,1);
-assert.ok(avisos.indexOf('Aún no tiene un periodo asignado') < avisos.indexOf('<section>'));
-for(const seccion of avisos.match(/<section>[\s\S]*?<\/section>/g)||[]){
-  assert.doesNotMatch(seccion,/<p[ >]/);
-  assert.equal((seccion.match(/<button /g)||[]).length,3);
+assert.ok(avisos.startsWith('<section class="sate-materia-decision">'));
+for(const seccion of avisos.match(/<section\b[^>]*>[\s\S]*?<\/section>/g)||[]){
+  assert.equal((seccion.match(/class="sate-aviso-materia__motivo"/g)||[]).length,1);
+  assert.match(seccion,/aria-label="[^"]+"/,'El aviso nombra la materia');
+  assert.doesNotMatch(seccion,/disabled/);
 }
-assert.match(run("desfaseAcciones('B203',true)"),/data-opcion="siguiente"[^>]* disabled/);
+assert.doesNotMatch(run("desfaseAcciones('B203')"),/data-opcion="siguiente"/);
+assert.match(run("desfaseAcciones('B204')"),/data-opcion="siguiente"/,'La opción válida se conserva');
 assert.equal(run("elegirDesfase('B204','siguiente')"),true);
 assert.equal(run("planAsignado('B204')"),1,'Solo elegir siguiente la incluye en N+1');
 assert.equal(run("conPlan(()=>tr().oblig.includes('B204'),1)"),true);
@@ -72,7 +75,7 @@ assert.equal(run("selected().some(c=>c[8]==='B204')"),true,'El horario permite s
 // Quitar de N vuelve a pedir decisión, sin enviarla automáticamente a N+1.
 run("toggleBox('B204')");
 assert.equal(run("planAsignado('B204')"),null);
-assert.match(run("desfaseAvisos()"),/Aún no tiene un periodo asignado/,'El aviso sigue visible al quitarla');
+assert.match(run("desfaseAvisos()"),/data-materia="B204"/,'El aviso sigue visible al quitarla');
 assert.equal(run("selected().some(c=>c[8]==='B204')"),false,'Sin elección tampoco conserva un grupo en el horario');
 assert.equal(run("generate(['B204',extra]).subj.some(s=>s.k==='B204')"),false,'Sin elección el generador no fija la materia');
 // Elegir este periodo y ETS persiste; ETS conserva el adeudo y excluye grupos en los tres modos.
@@ -106,3 +109,26 @@ run('perMetaBase=metaAnterior;for(const k in T)delete T[k];PLAN_CACHE=null');
 run("const libre=Object.keys(cur()).find(k=>!tr().done.includes(k)&&!tr().curso.includes(k)&&!tr().fail.includes(k)&&!tr().want.includes(k));conPlan(()=>toggleBox0(libre),1);conPlan(()=>toggleBox0(libre),0)");
 assert.equal(run('planAsignado(libre)'),1);
 console.log('OK DESF2/DESF3: sin asignación automática, tres elecciones, persistencia, adelanto, ETS, generador y plazo.');
+
+// Perfiles ficticios 3 y 4: la presentación y la validación usan el mismo plazo.
+for(const archivo of ['adeuda-telematica.json','desfase-dictamen-bionica.json']){
+  c.perfilPrueba=JSON.parse(leer('data/perfiles-prueba/'+archivo));
+  c.cur=()=>datos.mapas[c.perfilPrueba.carrera].cur;
+  run('ALUMNO=structuredClone(perfilPrueba);S.car=perfilPrueba.carrera;for(const k in T)delete T[k];PLAN_CACHE=null');
+  const claves=Array.from(run('tr().adeudos'));
+  assert.ok(claves.length>0,archivo);
+  for(const k of claves){
+    const html=run(`desfaseAcciones('${k}')`),valida=run(`desfaseSiguiente('${k}')`);
+    assert.equal(html.includes('data-opcion="siguiente"'),valida,archivo+': '+k);
+    assert.doesNotMatch(html,/disabled/);
+    const motivo=html.match(/class="sate-aviso-materia__motivo">([^<]+)</)[1];
+    assert.ok(motivo.split(/\s+/).length<=20,archivo+': motivo breve para '+k);
+    if(!valida)assert.equal(run(`elegirDesfase('${k}','siguiente')`),false);
+  }
+  assert.equal((run('desfaseAvisos()').match(/class="sate-aviso-materia"/g)||[]).length,claves.length);
+  assert.equal(run('desfaseAvisos(new Set(tr().adeudos))'),'','Horarios omite las materias con aviso en la oferta');
+}
+const seguro=c.SateUI.avisoMateria({clave:'<x>',nombre:'<img src=x onerror=1>',estado:'"estado"',motivo:'<script>',acciones:[{opcion:'"x',texto:'<b>'}]});
+assert.doesNotMatch(seguro,/<img|<script>|<b>/);
+assert.match(seguro,/&lt;img/);
+console.log('OK R2-PER: perfiles 3/4, motivo por materia, acciones válidas, límite de 20 palabras y escape HTML.');

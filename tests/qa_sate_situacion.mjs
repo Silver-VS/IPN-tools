@@ -117,7 +117,10 @@ vm.runInContext(`{
 }`,c);
 mostrar();
 assert.equal(box.querySelector('.sate-aviso').getAttribute('data-estado'),'error');
-assert.match(box.querySelector('.sate-aviso').textContent,/Desfase y dictamen/);
+assert.match(box.querySelector('.sate-aviso').textContent,/Revisa las materias por resolver/);
+assert.match(box.querySelector('.trayectoria-materias').innerHTML,/class="sate-aviso-materia__motivo"/);
+assert.equal(box.querySelector('.trayectoria-minimapa').parent,box,'El minimapa y la orientación comparten retícula');
+assert.equal(box.querySelector('.trayectoria-decisiones').parent,box,'Las decisiones ocupan su propia fila');
 assert.equal(vm.runInContext('CALAP.dictamen',c),true);
 assert.ok(!config.unidades.escom.pestanas.includes('situacion'));assert.ok(!config.unidades.upibi.pestanas.includes('situacion'));
 assert.ok(document.getElementById('sate-avisos-globales').querySelectorAll('.sate-chip').length>0);
@@ -154,3 +157,42 @@ pendiente=desdeLista.onclick();assert.equal(dlg.open,true);assert.equal(pdfsGene
 dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
 assert.equal(pdfsGenerados,2);assert.equal(document.activeElement,desdeLista);
 console.log('Descarga: modal real accesible, Cancelar/Esc sin generación, foco restaurado y aceptación desde asistente/lista.');
+
+// R2-PER: casos 1–4, sin huecos reservados para una lista de decisiones vacía.
+for(const archivo of ['primer-ingreso-bionica.json','regular-mecatronica.json','adeuda-telematica.json','desfase-dictamen-bionica.json']){
+  c.perfilR2=JSON.parse(leer('data/perfiles-prueba/'+archivo));
+  vm.runInContext('ALUMNO=perfilR2;S.car=perfilR2.carrera;SIM.on=false;for(const k in T)delete T[k];PLAN_CACHE=null',c);
+  SATE.actual.pestana='trayectoria';mostrar();
+  const n=vm.runInContext('tr().adeudos.length',c),decisiones=box.querySelector('.trayectoria-decisiones');
+  assert.equal(!!decisiones,n>0,archivo+': solo se crea la sección si tiene materias por resolver');
+  assert.ok(box.querySelector('.trayectoria-orientacion'),archivo+': orientación agrupada');
+  if(n){
+    const html=box.querySelector('.trayectoria-materias').innerHTML;
+    assert.equal((html.match(/class="sate-aviso-materia"/g)||[]).length,n,archivo);
+    assert.doesNotMatch(html,/disabled/);
+    const revisar=box.querySelector('.sate-aviso').querySelector('button');
+    revisar.click();assert.equal(document.activeElement.id,'perfil-materias-titulo',archivo+': la acción enfoca las materias');
+  }
+}
+console.log('OK R2-PER: perfiles ficticios 1–4, orientación y decisiones separadas, aviso contextual y foco en las materias.');
+
+// Oferta y generador reales: cada adeudo se explica una sola vez, con o sin grupos visibles.
+vm.runInContext(leer('web/dist/sate/horarios.js'),c,{filename:'horarios.js'});
+for(const archivo of ['adeuda-telematica.json','desfase-dictamen-bionica.json']){
+  c.perfilR2=JSON.parse(leer('data/perfiles-prueba/'+archivo));
+  vm.runInContext(`ALUMNO=perfilR2;S.car=perfilR2.carrera;for(const k in T)delete T[k];PLAN_CACHE=null;
+    S.per='actual';S.onlyWant=false;S.hideDone=false;S.hide=false;S.fit=false;S.q='';S.tur='*';S.niv='*';S.gavoid=[];
+    DATA.asig=tr().adeudos.map(k=>cur()[k][0]);
+    DATA.periodos.actual=tr().adeudos.flatMap((k,i)=>[0,1].map(j=>[S.car,'M',1,'F'+j,i,[],[[j,480,540]],cur()[k][1],k,'O']));actualizarOferta();`,c);
+  const n=vm.runInContext('tr().adeudos.length',c);
+  for(const vista of ['materia','grupo']){
+    vm.runInContext(`S.view='${vista}';renderOffer()`,c);
+    const oferta=document.getElementById('offer').innerHTML;
+    assert.equal((oferta.match(/class="sate-aviso-materia"/g)||[]).length,n,archivo+': un aviso por materia en vista '+vista);
+    assert.equal(document.getElementById('hor-desfase').innerHTML,'',archivo+': sin duplicar los avisos visibles');
+  }
+  vm.runInContext("S.q='busqueda-sin-coincidencias';renderOffer();S.gen=null;renderGen()",c);
+  assert.equal((document.getElementById('hor-desfase').innerHTML.match(/class="sate-aviso-materia"/g)||[]).length,n,archivo+': un filtro no oculta las decisiones');
+  assert.equal(document.getElementById('genres').innerHTML,'','El generador no duplica los avisos');
+}
+console.log('OK R2-PER Horarios: oferta por materia/grupo, grupos repetidos, filtros y generador sin duplicación (perfiles 3/4).');
