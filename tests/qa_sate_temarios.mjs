@@ -51,7 +51,7 @@ function contexto(extra = {}) {
     }, ...extra});
   vm.runInContext('window=globalThis', c);
   const crear = document.createElement.bind(document);
-  document.createElement = tag => { const n = crear(tag); if (tag === 'dialog') { n.showModal = () => { n.open = true; }; n.close = () => { n.open = false; }; } return n; };
+  document.createElement = tag => { const n = crear(tag); n.style.setProperty = (k, v) => { n.style[k] = v; }; if (tag === 'dialog') { n.showModal = () => { n.open = true; }; n.close = () => { n.open = false; }; } return n; };
   document.createElementNS = (ns, tag) => document.createElement(tag);
   document.contains = n => document.documentElement.contains(n);
   c.innerHeight = 800; c.addEventListener = () => {};
@@ -323,6 +323,9 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(portada.querySelector('#gd-res').hidden, true);
   // Tres vistas: «Trayectoria escolar» (por omisión), «Líneas de aprendizaje» y «Especializaciones»; la ficha se abre en un diálogo
   const exp = portada.querySelector('#gd-explorar');
+  assert.equal(portada.querySelector('#gd-consultar-titulo'), null, 'el buscador no repite un título y un párrafo');
+  assert.equal(portada.querySelector('label[for=gd-q]').textContent, textos['sate.guia.buscar_etiqueta'], 'etiqueta visible del control');
+  assert.equal(q.getAttribute('placeholder'), 'Nombre o clave');
   assert.ok(exp, 'sección del explorador');
   assert.equal(exp.querySelector('#gd-carrera').value, 'bionica');
   const modos = portada.querySelectorAll('.sate-segmentado button');
@@ -374,6 +377,12 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(portada.querySelector('.gd-esp').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true);
   assert.equal(portada.querySelectorAll('.gd-esp-linea').length, 6);
   assert.equal(portada.querySelectorAll('.gd-esp-area').length, 3);
+  const nucleoMapa = JSON.parse(leer('web/dist/sate/datos/upiita/nucleo.json'));
+  const areasMapa = [...new Set(nucleoMapa.mapas.B.lineas.map(l => l.area))];
+  for(const [i,l] of indice.carreras.bionica.lineas.entries()){
+    assert.equal(l.color, nucleoMapa.areaColores[areasMapa.indexOf(l.area) % nucleoMapa.areaColores.length], 'misma paleta y orden de las pestañas del Mapa');
+    assert.equal(portada.querySelectorAll('.gd-esp-linea')[i].style['--ipn-linea-especializacion'], l.color, 'acento compilado en la especialización');
+  }
   const chipEsp = portada.querySelector('.gd-esp-linea .gd-chip');
   assert.ok(/^B/.test(chipEsp.getAttribute('data-clave')));
   chipEsp.click(); await dormir(30);

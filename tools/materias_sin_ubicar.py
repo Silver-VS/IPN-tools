@@ -43,6 +43,11 @@ def diagnostico(nucleo, oferta):
     return resultado
 
 
+def optativas_sin_linea(mapa):
+    """Solo optativas del catálogo con un espacio compatible del plan, sin línea ni caja propia."""
+    return [k for k, estado in clasificar(mapa).items() if estado == 'sin_selector']
+
+
 def main():
     texto = ['# Materias sin ubicar en el mapa', '',
              '## 1. Criterio y reproducción', '',

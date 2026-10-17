@@ -6,6 +6,7 @@ const leer=p=>readFileSync(p,'utf8');
 const core=leer('web/sate/nucleo.js'), mapa=leer('web/sate/mapa.js');
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 let carreras=0, casos=0;
+const perfiles=JSON.parse(leer('data/perfiles-prueba/indice.json')).perfiles.filter(p=>[1,2,5].includes(p.caso));
 for(const unidad of ['upiita','escom','upibi']){
   const data=JSON.parse(leer(`web/dist/sate/datos/${unidad}/nucleo.json`));
   const oferta=JSON.parse(leer(`web/dist/sate/datos/${unidad}/oferta.json`));
@@ -28,15 +29,18 @@ for(const unidad of ['upiita','escom','upibi']){
     vm.runInContext(core.slice(core.indexOf('function toggleBox('),core.indexOf('/* ---------- eventos')),c);
     for(const per of ['actual','proximo']){
       S.per=per;c.renderSinUbicar();
-      const off=c.offeredClaves(), visibles=m.sinUbicar.filter(k=>off.has(k));casos+=visibles.length;
-      assert.equal($('#sin-ubicar').hidden,visibles.length===0,`${unidad}/${car}/${per}: visibilidad`);
-      const html=$('#sin-ubicar-materias').innerHTML;
+      const off=c.offeredClaves(), visibles=m.optativasSinLinea.filter(k=>off.has(k));casos+=visibles.length;
+      assert.equal($('#optativas-sin-linea').hidden,visibles.length===0,`${unidad}/${car}/${per}: visibilidad`);
+      const html=$('#optativas-sin-linea-materias').innerHTML;
+      for(const k of m.sinUbicar.filter(k=>!m.optativasSinLinea.includes(k))){
+        assert.ok(!html.includes(`data-fwant="${k}"`),`${k}: no inventa un lugar en el plan`);
+      }
       for(const k of visibles){
         assert.match(html,new RegExp(`data-fwant="${k}"`),`${unidad}/${car}/${per}/${k}: selección`);
         assert.ok(html.includes(m.cur[k][0]));
         assert.ok(html.includes(`Requisitos de ${k}`));
         c.toggleBox(k);assert.ok(estado.want.includes(k),`${k}: elegida por toggleBox real`);
-        assert.ok($('#sin-ubicar-materias').innerHTML.includes('Quitar de mi plan'));
+        assert.ok($('#optativas-sin-linea-materias').innerHTML.includes('Quitar de mi plan'));
         c.toggleBox(k);assert.ok(!estado.want.includes(k),`${k}: quitar`);
       }
       for(const b of m.layout?.boxes||[])if(b[4])assert.ok(!m.sinUbicar.includes(b[4]),`${b[4]} ya tiene caja`);
@@ -45,14 +49,29 @@ for(const unidad of ['upiita','escom','upibi']){
         assert.ok(visibles.includes('B307'),'b307 normalizada y accesible en ambos periodos');
         const fill=c.slotFill(m.layout,new Set(['B307']));
         assert.ok([...fill.values()].some(v=>v.k==='B307'),'slotFill sí admite B307 después de elegirla');
-        estado.done=['B307'];c.renderSinUbicar();assert.match($('#sin-ubicar-materias').innerHTML,/data-fwant="B307"[^>]*disabled/);
+        estado.done=['B307'];c.renderSinUbicar();assert.match($('#optativas-sin-linea-materias').innerHTML,/data-fwant="B307"[^>]*disabled/);
         c.toggleBox('B307');assert.ok(!estado.want.includes('B307'),'no vuelve a elegir acreditadas');estado.done=[];
       }
     }
     S.per='actual';estado.curso=[...m.sinUbicar];c.renderSinUbicar();
     for(const k of m.sinUbicar)c.toggleBox(k);
     assert.equal(estado.want.length,0,'no selecciona las materias en curso');
+    if(unidad==='upiita')for(const p of perfiles.filter(p=>p.carrera===car)){
+      const perfil=JSON.parse(leer('data/perfiles-prueba/'+p.archivo));
+      estado.done=perfil.acreditadas.map(f=>f[0]);estado.curso=perfil.en_curso;estado.want=[];
+      c.renderSinUbicar();
+      for(const k of m.optativasSinLinea.filter(k=>c.offeredClaves().has(k))){
+        c.toggleBox(k);
+        assert.equal(estado.want.includes(k),!estado.done.includes(k)&&!estado.curso.includes(k),`${p.id}/${k}: respeta el estado del perfil ficticio`);
+      }
+    }
   }
 }
-assert.match(leer('web/sate/cascaron.html'),/<details[^>]*id="sin-ubicar"[^>]*hidden>/,'plegado y oculto al iniciar');
-console.log(`OK sin ubicar: ${carreras} carreras/planes, ${casos} casos por periodo; selección, grupos, requisitos y espacios reales.`);
+const cascaron=leer('web/sate/cascaron.html');
+assert.ok(!cascaron.includes('id="sin-ubicar"'),'sin sección ajena al plan');
+assert.match(cascaron, /id="lineas-card"[\s\S]*?<section[^>]*id="optativas-sin-linea"[^>]*hidden>/,'grupo dentro de optativas, oculto sin oferta');
+const css=leer('web/sate/componentes.css').split('/* R2-MAP:')[1];
+assert.match(css, /#v-tray \.below\{grid-template-columns:minmax\(0,1fr\)/,'sin columna vacía junto a seriación');
+assert.match(css, /#v-tray \.lvls\{display:grid;grid-template-columns:repeat\(auto-fit/,'los niveles se redistribuyen en vez de estirar sus barras');
+assert.match(css, /#v-tray \.plan-bandeja\{margin-top:var\(--ipn-esp-7\)\}/,'misma separación al alcanzar el final');
+console.log(`OK optativas sin línea: ${carreras} carreras/planes, ${casos} casos por periodo; selección, grupos, requisitos y espacios reales.`);

@@ -344,7 +344,7 @@ const cabeceraDis5=css.match(/\.wrap>header\.top\{([^}]+)\}/)[1];
 for(const d of ['border:0','background:transparent','box-shadow:none'])assert.ok(cabeceraDis5.includes(d),d);
 assert.doesNotMatch(cabeceraDis5,/border-top:/);
 assert.match(css,/\[id\^="sate-tab-2-"\]\[role=tabpanel\][^{]*\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
-const movilDis5=css.slice(css.lastIndexOf('@media(max-width:639px)'));
+const movilDis5=css.slice(css.lastIndexOf('@media(max-width:639px)',css.lastIndexOf('.brand h1#sate-titulo')));
 assert.match(movilDis5,/\.brand h1#sate-titulo\{[^}]*flex-wrap:nowrap;white-space:nowrap/,'DIS7: marca móvil en un renglón');
 assert.match(movilDis5,/grid-template-areas:"t l";[^}]*white-space:nowrap/,'DIS7: ayuda en la fila de la marca');
 assert.match(css,/#g-n\{display:flex;flex-wrap:wrap;min-width:0;max-width:100%\}/,'DIS7: paginador adaptable al ancho disponible');

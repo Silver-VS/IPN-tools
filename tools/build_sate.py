@@ -824,9 +824,10 @@ def main(solo_datos=False):
                     extra.setdefault(c[0], {})[syn[key]] = [asig[c[4]], 0.0, c[2], "O"]
                 c[8], c[7], c[9] = syn[key], 0.0, "O"
     data["mapas"] = load_maps(d, upiita, extra)
-    from materias_sin_ubicar import clasificar
+    from materias_sin_ubicar import clasificar, optativas_sin_linea
     for car, mapa in data['mapas'].items():
         mapa['sinUbicar'] = [k for k, estado in clasificar(mapa).items() if estado in ('sin_ubicar', 'sin_selector')]
+        mapa['optativasSinLinea'] = optativas_sin_linea(mapa)
     # salones: PDF de horarios por aula de la unidad (tools/salones.py). La captura del SAES no trae el ciclo:
     # cada PDF se aplica a la oferta (actual o próxima) con la que mejor cruza, si cubre al menos el 70 %.
     import salones
@@ -1027,7 +1028,11 @@ def escribir_temarios(data, datos):
                 materias[clave]["r"] = [x for x in directos[clave] if x in cur]
         orden = {c[0]: i for i, c in enumerate(layout.get("cols", []))}
         columnas.sort(key=lambda a: orden.get(a["nombre"], 99))
-        lineas = [{"area": l.get("area"), "linea": l.get("linea"), "claves": [k for k in l.get("claves", []) if k in cur]}
+        # renderLineas asigna la paleta por el primer orden de áreas de las líneas, no por columna del mapa.
+        areas_lineas = list(dict.fromkeys(l.get("area") for l in mapa.get("lineas", [])))
+        lineas = [{"area": l.get("area"), "linea": l.get("linea"),
+                   "color": CATS["paleta"][areas_lineas.index(l.get("area")) % len(CATS["paleta"])],
+                   "claves": [k for k in l.get("claves", []) if k in cur]}
                   for l in mapa.get("lineas", []) if l.get("claves")]
         carreras[d["carrera"]] = {"letra": letra, "nombre": nombre_propio(data["carreras"].get(letra, d["carrera"])),
                                   "plan": d["plan"], "total": len(salida), "areas": columnas, "lineas": lineas}

@@ -430,8 +430,8 @@
     }
     const elegir = h('button', { type: 'button', 'class': 'btn', texto: t('temarios.selector.abrir') });
     elegir.addEventListener('click', () => abrirSelector({ carrera: carreraPropia() }));
-    return h('section', { 'class': 'guia-buscar', 'aria-labelledby': 'gd-consultar-titulo' }, [
-      h('div', {}, [h('h3', { id: 'gd-consultar-titulo', texto: t('sate.guia.consultar_titulo') }), h('p', { 'class': 'guia-resumen', texto: t('sate.guia.consultar_texto') })]),
+    return h('section', { 'class': 'guia-buscar', 'aria-label': t('sate.guia.consultar_titulo') }, [
+      h('label', { 'class': 'tmr-campo', for: 'gd-q', texto: t('sate.guia.buscar_etiqueta') }),
       buscar.raiz, aviso, res, h('div', {}, [elegir])]);
   }
   // Programas de estudio con tres vistas (trayectoria escolar, líneas de aprendizaje, especializaciones). Elegir una materia abre su ficha
@@ -501,8 +501,12 @@
       for (const l of lineas) { if (!porArea.has(l.area)) porArea.set(l.area, []); porArea.get(l.area).push(l); }
       if (!porArea.size) { esp.replaceChildren(h('p', { 'class': 'tmr-nota', texto: t('sate.guia.esp_vacia') })); return; }
       esp.replaceChildren(...[...porArea].map(([area, ls]) => h('div', { 'class': 'gd-esp-area' }, [h('h4', { texto: area }),
-        ...ls.map(l => h('div', { 'class': 'gd-esp-linea' }, [h('small', { texto: l.linea }),
-          h('ul', {}, l.claves.filter(k => ind.materias[k]).map(k => h('li', {}, [chip({ clave: k }, 'gd-chip--esp', [h('span', { texto: ind.materias[k].n }), h('small', { texto: k })])])))]))])));
+        ...ls.map(l => {
+          const linea = h('div', { 'class': 'gd-esp-linea' }, [h('small', { texto: l.linea }),
+            h('ul', {}, l.claves.filter(k => ind.materias[k]).map(k => h('li', {}, [chip({ clave: k }, 'gd-chip--esp', [h('span', { texto: ind.materias[k].n }), h('small', { texto: k })], l.color)])))]);
+          if (l.color && linea.style?.setProperty) linea.style.setProperty('--ipn-linea-especializacion', l.color);
+          return linea;
+        })])));
     }
     function pintar() {
       seg.fijar(G.modo);

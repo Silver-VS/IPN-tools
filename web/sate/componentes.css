@@ -954,3 +954,48 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
 .mapwrap{padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7));scroll-padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7))}
 body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
 body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+
+/* R2-MAP: ritmo del Mapa, cabeceras compartidas y equilibrio del Calendario. */
+/* Seriación tiene su propio renglón: no queda media retícula vacía antes de las optativas. */
+#v-tray .below{grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-7);margin-top:var(--ipn-esp-7)}
+#v-tray .below>.card{min-width:0}
+#v-tray .lvls{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:var(--ipn-esp-3) var(--ipn-esp-5)}
+#v-tray .lvl-intro{grid-column:1/-1}
+#v-tray .lvl:first-of-type{border-top:1px solid var(--ipn-linea)}
+#v-tray .lvl-req{padding-left:0}
+#v-tray .plan-bandeja{margin-top:var(--ipn-esp-7)}
+#v-tray .ol-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
+.optativas-sin-linea{margin-top:var(--ipn-esp-5);padding-top:var(--ipn-esp-5);border-top:1px solid var(--ipn-linea)}
+.optativas-sin-linea[hidden]{display:none}
+.optativas-sin-linea h4{margin:0 0 var(--ipn-esp-1);font-size:var(--ipn-tamano-m);font-weight:600}
+.optativas-sin-linea p{margin:0 0 var(--ipn-esp-3);max-width:68ch;font-size:var(--ipn-tamano-s)}
+.optativas-sin-linea-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr));gap:var(--ipn-esp-3)}
+.optativas-sin-linea-materia{min-width:0;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);overflow-wrap:anywhere}
+.optativas-sin-linea-materia.want{border-color:var(--ipn-acento)}
+.optativas-sin-linea-materia>small{display:block;margin:var(--ipn-esp-2) 0;color:var(--ipn-tenue)}
+.optativas-sin-linea-materia details{margin-top:var(--ipn-esp-3)}
+.optativas-sin-linea-materia :is(button,summary){min-height:44px}
+.guia .guia-cab{gap:var(--ipn-esp-1)}
+.guia .guia-cab>.sate-migas{margin-bottom:var(--ipn-esp-3)}
+.guia .guia-cab>h2,.tmr .tmr-ficha-enc h2{font-size:var(--ipn-tamano-xl);font-weight:700;line-height:1.25}
+.guia .guia-cab>p{margin:0;max-width:68ch;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.tmr .guia-buscar{row-gap:var(--ipn-esp-2)}
+.guia .gd-explorar-enc h3{font-size:var(--ipn-tamano-l);font-weight:700;line-height:1.25}
+.tmr .tmr-ficha-enc p{margin-top:var(--ipn-esp-1)}
+.tmr .gd-esp{grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr))}
+.tmr .gd-esp-area>h4{border-bottom-color:var(--ipn-linea);font-size:var(--ipn-tamano-m)}
+.tmr .gd-esp-linea{border-top:var(--ipn-esp-1) solid var(--ipn-linea-especializacion,var(--ipn-linea))}
+/* El color identifica la línea; el texto conserva el contraste semántico en ambos temas. */
+.tmr .gd-esp-linea .gd-chip--esp{border-inline-start:var(--ipn-esp-1) solid var(--ipn-linea-especializacion,var(--ipn-linea))}
+#sate-calendario .calendario-arriba{grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--ipn-esp-5);margin-bottom:var(--ipn-esp-7);align-items:stretch}
+#sate-calendario .calendario-arriba>.calendario-tarjeta{padding:var(--ipn-esp-5);background:var(--ipn-hundido);border-radius:var(--ipn-radio)}
+#sate-calendario .calendario-estado{grid-template-columns:minmax(0,1fr);align-content:center;gap:var(--ipn-esp-5)}
+#sate-calendario .calendario-semana{gap:var(--ipn-esp-1)}
+#sate-calendario .calendario-mes-chico{min-width:0}
+@media(max-width:1023px){
+  #sate-calendario .calendario-arriba{grid-template-columns:minmax(0,1fr)}
+  #sate-calendario .calendario-abajo{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:639px){
+  #sate-calendario .calendario-arriba>.calendario-tarjeta{padding:var(--ipn-esp-3)}
+}
