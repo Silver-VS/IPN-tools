@@ -8,9 +8,35 @@
   const CAMPOS = ['todo', 'titulo', 'autor', 'tema'];
   // El OCR mezcla APA, comillas y listas separadas por coma o punto y coma.
   // Solo se descarta el prefijo de autor cuando hay un delimitador reconocible.
+  const EDITORIAL = /\b(?:pearson|mc\.?\s*-?\s*graw|mcgraw|wiley|springer|prentice|thomson|cengage|limusa|alfaomega|alfa\s*omega|oxford|cambridge|addison|elsevier|paraninfo|trillas|dover|crc|taylor|academic press|artech|apress|siam|mir|editorial|ediciones|publishing|publishers|press|interamericana|learning|hall)\b/i;
+  const PAIS = /^(?:m[eé]xico|espa[nñ]a|usa|u\.s\.a\.?|uk|estados unidos|colombia|argentina|india|england|germany|great britain|netherlands|canad[aá])\b/i;
+  const EDICION = /\s*[\(\[]?\s*(?:\d+\s*(?:[.ªºa-z°]{0,4})\s*\.?\s*(?:edici[oó]n|edition|ed\b\.?)|(?:primera|segunda|tercera|cuarta|quinta|sexta|s[eé]ptima|octava|novena|first|second|third|fourth|fifth|\d+(?:ra|da|er|era|ma|a))\s*(?:edici[oó]n|edition|ed\b\.?)|\d+\s*(?:ª|º|°)\s*(?:ed\b\.?)?)\s*[\)\]]?/giu;
+  const AUTOR = /^[\p{Lu}][\p{L}'-]+(?:\s+[\p{Lu}][\p{L}'-]+)?,?\s+(?:\p{Lu}\.\s*){1,3}$|^[\p{Lu}][\p{L}'-]+,\s+\p{Lu}$|^(?:\p{Lu}\.\s*){1,3}\s*[\p{Lu}][\p{L}'-]+$/u;
+  const esMalo = c => !c || !/\p{L}{3}/u.test(c) || EDITORIAL.test(c) && c.split(/\s+/).length <= 4 || AUTOR.test(c.trim()) || PAIS.test(c) ||
+    /^(?:disponible|www\.|http)/i.test(c) || /^[\p{Lu}\s.,&]+$/u.test(c) && c.split(/\s+/).length <= 3 && /,/.test(c);
+  // Limpia un candidato: viñetas, ediciones, paréntesis sin cerrar, «, País: Editorial» y signos sueltos.
+  function limpiarTitulo(t) {
+    let s = String(t || '').replace(/^[\s•*·\-–—]*\d{1,2}[.)]\s+/, '').replace(/^[\s•*·\-–—,;.:]+/, '');
+    s = s.replace(EDICION, ' ').replace(/\(\s*\)|\[\s*\]/g, ' ').replace(/\s+([,;.])/g, '$1').replace(/([,;.])(?:\s*[,;.])+/g, '$1');
+    s = s.replace(/[,;.]\s*(?:[\p{L} ]{2,25}:\s*)?(?:ed\.?|editorial|ediciones)\b.*$/iu, '');
+    s = s.replace(/[,;.:]?\s*\b(?:m[eé]xico|espa[nñ]a|usa|u\.s\.a|uk|estados unidos|colombia|argentina|india|england|germany|great britain|netherlands|canad[aá]|madrid|barcelona|mosc[uú])\b.*$/iu, '');
+    s = s.replace(/[,;.]\s*(?:USA|U\.S\.A\.?)\b.*$/, '');
+    s = s.replace(new RegExp('(?:[,;]|\\s+Ed\\.?\\s)\\s*[^,;]*' + EDITORIAL.source + '.*$', 'i'), '').replace(/\(\s*coord\.?\s*\)|^\s*(?:et\.?\s*)?al\.?,\s*/gi, '').replace(/\s*;.*$/, '').replace(/\*+$/, '').replace(/\s+/g, ' ');
+    if ((s.match(/\(/g) || []).length > (s.match(/\)/g) || []).length) s = s.replace(/\s*\([^)]*$/, '');
+    if ((s.match(/\)/g) || []).length > (s.match(/\(/g) || []).length) s = s.replace(/^[^(]*\)\s*/, '');
+    return s.replace(/\s+Ed\.?$/, '').replace(/^[\s,;.:&\-–]+|[\s,;.:&\-–]+$/g, '').trim();
+  }
+  // Segmentos de una referencia separados por coma, punto y coma o punto; se elige el más parecido a un título.
+  function mejorSegmento(original) {
+    const sinFecha = original.replace(/\((?:18|19|20)\d{2}[a-z]?\)/g, ',').replace(/\b(?:ISBN|ISSN)\b.*$/i, '');
+    const partes = sinFecha.split(/\s*[;,]\s*|\.\s+/).map(limpiarTitulo).filter(p => p && !esMalo(p) && !/^\d/.test(p) && !/p[aá]gs?\b/i.test(p));
+    let mejor = '';
+    for (const p of partes) if (p.split(/\s+/).length > mejor.split(/\s+/).filter(Boolean).length) mejor = p;
+    return mejor;
+  }
   function tituloDeReferencia(texto) {
     const original = String(texto == null ? '' : texto).replace(/\s+/g, ' ').trim();
-    const citado = original.match(/[“"]([^”"]+)[”"]/);
+    const citado = original.match(/[“"«]([^”"»]+)[”"»]/);
     const fecha = original.match(/\((?:18|19|20)\d{2}[a-z]?\)\.?\s*(.+)/i);
     let s = citado ? citado[1] : fecha ? fecha[1] : original;
     if (!citado && !fecha) {
@@ -27,9 +53,25 @@
     if (!citado) s = s.split(/\.\s+/)[0];
     s = s.replace(/\b(?:ISBN|ISSN)\b.*$/i, '')
       .replace(/(?:[,;]\s*|\s+)(?:(?:\d+(?:[.ªºa-z]+)?|primera|segunda|tercera|cuarta|quinta|sexta|séptima|octava|novena)\s*(?:edici[oó]n|edition|ed\b)|editorial\b|edit\.|ed\.|Mc\.?\s*Graw|Prentice\b|Pearson\b).*$/i, '')
-      .replace(/\b(?:18|19|20)\d{2}\b.*$/, '').replace(/[.;,\s–-]+$/, '').trim();
-    // Conservar conectores y subtítulos; ocho palabras acotan la consulta sin inventar términos.
-    return (s && /\p{L}{3}/u.test(s) ? s : original).split(/\s+/).slice(0, 8).join(' ');
+      .replace(/\b(?:18|19|20)\d{2}\b.*$/, '');
+    s = limpiarTitulo(s);
+    if (esMalo(s)) s = mejorSegmento(original) || s;
+    // Conservar conectores y subtítulos; ocho palabras acotan el título mostrado.
+    if (s && s.split(/\s+/).length === 1) {
+      const alterno = mejorSegmento(original);
+      if (alterno.split(/\s+/).length >= 2) s = alterno;
+    }
+    let corto = (s && /\p{L}{3}/u.test(s) ? s : original).split(/\s+/).slice(0, 8).join(' ');
+    if ((corto.match(/\(/g) || []).length > (corto.match(/\)/g) || []).length) corto = corto.replace(/\s*\([^)]*$/, '');
+    return corto.replace(/[\s,;:.&–-]+$/, '');
+  }
+  const VACIAS = new Set('de del la las los el y e en para por con a an the of and for to in on with su sus un una al o u que como sobre desde'.split(' '));
+  // Término de consulta para el catálogo: 4–5 palabras significativas del título (antes de «:» o «.»),
+  // porque el catálogo del IPN responde mal a títulos largos completos.
+  function consultaDeReferencia(titulo, maximo) {
+    const base = String(titulo == null ? '' : titulo).split(/[:.]/)[0];
+    const palabras = (base.match(/[\p{L}\p{N}]+/gu) || []).filter(w => w.length > 2 && !VACIAS.has(w.toLowerCase()));
+    return palabras.slice(0, maximo || 5).join(' ');
   }
   // URL de un buscador: el término se codifica con encodeURIComponent; sin término se abre la portada del buscador.
   // op: {campo: 'todo'|'titulo'|'autor'|'tema', biblioteca: código de la biblioteca de la unidad (solo el catálogo lo filtra)}
@@ -42,11 +84,12 @@
     let u = fuente.url
       .replace('{termino}', encodeURIComponent((campo.prefijo || '') + q))
       .replace('{campo}', encodeURIComponent(campo.codigo || ''));
+    if (op.adyacente && fuente.adyacente) u += fuente.adyacente;
     if (op.biblioteca && fuente.filtroUnidad) u += fuente.filtroUnidad.replace('{biblioteca}', encodeURIComponent(op.biblioteca));
     return u;
   }
   const destinos = (fuentes, termino, op) => (fuentes || []).map(f => ({ id: f.id, titulo: f.titulo, descripcion: f.descripcion, aviso: f.aviso || null, href: url(f, termino, op) }));
-  raiz.SateBibliotecas = { CAMPOS, url, destinos, tituloDeReferencia };
+  raiz.SateBibliotecas = { CAMPOS, url, destinos, tituloDeReferencia, consultaDeReferencia };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -68,7 +111,7 @@
     const catalogo = (SATE_CONFIG.bibliotecas || []).find(f => f.id === 'catalogo');
     return h('li', { 'class': 'sate-biblio__referencia' }, [
       h('span', { texto }), catalogo && titulo ? h('a', { 'class': 'sate-btn sate-btn--chico',
-        href: url(catalogo, titulo, { campo: 'titulo' }), target: '_blank', rel: 'noopener',
+        href: url(catalogo, consultaDeReferencia(titulo) || titulo, { campo: 'titulo', adyacente: true }), target: '_blank', rel: 'noopener',
         'aria-label': t('sate.biblio.disponibilidad_titulo', { titulo }), texto: t('sate.biblio.disponibilidad') }) : null]);
   }
   raiz.SateBibliotecas.referencia = referencia;

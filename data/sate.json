@@ -226,6 +226,7 @@
       "titulo": "sate.guia.biblio_catalogo",
       "descripcion": "sate.guia.biblio_catalogo_texto",
       "url": "https://www.busqueda.dirbibliotecas.ipn.mx/F/?func=find-b&request={termino}&find_code={campo}",
+      "adyacente": "&adjacent=N",
       "campos": {
         "todo": {
           "codigo": "WRD"
