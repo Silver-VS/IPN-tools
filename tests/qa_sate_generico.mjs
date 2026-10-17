@@ -323,10 +323,11 @@ const componentes=leer('web/sate/componentes.js'), desempeno=leer('web/sate/dese
   UI.cuadriculaHorario(propios,{...op,soloLectura:true});assert.doesNotMatch(cal.innerHTML,/data-own|data-gap|role="button"/);
   for(const nombre of ['cajaMateria','cuadriculaHorario'])assert.ok(generico.includes('SateUI.'+nombre),nombre+' compartido');
 }
-for(const componente of ['indicadoresTrayectoria','fichasKardex','caminoTrayectoria','leyendaGrafica']){
+for(const componente of ['indicadoresTrayectoria','caminoTrayectoria','leyendaGrafica']){
   assert.ok(componentes.includes('function '+componente));
   assert.ok(desempeno.includes('SateUI.'+componente));assert.ok(generico.includes('SateUI.'+componente));
 }
+assert.ok(componentes.includes('function fichasKardex')&&generico.includes('SateUI.fichasKardex'),'Kárdex genérico conserva sus fichas');
 assert.match(css,/\[data-sate-generico\] #v-tray[^}]*min-width:0;max-width:100%/);
 assert.match(css,/\[data-sate-generico\] \.mapwrap[^}]*max-width:100%;min-width:0/);
 assert.match(shell,/\.mapwrap\{[^}]*overflow:auto/);
