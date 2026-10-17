@@ -401,7 +401,7 @@
 
   /* ---------- Programas de estudio: #/<unidad>/guia/programas[/<carrera>/<clave>[/<seccion>]] ---------- */
   const P = { token: 0, clave: null };
-  const G = { carrera: null, modo: 'trayectoria', token: 0 };
+  const G = { carrera: null, modo: 'trayectoria', vista: null, token: 0 };
   const claseNivel = v => 'gd-n' + Math.min(Math.max(+v || 1, 1), 9);
   const reducido = () => !!(raiz.matchMedia && raiz.matchMedia('(prefers-reduced-motion:reduce)').matches);
 
@@ -434,7 +434,7 @@
       h('label', { 'class': 'tmr-campo', for: 'gd-q', texto: t('sate.guia.buscar_etiqueta') }),
       buscar.raiz, aviso, res, h('div', {}, [elegir])]);
   }
-  // Programas de estudio con tres vistas (trayectoria escolar, líneas de aprendizaje, especializaciones). Elegir una materia abre su ficha
+  // Programas de estudio con dos formas de explorar (trayectoria escolar; líneas y especializaciones, en metro o en matriz). Elegir una materia abre su ficha
   // única en una ventana emergente (SateUI.modal): la página no cambia de ruta ni se desplaza, y al cerrar el foco vuelve a la materia.
   async function abrirFicha(clave) {
     const k = claveNorm(clave), token = ++G.token, nombre = nombreDe(k);
@@ -455,14 +455,100 @@
       SateUI.modal(nombre, h('div', {}, [h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra]), { amplio: true });
     }
   }
+  /* Metro: una línea por área (mismo color que en el Mapa), una estación por unidad de aprendizaje y una columna por nivel.
+     Cada estación es un botón HTML sobre un lienzo con las vías en SVG; no hay panel lateral: elegirla abre la ficha. */
+  const METRO = { ancho: 148, alto: 74, caracteres: 17, tope: 4, margen: 14, arriba: 4 };
+  const subcolumnasDe = (filas, v) => Math.max(1, ...filas.map(f => Math.ceil(f.items.filter(i => i.v === v).length / METRO.tope)));
+  // Reparte las estaciones: cada nivel ocupa una o más subcolumnas de a lo más METRO.tope estaciones.
+  function distribuirMetro(filas) {
+    const niveles = [...new Set(filas.flatMap(f => f.items.map(i => i.v)))].filter(v => v != null).sort((a, b) => a - b);
+    const inicio = new Map(); let x = METRO.margen;
+    for (const v of niveles) { inicio.set(v, x); x += subcolumnasDe(filas, v) * METRO.ancho; }
+    const lineas = filas.map(f => {
+      const pos = [], altos = new Map();
+      for (const v of niveles) {
+        f.items.filter(i => i.v === v).forEach((i, k) => {
+          const sub = Math.floor(k / METRO.tope), clave = v + ':' + sub, previo = altos.get(clave) || METRO.arriba;
+          const alto = METRO.alto + 15 * Math.max(0, Math.ceil(i.n.length / METRO.caracteres) - 2);
+          altos.set(clave, previo + alto);
+          pos.push({ item: i, x: inicio.get(v) + sub * METRO.ancho + METRO.ancho / 2, y: previo });
+        });
+      }
+      return { fila: f, pos, alto: Math.max(METRO.alto, ...altos.values()) + METRO.margen };
+    });
+    return { niveles, inicio, ancho: x + METRO.margen, lineas };
+  }
+  // Vía de una línea: recorre sus estaciones con ángulos rectos, como en un plano de metro.
+  function trazoMetro(pos) {
+    let d = '';
+    pos.forEach((p, k) => {
+      const cy = p.y + 9;
+      if (!k) { d += 'M' + p.x + ' ' + cy; return; }
+      const q = pos[k - 1];
+      if (q.x === p.x) d += ' V' + cy; else d += ' H' + (q.x + p.x) / 2 + ' V' + cy + ' H' + p.x;
+    });
+    return d;
+  }
+  function pintarMetro(destino, ind, carreraId, abrirFichaDe) {
+    const car = ind.carreras[carreraId], filas = lineasDeAprendizaje(ind.materias, carreraId, car.areas);
+    const veces = new Map();   // en cuántas especializaciones aparece cada materia
+    for (const l of car.lineas || []) for (const k of new Set(l.claves)) veces.set(k, (veces.get(k) || 0) + 1);
+    const m = distribuirMetro(filas), lienzo = h('div', { 'class': 'gd-metro-lienzo' }), NS = 'http://www.w3.org/2000/svg';
+    lienzo.appendChild(h('div', { 'class': 'gd-metro-fila gd-metro-fila--enc', 'aria-hidden': 'true' }, [h('span', { 'class': 'gd-metro-quien', texto: t('sate.guia.columna_linea') }),
+      h('div', { 'class': 'gd-metro-via gd-metro-via--enc', style: 'width:' + m.ancho + 'px' }, m.niveles.map(v =>
+        h('span', { 'class': 'gd-metro-nivel', style: 'left:' + m.inicio.get(v) + 'px;width:' + subcolumnasDe(filas, v) * METRO.ancho + 'px', texto: t('temarios.lista.nivel', { n: v }) })))]));
+    for (const l of m.lineas) {
+      const f = l.fila, nombre = f.nombre || t('sate.guia.linea_otras');
+      const via = h('div', { 'class': 'gd-metro-via', style: 'width:' + m.ancho + 'px;height:' + l.alto + 'px' });
+      const svg = document.createElementNS(NS, 'svg'), tr = document.createElementNS(NS, 'path');
+      svg.setAttribute('class', 'gd-metro-trazo'); svg.setAttribute('width', String(m.ancho)); svg.setAttribute('height', String(l.alto)); svg.setAttribute('aria-hidden', 'true');
+      tr.setAttribute('d', trazoMetro(l.pos)); tr.setAttribute('class', 'gd-metro-linea'); tr.setAttribute('fill', 'none');
+      svg.appendChild(tr); via.appendChild(svg);
+      for (const p of l.pos) {
+        const i = p.item, n = veces.get(i.clave) || 0;
+        const e = h('button', { type: 'button', 'class': 'gd-estacion' + (n > 1 ? ' gd-estacion--cruce' : ''), 'data-clave': i.clave, 'aria-haspopup': 'dialog',
+          'aria-label': t('sate.guia.metro_estacion', { materia: i.n, clave: i.clave, linea: nombre, nivel: i.v }) + (n > 1 ? '. ' + t('sate.guia.metro_correspondencia', { n }) : ''),
+          style: 'left:' + (p.x - METRO.ancho / 2) + 'px;top:' + p.y + 'px;width:' + METRO.ancho + 'px' },
+          [h('span', { 'class': 'gd-estacion-punto', 'aria-hidden': 'true' }), h('small', { texto: i.clave, 'aria-hidden': 'true' }), h('span', { 'class': 'gd-estacion-nombre', texto: i.n, 'aria-hidden': 'true' })]);
+        e.addEventListener('click', () => abrirFichaDe(i.clave));
+        via.appendChild(e);
+      }
+      const fila = h('div', { 'class': 'gd-metro-fila', role: 'group', 'aria-label': nombre }, [h('div', { 'class': 'gd-metro-quien' }, [h('h4', { texto: nombre })]), via]);
+      if (f.color && fila.style && fila.style.setProperty) fila.style.setProperty('--gd-area', f.color);
+      lienzo.appendChild(fila);
+    }
+    // Al enfocar o pasar sobre una estación se resaltan las que van antes y después en la seriación.
+    const marcar = clave => {
+      lienzo.classList.toggle('gd-metro--foco', !!clave);
+      for (const e of lienzo.querySelectorAll('.gd-estacion')) {
+        const c = e.getAttribute('data-clave');
+        e.classList.toggle('gd-estacion--rel', !!clave && (c === clave || (ind.materias[clave].r || []).includes(c) || (ind.materias[c].r || []).includes(clave)));
+      }
+    };
+    const estacion = ev => ev.target && ev.target.closest && ev.target.closest('.gd-estacion');
+    for (const [entra, sale] of [['focusin', 'focusout'], ['mouseover', 'mouseout']]) {
+      lienzo.addEventListener(entra, ev => { const e = estacion(ev); if (e) marcar(e.getAttribute('data-clave')); });
+      lienzo.addEventListener(sale, ev => { if (estacion(ev)) marcar(null); });
+    }
+    const caja = h('div', { 'class': 'gd-metro-caja', role: 'region', tabindex: '0', 'aria-label': t('sate.guia.metro_etiqueta') }, [lienzo]);
+    destino.replaceChildren(caja, (car.lineas || []).length ? h('p', { 'class': 'tmr-nota gd-metro-leyenda', texto: t('sate.guia.metro_leyenda_correspondencia') }) : null);
+  }
+  const VISTA_CLAVE = 'ipnt.programasVista';
+  function vistaGuardada() {
+    try { const v = (raiz.IPNT?.almacen || raiz.localStorage).getItem(VISTA_CLAVE); if (v === 'metro' || v === 'matriz') return v; } catch (e) { /* sin almacén: se usa la vista por omisión */ }
+    return raiz.matchMedia && raiz.matchMedia('(max-width:639.98px)').matches ? 'matriz' : 'metro';   // en teléfono, la matriz
+  }
+  function guardarVista(v) { try { raiz.IPNT?.set(VISTA_CLAVE, v); } catch (e) { /* la elección solo vale en esta visita */ } }
   function explorador() {
     const ind = E.indice, ids = Object.keys(ind.carreras);
     if (!G.carrera || !ind.carreras[G.carrera]) G.carrera = carreraPropia();
+    G.vista ||= vistaGuardada();
     const selCarrera = h('select', { id: 'gd-carrera' });
     selCarrera.replaceChildren(...ids.map(id => h('option', { value: id, texto: ind.carreras[id].nombre })));
     selCarrera.value = G.carrera;
-    const tray = h('div', { 'class': 'gd-tray' }), mapa = h('div', { 'class': 'gd-mapa' }), esp = h('div', { 'class': 'gd-esp' });
-    const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria'), corto: t('sate.guia.modo_trayectoria_corto') }, { id: 'lineas', texto: t('sate.guia.modo_lineas'), corto: t('sate.guia.modo_lineas_corto') }, { id: 'esp', texto: t('sate.guia.modo_esp'), corto: t('sate.guia.modo_esp_corto') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
+    const tray = h('div', { 'class': 'gd-tray' }), lin = h('div', { 'class': 'gd-lin' }), metro = h('div', { 'class': 'gd-metro' }), mapa = h('div', { 'class': 'gd-mapa' }), esp = h('div', { 'class': 'gd-esp' });
+    const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria'), corto: t('sate.guia.modo_trayectoria_corto') }, { id: 'lineas', texto: t('sate.guia.modo_lineas'), corto: t('sate.guia.modo_lineas_corto') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
+    const vista = SateUI.segmentado({ etiqueta: t('sate.guia.vista_etiqueta'), opciones: [{ id: 'metro', texto: t('sate.guia.vista_metro') }, { id: 'matriz', texto: t('sate.guia.vista_matriz') }], valor: G.vista, alCambiar: v => { G.vista = v; guardarVista(v); pintar(); } });
     // Una materia es siempre un botón: clic, Enter o espacio abren su ficha en la ventana emergente.
     function chip(i, clase, hijos, color) {
       const b = h('button', { type: 'button', 'class': 'gd-chip ' + clase, 'data-clave': i.clave, 'aria-haspopup': 'dialog' }, hijos);
@@ -509,16 +595,21 @@
         })])));
     }
     function pintar() {
-      seg.fijar(G.modo);
-      tray.hidden = G.modo !== 'trayectoria'; mapa.hidden = G.modo !== 'lineas'; esp.hidden = G.modo !== 'esp';
-      if (G.modo === 'trayectoria') pintarTrayectoria(); else if (G.modo === 'lineas') pintarMapa(); else pintarEsp();
+      seg.fijar(G.modo); vista.fijar(G.vista);
+      tray.hidden = G.modo !== 'trayectoria'; lin.hidden = G.modo !== 'lineas';
+      metro.hidden = G.vista !== 'metro'; mapa.hidden = G.vista !== 'matriz';
+      if (G.modo === 'trayectoria') { pintarTrayectoria(); return; }
+      if (G.vista === 'metro') { pintarMetro(metro, ind, G.carrera, abrirFicha); mapa.replaceChildren(); } else { pintarMapa(); metro.replaceChildren(); }
+      pintarEsp();
     }
     selCarrera.addEventListener('change', () => { G.carrera = selCarrera.value; pintar(); });
     pintar();
     const campo = ids.length > 1 ? h('label', { 'class': 'tmr-campo gd-campo' }, [h('span', { texto: t('temarios.filtro.carrera') }), selCarrera]) : null;
+    lin.replaceChildren(h('div', { 'class': 'gd-lin-barra' }, [vista.raiz]), metro, mapa,
+      h('section', { 'class': 'gd-esp-seccion' }, [h('h3', { texto: t('sate.guia.esp_titulo') }), esp]));
     return h('section', { 'class': 'gd-explorar', id: 'gd-explorar', 'aria-labelledby': 'gd-explorar-titulo' }, [
       h('header', { 'class': 'gd-explorar-enc' }, [h('div', {}, [h('h3', { id: 'gd-explorar-titulo', texto: t('sate.guia.explorar_seccion') }), h('p', { texto: t('sate.guia.explorar_intro') })]), campo, seg.raiz]),
-      tray, mapa, esp,
+      tray, lin,
       h('p', { 'class': 'tmr-nota', texto: t('sate.guia.explorar_nota') })]);
   }
   function cabeceraPagina(migas, titulo, intro) {
