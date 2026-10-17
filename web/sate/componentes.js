@@ -367,14 +367,14 @@
       o.items.forEach(function (it, i) {
         var sel = it.id === ident, p = panelDe(it);
         botones[i].setAttribute('aria-selected', String(sel));
-        botones[i].tabIndex = sel ? 0 : -1;
+        botones[i].tabIndex = sel || it.href ? 0 : -1;
         if (p) p.hidden = !sel;
         if (sel && foco) botones[i].focus();
       });
       if (o.alCambiar) o.alCambiar(ident);
     }
     o.items.forEach(function (it, i) {
-      var b = el('button', { type: 'button', role: 'tab', class: 'sate-pestana', id: base + '-' + it.id, 'data-id': it.id });
+      var b = el(it.href ? 'a' : 'button', { type: it.href ? null : 'button', href:it.href || null, role: 'tab', class: 'sate-pestana', id: base + '-' + it.id, 'data-id': it.id });
       contenidoPestana(b, it);
       if (i && it.grupo != null && it.grupo !== o.items[i-1].grupo) b.className += ' sate-grupo-inicio';
       var p = panelDe(it);
@@ -383,7 +383,7 @@
         b.setAttribute('aria-controls', p.id);
         p.setAttribute('role', 'tabpanel'); p.setAttribute('aria-labelledby', b.id);
       }
-      b.addEventListener('click', function () { seleccionar(it.id, false); });
+      if (!it.href) b.addEventListener('click', function () { seleccionar(it.id, false); });
       b.addEventListener('keydown', function (e) {
         var n = o.items.length, j = null;
         if (e.key === 'ArrowRight') j = (i + 1) % n;
@@ -391,7 +391,8 @@
         else if (e.key === 'Home') j = 0;
         else if (e.key === 'End') j = n - 1;
         if (j === null) return;
-        e.preventDefault(); seleccionar(o.items[j].id, true);
+        e.preventDefault();
+        if (o.items[j].href) botones[j].focus(); else seleccionar(o.items[j].id, true);
       });
       botones.push(b); lista.appendChild(b);
     });
@@ -415,10 +416,10 @@
         if (it.id !== 'mas') { marcar(it.id); if (o.alElegir) o.alElegir(it.id); return; }
         var lista = el('div', {class:'sate-mas-lista'});
         restantes.forEach(function (item) {
-          var a = el('button', {type:'button', class:'sate-btn', 'data-id':item.id});
+          var a = el(item.href ? 'a' : 'button', {type:item.href ? null : 'button', href:item.href || null, class:'sate-btn', 'data-id':item.id});
           contenidoPestana(a, Object.assign({}, item, {texto:item.titulo || item.texto}));
           if (nav.activa === item.id) a.setAttribute('aria-current','page');
-          a.addEventListener('click', function () { cerrar(); marcar(item.id); if (o.alElegir) o.alElegir(item.id); });
+          if (!item.href) a.addEventListener('click', function () { cerrar(); marcar(item.id); if (o.alElegir) o.alElegir(item.id); });
           lista.appendChild(a);
         });
         b.focus();

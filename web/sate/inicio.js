@@ -117,10 +117,14 @@
     return temariosListos ||= Promise.all([script('bibliotecas.js'), script('temarios.js')])
       .then(() => SATE.temarios.preparar()).catch(e => { temariosListos = null; console.debug('SATE: temarios no disponibles', e.message); });
   }
-  function ir(id) { location.hash = '#/' + u + '/' + id; }
+  function ir(id) {
+    const externa=cfg.vistas?.find(v=>v.id===id&&v.externa&&v.habilitada!==false&&!oculta(v.id));
+    if(externa){location.href=externa.href;return}
+    location.hash = '#/' + u + '/' + id;
+  }
   function adaptarPestanas() {
     const contenedor = document.getElementById('sate-tabs'), navegacion = contenedor?.closest?.('.sate-navegacion');
-    const controles = navegacion?.querySelector('.sate-controles') || document.querySelector?.('header.top>.sate-controles');
+    const controles = navegacion?.querySelector('.sate-controles') || document.querySelector?.('header.top .sate-controles');
     // La navegación sigue funcionando en un contenedor sin medición responsiva.
     if (!navegacion || !controles) return;
     const medicion = document.createElement('div');
@@ -304,12 +308,13 @@
   function actualizarPestanas(activa=actual?.padre || actual?.pestana){
       if(!cfg.pestanas.includes(activa))activa=api.personal()?'trayectoria':'mapa';
       const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
+      for(const v of cfg.vistas||[])if(v.externa&&v.habilitada!==false&&!oculta(v.id))items.push({id:v.id,href:v.href,texto:texto('sate.pestana.'+v.id+'.titulo'),corto:texto('sate.pestana.'+v.id+'.corto')});
       tabs = SateUI.pestanas({items,activa,alCambiar:id=>{if(!seleccionProgramada && actual && actual.pestana!==id)ir(id)}});
       document.getElementById('sate-tabs').replaceChildren();
       document.getElementById('sate-tabs').appendChild(tabs);
       for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='guia'?'sate-guia':id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');
       barra?.remove?.();
-      barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa,alElegir:ir});
+      barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,href:it.href,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa,alElegir:ir});
       document.body.appendChild(barra);
       recalcularPestanas();
       if(actual&&(actual.padre || actual.pestana)!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
@@ -335,9 +340,6 @@
   }
   // Logo de la unidad, hasta la derecha: el oficial de la unidad si lo hay; si no, el del catálogo SAES con su halo.
   const ranura = document.getElementById('sate-logo-unidad');
-  // Nombre de la unidad a la izquierda de su logo, pequeño, hasta 2 líneas (dato de identidad, nunca un literal).
-  const nombreUnidad = document.getElementById('sate-unidad-nombre');
-  nombreUnidad.textContent = cfg.nombre; nombreUnidad.title = cfg.nombre;
   if (cfg.logo) {
     const enlace = document.createElement('a'); enlace.className = 'unit'; enlace.href = cfg.logo.enlace;
     for (const [tema, clase] of [['claro','logo-lt'],['oscuro','logo-dk']]) {

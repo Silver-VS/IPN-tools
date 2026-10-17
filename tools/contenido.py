@@ -111,6 +111,16 @@ def validar_sate(claves, errores, ruta=SATE):
                 if f"sate.pestana.{p}.{suf}" not in claves:
                     errores.append(f"data/sate.json: unidades.{u}: falta la clave sate.pestana.{p}.{suf}")
         for v in c.get("vistas", []):
+            if v.get('externa'):
+                from encabezado import enlace_local
+                try:
+                    enlace_local(v.get('href', ''))
+                except ValueError as e:
+                    errores.append(f'data/sate.json: unidades.{u}: {e}')
+                for suf in ('titulo', 'corto'):
+                    if f'sate.pestana.{v.get("id")}.{suf}' not in claves:
+                        errores.append(f'data/sate.json: unidades.{u}: falta sate.pestana.{v.get("id")}.{suf}')
+                continue
             if f"sate.vista.{v.get('id')}.titulo" not in claves:
                 errores.append(f"data/sate.json: unidades.{u}: falta la clave sate.vista.{v.get('id')}.titulo")
             if v.get("padre") not in c.get("pestanas", []):

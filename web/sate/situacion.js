@@ -51,8 +51,9 @@
     box.hidden=!isPersonal();if(box.hidden)return;
     const {d,lista}=datos();
     const avance=d.D.obt!=null&&d.D.total>0?Math.round(d.D.obt/d.D.total*100)+' %':tt('sin_avance');
-    const estado=d.nDes?tx('desfase_cuerpo',{n:d.nDes}):tx(ALUMNO.reprobadas_periodo==null?'sin_confirmar':'sin_desfase');
-    const resumen=el('p',tt('resumen',{periodo:perName(d.D.actual??d.meta),avance,desfase:String(estado).replace(/[.\s]+$/,'')}),'trayectoria-resumen');
+    // Solo se señala el desfase cuando existe; sin desfase el resumen no dice nada de él (dueño, 2026-10-17).
+    const base=tt('resumen',{periodo:perName(d.D.actual??d.meta),avance});
+    const resumen=el('p',d.nDes?base+' · '+tx('desfase_cuerpo',{n:d.nDes}):base+'.','trayectoria-resumen');
     const recorte=SateUI.recorteCalendario(SATE.calendario.recorte('trayectoria'));
     if(recorte)resumen.appendChild(recorte);box.appendChild(resumen);
     // El presente muestra siempre el SAES real, aunque esté activo el escenario N+1.
