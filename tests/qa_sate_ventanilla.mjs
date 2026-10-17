@@ -54,26 +54,21 @@ assert.equal(t.prellenar({upiita_saes:1,unidad:'escom',boleta:'2099000000'}).bol
 aplicacion={aplica:true,motivo:'Causal ficticia'};t.mostrarLista(box);
 const filasLista=()=>box.todos().filter(n=>n.tagName==='li'&&n.className==='tramite-fila');
 const rotulos=()=>box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent);
-assert.equal(filasLista().length,4,'Dictamen, Electivas y las dos bajas, una fila cada uno');
-assert.deepEqual(rotulos(),['Disponibles'],'Sin avance, todo está disponible');
-assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Iniciar trámite').length,4);
-assert.equal(box.todos().filter(n=>n.tagName==='button').length,4,'Una sola acción por fila');
+assert.equal(filasLista().length,4,'Los trámites aparecen una sola vez en la portada');
+assert.deepEqual(rotulos(),['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
+assert.equal(box.todos().filter(n=>n.tagName==='button').length,4,'Cada trámite abre su resumen');
 assert.ok(box.todos().some(n=>n.textContent==='Te aplica · Causal ficticia'));
-box.todos().find(n=>n.textContent==='Iniciar trámite').click();assert.equal(ir,'tramites/dictamen');
+assert.ok(!box.todos().some(n=>n.tagName==='h3'&&n.textContent==='En curso y terminados'),'La portada no repite la lista por estado');
 almacen.set('hu.tramite.dictamen',JSON.stringify({paso:1,total:4,actualizado:Date.now()-300000}));
 almacen.set('hu.tramite.electivas',JSON.stringify({listo:true}));t.mostrarLista(box);
-assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').length,1);
-assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Descargar formato').length,1);
+assert.equal(box.todos().filter(n=>n.tagName==='button').length,4);
 assert.ok(box.todos().some(n=>n.textContent.includes('Paso 2 de 4 · guardado hace 5 min')));
-assert.deepEqual(rotulos(),['En curso y terminados','Disponibles'],'Lo iniciado o listo va primero; Dictamen listo no se mezcla con lo disponible');
-const grupoCurso=box.todos().filter(n=>n.tagName==='ul')[0];
-assert.equal(grupoCurso.todos().filter(n=>n.tagName==='h4').length,2,'Dictamen (en progreso) y Electivas (listo) en el primer grupo');
-assert.equal(box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Iniciar trámite').length,2,'Las dos bajas siguen sin iniciar');
-assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Revisar o corregir'),'Un trámite listo se puede revisar');
-assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Reiniciar trámite'));
-assert.ok(box.todos().filter(n=>n.tagName==='button'&&n.attrs['aria-label']).every(n=>n.attrs['aria-label'].includes(': ')),'Cada botón de la lista dice sobre qué trámite actúa');
+assert.deepEqual(rotulos(),['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
+assert.ok(box.todos().some(n=>n.textContent==='En progreso'));
+assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));
+assert.ok(box.todos().filter(n=>n.tagName==='button'&&n.attrs['aria-label']).every(n=>n.attrs['aria-label'].includes('. ')),'Cada botón identifica el trámite y su propósito');
 aplicacion={aplica:false,motivo:'Motivo ficticio'};t.mostrarLista(box);
-assert.equal(filasLista().length,4);assert.equal(box.todos().filter(n=>n.tagName==='button').length,0,'Ningún botón para un trámite que no aplica');
+assert.equal(filasLista().length,4);assert.equal(box.todos().filter(n=>n.tagName==='button').length,4,'El resumen sigue disponible aunque el trámite no aplique');
 assert.ok(box.todos().some(n=>n.textContent==='No aplica'));
 aplicacion=null;
 modulo.mostrar({tramite:'dictamen'});assert.equal(abiertos.length,0,'Sin definición se muestra la lista; no hay página antigua');
@@ -144,7 +139,9 @@ const listo=t.asistente(box,defListo);box.querySelector('input').value='Ficticio
 assert.equal(JSON.parse(almacen.get('hu.tramite.listo-prueba')).listo,true,'Listo solo tras generación correcta');listo.destruir();
 let generadoDesdeLista=0;t.registrar({...defListo,id:'electivas',generar:async()=>{generadoDesdeLista++;return new Uint8Array([37,80,68,70])}});
 almacen.set('hu.tramite.electivas',JSON.stringify({listo:true,paso:1,total:2,datos:{dato:'Ficticio'}}));t.mostrarLista(box);
-await cancelar(()=>box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar formato').onclick());assert.equal(generadoDesdeLista,0);await aceptar(()=>box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar formato').onclick());assert.equal(generadoDesdeLista,1,'Descargar en la lista genera el PDF directamente');
+dialogo=null;box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Electivas. ')).click();
+assert.ok(dialogo.contenido.todos().some(n=>n.tagName==='ol'&&n.children.length===2));assert.equal(dialogo.acciones[0].texto,'Empezar');dialogo.acciones[0].onclick();
+assert.equal(ir,'tramites/electivas');assert.equal(generadoDesdeLista,0,'La portada abre el proceso; no genera el PDF desde la lista');
 const invalido=t.asistente(box,{...defListo,id:'preview-invalida',datos:{dato:'Ficticio'}});
 await new Promise(r=>setTimeout(r,350));assert.equal(box.querySelector('iframe'),null,'Sin vista previa en un paso de captura');
 invalido.destruir();
@@ -179,8 +176,19 @@ almacen.set('hu.tramite.datos',JSON.stringify({confirmado:true,datos:{paterno:'P
 almacen.delete('hu.tramite.dictamen');
 vm.runInContext(readFileSync('web/sate/dictamen.js','utf8'),c);
 const dic=c.SateDictamen;await dic.cargar();
+aplicacion=null;t.mostrarLista(box);
+const botonDictamen=box.todos().find(n=>n.tagName==='button'&&n.className.includes('tramite-fila-boton')&&n.attrs['aria-label']?.startsWith('Dictamen. '));
+assert.ok(botonDictamen,'La portada agrupa los trámites por intención');
+botonDictamen.click();
+assert.equal(dialogo.titulo,'Dictamen');
+assert.ok(dialogo.contenido.todos().some(n=>n.tagName==='ol'&&n.children.length===5),'El resumen muestra los pasos numerados del trámite');
+assert.ok(dialogo.contenido.todos().some(n=>n.textContent.includes('Entrega original y copia')),'El resumen incluye los documentos existentes');
+assert.equal(dialogo.acciones[0].texto,'Empezar');dialogo.acciones[0].onclick();assert.equal(ir,'tramites/dictamen');
+dialogo=null;
 c.SATE.repintar=()=>modulo.mostrar({tramite:'dictamen'});
 modulo.mostrar({tramite:'dictamen'});
+const volverVentanilla=box.todos().find(n=>n.tagName==='button'&&n.textContent==='Volver a la Ventanilla');
+assert.ok(volverVentanilla,'El proceso conserva un botón de regreso arriba');volverVentanilla.click();assert.equal(ir,'tramites');
 assert.ok(box.querySelector('form'),'Dictamen pide el contacto dentro del paso');
 assert.ok(box.todos().some(n=>n.name==='celular'));assert.ok(box.todos().some(n=>n.name==='telefono'));
 box.querySelector('form').onsubmit({preventDefault(){}});
@@ -248,10 +256,8 @@ assert.equal(uniones.at(-1).pdfs.length,2);assert.equal(uniones.at(-1).op,undefi
 assert.equal(dd.archivo(ad),'dictamen-interno-2099000000.pdf');
 assert.ok(!almacen.get('hu.tramite.dictamen').includes('Motivo ficticio'));
 asist.destruir();t.mostrarLista(box);assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));
-const antesLista=estampados.length;
-await aceptar(()=>box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar formato').onclick());
-assert.equal(estampados.length,antesLista+2,'Descargar desde la lista genera formato y carta otra vez');
-assert.equal(estampados.at(-1).valores.motivos,'Motivo ficticio para la prueba.','Descarga desde lista conserva sensibles en memoria');
+dialogo=null;box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Dictamen. ')).click();
+assert.equal(dialogo.titulo,'Dictamen');dialogo.acciones[0].onclick();assert.equal(ir,'tramites/dictamen');
 assert.equal(t.modelo(dd).datos.motivos,'Motivo ficticio para la prueba.','Listo conserva sensibles únicamente en memoria de esta página');
 const campoFilas=dd.pasos[1].campos[0],candidatas=Object.entries(c.SATE_DATA.dictamen.materias).filter(([k])=>k.startsWith('B|09|')).slice(0,9).map(([k,[nombre,nivel]])=>({clave:k.split('|')[2],nombre,nivel,cursada:'',recursada:''}));
 const contMaterias=new Nodo('div'),ctxMaterias={datos:{filas:candidatas.slice(0,8)},cambiar(v){this.datos.filas=v}};
@@ -367,20 +373,19 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   await assert.rejects(()=>dd3.generar({...dAnexo,adjuntos:[{id:'inexistente',nombre:'x.pdf',tipo:'pdf',paginas:1,peso:1}]}),'Un anexo perdido no se omite en silencio');
   for(const [k,v] of almacen)assert.ok(!v.includes('constancia.pdf')&&!v.includes('credencial.jpg'),'Ningún anexo en el almacenamiento: '+k);
 
-  // Regreso a Ventanilla digital arriba (junto al título) y al final, separado de las acciones.
+  // Regreso a Ventanilla arriba, junto al título del proceso.
   const a2=t.asistente(box,dd3);
-  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='← Volver a Ventanilla digital');
-  assert.equal(regresos.length,2);
+  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Volver a la Ventanilla');
+  assert.equal(regresos.length,1);
   assert.equal(box.todos().find(n=>n.className.includes('tramite-guia'))?.href,'#/upiita/guia/situacion/que-es-dictamen','El dictamen enlaza a su respuesta de la Guía');
   assert.ok(regresos.every(n=>n.className.includes('sate-volver')),'«Volver» es un botón del sistema');
   assert.equal(box.children[0].className,'tramite-encabezado');assert.equal(box.children[0].children[0].textContent,'Solicitud de dictamen');
   assert.ok(box.children[0].children.includes(regresos[0]),'Arriba, a la altura del título');
-  assert.equal(box.children.at(-1).className,'tramite-pie');assert.ok(box.children.at(-1).children.includes(regresos[1]),'Al final de la página');
-  assert.ok(!box.todos().filter(n=>n.className==='tramite-acciones').some(n=>n.todos().includes(regresos[1])),'No comparte renglón con Continuar ni Generar');
-  ir=null;regresos[1].click();assert.equal(ir,'tramites');ir=null;regresos[0].click();assert.equal(ir,'tramites');
+  assert.equal(box.children.at(-1).className,'tramite-proceso');
+  ir=null;regresos[0].click();assert.equal(ir,'tramites');
   a2.destruir();
   const css2=readFileSync('web/sate/componentes.css','utf8');
-  assert.match(css2,/\.tramite-pie\{[^}]*border-top/);assert.match(css2,/\.tramite-encabezado\{[^}]*justify-content:space-between/);
+  assert.match(css2,/\.tramite-proceso\{[^}]*grid-template-columns/);assert.match(css2,/\.tramite-encabezado\{[^}]*justify-content:space-between/);
   console.log('Dictamen DIC2: fundamento por situación, formato nunca en blanco, motivo detectado u otro, anexos unidos en un PDF y regreso arriba y abajo correctos.');
 }
 
@@ -459,7 +464,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').click();
   assert.equal(box.todos().find(n=>n.type==='radio'&&n.checked)?.value,'salud','Dentro de la sesión se conserva');
   assert.equal(t.modelo(B.definir('temporal')).datos.motivo,'','Al recargar, el motivo sensible se vuelve a preguntar');
-  // La descarga marca el trámite como listo y la lista permite volver a descargar.
+  // La descarga marca el trámite como listo y la portada conserva su estado.
   const radiosOtra=box.todos().filter(n=>n.type==='radio');radiosOtra[1].checked=true;radiosOtra[1].onchange();
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').click();
   const descargar=box.todos().find(n=>n.tagName==='button'&&n.textContent==='Descargar PDF');
@@ -471,8 +476,9 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.equal(bajasEstampadas.at(-1).valores.periodos,'27/2, 28/1','Dos periodos cruzando año');
   await assert.rejects(()=>temporal.generar({motivo:'salud',periodo:'27/2',periodos:'3'}));
   modulo.ocultar();t.mostrarLista(box);
-  assert.ok(box.todos().some(n=>n.tagName==='button'&&n.textContent==='Descargar formato'),'PDF disponible desde la lista');
-  assert.deepEqual(box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent),['En curso y terminados','Disponibles']);
+  assert.ok(box.todos().some(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Baja temporal. ')),'El resumen de baja sigue disponible en la portada');
+  assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));
+  assert.deepEqual(box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent),['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
 
   // Baja definitiva: mismo asistente, motivo propio y enlace a su formato.
   modulo.mostrar({tramite:'baja_definitiva'});

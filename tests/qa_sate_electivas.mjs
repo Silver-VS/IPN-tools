@@ -13,7 +13,7 @@ class Nodo{
   querySelector(s){return this.todos().find(n=>s.startsWith('#')?n.id===s.slice(1):s.startsWith('[')?(()=>{const m=s.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);return m&&(m[2]==null?n.attrs[m[1]]!=null:n.attrs[m[1]]===m[2])})():n.tagName===s)||null}
   todos(){return this.children.flatMap(n=>[n,...n.todos()])}focus(){foco=this}click(){return this.onclick?.()}
 }
-let dialogo, foco,modulo,urlN=0;const box=new Nodo('section'),almacen=new Map(),descargas=[],estampados=[],uniones=[],scripts=[],solicitudes=[];
+let dialogo, foco,modulo,ruta,urlN=0;const box=new Nodo('section'),almacen=new Map(),descargas=[],estampados=[],uniones=[],scripts=[],solicitudes=[];
 const recursos={pdfs:{die03:'FICTICIO',form:'FICTICIO',die01:'FICTICIO',die02:'FICTICIO'},oferta:[['B','M','F01','Materia ficticia','Profesor ficticio',4.5,'F','P']],curric:{'B|BE01':['ELECTIVA I']}};
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const timers=new Set();
@@ -24,7 +24,7 @@ const c=vm.createContext({SateUI:{modal(titulo,contenido,op){dialogo={titulo,con
   URL:{createObjectURL:()=>`blob:${++urlN}`,revokeObjectURL(){}},
   location:{replace(){throw new Error('El asistente no debe redirigir a la página antigua')}},
   SATE_UNIDAD:'upiita',SATE_CONFIG:config,SATE_DATA:{calendario:{periodo:'27/1'}},
-  SATE:{texto:(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,id)=>v[id]??''),pestana:(id,m)=>modulo=m,presente:{aplicaTramite:()=>null},ir(){},repintar(){modulo.mostrar({tramite:'electivas'})},script:async s=>scripts.push(s)},
+  SATE:{texto:(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,id)=>v[id]??''),pestana:(id,m)=>modulo=m,presente:{aplicaTramite:()=>null},ir(r){ruta=r},repintar(){modulo.mostrar({tramite:'electivas'})},script:async s=>scripts.push(s)},
   fetch:async url=>{solicitudes.push(url);return {ok:true,json:async()=>url.endsWith('electivas-pdf.json')?recursos.pdfs:{...recursos,pdfs:undefined}}},
   PDFLib:{PDFDocument:{create:async()=>({embedFont:async()=>({widthOfTextAtSize:(s,z)=>String(s).length*z/2,encodeText:s=>{if(s.includes('😀'))throw new Error('Unsupported')}})})},StandardFonts:{Helvetica:'Helvetica'}},
   PdfElectivas:{generar:async d=>{estampados.push(plano(d));return new Uint8Array([estampados.length])}}
@@ -118,7 +118,8 @@ assert.equal(JSON.parse(almacen.get('hu.tramite.electivas')).listo,true);
 await new Promise(r=>setTimeout(r,360));assert.match(box.querySelector('iframe').src,/^blob:/);
 modulo.ocultar();
 let preparadoDesdeLista=0;T.registrar({...E.def,preparar:async()=>{preparadoDesdeLista++;await E.preparar()}});
-T.mostrarLista(box);await cancelar(()=>texto('Descargar formato').onclick());assert.equal(preparadoDesdeLista,0);await aceptar(()=>texto('Descargar formato').onclick());assert.equal(preparadoDesdeLista,1);assert.equal(descargas.at(-1),'electivas-2099000000.pdf');
+T.mostrarLista(box);dialogo=null;box.todos().find(n=>n.tagName==='button'&&n.className.includes('tramite-fila-boton')&&n.attrs['aria-label']?.startsWith('Electivas. ')).click();
+assert.equal(dialogo.titulo,'Electivas');assert.ok(dialogo.contenido.todos().some(n=>n.tagName==='ol'&&n.children.length===3));assert.equal(dialogo.acciones[0].texto,'Empezar');dialogo.acciones[0].onclick();assert.equal(ruta,'tramites/electivas');assert.equal(preparadoDesdeLista,0,'La lista abre el resumen y no inicia ni descarga el trámite');
 modulo.mostrar({tramite:'electivas'});texto('Cambiar').click();assert.ok(texto('Editar'));
 assert.equal(box.querySelector('form'),null);texto('Editar').click();assert.ok(box.querySelector('form'));
 box.querySelector('form').onsubmit({preventDefault(){}});assert.ok(box.todos().some(n=>n.textContent==='Tus electivas'),'Guardar inline conserva el asistente en la misma ruta');

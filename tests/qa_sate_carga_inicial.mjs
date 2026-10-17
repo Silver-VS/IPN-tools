@@ -43,7 +43,7 @@ for(const nombre of ['dictamen','bajas','electivas']){
   assert.ok(Object.values(d).every(pdf=>pdf.startsWith('JVBERi0')),'PDF conservados en archivo bajo demanda');
 }
 assert.match(leer('web/sate/electivas.js'),/async function generar\(d\)[\s\S]*electivas-pdf\.json/,'Electivas descarga PDF solo al generar');
-assert.match(leer('web/sate/tramites.js'),/await SATE\.prepararTramite\?\.\(id\)/,'Descarga desde la lista también carga plantillas');
+assert.match(leer('web/sate/tramites.js'),/function abrirResumen\(id,def\)[\s\S]*tramite-resumen__pasos[\s\S]*SateUI\.modal/,'La portada resume los pasos antes de abrir el proceso');
 // Ejecutar el encabezado real: ni reescribir opciones ni recorrer grupos al cambiar de pestaña.
 const core=leer('web/sate/nucleo.js');let opciones=0, recorridos=0;
 let oferta=[['B',null,null,'1BV1']];const selector={set innerHTML(v){opciones++}};

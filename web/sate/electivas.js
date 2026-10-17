@@ -187,9 +187,9 @@
     }
     return PdfTramites.unir(pdfs);
   }
-  const def={id:'electivas',titulo:'Tus electivas',get lead(){return SATE.texto('sate.ventanilla.electivas_para')},volver:true,datos:inicial,preparar,descargaTexto:'Descargar mi solicitud (PDF)',archivo:()=>`electivas-${identidad()?.boleta}.pdf`,generar,pasos:[
-    {titulo:'Tus actividades',campos:[{id:'actividades',texto:'Actividades',render:actividades,validar:validarActividades,revision:revisionActividades}]},
-    {titulo:'Preguntas del formulario',campos:[{id:'formulario',texto:'Formulario',render:formulario,validar:validarFormulario,revision:revisionFormulario}]}
+  const def={id:'electivas',titulo:'Tus electivas',get lead(){return SATE.texto('sate.ventanilla.electivas_para')},requisitos:()=>[SATE.texto('sate.ventanilla.electivas_requisitos')],volver:true,datos:inicial,preparar,descargaTexto:'Descargar mi solicitud (PDF)',archivo:()=>`electivas-${identidad()?.boleta}.pdf`,generar,pasos:[
+    {titulo:SATE.texto('sate.ventanilla.electivas_paso_actividades'),campos:[{id:'actividades',texto:'Actividades',render:actividades,validar:validarActividades,revision:revisionActividades}]},
+    {titulo:SATE.texto('sate.ventanilla.electivas_paso_formulario'),campos:[{id:'formulario',texto:'Formulario',render:formulario,validar:validarFormulario,revision:revisionFormulario}]}
   ]};
   SateTramites.registrar(def);
   raiz.SateElectivas={preparar,inscrito,inicial,importar,validarActividad,validarActividades,validarFormulario,medir,totales,generar,def};
