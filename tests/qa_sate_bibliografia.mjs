@@ -63,4 +63,13 @@ for (const [texto, titulo, consulta] of reales) {
   assert.equal(b.consultaDeReferencia(titulo), consulta, titulo);
 }
 assert.equal(b.consultaDeReferencia('Sistemas de control en tiempo discreto para ingeniería moderna'), 'Sistemas control tiempo discreto ingeniería');
+// Renglones rotos del OCR y autores antepuestos (R2-BIB2).
+for (const [ref, esperado] of [
+  ['ISBN 978-970-10-6517-4', ''],
+  ['https://www.ejemplo.mx/libro', ''],
+  ['Ambiental (1ª edición). España, Pearson Prentice Hall/Pearson Educación. ISBN 9788420543987.', ''],
+  ['Larson Ron. Cálculo. McGraw-Hill', 'Cálculo'],
+  ['Leithold Luis, El cálculo, 7a ed., Oxford University Press, México 1998', 'El cálculo'],
+  ['Larson, Hostetler, Edwards, Cálculo I, Ed. McGraw Hill, 8ª Edición, México 2006', 'Cálculo I']
+]) assert.equal(b.tituloDeReferencia(ref), esperado, ref);
 console.log('OK');
