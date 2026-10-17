@@ -695,6 +695,8 @@ acreditada_por = "Acreditada por {forma}"
 [sate.planeacion]
 optativas_sin_linea = "Optativas sin línea"
 optativas_sin_linea_ayuda = "Cubren espacios y créditos de optativa de su nivel, sin pertenecer a una línea de especialización. Puedes elegirlas cuando tengan grupos."
+sin_lugar_titulo = "Sin lugar en el mapa"
+sin_lugar_ayuda = "Se ofertan para tu carrera, pero el plan no les asigna un espacio. Consulta con Gestión Escolar si te sirven."
 sin_ubicar_grupos = "Ver grupos"
 sin_ubicar_requisitos = "Ver requisitos"
 sin_ubicar_cursar = "Quiero cursarla"

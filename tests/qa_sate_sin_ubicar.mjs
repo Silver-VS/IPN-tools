@@ -30,10 +30,12 @@ for(const unidad of ['upiita','escom','upibi']){
     for(const per of ['actual','proximo']){
       S.per=per;c.renderSinUbicar();
       const off=c.offeredClaves(), visibles=m.optativasSinLinea.filter(k=>off.has(k));casos+=visibles.length;
-      assert.equal($('#optativas-sin-linea').hidden,visibles.length===0,`${unidad}/${car}/${per}: visibilidad`);
+      const consulta=m.sinUbicar.filter(k=>m.cur[k]&&off.has(k)&&!visibles.includes(k));
+      assert.equal($('#optativas-sin-linea').hidden,visibles.length===0&&consulta.length===0,`${unidad}/${car}/${per}: visibilidad`);
       const html=$('#optativas-sin-linea-materias').innerHTML;
       for(const k of m.sinUbicar.filter(k=>!m.optativasSinLinea.includes(k))){
         assert.ok(!html.includes(`data-fwant="${k}"`),`${k}: no inventa un lugar en el plan`);
+        if(consulta.includes(k))assert.ok(html.includes(m.cur[k][0]),`${k}: se puede consultar aunque no tenga lugar`);
       }
       for(const k of visibles){
         assert.match(html,new RegExp(`data-fwant="${k}"`),`${unidad}/${car}/${per}/${k}: selección`);

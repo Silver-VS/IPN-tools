@@ -2,11 +2,13 @@ function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
 function renderSinUbicar(){
   const el=$('#optativas-sin-linea'), off=offeredClaves(), c=cur();
   const claves=(MAP().optativasSinLinea||[]).filter(k=>c[k]?.[3]==='P'&&off.has(k));
-  el.hidden=!claves.length;
-  if(!claves.length){$('#optativas-sin-linea-materias').innerHTML='';return}
+  // Ofertadas sin lugar en el plan (no optativas): solo consulta, sin inventarles un espacio.
+  const consulta=(MAP().sinUbicar||[]).filter(k=>c[k]&&off.has(k)&&!claves.includes(k));
+  el.hidden=!claves.length&&!consulta.length;
+  if(el.hidden){$('#optativas-sin-linea-materias').innerHTML='';return}
   const tx=k=>esc(SATE.texto('sate.planeacion.'+k));
-  $('#optativas-sin-linea-titulo').textContent=SATE.texto('sate.planeacion.optativas_sin_linea')+' · '+claves.length;
-  $('#optativas-sin-linea-materias').innerHTML=`<p class="muted">${tx('optativas_sin_linea_ayuda')}</p><div class="optativas-sin-linea-grid">`+
+  $('#optativas-sin-linea-titulo').textContent=claves.length?SATE.texto('sate.planeacion.optativas_sin_linea')+' · '+claves.length:SATE.texto('sate.planeacion.sin_lugar_titulo');
+  $('#optativas-sin-linea-materias').innerHTML=(claves.length?`<p class="muted">${tx('optativas_sin_linea_ayuda')}</p><div class="optativas-sin-linea-grid">`:'<div hidden>')+
       claves.map(k=>{
         const paso=planAsignado(k), bloqueada=['done','curso'].includes(statusOf(k))||tr().oblig.includes(k);
         const grupos=classes().filter(g=>g[0]===S.car&&g[8]===k);
@@ -15,7 +17,14 @@ function renderSinUbicar(){
           `<div class="actions">${PLAN_DOS_PERIODOS?planAcciones(k):`<button class="btn" type="button" data-fwant="${k}" aria-pressed="${paso===S.planPaso}"${bloqueada?' disabled':''}>${tx(paso===S.planPaso?'sin_ubicar_quitar':'sin_ubicar_cursar')}</button>`}</div>`+
           `<details><summary>${tx('sin_ubicar_requisitos')}</summary>${inspParts(k).l2}</details>`+
           `<details><summary>${tx('sin_ubicar_grupos')} · ${grupos.length}</summary><ul>${grupos.map(g=>`<li><b>${esc(g[3])}</b> · ${esc(profs(g))}<br>${pattern(g).map(esc).join('<br>')}</li>`).join('')}</ul></details></article>`;
-      }).join('')+'</div>';
+      }).join('')+'</div>'+(consulta.length?`${claves.length?`<h4>${tx('sin_lugar_titulo')} · ${consulta.length}</h4>`:''}<p class="muted">${tx('sin_lugar_ayuda')}</p><div class="optativas-sin-linea-grid">`+
+      consulta.map(k=>{
+        const grupos=classes().filter(g=>g[0]===S.car&&g[8]===k);
+        return `<article class="optativas-sin-linea-materia"><b>${esc(pretty(c[k][0]))}</b>`+
+          `<small>${esc(k)} · ${esc(SATE.texto('sate.planeacion.nivel',{n:c[k][2]}))} · ${esc(textoCreditos(k,c[k][1],true))}</small>`+
+          `<details><summary>${tx('sin_ubicar_requisitos')}</summary>${inspParts(k).l2}</details>`+
+          `<details><summary>${tx('sin_ubicar_grupos')} · ${grupos.length}</summary><ul>${grupos.map(g=>`<li><b>${esc(g[3])}</b> · ${esc(profs(g))}<br>${pattern(g).map(esc).join('<br>')}</li>`).join('')}</ul></details></article>`;
+      }).join('')+'</div>':'');
   montarAyudasCreditos();
 }
 /* Cadena de requisitos y dependientes de la materia bajo el cursor (o de la fila elegida en «requisitos»).
