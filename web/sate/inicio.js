@@ -354,9 +354,11 @@
   if (!u) { medicionLista.then(mostrarEntrada).catch(error); return; }
   // «SATE {unidad}»: la unidad es el botón subrayado (color de la unidad) que abre el cambio de unidad.
   const botonUnidad = document.getElementById('b-unidad');
-  botonUnidad.textContent = cfg.siglas; botonUnidad.hidden = false;
+  botonUnidad.textContent = texto('sate.encabezado.unidad_marca', {unidad: cfg.siglas}); botonUnidad.hidden = false;
   botonUnidad.setAttribute('aria-label', cfg.siglas + '. ' + texto('sate.encabezado.unidad')); botonUnidad.title = texto('sate.encabezado.unidad');
-  document.getElementById('sate-titulo').replaceChildren(texto('sate.siglas') + ' ', botonUnidad);
+  const siglasSate = document.createElement('span'); siglasSate.className = 'sate-siglas'; siglasSate.textContent = texto('sate.siglas');
+  const separador = document.createElement('span'); separador.className = 'sate-sep';
+  document.getElementById('sate-titulo').replaceChildren(siglasSate, separador, botonUnidad);
   if (cfg.leyenda) {
     const ayuda = SateUI.ayuda('sate.leyenda.'+cfg.leyenda,{unidad:cfg.siglas});
     const boton = ayuda.querySelector('button');
