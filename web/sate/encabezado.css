@@ -102,3 +102,15 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
   .sate-contexto .sate-controles{flex:0 1 auto}
   #sate-leyenda{flex:none}
 }
+
+/* Marca «SATE | UPIITA-IPN» (dueño, 2026-10-17): siglas en el acento, separador fino y la unidad con punteado sutil. */
+.sate-marca #sate-titulo{gap:0}
+/* Guinda institucional del IPN en claro y blanco (el del isologo calado) en oscuro: SATE no toma el color de la unidad. */
+:root{--ipn-marca:#7A1F45}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--ipn-marca:#ffffff}}
+:root[data-theme="dark"]{--ipn-marca:#ffffff}
+.sate-marca .sate-siglas{color:var(--ipn-marca);font-weight:700}
+.sate-marca .sate-sep{align-self:center;width:var(--ipn-linea-fina);height:1.1em;margin-inline:var(--ipn-esp-3);background:var(--ipn-linea)}
+.sate-marca :is(.sate-unidad-btn,.sate-unidad-nombre){color:var(--ipn-texto);font-weight:600;text-decoration:underline dotted;text-decoration-color:var(--ipn-tenue);text-decoration-thickness:var(--ipn-linea-fina);text-underline-offset:.25em}
+.sate-marca .sate-unidad-nombre{text-decoration:none}
+.sate-marca .sate-unidad-btn:hover{text-decoration-color:currentColor}
