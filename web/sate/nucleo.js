@@ -816,6 +816,8 @@ function ajustarCarrera(){
     parseFloat(estilo.borderLeftWidth)+parseFloat(estilo.borderRightWidth))+'px + var(--ipn-esp-6))';
 }
 if(document.fonts){document.fonts.ready.then(ajustarCarrera);document.fonts.addEventListener('loadingdone',ajustarCarrera)}
+let TOP_CARRERAS=null;
+const TOP_GRUPOS=new WeakMap();
 function renderTop(){
   renderSimGlobal();
   if(!hasOffer(S.per)&&hasOffer('actual'))S.per='actual';
@@ -826,10 +828,17 @@ function renderTop(){
   
   const cars=Object.entries(DATA.carreras).filter(([k])=>DATA.mapas[k]);
   if(!cars.some(([k])=>k===S.car)) S.car=cars[0][0];
-  $('#f-carrera').innerHTML=cars.map(([k,v])=>`<option value="${esc(k)}"${k===S.car?' selected':''}>${esc(v.toLocaleLowerCase('es-MX').replace(/\p{L}+/gu,(palabra,indice)=>indice>0&&/^(de|del|la|las|los|y|en|e)$/.test(palabra)?palabra:palabra[0].toLocaleUpperCase('es-MX')+palabra.slice(1)))}</option>`).join('');
-  ajustarCarrera();
+  const carrerasClave=JSON.stringify([cars,S.car]);
+  if(TOP_CARRERAS!==carrerasClave){
+    $('#f-carrera').innerHTML=cars.map(([k,v])=>`<option value="${esc(k)}"${k===S.car?' selected':''}>${esc(v.toLocaleLowerCase('es-MX').replace(/\p{L}+/gu,(palabra,indice)=>indice>0&&/^(de|del|la|las|los|y|en|e)$/.test(palabra)?palabra:palabra[0].toLocaleUpperCase('es-MX')+palabra.slice(1)))}</option>`).join('');
+    TOP_CARRERAS=carrerasClave;ajustarCarrera();
+  }
   const f=new Date(DATA.capturado).toLocaleString('es-MX',{dateStyle:'long',timeStyle:'short'});
-  const n=new Set(classes().filter(c=>c[0]===S.car).map(c=>c[3])).size;
+  const oferta=classes();
+  if(!TOP_GRUPOS.has(oferta))TOP_GRUPOS.set(oferta,new Map());
+  const grupos=TOP_GRUPOS.get(oferta);
+  if(!grupos.has(S.car))grupos.set(S.car,new Set(oferta.filter(c=>c[0]===S.car).map(c=>c[3])).size);
+  const n=grupos.get(S.car);
   const nota=(clave,datos)=>SATE.texto('sate.horarios.'+clave,datos);
   $('#notice').textContent=[nota('captura_fecha',{fecha:f}),nota('captura_grupos',{n}),
     !hasOffer('proximo')?nota('captura_sin_proximo'):S.per==='proximo'?nota('captura_incompleta'):'',

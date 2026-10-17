@@ -56,5 +56,47 @@
     }
     return 'sate/index.html' + query + hash;
   }
-  raiz.SateRutas = { ruta, redireccion };
+  // Inventario compartido con la medición sin navegador. No incluye acciones de detalle/PDF.
+  function recursos(cfg, unidad, id) {
+    const datos = n => 'datos/' + unidad + '/' + n + '.json';
+    const tramites = [...new Set((cfg.tramites || []).flatMap(t => [
+      ...(t === 'electivas' ? ['../tramites/electivas-reglas.js'] : []), cfg.scriptsTramite?.[t] || t + '.js']))];
+    return ({trayectoria:['desempeno.js'], mapa:[datos('oferta'),'mapa.js'],
+      horarios:[datos('oferta'),...(cfg.cupos ? ['cupos.js','cupos-vista.js'] : []),'horarios.js'],
+      calendario:['calendario.js'], tramites:[datos('tramites'),'tramites.js',...tramites],
+      guia:['bibliotecas.js','guia.js','guia.css','temarios.css','../policore/lector.css',...(cfg.guiaDatos ? [datos('guia')] : [])],
+      temarios:['bibliotecas.js','temarios.js','guia.css','temarios.css',datos('temarios/indice')]})[id] || [];
+  }
+  function precargador(cfg, unidad, json) {
+    const pedidos = new Set();
+    function precargar(id) {
+      if (raiz.navigator?.connection?.saveData) return Promise.resolve();
+      return Promise.all(recursos(cfg, unidad, id).map(url => {
+        if (pedidos.has(url)) return;
+        pedidos.add(url);
+        if (url.endsWith('.json')) return json(url).catch(e => {
+          pedidos.delete(url); console.debug('SATE: precarga fallida', {url, mensaje:e.message});
+        });
+        // Descargar sin ejecutar: los scripts clásicos dependen del orden del núcleo.
+        const enlace = raiz.document.createElement('link');
+        enlace.rel = 'preload'; enlace.as = url.endsWith('.css') ? 'style' : 'script'; enlace.href = url;
+        enlace.onerror = () => pedidos.delete(url);
+        raiz.document.head.appendChild(enlace);
+      }));
+    }
+    function reposo(ids) {
+      if (raiz.navigator?.connection?.saveData) return;
+      const pendientes = ids.slice();
+      const siguiente = () => {
+        if (!pendientes.length || raiz.navigator?.connection?.saveData) return;
+        precargar(pendientes.shift()).finally(() => programar());
+      };
+      const programar = () => raiz.requestIdleCallback ? raiz.requestIdleCallback(siguiente) : raiz.setTimeout(siguiente, 250);
+      // El temporizador fuera del frame permite presentar primero la vista inicial.
+      if (raiz.requestAnimationFrame) raiz.requestAnimationFrame(() => raiz.setTimeout(programar, 0));
+      else programar();
+    }
+    return {precargar, reposo};
+  }
+  raiz.SateRutas = { ruta, redireccion, recursos, precargador };
 })(typeof window !== 'undefined' ? window : globalThis);

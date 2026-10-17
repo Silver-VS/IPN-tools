@@ -78,10 +78,20 @@
     }));
     return cargas.get(src);
   }
-  async function json(nombre) {
-    const url = 'datos/' + u + '/' + nombre + '.json', r = await fetch(url);
-    if (!r.ok) throw new Error(url + ': HTTP ' + r.status);
-    return r.json();
+  const datosCache = new Map();
+  function jsonURL(url) {
+    if (!datosCache.has(url)) datosCache.set(url, fetch(url).then(r => {
+      if (!r.ok) throw new Error(url + ': HTTP ' + r.status);
+      return r.json();
+    }).catch(e => { datosCache.delete(url); throw e; }));
+    return datosCache.get(url);
+  }
+  const json = nombre => jsonURL('datos/' + u + '/' + nombre + '.json');
+  const precarga = SateRutas.precargador(cfg || {}, u, jsonURL);
+  async function prepararTramite(id) {
+    const clave = id.startsWith('baja_') ? 'bajas' : id;
+    if (!['dictamen','bajas'].includes(clave) || !window.SATE_DATA[clave]) return;
+    window.SATE_DATA[clave].pdfs ||= await json(clave + '-pdf');
   }
   let oferta;
   function cargarOferta() {
@@ -223,22 +233,33 @@
   async function activar(r) {
     if (!r || !api) return;
     const medida = window.SateMedicion?.iniciar('ruta', r.pestana);
+    let v;
     try {
     if (unidadRealce || r.unidad !== u) aplicarRealce(r.unidad);
     if (r.unidad !== u) { IPNT.set('ipnt.unidad', r.unidad); location.reload(); return; }
-    const v = ++version;
+    v = ++version;
+    const marca = r.vista ? r.padre : r.pestana;
+    seleccionProgramada = true; tabs.seleccionar(marca); seleccionProgramada = false; barra.marcar(marca);
+    if (actual) modulos[actual.pestana]?.ocultar?.();
+    const espera = document.getElementById('sate-carga');
+    espera.textContent = texto('sate.pestana.' + marca + '.titulo'); espera.style.minHeight = '40vh'; espera.hidden = false;
+    for (const id of ['v-tray','sate-trayectoria','sate-calendario','v-hor','sate-tramites','sate-temarios','sate-guia']) document.getElementById(id).hidden = true;
+    // Incluso con caché caliente se entrega un frame antes de montar o calcular la vista.
+    if (window.requestAnimationFrame) await new Promise(ok => requestAnimationFrame(() => setTimeout(ok, 0)));
+    if (v !== version) return;
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
     if (!cfg.generica && (r.pestana === 'mapa' || r.pestana === 'horarios')) await cargarOferta();
     const m = await modulo(r.pestana);
+    if (r.pestana === 'guia' && cfg.guiaDatos) await json('guia');
+    if (r.pestana === 'temarios') await json('temarios/indice');
+    if (v !== version) return;
+    if (r.pestana === 'tramites' && r.tramite) await prepararTramite(r.tramite);
     if (r.pestana === 'tramites' && r.tramite === 'electivas') await SateElectivas.preparar();
     if (v !== version) return;
-    if (actual) modulos[actual.pestana]?.ocultar?.();
     actual = r;
     if (location.hash.startsWith('#/') && location.hash !== r.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
     api.estado.tab = r.pestana === 'horarios' ? 'hor' : 'tray';
     if (!montados.has(r.pestana)) { m.montar?.(); montados.add(r.pestana); }
-    const marca = r.vista ? r.padre : r.pestana;   // una vista marca la pestaña de la que cuelga
-    seleccionProgramada = true; tabs.seleccionar(marca); seleccionProgramada = false; barra.marcar(marca);
     document.getElementById('v-tray').hidden = r.pestana !== 'mapa';
     document.getElementById('sate-trayectoria').hidden = r.pestana !== 'trayectoria';
     document.getElementById('sate-calendario').hidden = r.pestana !== 'calendario';
@@ -252,6 +273,9 @@
     api.store.set('ruta', r.hash);
     document.getElementById('sate-carga').hidden = true;
     repintar();
+    } catch (e) {
+      if (v == null || v === version) throw e;
+      console.debug('SATE: carga de ruta sustituida', {pestana:r.pestana, mensaje:e.message});
     } finally { window.SateMedicion?.terminar(medida); }
   }
   function repintar() {
@@ -286,7 +310,7 @@
     // Fuera del encabezado: los repintados de avisos conservan la decisión pendiente.
     caja.after(aviso);
   }
-  window.SATE = {texto, modulos, error, script, identidadSaes, cargarTemarios, get actual(){return actual}, get almacen(){return api?.store}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
+  window.SATE = {texto, modulos, error, script, json:jsonURL, prepararTramite, identidadSaes, cargarTemarios, get actual(){return actual}, get almacen(){return api?.store}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
     async visitar(id) { const r=SateRutas.ruta('#/'+u+'/'+id,u,config);if(!r)return;history.replaceState(null,'',location.pathname+location.search+r.hash);await activar(r); },
     articulo: async (doc, n) => { await script('guia.js'); return SATE.articulo(doc, n); },
     async nucleoListo(a) {
@@ -299,6 +323,7 @@
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
       await activar(r);
+      if (!cfg.generica) precarga.reposo([...cfg.pestanas, ...(cfg.vistas || []).map(v=>v.id)].filter(id=>id!==r.pestana));
       const recorrido=document.createElement('button');recorrido.type='button';recorrido.className='sate-btn';recorrido.textContent=texto('sate.recorrido.boton');recorrido.onclick=()=>{SateUI.recorridoDecidir((k,v)=>IPNT.set(k,v),true);document.getElementById('sate-recorrido-invitacion')?.remove();iniciarRecorrido()};
       document.getElementById('foot').appendChild(recorrido);
       invitarRecorrido();addEventListener('sate-saes-actualizado',invitarRecorrido);
@@ -316,6 +341,10 @@
       barra?.remove?.();
       barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,href:it.href,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa,alElegir:ir});
       document.body.appendChild(barra);
+      for (const nav of [tabs, barra]) for (const evento of ['pointerover','focusin']) nav.addEventListener?.(evento, e => {
+        const id = e.target.closest?.('[data-id]')?.dataset.id;
+        if (cfg.pestanas.includes(id)) precarga.precargar(id);
+      });
       recalcularPestanas();
       if(actual&&(actual.padre || actual.pestana)!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
   }

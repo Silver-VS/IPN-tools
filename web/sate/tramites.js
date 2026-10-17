@@ -269,6 +269,7 @@
             if(!await confirmarDescarga())return;
             accion.disabled=true;
             try{
+              await SATE.prepararTramite?.(id);
               const m=modelo(def);
               await def.preparar?.(m.datos,m.paso);
               if(m.campos.some(c=>m.validar(c))){m.listo=false;m.guardar();SATE.ir('tramites/'+id);return}

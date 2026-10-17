@@ -1,0 +1,187 @@
+{
+  "unidad": "upiita",
+  "modelo": "Primer clic frío sin perfil tras núcleo; 10 Mbit/s, sin latencia ni DOM; caché y precarga excluidas",
+  "filas": [
+    {
+      "tab": "trayectoria",
+      "KB": 27.9,
+      "parseMs": 0,
+      "estimadoMs": 22.3,
+      "archivos": [
+        {
+          "archivo": "desempeno.js",
+          "bytes": 27875,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "mapa",
+      "KB": 210.1,
+      "parseMs": 2.116,
+      "estimadoMs": 170.2,
+      "archivos": [
+        {
+          "archivo": "datos/upiita/oferta.json",
+          "bytes": 191430,
+          "parseMs": 2.1155159999999995
+        },
+        {
+          "archivo": "mapa.js",
+          "bytes": 18640,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "horarios",
+      "KB": 300.1,
+      "parseMs": 1.976,
+      "estimadoMs": 242.0,
+      "archivos": [
+        {
+          "archivo": "datos/upiita/oferta.json",
+          "bytes": 191430,
+          "parseMs": 1.9760800000000005
+        },
+        {
+          "archivo": "cupos.js",
+          "bytes": 13315,
+          "parseMs": 0
+        },
+        {
+          "archivo": "cupos-vista.js",
+          "bytes": 15581,
+          "parseMs": 0
+        },
+        {
+          "archivo": "horarios.js",
+          "bytes": 79730,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "tramites",
+      "KB": 1659.9,
+      "parseMs": 2.365,
+      "estimadoMs": 1330.3,
+      "archivos": [
+        {
+          "archivo": "datos/upiita/tramites.json",
+          "bytes": 1561902,
+          "parseMs": 2.364974000000001
+        },
+        {
+          "archivo": "tramites.js",
+          "bytes": 25766,
+          "parseMs": 0
+        },
+        {
+          "archivo": "dictamen.js",
+          "bytes": 29556,
+          "parseMs": 0
+        },
+        {
+          "archivo": "../tramites/electivas-reglas.js",
+          "bytes": 12768,
+          "parseMs": 0
+        },
+        {
+          "archivo": "electivas.js",
+          "bytes": 20634,
+          "parseMs": 0
+        },
+        {
+          "archivo": "bajas.js",
+          "bytes": 9237,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "calendario",
+      "KB": 33.1,
+      "parseMs": 0,
+      "estimadoMs": 26.4,
+      "archivos": [
+        {
+          "archivo": "calendario.js",
+          "bytes": 33053,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "guia",
+      "KB": 122.7,
+      "parseMs": 0.177,
+      "estimadoMs": 98.3,
+      "archivos": [
+        {
+          "archivo": "bibliotecas.js",
+          "bytes": 7546,
+          "parseMs": 0
+        },
+        {
+          "archivo": "guia.js",
+          "bytes": 24892,
+          "parseMs": 0
+        },
+        {
+          "archivo": "datos/upiita/guia.json",
+          "bytes": 62526,
+          "parseMs": 0.17663000000000012
+        },
+        {
+          "archivo": "guia.css",
+          "bytes": 5202,
+          "parseMs": 0
+        },
+        {
+          "archivo": "temarios.css",
+          "bytes": 13771,
+          "parseMs": 0
+        },
+        {
+          "archivo": "../policore/lector.css",
+          "bytes": 8719,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "temarios",
+      "KB": 97.9,
+      "parseMs": 0.254,
+      "estimadoMs": 78.6,
+      "archivos": [
+        {
+          "archivo": "bibliotecas.js",
+          "bytes": 7546,
+          "parseMs": 0
+        },
+        {
+          "archivo": "temarios.js",
+          "bytes": 42202,
+          "parseMs": 0
+        },
+        {
+          "archivo": "datos/upiita/temarios/indice.json",
+          "bytes": 29183,
+          "parseMs": 0.25388400000000044
+        },
+        {
+          "archivo": "guia.css",
+          "bytes": 5202,
+          "parseMs": 0
+        },
+        {
+          "archivo": "temarios.css",
+          "bytes": 13771,
+          "parseMs": 0
+        }
+      ]
+    }
+  ]
+}

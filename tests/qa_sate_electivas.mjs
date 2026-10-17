@@ -13,7 +13,7 @@ class Nodo{
   querySelector(s){return this.todos().find(n=>s.startsWith('#')?n.id===s.slice(1):s.startsWith('[')?(()=>{const m=s.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);return m&&(m[2]==null?n.attrs[m[1]]!=null:n.attrs[m[1]]===m[2])})():n.tagName===s)||null}
   todos(){return this.children.flatMap(n=>[n,...n.todos()])}focus(){foco=this}click(){return this.onclick?.()}
 }
-let dialogo, foco,modulo,urlN=0;const box=new Nodo('section'),almacen=new Map(),descargas=[],estampados=[],uniones=[],scripts=[];
+let dialogo, foco,modulo,urlN=0;const box=new Nodo('section'),almacen=new Map(),descargas=[],estampados=[],uniones=[],scripts=[],solicitudes=[];
 const recursos={pdfs:{die03:'FICTICIO',form:'FICTICIO',die01:'FICTICIO',die02:'FICTICIO'},oferta:[['B','M','F01','Materia ficticia','Profesor ficticio',4.5,'F','P']],curric:{'B|BE01':['ELECTIVA I']}};
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const timers=new Set();
@@ -25,7 +25,7 @@ const c=vm.createContext({SateUI:{modal(titulo,contenido,op){dialogo={titulo,con
   location:{replace(){throw new Error('El asistente no debe redirigir a la página antigua')}},
   SATE_UNIDAD:'upiita',SATE_CONFIG:config,SATE_DATA:{calendario:{periodo:'27/1'}},
   SATE:{texto:(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,id)=>v[id]??''),pestana:(id,m)=>modulo=m,presente:{aplicaTramite:()=>null},ir(){},repintar(){modulo.mostrar({tramite:'electivas'})},script:async s=>scripts.push(s)},
-  fetch:async()=>({ok:true,json:async()=>recursos}),
+  fetch:async url=>{solicitudes.push(url);return {ok:true,json:async()=>url.endsWith('electivas-pdf.json')?recursos.pdfs:{...recursos,pdfs:undefined}}},
   PDFLib:{PDFDocument:{create:async()=>({embedFont:async()=>({widthOfTextAtSize:(s,z)=>String(s).length*z/2,encodeText:s=>{if(s.includes('😀'))throw new Error('Unsupported')}})})},StandardFonts:{Helvetica:'Helvetica'}},
   PdfElectivas:{generar:async d=>{estampados.push(plano(d));return new Uint8Array([estampados.length])}}
 });
@@ -57,6 +57,7 @@ assert.equal(R.search('investigación')[0].k,R.search('investigacion')[0].k);
 assert.equal(R.search('II.3.2')[0].k,'II.3.2');assert.equal(R.credOf({k:'II.3.2',h:80}),2);
 assert.match(leer('web/sate/electivas.js'),/R.totals\(/);
 await E.preparar();assert.ok(scripts.includes('../tramites/pdf-electivas.js'));
+assert.ok(!solicitudes.some(url=>url.endsWith('-pdf.json')),'Abrir Electivas no descarga las plantillas');
 assert.match(E.validarActividades([]),/Guarda tus datos aquí/);
 assert.equal(E.inscrito(null),'');assert.equal(E.inscrito({en_curso:['F']},'27/1'),'si');
 assert.equal(E.inscrito({acreditadas:[['F',8,'26/2']]},'27/1'),'si');assert.equal(E.inscrito({acreditadas:[['F',8,'25/2']]},'27/1'),'');
@@ -99,6 +100,8 @@ const d={actividades:[{...actividad,h:40}],formulario:form};
 const opt=(k,car,grupo,h)=>({k,desc:'Materia ficticia',h,ev:'boleta',o:{car,grupo,profesor:'Profesor ficticio',pmail:'docente@example.test',horario:h===54?3:6,per:'27/1',dep:'TA'}});
 d.actividades.push(opt('II.1.1.2','B','F01',54),opt('I.1.1.1','M','F02',108));
 assert.equal(E.validarActividades(d.actividades),'');await E.generar(d);
+assert.equal(solicitudes.filter(url=>url.endsWith('electivas-pdf.json')).length,1,'Generar carga las plantillas una vez');
+assert.deepEqual(estampados[0].pdfs,recursos.pdfs,'El estampador recibe los PDF separados');
 assert.equal(estampados.length,3);assert.equal(estampados[0].tipo,'die03');assert.equal(estampados[0].actividades.length,3);
 assert.equal(estampados[1].estado.o.car,'B');assert.equal(estampados[2].estado.o.car,'M');assert.equal(uniones[0].pdfs.length,3);assert.equal(uniones[0].op,undefined,'Unión sin hoja de instrucciones');
 const migrada=E.importar({acts:[opt('II.1.1.2','B','F01',81)],f:viejo.f,o:{car:'B',cls:'B|F01|Materia ficticia',pmail:'docente@example.test',dep:'TA',per:'26/2'}});

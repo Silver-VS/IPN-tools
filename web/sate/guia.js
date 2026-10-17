@@ -92,10 +92,10 @@
   function datos() {
     const u = unidad();
     if (E.datos.has(u)) return E.datos.get(u);
-    const promesa = fetch('datos/' + u + '/guia.json').then(r => {
+    const promesa = (SATE.json ? SATE.json('datos/' + u + '/guia.json') : fetch('datos/' + u + '/guia.json').then(r => {
       if (!r.ok) throw new Error('datos/' + unidad() + '/guia.json: HTTP ' + r.status);
       return r.json();
-    }).catch(e => { E.datos.delete(u); throw e; });
+    })).catch(e => { E.datos.delete(u); throw e; });
     E.datos.set(u, promesa);
     return promesa;
   }

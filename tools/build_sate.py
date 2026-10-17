@@ -1179,12 +1179,16 @@ def escribir_datos(data):
         if UNIDAD == 'upiita' and nombre == 'tramites':
             d['dictamen'] = datos_dictamen()
             d['bajas'] = datos_bajas()
+            for tramite in ('dictamen', 'bajas'):
+                pdfs = d[tramite].pop('pdfs')
+                (datos / (tramite + '-pdf.json')).write_text(json.dumps(pdfs, separators=(',', ':')), encoding='utf-8')
         (datos / (nombre + ".json")).write_text(json.dumps(d, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     if UNIDAD == 'upiita':
         import base64
         rows, curric, cap = oferta_electivas()
         electivas = {'oferta': rows, 'curric': curric, 'capturado': cap,
                      'pdfs': {k: base64.b64encode((ROOT / 'data/gestion_escolar' / f).read_bytes()).decode() for k, f in PDFS_ELECTIVAS.items()}}
+        (datos / 'electivas-pdf.json').write_text(json.dumps(electivas.pop('pdfs'), separators=(',', ':')), encoding='utf-8')
         (datos / 'electivas.json').write_text(json.dumps(electivas, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     escribir_temarios(data, datos)
     escribir_recursos(datos)
