@@ -63,8 +63,8 @@ assert.ok(document.querySelector('.guia-articulo').querySelector('a[target="_bla
 assert.equal(solicitudes.filter(s=>s.endsWith('/demo.json')).length, 1, 'caché en memoria');
 c.SateUI.cerrarModal();
 const termino = caja.querySelector('.sate-termino'); termino.click();
-assert.ok(!caja.querySelector('.sate-globo').hidden);
-assert.equal(caja.querySelector('.sate-globo').textContent, 'Unidad ficticia <segura>.');
+assert.ok(!document.getElementById(termino.getAttribute('aria-describedby')).hidden);
+assert.equal(document.getElementById(termino.getAttribute('aria-describedby')).textContent, 'Unidad ficticia <segura>.');
 document.dispatchEvent(new Evento('keydown',{key:'Escape'}));
 assert.ok(caja.querySelector('.sate-globo').hidden);
 movil = true; termino.click();
