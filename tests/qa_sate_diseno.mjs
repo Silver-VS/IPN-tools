@@ -93,7 +93,6 @@ assert.match(perfilCss,/\.mm-leg \.mm-fila\{justify-content:flex-start\}/);
 assert.match(perfilCss,/font-variant-numeric:tabular-nums/);
 assert.match(perfilCss,/#trayectoria-escenario:not\(\[open\]\)>div\{display:none\}/);
 assert.match(perfilCss,/#trayectoria-escenario section.meta-panel\{[^}]*margin:0/);
-assert.match(perfilCss,/\.wrap>header.top>\.sate-navegacion\{margin-top:var\(--ipn-esp-5\)/);
 // Contraste de texto AA y de puntos/foco ≥3:1 con los tokens efectivos de ambos temas.
 const fuente=leer('web/sate/cascaron.html');
 // DIS9: los cuerpos cerrados salen del layout, incluidos los controles flex de simulación.
@@ -355,8 +354,6 @@ assert.match(css,/\[id\^="sate-tab-2-"\]\[role=tabpanel\][^{]*\{[^}]*border:0;[^
 const antesPerfil=css.slice(0,css.indexOf('/* R2-PER:'));
 const movilDis5=antesPerfil.slice(antesPerfil.lastIndexOf('@media(max-width:639px)'));
 assert.match(css,/\.brand h1#sate-titulo\{[^}]*flex-wrap:nowrap;white-space:nowrap/,'DIS7: marca móvil en un renglón');
-assert.match(shell,/<div class="sate-controles">\s*<label[^\n]+\n\s*<span id="sate-leyenda">/,'R2-PER: fase de prueba junto a la carrera, separada de la marca');
-assert.match(perfilCss,/@media\(max-width:639px\)[\s\S]*?grid-template-areas:"ipn marca" "lado lado" "carrera carrera"/,'R2-PER: acciones y contexto refluyen en móvil');
 assert.match(css,/#g-n\{display:flex;flex-wrap:wrap;min-width:0;max-width:100%\}/,'DIS7: paginador adaptable al ancho disponible');
 const nucleoDis7=leer('web/sate/nucleo.js');
 const opcionesDis7={};

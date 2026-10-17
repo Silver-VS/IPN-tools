@@ -955,15 +955,7 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
 body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
 body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
 
-/* R2-PER: marca, contexto y acciones; avisos anclados a cada materia. */
-.wrap>header.top{grid-template-columns:auto auto minmax(0,1fr) auto;column-gap:var(--ipn-esp-4);row-gap:var(--ipn-esp-3);padding-inline:0}
-.wrap>header.top>.brand{grid-template-columns:minmax(0,1fr);grid-template-areas:"t"}
-.wrap>header.top>.sate-controles{display:flex;flex-direction:column;align-items:flex-start;justify-self:stretch;gap:var(--ipn-esp-1);margin-left:var(--ipn-esp-5);min-width:0;max-width:100%}
-.wrap>header.top>.sate-controles .field,.wrap>header.top>.sate-controles select{min-width:0;max-width:100%}
-.wrap>header.top>.sate-navegacion{margin-top:var(--ipn-esp-5);padding:0;min-width:0}
-#sate-leyenda:empty{display:none}
-#sate-leyenda .sate-ayuda__btn{min-height:calc(var(--ipn-esp-6) + var(--ipn-esp-3));height:auto;color:var(--ipn-tenue);white-space:normal;text-align:left}
-.wrap>header.top>.sate-fila-avisos:has(#sate-avisos-globales:empty){display:none}
+/* R2-PER: avisos anclados a cada materia y retícula del perfil. */
 
 #sate-presente{align-items:start;gap:var(--ipn-esp-5)}
 #sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
@@ -1002,11 +994,6 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 #trayectoria-escenario section.meta-panel+section.meta-panel{border-left:1px solid var(--ipn-linea);padding-left:var(--ipn-esp-5)}
 #trayectoria-escenario .meta-panel h3{font-size:var(--ipn-tamano-m);font-weight:600;color:var(--ipn-tenue);margin:0 0 var(--ipn-esp-2)}
 #trayectoria-escenario .meta-controls,#trayectoria-escenario .meta-controls label{min-width:0;max-width:100%;flex-wrap:wrap}
-@media(max-width:1199px){
-  .wrap>header.top{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"ipn marca lado" "carrera carrera carrera" "nav nav nav" "avisos avisos avisos"}
-  .wrap>header.top>.sate-controles{margin-left:0;flex-direction:row;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2) var(--ipn-esp-5)}
-  #sate-leyenda{grid-area:auto}
-}
 @media(max-width:899px){
   #sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr)}
   .trayectoria-minimapa{grid-column:1;grid-row:3}
@@ -1015,13 +1002,5 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
   #trayectoria-escenario section.meta-panel+section.meta-panel{border-left:0;border-top:1px solid var(--ipn-linea);padding-left:0;padding-top:var(--ipn-esp-5)}
 }
 @media(max-width:639px){
-  .wrap>header.top{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"ipn marca" "lado lado" "carrera carrera" "nav nav" "avisos avisos";padding-inline:0}
-  .wrap>header.top>.brand{grid-template-areas:"t"}
-  .sate-lado{grid-area:lado;display:flex;align-items:flex-end}
-  .header-actions{flex-wrap:wrap;max-width:100%}
-  .wrap>header.top>.sate-controles{flex-direction:column;align-items:flex-start;gap:var(--ipn-esp-1)}
-  #sate-leyenda .sate-ayuda__btn{height:auto!important;min-height:calc(var(--ipn-esp-6) + var(--ipn-esp-3))!important}
-  #sate-leyenda .sate-ayuda__btn>span{display:inline}
-  #sate-leyenda .sate-ayuda__btn::after{content:none}
   .trayectoria-materias{grid-template-columns:minmax(0,1fr)}
 }
