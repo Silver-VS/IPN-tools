@@ -18,7 +18,7 @@
       let ancla;
       if (partes[0] === 'reglamentos' && partes.length === 3) {
         try { ancla = decodeURIComponent(partes[2]); } catch { return null; }
-        if (!/^(?:art-[\w -]+|cap-\d+|transitorios|texto)$/.test(ancla)) return null;
+        if (!/^(?:art-[\w -]+(?:\.\w+){0,2}|cap-\d+|transitorios|texto)$/.test(ancla)) return null;
       }
       if (partes.length > (partes[0] === 'reglamentos' ? 3 : 2) || !partes.slice(0, ancla ? 2 : partes.length).every(p => /^[A-Za-z0-9_-]+$/.test(p))) return null;
       return {unidad, pestana:'guia', tramite:null, partes:ancla ? [...partes.slice(0, 2), ancla] : partes.slice(),

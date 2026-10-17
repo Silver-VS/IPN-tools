@@ -43,23 +43,80 @@
     partes.push({ texto: String(texto || '').slice(pos) });
     return partes;
   }
-  function documentoReglamento(d, t) {
-    const secciones = [];
-    let ubicacion = '';
-    for (const a of d.articulos || []) {
-      const u = (a.ubicacion || []).join(' · ');
-      if (u && u !== ubicacion) {
-        secciones.push({ id: 'cap-' + secciones.length, titulo: u, tipo: 'texto', contenido: u });
-        ubicacion = u;
-      }
-      secciones.push({ id: 'art-' + a.n, titulo: t('sate.guia.articulo_rotulo', { n: a.n }), tipo: 'texto', contenido: a.texto });
-    }
-    if (d.transitorios?.length) secciones.push({ id: 'transitorios', titulo: t('sate.guia.transitorios'), tipo: 'lista', contenido: d.transitorios.map(a => a.n + '. ' + a.texto) });
-    if (d.texto && !secciones.length) secciones.push({ id: 'texto', titulo: d.titulo, tipo: 'texto', contenido: d.texto });
-    return { titulo: d.titulo, subtitulo: d.gaceta, secciones, fuente: { texto: t('sate.guia.pdf_oficial'), url: d.url },
-      avisos: d.ocr ? [{ tipo: 'ocr', texto: t('sate.guia.aviso_ocr') }] : [] };
+  /* ---- Lector de reglamentos: estructura, anclas y relaciones, a partir de data/reglamentos/<id>.json ---- */
+  // Ancla citable: art-7 (artículo), art-7.III (fracción), art-7.III.b (inciso). El número puede llevar espacios (1 Bis).
+  const anclaArticulo = (n, fr, inciso) => 'art-' + n + (fr ? '.' + fr + (inciso ? '.' + inciso : '') : '');
+  function leerAncla(ancla) {
+    const m = /^art-([\w -]+?)(?:\.(\w+)(?:\.(\w+))?)?$/.exec(String(ancla || ''));
+    return m ? { n: m[1], fr: m[2] || null, inciso: m[3] || null } : null;
   }
-  raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, documentoReglamento };
+  // Árbol de títulos y capítulos según la ubicación de cada artículo; cada nodo guarda los números de artículo que contiene.
+  function arbolReglamento(reg) {
+    const raizArbol = { titulo: null, hijos: [], articulos: [] }, vistos = new Map();
+    for (const a of (reg && reg.articulos) || []) {
+      let nodo = raizArbol, clave = '';
+      for (const u of a.ubicacion || []) {
+        clave += '\u0001' + u;
+        let hijo = vistos.get(clave);
+        if (!hijo) { hijo = { titulo: u, hijos: [], articulos: [] }; nodo.hijos.push(hijo); vistos.set(clave, hijo); }
+        nodo = hijo;
+      }
+      nodo.articulos.push(a.n);
+    }
+    return raizArbol;
+  }
+  const totalArticulos = nodo => nodo.articulos.length + nodo.hijos.reduce((s, h) => s + totalArticulos(h), 0);
+  // Artículos de definiciones («se entenderá por: Término: definición. Otro: …»): un párrafo por término.
+  // Regla conservadora: solo tras «por:», con términos que empiezan en mayúscula y no pasan de 80 caracteres sin signos.
+  function dividirDefiniciones(texto) {
+    const m = /^([\s\S]{0,240}?\bpor:)\s+([\s\S]+)$/.exec(String(texto || ''));
+    if (!m) return null;
+    const partes = m[2].replace(/([.;])\s+(?=[A-ZÁÉÍÓÚÑ][^.:;•]{0,80}?:\s)/g, '$1\u0001').split('\u0001');
+    const definiciones = partes.map(p => /^([A-ZÁÉÍÓÚÑ][^.:;•]{0,79}?):\s+(\S[\s\S]*)$/.exec(p.trim())).map(x => x && { termino: x[1], texto: x[2] });
+    return partes.length >= 3 && definiciones.every(Boolean) ? { intro: m[1], definiciones } : null;
+  }
+  // Un artículo en bloques: texto previo, fracciones (con sus incisos) o definiciones; nada se reescribe, solo se parte.
+  function partesArticulo(a) {
+    const frs = (a && a.fracciones) || [], texto = String((a && a.texto) || '');
+    const inicio = frs.length ? Math.max(...['. ', '.- '].map(sep => texto.indexOf(frs[0].fr + sep + frs[0].texto))) : -1;
+    if (inicio >= 0) {
+      return { intro: texto.slice(0, inicio).trim(), definiciones: null, fracciones: frs.map(f => {
+        const corte = f.incisos && f.incisos.length ? f.texto.indexOf(' ' + f.incisos[0].inciso + ') ') : -1;
+        return corte >= 0 ? { fr: f.fr, texto: f.texto.slice(0, corte).trim(), incisos: f.incisos } : { fr: f.fr, texto: f.texto, incisos: [] };
+      }) };
+    }
+    const d = frs.length ? null : dividirDefiniciones(texto);
+    return d ? { intro: d.intro, definiciones: d.definiciones, fracciones: [] } : { intro: texto, definiciones: null, fracciones: [] };
+  }
+  // Artículos que contienen todas las palabras (o cuyo número empieza como lo escrito); primero el número exacto.
+  function buscarArticulos(reg, q, maximo) {
+    const ts = terminos(q), num = norm(q).trim();
+    if (!ts.length) return [];
+    const r = [];
+    for (const a of (reg && reg.articulos) || []) {
+      const n = norm(a.n), exacto = n === num;
+      if (exacto || (/^\d/.test(num) && n.startsWith(num)) || (!/^\d+$/.test(num) && ts.every(w => norm(a.texto + ' ' + (a.ubicacion || []).join(' ')).includes(w)))) r.push({ a, peso: exacto ? 0 : 1 });
+    }
+    return r.sort((x, y) => x.peso - y.peso).slice(0, maximo || 40).map(x => x.a);
+  }
+  // Preguntas de la Guía que citan cada artículo (fuente con artículos o marca [[a:doc:n|…]]) y los trámites de SATE a los que remiten.
+  const indicesCitas = new WeakMap();
+  function citasPorArticulo(d) {
+    if (indicesCitas.has(d)) return indicesCitas.get(d);
+    const indice = new Map(), marca = /\[\[a:([\w-]+):([\w -]+)\|/g;
+    const agregar = (doc, n, p) => { const k = doc + ':' + n, l = indice.get(k) || []; if (!l.includes(p)) l.push(p); indice.set(k, l); };
+    for (const p of (d && d.preguntas) || []) {
+      for (const f of p.fuentes || []) for (const n of f.arts || []) agregar(f.doc, n, p);
+      for (const texto of [p.respuesta, ...(p.pasos || [])]) { marca.lastIndex = 0; let m; while ((m = marca.exec(texto || ''))) agregar(m[1], m[2], p); }
+    }
+    indicesCitas.set(d, indice);
+    return indice;
+  }
+  function relacionesArticulo(d, doc, n, tramitesUnidad) {
+    const preguntas = (d && citasPorArticulo(d).get(doc + ':' + n)) || [], disponibles = tramitesUnidad || [];
+    return { preguntas, tramites: [...new Set(preguntas.map(p => p.ventanilla).filter(v => v && disponibles.includes(v)))] };
+  }
+  raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -284,30 +341,179 @@
     return { titulo: cab.titulo };
   }
 
-  /* ---------- reglamentos y a quién acudo ---------- */
-  let lectorActivo;
-  function cargarLector() {
-    if (raiz.PoliCORE?.lector) return Promise.resolve(raiz.PoliCORE.lector);
-    return SATE.script('../policore/lector.js').then(() => raiz.PoliCORE.lector);
+  /* ---------- reglamentos ---------- */
+  let limpiarLector = null;
+  const apagarLector = () => { if (limpiarLector) { limpiarLector(); limpiarLector = null; } };
+  const pantallaChica = () => !!(raiz.matchMedia && raiz.matchMedia('(max-width:768.98px)').matches);
+  function copiarEnlace(href) {
+    const url = new URL(href, raiz.location.href).href;
+    if (raiz.navigator?.clipboard?.writeText) return raiz.navigator.clipboard.writeText(url);
+    return Promise.reject(new Error('Sin portapapeles'));
+  }
+  // Lector de tres paneles: índice del reglamento | texto de un artículo | trámites y preguntas que lo citan.
+  function montarReglamento(raizGuia, d, reg, doc, ancla) {
+    const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos'), href: rutaGuia('reglamentos') }, { texto: reg.titulo }], reg.titulo, reg.gaceta);
+    const articulos = reg.sin_texto ? [] : reg.articulos || [], transitorios = reg.sin_texto ? [] : reg.transitorios || [];
+    const fuenteDoc = reg.url ? h('p', { 'class': 'rgl-fuente' }, [enlaceExterno('', reg.url, t('sate.guia.pdf_oficial'))]) : null;
+    const avisoOcr = reg.ocr && !reg.sin_texto ? h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }) : null;
+    if (!articulos.length && !transitorios.length) {
+      // Sin articulado (código, lineamientos escaneados): el texto corrido, sin índice.
+      const lineas = !reg.sin_texto && reg.texto ? String(reg.texto).split(/\n+/).filter(Boolean) : [];
+      raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado' }, [avisoOcr, lineas.length
+        ? h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-ancla': 'texto' }, lineas.map(x => h('p', { texto: x })))
+        : h('p', { role: 'status', texto: t('sate.guia.sin_articulo') }), fuenteDoc]));
+      return { titulo: cab.titulo };
+    }
+    const posicion = new Map(articulos.map((a, i) => [a.n, i]));
+    const arbol = arbolReglamento(reg), tramites = cfg().tramites || [];
+    const grupos = new Map(), enlaces = new Map();     // artículo -> grupos que lo contienen / enlace del índice
+    const enlaceAncla = (clase, anclaDe, contenido, extra) => h('a', { 'class': clase, href: rutaReglamento(doc, anclaDe), 'data-ancla': anclaDe, ...extra }, contenido);
+    const chip = (n, ancestros) => {
+      const a = enlaceAncla('rgl-art', anclaArticulo(n), t('sate.guia.rgl_art_corto', { n }));
+      enlaces.set(n, a);
+      grupos.set(n, ancestros);
+      return h('li', {}, [a]);
+    };
+    function nodoArbol(nodo, ancestros) {
+      const det = h('details', { 'class': 'rgl-grupo' }), cuerpo = h('div', { 'class': 'rgl-grupo__cuerpo' });
+      const propios = [...ancestros, det];
+      for (const hijo of nodo.hijos) cuerpo.appendChild(nodoArbol(hijo, propios));
+      if (nodo.articulos.length) cuerpo.appendChild(h('ul', { 'class': 'rgl-arts' }, nodo.articulos.map(n => chip(n, propios))));
+      det.append(h('summary', {}, [h('span', { texto: nodo.titulo }), h('small', { texto: String(totalArticulos(nodo)) })]), cuerpo);
+      return det;
+    }
+    const arbolNav = h('div', { 'class': 'rgl-arbol' }, arbol.hijos.map(x => nodoArbol(x, [])));
+    if (arbol.articulos.length) arbolNav.appendChild(h('ul', { 'class': 'rgl-arts' }, arbol.articulos.map(n => chip(n, []))));
+    const enlaceTransitorios = transitorios.length ? enlaceAncla('rgl-art rgl-art--ancho', 'transitorios', t('sate.guia.transitorios')) : null;
+    if (enlaceTransitorios) arbolNav.appendChild(h('ul', { 'class': 'rgl-arts' }, [h('li', {}, [enlaceTransitorios])]));
+
+    const resultados = h('ul', { 'class': 'rgl-resultados', hidden: true });
+    const aviso = h('p', { 'class': 'sate-sr', role: 'status', 'aria-live': 'polite' });
+    let primero = null;
+    const buscar = SateUI.buscador({ etiqueta: t('sate.guia.rgl_buscar_etiqueta'), marcador: t('sate.guia.rgl_buscar_marcador'), id: 'rgl-q',
+      alCambiar: q => {
+        const hay = terminos(q).length > 0, r = hay ? buscarArticulos(reg, q, 40) : [];
+        primero = r[0] ? anclaArticulo(r[0].n) : null;
+        arbolNav.hidden = hay;
+        resultados.hidden = !hay;
+        resultados.replaceChildren(...r.map(a => h('li', {}, [enlaceAncla('rgl-resultado', anclaArticulo(a.n), [h('strong', { texto: t('sate.guia.rgl_art_corto', { n: a.n }) }), h('span', { texto: a.texto.slice(0, 90) })])])));
+        aviso.textContent = hay ? t('sate.guia.rgl_resultados', { n: r.length }) : '';
+      },
+      alEnviar: () => { if (primero) ir(primero, true); } });
+    const resumen = h('span', { 'class': 'rgl-resumen__actual' });
+    const cuerpoIndice = h('div', { 'class': 'rgl-indice__cuerpo' }, [h('div', { 'class': 'rgl-buscar' }, [buscar.raiz]), aviso, resultados, arbolNav]);
+    const indice = h('details', { 'class': 'rgl-indice', open: true }, [h('summary', { 'class': 'rgl-resumen' }, [h('span', { texto: t('sate.guia.rgl_indice') }), resumen]), cuerpoIndice]);
+    const texto = h('article', { 'class': 'rgl-texto', 'aria-label': reg.titulo });
+    const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
+    const rejilla = h('div', { 'class': 'rgl' }, [indice, texto, riel]);
+    if (fuenteDoc || avisoOcr) cab.nodo.appendChild(h('div', { 'class': 'rgl-datos' }, [fuenteDoc, avisoOcr]));
+    raizGuia.append(cab.nodo, rejilla);
+
+    let actual = null, mensaje = null, temporizador = 0, enlaceActual = '';
+    function fila(clase, marca, anclaDe, etiqueta, contenido) {
+      return h('li', { 'class': clase, 'data-ancla': anclaDe }, [enlaceAncla('rgl-marca', anclaDe, marca, { 'aria-label': etiqueta }), h('div', {}, contenido)]);
+    }
+    function cuerpoArticulo(a) {
+      const p = partesArticulo(a), nodos = [];
+      if (p.intro) nodos.push(h('p', { texto: p.intro }));
+      if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones' }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
+      if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
+        h('p', { texto: f.texto }),
+        f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), [h('p', { texto: x.texto })]))) : null]))));
+      return h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial' }, nodos);
+    }
+    const rotuloArticulo = a => ({ ancla: anclaArticulo(a.n), rotulo: t('sate.guia.articulo_rotulo', { n: a.n }) });
+    function paginas(antes, despues) {
+      const enlace = (x, clase, ref) => x ? enlaceAncla('rgl-pagina ' + clase, x.ancla, [h('small', { texto: ref }), h('span', { texto: x.rotulo })]) : h('span');
+      return h('nav', { 'class': 'rgl-paginas', 'aria-label': t('sate.guia.rgl_indice') }, [enlace(antes, 'rgl-pagina--antes', t('sate.guia.rgl_anterior')), enlace(despues, 'rgl-pagina--despues', t('sate.guia.rgl_siguiente'))]);
+    }
+    function copiar() {
+      const avisar = clave => { if (mensaje) { mensaje.textContent = t(clave); raiz.clearTimeout(temporizador); temporizador = raiz.setTimeout(() => { mensaje.textContent = ''; }, 2500); } };
+      Promise.resolve().then(() => copiarEnlace(enlaceActual)).then(() => avisar('sate.guia.rgl_copiado'), () => avisar('sate.guia.rgl_copiar_error'));
+    }
+    function cabeceraTexto(rotulo, ubicacion) {
+      const boton = h('button', { type: 'button', 'class': 'btn rgl-copiar', texto: t('sate.guia.rgl_copiar') });
+      boton.addEventListener('click', copiar);
+      mensaje = h('span', { 'class': 'rgl-copiado', role: 'status', 'aria-live': 'polite' });
+      return h('header', { 'class': 'rgl-cab' }, [h('div', {}, [ubicacion ? h('p', { 'class': 'rgl-ubicacion', texto: ubicacion }) : null, h('h3', { tabindex: '-1', texto: rotulo })]), h('div', { 'class': 'rgl-acciones' }, [boton, mensaje])]);
+    }
+    function pintarRiel(a) {
+      const rel = a ? relacionesArticulo(d, doc, a.n, tramites) : { preguntas: [], tramites: [] };
+      const bloques = [];
+      if (rel.tramites.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_tramites') }), h('ul', {}, rel.tramites.map(id => h('li', {}, [h('a', { href: '#/' + unidad() + '/tramites/' + id, texto: t('sate.tramite.' + id + '.titulo') })])))]));
+      if (rel.preguntas.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_preguntas') }), h('ul', {}, rel.preguntas.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]));
+      riel.replaceChildren(...bloques);
+      riel.hidden = !bloques.length;
+      rejilla.classList.toggle('rgl--sin-riel', !bloques.length);
+    }
+    function marcarIndice(clave) {
+      for (const [n, a] of enlaces) { if (n === clave) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
+      if (enlaceTransitorios) { if (clave === 'transitorios') enlaceTransitorios.setAttribute('aria-current', 'true'); else enlaceTransitorios.removeAttribute('aria-current'); }
+      for (const g of grupos.get(clave) || []) g.open = true;
+      // Con el índice abierto, el artículo actual queda a la vista dentro de su propio desplazamiento.
+      const activo = clave === 'transitorios' ? enlaceTransitorios : enlaces.get(clave), r = cuerpoIndice.getBoundingClientRect();
+      if (activo && indice.open && r.height) { const a = activo.getBoundingClientRect(); if (a.top < r.top || a.bottom > r.bottom) cuerpoIndice.scrollTop += a.top - r.top - r.height / 3; }
+    }
+    // Pinta un artículo (o los transitorios).
+    function pintar(clave) {
+      if (clave === 'transitorios') {
+        const rotulo = t('sate.guia.transitorios');
+        texto.replaceChildren(cabeceraTexto(rotulo, ''),
+          h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial' }, [h('ol', { 'class': 'rgl-fracciones' }, transitorios.map(x => h('li', { 'class': 'rgl-fr' }, [h('span', { 'class': 'rgl-marca', texto: x.n + '.' }), h('div', {}, [h('p', { texto: x.texto })])])))]),
+          paginas(articulos.length ? rotuloArticulo(articulos[articulos.length - 1]) : null, null));
+        pintarRiel(null);
+        resumen.textContent = rotulo;
+      } else {
+        const i = posicion.get(clave), a = articulos[i];
+        texto.replaceChildren(cabeceraTexto(t('sate.guia.articulo_rotulo', { n: a.n }), (a.ubicacion || []).join(' · ')), cuerpoArticulo(a),
+          paginas(i > 0 ? rotuloArticulo(articulos[i - 1]) : null, i < articulos.length - 1 ? rotuloArticulo(articulos[i + 1]) : transitorios.length ? { ancla: 'transitorios', rotulo: t('sate.guia.transitorios') } : null));
+        pintarRiel(a);
+        resumen.textContent = t('sate.guia.rgl_art_corto', { n: a.n });
+      }
+      marcarIndice(clave);
+      actual = clave;
+    }
+    // Muestra el artículo o la fracción de un ancla; sin ancla válida, el primer artículo. Devuelve el nodo de la fracción, si hay.
+    function ir(anclaDestino, empujar) {
+      const p = leerAncla(anclaDestino);
+      const clave = anclaDestino === 'transitorios' && transitorios.length ? 'transitorios' : p && posicion.has(p.n) ? p.n : articulos.length ? articulos[0].n : 'transitorios';
+      const cambio = clave !== actual;
+      if (cambio) pintar(clave);
+      const final = p && clave === p.n && p.fr ? anclaArticulo(p.n, p.fr, p.inciso) : clave === 'transitorios' ? 'transitorios' : anclaArticulo(clave);
+      const fr = final.includes('.') ? Array.from(texto.querySelectorAll('li[data-ancla]')).find(x => x.getAttribute('data-ancla') === final) : null;
+      for (const x of texto.querySelectorAll('.rgl-activa')) x.classList.remove('rgl-activa');
+      if (fr) fr.classList.add('rgl-activa');
+      enlaceActual = rutaReglamento(doc, fr ? final : clave === 'transitorios' ? clave : anclaArticulo(clave));
+      if (empujar) {
+        try { history[cambio ? 'pushState' : 'replaceState'](null, '', enlaceActual); } catch (e) { /* sin historial */ }
+        if (indice.open && pantallaChica()) indice.open = false;
+        if (fr) SateUI.revelar(fr);
+        else if (cambio) { const r = texto.getBoundingClientRect(); if (r.top < 0 && texto.scrollIntoView) texto.scrollIntoView({ block: 'start' }); }
+      }
+      return fr;
+    }
+    rejilla.addEventListener('click', e => {
+      const a = e.target.closest && e.target.closest('a[data-ancla]');
+      if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+      e.preventDefault();
+      ir(a.getAttribute('data-ancla'), true);
+    });
+    const consulta = raiz.matchMedia ? raiz.matchMedia('(max-width:768.98px)') : null;
+    const ajustar = () => { indice.open = !(consulta && consulta.matches); };
+    if (consulta?.addEventListener) consulta.addEventListener('change', ajustar);
+    ajustar();
+    limpiarLector = () => { if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); raiz.clearTimeout(temporizador); };
+    const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
+    if (fr) SateUI.revelar(fr);
+    return { titulo: cab.titulo, enDocumento: !!fr };
   }
   async function apartadoReglamentos(raizGuia, d, doc, ancla, vigente) {
-    const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos') }], tituloApartado('reglamentos'), t('sate.guia.reglamentos_intro'));
     if (doc) {
-      const reg = await cargarReglamento(doc), lector = await cargarLector();
+      const reg = await cargarReglamento(doc);
       if (!vigente()) return {};
-      const contenedor = h('div', {});
-      raizGuia.append(cab.nodo, contenedor);
-      if (reg.sin_texto) raizGuia.appendChild(h('p', { texto: t('sate.guia.sin_articulo') }));
-      function resaltar(id) {
-        for (const s of contenedor.querySelectorAll('[data-pc-seccion]')) s.classList.toggle('guia-articulo-activo', s.getAttribute('data-pc-seccion') === id);
-      }
-      lectorActivo = lector.montar(contenedor, documentoReglamento(reg, t), {
-        texto: t, enlace: id => rutaReglamento(doc, id),
-        alNavegar: id => { resaltar(id); history.replaceState(null, '', rutaReglamento(doc, id)); }
-      });
-      resaltar(ancla);
-      return { titulo: cab.titulo, enDocumento: !!ancla && lectorActivo.irA(ancla, { inmediato: true, notificar: false }) };
+      return montarReglamento(raizGuia, d, reg, doc, ancla);
     }
+    const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos') }], tituloApartado('reglamentos'), t('sate.guia.reglamentos_intro'));
     const indice = await cargarReglamento('indice');
     const docs = Object.entries(d.documentos).filter(([, x]) => x.reglamento).map(([id, x]) => ({ id, ...x }));
     const lista = h('ul', { 'class': 'sate-tarjetas-nav' }, docs.map(x => h('li', {}, [
@@ -358,7 +564,7 @@
   async function mostrar(r) {
     const caja = document.getElementById('sate-guia'), mi = ++token;
     const [apartado, id, ancla] = (r && r.partes) || [];
-    if (lectorActivo) { lectorActivo.desmontar(); lectorActivo = null; }
+    apagarLector();
     const raizGuia = h('div', { 'class': 'tmr guia' });
     caja.replaceChildren(raizGuia);
     try {
@@ -384,6 +590,6 @@
       raizGuia.replaceChildren(h('p', { 'class': 'tmr-vacio', role: 'alert', texto: t('sate.guia.error_datos') }), otra);
     }
   }
-  SATE.guia = { datos, enlace: (...p) => rutaGuia(...p), documentoReglamento };
-  SATE.pestana('guia', { montar() {}, mostrar(r) { return mostrar(r).catch(e => SATE.error(e)); }, ocultar() { token++; if (lectorActivo) { lectorActivo.desmontar(); lectorActivo = null; } } });
+  SATE.guia = { datos, enlace: (...p) => rutaGuia(...p) };
+  SATE.pestana('guia', { montar() {}, mostrar(r) { return mostrar(r).catch(e => SATE.error(e)); }, ocultar() { token++; apagarLector(); } });
 })(typeof window !== 'undefined' ? window : globalThis);

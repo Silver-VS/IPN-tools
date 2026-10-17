@@ -76,11 +76,11 @@ assert.equal(c.SateRutas.ruta('#/ficticia/guia/reglamentos/demo/art-1%20Bis','fi
 assert.equal(c.SateRutas.ruta('#/ficticia/guia/reglamentos/demo/art-%ZZ','ficticia',config.unidades), null);
 desplazamientos.length = 0;
 await pestana.mostrar(ruta);
-assert.equal(desplazamientos.length, 0, 'el enlace profundo conserva el desplazamiento al artículo');
-assert.deepEqual(scripts, ['../policore/lector.js']);
-assert.ok(caja.querySelector('[data-pc-seccion="art-1"]').classList.contains('guia-articulo-activo'));
+assert.deepEqual(scripts, [], 'el lector de reglamentos ya no carga PoliCORE');
+assert.ok(caja.querySelector('.rgl'), 'tres paneles');
+assert.equal(caja.querySelector('.rgl-art[aria-current]').getAttribute('data-ancla'), 'art-1');
 assert.ok(caja.textContent.includes('Texto literal <seguro>'));
-assert.ok(caja.querySelector('[data-pc-seccion="transitorios"]'));
+assert.ok(caja.querySelector('.rgl-art--ancho'), 'transitorios en el índice');
 await pestana.mostrar({partes:['acudir']});
 assert.ok(caja.textContent.includes('sate.guia.acudir_ipn'));
 assert.ok(caja.textContent.includes('sate.guia.fuente_pagina'));
