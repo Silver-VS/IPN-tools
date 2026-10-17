@@ -149,6 +149,16 @@
   }
 
   /* ---------- Tarjeta de aviso ---------- */
+  /* R2-PER: HTML compartido para las vistas que construyen renglones de materias. */
+  function avisoMateria(o) {
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return `<aside class="sate-aviso-materia" data-materia="${esc(o.clave)}" aria-label="${esc(o.nombre)}">
+      <p class="sate-aviso-materia__cab"><strong>${esc(o.nombre)}</strong><span>${esc(o.estado)}</span></p>
+      <p class="sate-aviso-materia__motivo">${esc(o.motivo)}</p>
+      ${o.eleccion?`<p class="sate-aviso-materia__eleccion" role="status">${esc(o.eleccion)}</p>`:''}
+      <div class="sate-chips">${o.acciones.map(a=>`<button type="button" class="sate-chip sate-chip--reemplazo" data-estado="${a.elegida?'ok':'aviso'}" data-desfase="${esc(o.clave)}" data-opcion="${esc(a.opcion)}" aria-pressed="${!!a.elegida}">${esc(a.texto)}</button>`).join('')}</div>
+    </aside>`;
+  }
   /* aviso({estado, titulo, cuerpo, accion:{texto, onclick|href}, descartable}) */
   function aviso(o) {
     var e = estado(o.estado);
@@ -483,8 +493,12 @@ function minimapaCurricular(ctx,L,FILL,op={}){
     svg+=`<circle data-estado="${st}" cx="${cx}" cy="${cy}" r="${r}" fill="${colores[st]}"/>`;
   });
   svg+='</svg>';
-  // leyenda en dos filas centradas: avance (acreditadas, en curso, por cursar) y alertas (reprobadas, desfasadas)
-  const pastilla=st=>`<span><i style="background:${colores[st]}"></i>${esc(SATE.texto('sate.minimapa.'+st,{n:cnt[st]}))}</span>`;
+  // El número se separa después de traducir para conservar los plurales del catálogo.
+  const pastilla=st=>{
+    const texto=SATE.texto('sate.minimapa.'+st,{n:cnt[st]}),numero=String(cnt[st]);
+    const conteo=texto.startsWith(numero)?`<b class="mm-numero">${esc(numero)}</b> ${esc(texto.slice(numero.length).trim())}`:esc(texto);
+    return `<span><i style="background:${colores[st]}"></i>${conteo}</span>`;
+  };
   const leyenda=[['done','curso','pend'],['fail','late']].map(fila=>fila.filter(st=>st in cnt)).filter(f=>f.length)
     .map(f=>`<div class="mm-fila">${f.map(pastilla).join('')}</div>`).join('');
   return {svg,leyenda,cnt};
@@ -624,7 +638,7 @@ function leyendaGrafica(items,esc){
   return `<span class="ley">${items.map(([t,c,x])=>`<span><svg viewBox="0 0 22 14" width="22" height="14" aria-hidden="true" fill="none">${m(t,c)}</svg>${esc(x)}</span>`).join('')}</span>`;
 }
 
-  raiz.SateUI = { definicion: (texto, titulo, definicion) => ayuda('', {}, {texto, titulo, definicion}), leyendaGrafica, indicadoresTrayectoria, fichasKardex, caminoTrayectoria, bandasMapa:rowBands, minimapaCurricular, cajaMateria, resalteCaja, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
+  raiz.SateUI = { avisoMateria, definicion: (texto, titulo, definicion) => ayuda('', {}, {texto, titulo, definicion}), leyendaGrafica, indicadoresTrayectoria, fichasKardex, caminoTrayectoria, bandasMapa:rowBands, minimapaCurricular, cajaMateria, resalteCaja, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior,
     volver: volver, migas: migas, tarjetaNav: tarjetaNav, buscador: buscador, segmentado: segmentado, pregunta: pregunta, revelar: revelar };
 })(typeof window !== 'undefined' ? window : globalThis);

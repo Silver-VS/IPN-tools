@@ -64,12 +64,21 @@
       boton.innerHTML=mini.svg;boton.onclick=()=>SATE.ir('mapa');vista.appendChild(boton);
       const leyenda=el('div',null,'mm-leg');leyenda.innerHTML=mini.leyenda;vista.appendChild(leyenda);box.appendChild(vista);
     }
-    const principal=lista[0];
-    box.appendChild(SateUI.aviso({estado:principal.estado,titulo:tt('siguiente_paso'),cuerpo:principal.titulo+': '+principal.cuerpo,accion:{texto:tx(principal.id==='actualizacion'?'usar_lector':config().tramites.includes(principal.tramite)?'que_hacer':'ver_detalles'),onclick:()=>abrirTramite(principal)}}));
-    box.appendChild(el('h3',tx('pendientes')));
-    box.appendChild(SateUI.chips(lista.filter(x=>x!==principal&&x.estado!=='ok').map(x=>({id:x.id,estado:x.estado,texto:x.titulo+' ⓘ',abre:()=>detalle(x)}))));
-    const planear=el('button',SATE.texto('sate.planeacion.titulo'),'sate-enlace');planear.type='button';planear.onclick=()=>SATE.ir('mapa');box.appendChild(planear);
-    const decisiones=el('div');decisiones.innerHTML=conPlan(()=>conSim(false,desfaseAvisos),0);box.appendChild(decisiones);
+    const principal=lista[0],html=conPlan(()=>conSim(false,desfaseAvisos),0);
+    const orientacion=el('div',null,'trayectoria-orientacion');
+    orientacion.appendChild(SateUI.aviso({estado:principal.estado,titulo:tt('siguiente_paso'),cuerpo:html?tt('decidir_materias'):principal.titulo+': '+principal.cuerpo,accion:{texto:html?tt('revisar_materias'):tx(principal.id==='actualizacion'?'usar_lector':config().tramites.includes(principal.tramite)?'que_hacer':'ver_detalles'),onclick:()=>{
+      if(html){const destino=document.getElementById('perfil-materias-titulo');destino.focus();destino.scrollIntoView?.({block:'nearest'})}else abrirTramite(principal);
+    }}}));
+    orientacion.appendChild(el('h3',tx('pendientes')));
+    orientacion.appendChild(SateUI.chips(lista.filter(x=>x!==principal&&x.estado!=='ok'&&(!html||!['adeudos','desfase'].includes(x.id))).map(x=>({id:x.id,estado:x.estado,texto:x.titulo+' ⓘ',abre:()=>detalle(x)}))));
+    const planear=el('button',SATE.texto('sate.planeacion.titulo'),'sate-enlace');planear.type='button';planear.onclick=()=>SATE.ir('mapa');orientacion.appendChild(planear);
+    box.appendChild(orientacion);
+    if(html){
+      const decisiones=el('section',null,'trayectoria-decisiones');
+      const titulo=el('h3',tt('materias_resolver'));titulo.id='perfil-materias-titulo';titulo.tabIndex=-1;
+      decisiones.setAttribute('aria-labelledby',titulo.id);decisiones.appendChild(titulo);
+      const materias=el('div',null,'trayectoria-materias');materias.innerHTML=html;decisiones.appendChild(materias);box.appendChild(decisiones);
+    }
   }
   function tramite(box,id) {
     if(!isPersonal())return;

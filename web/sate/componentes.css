@@ -847,3 +847,53 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
 .mapwrap{padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7));scroll-padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7))}
 body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
 body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+
+/* R2-PER: avisos anclados a cada materia y retícula del perfil. */
+
+#sate-presente{align-items:start;gap:var(--ipn-esp-5)}
+#sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.trayectoria-resumen{margin:0}
+.trayectoria-orientacion{grid-column:1;grid-row:2;min-width:0;display:grid;gap:var(--ipn-esp-3)}
+.trayectoria-orientacion>h3{margin:var(--ipn-esp-3) 0 0;font-size:var(--ipn-tamano-m);font-weight:600;color:var(--ipn-tenue)}
+.trayectoria-minimapa{grid-column:2;grid-row:2;align-self:start;gap:var(--ipn-esp-2);min-width:0}
+.trayectoria-minimapa button{flex:none}
+.trayectoria-minimapa .mm-leg,.mm-leg{align-items:flex-start}
+.mm-leg .mm-fila{justify-content:flex-start}
+.mm-leg .mm-fila>span{display:inline-flex;align-items:center;gap:var(--ipn-esp-1)}
+.mm-leg .mm-fila>span>i{flex:none;margin-right:0}
+.mm-numero{min-width:var(--ipn-esp-4);text-align:right;font-variant-numeric:tabular-nums}
+.trayectoria-decisiones{grid-column:1 / -1;min-width:0;margin-top:var(--ipn-esp-3)}
+.trayectoria-decisiones>h3{margin:0 0 var(--ipn-esp-3);font-size:var(--ipn-tamano-l);font-weight:700}
+.trayectoria-materias{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-4);align-items:start}
+.sate-materia-decision{min-width:0}
+.sate-aviso-materia{min-width:0;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido);font-size:var(--ipn-tamano-s);overflow-wrap:anywhere}
+.sate-aviso-materia p{margin:0}
+.sate-aviso-materia__cab{display:flex;flex-wrap:wrap;align-items:baseline;gap:var(--ipn-esp-1) var(--ipn-esp-3)}
+.sate-aviso-materia__cab>span{color:var(--ipn-error);font-size:var(--ipn-tamano-xs);font-weight:600}
+.sate-aviso-materia .sate-aviso-materia__motivo{margin-top:var(--ipn-esp-2);line-height:1.5}
+.sate-aviso-materia .sate-aviso-materia__eleccion{margin-top:var(--ipn-esp-2);color:var(--ipn-tenue)}
+.sate-aviso-materia .sate-chips{margin-top:var(--ipn-esp-3);gap:var(--ipn-esp-2);flex-wrap:wrap}
+.sate-aviso-materia .sate-chip{min-height:calc(var(--ipn-esp-6) + var(--ipn-esp-3));max-width:100%;white-space:normal;text-align:left}
+.sate-aviso-materia .sate-chip:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.subj>.sate-aviso-materia{margin:var(--ipn-esp-3)}
+#hor-desfase{display:grid;gap:var(--ipn-esp-3);margin-bottom:var(--ipn-esp-4)}
+#hor-desfase:empty{display:none}
+
+#trayectoria-escenario>summary{font-size:var(--ipn-tamano-l);font-weight:700;padding-bottom:var(--ipn-esp-2)}
+#trayectoria-escenario>summary small{font-size:var(--ipn-tamano-s)}
+#trayectoria-escenario>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-5);padding-top:var(--ipn-esp-2)}
+#trayectoria-escenario:not([open])>div{display:none}
+#trayectoria-escenario section.meta-panel{min-width:0;margin:0;padding-block:0}
+#trayectoria-escenario section.meta-panel+section.meta-panel{border-left:1px solid var(--ipn-linea);padding-left:var(--ipn-esp-5)}
+#trayectoria-escenario .meta-panel h3{font-size:var(--ipn-tamano-m);font-weight:600;color:var(--ipn-tenue);margin:0 0 var(--ipn-esp-2)}
+#trayectoria-escenario .meta-controls,#trayectoria-escenario .meta-controls label{min-width:0;max-width:100%;flex-wrap:wrap}
+@media(max-width:899px){
+  #sate-presente:has(.trayectoria-minimapa){grid-template-columns:minmax(0,1fr)}
+  .trayectoria-minimapa{grid-column:1;grid-row:3}
+  .trayectoria-orientacion{grid-row:2}
+  #trayectoria-escenario>div{grid-template-columns:minmax(0,1fr)}
+  #trayectoria-escenario section.meta-panel+section.meta-panel{border-left:0;border-top:1px solid var(--ipn-linea);padding-left:0;padding-top:var(--ipn-esp-5)}
+}
+@media(max-width:639px){
+  .trayectoria-materias{grid-template-columns:minmax(0,1fr)}
+}
