@@ -81,6 +81,8 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
 @media(min-width:768px){
   #sate-tabs .sate-pestanas{width:auto;justify-content:flex-start;gap:var(--ipn-esp-6)}
   #sate-tabs .sate-pestana{flex:none;min-width:0;padding-inline:0}
+  /* Sin ícono en escritorio: su caja vacía corría el texto, el subrayado y el punto de la pestaña activa. */
+  #sate-tabs .sate-pestana__icono{display:none}
 }
 /* En teléfono la barra de pestañas es fija abajo: su renglón y el de avisos vacíos no dejan hueco. */
 @media(max-width:767px){
