@@ -104,12 +104,22 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(kardex.open,false,'F: preferencia explícita prevalece');
   assert.match(document.querySelector('#kstats').innerHTML,/Tu camino|kpis/);
   const orden=document.querySelector('#kstats').innerHTML;
-  const bloques=['class="kpis"','id="ch-camino"','id="ch-kx"','id="trayectoria-sim-slot"','id="trayectoria-escenario-titulo"','id="meta-periodos"','id="prom-meta"','id="ch-cat"'];
+  const bloques=['class="kpis"','id="kx-curso-titulo"','id="trayectoria-kardex"','id="kx-lista"','id="ch-camino"','id="trayectoria-sim-slot"','id="trayectoria-escenario-titulo"','id="meta-periodos"','id="prom-meta"','id="ch-cat"'];
   assert.ok(bloques.every((x,i)=>orden.includes(x)&&(!i||orden.indexOf(bloques[i-1])<orden.indexOf(x))),'B1: orden del desempeño y metas agrupadas');
-  assert.match(orden,/<\/div><\/details>\s*<div id="trayectoria-sim-slot"><\/div>\s*<details[^>]+id="trayectoria-escenario"/,'REV1: simulación inmediatamente después del kárdex y antes de escenarios');
+  assert.ok(orden.indexOf('id="trayectoria-kardex"')<orden.indexOf('id="ch-camino"')&&orden.indexOf('id="ch-camino"')<orden.indexOf('id="trayectoria-sim-slot"'),'B1: kárdex antes de trayectoria y escenarios');
   assert.match(orden,/<details class="trayectoria-areas-detalle"><summary>Ver detalle<\/summary>/,'REV1: datos de áreas plegados por omisión');
   assert.match(orden,/Escala 6–10 · línea: tu promedio sin reprobadas \([^)]*\) · acento: tus 2 mejores áreas/);
   assert.match(document.querySelector('#est-sim').innerHTML,/Simular fin de semestre/);
+  vm.runInContext("ALUMNO.kardex_reprobadas=[[Object.keys(cur())[0],5,'23/2','ORD']];ALUMNO.en_curso=[Object.keys(cur())[1]]",c);
+  pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.match(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'Perfil ficticio adeuda resalta junto a la materia');
+  document.querySelector('#kx-estado').id='kx-estado';document.querySelector('#kx-estado').value='reprobadas';document.querySelector('#kstats').eventos.change.forEach(fn=>fn({target:document.querySelector('#kx-estado')}));
+  assert.equal(vm.runInContext('KX_FILTRO[S.car]?.estado',c),'reprobadas','El control actualiza el filtro');
+  assert.match(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'El filtro de reprobadas muestra adeudos');
+  assert.equal((document.querySelector('#kx-lista').innerHTML.match(/<li>/g)||[]).length,1,'El filtro excluye acreditadas');
+  assert.equal(vm.runInContext('kardexFiltro().estado',c),'reprobadas','El filtro queda recordado por carrera');
+  document.querySelector('#kx-estado').value='acreditadas';document.querySelector('#kstats').eventos.change.forEach(fn=>fn({target:document.querySelector('#kx-estado')}));
+  assert.doesNotMatch(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'El filtro de acreditadas oculta adeudos');
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;assert.equal(solicitudes.length,2,'Carga única');
   // El chip es global y Quitar desactiva todas las comparaciones sin alterar el SAES.
   const real=vm.runInContext('JSON.stringify(ALUMNO)',c);

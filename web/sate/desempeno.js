@@ -12,6 +12,25 @@ const cargarPlot=()=>window.Plot?Promise.resolve():PLOT_P||(PLOT_P=LIB_PLOT.redu
 
 let ST_RENDER=0;
 const trayectoriaAbierta=(id,inicial=false)=>store.get('trayectoria.seccion.'+id,!MQ_PHONE.matches&&inicial);
+const KX_FILTRO={};
+const kardexFiltro=()=>({periodo:'*',estado:'*',...store.get('trayectoria.kardex.'+S.car,{}),...KX_FILTRO[S.car]});
+const filasKardex=()=>{
+  const c=cur(), A=ALUMNO;
+  return [...(A.acreditadas||[]).filter(r=>r&&notaValida(r[1])!=null).map(r=>({...r,acreditada:true})),
+    ...(A.kardex_reprobadas||[]).filter(r=>r&&Number.isFinite(+r[1])&&+r[1]>=0&&+r[1]<6).map(r=>({...r,acreditada:false}))]
+    .map(r=>({clave:r[0],cal:+r[1],periodo:r[2]||'',codigo:r[3]||'',nombre:pretty(c[r[0]]?.[0]||r[0]),acreditada:r.acreditada}))
+    .sort((a,b)=>(perIdx(b.periodo)??-1)-(perIdx(a.periodo)??-1)||a.clave.localeCompare(b.clave,'es'));
+};
+function renderKardexLista(){
+  const rows=filasKardex(), filtro=kardexFiltro(), periodos=[...new Set(rows.map(r=>r.periodo).filter(Boolean))].sort((a,b)=>(perIdx(b)??-1)-(perIdx(a)??-1));
+  const aprobadas=(ALUMNO.acreditadas||[]).map(r=>notaValida(r?.[1])).filter(v=>v!=null), media=aprobadas.length?aprobadas.reduce((a,b)=>a+b,0)/aprobadas.length:null;
+  const visibles=rows.filter(r=>(filtro.periodo==='*'||r.periodo===filtro.periodo)&&(filtro.estado==='*'||(filtro.estado==='acreditadas')===r.acreditada));
+  $('#kx-periodo').innerHTML=`<option value="*">${esc(SATE.texto('sate.trayectoria.kardex_todos'))}</option>${periodos.map(p=>`<option value="${esc(p)}"${p===filtro.periodo?' selected':''}>${esc(p)}</option>`).join('')}`;
+  $('#kx-estado').value=filtro.estado;
+  $('#kx-prom-oficial').textContent=ALUMNO.promedio==null?'—':(+ALUMNO.promedio).toFixed(2);
+  $('#kx-prom-acreditadas').textContent=media==null?'—':media.toFixed(2);
+  $('#kx-lista').innerHTML=visibles.length?visibles.map(r=>`<li><span><b>${esc(r.clave)}</b> · ${esc(r.nombre)}${!r.acreditada?` <strong class="kx-marca">${esc(SATE.texto('sate.trayectoria.kardex_adeudo'))}</strong>`:''}</span><span>${r.periodo?esc(r.periodo):'—'} · ${r.cal} · ${esc(r.codigo)}</span></li>`).join(''):`<li>${esc(SATE.texto('sate.trayectoria.kardex_vacio'))}</li>`;
+}
 function prepararSeccion(el,id,dibujar){
   el.open=trayectoriaAbierta(id,id==='kardex'||id==='escenario'||id==='simulacion');
   let dibujada=false,turno=0;
@@ -143,12 +162,12 @@ async function renderStatsVista(){
   const focoSim=$('#desempeno-simulacion').contains(document.activeElement)?document.activeElement:null;
   $('#sate-trayectoria').appendChild($('#desempeno-simulacion'));
   box.innerHTML=`${D.avisos.length?`<p class="st-note">${D.avisos.map(esc).join(' ')}</p>`:''}${SateUI.indicadoresTrayectoria(D,{esc,fmtCr,info,SATE})}
-    <div class="charts">
-      <figure class="ch-wide"><figcaption><h3>Tu camino en la carrera ${simTag('camino')}</h3>${ley([['cuadro','var(--ipn-acento)','Acreditado'],['rayado','var(--ipn-acento)',Dc.simulado?'Simulado':'En curso'],['cuadro','var(--ipn-linea)','Te falta'],['marca','var(--ipn-acento)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure>
-    </div>
-    <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}<small>${esc(SATE.texto('sate.trayectoria.kardex_resumen',{n:Dk.rows.length}))}</small></summary><div class="charts">
-      <figure class="ch-wide"><figcaption>${simTag('kardex')}${ley([['grado','','Calificación'],...[['E','Extraordinario'],['T','ETS'],['R','Recurse']].filter(([l])=>Dk.rows.some(r=>({EXT:'E',ETS:'T',REC:'R'})[r.codigo]===l)).map(([l,t])=>['letra',l,t]),...(Dk.rows.some(r=>r.sim)?[['simulada','var(--ipn-texto)','Simulada']]:[])])}</figcaption><div id="ch-kx"></div></figure>
+    <section class="trayectoria-kardex-curso" aria-labelledby="kx-curso-titulo"><h3 id="kx-curso-titulo">${esc(SATE.texto('sate.trayectoria.kardex_curso'))}</h3><ul class="kx-lista">${(A.en_curso||[]).map(k=>`<li><span><b>${esc(k)}</b> · ${esc(pretty(cur()[k]?.[0]||k))}</span><span>${esc(SATE.texto('sate.desempeno.en_curso'))}</span></li>`).join('')||`<li>${esc(SATE.texto('sate.trayectoria.kardex_sin_curso'))}</li>`}</ul></section>
+    <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}<small>${esc(SATE.texto('sate.trayectoria.kardex_resumen',{n:Dk.rows.length}))}</small></summary><div>
+      <div class="kx-controles"><label>${esc(SATE.texto('sate.trayectoria.kardex_periodo'))}<select id="kx-periodo"></select></label><label>${esc(SATE.texto('sate.trayectoria.kardex_estado'))}<select id="kx-estado"><option value="*">${esc(SATE.texto('sate.trayectoria.kardex_todos'))}</option><option value="acreditadas">${esc(SATE.texto('sate.trayectoria.kardex_acreditadas'))}</option><option value="reprobadas">${esc(SATE.texto('sate.trayectoria.kardex_reprobadas'))}</option></select></label></div>
+      <div class="kx-promedios"><span>${esc(SATE.texto('sate.trayectoria.kardex_prom_oficial'))} <b id="kx-prom-oficial"></b></span><span>${esc(SATE.texto('sate.trayectoria.kardex_prom_acreditadas'))} <b id="kx-prom-acreditadas"></b></span></div><ul id="kx-lista" class="kx-lista"></ul>
     </div></details>
+    <div class="charts"><figure class="ch-wide"><figcaption><h3>Tu camino en la carrera ${simTag('camino')}</h3>${ley([['cuadro','var(--ipn-acento)','Acreditado'],['rayado','var(--ipn-acento)',Dc.simulado?'Simulado':'En curso'],['cuadro','var(--ipn-linea)','Te falta'],['marca','var(--ipn-acento)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure></div>
     <div id="trayectoria-sim-slot"></div>
     <details class="trayectoria-plegable" id="trayectoria-escenario"><summary id="trayectoria-escenario-titulo">${esc(SATE.texto('sate.trayectoria.y_si'))}<small>${esc(SATE.texto('sate.trayectoria.y_si_resumen'))}</small></summary><div>
       ${conSim(usaSim('meta'),()=>metaPanel(statsDatos()))}
@@ -173,14 +192,7 @@ async function renderStatsVista(){
     ec:Dc.simulado?0:[...new Set(tr().enCurso)].reduce((t,k)=>t+(cur()[k]?.[1]||0),0),info},$('#ch-camino').clientWidth);
   montarAyudasCreditos();
   // 2) kárdex por periodo: cada materia es un cuadro con su calificación; encabezado con promedio y créditos
-  prepararSeccion($('#trayectoria-kardex'),'kardex',()=>{const host=$('#ch-kx');
-    const col=(t,sub,rs)=>SateUI.fichasKardex(t,sub,rs,esc);
-    const eq=Dk.rows.filter(r=>r.eqv), sinP=Dk.rows.filter(r=>!r.eqv&&r.per==null);
-    let prev=null;
-    host.innerHTML=`<div class="kx">`+(eq.length?col('Equivalencias',`${eq.length} materias`,eq):'')+
-      Dk.porPer.filter(d=>d.n).map(d=>{const rs=Dk.rows.filter(r=>!r.eqv&&r.per===d.per), dif=prev!=null?d.prom-prev:null;prev=d.prom;
-        return col(d.lbl,`${f2(d.prom)}${dif!=null&&Math.abs(dif)>=.01?` <em class="${dif>0?'up':'down'}">${dif>0?'▲':'▼'}</em>`:''} · ${d.cr!=null?fmtCr(d.cr)+' cr':''}`,rs)}).join('')+
-      (sinP.length?col('Sin periodo',`${sinP.length} materias`,sinP):'')+`</div>`});
+  renderKardexLista();prepararSeccion($('#trayectoria-kardex'),'kardex');
   // Dos materias evitan presentar una sola calificación como una afinidad consolidada.
   const grupos=new Map();for(const r of Da.rows){if(!grupos.has(r.cat))grupos.set(r.cat,[]);grupos.get(r.cat).push(r)}
   const porArea=[...grupos].map(([cat,v])=>({cat,media:v.reduce((a,r)=>a+r.cal,0)/v.length,n:v.length,
@@ -217,6 +229,8 @@ const cambiarMeta=e=>{
   $('#meta-periodos').setAttribute('aria-invalid',String(!metaCreditos(D,cfg.periodos,cfg.actual).valida));
 };
 $('#kstats').addEventListener('input',cambiarMeta);
+$('#kstats').addEventListener('change',e=>{if(!['kx-periodo','kx-estado'].includes(e.target.id))return;
+  const cfg={...kardexFiltro(),[e.target.id==='kx-periodo'?'periodo':'estado']:e.target.value};KX_FILTRO[S.car]=cfg;store.set('trayectoria.kardex.'+S.car,cfg);renderKardexLista()});
 $('#kstats').addEventListener('input',e=>{if(e.target.id!=='prom-meta')return;const v=+e.target.value;if(!(v>=6&&v<=10))return;
   store.set('promMeta.'+S.car,v);store.set('pmCal.'+S.car,{});const D=statsDatos(),M=promMeta(D,v);
   $('#pm-res').innerHTML=promMetaHtml(M)});
