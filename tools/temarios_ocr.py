@@ -57,5 +57,5 @@ for k, (p, i) in enumerate(tareas, 1):
 for p in pdfs:
     base = sal / p.relative_to(raiz).with_suffix("")
     partes = sorted(base.parent.glob(f"{base.name}-p*.txt"), key=lambda x: int(re.search(r"-p(\d+)\.txt$", x.name).group(1)))
-    if partes: base.with_suffix(".md").write_text("\n\n---\n\n".join(x.read_text(encoding="utf-8") for x in partes), encoding="utf-8")
+    if partes: (base.parent / (base.name + ".md")).write_text("\n\n---\n\n".join(x.read_text(encoding="utf-8") for x in partes), encoding="utf-8")
 print(f"listo en {time.time()-t0:.0f} s", flush=True)
