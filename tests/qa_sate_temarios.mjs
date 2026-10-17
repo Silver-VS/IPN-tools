@@ -321,17 +321,17 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.match(portada.querySelector('#gd-res').textContent, /No hay una materia con ese nombre/);
   q.value = ''; q.dispatchEvent(new Evento('input', {target: q}));
   assert.equal(portada.querySelector('#gd-res').hidden, true);
-  // Tres vistas: «Trayectoria escolar» (por omisión), «Líneas de aprendizaje» y «Especializaciones»; la ficha se abre en un diálogo
+  // Dos formas: «Trayectoria escolar» (por omisión) y «Líneas y especializaciones» (metro o matriz); la ficha se abre en un diálogo
   const exp = portada.querySelector('#gd-explorar');
   assert.equal(portada.querySelector('#gd-consultar-titulo'), null, 'el buscador no repite un título y un párrafo');
   assert.equal(portada.querySelector('label[for=gd-q]').textContent, textos['sate.guia.buscar_etiqueta'], 'etiqueta visible del control');
   assert.equal(q.getAttribute('placeholder'), 'Nombre o clave');
   assert.ok(exp, 'sección del explorador');
   assert.equal(exp.querySelector('#gd-carrera').value, 'bionica');
-  const modos = portada.querySelectorAll('.sate-segmentado button');
-  igual(modos.map(b => b.querySelector('.sate-segmentado__largo').textContent), ['Trayectoria escolar', 'Líneas de aprendizaje', 'Especializaciones']);
-  igual(modos.map(b => b.getAttribute('aria-pressed')), ['true', 'false', 'false'], 'la trayectoria escolar es la vista por omisión');
-  assert.equal(portada.querySelector('.gd-tray').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true); assert.equal(portada.querySelector('.gd-esp').hidden, true);
+  const modos = portada.querySelectorAll('.gd-explorar-enc .sate-segmentado button');
+  igual(modos.map(b => b.querySelector('.sate-segmentado__largo').textContent), ['Trayectoria escolar', 'Líneas y especializaciones']);
+  igual(modos.map(b => b.getAttribute('aria-pressed')), ['true', 'false'], 'la trayectoria escolar es la vista por omisión');
+  assert.equal(portada.querySelector('.gd-tray').hidden, false); assert.equal(portada.querySelector('.gd-lin').hidden, true);
   assert.equal(portada.querySelectorAll('.gd-tray .gd-chip').length, 72, 'trayectoria: todas las materias de la carrera, una vez');
   const niveles = new Set(Object.values(indice.materias).filter(x => x.c === 'bionica' && x.v != null).map(x => x.v));
   assert.ok(portada.querySelectorAll('.gd-sem').length >= niveles.size, 'una columna por semestre');
@@ -357,24 +357,46 @@ function el(document, tag, attrs = {}, hijos = []) {
   if (enlaceRel) { const dest = indice.materias[enlaceRel.getAttribute('href').split('/').at(-1)].n; enlaceRel.click(); await dormir(30); assert.equal(document.querySelector('dialog').querySelector('.sate-modal__titulo').textContent, dest); }
   fd.dispatchEvent(new Evento('cancel', {target: fd}));
   assert.equal(fd.open, false, 'Escape cierra');
-  // Líneas de aprendizaje
+  // Líneas y especializaciones: metro por omisión, matriz con el conmutador
   const rel = T_.relaciones(indice.materias, 'B103');
   assert.ok(rel.despues.length > 0, 'B103 desbloquea otras materias por la seriación real');
   modos[1].click();
-  assert.equal(portada.querySelector('.gd-mapa').hidden, false); assert.equal(portada.querySelector('.gd-tray').hidden, true);
-  assert.equal(portada.querySelectorAll('.gd-mapa .gd-chip').length, 72, 'líneas: todas las materias de la carrera, una vez');
+  assert.equal(portada.querySelector('.gd-lin').hidden, false); assert.equal(portada.querySelector('.gd-tray').hidden, true);
+  const vistas = portada.querySelectorAll('.gd-lin-barra .sate-segmentado button');
+  igual(vistas.map(b => b.textContent), ['Metro', 'Matriz']);
+  igual(vistas.map(b => b.getAttribute('aria-pressed')), ['true', 'false'], 'el metro es la vista por omisión');
+  assert.equal(portada.querySelector('.gd-metro').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true);
   const filas = T_.lineasDeAprendizaje(indice.materias, 'bionica', indice.carreras.bionica.areas);
-  assert.equal(portada.querySelectorAll('.gd-fila').length, filas.length + 1, 'una fila por línea más el encabezado de niveles');
   assert.ok(filas.at(-1).nombre === null && filas.at(-1).items.length > 0, 'las optativas van al final, en su propia fila');
   assert.ok(filas.every(f => f.items.every((i, k) => k === 0 || f.items[k - 1].v <= i.v)), 'cada línea ordenada por nivel');
+  assert.equal(portada.querySelectorAll('.gd-metro .gd-estacion').length, 72, 'metro: todas las materias de la carrera, una vez');
+  assert.equal(portada.querySelectorAll('.gd-metro-fila').length, filas.length + 1, 'una vía por línea más el encabezado de niveles');
+  assert.equal(portada.querySelectorAll('.gd-metro-linea').length, filas.length, 'una vía dibujada por línea');
+  const est = portada.querySelector('.gd-metro .gd-estacion[data-clave=B103]');
+  assert.equal(est.tagName, 'BUTTON', 'cada estación es un botón (teclado)');
+  assert.match(est.getAttribute('aria-label'), /^Álgebra lineal, B103, .+, nivel 1$/, 'nombre accesible: unidad, clave, línea y nivel');
+  assert.equal(est.getAttribute('style').includes('width:148px'), true);
+  assert.equal(portada.querySelector('.gd-metro-caja').getAttribute('tabindex'), '0', 'la caja se desplaza con el teclado');
+  const nombres = portada.querySelectorAll('.gd-estacion-nombre').map(n => n.textContent);
+  assert.ok(nombres.every(n => !n.includes('…')), 'ningún rótulo se trunca');
+  const cruces = portada.querySelectorAll('.gd-estacion--cruce');
+  const enMas = new Map(); for (const l of indice.carreras.bionica.lineas) for (const k of new Set(l.claves)) enMas.set(k, (enMas.get(k) || 0) + 1);
+  assert.equal(cruces.length, [...enMas].filter(([k, n]) => n > 1 && indice.materias[k]).length, 'correspondencias: materias en más de una especialización');
+  assert.match(portada.querySelector('.gd-metro-leyenda').textContent, /Anillo doble/);
+  est.click(); await dormir(30);
+  assert.equal(document.querySelector('dialog').open, true, 'la estación abre el diálogo de la ficha');
+  document.querySelector('dialog').dispatchEvent(new Evento('cancel', {target: document.querySelector('dialog')}));
+  vistas[1].click();
+  assert.equal(portada.querySelector('.gd-mapa').hidden, false); assert.equal(portada.querySelector('.gd-metro').hidden, true);
+  assert.equal(portada.querySelectorAll('.gd-mapa .gd-chip').length, 72, 'matriz: todas las materias de la carrera, una vez');
+  assert.equal(portada.querySelectorAll('.gd-fila').length, filas.length + 1, 'una fila por línea más el encabezado de niveles');
   assert.match(portada.querySelector('.gd-mapa .gd-chip[data-clave=B103]').getAttribute('class'), /gd-n1\b/, 'el chip va en la columna de su nivel');
   const conAntes = portada.querySelector('.gd-chip-antes'); assert.ok(conAntes && /^Antes: /.test(conAntes.textContent), 'la seriación se ve en la línea');
   portada.querySelector('.gd-mapa .gd-chip[data-clave=B103]').click(); await dormir(30);
-  assert.equal(document.querySelector('dialog').open, true, 'también abre el diálogo desde las líneas');
+  assert.equal(document.querySelector('dialog').open, true, 'también abre el diálogo desde la matriz');
   document.querySelector('dialog').dispatchEvent(new Evento('cancel', {target: document.querySelector('dialog')}));
-  // Especializaciones
-  modos[2].click();
-  assert.equal(portada.querySelector('.gd-esp').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true);
+  // Bloques de especialización bajo ambas vistas
+  assert.equal(portada.querySelector('.gd-esp').hidden, false);
   assert.equal(portada.querySelectorAll('.gd-esp-linea').length, 6);
   assert.equal(portada.querySelectorAll('.gd-esp-area').length, 3);
   const nucleoMapa = JSON.parse(leer('web/dist/sate/datos/upiita/nucleo.json'));
