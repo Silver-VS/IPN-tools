@@ -246,7 +246,15 @@ assert.equal(C.texto(config.textos,'lugares',{n:1}),'1 lugar');
 assert.equal(C.texto(config.textos,'lugares',{n:2}),'2 lugares');
 assert.equal(C.texto(config.textos,'lugares',{n:0}),'Sin lugares');
 assert.match(C.texto(config.textos,'aviso',{n:1,materia:'B105',grupo:'1BM3'}),/1 lugar$/);
-for(const archivo of ['lector','cupos'])assert.match(leer('web/dist/'+archivo+'.js'),/sate\.js\?v=/);
+// Según cómo se compiló (UPIITA_SITE): entrada que carga sate.js publicado, o copia completa con la acción.
+// Ambas formas deben fijar la acción; la copia completa es exactamente la acción seguida de sate.js.
+const sateCompilado=leer('web/dist/sate.js');
+for(const [archivo,accion] of [['lector','lector'],['cupos','cupos']]){
+  const entrada=leer('web/dist/'+archivo+'.js');
+  assert.ok(entrada.includes('window.IPNTSateAccion='+JSON.stringify(accion)),archivo);
+  if(entrada.startsWith('(()=>{'))assert.match(entrada,/sate\.js\?v=/);
+  else assert.equal(entrada,'window.IPNTSateAccion='+JSON.stringify(accion)+';'+sateCompilado,archivo);
+}
 // Barra real ejecutada desde Inicio.aspx, sin selects ni tabla en la página visible.
 let panelMessage,peticionesPanel=0,tiempo=Date.now(),intervalos=[],visibilidad,aperturas=0;
 const nodes=new Map(),node=k=>{if(!nodes.has(k))nodes.set(k,{value:'',innerHTML:'',style:{setProperty(){}}});return nodes.get(k)};
