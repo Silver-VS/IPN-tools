@@ -11,7 +11,7 @@ const a=JSON.parse(leer('data/perfiles-prueba/regular-mecatronica.json'));
 const pasos=JSON.parse(leer('data/recorrido.json'));
 const toml=leer('contenido/textos/es.toml').split('[sate.recorrido]')[1].split('\n[')[0];
 const textos=Object.fromEntries([...toml.matchAll(/^(\w+) = "(.*)"$/gm)].map(m=>[m[1],m[2]]));
-const tx=(k,v)=>textos[k].replace(/\{(\w+)\}/g,(_,p)=>v[p]);
+const tx=(k,v={})=>textos[k].replace(/\{(\w+)\}/g,(_,p)=>v[p]);
 const avance=Math.round(a.avance.obtenidos/(a.carga.total||a.avance.obtenidos+a.avance.faltan)*100)+' %';
 assert.ok(r.contenido(pasos[0],a,tx).includes(avance));
 assert.ok(r.contenido(pasos[1],a,tx).includes(String(r.variables(a).n)));
@@ -20,53 +20,58 @@ assert.equal(r.contenido(pasos[0],{},tx),textos.trayectoria);
 assert.equal(r.cumple({condicion:'personal'},null),false);
 assert.equal(r.cumple({condicion:'personal'},a),true);
 assert.equal(r.cumple({condicion:'desconocida'},a),false);
-assert.equal(pasos.filter(p=>r.cumple(p,null)).length,5);
-assert.equal(r.siguiente(pasos,0,1,p=>p.selector==='#b-horario'),3);
-assert.equal(r.siguiente(pasos,5,-1,p=>p.selector==='#b-horario'),3);
+assert.equal(pasos.filter(p=>r.cumple(p,null)).length,6);
+assert.deepEqual([...new Set(pasos.map(p=>p.pestana))],['trayectoria','mapa','horarios','tramites','calendario','guia']);
+assert.ok(pasos.every(p=>['barra','flotante',undefined].includes(p.control)));
+assert.equal(pasos.find(p=>p.pestana==='mapa').control,'barra');
+assert.equal(pasos.find(p=>p.pestana==='horarios').control,'flotante');
+assert.equal(r.control({}, {top:40},1440),'flotante');
+assert.equal(r.control({}, {top:120},1440),'barra');
+assert.equal(r.control({}, {top:120},375),'flotante');
+assert.equal(r.siguiente(pasos,0,1,p=>p.pestana==='horarios'),3);
+assert.equal(r.siguiente(pasos,6,-1,p=>p.pestana==='horarios'),3);
 assert.equal(r.siguiente(pasos,0,1,()=>false),-1);
 for(const acepta of [true,false]){
   const almacen=new Map(),get=k=>almacen.get(k)??null;
-  assert.ok(ui.recorridoOfrecer(get));
-  ui.recorridoDecidir((k,v)=>almacen.set(k,v),acepta);
-  assert.equal(ui.recorridoOfrecer(get),false);
+  assert.ok(ui.recorridoOfrecer(get));ui.recorridoDecidir((k,v)=>almacen.set(k,v),acepta);
   assert.equal(ui.recorridoOfrecer(get),false);
 }
-// Los recursos se sirven localmente y el módulo no forma parte de la carga inicial.
 const inicio=leer('web/sate/inicio.js');
 assert.match(inicio,/await script\('recorrido.js'\)/);
 assert.doesNotMatch(leer('web/sate/cascaron.html'),/src="recorrido.js"/);
 for(const p of pasos){assert.ok(textos[p.texto]);if(p.personal)assert.ok(textos[p.personal])}
-// Integración del controlador real: pestañas asíncronas, elemento ausente y Escape.
-const eventos=new Map(),botones=[],vistas=[];
-let cerrada=false,dialogo;
-const objetivo={closest:()=>null,getClientRects:()=>[{}],scrollIntoView(){},getBoundingClientRect:()=>({top:96,left:12,right:308,bottom:600})};
-const documento={activeElement:{isConnected:true,focus(){}},querySelector:s=>s===pasos[1].selector?null:objetivo,
-  createElement(){const b={focus(){}};botones.push(b);return b}};
-const entorno={console,document:documento,innerWidth:320,
-  fetch:async()=>({ok:true,json:async()=>pasos}),
-  addEventListener:(k,f)=>eventos.set(k,f),removeEventListener:k=>eventos.delete(k),
+
+// La bienvenida muestra las pestañas y el paso conserva el control declarado.
+const eventos=new Map(),vistas=[],creados=[];let cerrada=false,dialogo;
+function nodo(tag='div'){
+  const n={tag,children:[],dataset:{},style:{},hidden:false,textContent:'',className:'',
+    classList:{add(){},remove(){}},append(...xs){this.children.push(...xs)},appendChild(x){this.children.push(x)},
+    insertBefore(x){this.children.unshift(x)},setAttribute(k,v){this[k]=v},addEventListener(k,f){this['on'+k]=f},
+    querySelector(sel){return sel==='button'?this.children.find(x=>x.tag==='button'):null},querySelectorAll(){return this.children.filter(x=>x.tag==='button')},
+    closest(){return null},getClientRects(){return [{}]},getBoundingClientRect(){return {top:120,left:12,right:308,bottom:300,height:180}},
+    scrollIntoView(){},focus(){}};
+  if(tag==='button')n.type='button';creados.push(n);return n;
+}
+const objetivo={closest:()=>null,getClientRects:()=>[{}],scrollIntoView(){},getBoundingClientRect:()=>({top:120,left:12,right:308,bottom:300,height:180})};
+const documento={activeElement:{isConnected:true,focus(){}},querySelector:()=>objetivo,createElement:nodo};
+const entorno={console,document:documento,innerWidth:375,innerHeight:700,matchMedia:()=>({matches:false}),requestAnimationFrame:f=>f(),
+  fetch:async()=>({ok:true,json:async()=>pasos}),addEventListener:(k,f)=>eventos.set(k,f),removeEventListener:k=>eventos.delete(k),
   SATE_CONFIG:{unidades:{ficticia:{pestanas:[...new Set(pasos.map(p=>p.pestana))]}}},SATE_UNIDAD:'ficticia',
-  SATE:{alumno:()=>a,texto:(k,v)=>k==='sate.recorrido.paso'?`${v.n}/${v.total}`:tx(k.replace('sate.recorrido.',''),v),visitar:async id=>{vistas.push(id)}},
+  SATE:{alumno:()=>a,texto:(k,v)=>k.startsWith('sate.pestana.')?({trayectoria:'Tu perfil',mapa:'Mapa curricular',horarios:'Horarios de clase',tramites:'Ventanilla digital',calendario:'Calendario escolar',guia:'Guía politécnica'})[k.split('.')[2]]:k==='sate.recorrido.paso'?`${v.n}/${v.total}`:k==='sate.recorrido.bienvenida'?'Qué puedes hacer en SATE':k==='sate.recorrido.muestrame'?'Muéstrame':k==='sate.recorrido.terminar'?'Terminar':k==='sate.recorrido.siguiente'?'Siguiente':k==='sate.recorrido.anterior'?'Anterior':k==='sate.recorrido.salir'?'Salir':tx(k.replace('sate.recorrido.',''),v),visitar:async id=>{vistas.push(id)}},
   SateUI:{recorridoTarjeta(salir){
-    dialogo={elemento:{open:false,showModal(){this.open=true},remove(){cerrada=true}},
-      tarjeta:{getBoundingClientRect:()=>({top:360})},titulo:{},texto:{},acciones:{appendChild(){}},marco:{style:{}},escape:salir};return dialogo;
-  }},scrollBy(){}};
+    dialogo={elemento:{open:false,dataset:{},showModal(){this.open=true},remove(){cerrada=true},querySelectorAll(){return []},addEventListener(){}},
+      tarjeta:Object.assign(nodo(),{getBoundingClientRect:()=>({top:360,height:120})}),titulo:nodo(),texto:nodo(),acciones:nodo(),marco:nodo(),escape:salir};return dialogo;
+  },modal(){}},scrollBy(){}};
 entorno.window=entorno;
 vm.runInNewContext(leer('web/sate/recorrido.js'),entorno);
 await entorno.SateRecorrido.iniciar();
 assert.equal(dialogo.elemento.open,true);
-assert.ok(dialogo.texto.textContent.includes(avance));
-await botones[1].onclick();
+assert.equal(dialogo.lista.children.length,6);
+assert.deepEqual(dialogo.lista.children.map(x=>x.children[0].textContent),['Tu perfil','Mapa curricular','Horarios de clase','Ventanilla digital','Calendario escolar','Guía politécnica']);
+dialogo.lista.children.find(x=>x.children[0].textContent==='Mapa curricular').children[2].onclick();
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(dialogo.tarjeta.dataset.control,'barra');
 assert.equal(vistas.at(-1),'mapa');
-assert.equal(vistas.length,3,'Se visitó y saltó el elemento ausente');
-assert.ok(parseFloat(dialogo.marco.style.height)+parseFloat(dialogo.marco.style.top)<360,'La tarjeta no cubre el resalte');
-for(const ancho of [320,375]){
-  entorno.innerWidth=ancho;eventos.get('resize')();
-  assert.ok(parseFloat(dialogo.marco.style.left)+parseFloat(dialogo.marco.style.width)<=ancho-8);
-}
-await botones[0].onclick();
-assert.equal(vistas.at(-1),'trayectoria');
-dialogo.escape();
-assert.ok(cerrada);
-assert.equal(eventos.size,0);
-console.log('OK recorrido');
+assert.equal(dialogo.acciones.children.length,3);
+dialogo.escape();assert.ok(cerrada);assert.equal(eventos.size,0);
+console.log('OK recorrido: bienvenida, pestañas, control declarado, omisión en 375 px y Escape.');

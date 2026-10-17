@@ -10,25 +10,41 @@
   function cumple(p,a){return p.condicion==='siempre'||p.condicion==='personal'&&!!a}
   function contenido(p,a,texto=tx){const v=variables(a);return texto(a&&p.personal&&(p.texto!=='trayectoria'||v.avance!=null)?p.personal:p.texto,v)}
   function siguiente(pasos,desde,direccion,existe){for(let i=desde;i>=0&&i<pasos.length;i+=direccion)if(existe(pasos[i]))return i;return -1}
+  function control(p,rect,ancho){return p.control||((ancho<=639||rect.top<88)?'flotante':'barra')}
   let activo=false;
   async function iniciar(){
     if(activo)return;
     activo=true;
-    let ui,origen=document.activeElement,elemento,indice=-1,ocupado=false,cerrado=false;
+    let ui,origen=document.activeElement,elemento,indice=-1,pasos=[],ocupado=false,cerrado=false;
     const salir=()=>{cerrado=true;activo=false;removeEventListener('resize',colocar);removeEventListener('scroll',colocar,true);ui?.elemento.remove();if(origen?.isConnected)origen.focus()};
     function colocar(){
-      if(!elemento||!ui)return;
-      const r=elemento.getBoundingClientRect(),limite=ui.tarjeta.getBoundingClientRect().top-12;
-      const top=Math.max(8,Math.min(r.top,limite-44)),left=Math.max(8,r.left);
-      Object.assign(ui.marco.style,{top:top+'px',left:left+'px',width:Math.max(0,Math.min(r.right,innerWidth-8)-left)+'px',height:Math.max(0,Math.min(r.bottom,limite)-top)+'px'});
+      if(!elemento||!ui||!ui.elemento.open)return;
+      const r=elemento.getBoundingClientRect(),limite=ui.tarjeta.getBoundingClientRect();
+      const top=Math.max(8,r.top),left=Math.max(8,r.left);
+      Object.assign(ui.marco.style,{top:top+'px',left:left+'px',width:Math.max(0,Math.min(r.right,innerWidth-8)-left)+'px',height:Math.max(0,Math.min(r.bottom,innerHeight-8)-top)+'px'});
     }
     try{
       const r=await fetch('recorrido.json');if(!r.ok)throw new Error('recorrido.json: HTTP '+r.status);
       const a=SATE.alumno?.(),cfg=SATE_CONFIG.unidades[SATE_UNIDAD];
-      const pasos=(await r.json()).filter(p=>cfg.pestanas.includes(p.pestana)&&cumple(p,a));
+      pasos=(await r.json()).filter(p=>cfg.pestanas.includes(p.pestana)&&cumple(p,a));
       ui=SateUI.recorridoTarjeta(salir);
+      ui.tarjeta.classList.add('sate-recorrido__bienvenida');ui.elemento.dataset.vista='bienvenida';
+      ui.titulo.textContent=tx('bienvenida');ui.texto.textContent='';
+      const lista=document.createElement('div');lista.className='sate-recorrido__lista';lista.setAttribute('aria-label',tx('bienvenida'));
+      const pestanas=[...new Set(cfg.pestanas)];
+      for(const pestana of pestanas){
+        const paso=pasos.find(p=>p.pestana===pestana);if(!paso)continue;
+        const tarjeta=document.createElement('article');tarjeta.className='sate-recorrido__opcion';
+        const titulo=document.createElement('h3');titulo.textContent=SATE.texto('sate.pestana.'+pestana+'.titulo');
+        const texto=document.createElement('p');texto.textContent=contenido(paso,a);
+        const boton=document.createElement('button');boton.type='button';boton.className='sate-btn';boton.textContent=tx('muestrame');boton.onclick=()=>{ui.elemento.dataset.vista='pasos';ui.tarjeta.classList.remove('sate-recorrido__bienvenida');ui.lista.hidden=true;iniciarPestana(pestana).catch(()=>SateUI.modal(tx('boton'),tx('error'),{pequeno:true}))};
+        tarjeta.append(titulo,texto,boton);lista.appendChild(tarjeta);
+      }
+      ui.lista=lista;ui.tarjeta.insertBefore(lista,ui.acciones);ui.acciones.hidden=true;
+      ui.elemento.showModal();
       const botones={};
       for(const k of ['anterior','siguiente','salir']){const b=document.createElement('button');b.type='button';b.className='sate-btn';b.textContent=tx(k);b.onclick=()=>k==='salir'?salir():mover(k==='anterior'?-1:1).catch(()=>SateUI.modal(tx('boton'),tx('error'),{pequeno:true}));ui.acciones.appendChild(b);botones[k]=b}
+      async function iniciarPestana(pestana){pasos=pasos.filter(p=>p.pestana===pestana);indice=-1;ui.acciones.hidden=false;await mover(1)}
       async function mover(direccion){
         if(ocupado||cerrado)return;ocupado=true;let i=indice;
         try{
@@ -39,17 +55,27 @@
             console.debug('SATE: paso de recorrido omitido',{paso:i,selector:pasos[i].selector});
           }
           if(i===-1){if(direccion>0)salir();return}
-          indice=i;ui.titulo.textContent=tx('paso',{n:i+1,total:pasos.length});ui.texto.textContent=contenido(pasos[i],a);
-          botones.anterior.disabled=i===0;
-          if(!ui.elemento.open)ui.elemento.showModal();
-          elemento.scrollIntoView({block:'start',behavior:'instant'});window.scrollBy({top:-96,behavior:'instant'});colocar();
-          botones.salir.focus({preventScroll:true});
+          indice=i;const paso=pasos[i];ui.titulo.textContent=tx('paso',{n:i+1,total:pasos.length});ui.texto.textContent=contenido(paso,a);
+          ui.tarjeta.dataset.control=control(paso,elemento.getBoundingClientRect(),innerWidth);
+          botones.anterior.disabled=i===0;botones.siguiente.textContent=i===pasos.length-1?tx('terminar'):tx('siguiente');
+          elemento.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+          await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+          const caja=elemento.getBoundingClientRect(),alto=ui.tarjeta.getBoundingClientRect().height;
+          if(ui.tarjeta.dataset.control==='barra'&&caja.top<80)window.scrollBy({top:caja.top-96,behavior:'instant'});
+          if(ui.tarjeta.dataset.control==='flotante'&&caja.bottom>innerHeight-alto-16)window.scrollBy({top:caja.bottom-(innerHeight-alto-24),behavior:'instant'});
+          colocar();botones.salir.focus({preventScroll:true});
         }catch(e){salir();console.error('SATE: paso de recorrido fallido',{paso:i,mensaje:e.message,pila:e.stack});throw e}
         finally{ocupado=false}
       }
+      ui.elemento.addEventListener('keydown',e=>{
+        if(e.key!=='Tab')return;
+        const enfocados=[...ui.elemento.querySelectorAll('button:not([disabled])')].filter(b=>!b.closest('[hidden]'));if(!enfocados.length)return;
+        if(e.shiftKey&&document.activeElement===enfocados[0]){e.preventDefault();enfocados.at(-1).focus()}
+        else if(!e.shiftKey&&document.activeElement===enfocados.at(-1)){e.preventDefault();enfocados[0].focus()}
+      });
       addEventListener('resize',colocar);addEventListener('scroll',colocar,true);
-      await mover(1);
+      (lista.querySelector('button')||ui.acciones.querySelector('button')).focus();
     }catch(e){salir();throw e}
   }
-  raiz.SateRecorrido={iniciar,variables,cumple,contenido,siguiente};
+  raiz.SateRecorrido={iniciar,variables,cumple,contenido,siguiente,control};
 })(typeof window!=='undefined'?window:globalThis);

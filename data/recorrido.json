@@ -1,8 +1,9 @@
 [
-  {"pestana":"trayectoria","selector":"#desempeno-titulo","texto":"trayectoria","personal":"trayectoria_personal","condicion":"siempre"},
-  {"pestana":"trayectoria","selector":"#sate-presente .sate-aviso","texto":"pendientes","personal":"pendientes_personal","condicion":"personal"},
-  {"pestana":"mapa","selector":"#h-chosen","texto":"mapa","condicion":"siempre"},
-  {"pestana":"horarios","selector":"#b-horario","texto":"horarios","condicion":"siempre"},
-  {"pestana":"tramites","selector":"#sate-tramites h2","texto":"tramites","condicion":"siempre"},
-  {"pestana":"guia","selector":"#sate-guia .guia-cab","texto":"guia","condicion":"siempre"}
+  {"pestana":"trayectoria","selector":"#sate-trayectoria","texto":"trayectoria","personal":"trayectoria_personal","condicion":"siempre","control":"flotante"},
+  {"pestana":"trayectoria","selector":"#sate-presente","texto":"pendientes","personal":"pendientes_personal","condicion":"personal","control":"barra"},
+  {"pestana":"mapa","selector":"#v-tray","texto":"mapa","condicion":"siempre","control":"barra"},
+  {"pestana":"horarios","selector":"#v-hor","texto":"horarios","condicion":"siempre","control":"flotante"},
+  {"pestana":"tramites","selector":"#sate-tramites","texto":"tramites","condicion":"siempre","control":"barra"},
+  {"pestana":"calendario","selector":"#sate-calendario","texto":"calendario","condicion":"siempre"},
+  {"pestana":"guia","selector":"#sate-guia","texto":"guia","condicion":"siempre","control":"flotante"}
 ]
