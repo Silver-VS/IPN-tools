@@ -45,7 +45,7 @@ def encabezado_sate(*, textos, unidad=None, contexto=True, acciones=True,
         siglas = (f'<button class="sate-unidad-btn" id="b-unidad" type="button" aria-haspopup="dialog" '
                   f'aria-label="{t("sate.encabezado.unidad")}" title="{t("sate.encabezado.unidad")}" hidden></button>')
     else:
-        siglas = escape(unidad['siglas'])
+        siglas = '<span class="sate-unidad-nombre">' + escape(t('sate.encabezado.unidad_marca').replace('{unidad}', unidad['siglas'])) + '</span>'
     leyenda = '<span id="sate-leyenda"></span>'
     if unidad and unidad.get('leyenda'):
         ayuda = textos['sate.leyenda.' + unidad['leyenda']].replace('{unidad}', unidad['siglas'])
@@ -77,7 +77,7 @@ def encabezado_sate(*, textos, unidad=None, contexto=True, acciones=True,
         enlaces.append(f'<a class="sate-pestana" href="{escape(enlace_local(p["href"]), quote=True)}"{actual}>{escape(p["texto"])}</a>')
     navegacion = ('<div class="sate-enlaces">' + ''.join(enlaces) + '</div>') if enlaces else ''
     html = (f'<header class="top sate-encabezado"><div class="sate-marca">{ipn}<div class="brand">'
-            f'<h1 id="sate-titulo">{t("sate.siglas")} {siglas}</h1><p id="sate-nombre">{t("sate.nombre")}</p></div></div>'
+            f'<h1 id="sate-titulo"><span class="sate-siglas">{t("sate.siglas")}</span><span class="sate-sep" aria-hidden="true"></span>{siglas}</h1><p id="sate-nombre">{t("sate.nombre")}</p></div></div>'
             f'{contexto}{lado}<nav class="sate-navegacion" aria-label="{t("sate.encabezado.navegacion")}"><div id="sate-tabs">{navegacion}</div><button id="t-tray" hidden></button></nav>'
             + ('<div class="sate-fila-avisos"><div id="sate-avisos-globales"></div></div>' if avisos else '') + '</header>')
     if acciones:

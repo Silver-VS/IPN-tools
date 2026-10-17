@@ -33,6 +33,8 @@ leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener error
 # Pestañas. `titulo` va en escritorio; `corto` en la barra inferior del teléfono (una palabra).
 [sate.encabezado]
 unidad = "Cambiar unidad académica"
+# Nombre de la unidad junto a «SATE» en la marca del encabezado.
+unidad_marca = "{unidad}-IPN"
 carrera = "Carrera"
 prueba = "Fase de prueba"
 acciones = "Acciones de SATE"

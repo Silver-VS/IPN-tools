@@ -7,7 +7,8 @@ const html = leer('web/dist/sate/index.html');
 const config = JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const texto = (k,v={}) => config.textos[k].replace(/\{(\w+)\}/g,(_,n)=>v[n]??'{'+n+'}');
 const encabezado = html.slice(html.indexOf('<header class="top sate-encabezado">'), html.indexOf('</header>', html.indexOf('<header class="top sate-encabezado">')));
-assert.match(encabezado, /<h1 id="sate-titulo">SATE <button class="sate-unidad-btn" id="b-unidad"[^>]*aria-label="Cambiar unidad académica"[^>]*><\/button><\/h1>/);
+// Marca «SATE | UPIITA-IPN»: siglas, separador decorativo y la unidad como botón (dueño, 2026-10-17).
+assert.match(encabezado, /<h1 id="sate-titulo"><span class="sate-siglas">SATE<\/span><span class="sate-sep" aria-hidden="true"><\/span><button class="sate-unidad-btn" id="b-unidad"[^>]*aria-label="Cambiar unidad académica"[^>]*><\/button><\/h1>/);
 assert.match(encabezado, /<p id="sate-nombre">Sistema de Apoyo a la Trayectoria Escolar<\/p>/);
 assert.ok(!encabezado.includes('unit-switch'), 'sin selector de unidad aparte');
 assert.match(encabezado, /<span id="sate-leyenda"><\/span>/);
@@ -65,14 +66,17 @@ for (const [unidad,generica,sinLogo] of [['upiita'],['upiita',false,true],['esco
   vm.runInContext(inicio.slice(inicio.indexOf('  function logoUnidad('),inicio.indexOf('  async function activar(')),c);
   vm.runInContext(inicio.slice(inicio.indexOf('  // «SATE {unidad}»'),inicio.indexOf('  if (cfg.leyenda)')),c);
   const siglas=c.SATE_CONFIG.unidades[unidad].siglas;
-  assert.equal(botonUnidad.textContent,siglas);assert.equal(botonUnidad.hidden,false);
+  assert.equal(botonUnidad.textContent,siglas+'-IPN');assert.equal(botonUnidad.hidden,false);
   assert.equal(botonUnidad['aria-label'],siglas+'. Cambiar unidad académica');
-  assert.equal(titulo.children[0],'SATE ');assert.equal(titulo.children[1],botonUnidad,unidad+': la unidad es el botón del título');
+  // Marca «SATE | UPIITA-IPN»: siglas, separador y la unidad como botón.
+  assert.equal(titulo.children[0].className,'sate-siglas');assert.equal(titulo.children[0].textContent,'SATE');
+  assert.equal(titulo.children[1].className,'sate-sep');
+  assert.equal(titulo.children[2],botonUnidad,unidad+': la unidad es el botón del título');
   vm.runInContext(inicio.slice(inicio.indexOf('  // Logo de la unidad, hasta la derecha'),inicio.indexOf('  function identidadSaes()')),c);
   if(c.SATE_CONFIG.unidades[unidad].logo){
     const enlace=ranura.children[0];assert.equal(enlace.className,'unit');assert.equal(enlace.children.length,2);
     assert.deepEqual(enlace.children.map(i=>i.className),['logo-lt','logo-dk']);
-    assert.equal(halos.length,0);
+    assert.equal(halos.filter(h=>!/^sate-(siglas|sep)$/.test(h.className)).length,0);
     continue;
   }
   const halo=ranura.children[0],img=halo.children[0];
@@ -168,7 +172,7 @@ assert.match(css,/\.sate-controles select\{field-sizing:content;min-width:0;max-
     assert.match(selector.style.width,/\+ var\(--ipn-esp-6\)\)/);
   }
   nativo=true;const antes=mediciones;contexto.ajustar();assert.equal(mediciones,antes);
-  assert.match(fuente,/innerHTML=cars\.map[^\n]*\n  ajustarCarrera\(\)/);
+  assert.match(fuente,/TOP_CARRERAS!==carrerasClave[\s\S]*?innerHTML=cars\.map[\s\S]*?TOP_CARRERAS=carrerasClave;ajustarCarrera\(\)/);
 }
 const catalogo=leer('contenido/textos/es.toml');
 for(const clave of ['lead_temporal','aviso_temporal_1','periodos_ayuda']){
