@@ -34,7 +34,9 @@ leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener error
 [sate.encabezado]
 unidad = "Cambiar unidad académica"
 carrera = "Carrera"
-prueba = "Fase de prueba ⓘ"
+prueba = "Fase de prueba"
+acciones = "Acciones de SATE"
+navegacion = "Secciones de SATE"
 # Botón del encabezado: con datos del SAES ya cargados («actualizar») o sin ellos («cargar»); `_corto` en anchos medios y teléfono.
 actualizar = "Actualizar datos SAES"
 actualizar_corto = "Actualizar"
@@ -1517,6 +1519,10 @@ seccion_otro = "Otro documento: un reglamento ficticio"
 [temarios.biblio]
 basica = "Básica"
 complementaria = "Complementaria"
+
+[sate.pestana.grupos]
+titulo = "Grupos"
+corto = "Grupos"
 
 [sate.pestana.guia]
 titulo = "Guía politécnica"

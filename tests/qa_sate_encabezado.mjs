@@ -6,7 +6,7 @@ const leer = f => readFileSync(f, 'utf8');
 const html = leer('web/dist/sate/index.html');
 const config = JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const texto = (k,v={}) => config.textos[k].replace(/\{(\w+)\}/g,(_,n)=>v[n]??'{'+n+'}');
-const encabezado = html.slice(html.indexOf('<header class="top">'), html.indexOf('</header>', html.indexOf('<header class="top">')));
+const encabezado = html.slice(html.indexOf('<header class="top sate-encabezado">'), html.indexOf('</header>', html.indexOf('<header class="top sate-encabezado">')));
 assert.match(encabezado, /<h1 id="sate-titulo">SATE <button class="sate-unidad-btn" id="b-unidad"[^>]*aria-label="Cambiar unidad académica"[^>]*><\/button><\/h1>/);
 assert.match(encabezado, /<p id="sate-nombre">Sistema de Apoyo a la Trayectoria Escolar<\/p>/);
 assert.ok(!encabezado.includes('unit-switch'), 'sin selector de unidad aparte');
@@ -21,6 +21,8 @@ assert.ok(acciones.indexOf('id="saes-open"') < acciones.indexOf('id="ipnt-open"'
 assert.match(acciones, /id="saes-open"[^>]*data-saes-open[\s\S]*id="sate-saes-indicador"[^>]*role="img"[^>]*aria-label="Sin datos del SAES: consulta el mapa o arma tu horario"[\s\S]*Traer datos SAES/);
 assert.match(encabezado, /class="enc-btn sate-opinar" type="button" data-encuesta hidden/, 'DIS5: Opinar conserva el gancho dentro de las acciones');
 assert.ok(encabezado.indexOf('sate-logo-ipn') < encabezado.indexOf('class="brand"') && encabezado.indexOf('class="brand"') < encabezado.indexOf('class="sate-lado"'));
+assert.ok(encabezado.indexOf('class="sate-contexto"') < encabezado.indexOf('id="sate-leyenda"'), 'La fase de prueba pertenece al contexto');
+assert.ok(encabezado.indexOf('class="header-actions"') < encabezado.indexOf('id="sate-logo-unidad"'), 'El logo pertenece a las acciones');
 assert.ok(!encabezado.slice(encabezado.indexOf('class="sate-navegacion"')).includes('saes-open'));
 // Ruta del logo del IPN: un solo lugar (data/identidad/logo_ipn.json)
 const logo = JSON.parse(leer('data/identidad/logo_ipn.json'));
@@ -122,13 +124,14 @@ for (const unidad of Object.keys(config.unidades)) {
 }
 // Ejecutar el estado real: leer, reemplazar y borrar; el perfil ficticio no es una lectura SAES.
 const saes = leer('web/dist/sate/nucleo.js').match(/const SAES=\{[\s\S]*?\n\};/)[0];
-const span={}, corto={}, clases={}, btn={querySelector:s=>s==='.sate-texto-corto'?corto:span};
+const span={}, corto={}, clases={}, btn={setAttribute(k,v){this[k]=v},querySelector:s=>s==='.sate-texto-corto'?corto:span};
 const indicador={classList:{toggle(k,v){clases[k]=v}},setAttribute(k,v){this[k]=v}};
 const c=vm.createContext({SATE:{texto},document:{getElementById:id=>id==='saes-open'?btn:id==='sate-saes-indicador'?indicador:null}});
 vm.runInContext(saes+'\nglobalThis.estado=SAES.status;',c);
 for (const datos of [null,{leido:'2026-10-07T12:00:00Z'},{leido:'2026-10-08T15:00:00Z'},null,{demo:true,leido:'2026-10-07T12:00:00Z'}]) {
   const usando=!!datos&&!datos.demo;
   c.estado(datos);assert.equal(clases.on,usando);assert.equal(span.textContent,usando?'Actualizar datos SAES':'Traer datos SAES');
+  assert.equal(btn['aria-label'],span.textContent,'La acción en icono conserva su nombre accesible');
   assert.equal(corto.textContent,usando?'Actualizar':'Traer datos');
   const esperado=usando?texto('sate.cupos.alumno_actualizado',{hora:new Date(datos.leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false})}):texto('sate.encabezado.sin_datos');
   assert.equal(indicador.title,esperado);assert.equal(indicador['aria-label'],esperado);
@@ -138,7 +141,14 @@ assert.match(core,/if\(location.hash==='#demo'\)/);
 assert.match(core,/Modo demostración[\s\S]*Salir del modo demostración/);
 assert.match(core,/sessionStorage.removeItem\('ipnt.demo'\)/);
 const css=leer('web/sate/componentes.css');
-assert.match(css,/\.sate-unidad-nombre\{[^}]*margin-right:var\(--ipn-esp-4\);padding-right:var\(--ipn-esp-4\);border-right:1px solid var\(--ipn-tenue\)/);
+const cssEnc=leer('web/sate/encabezado.css');
+assert.equal(leer('web/dist/sate/encabezado.css'),cssEnc);
+assert.match(html,/<link rel="stylesheet" href="encabezado.css">/);
+assert.match(cssEnc,/grid-template-areas:"marca contexto acciones" "nav nav nav" "avisos avisos avisos"/);
+assert.match(cssEnc,/@media\(min-width:768px\) and \(max-width:1199px\)/);
+assert.match(cssEnc,/@media\(max-width:767px\)/);
+assert.match(cssEnc,/\.sate-marca\{[^}]*display:flex;align-items:center/);
+assert.match(cssEnc,/margin:var\(--ipn-esp-6\) 0 0/,'Aire entre la franja superior y las pestañas');
 assert.match(css,/\.sate-controles select\{field-sizing:content;min-width:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap/);
 // El respaldo mide solo la opción elegida, también después de cambiar carrera.
 {
@@ -222,16 +232,28 @@ assert.equal(medicion.inert,true);
 {
   assert.equal((html.match(/<header\b/g) || []).length, 1);
   assert.ok(!html.includes('<!--__INST_'));
-  const css = leer('web/sate/componentes.css');
-  assert.match(css, /grid-template-areas:"ipn marca carrera lado" "nav nav nav nav"/);
-  assert.match(css, /grid-template-areas:"ipn marca acciones" "nav nav nav" "carrera carrera carrera"/);
-  assert.match(css, /\.header-actions>\.sate-opinar\{position:static/);
-  assert.match(css, /\.sate-unidad-btn\{[^}]*color:var\(--sate-realce\)[^}]*text-decoration:underline/);
+  const css = leer('web/sate/encabezado.css');
+  assert.match(css, /grid-template-areas:"marca contexto acciones" "nav nav nav"/);
+  assert.match(css, /grid-template-areas:"marca acciones" "contexto contexto" "nav nav"/);
+  assert.match(css, /\.sate-unidad-btn\{[^}]*color:var\(--ipn-acento\)[^}]*text-decoration:underline/);
   assert.match(css, /\.sate-estado-dato\.on\{background:var\(--ipn-ok\)\}/);
   assert.match(css, /\.sate-estado-dato\{[^}]*background:var\(--ipn-error\)/);
-  assert.match(css, /:is\(\.sate-unidad-btn,\.sate-controles select,\.header-actions button/);
-  assert.match(css, /body\.sate-flotante \.sate-barra\{display:flex\}/);
+  assert.match(css, /:is\(button,a,select,summary\):focus-visible/);
+  assert.match(leer('web/sate/componentes.css'), /body\.sate-flotante \.sate-barra\{display:flex\}/);
   assert.equal(config.unidades.upiita.pestanas.length, 6);
+}
+// El menú conserva su estado dentro de cada escalón y se restablece al cruzar 768 px.
+{
+  let cambio,teclado,enfocado=false;
+  const menu={open:true,querySelector(){return {focus(){enfocado=true}}}};
+  const cabecera={querySelector(){return menu},addEventListener(k,f){assert.equal(k,'keydown');teclado=f}};
+  const media={matches:false,addEventListener(k,f){assert.equal(k,'change');cambio=f}};
+  const script=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].find(m=>m[1].includes('document.currentScript.previousElementSibling'))[1];
+  vm.runInNewContext(script,{document:{currentScript:{previousElementSibling:cabecera}},matchMedia:()=>media});
+  for(const ancho of [2560,1920,1440,1200,1024,768,767,375,320]){
+    media.matches=ancho<768;cambio();assert.equal(menu.open,ancho>=768,String(ancho));
+  }
+  menu.open=true;teclado({key:'Escape'});assert.equal(menu.open,false);assert.equal(enfocado,true);
 }
 let bloques = 0;
 const paginas = [...readdirSync('web/dist').filter(f=>/^horarios-.*\.html$/.test(f)).map(f=>'web/dist/'+f), ...readdirSync('web/dist/sate').filter(f=>f.endsWith('.html')).map(f=>'web/dist/sate/'+f)];

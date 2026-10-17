@@ -61,6 +61,16 @@ assert.equal(mapa.getAttribute('aria-selected'),'true');assert.equal(mapa.tabInd
 const horarios=barra.children.find(b=>b.getAttribute('data-id')==='horarios');
 horarios.eventos.click();assert.equal(destino,'horarios');
 assert.equal(horarios.getAttribute('aria-current'),'page');
+// Capacidad externa: enlace real, alcanzable con teclado, sin cambiar el panel local.
+{
+  let cambios=0;
+  const externos=c.SateUI.pestanas({items:items.concat([{id:'grupos',href:'grupos/',texto:'Grupos'}]),activa:'mapa',alCambiar(){cambios++}});
+  const enlace=externos.children.at(-1),antes=cambios;
+  assert.equal(enlace.tagName,'a');assert.equal(enlace.getAttribute('href'),'grupos/');
+  assert.equal(enlace.tabIndex,0);assert.equal(enlace.eventos.click,undefined);
+  externos.children[0].eventos.keydown({key:'End',preventDefault(){}});
+  assert.equal(document.activeElement,enlace);assert.equal(cambios,antes);
+}
 assert.deepEqual(config.unidades.upiita.tramites,['dictamen','electivas','baja_temporal','baja_definitiva']);
 for(const nav of [tabs,barra])assert.ok(nav.children.some(b=>b.getAttribute('data-id')==='tramites'));
 vm.runInContext(leer('web/dist/sate/rutas.js'),c);
@@ -326,7 +336,7 @@ function validarEscala(fuente,archivo){
     }
   }
 }
-for(const archivo of ['web/sate/componentes.css','web/horarios.template.html','web/sate/cascaron.html']){
+for(const archivo of ['web/sate/componentes.css','web/sate/encabezado.css','web/horarios.template.html','web/sate/cascaron.html']){
   const fuente=leer(archivo);
   const estilos=archivo.endsWith('.html')?[...fuente.matchAll(/<style\b[^>]*>([\s\S]*?)<\/style>/g)].map(m=>m[1]).join('\n'):fuente;
   validarEscala(estilos,archivo);
@@ -336,17 +346,18 @@ for(const valor of ['.78rem','13.6px','1.1em','var(--ipn-tamano-xxl)','1em','100
 assert.throws(()=>validarEscala('.box2{font-size:.85em}','regresión'),assert.AssertionError);
 validarEscala('.control{font-size:inherit}.nota{font-size:var(--ipn-tamano-xs)!important}','escala válida');
 assert.match(leer('web/sate/inicio.js'),/boton\.replaceChildren\(etiqueta\)/);
-assert.match(css,/#sate-leyenda \.sate-ayuda__btn>span\{display:none\}/,'La leyenda móvil se oculta sin font-size:0');
+const cssEnc=leer('web/sate/encabezado.css');
+assert.match(cssEnc,/#sate-leyenda \.sate-ayuda__btn\{[^}]*font-size:var\(--ipn-tamano-xs\)/,'La leyenda conserva la escala xs');
 console.log('DIS4: cinco tamaños, excepciones del mapa documentadas y leyenda móvil sin tamaño cero. OK.');
 
 // DIS5: contratos de superficie y desborde sin iniciar navegador.
-const cabeceraDis5=css.match(/\.wrap>header\.top\{([^}]+)\}/)[1];
+const cabeceraDis5=cssEnc.match(/header\.sate-encabezado\{([^}]+)\}/)[1];
 for(const d of ['border:0','background:transparent','box-shadow:none'])assert.ok(cabeceraDis5.includes(d),d);
 assert.doesNotMatch(cabeceraDis5,/border-top:/);
 assert.match(css,/\[id\^="sate-tab-2-"\]\[role=tabpanel\][^{]*\{[^}]*border:0;[^}]*background:transparent;box-shadow:none/);
 const movilDis5=css.slice(css.lastIndexOf('@media(max-width:639px)'));
-assert.match(movilDis5,/\.brand h1#sate-titulo\{[^}]*flex-wrap:nowrap;white-space:nowrap/,'DIS7: marca móvil en un renglón');
-assert.match(movilDis5,/grid-template-areas:"t l";[^}]*white-space:nowrap/,'DIS7: ayuda en la fila de la marca');
+assert.match(cssEnc,/\.sate-marca #sate-titulo\{[^}]*white-space:nowrap/,'Marca en un renglón');
+assert.match(cssEnc,/grid-template-areas:"marca acciones" "contexto contexto" "nav nav" "avisos avisos"/,'Carrera bajo la marca en móvil');
 assert.match(css,/#g-n\{display:flex;flex-wrap:wrap;min-width:0;max-width:100%\}/,'DIS7: paginador adaptable al ancho disponible');
 const nucleoDis7=leer('web/sate/nucleo.js');
 const opcionesDis7={};

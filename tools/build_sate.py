@@ -1198,6 +1198,7 @@ def escribir_sate(data):
     """Datos y páginas de SATE (compilación completa)."""
     import shutil, cuenta, saes, comun, contenido, skins, encuesta
     from institucional import write_dist
+    from encabezado import encabezado_sate
     dist = ROOT / "web/dist"
     destino = dist / "sate"
     datos = escribir_datos(data)
@@ -1229,6 +1230,8 @@ def escribir_sate(data):
         c["saes"] = json.loads(conf.read_text(encoding="utf-8")).get("saes", "") if conf.exists() else saes.SAES_URL
     textos = contenido.objeto_t()
     html = (fuente / "cascaron.html").read_text(encoding="utf-8")
+    html = html.replace('<!--__SATE_ENCABEZADO__-->', encabezado_sate(textos=textos))
+    shutil.copy(fuente / 'encabezado.css', destino / 'encabezado.css')
     # Extraer las vistas ocultas sin modificar ids ni el estado de los controles.
     inicio_hor = html.index('  <section id="v-hor"')
     fin_hor = html.index('  <!-- módulo "Exportar horario"', inicio_hor)
@@ -1313,6 +1316,7 @@ def escribir_sate(data):
     html = html.replace('<span>Traer mis datos del SAES</span>',
         '<span class="sate-estado-dato" id="sate-saes-indicador" role="img" aria-label="' + sin_datos + '" title="' + sin_datos + '"></span>'
         '<span class="sate-texto-largo">' + textos['sate.encabezado.cargar'] + '</span><span class="sate-texto-corto">' + textos['sate.encabezado.cargar_corto'] + '</span>', 1)
+    html = html.replace('id="saes-open"', 'id="saes-open" aria-label="' + _html.escape(textos['sate.encabezado.cargar'], quote=True) + '"', 1)
     html = re.sub(r'<button class="link demo-open"[^>]*>.*?</button>', '', html, count=1)
     # El marcador completo y las instrucciones del SAES solo se descargan al abrirlos.
     dialogo = re.search(r'<dialog[^>]*id="saes-dlg".*?</dialog>\s*<script>(.*?)</script>', html, re.S)
@@ -1342,7 +1346,7 @@ def escribir_sate(data):
     core = core.replace(estado_original, """    const indicador=document.getElementById('sate-saes-indicador'), usando=!!d&&!d.demo;
     if(btn){const clave='sate.encabezado.'+(usando?'actualizar':'cargar');
       btn.querySelector('.sate-texto-largo').textContent=SATE.texto(clave);
-      btn.querySelector('.sate-texto-corto').textContent=SATE.texto(clave+'_corto')}
+      btn.querySelector('.sate-texto-corto').textContent=SATE.texto(clave+'_corto');btn.setAttribute('aria-label',SATE.texto(clave))}
     if(indicador){
       const hora=usando?new Date(d.leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false}):'';
       const texto=SATE.texto(usando?'sate.cupos.alumno_actualizado':'sate.encabezado.sin_datos',{hora});

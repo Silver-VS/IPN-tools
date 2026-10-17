@@ -3,6 +3,7 @@
   "pestanasOcultas": [],
   "_pestanasOcultas": "Pestañas que no se muestran en ninguna unidad mientras se rediseñan.",
   "_vistas": "Vistas con ruta propia (#/<unidad>/<id>) que no ocupan una pestaña: `padre` es la pestaña que se marca al estar en ellas. La compilación las quita de una unidad que no tenga datos (temarios: data/temarios/<unidad>/). Textos: sate.vista.<id>.titulo.",
+  "_vistasExternas": "Capacidad opcional por unidad en vistas: {\"id\":\"grupos\",\"href\":\"grupos/\",\"externa\":true}. Añade una pestaña con enlace relativo a sate/; textos sate.pestana.grupos.titulo y .corto. habilitada:false la apaga. Documentada, sin activar en ninguna unidad; ver docs/SATE-ENCABEZADO.md.",
   "unidades": {
     "upiita": {
       "pestanas": [

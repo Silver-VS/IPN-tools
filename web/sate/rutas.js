@@ -31,7 +31,7 @@
     }
     if (['situacion','desempeno'].includes(pestaña)) pestaña = 'trayectoria';
     // Vistas con ruta propia que no ocupan una pestaña (data/sate.json: vistas); las partes siguientes son suyas.
-    const vista = config[unidad]?.vistas?.find(v => v.id === pestaña);
+    const vista = config[unidad]?.vistas?.find(v => v.id === pestaña && !v.externa);
     if (vista) {
       if (partes.length > 4 || !partes.every(p => /^[A-Za-z0-9_.-]+$/.test(p))) return null;
       return { unidad, pestana: pestaña, vista: true, padre: vista.padre, partes: partes.slice(), tramite: null,

@@ -59,10 +59,10 @@
 *{box-sizing:border-box}
 html{scrollbar-gutter:stable}
 [hidden]{display:none!important}
-body{background:var(--ipn-fondo);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-m);line-height:1.5;padding-inline:var(--ipn-esp-4);padding-block:0 var(--ipn-esp-7)}
+body{background:var(--ipn-fondo);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-m);line-height:1.5;padding-inline:var(--ipn-contenido-margen);padding-block:0 var(--ipn-esp-7)}
 button,input,select,textarea{font:inherit;font-size:var(--ipn-tamano-s);color:inherit}
 :focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
-.wrap{max-width:1480px;margin:0 auto}
+.wrap{max-width:var(--ipn-contenido-ancho);margin:0 auto}
 h3{font-size:var(--ipn-tamano-l);line-height:1.25}
 h4{font-size:var(--ipn-tamano-m);font-weight:600;line-height:1.25}
 small{font-size:var(--ipn-tamano-xs)}
@@ -773,7 +773,6 @@ html[data-vista=cupos] #sate-nombre,html[data-vista=cupos] #v-hor,
 html[data-vista=cupos] .sate-logo-ipn,html[data-vista=cupos] #sate-logo-unidad,html[data-vista=cupos] .sate-boton-flota{display:none!important}
 html[data-vista=cupos] body{padding-bottom:var(--ipn-esp-5)}
 html[data-vista=cupos] .wrap{max-width:1024px}
-html[data-vista=cupos] header.top{padding-block:var(--ipn-esp-4) var(--ipn-esp-3)}
 html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
 #cupos-vista{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4);padding-block:var(--ipn-esp-5);min-width:0}
 #cupos-vista h3{font-size:var(--ipn-tamano-l);margin:0 0 var(--ipn-esp-2);line-height:1.25}
@@ -846,25 +845,10 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
   .cupos-tabla td:last-child{position:static}
 }
 </style>
+<link rel="stylesheet" href="encabezado.css">
 
 <div class="wrap">
-  <header class="top">
-    <!--__INST_EN_ENCABEZADO__-->
-    <div class="brand">
-      <!--__IPNT_HOME__-->
-      <div class="sate-identidad"><h1 id="sate-titulo">/*__SATE_SIGLAS__*/ <button class="sate-unidad-btn" id="b-unidad" type="button" aria-haspopup="dialog" aria-label="/*__SATE_UNIDAD__*/" title="/*__SATE_UNIDAD__*/" hidden></button></h1><span id="sate-leyenda"></span></div>
-      <p id="sate-nombre">/*__SATE_NOMBRE__*/</p>
-    </div>
-    <div class="sate-controles">
-      <label class="field"><span class="sate-sr">/*__SATE_CARRERA__*/</span><select id="f-carrera"></select></label>
-    </div>
-    <div class="sate-lado">
-      <span id="sate-logo-unidad" class="sate-logo-slot"><span id="sate-unidad-nombre" class="sate-unidad-nombre"></span></span>
-      <div class="header-actions"><!--__SAES_CARD__--><!--__CUENTA_BTN__--><!--__THEME_BTN__--><button class="enc-btn sate-opinar" type="button" data-encuesta hidden title="/*__SATE_OPINAR_TITULO__*/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>/*__SATE_OPINAR__*/</span></button></div>
-    </div>
-    <div class="sate-fila-avisos"><div id="sate-avisos-globales"></div></div>
-    <div class="sate-navegacion"><div id="sate-tabs"></div><button id="t-tray" hidden></button></div>
-  </header>
+  <!--__SATE_ENCABEZADO__-->
 
   <section id="sate-entrada" class="card sate-entrada" aria-labelledby="sate-entrada-titulo" hidden></section>
   <div class="bar-top">
