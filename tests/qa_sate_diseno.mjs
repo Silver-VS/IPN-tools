@@ -357,6 +357,7 @@ vm.runInNewContext(nucleoDis7.split('\n').find(l=>l.includes("$('#f-carrera').in
 assert.equal(opcionesDis7.innerHTML,'<option value="tel" selected>Ingeniería Telemática</option><option value="otra">Ingeniería de la Computación y en Redes</option>');
 const capturaDis7={};
 vm.runInNewContext(nucleoDis7.slice(nucleoDis7.indexOf('  const f=new Date(DATA.capturado)'),nucleoDis7.indexOf('\n}\n/* Vista en lista')) ,{
+  TOP_GRUPOS:new WeakMap(),
   DATA:{capturado:'2026-10-16T12:00:00Z'},S:{car:'tel',per:'proximo'},classes:()=>[['tel',0,0,'1']],hasOffer:()=>true,
   $:()=>capturaDis7,SATE:{texto:(k,v={})=>config.textos[k].replace(/\{(\w+)\}/g,(_,n)=>v[n])},
 });

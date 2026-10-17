@@ -158,7 +158,7 @@ assert.match(css,/\.sate-controles select\{field-sizing:content;min-width:0;max-
     assert.match(selector.style.width,/\+ var\(--ipn-esp-6\)\)/);
   }
   nativo=true;const antes=mediciones;contexto.ajustar();assert.equal(mediciones,antes);
-  assert.match(fuente,/innerHTML=cars\.map[^\n]*\n  ajustarCarrera\(\)/);
+  assert.match(fuente,/TOP_CARRERAS!==carrerasClave[\s\S]*?innerHTML=cars\.map[\s\S]*?TOP_CARRERAS=carrerasClave;ajustarCarrera\(\)/);
 }
 const catalogo=leer('contenido/textos/es.toml');
 for(const clave of ['lead_temporal','aviso_temporal_1','periodos_ayuda']){

@@ -161,7 +161,7 @@
   cargarCss();
 
   /* ---------- datos ---------- */
-  const traer = nombre => fetch('datos/' + unidad() + '/temarios/' + nombre + '.json').then(r => {
+  const traer = nombre => SATE.json ? SATE.json('datos/' + unidad() + '/temarios/' + nombre + '.json') : fetch('datos/' + unidad() + '/temarios/' + nombre + '.json').then(r => {
     if (!r.ok) throw new Error('datos/' + unidad() + '/temarios/' + nombre + ': HTTP ' + r.status);
     return r.json();
   });

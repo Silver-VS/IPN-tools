@@ -165,6 +165,8 @@ console.log('Ventanilla: estados, rutas, confirmación, apellidos compuestos, pa
 
 // V2: captura académica contra los contratos compartidos, con perfil ficticio.
 c.SATE_DATA={...JSON.parse(readFileSync('web/dist/sate/datos/upiita/tramites.json','utf8')),carreras:{B:'Ingeniería Biónica'}};
+// Este ensayo monta directamente el detalle, después de la carga que realiza el router.
+for(const tramite of ['dictamen','bajas'])c.SATE_DATA[tramite].pdfs=JSON.parse(readFileSync('web/dist/sate/datos/upiita/'+tramite+'-pdf.json','utf8'));
 c.SATE.script=async()=>{};
 const estampados=[],uniones=[];
 c.PDFLib={StandardFonts:{Helvetica:'Helvetica'},PDFDocument:{create:async()=>({embedFont:async()=>({widthOfTextAtSize:(s,size)=>s.length*size*.5})})}};

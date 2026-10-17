@@ -1,0 +1,207 @@
+{
+  "unidad": "upiita",
+  "modelo": "Primer clic frío sin perfil tras núcleo; 10 Mbit/s, sin latencia ni DOM; caché y precarga excluidas",
+  "filas": [
+    {
+      "tab": "trayectoria",
+      "KB": 27.9,
+      "parseMs": 0,
+      "estimadoMs": 22.3,
+      "archivos": [
+        {
+          "archivo": "desempeno.js",
+          "bytes": 27875,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "mapa",
+      "KB": 210.1,
+      "parseMs": 3.322,
+      "estimadoMs": 171.4,
+      "archivos": [
+        {
+          "archivo": "datos/upiita/oferta.json",
+          "bytes": 191430,
+          "parseMs": 3.3224400000000003
+        },
+        {
+          "archivo": "mapa.js",
+          "bytes": 18640,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "horarios",
+      "KB": 300.1,
+      "parseMs": 2.254,
+      "estimadoMs": 242.3,
+      "archivos": [
+        {
+          "archivo": "datos/upiita/oferta.json",
+          "bytes": 191430,
+          "parseMs": 2.2542920000000004
+        },
+        {
+          "archivo": "cupos.js",
+          "bytes": 13315,
+          "parseMs": 0
+        },
+        {
+          "archivo": "cupos-vista.js",
+          "bytes": 15581,
+          "parseMs": 0
+        },
+        {
+          "archivo": "horarios.js",
+          "bytes": 79730,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "tramites",
+      "KB": 177.4,
+      "parseMs": 0.834,
+      "estimadoMs": 142.7,
+      "archivos": [
+        {
+          "archivo": "datos/upiita/tramites.json",
+          "bytes": 79184,
+          "parseMs": 0.8342020000000013
+        },
+        {
+          "archivo": "tramites.js",
+          "bytes": 25814,
+          "parseMs": 0
+        },
+        {
+          "archivo": "dictamen.js",
+          "bytes": 29556,
+          "parseMs": 0
+        },
+        {
+          "archivo": "../tramites/electivas-reglas.js",
+          "bytes": 12768,
+          "parseMs": 0
+        },
+        {
+          "archivo": "electivas.js",
+          "bytes": 20809,
+          "parseMs": 0
+        },
+        {
+          "archivo": "bajas.js",
+          "bytes": 9237,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "calendario",
+      "KB": 33.1,
+      "parseMs": 0,
+      "estimadoMs": 26.4,
+      "archivos": [
+        {
+          "archivo": "calendario.js",
+          "bytes": 33053,
+          "parseMs": 0
+        }
+      ]
+    },
+    {
+      "tab": "guia",
+      "KB": 122.7,
+      "parseMs": 0.332,
+      "estimadoMs": 98.5,
+      "archivos": [
+        {
+          "archivo": "bibliotecas.js",
+          "bytes": 7546,
+          "parseMs": 0
+        },
+        {
+          "archivo": "guia.js",
+          "bytes": 24947,
+          "parseMs": 0
+        },
+        {
+          "archivo": "guia.css",
+          "bytes": 5202,
+          "parseMs": 0
+        },
+        {
+          "archivo": "temarios.css",
+          "bytes": 13771,
+          "parseMs": 0
+        },
+        {
+          "archivo": "../policore/lector.css",
+          "bytes": 8719,
+          "parseMs": 0
+        },
+        {
+          "archivo": "datos/upiita/guia.json",
+          "bytes": 62526,
+          "parseMs": 0.33180200000000015
+        }
+      ]
+    },
+    {
+      "tab": "temarios",
+      "KB": 98,
+      "parseMs": 0.665,
+      "estimadoMs": 79.1,
+      "archivos": [
+        {
+          "archivo": "bibliotecas.js",
+          "bytes": 7546,
+          "parseMs": 0
+        },
+        {
+          "archivo": "temarios.js",
+          "bytes": 42281,
+          "parseMs": 0
+        },
+        {
+          "archivo": "guia.css",
+          "bytes": 5202,
+          "parseMs": 0
+        },
+        {
+          "archivo": "temarios.css",
+          "bytes": 13771,
+          "parseMs": 0
+        },
+        {
+          "archivo": "datos/upiita/temarios/indice.json",
+          "bytes": 29183,
+          "parseMs": 0.6654019999999992
+        }
+      ]
+    }
+  ],
+  "sincrono": {
+    "trayectoria": "Estadísticas y secciones abiertas; con perfil puede cargar D3/Plot",
+    "mapa": "Seriación, sugerencias, mapa y lista",
+    "horarios": "Filtros, oferta y agenda",
+    "tramites": "Estado y lista de trámites",
+    "calendario": "Eventos y cuadrícula mensual",
+    "guia": "Portada y apartados",
+    "temarios": "Índice y explorador"
+  },
+  "bajoDemanda": [
+    "dictamen-pdf.json",
+    "bajas-pdf.json",
+    "electivas.json",
+    "electivas-pdf.json",
+    "pdf-lib y estampadores PDF",
+    "reglamentos/<documento>.json",
+    "temarios/<carrera>.json",
+    "recursos/<carrera>.json"
+  ],
+  "limitacion": "Pintado no aislado: requiere DOM, layout y perfil. ?medir permite medirlo localmente. No se extrapola desde JSON.parse."
+}

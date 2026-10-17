@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),PDFLib=require('../web/assets/vendor/pdf-lib.min.js');
 const base=JSON.parse(readFileSync('web/dist/sate/datos/upiita/tramites.json','utf8')).bajas;
+base.pdfs=JSON.parse(readFileSync('web/dist/sate/datos/upiita/bajas-pdf.json','utf8'));
 const a=JSON.parse(readFileSync('data/perfiles-prueba/regular-mecatronica.json','utf8'));
 const errores=[],c=vm.createContext({PDFLib,console:{error:(...args)=>errores.push(args)}});
 vm.runInContext(readFileSync('web/tramites/pdf-bajas.js','utf8'),c);

@@ -177,6 +177,7 @@
   function revisionFormulario(f,d){const filas=[];for(const [k,t,campos] of preguntas){filas.push({texto:t,valor:f[k]==='si'?'Sí':'No'});if(f[k]==='si')for(const [id,t] of campos)filas.push({texto:t,valor:String(f[id]||'0')})}filas.push({texto:'Observaciones',valor:f.obs||'Sin observaciones'});const t=totales(d);if(t)filas.push({texto:'Créditos de electivas',valor:R.fmt(t.all)+' de '+t.r.n*t.r.c});return filas}
   async function generar(d){
     await preparar();const error=validarActividades(d.actividades)||validarFormulario(d.formulario);if(error)throw new Error(error);
+    if(!recursos.pdfs){const r=await fetch('datos/'+SATE_UNIDAD+'/electivas-pdf.json');if(!r.ok)throw new Error('Electivas PDF: HTTP '+r.status);recursos.pdfs=await r.json()}
     const id=identidad(),estado={car:carrera(),d:{ap:[id.paterno,id.materno].filter(Boolean).join(' '),no:id.nombres,bo:id.boleta,co:id.correo},acts:d.actividades,f:{...d.formulario,obs:observacion(d.formulario)}};
     const base={estado,pdfs:recursos.pdfs,oferta:recursos.oferta,catalogo:R.CATK,actividades:d.actividades,fecha:new Date().toISOString()};
     const pdfs=[await PdfElectivas.generar({...base,tipo:'die03'})];

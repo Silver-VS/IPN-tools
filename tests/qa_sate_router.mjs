@@ -27,6 +27,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
         if(s.src==='situacion.js') c.SATE.presente={avisos(){vistos.push('avisos')},tramite(){vistos.push('procedimiento')}};
         if(s.src==='temarios.js'){c.SATE.pestana('guia',{montar(){},mostrar(){vistos.push('guia')},ocultar(){}});c.SATE.temarios={preparar:async()=>{}};c.SATE.pestana('temarios',{montar(){vistos.push('montar-temarios')},mostrar(r){vistos.push('temarios:'+r.partes.join('/'))},ocultar(){vistos.push('ocultar-temarios')}})}
         if(s.src==='calendario.js') c.SATE.pestana('calendario',{montar(){vistos.push('montar-calendario')},mostrar(){vistos.push('mes')},ocultar(){vistos.push('ocultar-calendario')}});
+        if(s.src==='tramites.js') c.SATE.pestana('tramites',{mostrar(){vistos.push('tramites')}});
         if(s.src==='desempeno.js') c.SATE.pestana('trayectoria',{montar(){vistos.push('montar-desempeno')},mostrar(){vistos.push('desempeno')},ocultar(){vistos.push('ocultar-desempeno')}});
         if(s.src==='horarios.js') c.SATE.pestana('horarios',{montar(){vistos.push('montar-hor')},mostrar(){vistos.push('hor')}});
         s.onload();
@@ -38,7 +39,7 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
     SATE_CONFIG:{unidades:config,textos:{}},history:{replaceState(a,b,url){location.hash=url.slice(url.indexOf('#'))}},
     addEventListener:(n,f)=>eventos[n]=f,
     situacionDatos(){return null},renderCalendario(){vistos.push('calendario')},
-    fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url.includes('nucleo')?{mapas:{B:{}},unidad:'upiita'}:{}}},
+    fetch:async url=>{fetches.push(url);return {ok:true,json:async()=>url.includes('nucleo')?{mapas:{B:{}},unidad:'upiita'}:url.endsWith('/tramites.json')?{dictamen:{},bajas:{}}:{}}},
     SateUI:{usarTextos(){},usarAlmacen(){},modal(){},cerrarModal(){},ayuda(){return nodo()},
       pestanas(o){const n=nodo();n.seleccionar=id=>{seleccionados.push(id);o.alCambiar(id)};return n},barraInferior(){return {marcar(){}}}}
   });
@@ -54,7 +55,10 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   if(hashInicial.endsWith('/situacion'))assert.equal(fetches.some(u=>u.endsWith('oferta.json')),false);
   assert.equal(archivos.includes('horarios.js'),false,'saveData impide precarga');
   const antes=fetches.length,mapas=archivos.filter(a=>a==='mapa.js').length;
-  location.hash='#/upiita/calendario';eventos.hashchange();await vaciar();
+  location.hash='#/upiita/calendario';eventos.hashchange();
+  assert.equal(seleccionados.at(-1),'calendario','Selección inmediata durante la carga');
+  assert.equal(document.getElementById('sate-carga').hidden,false,'Título visible durante la carga');
+  await vaciar();
   assert.equal(c.SATE.actual.pestana,'calendario');
   assert.equal(fetches.length,antes,'Calendario no descarga oferta ni trámites');
   assert.equal(document.getElementById('sate-calendario').hidden,false);
@@ -97,6 +101,12 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   assert.equal(c.SATE.actual.tramite,null);
   assert.equal(location.hash,'#/upiita/trayectoria');
   assert.equal(fetches.filter(u=>u.endsWith('tramites.json')).length,0,'Sin Ventanilla no se descargan trámites');
+  location.hash='#/upiita/tramites';eventos.hashchange();await vaciar();
+  assert.equal(fetches.some(url=>url.endsWith('-pdf.json')),false,'La lista no descarga PDF');
+  await Promise.all([c.SATE.prepararTramite('dictamen'),c.SATE.prepararTramite('dictamen')]);
+  assert.equal(fetches.filter(url=>url.endsWith('dictamen-pdf.json')).length,1,'Una carga concurrente de plantillas');
+  location.hash='#/upiita/tramites/baja_temporal';eventos.hashchange();await vaciar();
+  assert.equal(fetches.filter(url=>url.endsWith('bajas-pdf.json')).length,1,'El detalle carga su plantilla');
   location.hash='#/upiita/mapa';eventos.hashchange();await vaciar();
   location.hash='#error=oauth';eventos.hashchange();await vaciar();
   assert.equal(c.SATE.actual.pestana,'mapa');
