@@ -421,7 +421,6 @@ button.sate-chip{cursor:pointer}
 .sate-modal[open]{display:flex;flex-direction:column}
 .sate-modal::backdrop{background:rgba(9,9,11,.55)}   /* oscurece en claro y en oscuro (con --ipn-texto se aclaraba en oscuro) */
 .sate-modal--pequeno{width:min(24rem,calc(100vw - var(--ipn-esp-5)))}
-.sate-ayuda__btn.sate-termino{display:inline;width:auto;height:auto;min-width:0;min-height:0;padding:0;border:0;border-radius:0;color:var(--ipn-acento);font:inherit;text-decoration:underline dotted;text-underline-offset:.2em;vertical-align:baseline}
 .sate-modal__cab{display:flex;align-items:center;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
 .sate-modal__titulo{flex:1;margin:0;font-size:var(--ipn-tamano-l);font-weight:600;line-height:1.25}
 .sate-modal__x{flex:none;width:2.5rem;height:2.5rem;border:0;border-radius:50%;background:none;cursor:pointer}
@@ -513,7 +512,11 @@ button.sate-chip{cursor:pointer}
 .sate-ayuda{display:inline-block;position:relative;vertical-align:middle}
 .sate-ayuda__btn{display:inline-grid;place-items:center;min-width:1.75rem;min-height:1.75rem;border:0;background:none;color:var(--ipn-tenue);cursor:pointer;border-radius:50%;font-size:var(--ipn-tamano-m);padding:0}
 .sate-ayuda__btn:hover{color:var(--ipn-acento)}
-.sate-globo{position:fixed;z-index:60;box-sizing:border-box;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);font-weight:400;line-height:1.5;text-align:left}
+.sate-ayuda--termino{display:inline;position:static;vertical-align:baseline}
+.sate-ayuda__btn.sate-termino{display:inline;position:relative;width:auto;height:auto;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;color:inherit;font:inherit;text-decoration:underline dotted 1px;text-decoration-color:var(--ipn-tenue);text-underline-offset:.22em;cursor:help}
+.sate-ayuda__btn.sate-termino:hover,.sate-ayuda__btn.sate-termino:focus-visible{color:inherit;text-decoration-color:currentColor;background:none}
+.sate-ayuda__btn.sate-termino:focus-visible{outline:1px solid currentColor;outline-offset:2px}
+.sate-globo{position:fixed;z-index:60;box-sizing:border-box;max-width:min(320px,40ch,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;overflow-wrap:anywhere;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);font-weight:400;line-height:1.5;text-align:left}
 .sate-globo[hidden]{display:none}
 .sate-globo a{color:var(--ipn-acento)}
 
@@ -734,9 +737,11 @@ body.sate-flotante .sate-barra{display:flex}
   .trange input{width:100%;min-width:0}
 }
 @media(hover:none){
-  :is(button,.btn,.sate-btn,.chip,.chk,.check,.tgl,summary,[role=button],select,input:not([type=checkbox]):not([type=radio])){min-height:44px!important}
-  :is(button,.btn,.sate-btn,.chip,[role=button]){min-width:44px!important}
-  :is(.x,.sate-aviso__x,.sate-modal__x,.sate-ayuda__btn,.pill button){min-width:44px!important;min-height:44px!important}
+  :is(button,.btn,.sate-btn,.chip,.chk,.check,.tgl,summary,[role=button],select,input:not([type=checkbox]):not([type=radio])):not(.sate-termino){min-height:44px!important}
+  :is(button,.btn,.sate-btn,.chip,[role=button]):not(.sate-termino){min-width:44px!important}
+  :is(.x,.sate-aviso__x,.sate-modal__x,.sate-ayuda__btn,.pill button):not(.sate-termino){min-width:44px!important;min-height:44px!important}
+  /* El área de toque crece fuera del flujo para conservar la altura del renglón. */
+  .sate-termino::before{content:"";position:absolute;inset:50% auto auto 50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}
   .marks{gap:var(--ipn-esp-2)}
 }
 

@@ -177,13 +177,14 @@
 
   /* ---------- Ayuda ⓘ ---------- */
   var globoAbierto = null;
-  function cerrarGlobo() { if (globoAbierto) { globoAbierto(); globoAbierto = null; } }
+  function cerrarGlobo(foco) { if (globoAbierto) globoAbierto(foco); }
   /* ayuda(clave, vars?) → elemento. Escritorio: globo (hover, foco, clic). Teléfono/táctil: modal pequeño. */
   function ayuda(clave, vars, definicion) {
     vars = Object.fromEntries(Object.entries(vars || {}).map(([k,v]) => [k,String(v).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))]));
     var env = el('span', { class: 'sate-ayuda' });
     var b = el('button', { type: 'button', class: 'sate-ayuda__btn', 'aria-label': traducir('componentes.ayuda.boton'), texto: 'ⓘ' });
     if (definicion) {
+      env.classList.add('sate-ayuda--termino');
       b.textContent = definicion.texto;
       b.setAttribute('aria-label', definicion.texto);
       b.classList.add('sate-termino');
@@ -191,41 +192,50 @@
     var gid = id('globo');
     var g = el('span', { class: 'sate-globo', role: 'tooltip', id: gid, hidden: true });
     env.appendChild(b); env.appendChild(g);
-    var fijo = false, t = null;
+    var fijo = false, devolviendoFoco = false, t = null;
     function colocar() {
       var r = b.getBoundingClientRect(), w = Math.min(320, raiz.innerWidth - 16);
       g.style.width = w + 'px';
-      var x = Math.max(8, Math.min(r.left + r.width / 2 - w / 2, raiz.innerWidth - w - 8));
+      w = g.getBoundingClientRect().width;
+      var x = Math.max(8, Math.min(r.left, raiz.innerWidth - w - 8));
       g.style.left = x + 'px';
-      g.style.top = (r.bottom + 6) + 'px';
       var alto = g.offsetHeight;
-      if (r.bottom + 6 + alto > raiz.innerHeight && r.top - 6 - alto > 0) g.style.top = (r.top - 6 - alto) + 'px';
+      var y = r.bottom + 6;
+      if (y + alto > raiz.innerHeight - 8) y = r.top - 6 - alto;
+      g.style.top = Math.max(8, Math.min(y, raiz.innerHeight - alto - 8)) + 'px';
     }
     function mostrar() {
       if (!g.hidden) return;
       cerrarGlobo();
       if (definicion) g.textContent = definicion.definicion;
       else g.innerHTML = traducir(clave, vars);
+      // Las coordenadas pertenecen al viewport, fuera de ancestros transformados o recortados.
+      (b.closest('dialog[open]') || document.body).appendChild(g);
       g.hidden = false; b.setAttribute('aria-describedby', gid);
       colocar();
       globoAbierto = ocultar;
     }
-    function ocultar() { g.hidden = true; fijo = false; b.removeAttribute('aria-describedby'); if (globoAbierto === ocultar) globoAbierto = null; }
-    function programar() { clearTimeout(t); t = setTimeout(function () { if (!fijo && !env.contains(document.activeElement)) ocultar(); }, 160); }
-    env.addEventListener('mouseenter', function () { if (!esMovil()) { clearTimeout(t); mostrar(); } });
+    function ocultar(foco) { clearTimeout(t); g.hidden = true; fijo = false; b.removeAttribute('aria-describedby'); env.appendChild(g); if (globoAbierto === ocultar) globoAbierto = null; if (foco) { devolviendoFoco = true; b.focus(); devolviendoFoco = false; } }
+    function programar() { clearTimeout(t); t = setTimeout(function () { if (!fijo && !env.contains(document.activeElement) && !g.contains(document.activeElement)) ocultar(); }, 160); }
+    env.addEventListener('mouseenter', function () { if (!esMovil()) { clearTimeout(t); t = setTimeout(mostrar, 120); } });
     env.addEventListener('mouseleave', function () { if (!esMovil()) programar(); });
-    env.addEventListener('focusin', function () { if (!esMovil()) { clearTimeout(t); mostrar(); } });
+    env.addEventListener('focusin', function () { if (!esMovil() && !devolviendoFoco) { clearTimeout(t); mostrar(); } });
     env.addEventListener('focusout', function () { programar(); });
-    env.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !g.hidden) { e.stopPropagation(); ocultar(); b.focus(); } });
+    g.addEventListener('mouseenter', function () { clearTimeout(t); });
+    g.addEventListener('mouseleave', programar);
+    g.addEventListener('focusin', function () { clearTimeout(t); });
+    g.addEventListener('focusout', programar);
+    env.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !g.hidden) { e.stopPropagation(); ocultar(true); } });
     b.addEventListener('click', function () {
       if (esMovil()) { modal(definicion ? definicion.titulo : traducir('componentes.ayuda.titulo'), function () { return definicion ? el('p', { texto: definicion.definicion }) : el('p', { html: traducir(clave, vars) }); }, { pequeno: true }); return; }
       if (g.hidden) { mostrar(); fijo = true; } else if (fijo) ocultar(); else fijo = true;
     });
     return env;
   }
-  document.addEventListener('click', function (e) { if (globoAbierto && !(e.target.closest && e.target.closest('.sate-ayuda'))) cerrarGlobo(); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && globoAbierto) cerrarGlobo(); });
+  document.addEventListener('click', function (e) { if (globoAbierto && !(e.target.closest && e.target.closest('.sate-ayuda,.sate-globo'))) cerrarGlobo(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && globoAbierto) { e.stopPropagation(); cerrarGlobo(true); } });
   raiz.addEventListener('scroll', function () { cerrarGlobo(); }, true);
+  raiz.addEventListener('resize', function () { cerrarGlobo(); });
 
   /* ---------- Desplegable recordado ---------- */
   /* desplegable({clave, titulo, contenido, ayuda:'clave', abierto}) ; el estado se guarda en ipnt.ui.desp.<clave> */
