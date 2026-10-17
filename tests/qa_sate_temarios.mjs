@@ -543,6 +543,12 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(ficha.querySelector('h2').textContent, indice.materias.B103.n);
   assert.equal(ficha.querySelectorAll('.tmr-cifras strong').length, 3);
   assert.equal(ficha.querySelector('.tmr-descripcion').textContent, reg103.descripcion);
+  assert.ok(ficha.querySelector('.tmr-trayectoria'), 'relación con la trayectoria escolar');
+  assert.ok(ficha.querySelector('#ficha-evaluacion'), 'acreditación y evaluación continua');
+  assert.match(ficha.querySelector('#ficha-evaluacion').textContent, /ponderación la define cada docente/i);
+  assert.ok(ficha.querySelector('.tmr-rel-enlace'), 'los requisitos se enlazan al programa');
+  assert.match(leer('web/sate/temarios.css'), /\.tmr-lateral\{[^}]*position:sticky/);
+  assert.match(leer('web/sate/temarios.css'), /@media\(max-width:1023\.98px\)\{\.tmr-pagina[^}]*"principal" "lateral" "resto"/);
   assert.equal(ficha.querySelector('.tmr-pdf').getAttribute('href'), reg103.pdf);
   assert.equal(ficha.querySelector('.tmr-oficial'), null, 'sin «Leer el programa completo aquí»');
   assert.equal(caja2.querySelector('.tmr-col-lista'), null, 'sin lista larga que recorrer');
