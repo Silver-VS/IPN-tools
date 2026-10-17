@@ -95,6 +95,8 @@ assert.match(css,/aria-selected=true\]::after.*background:var\(--sate-realce\)/)
 assert.match(css,/\.sate-grupo-inicio::before.*width:1px/);
 assert.match(css,/\.sate-pestana:focus-visible,\.sate-barra__btn:focus-visible,\.trayectoria-minimapa button:focus-visible/);
 assert.ok(css.includes('.trayectoria-resumen{grid-column:1 / -1}'));   // resumen a todo el ancho
+assert.match(css,/#v-tray\{padding-bottom:calc\(var\(--sate-plan-alto,var\(--ipn-esp-7\)\) \+ var\(--ipn-barra-alto\) \+ var\(--ipn-esp-7\) \+ env\(safe-area-inset-bottom,0px\)\)\}/,'El Mapa reserva la bandeja y la barra inferior al final');
+assert.match(css,/#v-tray \.plan-grupo\{margin-top:var\(--ipn-esp-5\);padding-top:0;border:0;background:transparent;box-shadow:none\}/,'Los periodos se separan con espacio, sin tarjeta interior');
 const perfilCss=css.slice(css.indexOf('/* R2-PER:'));
 assert.match(perfilCss,/\.trayectoria-minimapa\{grid-column:2;grid-row:2;align-self:start/);
 assert.match(perfilCss,/\.trayectoria-decisiones\{grid-column:1 \/ -1/,'Las decisiones no dejan una columna vacía bajo el minimapa');

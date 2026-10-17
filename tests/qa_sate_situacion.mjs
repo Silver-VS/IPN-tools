@@ -6,7 +6,11 @@ const leer=f=>readFileSync(f,'utf8');
 const html=leer('web/dist/sate/index.html');
 const config=JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const textos=config.textos;
-const texto=(k,v={})=>(textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}');
+const texto=(k,v={})=>{
+  const original=textos[k]||k;
+  const fuente=k==='sate.situacion.desfase_resumen'?original.replace(/\{n, plural, one \{([^{}]*)\} other \{([^{}]*)\}\}/g,(_,uno,varios)=>(Number(v.n)===1?uno:varios).replaceAll('#',v.n)):original;
+  return fuente.replace(/\{(\w+)\}/g,(_,nombre)=>v[nombre]??'{'+nombre+'}');
+};
 let document;
 class Nodo {
   constructor(tag='div'){this.tagName=tag;this.children=[];this.attrs={};this.eventos={};this.style={setProperty(){}};this.dataset={};this.value='';this.options=[];this.hidden=false;this.open=false;this.offsetParent={};this.clientWidth=375;this.offsetWidth=375;this.offsetHeight=80;
@@ -166,6 +170,11 @@ for(const archivo of ['primer-ingreso-bionica.json','regular-mecatronica.json','
   const n=vm.runInContext('tr().adeudos.length',c),decisiones=box.querySelector('.trayectoria-decisiones');
   assert.equal(!!decisiones,n>0,archivo+': solo se crea la sección si tiene materias por resolver');
   assert.ok(box.querySelector('.trayectoria-orientacion'),archivo+': orientación agrupada');
+  if(archivo==='desfase-dictamen-bionica.json'){
+    const resumen=box.querySelector('.trayectoria-resumen').textContent;
+    assert.match(resumen,/ · 2 materias desfasadas\./,'El resumen conserva solo el conteo de materias desfasadas');
+    assert.doesNotMatch(resumen,/Confirma con Gestión Escolar/,'El detalle queda en Materias por resolver');
+  }
   if(n){
     const html=box.querySelector('.trayectoria-materias').innerHTML;
     assert.equal((html.match(/class="sate-aviso-materia"/g)||[]).length,n,archivo);

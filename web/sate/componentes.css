@@ -918,6 +918,8 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 #v-tray .lvl:first-of-type{border-top:1px solid var(--ipn-linea)}
 #v-tray .lvl-req{padding-left:0}
 #v-tray .plan-bandeja{margin-top:var(--ipn-esp-7)}
+#v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
+#v-tray .plan-grupo{margin-top:var(--ipn-esp-5);padding-top:0;border:0;background:transparent;box-shadow:none}
 #v-tray .ol-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,18rem),1fr))}
 .optativas-sin-linea{margin-top:var(--ipn-esp-5);padding-top:var(--ipn-esp-5);border-top:1px solid var(--ipn-linea)}
 .optativas-sin-linea[hidden]{display:none}

@@ -85,6 +85,7 @@ recursar_cuerpo = "El aviso de tu unidad permite inscribirte en ventanillas el {
 revisar_desfase = "Revisa tus materias desfasadas"
 desfase_dictamen = "Desfase y dictamen"
 desfase_cuerpo = "Tienes {n} materias desfasadas. Confirma con Gestión Escolar las opciones para continuar."
+desfase_resumen = "{n, plural, one {# materia desfasada.} other {# materias desfasadas.}}"
 dictamen_detalle = "Según el aviso del periodo, necesitas revisar si cuentas con dictamen vigente. Consulta Gestión Escolar antes de planear la reinscripción; el marcador SATE todavía no confirma la vigencia del dictamen."
 limite_detalle = "La autorización sin dictamen cubre hasta {n} materias en su primer periodo de desfase. Consulta tus opciones en ventanillas."
 desfase_detalle = "Consulta el plazo de cada materia y el aviso vigente. Puedes revisar opciones de recursamiento o ETS con Gestión Escolar. Esta orientación no sustituye una resolución oficial."
