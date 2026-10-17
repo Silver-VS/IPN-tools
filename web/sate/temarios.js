@@ -267,8 +267,8 @@
         m.nivel != null ? h('p', { 'class': 'tmr-trayectoria-dato', texto: t('temarios.ficha.nivel', { n: m.nivel }) }) : null,
         cr.tepic != null || cr.satca != null ? h('p', { 'class': 'tmr-trayectoria-dato', texto: t('temarios.ficha.creditos', { n: num(cr.tepic ?? cr.satca), escala: cr.tepic != null ? 'TEPIC' : 'SATCA' }) }) : null,
         m.area?.nombre ? h('p', { 'class': 'tmr-area', style: '--tmr-area:' + colorArea }, [m.area.nombre]) : null,
-        fichaRelacion(t('temarios.ficha.requisitos'), rel.antes, t('temarios.ficha.sin_requisitos')),
-        fichaRelacion(t('temarios.ficha.habilita'), rel.despues, t('temarios.ficha.sin_habilita'))
+        fichaRelacion(t('temarios.ficha.requisitos'), rel.antes, t('temarios.ficha.sin_requisitos'), alIr),
+        fichaRelacion(t('temarios.ficha.habilita'), rel.despues, t('temarios.ficha.sin_habilita'), alIr)
       ]);
       const acreditacion = h('section', { 'class': 'tmr-lateral-bloque', id: 'ficha-evaluacion' }, [
         h('h3', { texto: t('temarios.ficha.acreditacion') }),
