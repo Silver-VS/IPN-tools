@@ -88,3 +88,9 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
   .sate-encabezado .sate-contexto{margin-top:var(--ipn-esp-4)}
   .sate-encabezado>.sate-navegacion{margin-top:0}
 }
+/* «Fase de prueba» nunca baja de renglón: en anchos medios se encoge el selector (con puntos suspensivos), no la etiqueta. */
+@media(min-width:768px){
+  .sate-contexto{flex-wrap:nowrap}
+  .sate-contexto .sate-controles{flex:0 1 auto}
+  #sate-leyenda{flex:none}
+}
