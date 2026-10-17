@@ -956,7 +956,7 @@ body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
 body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
 
 /* R2-HOR: cupos reservados dentro del bloque y columnas legibles con traslapes. */
-.cal:has(>.day){--ipn-horario-columna:calc(var(--ipn-esp-8) + var(--ipn-esp-6));grid-template-columns:calc(var(--ipn-esp-6) + var(--ipn-esp-5)) repeat(var(--days),minmax(calc(var(--ipn-horario-columna)*var(--ipn-horario-solapes,1)),1fr));min-width:calc(var(--ipn-esp-6) + var(--ipn-esp-5) + var(--days)*var(--ipn-horario-columna)*var(--ipn-horario-solapes,1))}
+.cal:has(>.day){--ipn-horario-columna:calc(var(--ipn-esp-8) + var(--ipn-esp-6));grid-template-columns:calc(var(--ipn-esp-6) + var(--ipn-esp-5)) repeat(var(--days),minmax(var(--ipn-horario-columna-min,var(--ipn-horario-columna)),1fr));min-width:max-content}
 .cal .blk .horario-contenido{display:block;min-width:0;min-height:0;overflow:hidden;flex:1 1 100%;overflow-wrap:anywhere}
 .cal .blk.blk-cupo{display:grid;grid-template-rows:auto minmax(0,1fr);align-content:stretch;align-items:start;gap:var(--ipn-esp-1);padding-block:0}
 .cal .blk-cupo>.cupos-insignia{max-width:100%;justify-self:start;white-space:nowrap;line-height:1.2;padding:0 var(--ipn-esp-1);margin:0;box-sizing:border-box}

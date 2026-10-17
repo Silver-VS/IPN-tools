@@ -530,7 +530,10 @@ function cuadriculaHorario(all,op){
   html+='</div>';
   const items=lanes(all.flatMap(c=>slots(c).map(([d,a,b])=>({c,d,a,b,ghost:c===ghost}))));
   // Una columna conserva espacio para la insignia incluso cuando hay grupos traslapados.
-  cal.style.setProperty('--ipn-horario-solapes',Math.max(1,...items.map(b=>b.n)));
+  const solapes=Math.max(1,...items.map(b=>b.n));
+  const anchoCarril=Array(solapes).fill('var(--ipn-horario-columna)').join(' + ');
+  cal.style.setProperty('--ipn-horario-solapes',solapes);
+  cal.style.setProperty('--ipn-horario-columna-min',`calc(${anchoCarril})`);
   for(let d=0;d<days;d++){
     html+=`<div class="day" style="height:${h}px">`;
     if(!soloLectura)for(let m=lo;m<end;m+=BLOCK){const on=S.gap&&S.gap.d===d&&S.gap.a===m;

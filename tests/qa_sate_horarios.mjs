@@ -44,7 +44,7 @@ assert.equal((cal.innerHTML.match(/class="cupos-insignia"/g)||[]).length,1,'Una 
 const larga=grupo(960,1050);larga.nombre='Unidad de aprendizaje ficticia con un nombre que ocupa varios renglones';
 for(const etiqueta of ['Sin lugares','1 lugar','120 lugares','Sin consulta']){
   pintar([larga],{insignia:()=>'<span class="cupos-insignia">'+etiqueta+'</span>'});
-  assert.ok(cal.innerHTML.indexOf(etiqueta)<cal.innerHTML.indexOf(larga.nombre),'El cupo no depende de la longitud del nombre: '+etiqueta);
+  assert.ok(cal.innerHTML.indexOf(etiqueta)<cal.innerHTML.indexOf('<span class="horario-contenido">'),'El cupo no depende de la longitud del nombre: '+etiqueta);
 }
 pintar([grupo(960,1050),grupo(990,1080)]);assert.equal(propiedades['--ipn-horario-solapes'],2);
 pintar([grupo(960,1050)],{soloLectura:true,SLOTPX:18});assert.doesNotMatch(cal.innerHTML,/data-k=|data-gap=/);
@@ -89,7 +89,7 @@ await e.drawSchedule('week',1);assert.equal(e.weekGrid().rows[0][0],1080);
 
 const css=leer('web/sate/componentes.css').split('/* R2-HOR:')[1];
 assert.match(css,/grid-template-rows:auto minmax\(0,1fr\)/,'La insignia tiene una fila propia');
-assert.match(css,/min-width:calc\([^\n]+--ipn-horario-solapes/,'Los traslapes conservan ancho por carril');
+assert.match(css,/minmax\(var\(--ipn-horario-columna-min/,'Los traslapes conservan ancho por carril');
 assert.match(css,/\.sate-cupos-consultar\.btn\{[^}]*min-height:44px/);
 assert.match(css,/:focus-visible/);
 const html=leer('web/sate/cascaron.html');
