@@ -103,7 +103,7 @@
 .tramite-fila-boton:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 /* Ventanilla A (dueño, 2026-10-17): cada trámite es un objeto con borde fino; gana a .sate-btn (píldora). */
 .sate-btn.tramite-fila-boton{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:var(--ipn-esp-1);min-height:0;height:auto;padding:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);text-align:left;white-space:normal;line-height:1.4}
-.sate-btn.tramite-fila-boton:hover{border-color:var(--sate-realce);background:var(--ipn-superficie)}
+.sate-btn.tramite-fila-boton:hover{border-color:var(--ipn-tenue);background:var(--ipn-superficie)}
 .tramite-fila-boton .tramite-fila-titulo{grid-column:1;font-size:var(--ipn-tamano-m);font-weight:600;color:var(--ipn-texto)}
 .tramite-fila-boton .tramite-fila-para{grid-column:1;font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
 .tramite-fila-boton .tramite-estado{grid-column:2;grid-row:1 / span 2;align-self:center}
