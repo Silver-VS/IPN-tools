@@ -251,15 +251,33 @@
         (m.bibliografia || []).length ? h('h3', { texto: t('sate.guia.bibliografia') }) : h('h3', { texto: t('temarios.ficha.bibliotecas_titulo') }),
         (m.bibliografia || []).length ? h('ul', { 'class': 'tmr-biblio' }, m.bibliografia.map(b => SateBibliotecas.referencia(String(b.texto || '').trim()))) : null,
         raiz.SateBibliotecas && raiz.SateBibliotecas.panel ? raiz.SateBibliotecas.panel({ termino: m.nombre, titulo: t('temarios.ficha.bibliotecas_titulo') }) : null]);
-      const secciones = [['objetivo', t('temarios.seccion.objetivo'), texto('objetivo', t('temarios.seccion.objetivo'), m.objetivo)], ['contenidos', t('sate.guia.veras'), unidades],
-        ['orientacion', t('temarios.seccion.orientacion'), texto('orientacion', t('temarios.seccion.orientacion'), m.orientacion)], ['evaluacion', t('temarios.seccion.evaluacion'), texto('evaluacion', t('temarios.seccion.evaluacion'), m.evaluacion)],
-        ['recursos', t('sate.guia.recursos'), rec], ['relaciones', t('sate.guia.relaciones'), relaciones_], ['bibliografia', t('sate.guia.bibliografia'), biblio]].filter(x => x[2]);
-      const indice = h('nav', { 'class': 'tmr-indice', 'aria-label': t('temarios.ficha.indice') }, secciones.map(([id, titulo]) => {
+      const objetivo = texto('objetivo', t('temarios.seccion.objetivo'), m.objetivo);
+      const secciones = [['contenidos', t('sate.guia.veras'), unidades],
+        ['orientacion', t('temarios.seccion.orientacion'), texto('orientacion', t('temarios.seccion.orientacion'), m.orientacion)],
+        ['recursos', t('sate.guia.recursos'), rec], ['bibliografia', t('sate.guia.bibliografia'), biblio]].filter(x => x[2]);
+      const indiceSecciones = [['objetivo', t('temarios.seccion.objetivo')], ['relaciones', t('temarios.ficha.trayectoria')], ['evaluacion', t('temarios.ficha.acreditacion')], ...secciones.map(([id, titulo]) => [id, titulo])];
+      const indice = h('nav', { 'class': 'tmr-indice', 'aria-label': t('temarios.ficha.indice') }, indiceSecciones.map(([id, titulo]) => {
         const a = h('a', { href: ir(r.carreraId, m.clave, id), 'data-seccion': id, texto: titulo });
         if (dialogo) a.addEventListener('click', e => { e.preventDefault(); const n = document.getElementById('ficha-' + id); if (n && n.scrollIntoView) n.scrollIntoView({ behavior: reducido() ? 'auto' : 'smooth', block: 'start' }); });   // dentro de la ventana, sin cambiar de ruta
         return a;
       }));
-      cuerpo = [enc, cifras, indice, ...secciones.map(x => x[2]), h('footer', { 'class': 'tmr-bloque' }, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))];
+      const colorArea = m.area?.color || 'var(--ipn-acento)';
+      const trayectoria = h('section', { 'class': 'tmr-lateral-bloque tmr-trayectoria', id: 'ficha-relaciones' }, [
+        h('h3', { texto: t('temarios.ficha.trayectoria') }),
+        m.nivel != null ? h('p', { 'class': 'tmr-trayectoria-dato', texto: t('temarios.ficha.nivel', { n: m.nivel }) }) : null,
+        cr.tepic != null || cr.satca != null ? h('p', { 'class': 'tmr-trayectoria-dato', texto: t('temarios.ficha.creditos', { n: num(cr.tepic ?? cr.satca), escala: cr.tepic != null ? 'TEPIC' : 'SATCA' }) }) : null,
+        m.area?.nombre ? h('p', { 'class': 'tmr-area', style: '--tmr-area:' + colorArea }, [m.area.nombre]) : null,
+        fichaRelacion(t('temarios.ficha.requisitos'), rel.antes, t('temarios.ficha.sin_requisitos')),
+        fichaRelacion(t('temarios.ficha.habilita'), rel.despues, t('temarios.ficha.sin_habilita'))
+      ]);
+      const acreditacion = h('section', { 'class': 'tmr-lateral-bloque', id: 'ficha-evaluacion' }, [
+        h('h3', { texto: t('temarios.ficha.acreditacion') }),
+        ...parrafos(m.evaluacion).map(x => h('p', { texto: x })),
+        h('p', { 'class': 'tmr-nota', texto: t('temarios.ficha.ponderacion') })
+      ]);
+      cuerpo = [h('div', { 'class': 'tmr-principal' }, [enc, cifras, indice, objetivo]),
+        h('aside', { 'class': 'tmr-lateral' }, [trayectoria, acreditacion]),
+        h('div', { 'class': 'tmr-col-resto' }, [...secciones.map(x => x[2]), h('footer', { 'class': 'tmr-bloque' }, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))])];
     }
     const ficha = h('div', { 'class': 'tmr-ficha' + (vistazo ? ' tmr-ficha--vistazo' : '') }, cuerpo.filter(Boolean));
     if (ficha.style && ficha.style.setProperty) ficha.style.setProperty('--tmr-area', m.area?.color || 'var(--ipn-acento)');

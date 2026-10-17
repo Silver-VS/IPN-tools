@@ -65,7 +65,22 @@
 @media(max-width:30rem){.tmr-enc h2{font-size:var(--ipn-tamano-xl);line-height:1.25}}
 
 /* ---------- vista única: la ficha completa es una tarjeta de página ---------- */
-.tmr-pagina>.tmr-ficha{padding:var(--ipn-esp-6);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+.tmr-pagina>.tmr-ficha{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);grid-template-areas:"principal lateral" "resto lateral";align-items:start;gap:var(--ipn-esp-6);padding:var(--ipn-esp-6);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+.tmr-principal{grid-area:principal;display:grid;gap:var(--ipn-esp-5);min-width:0}
+.tmr-col-resto{grid-area:resto;display:grid;gap:var(--ipn-esp-6);min-width:0}
+.tmr-lateral{grid-area:lateral;position:sticky;top:var(--ipn-esp-5);align-self:start;display:grid;gap:var(--ipn-esp-6);min-width:0}
+.tmr-lateral-bloque{display:grid;gap:var(--ipn-esp-3);min-width:0}
+.tmr-lateral-bloque h3{margin:0;font-size:var(--ipn-tamano-l);line-height:1.25}
+.tmr-lateral-bloque>p{margin:0}
+.tmr-trayectoria-dato{font-size:var(--ipn-tamano-s)}
+.tmr-area{padding-left:var(--ipn-esp-3);border-left:3px solid var(--tmr-area);color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.tmr-lateral .tmr-rel{display:grid;gap:var(--ipn-esp-2)}
+.tmr-lateral .tmr-rel h4{margin:0;font-size:var(--ipn-tamano-s);font-weight:600}
+.tmr-lateral .tmr-rel-lista{display:grid;gap:var(--ipn-esp-1)}
+.tmr-lateral .tmr-rel-enlace{display:flex;align-items:center;min-height:2.75rem;color:var(--ipn-texto);font-size:var(--ipn-tamano-s)}
+.tmr-lateral .tmr-rel-enlace:hover{color:var(--ipn-acento)}
+.tmr-lateral .tmr-rel-enlace:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+@media(max-width:1023.98px){.tmr-pagina>.tmr-ficha{grid-template-columns:minmax(0,1fr);grid-template-areas:"principal" "lateral" "resto"}.tmr-lateral{position:static}}
 .tmr-pagina .tmr-cifras strong{font-size:var(--ipn-tamano-xl);line-height:1.1}
 @media(max-width:639.98px){.tmr-pagina>.tmr-ficha{padding:var(--ipn-esp-4)}.tmr-pagina .tmr-cifras strong{font-size:var(--ipn-tamano-l)}}
 
