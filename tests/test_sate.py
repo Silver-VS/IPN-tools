@@ -71,6 +71,20 @@ class SateBuild(unittest.TestCase):
                 build_sate.escribir_recursos(raiz / 'salida')
                 self.assertFalse((raiz / 'salida/recursos').exists())
 
+    def test_optativas_sin_linea_respetan_el_plan(self):
+        from materias_sin_ubicar import optativas_sin_linea
+        mapa = {'cur': {k: [nombre, 6, nivel, tipo] for k, nombre, nivel, tipo in [
+            ('P3', 'Optativa libre', 3, 'P'), ('P4', 'Optativa otro nivel', 4, 'P'),
+            ('O3', 'Obligatoria fuera del mapa', 3, 'O'), ('EL', 'ELECTIVA I', 3, 'P'),
+            ('L3', 'Optativa con línea', 3, 'P'), ('C3', 'Optativa con caja', 3, 'P')]},
+            'lineas': [{'claves': ['L3']}], 'layout': {'boxes': [
+                [0, 0, 1, 1, '', 'Optativa', 7, 3], [0, 0, 1, 1, 'C3', '', 7, 3]]}}
+        self.assertEqual(optativas_sin_linea(mapa), ['P3'])
+        mapa['layout']['boxes'][0].pop()
+        self.assertEqual(optativas_sin_linea(mapa), ['P3', 'P4'])
+        mapa.pop('layout')
+        self.assertEqual(optativas_sin_linea(mapa), [])
+
     def test_creditos_por_escala(self):
         from build_sate import creditos_materia
         self.assertEqual(creditos_materia('B', '09', 'B101', '7.50', '3', '1.5'),

@@ -1,25 +1,21 @@
 function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
 function renderSinUbicar(){
-  const el=$('#sin-ubicar'), off=offeredClaves(), c=cur();
-  const claves=(MAP().sinUbicar||[]).filter(k=>c[k]&&off.has(k));
+  const el=$('#optativas-sin-linea'), off=offeredClaves(), c=cur();
+  const claves=(MAP().optativasSinLinea||[]).filter(k=>c[k]?.[3]==='P'&&off.has(k));
   el.hidden=!claves.length;
-  if(!claves.length){$('#sin-ubicar-materias').innerHTML='';return}
+  if(!claves.length){$('#optativas-sin-linea-materias').innerHTML='';return}
   const tx=k=>esc(SATE.texto('sate.planeacion.'+k));
-  $('#sin-ubicar-titulo').textContent=SATE.texto('sate.planeacion.sin_ubicar')+' · '+claves.length;
-  $('#sin-ubicar-materias').innerHTML=`<p class="muted">${tx('sin_ubicar_ayuda')}</p>`+
-    [['P','sin_ubicar_optativas'],['otras','sin_ubicar_otras']].map(([tipo,titulo])=>{
-      const ks=claves.filter(k=>tipo==='P'?c[k][3]==='P':c[k][3]!=='P');
-      if(!ks.length)return '';
-      return `<section><h4>${tx(titulo)}</h4><div class="sin-ubicar-grid">`+ks.map(k=>{
+  $('#optativas-sin-linea-titulo').textContent=SATE.texto('sate.planeacion.optativas_sin_linea')+' · '+claves.length;
+  $('#optativas-sin-linea-materias').innerHTML=`<p class="muted">${tx('optativas_sin_linea_ayuda')}</p><div class="optativas-sin-linea-grid">`+
+      claves.map(k=>{
         const paso=planAsignado(k), bloqueada=['done','curso'].includes(statusOf(k))||tr().oblig.includes(k);
         const grupos=classes().filter(g=>g[0]===S.car&&g[8]===k);
-        return `<article class="sin-ubicar-materia${paso!=null?' want':''}"><b>${esc(pretty(c[k][0]))}</b>`+
+        return `<article class="optativas-sin-linea-materia${paso!=null?' want':''}"><b>${esc(pretty(c[k][0]))}</b>`+
           `<small>${esc(k)} · ${esc(SATE.texto('sate.planeacion.nivel',{n:c[k][2]}))} · ${esc(textoCreditos(k,c[k][1],true))}</small>`+
           `<div class="actions">${PLAN_DOS_PERIODOS?planAcciones(k):`<button class="btn" type="button" data-fwant="${k}" aria-pressed="${paso===S.planPaso}"${bloqueada?' disabled':''}>${tx(paso===S.planPaso?'sin_ubicar_quitar':'sin_ubicar_cursar')}</button>`}</div>`+
           `<details><summary>${tx('sin_ubicar_requisitos')}</summary>${inspParts(k).l2}</details>`+
           `<details><summary>${tx('sin_ubicar_grupos')} · ${grupos.length}</summary><ul>${grupos.map(g=>`<li><b>${esc(g[3])}</b> · ${esc(profs(g))}<br>${pattern(g).map(esc).join('<br>')}</li>`).join('')}</ul></details></article>`;
-      }).join('')+'</div></section>';
-    }).join('');
+      }).join('')+'</div>';
   montarAyudasCreditos();
 }
 /* Cadena de requisitos y dependientes de la materia bajo el cursor (o de la fila elegida en «requisitos»).

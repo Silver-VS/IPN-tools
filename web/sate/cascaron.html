@@ -726,12 +726,6 @@ footer{margin-top:var(--ipn-esp-6);padding-top:var(--ipn-esp-4);border-top:1px s
 .insp[hidden],.mapnote[hidden]{display:none}
 .map-plan .mapwrap{border:0;border-radius:0}
 .map-plan .tlist{margin:0;padding:var(--ipn-esp-3)}
-.sin-ubicar{margin:var(--ipn-esp-3);border:1px solid var(--line);border-radius:var(--r)}
-.sin-ubicar-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:var(--ipn-esp-3)}
-.sin-ubicar-materia{padding:var(--ipn-esp-3);border:1px solid var(--line);border-radius:var(--r);overflow-wrap:anywhere}
-.sin-ubicar-materia.want{border-color:var(--ipn-acento)}
-.sin-ubicar-materia>small{display:block;margin:var(--ipn-esp-2) 0;color:var(--ipn-tenue)}
-.sin-ubicar-materia details{margin-top:var(--ipn-esp-3)}
 @media(max-width:639px){.plan-resumen{display:grid;gap:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs)}.plan-head .actions{margin-left:0}}
 .plan-grupos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-4)}
 .plan-grupo{min-width:0;border-top:3px solid var(--ipn-acento);padding-top:var(--ipn-esp-2)}
@@ -897,7 +891,6 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
     <div class="map-plan">
     <div class="mapwrap" id="mapwrap"><div class="areas" id="areas"></div><div class="map" id="map"></div></div>
     <div class="tlist" id="tlist" hidden></div>
-    <details class="sate-desp sin-ubicar" id="sin-ubicar" hidden><summary id="sin-ubicar-titulo"></summary><div id="sin-ubicar-materias"></div></details>
     <ul class="mapnote" id="mapnote" hidden></ul>
     <section class="plan-panel" id="plan-panel">
       <div class="insp" id="insp" aria-live="polite" hidden></div>
@@ -918,7 +911,9 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
     </div>
     <div class="below">
       <div class="card" data-personal hidden><h3 class="sub">Seriación recomendada por nivel</h3><div class="lvls" id="lvls"></div></div>
-      <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div></div>
+      <div class="card wide" id="lineas-card"><h3 class="sub">Optativas y líneas de especialización</h3><div id="lineas"></div>
+        <section class="optativas-sin-linea" id="optativas-sin-linea" aria-labelledby="optativas-sin-linea-titulo" hidden><h4 id="optativas-sin-linea-titulo"></h4><div id="optativas-sin-linea-materias"></div></section>
+      </div>
     </div>
       <div class="plan-head plan-bandeja"><p class="plan-resumen" id="plan-resumen" role="status" aria-live="polite"></p>
         <div class="actions"><details class="plan-menu" id="plan-menu"><summary></summary><div class="plan-menu-cuerpo"><button class="btn" type="button" id="plan-simular"></button><button class="btn" type="button" id="b-none"></button></div></details><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="plan-deshacer" hidden></button></div>

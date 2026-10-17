@@ -385,6 +385,11 @@ for(const categoria of api.categorias){assert.ok(css.includes('--ipn-cal-'+categ
 assert.match(css,/\[data-theme=dark\] #sate-calendario\{/);assert.match(css,/@media\(prefers-color-scheme:dark\)/);
 assert.match(css,/grid-template-columns:repeat\(7,minmax\(0,1fr\)\)/);
 assert.match(css,/\.calendario-arriba\{display:grid;grid-template-columns:minmax\(0,1fr\) 300px/);
+// R2-MAP: la sección común posterior gana la cascada sin afectar a otras vistas.
+const r2 = css.slice(css.indexOf('/* R2-MAP:'));
+assert.match(r2, /#sate-calendario \.calendario-arriba\{grid-template-columns:minmax\(0,7fr\) minmax\(0,5fr\)/);
+assert.match(r2, /@media\(max-width:1023px\)\{\s*#sate-calendario \.calendario-arriba\{grid-template-columns:minmax\(0,1fr\)\}/);
+assert.match(r2, /#sate-calendario \.calendario-arriba>\.calendario-tarjeta\{[^}]*background:var\(--ipn-hundido\)/);
 assert.match(css,/@media\(max-width:639px\)\{\.calendario-arriba,\.calendario-abajo\{grid-template-columns:minmax\(0,1fr\)\}/);
 assert.match(css,/\.calendario-centro\{bottom:16%/);assert.match(css,/\.calendario-centro-largo\{display:none\}/);assert.match(css,/\.calendario-svg-mes,\.calendario-svg-extremo\{font-size:var\(--ipn-tamano-l\)\}/);
 assert.match(css,/\.calendario-lado\{position:sticky/);assert.match(css,/\.calendario-tarjeta\[hidden\]\{display:none\}/);
