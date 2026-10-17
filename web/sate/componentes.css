@@ -897,3 +897,15 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 @media(max-width:639px){
   .trayectoria-materias{grid-template-columns:minmax(0,1fr)}
 }
+/* R2-HOR: cupos reservados dentro del bloque y columnas legibles con traslapes. */
+.cal:has(>.day){--ipn-horario-columna:calc(var(--ipn-esp-8) + var(--ipn-esp-6));grid-template-columns:calc(var(--ipn-esp-6) + var(--ipn-esp-5)) repeat(var(--days),minmax(var(--ipn-horario-columna-min,var(--ipn-horario-columna)),1fr));min-width:max-content}
+.cal .blk .horario-contenido{display:block;min-width:0;min-height:0;overflow:hidden;flex:1 1 100%;overflow-wrap:anywhere}
+.cal .blk.blk-cupo{display:grid;grid-template-rows:auto minmax(0,1fr);align-content:stretch;align-items:start;gap:var(--ipn-esp-1);padding-block:0}
+.cal .blk-cupo>.cupos-insignia{max-width:100%;justify-self:start;white-space:nowrap;line-height:1.2;padding:0 var(--ipn-esp-1);margin:0;box-sizing:border-box}
+.cal .blk-cupo>.horario-contenido{max-height:100%}
+.cupos-cabecera{gap:var(--ipn-esp-3);align-items:center}
+.cupos-cabecera>span:empty{display:none}
+.sate-cupos-consultar.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--ipn-esp-2);min-height:44px;max-width:100%;padding:var(--ipn-esp-2) var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);background:var(--ipn-superficie);color:var(--ipn-texto);white-space:normal;text-align:left}
+.sate-cupos-consultar svg{flex:none}
+.sate-cupos-consultar.btn:hover{background:var(--ipn-hundido)}
+.sate-cupos-consultar.btn:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}

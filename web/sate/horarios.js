@@ -697,8 +697,7 @@ function renderCal(){
   const viajes=SEMANA_ACTIVA?semanaTraslados(sel).map(([d,a,b])=>({own:true,n:txH('semana_categoria_traslados'),h:[[d,Math.max(0,a),Math.min(1440,b)]]})):[];
   const all=[...sel,...own,...viajes,...(ghost?[ghost]:[])];
   const reducida=document.documentElement.dataset.vista==='cupos';
-  const items=SateUI.cuadriculaHorario(all,{S,slots,START,BLOCK,SLOT,SLOTPX,$,DAYS,hm,esc,txH,hue,keyOf,name,profs,roomAt,ghost,soloLectura:reducida,insignia:reducida?CUPOS.insignia:null});
-  if(typeof CUPOS!=='undefined')for(const b of document.querySelectorAll('#cal .blk[data-k]')){const c=byKey(b.dataset.k);if(c)b.insertAdjacentHTML('beforeend',CUPOS.insignia(c))}
+  const items=SateUI.cuadriculaHorario(all,{S,slots,START,BLOCK,SLOT,SLOTPX,$,DAYS,hm,esc,txH,hue,keyOf,name,profs,roomAt,ghost,soloLectura:reducida,insignia:typeof CUPOS!=='undefined'?CUPOS.insignia:null});
   const cv=(reducida||$('#horario-compacto').open)&&MQ_PHONE.matches?'dia':cview();document.querySelectorAll('[data-cview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.cview===cv)));
   $('.calwrap').hidden=cv==='dia';$('#agenda').hidden=cv!=='dia';
   if(cv==='dia')$('#agenda').innerHTML=agendaHorario(items,reducida);

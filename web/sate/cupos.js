@@ -23,7 +23,7 @@ const CUPOS=(()=>{
     for(const id of ['#cupos-estado','#cupos-estado-horario']){const n=$(id);if(n){n.textContent=estado;n.classList.toggle('cupos-antigua',!!hay&&vieja)}}
     ayuda.textContent=tx('ayuda')+(hay&&vieja?' '+tx('antigua_ayuda'):'');
     const aviso=$('#cupos-llenos');if(aviso){aviso.hidden=!selected().some(c=>fila(c)?.disponibles===0);$('#cupos-llenos-texto').textContent=tx('horario_lleno')}
-    for(const n of document.querySelectorAll('[data-cupos-ayuda]'))n.textContent=tx(hay?'actualizar':'consultar');
+    for(const n of document.querySelectorAll('[data-cupos-ayuda]'))(n.querySelector?.('[data-cupos-etiqueta]')||n).textContent=tx(hay?'actualizar_consulta':'consultar');
     seleccion();
   }
   function aceptar(d){if(!C.validar(d)||d.unidad!==UNIDAD)return;const nueva=C.reciente(datos,d);if(nueva===datos)return;datos=C.limpiar(nueva);IPNT.set(HU+'cupos',JSON.stringify(datos));
