@@ -36,6 +36,10 @@
   }
   function tituloDeReferencia(texto) {
     const original = String(texto == null ? '' : texto).replace(/\s+/g, ' ').trim();
+    // Renglones rotos del OCR: solo ISBN o solo una dirección web no son una referencia buscable.
+    if (/^(?:(?:ISBN|ISSN)[\s:#-]*[\dX-]{8,}[.\s]*|(?:https?:\/\/|www\.)\S+)$/i.test(original)) return '';
+    // Fragmento que empieza con una palabra suelta y su edición («Ambiental (1ª edición). …»): el título se perdió.
+    if (/^\p{L}+\s*\(\s*\d+\s*[ªºa°.]*\s*ed/iu.test(original)) return '';
     const citado = original.match(/[“"«]([^”"»]+)[”"»]/);
     const fecha = original.match(/\((?:18|19|20)\d{2}[a-z]?\)\.?\s*(.+)/i);
     let s = citado ? citado[1] : fecha ? fecha[1] : original;
@@ -60,6 +64,11 @@
     if (s && s.split(/\s+/).length === 1) {
       const alterno = mejorSegmento(original);
       if (alterno.split(/\s+/).length >= 2) s = alterno;
+    }
+    // «Apellido Nombre» antes del primer punto es autor: el título es el segmento siguiente.
+    if (/^\p{Lu}[\p{L}'-]+\s+\p{Lu}[\p{L}'-]+$/u.test(s) && original.startsWith(s + '.')) {
+      const siguiente = limpiarTitulo(original.slice(s.length + 1).split(/\.\s+/)[0]);
+      if (siguiente && !esMalo(siguiente)) s = siguiente;
     }
     let corto = (s && /\p{L}{3}/u.test(s) ? s : original).split(/\s+/).slice(0, 8).join(' ');
     if ((corto.match(/\(/g) || []).length > (corto.match(/\)/g) || []).length) corto = corto.replace(/\s*\([^)]*$/, '');
