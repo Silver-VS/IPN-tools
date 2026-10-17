@@ -762,7 +762,8 @@ def load_maps(offer, upiita=True, extra=None):
     return maps
 
 
-def main():
+def main(solo_datos=False):
+    """Compila la unidad. `solo_datos` escribe únicamente datos/<unidad>/*.json (sin páginas, JS ni CSS)."""
     import sys
     sys.path.insert(0, str(ROOT / "tools"))
     d = json.loads(SRC.read_text(encoding="utf-8"))
@@ -826,16 +827,15 @@ def main():
     from materias_sin_ubicar import clasificar
     for car, mapa in data['mapas'].items():
         mapa['sinUbicar'] = [k for k, estado in clasificar(mapa).items() if estado in ('sin_ubicar', 'sin_selector')]
-    # salones: PDF de horarios por aula de la unidad (tools/salones.py) -> solo el periodo actual; el próximo aún no
-    # los tiene. Se toma el archivo data/salones_*.json más reciente y se aplica si coincide con la oferta del SAES.
+    # salones: PDF de horarios por aula de la unidad (tools/salones.py). La captura del SAES no trae el ciclo:
+    # cada PDF se aplica a la oferta (actual o próxima) con la que mejor cruza, si cubre al menos el 70 %.
     import salones
     sal = sorted((ROOT / "data").glob("salones_*.json"), key=lambda p: p.stat().st_mtime)
     if sal and upiita:
-        sd = json.loads(sal[-1].read_text(encoding="utf-8"))
-        cob = salones.asignar(data["periodos"]["actual"], asig, sd)
-        if cob >= 0.7:
-            data["salones"] = {"periodo": sd.get("ciclo") or sd["periodo"], "cobertura": round(cob, 3)}
-        print("salones", sal[-1].name, f"cobertura {cob:.1%}", "aplicados" if cob >= 0.7 else "NO aplicados (otro periodo)")
+        meta = salones.aplicar_periodos(data['periodos'], asig,
+                                       [(p.name, json.loads(p.read_text(encoding='utf-8'))) for p in sal])
+        if meta:
+            data['salones'] = {**meta.get('actual', next(iter(meta.values()))), 'periodos': meta}
     if UNIDAD != "upiita":
         full = {}   # clave -> nombre completo según la oferta (el mapa curricular los recorta)
         for per in data["periodos"].values():
@@ -866,7 +866,12 @@ def main():
     sug = json.loads((ROOT / "data" / "sugerencias.json").read_text(encoding="utf-8")) if (ROOT / "data" / "sugerencias.json").exists() else {}
     data["sugerencias"] = sug.get(UNIDAD) or {}   # ajustes a las sugeridas (p. ej., materias que se cursan cerca de otra)
     payload = acentuar(json.dumps(tildes(data), ensure_ascii=False, separators=(",", ":")))
-    escribir_sate(json.loads(payload))
+    datos_json = json.loads(payload)
+    if solo_datos:
+        escribir_datos(datos_json)
+        print("SATE (solo datos)", UNIDAD, {k: len(v) for k, v in data["periodos"].items()})
+        return
+    escribir_sate(datos_json)
     import cuenta, saes, contenido
     import os
     site = os.environ.get("UPIITA_SITE", "")
@@ -1164,12 +1169,9 @@ def escribir_guia(datos):
     (datos / 'guia.json').write_text(json.dumps(guia, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 
-def escribir_sate(data):
-    import shutil, cuenta, saes, comun, contenido, skins, encuesta
-    from institucional import write_dist
-    dist = ROOT / "web/dist"
-    destino = dist / "sate"
-    datos = destino / "datos" / UNIDAD
+def escribir_datos(data):
+    """Solo los datos de la unidad (oferta, núcleo, trámites, electivas); no toca plantillas, JS ni CSS."""
+    datos = ROOT / "web/dist/sate/datos" / UNIDAD
     datos.mkdir(parents=True, exist_ok=True)
     for nombre, d in zip(("nucleo", "oferta", "tramites"), separar_datos(data)):
         if nombre == 'nucleo':
@@ -1187,7 +1189,18 @@ def escribir_sate(data):
     escribir_temarios(data, datos)
     escribir_recursos(datos)
     escribir_guia(datos)
-    shutil.copytree(ROOT / 'data/reglamentos', destino / 'datos/reglamentos', dirs_exist_ok=True)
+    import shutil
+    shutil.copytree(ROOT / 'data/reglamentos', ROOT / 'web/dist/sate/datos/reglamentos', dirs_exist_ok=True)
+    return datos
+
+
+def escribir_sate(data):
+    """Datos y páginas de SATE (compilación completa)."""
+    import shutil, cuenta, saes, comun, contenido, skins, encuesta
+    from institucional import write_dist
+    dist = ROOT / "web/dist"
+    destino = dist / "sate"
+    datos = escribir_datos(data)
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")
     fuente = ROOT / "web/sate"
@@ -1393,4 +1406,5 @@ document.addEventListener('click', e => {
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+    main(solo_datos="--solo-datos" in sys.argv)
