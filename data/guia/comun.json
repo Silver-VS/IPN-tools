@@ -107,18 +107,6 @@
    "resumen": "Índice oficial de la normatividad vigente.",
    "reglamento": false
   },
-  "calendario_cgc": {
-   "titulo": "Calendario de sesiones del Consejo General Consultivo 2025-2026",
-   "url": "https://www.ipn.mx/assets/files/esiqie/docs/estudiantes/gestion-escolar/26-1/dictamen-consejo-general-2025-2026.pdf",
-   "resumen": "Fechas límite de entrega y de sesión de la Comisión de Situación Escolar del Consejo General Consultivo, publicado por la ESIQIE.",
-   "reglamento": false
-  },
-  "proceso_cgc": {
-   "titulo": "Proceso de dictamen ante la Comisión de Situación Escolar del CGC",
-   "url": "https://www.cecyt16.ipn.mx/assets/files/cecyt16/docs/2026/Gestion%20escolar/proceso-cosie-cgc-c26-1.pdf",
-   "resumen": "Casos que atiende el CGC y cómo se presenta el expediente, publicado por el CECyT 16.",
-   "reglamento": false
-  },
   "dae": {
    "titulo": "Dirección de Administración Escolar del IPN",
    "url": "https://www.ipn.mx/dae/",
@@ -647,7 +635,7 @@
    "respuesta": "Depende de tu caso. La [[g:cosie_ctce|Comisión de Situación Escolar]] del [[g:ctce|Consejo Técnico Consultivo Escolar (CTCE)]] de tu unidad resuelve, entre otros, los adeudos del art. 98 del Reglamento Interno y las cargas menores a la mínima ([[a:rge:52|art. 52, fracc. III, del RGE]]). Si el cálculo de tus créditos muestra que ya no puedes terminar en el plazo máximo, tienes que pedir la autorización y la ampliación de plazo a la [[g:cosie_cgc|Comisión de Situación Escolar]] del [[g:cgc|Consejo General Consultivo (CGC)]] ([[a:rge:52|mismo artículo]]). Lo que el reglamento no prevé lo resuelve la comisión que corresponda ([[a:rge:60|art. 60]]).",
    "pasos": [
     "Pregunta en Gestión Escolar si tu caso lo resuelve la comisión de tu unidad o la del CGC.",
-    "Si va al CGC, confirma la fecha límite de entrega de la sesión que te toca: esa comisión sesiona en fechas fijas.",
+    "Pregunta en Gestión Escolar por los requisitos y la fecha límite de entrega.",
     "Entrega tu expediente completo antes de esa fecha."
    ],
    "acudir": [
@@ -663,12 +651,6 @@
       "52",
       "60"
      ]
-    },
-    {
-     "doc": "proceso_cgc"
-    },
-    {
-     "doc": "calendario_cgc"
     }
    ],
    "palabras": [
@@ -786,12 +768,6 @@
       "52",
       "57"
      ]
-    },
-    {
-     "doc": "proceso_cgc"
-    },
-    {
-     "doc": "calendario_cgc"
     }
    ],
    "palabras": [
@@ -828,9 +804,6 @@
       "57",
       "74"
      ]
-    },
-    {
-     "doc": "proceso_cgc"
     }
    ],
    "palabras": [
@@ -1216,10 +1189,10 @@
    "id": "formato-dictamen",
    "apartado": "tramites",
    "pregunta": "¿Qué formato lleno para pedir un dictamen y cómo lo presento?",
-   "respuesta": "Hay dos caminos según quién resuelve: el [[g:dictamen|dictamen]] interno, ante la [[g:cosie_ctce|Comisión de Situación Escolar]] del [[g:ctce|CTCE]] de tu unidad, y el externo, ante la [[g:cosie_cgc|Comisión de Situación Escolar del CGC]]. Cada uno tiene su formato y una lista de documentos que se anexan. Primero confirma en [[g:gestion_escolar|Gestión Escolar]] cuál corresponde a tu caso ([[a:rge:52|art. 52 del RGE]]); en el caso del CGC, el proceso y las fechas límite de entrega los publica el propio Consejo.",
+   "respuesta": "Hay dos caminos según quién resuelve: el [[g:dictamen|dictamen]] interno, ante la [[g:cosie_ctce|Comisión de Situación Escolar]] del [[g:ctce|CTCE]] de tu unidad, y el externo, ante la [[g:cosie_cgc|Comisión de Situación Escolar del CGC]]. El art. 52 del RGE establece cuándo corresponde solicitarlo. Pregunta en Gestión Escolar qué formato y anexos corresponden a tu caso ([[a:rge:52|art. 52 del RGE]]).",
    "pasos": [
     "Pregunta en Gestión Escolar si tu caso es interno o externo y qué formato te corresponde.",
-    "Reúne los anexos que pide el formato y la información de tu kárdex.",
+    "Pide en Gestión Escolar el formato vigente y reúne los anexos indicados.",
     "Imprime y firma tu solicitud y entrégala antes de la fecha límite."
    ],
    "acudir": [
@@ -1234,12 +1207,6 @@
      "arts": [
       "52"
      ]
-    },
-    {
-     "doc": "proceso_cgc"
-    },
-    {
-     "doc": "calendario_cgc"
     }
    ],
    "palabras": [

@@ -3,6 +3,11 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const config = JSON.parse(readFileSync('data/sate.json','utf8')).unidades;
+const rutasCtx = vm.createContext({});
+vm.runInContext(readFileSync('web/sate/rutas.js','utf8'), rutasCtx);
+assert.equal(rutasCtx.SateRutas.requiereRaiz({pestana:'guia',partes:['situacion']},'guia'), true, 'la pestaña Guía vuelve a su portada desde un apartado');
+assert.equal(rutasCtx.SateRutas.requiereRaiz({pestana:'temarios',vista:true,padre:'guia'},'guia'), true, 'la pestaña Guía vuelve desde Programas');
+assert.equal(rutasCtx.SateRutas.requiereRaiz({pestana:'guia'},'guia'), false, 'en la portada no navega de nuevo');
 const identidades = JSON.parse(readFileSync('data/unidades_identidad.json','utf8')).unidades;
 for(const [id,cfg] of Object.entries(config)){
   const {realce,siglas,nombre}=identidades[id];Object.assign(cfg,{realce,siglas,nombre});

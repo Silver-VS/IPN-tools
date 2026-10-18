@@ -212,7 +212,7 @@ async function renderStatsVista(){
   if(!vigente())return;
   const P=window.Plot;
   const col=d=>tok(mejores.includes(d)?'--ipn-acento':'--ipn-tenue');
-  put('#ch-cat',P.plot({...base('#ch-cat'),height:porArea.length*24+32,marginTop:0,marginBottom:32,marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
+  put('#ch-cat',P.plot({...base('#ch-cat'),height:Math.max(190,porArea.length*32+70),marginTop:30,marginBottom:32,marginLeft:$('#ch-cat').clientWidth<480?118:160,marginRight:20,
     x:{label:null,domain:[6,10],ticks:[6,7,8,9,10]},y:{label:null,domain:porArea.map(d=>d.cat),padding:0,tickSize:0,tickFormat:d=>d.length>18?d.slice(0,17)+'…':d},
     marks:[P.ruleY(porArea,{y:'cat',x1:6,x2:10,stroke:tok('--ipn-linea')}),
       P.ruleX(Da.media==null?[]:[Da.media],{stroke:tok('--ipn-tenue'),strokeOpacity:.4,strokeWidth:1}),

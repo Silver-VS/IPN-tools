@@ -42,6 +42,9 @@
     return { unidad, pestana: pestaña, tramite: partes[0] || null,
       hash: '#/' + unidad + '/' + pestaña + (partes.length ? '/' + partes[0] : '') + (hash.includes('?') ? '?' + hash.split('?').slice(1).join('?') : '') };
   }
+  function requiereRaiz(actual, id) {
+    return !!actual && !!(actual.pestana !== id || actual.vista || actual.partes?.length || actual.tramite);
+  }
   function redireccion(unidad, search, hash) {
     let query = search;
     if (unidad && hash && !hash.startsWith('#/')) {
@@ -98,5 +101,5 @@
     }
     return {precargar, reposo};
   }
-  raiz.SateRutas = { ruta, redireccion, recursos, precargador };
+  raiz.SateRutas = { ruta, requiereRaiz, redireccion, recursos, precargador };
 })(typeof window !== 'undefined' ? window : globalThis);

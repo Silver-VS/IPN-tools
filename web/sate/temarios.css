@@ -162,7 +162,8 @@
 .gd-sem>h4{padding-bottom:var(--ipn-esp-2);border-bottom:2px solid var(--ipn-acento);font-size:var(--ipn-tamano-m);line-height:1.25;font-weight:600}
 .gd-sem ul{display:grid;gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}
 .tmr-dialogo{min-width:0}
-.tmr-dialogo .tmr-ficha{gap:var(--ipn-esp-5)}
+.tmr-dialogo .tmr-ficha{grid-template-columns:minmax(0,1fr);grid-template-areas:none;gap:var(--ipn-esp-5)}
+.tmr-dialogo .tmr-principal,.tmr-dialogo .tmr-lateral,.tmr-dialogo .tmr-col-resto{grid-area:auto;position:static;min-width:0}
 
 /* ---------- líneas y especializaciones: metro y matriz ---------- */
 .gd-lin{display:grid;gap:var(--ipn-esp-6);min-width:0}
