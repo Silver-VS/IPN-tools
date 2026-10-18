@@ -66,9 +66,10 @@
         const bytes=await (def.previsualizar||def.generar)({...m.datos});
         if(destruido||v!==version)return;
         revocar();url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
+        const estado=box.querySelector('[data-pdf-estado]');if(estado)estado.textContent='';
         const marco=box.querySelector('iframe');if(marco)marco.src=url;
         const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=false;
-      }catch(e){if(destruido||v!==version)return;revocar();box.querySelector('iframe')?.removeAttribute('src');const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=true;console.error('Ventanilla: vista previa fallida',{tramite:def.id,paso:m.paso,error:e.name});const aviso=box.querySelector('[data-pdf-estado]');if(aviso)aviso.textContent=tx('pdf_error')}
+      }catch(e){if(destruido||v!==version)return;revocar();box.querySelector('iframe')?.removeAttribute('src');const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=true;console.error('Ventanilla: vista previa fallida',{tramite:def.id,paso:m.paso,error:e.name});const aviso=box.querySelector('[data-pdf-estado]');if(aviso)aviso.textContent=e.message||tx('pdf_error')}
     }
     // Un trámite puede declarar qué le falta (def.faltante) para que nunca se genere una hoja vacía.
     function estadoFalta(){
@@ -88,7 +89,7 @@
         if(destruido)return;
         bajar(bytes,typeof def.archivo==='function'?def.archivo(m.datos):def.archivo||def.id+'.pdf');
         m.listo=true;m.guardar();def.alTerminar?.(m.datos);
-      }catch(e){console.error('Ventanilla: descarga fallida',{tramite:def.id,paso:m.paso,error:e.name});box.querySelector('[data-pdf-estado]').textContent=tx('pdf_error')}
+      }catch(e){console.error('Ventanilla: descarga fallida',{tramite:def.id,paso:m.paso,error:e.name});box.querySelector('[data-pdf-estado]').textContent=e.message||tx('pdf_error')}
       finally{if(!destruido)b.disabled=!!def.faltante?.(m.datos,true)}
     }
     let confirmado=false;
@@ -139,14 +140,14 @@
           const grupo=el('div',null,'tramite-compuesto tramite-ancho'),error=el('p','');
           grupo.id='tramite-'+def.id+'-'+c.id;grupo.tabIndex=-1;
           error.id=grupo.id+'-error';error.setAttribute('aria-live','polite');grupo.setAttribute('aria-describedby',error.id);
-          grupo.onblur=()=>{const mensaje=m.validar(c);error.textContent=mensaje;grupo.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
-          render(grupo,{datos:m.datos,cambiar(valor,repintar=false){if(arguments.length)m.datos[c.id]=valor;m.listo=false;m.guardar();programar();if(repintar)pintar()},validar:()=>m.validar(c),repintar:pintar});
+          grupo.onblur=()=>{const mensaje=m.validar(c);if(!c.inline)error.textContent=mensaje;grupo.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
+        render(grupo,{datos:m.datos,cambiar(valor,repintar=false){if(arguments.length)m.datos[c.id]=valor;m.listo=false;m.guardar();const estado=box.querySelector('[data-pdf-estado]');if(estado)estado.textContent='';programar();if(repintar)pintar()},validar:()=>m.validar(c),repintar:pintar});
           grupo.appendChild(error);rejilla.appendChild(grupo);continue;
         }
         const l=el('label',null,'tramite-campo'+(c.tipo==='textarea'||c.ancho?' tramite-ancho':'')),n=el(c.tipo==='textarea'?'textarea':'input'),ayudaCampo=el('small',c.ayuda||''),error=el('span','');
         n.id='tramite-'+def.id+'-'+c.id;n.value=m.datos[c.id];if(c.tipo!=='textarea')n.type=c.tipo||'text';
         n.required=!!c.requerido;error.id=n.id+'-error';ayudaCampo.id=n.id+'-ayuda';error.setAttribute('aria-live','polite');n.setAttribute('aria-describedby',ayudaCampo.id+' '+error.id);
-        n.oninput=()=>{m.datos[c.id]=n.value;m.listo=false;programar()};
+        n.oninput=()=>{m.datos[c.id]=n.value;m.listo=false;const estado=box.querySelector('[data-pdf-estado]');if(estado)estado.textContent='';programar()};
         n.onblur=()=>{m.datos[c.id]=n.value;const mensaje=m.validar(c);error.textContent=mensaje;n.setAttribute('aria-invalid',String(!!mensaje));m.guardar()};
         l.appendChild(el('span',c.texto));l.appendChild(n);l.appendChild(ayudaCampo);l.appendChild(error);rejilla.appendChild(l);
       }
@@ -162,6 +163,10 @@
       const acciones=el('div',null,'tramite-acciones');acciones.appendChild(el('span',tx('guardado'),'tramite-guardado'));
       if(m.paso>0)acciones.appendChild(boton(tx('atras'),()=>{m.atras();pintar()}));
       const primario=b=>{b.className+=' sate-btn--primario';acciones.appendChild(b);return b};
+      if(def.descartar)acciones.appendChild(boton(tx('descartar'),()=>{
+        if(!def.descartar())return;
+        m.listo=false;for(const c of m.campos)if(c.sensible)m.datos[c.id]='';revocar();SATE.ir('tramites');
+      }));
       if(m.paso<def.pasos.length)primario(boton(tx('continuar'),()=>{
         // Validar también al continuar; la escritura por sí sola no muestra errores.
         for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);if(n){if(!c.pintar&&!c.render)m.datos[c.id]=n.value;n.onblur()}}
