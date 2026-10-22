@@ -4,6 +4,7 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const leer=f=>readFileSync(f,'utf8');
 const mapa=leer('web/sate/mapa.js'), nucleo=leer('web/sate/nucleo.js'), componentes=leer('web/sate/componentes.js');
+assert.match(mapa,/const H=Y\(bands\.length\?bands\[bands\.length-1\]\[3\]:L\.h\)/,'el SVG termina al final de la última banda curricular');
 
 // --- DOM mínimo con classList y atributos ---
 const nodo=(clase,data={},attrs={})=>{

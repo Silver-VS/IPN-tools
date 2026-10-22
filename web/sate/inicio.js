@@ -334,7 +334,7 @@
       if(!cfg.pestanas.includes(activa))activa=api.personal()?'trayectoria':'mapa';
       const items = cfg.pestanas.map(id => ({id,grupo:cfg.grupos.findIndex(g=>g.includes(id)),texto:texto('sate.pestana.'+id+'.titulo'),corto:texto('sate.pestana.'+id+'.corto')}));
       for(const v of cfg.vistas||[])if(v.externa&&v.habilitada!==false&&!oculta(v.id))items.push({id:v.id,href:v.href,texto:texto('sate.pestana.'+v.id+'.titulo'),corto:texto('sate.pestana.'+v.id+'.corto')});
-      tabs = SateUI.pestanas({items,activa,alCambiar:id=>{if(!seleccionProgramada && actual && actual.pestana!==id)ir(id)}});
+      tabs = SateUI.pestanas({items,activa,alCambiar:id=>{if(!seleccionProgramada && SateRutas.requiereRaiz(actual,id))ir(id)}});
       document.getElementById('sate-tabs').replaceChildren();
       document.getElementById('sate-tabs').appendChild(tabs);
       for (const id of cfg.pestanas) tabs.querySelector('[data-id="'+id+'"]').setAttribute('aria-controls',id==='guia'?'sate-guia':id==='horarios'?'v-hor':id==='tramites'?'sate-tramites':id==='trayectoria'?'sate-trayectoria':id==='calendario'?'sate-calendario':'v-tray');

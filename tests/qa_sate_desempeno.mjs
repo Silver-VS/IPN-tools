@@ -89,8 +89,9 @@ for(const unidad of ['upiita','escom','upibi']){
   for(const s of solicitudes){assert.match(s.integrity,/^sha384-/);assert.equal(s.crossOrigin,'anonymous')}
   assert.equal(trazados,1,'F: gráfica solo al abrir áreas');
   assert.deepEqual(Array.from(graficas[0].x.domain),[6,10],'K: escala absoluta fija');
-  assert.equal(graficas[0].height,graficas[0].y.domain.length*24+32,'REV1: filas de 24 px sin altura mínima vacía');
-  assert.equal(graficas[0].marginTop,0,'REV1: sin espacio vacío arriba');
+  assert.equal(graficas[0].height,Math.max(190,graficas[0].y.domain.length*32+70),'R4: alto suficiente para etiquetas y filas de áreas');
+  assert.equal(graficas[0].marginTop,30,'R4: margen superior para la primera etiqueta');
+  assert.equal(graficas[0].marginBottom,32,'R4: margen inferior para el eje');
   assert.equal(graficas[0].y.padding,0);
   assert.match(document.querySelector('#trayectoria-areas-datos').innerHTML,/<ol.*Promedio.*cr.*materias/,'K: ranking accesible con los mismos datos');
   areas.open=false;areas.eventos.toggle.at(-1)();

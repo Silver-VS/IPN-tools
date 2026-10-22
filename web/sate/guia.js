@@ -195,7 +195,7 @@
     const cuerpo = h('div', { 'class': 'guia-articulo' }, a ? [
       h('p', { texto: (a.ubicacion || []).join(' · ') }),
       h('div', { 'class': 'pc-lector pc-oficial' }, [h('p', { texto: inicioFracciones >= 0 ? a.texto.slice(0, inicioFracciones) : a.texto }),
-        a.fracciones?.length ? h('ol', {}, a.fracciones.map(f => h('li', { texto: f.fr + '. ' + f.texto }))) : null])
+        a.fracciones?.length ? h('ol', { 'class': 'rgl-fracciones' }, a.fracciones.map(f => h('li', { 'class': 'rgl-fr' }, [h('span', { 'class': 'rgl-marca', texto: f.fr + '.' }), ' ', h('div', { texto: f.texto })]))) : null])
     ] : [h('p', { role: 'status', texto: t(error ? 'sate.guia.error_articulo' : 'sate.guia.sin_articulo') })]);
     if (a && reg.ocr) cuerpo.appendChild(h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }));
     const leer = h('a', { href: rutaReglamento(doc, 'art-' + n), texto: t('sate.guia.leer_reglamento') });

@@ -572,6 +572,8 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.ok(ficha.querySelector('.tmr-rel-enlace'), 'los requisitos se enlazan al programa');
   assert.match(leer('web/sate/temarios.css'), /\.tmr-lateral\{[^}]*position:sticky/);
   assert.match(leer('web/sate/temarios.css'), /@media\(max-width:1023\.98px\)\{\.tmr-pagina[^}]*"principal" "lateral" "resto"/);
+  assert.match(leer('web/sate/temarios.css'), /\.tmr-dialogo \.tmr-ficha\{grid-template-columns:minmax\(0,1fr\);grid-template-areas:none/,'el diálogo no hereda las áreas de la ficha de página');
+  assert.match(leer('web/sate/temarios.css'), /\.tmr-dialogo \.tmr-principal,\.tmr-dialogo \.tmr-lateral,\.tmr-dialogo \.tmr-col-resto\{grid-area:auto;position:static/,'las secciones del diálogo se apilan en flujo');
   assert.equal(ficha.querySelector('.tmr-pdf').getAttribute('href'), reg103.pdf);
   assert.equal(ficha.querySelector('.tmr-oficial'), null, 'sin «Leer el programa completo aquí»');
   assert.equal(caja2.querySelector('.tmr-col-lista'), null, 'sin lista larga que recorrer');

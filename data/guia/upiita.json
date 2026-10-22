@@ -110,16 +110,12 @@
   {
    "id": "formato-dictamen",
    "pasos": [
-    "Abre «Dictamen» en la Ventanilla digital y elige el tipo que corresponde a tu caso (interno o externo).",
-    "Revisa el formato y los anexos que te pide; genera el PDF.",
+    "Pregunta en Gestión Escolar si el dictamen corresponde a la comisión de tu unidad o al CGC.",
+    "Solicita el formato vigente y revisa qué anexos debes presentar.",
     "Imprímelo, fírmalo y entrégalo en [[g:gestion_escolar|Gestión Escolar]] antes de la fecha límite."
    ],
    "reemplaza": true,
-   "ventanilla": "dictamen",
-   "formato": {
-    "texto": "Proceso y requisitos del dictamen ante el CGC",
-    "doc": "proceso_cgc"
-   }
+   "ventanilla": "dictamen"
   },
   {
    "id": "baja-temporal",
