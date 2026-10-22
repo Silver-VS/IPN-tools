@@ -104,8 +104,8 @@ function filtered(){
   const fits=c=>c[6].length&&!have.has(c[4])&&!done.has(c[8])&&![...sel,...own].some(x=>overlaps(x,c))&&
     (!S.gap||c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b));
   const mine=new Set(plan().sel);
-  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(hunt?fits(c):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
-    (!S.hideDone||!done.has(c[8]))&&(!S.hide||marks[keyOf(c)]?.s!=='no'||plan().sel.includes(keyOf(c)))&&
+  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
+    (!S.hideDone||mine.has(keyOf(c))||!done.has(c[8]))&&(!S.hide||marks[keyOf(c)]?.s!=='no'||mine.has(keyOf(c)))&&
     (!q||norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(q)));
 }
 function suggest(q){

@@ -412,7 +412,8 @@ let KEYMAP={};
 function actualizarOferta(){for(const p in DATA.periodos){const m=new Map();DATA.periodos[p].forEach(c=>m.set(keyOf(c),c));KEYMAP[p]=m}}
 actualizarOferta();
 const byKey=k=>KEYMAP[S.per].get(k);
-const selected=()=>plan().sel.map(byKey).filter(c=>c&&desfaseHorario(c[8]));
+// La decisión de desfase limita sugerencias; no invalida grupos que el alumno ya guardó.
+const selected=()=>plan().sel.map(byKey).filter(Boolean);
 const ownAsClasses=()=>plan().own.map((o,i)=>o.oculto?null:{own:true,i,n:o.n,tipo:o.tipo,h:o.d.map(d=>[d,o.a,o.b])}).filter(Boolean);
 const ownVis=()=>plan().own.filter(o=>!o.oculto);
 const slots=x=>x.own?x.h:x[6];

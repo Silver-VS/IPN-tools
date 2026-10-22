@@ -393,6 +393,21 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
   await vm.runInContext('SAES.open()',contexto);
   assert.equal(cargados.filter(n=>n==='saes-dialogo.js').length,1);
   await SATE.script('horarios.js'); SATE.modulos.horarios.montar(); SATE.modulos.horarios.mostrar();
+  if(unidad==='upiita'){
+    const adeudo=JSON.parse(leer('data/perfiles-prueba/adeuda-telematica.json'));
+    vm.runInContext(`ALUMNO=${JSON.stringify(JSON.stringify(adeudo))};ALUMNO=JSON.parse(ALUMNO);for(const k in T)delete T[k];`,contexto);
+    vm.runInContext(`
+      const adeudada=classes().find(c=>c[8]==='T203'&&c[6].length);
+      if(!adeudada)throw new Error('Fixture: T203 requiere grupo con horario');
+      S.car='T';plan().sel=[keyOf(adeudada)];tr().want=['T203'];Object.assign(S,{tur:'*',niv:'*',chips:[],q:'',gap:null,hide:false,hideDone:true,gavoid:[],fit:true,onlyWant:true});
+      renderOffer();renderPlans();renderCal();
+      if(!selected().some(c=>c[8]==='T203'))throw new Error('El grupo guardado por recursar no aparece');
+      const horas=adeudada[6].reduce((s,b)=>s+b[2]-b[1],0)/60;
+      if(!$('#stats').innerHTML.includes(fmtCr(adeudada[7]))||!$('#stats').innerHTML.includes(txH('materias_horario',{n:1}))||!$('#stats').innerHTML.includes(horas.toFixed(1)))throw new Error('El resumen excluye créditos, materia u horas por recursar');
+      if(!$('#plans').innerHTML.includes(fmtCr(adeudada[7])+' créditos'))throw new Error('La pestaña no refleja créditos del horario');
+      if(!$('#offer').innerHTML.includes('data-k="'+keyOf(adeudada)+'"'))throw new Error('El filtro de cabida oculta el grupo elegido');
+    `,contexto,{filename:'qa-horario-adeudo'});
+  }
   assert.ok(!cargados.includes('exportacion.js'));
   await document.querySelector('#b-export').eventos.click();
   await document.querySelector('#b-export').eventos.click();
