@@ -59,16 +59,16 @@
     --ipn-tenue: #a1a1aa;
     --ipn-acento: #ec9cbf;
     --ipn-acento-fuerte: #f7c6db;
-    --ipn-acento-suave: #2e1a24;
+    --ipn-acento-suave: #191418;
     --ipn-sobre-acento: #1d0a13;
     --ipn-ok: #6ee7a0;
-    --ipn-ok-suave: #0f2a1c;
+    --ipn-ok-suave: #0a0b0d;
     --ipn-aviso: #f5c56b;
-    --ipn-aviso-suave: #2f230b;
+    --ipn-aviso-suave: #100e0e;
     --ipn-error: #fda4b8;
-    --ipn-error-suave: #3a1520;
+    --ipn-error-suave: #1a1417;
     --ipn-info: #8db6f5;
-    --ipn-info-suave: #172638;
+    --ipn-info-suave: #13171d;
   }
 }
 
@@ -83,16 +83,16 @@
   --ipn-tenue: #a1a1aa;
   --ipn-acento: #ec9cbf;
   --ipn-acento-fuerte: #f7c6db;
-  --ipn-acento-suave: #2e1a24;
+  --ipn-acento-suave: #191418;
   --ipn-sobre-acento: #1d0a13;
   --ipn-ok: #6ee7a0;
-  --ipn-ok-suave: #0f2a1c;
+  --ipn-ok-suave: #0a0b0d;
   --ipn-aviso: #f5c56b;
-  --ipn-aviso-suave: #2f230b;
+  --ipn-aviso-suave: #100e0e;
   --ipn-error: #fda4b8;
-  --ipn-error-suave: #3a1520;
+  --ipn-error-suave: #1a1417;
   --ipn-info: #8db6f5;
-  --ipn-info-suave: #172638;
+  --ipn-info-suave: #13171d;
 }
 
 :root[data-tema="claro"] {
