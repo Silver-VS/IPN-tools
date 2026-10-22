@@ -3,9 +3,11 @@ if(typeof CUPOS!=='undefined')CUPOS.montar();
 $('#offer').addEventListener('click',e=>{
   if(e.target.closest('[data-oferta-mapa]'))SATE.ir('mapa');
   if(e.target.closest('[data-oferta-toda]')){S.onlyWant=false;store.set('onlyWant',false);renderHFilters();renderOffer()}
+  const temario=e.target.closest('[data-temario]');if(temario)SATE.temarios?.abrir(temario.dataset.temario,temario);
 });
 $('#f-hide').addEventListener('change',e=>{S.hide=e.target.checked;store.set('hide',S.hide);renderOffer()});
 $('#f-done').addEventListener('change',e=>{S.hideDone=e.target.checked;store.set('hideDone',S.hideDone);renderOffer()});
+$('#f-cupo').addEventListener('change',e=>{S.soloCupo=e.target.checked;store.set('soloCupo',S.soloCupo);renderOffer();if(S.gen||generacion)iniciarGeneracion()});
 $('#f-fit').addEventListener('change',e=>{S.fit=e.target.checked;renderOffer()});
 $('#f-want').addEventListener('change',e=>{S.onlyWant=e.target.checked;store.set('onlyWant',S.onlyWant);renderOffer()});
 $('#f-weekend').addEventListener('change',e=>{S.weekend=e.target.checked;store.set('weekend',S.weekend);renderCal()});
@@ -32,9 +34,9 @@ const gtChanged=()=>{gtSave();renderOffer();if(S.gen||generacion)iniciarGeneraci
 $('#g-from').addEventListener('change',e=>{GT.a=e.target.value;gtChanged()});
 $('#g-to').addEventListener('change',e=>{GT.b=e.target.value;gtChanged()});
 $('#b-reset').addEventListener('click',()=>{
-  Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,fit:false,gap:null,onlyWant:true,gavoid:[],gt:'*',gpref:[],gen:null});S.expand=new Set();
+  Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,soloCupo:false,fit:false,gap:null,onlyWant:true,gavoid:[],gt:'*',gpref:[],gen:null});S.expand=new Set();
   ws().marks={};save();   // también quita las marcas «Sí / Quizá / No» (y sus notas) del periodo consultado
-  ['tur','niv'].forEach(k=>store.set(k,'*'));store.set('hide',false);store.set('hideDone',true);store.set('onlyWant',true);store.set('excl',[]);
+  ['tur','niv'].forEach(k=>store.set(k,'*'));store.set('hide',false);store.set('hideDone',true);store.set('soloCupo',false);store.set('onlyWant',true);store.set('excl',[]);
   Object.assign(GT,{a:'',b:'',breaks:[],days:'',n:'',src:''});gtSave();$('#f-q').value='';$('#g-avoid').value='';$('#g-pref').value='';
   if($('#gen'))$('#gen').open=false;renderGTime();render()});
 $('#g-src').addEventListener('click',e=>{const b=e.target.closest('[data-gsrc]');if(!b)return;GT.src=b.dataset.gsrc;renderGTime();gtChanged()});
@@ -104,7 +106,7 @@ function filtered(){
   const fits=c=>c[6].length&&!have.has(c[4])&&!done.has(c[8])&&![...sel,...own].some(x=>overlaps(x,c))&&
     (!S.gap||c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b));
   const mine=new Set(plan().sel);
-  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
+  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(!S.soloCupo||mine.has(keyOf(c))||typeof CUPOS==='undefined'||!CUPOS.fila(c)||CUPOS.fila(c).disponibles>0)&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
     (!S.hideDone||mine.has(keyOf(c))||!done.has(c[8]))&&(!S.hide||marks[keyOf(c)]?.s!=='no'||mine.has(keyOf(c)))&&
     (!q||norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(q)));
 }
@@ -143,6 +145,8 @@ function renderHFilters(){
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
   document.querySelectorAll('[data-gt]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gt===S.gt));
   $('#f-hide').checked=S.hide;$('#f-done').checked=S.hideDone;$('#f-done').disabled=!isPersonal();$('#f-fit').checked=S.fit;$('#f-weekend').checked=S.weekend;
+  const compatibles=typeof CUPOS!=='undefined'&&CUPOS.disponible, datos=compatibles?CUPOS.datos:null;
+  $('#f-cupo').checked=S.soloCupo;$('#f-cupo').disabled=!compatibles;$('#f-cupo-ayuda').textContent=compatibles?SATE.texto('sate.horarios.cupo_ultima',{hora:CUPOS.fecha(datos)}):txH('cupo_sin_datos');
   const n=tr().want.length;$('#f-want').checked=S.onlyWant;$('#f-want').disabled=false;
   $('#f-want-l').textContent=n?txH('elegidas',{n}):SATE.texto('sate.planeacion.filtro_elegidas');
   const mine=classes().filter(c=>c[0]===S.car);
@@ -156,7 +160,7 @@ function renderHFilters(){
   renderActive();renderGPrefs();
 }
 function renderMasFiltros(){
-  const n=[S.hide,S.fit,!!(GT.a||GT.b),S.gavoid.length>0,S.hideDone&&isPersonal()].filter(Boolean).length;
+  const n=[S.hide,S.fit,!!(GT.a||GT.b),S.gavoid.length>0,S.hideDone&&isPersonal(),S.soloCupo].filter(Boolean).length;
   $('#f-more-title').textContent=txH(n?'mas_filtros_activos':'mas_filtros',{n});
   if(n)$('#f-more').open=true;
 }
@@ -169,6 +173,7 @@ function roomsTxt(c){if(!c[10]||!c[10].some(Boolean))return '';const by=new Map(
 /* Líneas de especialización de una optativa (por clave o por nombre, ya que una optativa puede tener varias claves) */
 function lineasDe(k){const c=cur(), n=c[k]?.[0]?.toUpperCase();if(!n)return[];
   return (MAP().lineas||[]).filter(l=>l.claves.some(x=>x===k||c[x]?.[0]?.toUpperCase()===n)).map(l=>l.linea!==l.area?l.linea:l.area)}
+function botonTemario(c){return SATE.temarios?.tiene(c[8])?`<button type="button" class="temario-mini" data-temario="${esc(c[8])}" aria-label="${esc(SATE.texto('sate.horarios.temario_abrir',{nombre:name(c)}))}" title="${esc(SATE.texto('sate.horarios.temario_abrir',{nombre:name(c)}))}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zM4 5.5v14A2.5 2.5 0 0 1 6.5 17H20M8 7h8M8 10h8"/></svg></button>`:''}
 function optRow(c,sel,inGroup){
   const k=keyOf(c), on=plan().sel.includes(k), mk=ws().marks[k]||{};
   const clash=[...sel,...ownAsClasses()].filter(s=>(s.own||keyOf(s)!==k)&&overlaps(s,c));
@@ -178,7 +183,7 @@ function optRow(c,sel,inGroup){
   if(!on&&same) tags+=`<span class="tag soft">${esc(txH('reemplaza',{grupo:same[3]}))}</span>`;
   const who=inGroup?`<b>${esc(name(c))}</b> <small>${esc(c[8])} · ${esc(textoCreditos(c[8],c[7]))}</small><br>${esc(profs(c))}`:esc(profs(c));
   if(isExcl(c)) tags+=`<span class="tag soft">${esc(txH('profesor_excluido'))}</span>`;
-  return `<div class="opt${mk.s==='no'||isExcl(c)?' no':''}" data-k="${esc(k)}"><span class="grp">${inGroup?'':esc(c[3])}</span><span class="who">${who}</span>
+  return `<div class="opt${mk.s==='no'||isExcl(c)?' no':''}" data-k="${esc(k)}"><span class="grp">${inGroup?'':esc(c[3])}</span><span class="who">${who}${inGroup?botonTemario(c):''}</span>
     <div class="right"><button class="add" data-toggle="${esc(k)}" aria-pressed="${on}">${esc(txH(on?'quitar_opcion':'agregar'))}</button>
       <span class="marks" role="group" aria-label="${esc(txH('marcar'))}"${isExcl(c)?` title="${esc(txH('profesor_excluido_ayuda'))}"`:''}>${[['si',txH('si')],['quiza',txH('quiza')],['no',txH('no')]].map(([m,l])=>isExcl(c)?`<button disabled data-m="${m}" aria-pressed="${m==='no'}">${esc(l)}</button>`:`<button data-mark="${m}" data-m="${m}" data-k="${esc(k)}" aria-pressed="${mk.s===m}">${esc(l)}</button>`).join('')}</span></div>
     <span class="when">${pattern(c).map(p=>`<span>${p}</span>`).join('')}${roomsTxt(c)?`<span class="room">${esc(txH('salon'))} ${roomsTxt(c)}</span>`:''}</span>
@@ -481,7 +486,7 @@ function* generarPasos(run,materias,rescate=false){
   const marks=ws().marks, own=ownAsClasses();
   const pref=S.gpref.map(norm), avoid=S.gavoid.map(norm);
   const pscore=c=>c[5].reduce((s,i)=>s+(pref.some(p=>norm(DATA.prof[i]).includes(p))?4:0),0);
-  const bad=c=>(typeof CUPOS!=='undefined'&&CUPOS.excluir(c))||marks[keyOf(c)]?.s==='no'||c[5].some(i=>avoid.some(p=>norm(DATA.prof[i]).includes(p)))||(S.gt!=='*'&&c[1]!==S.gt)||own.some(o=>overlaps(o,c))||outside(c);
+  const bad=c=>(typeof CUPOS!=='undefined'&&(CUPOS.excluir(c)||(S.soloCupo&&!plan().sel.includes(keyOf(c))&&CUPOS.fila(c)?.disponibles===0)))||marks[keyOf(c)]?.s==='no'||c[5].some(i=>avoid.some(p=>norm(DATA.prof[i]).includes(p)))||(S.gt!=='*'&&c[1]!==S.gt)||own.some(o=>overlaps(o,c))||outside(c);
   const ga=tmin(GT.a), gb=tmin(GT.b);
   function outside(c){return c[6].some(([d,a,b])=>(ga!=null&&a<ga)||(gb!=null&&b>gb))}
   const inPool=new Set(pool.map(keyOf));
@@ -642,7 +647,7 @@ function renderOffer(){
       const fl=cur()[c[8]]&&statusOf(c[8]).includes('fail');
       const etiqueta=st==='late'?(fl?(['agotada','dictamen'].includes(reglaDesfase()?.por[c[8]])?'desfasada_dictamen':'desfasada_recursar'):'desfasada'):st==='fail'?'recursar':st==='now'?'semestre':st==='curso'?'curso':st==='done'?'acreditada':(isPersonal()&&cur()[c[8]]&&available(c[8]))?'disponible':'';
       const badge=etiqueta?`<span class="tag ${['late','fail'].includes(st)?'bad':st==='now'||etiqueta==='disponible'?'good':'soft'}">${esc(txH(etiqueta))}</span> `:'';
-      return `<article class="subj"><header><h3>${badge}${esc(name(c))}</h3><span class="meta">${esc(c[8])} · ${esc(textoCreditos(c[8],c[7],true))} ${ayudaCreditos(c[8])} · ${esc(txH('nivel',{n:c[2]}))}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="${esc(txH('linea'))}">${esc(l)}</span>`).join('')}</span>`:''}</header>${aviso(c[8])}${(()=>{
+      return `<article class="subj"><header><h3>${badge}${esc(name(c))} ${botonTemario(c)}</h3><span class="meta">${esc(c[8])} · ${esc(textoCreditos(c[8],c[7],true))} ${ayudaCreditos(c[8])} · ${esc(txH('nivel',{n:c[2]}))}${c[9]&&c[9]!=='O'?' · '+TIPO[c[9]]:''}</span>${lineasDe(c[8]).length?`<span class="lineas">${lineasDe(c[8]).map(l=>`<span class="tag lin" title="${esc(txH('linea'))}">${esc(l)}</span>`).join('')}</span>`:''}</header>${aviso(c[8])}${(()=>{
         // con una opción marcada «Sí», la materia se colapsa a esa(s) opción(es) (y la que esté en el horario)
         const mk=ws().marks, keep=cs.filter(x=>mk[keyOf(x)]?.s==='si'||plan().sel.includes(keyOf(x)));
         const col=keep.length&&keep.some(x=>mk[keyOf(x)]?.s==='si')&&keep.length<cs.length, open=S.expand.has(c[4]);

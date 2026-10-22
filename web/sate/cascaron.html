@@ -471,6 +471,9 @@ textarea.paste{width:100%;min-height:5rem;font-family:var(--ipn-fuente-mono);fon
 .filters:has(details[open]){position:relative}
 .filters #f-more{flex-basis:100%;min-width:0}
 .filters #f-more summary{cursor:pointer;color:var(--ipn-acento);font-weight:600}
+.temario-mini{display:inline-grid;place-items:center;vertical-align:middle;min-width:44px;min-height:44px;margin-inline-start:var(--ipn-esp-1);padding:0;border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-acento);cursor:pointer}
+.temario-mini:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+#f-cupo-ayuda{color:var(--ipn-tenue)}
 .filters .more-filters{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-3) var(--ipn-esp-5);align-items:flex-end;padding-top:var(--ipn-esp-3)}
 .filters .more-filters input[type=text]{max-width:100%}
 .load-note{display:flex;align-items:center;gap:var(--ipn-esp-2);flex-wrap:wrap}
@@ -941,6 +944,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       </div></div>
       <label class="check"><input type="checkbox" id="f-hide"> Ocultar las marcadas como No</label>
       <label class="check"><input type="checkbox" id="f-done" checked> <span data-htexto="ocultar_acreditadas">Ocultar las ya acreditadas</span></label>
+      <label class="check"><input type="checkbox" id="f-cupo"> <span data-htexto="solo_cupo">Solo con cupo</span></label><small id="f-cupo-ayuda" aria-live="polite"></small>
       <label class="check" title="Muestra los grupos de la carrera compatibles con el horario actual"><input type="checkbox" id="f-fit"> Solo lo que cabe en mi horario</label>
       <div class="field"><span>En la escuela</span><div class="trange"><input type="time" id="g-from" step="1800" aria-label="Llegar desde"><span>a</span><input type="time" id="g-to" step="1800" aria-label="Salir a más tardar"></div></div>
       <label class="field"><span>Excluir profesores</span><input type="text" id="g-avoid" list="proflist" autocomplete="off"></label>
