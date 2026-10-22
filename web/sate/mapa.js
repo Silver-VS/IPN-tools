@@ -234,3 +234,21 @@ function resaltarMapa(){
 }
 // agrupa los eventos del cursor y del teclado en un solo cuadro de animación
 function pedirResalte(){if(!RESALTE_RAF)RESALTE_RAF=requestAnimationFrame(resaltarMapa)}
+
+/* Actualiza solo el estado de planeación de las cajas cuyo marcado cambió. */
+function actualizarMapaPlan(){
+  const ix=indiceMapa(), want=planElegidas(), done=new Set(tr().done), req=new Set([...ancestors(want)].filter(k=>!want.has(k)&&!done.has(k)));
+  for(const n of ix.cajas){
+    const k=n.dataset.box;if(!k)continue;
+    const paso=planAsignado(k), clases=['want','plan-1','plan-2','plan-otra','req'];
+    const debe=new Set([...(paso!=null?['want',`plan-${paso+1}`,PLAN_DOS_PERIODOS&&paso!==S.planPaso?'plan-otra':'']:[]),...(paso==null&&req.has(k)?['req']:[])]);
+    for(const cl of clases)if(n.classList.contains(cl)!==debe.has(cl)){if(debe.has(cl))n.classList.add(cl);else n.classList.remove(cl)}
+    const pressed=paso===S.planPaso;if(n.getAttribute('aria-pressed')!==String(pressed))n.setAttribute('aria-pressed',String(pressed));
+    let marca=n.querySelector('.plan-marca');
+    if(PLAN_DOS_PERIODOS&&paso!=null){if(!marca){marca=document.createElement('span');marca.className='plan-marca';marca.setAttribute('aria-hidden','true');n.appendChild(marca)}marca.textContent=(paso===0&&S.planPaso===1?'en ':'')+planEtiqueta(paso)}
+    else if(marca)marca.remove();
+    const titulo=n.getAttribute('title')||'', etiqueta=paso==null?'':` · ${SATE.texto('sate.planeacion.periodo_elegido',{marca:paso+1,periodo:planEtiqueta(paso)})}`, label=titulo+etiqueta;
+    if(n.getAttribute('aria-label')!==label)n.setAttribute('aria-label',label);
+  }
+  renderInsp();
+}

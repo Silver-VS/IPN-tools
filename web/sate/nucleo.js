@@ -671,7 +671,8 @@ function renderInsp(){
   el.hidden=!k||!c[k];
   if(el.hidden){el.innerHTML='';return}
   const {l1,l2}=inspParts(k), w=planAsignado(k)===S.planPaso, ob=tr().oblig.includes(k), done=statusOf(k)==='done';
-  el.innerHTML=`<div class="insp-t">${l1}</div><div class="insp-b">${l2}</div>`+(S.mapFocus?`<div class="insp-act">${PLAN_DOS_PERIODOS?planAcciones(k):ob||done||isElec(k)?'':`<button class="btn primary" type="button" data-fwant="${esc(k)}">${w?'Quitar de mi plan':'Quiero cursarla'}</button>`}<button class="btn" type="button" data-fclose="1">Cerrar</button></div>`:'');
+  const acciones=PLAN_DOS_PERIODOS?planAcciones(k):ob||done||isElec(k)?'':`<button class="btn primary" type="button" data-fwant="${esc(k)}">${w?'Quitar de mi plan':'Quiero cursarla'}</button>`;
+  el.innerHTML=`<div class="insp-t">${l1}</div><div class="insp-b">${l2}</div>`+(S.mapFocus&&acciones?`<div class="insp-act">${acciones}</div>`:'');
   montarAyudasCreditos();
 }
 function leyendaMapa(completa=false){
@@ -1043,10 +1044,10 @@ function analisis(){
   const carga=Object.entries(pp).filter(([,o])=>o.completo).map(([i,o])=>({per:+i,lbl:perName(+i),cr:o.cr,prom:o.v.reduce((s,v)=>s+v,0)/o.v.length,n:o.v.length})).sort((a,b)=>a.per-b.per);
   return {cuidar,lineas,cadena,ciclo,carga,nm};
 }
-function renderTray(){
+function renderTray(conservarMapa=false){
   renderSimGlobal();
   if(SATE.actual?.pestana==='trayectoria'){renderStats();return}
-  if(SATE.modulos.mapa){renderMap();conSim(usaSim('mapa'),()=>conPlan(renderList))}renderSide();
+  if(SATE.modulos.mapa){if(conservarMapa)actualizarMapaPlan();else renderMap();conSim(usaSim('mapa'),()=>conPlan(renderList))}renderSide();
 }
 function renderHor(){cancelarGeneracion();if(isPersonal())renderEqvHorario(ALUMNO);else $('#est-eqv').hidden=true;renderHFilters();renderOffer();renderPlans();renderCal();renderOwnForm();renderGen();renderEquiv();montarAyudasCreditos()}
 /* Equivalencias con otras carreras de la misma unidad (tabla «Equivalencia de Materias» del SAES): solo consulta.
@@ -1124,7 +1125,7 @@ function toggleBox0(k,mover=false){
     }else{
       planRecordar(k,true);elegirDesfase(k,paso?'siguiente':'actual');
     }
-    renderTray();return;
+    renderTray(true);return;
   }
   // La elección explícita de N+1 puede adelantarse a N.
   const adelantarObligatoria=otro===1&&paso===0&&conPlan(()=>tr().oblig.includes(k),1);
@@ -1140,25 +1141,27 @@ function toggleBox0(k,mover=false){
   if(!PLAN_DOS_PERIODOS){
     base.want=base.want.filter(x=>x!==k);if(otro!==paso)base.want.push(k);
     if(otro!==paso)avisoOptativa(k,base.want);
-    conPlan(saveT,0);renderTray();return;
+    conPlan(saveT,0);renderTray(true);return;
   }
   const siguientes=conPlan(()=>[...tr().want],1).filter(x=>x!==k);
   base.want=base.want.filter(x=>x!==k);
   if(otro!==paso){if(paso) siguientes.push(k);else base.want.push(k)}
   base.wantPorPeriodo={...base.wantPorPeriodo,[planClave(1)]:siguientes};PLAN_CACHE=null;
   if(otro!==paso)avisoOptativa(k,paso?siguientes:base.want);
-  conPlan(saveT,0);renderTray()}
+  conPlan(saveT,0);renderTray(true)}
 
 
 /* ---------- eventos ---------- */
 
 document.addEventListener('click',e=>{
-  const li=e.target.closest('#ac li');if(li){pick(+li.dataset.i);return}
+  const li=e.target.closest('#ac li');
+  const bx=e.target.closest('[data-box]');
+  if(bx){S.mapHover=bx.dataset.box;S.mapFocus=true;S.reqHover=null;resaltarMapa();toggleBox(bx.dataset.box);return}
   // táctil: un toque fuera del mapa y del inspector retira el enfoque
-  if((S.mapFocus||S.reqHover)&&!e.target.closest('#map,#insp,#lineas,#chosen-req')){S.mapFocus=false;S.mapHover=null;S.reqHover=null;resaltarMapa()}
+  if(S.mapFocus||S.reqHover){S.mapFocus=false;S.mapHover=null;S.reqHover=null;resaltarMapa()}
+  if(li){pick(+li.dataset.i);return}
   const requisito=e.target.closest('[data-req]');
   if(requisito){S.mapHover=requisito.dataset.req;S.reqHover=requisito.dataset.piden.split(' ');S.mapFocus=true;resaltarMapa();return}
-  const bx=e.target.closest('[data-box]');if(bx){S.reqHover=null;toggleBox(bx.dataset.box);return}
   const ob=e.target.closest('[data-obox]');if(ob){S.reqHover=null;toggleBox(ob.dataset.obox);return}
   // táctil: tocar un grupo de la oferta muestra (o retira) su vista previa en el horario
   const op=e.target.closest('#offer .opt');if(op&&tactil()&&!e.target.closest('button,input,a,label,select,textarea,summary')){S.hover=S.hover===op.dataset.k?null:op.dataset.k;renderCal();return}
@@ -1170,7 +1173,6 @@ document.addEventListener('click',e=>{
   if(d.lwant){toggleBox(d.lwant);return}
   if(d.fwant){toggleBox(d.fwant);return}
   if(d.fmover){const otro=planAsignado(d.fmover);if(otro!=null)conSim(usaSim('sugg'),()=>conPlan(()=>toggleBox0(d.fmover,true),1-otro));return}
-  if(d.fclose){S.mapFocus=false;S.mapHover=null;S.reqHover=null;resaltarMapa();return}
   if(d.mview){S.mview=d.mview;store.set('mview',S.mview);renderTray();return}
   if(d.cview){S.cview=d.cview;store.set('cview',S.cview);renderCal();return}
   if(t.id==='b-filt'){const f=t.closest('.filters');f.classList.toggle('open');t.setAttribute('aria-expanded',String(f.classList.contains('open')));return}
@@ -1200,7 +1202,7 @@ document.addEventListener('click',e=>{
   else if(d.useg!==undefined){const r=S.gen.top[+d.useg], to=d.to==='+'?nextPlan():d.to;ws().plans[to]=ws().plans[to]||{sel:[],own:JSON.parse(JSON.stringify(plan().own))};ws().plans[to].sel=r.cs.map(keyOf);ws().plan=to;refresh();renderGen()}
   else if(d.peekg!==undefined){const r=S.gen.top[+d.peekg];S.hover=null;const keep=plan().sel;plan().sel=r.cs.map(keyOf);renderCal();plan().sel=keep;$('#stats').insertAdjacentHTML('afterbegin','<span class="warn">Vista previa, no guardada.</span>')}
 });
-document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();const k=bx.dataset.box;toggleBox(k);document.querySelector(`[data-box="${CSS.escape(k)}"]`)?.focus()}});
+document.addEventListener('keydown',e=>{const bx=e.target.closest?.('[data-box]');if(e.key==='Escape'&&(S.mapFocus||S.reqHover||S.mapHover)){e.preventDefault();S.mapFocus=false;S.mapHover=null;S.reqHover=null;resaltarMapa();return}if(bx&&(e.key==='Enter'||e.key===' ')){e.preventDefault();S.mapHover=bx.dataset.box;S.mapFocus=true;S.reqHover=null;resaltarMapa();toggleBox(bx.dataset.box);document.querySelector(`[data-box="${CSS.escape(bx.dataset.box)}"]`)?.focus()}});
 document.addEventListener('change',e=>{if(e.target.dataset.note){const k=e.target.dataset.note,m=ws().marks;m[k]={...(m[k]||{}),n:e.target.value.trim()};save()}});
 $('#chosen-req').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const fila=e.target.closest('[data-req]');if(fila){S.mapHover=fila.dataset.req;S.reqHover=fila.dataset.piden.split(' ');S.mapFocus=false;pedirResalte()}});
 $('#chosen-req').addEventListener('focusin',e=>{const fila=e.target.closest('[data-req]');if(fila){S.mapHover=fila.dataset.req;S.reqHover=fila.dataset.piden.split(' ');S.mapFocus=false;pedirResalte()}});
@@ -1208,7 +1210,7 @@ const salirRequisitos=()=>{if(S.reqHover&&!S.mapFocus){S.mapHover=null;S.reqHove
 $('#chosen-req').addEventListener('toggle',e=>{if(!e.target.open&&S.reqHover){S.mapFocus=false;salirRequisitos()}},true);
 $('#chosen-req').addEventListener('pointerleave',salirRequisitos);
 $('#chosen-req').addEventListener('focusout',e=>{if(!e.relatedTarget?.closest('[data-req]'))salirRequisitos()});
-$('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-box]');const k=b?b.dataset.box:null;if(k!==S.mapHover||S.reqHover){S.reqHover=null;S.mapHover=k;pedirResalte()}});
+$('#map').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse'||S.mapFocus)return;const b=e.target.closest('[data-box]');const k=b?b.dataset.box:null;if(k!==S.mapHover||S.reqHover){S.reqHover=null;S.mapHover=k;pedirResalte()}});
 $('#lineas').addEventListener('pointerover',e=>{if(e.pointerType!=='mouse')return;const b=e.target.closest('[data-obox]');const k=b?b.dataset.obox:null;if(k!==S.mapHover||S.reqHover){S.reqHover=null;S.mapHover=k;pedirResalte()}});
 $('#lineas').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;pedirResalte()}});
 $('#map').addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'&&S.mapHover&&!S.mapFocus){S.mapHover=null;pedirResalte()}});
