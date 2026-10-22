@@ -207,7 +207,9 @@
       var r = b.getBoundingClientRect(), w = Math.min(320, raiz.innerWidth - 16);
       g.style.width = w + 'px';
       w = g.getBoundingClientRect().width;
-      var x = Math.max(8, Math.min(r.left, raiz.innerWidth - w - 8));
+      var x = r.left;
+      if (x + w > raiz.innerWidth - 8) x = r.right - w;
+      x = Math.max(8, Math.min(x, raiz.innerWidth - w - 8));
       g.style.left = x + 'px';
       var alto = g.offsetHeight;
       var y = r.bottom + 6;
