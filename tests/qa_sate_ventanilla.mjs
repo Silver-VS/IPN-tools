@@ -15,10 +15,10 @@ class Nodo{
 let dialogo, foco,aplicacion=null,ir,modulo;const almacen=new Map(),urls=new Set(),revocados=[],abiertos=[],box=new Nodo('section');
 const c=vm.createContext({SateUI:{modal(titulo,contenido,op){dialogo={titulo,contenido,...op}},tarjetaNav(o){const a=new Nodo('a');a.href=o.href;a.className='sate-tarjeta-nav';return a}},console,setTimeout:(fn,ms)=>{const h=setTimeout(fn,ms);if(ms>=30000)h.unref();return h},clearTimeout,Blob,Date,
   document:{createElement:t=>new Nodo(t),getElementById:()=>box},
-  localStorage:{getItem:k=>almacen.get(k)||null},IPNT:{set:(k,v)=>almacen.set(k,v)},
+  localStorage:{getItem:k=>almacen.get(k)||null,removeItem:k=>almacen.delete(k)},IPNT:{set:(k,v)=>almacen.set(k,v),borrar:k=>almacen.delete(k)},confirm:()=>true,
   URL:{createObjectURL(){const u='blob:'+urls.size;urls.add(u);return u},revokeObjectURL(u){revocados.push(u)}},
   location:{assign:u=>abiertos.push(u),replace:u=>abiertos.push(u)},SATE_UNIDAD:'upiita',SATE_CONFIG:config,
-  SATE:{texto,pestana:(id,m)=>modulo=m,presente:{aplicaTramite:()=>aplicacion},ir:r=>ir=r}});
+  SATE:{texto,script:async()=>{},pestana:(id,m)=>modulo=m,presente:{aplicaTramite:()=>aplicacion},ir:r=>ir=r}});
 async function aceptar(accion){
   dialogo=null;const pendiente=accion();
   assert.ok(dialogo,'La descarga primero abre el modal');
@@ -392,7 +392,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
 // VEN1: bajas con el mismo asistente, portada por grupos y pasos navegables.
 {
   const bajasEstampadas=[];
-  c.PdfBajas={generar:async d=>{bajasEstampadas.push(d);return new Uint8Array([37,80,68,70])}};
+  c.PdfBajas={generar:async d=>{bajasEstampadas.push(d);return new Uint8Array([37,80,68,70])},limite:async()=>32};
   vm.runInContext(readFileSync('web/sate/bajas.js','utf8'),c);
   const B=c.SateBajas,codigoBajas=readFileSync('web/sate/bajas.js','utf8');
   almacen.set('saes.alumno',JSON.stringify({upiita_saes:1,unidad:'upiita',periodo_actual:'27/1'}));
@@ -405,6 +405,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   // Todo texto visible de bajas.js existe en es.toml (claves estáticas y las que se arman con id).
   const claves=new Set([...codigoBajas.matchAll(/tx\('([a-z0-9_]+)'(?!\s*\+)/g)].map(m=>m[1]));
   for(const tipo of ['temporal','definitiva']){
+    claves.add('explicacion_exceso_'+tipo);
     for(const k of ['titulo_','lead_','paso_motivo_ayuda_','periodo_texto_'])claves.add(k+tipo);
     for(const n of [1,2,3])claves.add('aviso_'+tipo+'_'+n);
     for(const m of B.MOTIVOS[tipo]){claves.add('motivo_'+m);claves.add('motivo_'+m+'_ayuda')}
@@ -432,6 +433,9 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   const bloques=box.todos().filter(n=>n.className==='tramite-bloque');assert.equal(bloques.length,3,'Aviso, motivo y periodo: una tarjeta por tema');
   assert.deepEqual(bloques.slice(1).map(n=>n.children[0].textContent),['Motivo','Periodo']);
   assert.ok(box.todos().some(n=>n.tagName==='aside'&&n.className==='tramite-aviso'));
+  const campoCaso=B.definir('temporal').pasos[1].campos.find(x=>x.id==='explicacion');
+  assert.equal(campoCaso.validar(''),texto('sate.baja.explicacion_requerida'),'El caso es obligatorio');
+  assert.equal(campoCaso.texto,texto('sate.baja.explicacion_texto'),'La etiqueta no lo presenta como opcional');
   const radios=box.todos().filter(n=>n.type==='radio');assert.deepEqual(radios.map(r=>r.value),plano(B.MOTIVOS.temporal));
   assert.equal(box.todos().filter(n=>n.tagName==='select').length,2,'Periodo de inicio y periodos solicitados');
   assert.deepEqual(box.todos().filter(n=>n.tagName==='select')[1].children.map(n=>n.value),['1','2'],'Ambas duraciones disponibles');
@@ -439,7 +443,12 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').click();
   assert.match(box.querySelector('[data-pdf-estado]').textContent,/Elige el motivo/,'No avanza sin motivo y lo explica');
   radios[0].checked=true;radios[0].onchange();
-  box.todos().find(n=>n.tagName==='textarea').value='Texto ficticio sensible';box.todos().find(n=>n.tagName==='textarea').onblur();
+  const caso=box.todos().find(n=>n.tagName==='textarea'),contador=box.todos().find(n=>n.id==='baja-explicacion-contador');
+  assert.ok(caso.required);assert.equal(caso.getAttribute('aria-describedby'),contador.id,'Contador anunciado junto al campo');
+  await new Promise(r=>setTimeout(r,0));caso.value='1'.repeat(33);caso.oninput();
+  assert.equal((contador.textContent.match(/El texto supera/g)||[]).length,1,'Un solo aviso al superar el límite');
+  caso.value='1'.repeat(32);caso.oninput();assert.ok(!contador.textContent.includes('El texto supera'),'El aviso desaparece al volver al límite');
+  caso.value='Texto ficticio sensible';caso.onblur();
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').click();
   assert.ok(box.todos().some(n=>n.tagName==='h3'&&n.textContent==='Revisa y descarga el PDF'));
   const guardado=almacen.get('hu.tramite.baja_temporal');
@@ -472,7 +481,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.equal(bajasEstampadas.at(-1).tipo,'temporal');
   assert.equal(bajasEstampadas.at(-1).valores.periodos,'27/1');
   const temporal=B.definir('temporal');
-  await temporal.generar({motivo:'salud',periodo:'27/2',periodos:'2'});
+  await temporal.generar({motivo:'salud',periodo:'27/2',periodos:'2',explicacion:'Caso ficticio'});
   assert.equal(bajasEstampadas.at(-1).valores.periodos,'27/2, 28/1','Dos periodos cruzando año');
   await assert.rejects(()=>temporal.generar({motivo:'salud',periodo:'27/2',periodos:'3'}));
   modulo.ocultar();t.mostrarLista(box);
@@ -485,6 +494,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').click();
   assert.deepEqual(box.todos().filter(n=>n.type==='radio').map(r=>r.value),plano(B.MOTIVOS.definitiva));
   assert.equal(box.todos().filter(n=>n.tagName==='select').length,1,'La definitiva no pide periodos solicitados');
+  box.todos().find(n=>n.tagName==='textarea').value='Caso ficticio';box.todos().find(n=>n.tagName==='textarea').onblur();
   assert.ok(box.todos().some(n=>n.tagName==='li'&&/baja temporal conserva tu lugar/.test(n.textContent)),'Sugiere la baja temporal en tono informativo');
   box.todos().filter(n=>n.type==='radio')[0].checked=true;box.todos().filter(n=>n.type==='radio')[0].onchange();
   box.todos().find(n=>n.tagName==='button'&&n.textContent==='Continuar trámite').click();
@@ -497,14 +507,22 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.equal(box.todos().find(n=>n.tagName==='a'&&n.target==='_blank'),undefined);assert.ok(box.todos().some(n=>/No está disponible el formato/.test(n.textContent)));
   assert.ok(box.querySelector('[data-descargar]').disabled,'Sin original no permite generar una hoja vacía');
   c.SATE_DATA.bajas=datosBajas;modulo.ocultar();
+  almacen.set('hu.tramite.baja_temporal',JSON.stringify({paso:1,total:3,datos:{periodo:'27/1'}}));
+  modulo.mostrar({tramite:'baja_temporal'});
+  const descartar=box.todos().find(n=>n.tagName==='button'&&n.textContent===texto('sate.ventanilla.descartar'));
+  assert.ok(descartar,'La baja ofrece descartar el trámite');descartar.click();
+  assert.equal(almacen.has('hu.tramite.baja_temporal'),false,'Descartar borra el borrador IPNT');
+  assert.equal(ir,'tramites');t.mostrarLista(box);
+  const filaBaja=box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Baja temporal. '));
+  assert.ok(filaBaja&&!filaBaja.todos().some(n=>n.textContent==='En progreso'),'La portada ya no conserva el estado en progreso de la baja');
   const definitiva=B.definir('definitiva');
   await definitiva.generar({motivo:'personal',periodo:'27/1',explicacion:'Caso ficticio'});
   assert.match(bajasEstampadas.at(-1).valores.motivos,/Periodo solicitado: 27\/1/,'La definitiva conserva el periodo en motivos');
   const pantallaError=new Nodo('section');definitiva.revisar(pantallaError);
   const bibliotecaBajas=c.PdfBajas;
   c.PdfBajas={generar:async()=>{throw new Error(texto('sate.baja.exceso'))}};
-  await assert.rejects(()=>definitiva.generar({motivo:'personal',periodo:'27/1'}));
-  assert.equal(pantallaError.children[0].textContent,texto('sate.baja.exceso'),'El usuario ve la causa concreta del fallo');
+  await assert.rejects(()=>definitiva.generar({motivo:'personal',periodo:'27/1',explicacion:'Caso ficticio'}));
+  assert.ok(!pantallaError.todos().some(n=>n.attrs.role==='status'),'El detalle del PDF no se duplica con el estado del asistente');
   c.PdfBajas=bibliotecaBajas;
   // CSS: pasos, tarjetas, impresión y foco con tokens.
   const cssV=readFileSync('web/sate/componentes.css','utf8');

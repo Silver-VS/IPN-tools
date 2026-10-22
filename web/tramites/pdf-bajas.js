@@ -6,6 +6,12 @@
     temporal:{fecha:[332,381,209],paterno:[154,410,142],materno:[307,410,115],nombres:[433,410,128],boleta:[189,449,116],carrera:[396,449,165],correo:[260,635,294],celular:[291,658,263],periodos:[365,678,189]},
     definitiva:{fecha:[349,330,208],paterno:[134,358,142],materno:[288,358,112],nombres:[411,358,158],boleta:[154,418,109],carrera:[351,418,218],correo:[111,458,170],celular:[369,458,200]}
   };
+  const MOTIVOS={temporal:{x:62,w:492,base:511,lineas:6},definitiva:{x:27,w:542,base:520,lineas:6},tamano:7,interlineado:15};
+  async function limite(tipo,pdfs){
+    if(typeof PDFLib==='undefined'||!MOTIVOS[tipo]||!pdfs?.[tipo])return 0;
+    const doc=await PDFLib.PDFDocument.load(pdfs[tipo]),font=await doc.embedFont(PDFLib.StandardFonts.Helvetica);
+    return Math.floor(MOTIVOS[tipo].w/font.widthOfTextAtSize('M',MOTIVOS.tamano))*MOTIVOS[tipo].lineas;
+  }
   async function generar({tipo,valores:v,pdfs,texto:tx}){
     let campo='formato';
     try{
@@ -24,20 +30,20 @@
       for(const [k,c] of Object.entries(COORDS[tipo])){campo=k;texto(v[k],c)}
       campo='motivos';
       // Un renglón por celda del original. Ni recorte ni anexos que oculten un exceso.
-      const x=tipo==='temporal'?62:27,w=tipo==='temporal'?492:542,base=tipo==='temporal'?511:520;
+      const {x,w,base}=MOTIVOS[tipo];
       const lineas=[];
       for(const par of String(v.motivos||'').split(/\r?\n/)){
         let l='';for(const palabra of par.split(/\s+/).filter(Boolean)){
-          if(l&&font.widthOfTextAtSize(l+' '+palabra,10)>w){lineas.push(l);l=palabra}else l+=(l?' ':'')+palabra;
+          if(l&&font.widthOfTextAtSize(l+' '+palabra,MOTIVOS.tamano)>w){lineas.push(l);l=palabra}else l+=(l?' ':'')+palabra;
         }lineas.push(l);
       }
-      if(lineas.length>4)throw new Error(tx('exceso'));
-      lineas.forEach((l,i)=>texto(l,[x,base+i*25.55,w],10,10));
+      if(lineas.length>MOTIVOS[tipo].lineas)throw new Error(tx('explicacion_exceso_'+tipo));
+      lineas.forEach((l,i)=>texto(l,[x,base+i*MOTIVOS.interlineado,w],MOTIVOS.tamano,MOTIVOS.tamano));
       return await doc.save();
     }catch(error){
       // Solo contexto técnico: los datos personales nunca aparecen en el log.
       console.error('Bajas: PDF fallido',{tipo,campo,error:error.name});throw error;
     }
   }
-  raiz.PdfBajas={generar};
+  raiz.PdfBajas={generar,limite};
 })(globalThis);

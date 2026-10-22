@@ -59,9 +59,20 @@
       resumen:v=>v?tx('motivo_'+v):'',
       render(caja,ctx){opciones(caja,ctx,'motivo',tx('motivo_leyenda'),MOTIVOS[tipo].map(id=>[id,tx('motivo_'+id),tx('motivo_'+id+'_ayuda')]))}};
   }
-  function campoExplicacion(){
-    return {id:'explicacion',texto:tx('explicacion_texto'),tipo:'textarea',sensible:true,grupo:tx('grupo_motivo'),ayuda:tx('explicacion_ayuda'),
-      validar:v=>String(v||'').length>600?tx('explicacion_error'):'',revision:v=>[{texto:tx('r_explicacion'),valor:v||tx('sin_explicacion')}]};
+  function campoExplicacion(tipo,alLimite){
+    let max=0;
+    const errorExceso=()=>tx('explicacion_exceso_'+tipo);
+    const validar=v=>!String(v||'').trim()?tx('explicacion_requerida'):max&&String(v).length>max?errorExceso():'';
+    return {id:'explicacion',texto:tx('explicacion_texto'),tipo:'textarea',sensible:true,grupo:tx('grupo_motivo'),ayuda:tx('explicacion_ayuda'),inline:true,
+      validar,revision:v=>[{texto:tx('r_explicacion'),valor:v}],
+      render(caja,ctx){
+        const etiqueta=el('label',null,'tramite-campo'),entrada=el('textarea'),contador=el('small'),id='baja-explicacion-contador';
+        entrada.id='tramite-baja-'+tipo+'-explicacion';entrada.required=true;contador.id=id;contador.setAttribute('aria-live','polite');entrada.setAttribute('aria-describedby',id);
+        const actualizar=()=>{const n=entrada.value.length,estado=validar(entrada.value);contador.textContent=max?tx('explicacion_contador',{n,max})+(estado?' · '+estado:''):tx('explicacion_cargando',{n});entrada.setAttribute('aria-invalid',String(!!estado));ctx.cambiar(entrada.value)};
+        entrada.value=ctx.datos.explicacion||'';entrada.oninput=actualizar;entrada.onblur=actualizar;
+        etiqueta.appendChild(el('span',tx('explicacion_texto')));etiqueta.appendChild(entrada);etiqueta.appendChild(contador);caja.appendChild(etiqueta);
+        cargar().then(async()=>{max=await PdfBajas.limite(tipo,raiz.SATE_DATA.bajas.pdfs);alLimite(max);actualizar()}).catch(()=>{});actualizar();
+      }};
   }
   function campoPeriodo(tipo){
     const lista=periodos();
@@ -91,30 +102,24 @@
   }
   function definir(tipo){
     const id='baja_'+tipo,url=urlFormato(tipo);
-    let avisoPdf;
-    const faltante=d=>validarIdentidad()||(!raiz.SATE_DATA?.bajas?.pdfs?.[tipo]?tx('sin_formato'):'')||(!MOTIVOS[tipo].includes(d.motivo)?tx('motivo_error'):'')||(!periodoValido(d.periodo)?tx('periodo_error'):'')||(tipo==='temporal'&&!['1','2'].includes(String(d.periodos))?tx('periodos_error'):'')||(String(d.explicacion||'').length>600?tx('explicacion_error'):'');
+    let limiteExplicacion=0;
+    const faltante=d=>validarIdentidad()||(!raiz.SATE_DATA?.bajas?.pdfs?.[tipo]?tx('sin_formato'):'')||(!MOTIVOS[tipo].includes(d.motivo)?tx('motivo_error'):'')||(!periodoValido(d.periodo)?tx('periodo_error'):'')||(tipo==='temporal'&&!['1','2'].includes(String(d.periodos))?tx('periodos_error'):'')||(!String(d.explicacion||'').trim()?tx('explicacion_requerida'):'')||(limiteExplicacion&&String(d.explicacion||'').length>limiteExplicacion?tx('explicacion_exceso_'+tipo):'');
     async function generar(d){
-      if(avisoPdf)avisoPdf.textContent='';
-      try{
-        const falta=faltante(d);if(falta)throw new Error(falta);
-        await cargar();
-        const periodos=tipo==='temporal'?Array.from({length:+d.periodos},(_,i)=>deIndice(indice(d.periodo)+i)).join(', '):d.periodo;
-        return await PdfBajas.generar({tipo,pdfs:raiz.SATE_DATA.bajas.pdfs,texto:tx,valores:{...identidad(),fecha:new Date().toLocaleDateString('es-MX'),periodos,
-          motivos:[...(tipo==='definitiva'?[tx('pdf_periodo',{periodo:d.periodo})]:[]),tx('motivo_'+d.motivo),d.explicacion].filter(Boolean).join('. ')}});
-      }catch(error){
-        // El asistente común muestra un fallo genérico; conservar aquí la explicación concreta del PDF.
-        if(avisoPdf)avisoPdf.textContent=error.message;throw error;
-      }
+      const falta=faltante(d);if(falta)throw new Error(falta);
+      await cargar();
+      const periodos=tipo==='temporal'?Array.from({length:+d.periodos},(_,i)=>deIndice(indice(d.periodo)+i)).join(', '):d.periodo;
+      return await PdfBajas.generar({tipo,pdfs:raiz.SATE_DATA.bajas.pdfs,texto:tx,valores:{...identidad(),fecha:new Date().toLocaleDateString('es-MX'),periodos,
+        motivos:[...(tipo==='definitiva'?[tx('pdf_periodo',{periodo:d.periodo})]:[]),tx('motivo_'+d.motivo),d.explicacion].filter(Boolean).join('. ')}});
     }
     return {id,titulo:tx('titulo_'+tipo),lead:tx('lead_'+tipo),requisitos:()=>[tx('revision_ayuda')],volver:true,revisarTitulo:tx('revisar_titulo'),revisionAyuda:tx('revision_ayuda'),
       datos:{periodos:'1'},
       pasos:[
         {titulo:tx('paso_datos'),ayuda:tx('paso_datos_ayuda'),campos:[campoIdentidad()]},
-        {titulo:tx('paso_motivo'),ayuda:tx('paso_motivo_ayuda_'+tipo),campos:[campoAviso(tipo),campoMotivo(tipo),campoExplicacion(),campoPeriodo(tipo),...(tipo==='temporal'?[campoPeriodos()]:[])]}
+        {titulo:tx('paso_motivo'),ayuda:tx('paso_motivo_ayuda_'+tipo),campos:[campoAviso(tipo),campoMotivo(tipo),campoExplicacion(tipo,n=>limiteExplicacion=n),campoPeriodo(tipo),...(tipo==='temporal'?[campoPeriodos()]:[])]}
       ],
       descargaTexto:tx('descargar'),archivo:id+'.pdf',faltante,generar,previsualizar:generar,
+      descartar:()=>{if(!window.confirm(tx('descartar_confirmacion')))return false;IPNT.borrar?.('hu.tramite.'+id);if(!IPNT.borrar)(window.IPNT?.almacen||localStorage).removeItem('hu.tramite.'+id);return true},
       revisar(pantalla){
-        avisoPdf=el('p');avisoPdf.setAttribute('role','status');pantalla.appendChild(avisoPdf);
         const oficial=el('section',null,'tramite-oficial');
         oficial.appendChild(el('h4',tx('oficial_titulo')));
         oficial.appendChild(el('p',tx(url?'oficial_ayuda':'sin_formato')));
