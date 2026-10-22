@@ -33,6 +33,7 @@
   function ingreso(a){return [...new Set([...(a.acreditadas||[]).map(r=>periodo(r[2])),...(a.kardex_reprobadas||[]).map(r=>periodo(r[2])),...(a.reprobadas_periodo||[]).map(r=>periodo(r[1]))].filter(Boolean))].sort()[0]||''}
   const causasCarta=['salud','trabajo','familiar','economica','academica','cambio','otra'];
   const planesCarta=['asesorias','tutorias','reducida','compatible'];
+  const limpiarRespuesta=s=>String(s||'').trim().replace(/[\s.,?!;]+$/u,'');
   const nombreCarta=s=>String(s).split(/(\s+)/).map((p,i)=>{
     const baja=p.toLocaleLowerCase('es');
     if(i&&['y','de','en','del','la','las','los','el','a','con','para','por'].includes(baja))return baja;
@@ -41,17 +42,17 @@
   function carta(d,r){
     if(!r||![r.causas?.length,r.acciones?.trim(),r.planes?.length,r.plan?.trim(),r.documentos?.trim(),r.peticion?.trim()].some(Boolean))return '';
     const partes=[d.tipo==='externo'?tx('destino_externo')+':':tx('borrador_destino_interno',{unidad:SATE_CONFIG.unidades[SATE_UNIDAD].siglas})];
-    const periodos=String(r.periodos||'').split(/\s*(?:,|;|\by\b)\s*/).filter(Boolean);
+    const periodos=String(r.periodos||'').split(/\s*(?:,|;|\by\b)\s*/).map(limpiarRespuesta).filter(Boolean);
     if(r.causas?.length)partes.push(tx('borrador_contexto',{causas:enumerar(r.causas.filter(k=>causasCarta.includes(k)).map(k=>tx('carta_causa_'+k).toLocaleLowerCase('es'))),periodos:periodos.length?tx(periodos.length===1?'carta_periodo_uno':'carta_periodo_varios',{lista:enumerar(periodos)}):tx('carta_periodo_sin_dato')}));
-    if(r.acciones?.trim())partes.push(tx('borrador_acciones',{acciones:r.acciones.trim()}));
-    const peticion=r.peticion?.trim()||d.peticion?.trim();
+    if(r.acciones?.trim())partes.push(tx('borrador_acciones',{acciones:limpiarRespuesta(r.acciones)}));
+    const peticion=limpiarRespuesta(r.peticion),peticionMaterias=peticion||limpiarRespuesta(d.peticion);
     const normalizar=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es').replace(/\s+/g,' ').trim();
-    const materias=[...new Set((d.filas||[]).map(f=>f.nombre).filter(Boolean))].filter(n=>!normalizar(peticion||'').includes(normalizar(n)));
+    const materias=[...new Set((d.filas||[]).map(f=>f.nombre).filter(Boolean))].filter(n=>!normalizar(peticionMaterias).includes(normalizar(n)));
     if(materias.length)partes.push(tx('borrador_materias',{materias:enumerar(materias.map(nombreCarta))}));
-    const plan=[...(r.planes||[]).filter(k=>planesCarta.includes(k)).map(k=>tx('carta_plan_'+k).toLocaleLowerCase('es')),r.plan?.trim()].filter(Boolean);
+    const plan=[...(r.planes||[]).filter(k=>planesCarta.includes(k)).map(k=>tx('carta_plan_'+k).toLocaleLowerCase('es')),limpiarRespuesta(r.plan)].filter(Boolean);
     if(plan.length)partes.push(tx('borrador_plan',{plan:enumerar(plan)}));
-    if(r.documentos?.trim())partes.push(tx('borrador_documentos',{documentos:r.documentos.trim()}));
-    partes.push(tx('borrador_peticion'));
+    if(r.documentos?.trim())partes.push(tx('borrador_documentos',{documentos:limpiarRespuesta(r.documentos)}));
+    partes.push(peticion?tx('borrador_peticion_personalizada',{peticion}):tx('borrador_peticion'));
     return partes.join('\n\n');
   }
   function aplicarCarta(d,r,confirmar){
