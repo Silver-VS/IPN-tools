@@ -291,12 +291,13 @@ assert.match(css,/\.trayectoria-datos\{[^}]*grid-column:1;grid-row:2 \/ span 4;a
 assert.match(css,/\.trayectoria-datos p\{margin:0;line-height:1\.6\}/);
 assert.match(css,/@media\(max-width:639px\)\{\.trayectoria-datos\{grid-row:3\}\}/);
 const acreditada=shell.match(/\.box\.done\{([^}]+)\}/)[1];
-assert.match(acreditada,/opacity:1/);assert.match(acreditada,/color:var\(--ipn-texto\)/);assert.match(acreditada,/background:var\(--ipn-superficie\)/);
+assert.match(acreditada,/opacity:1/);assert.match(acreditada,/color:var\(--ipn-texto\)/);assert.match(acreditada,/background:color-mix\(in srgb,var\(--ipn-ok\) 12%,var\(--ipn-superficie\)\)/);
 assert.doesNotMatch(acreditada,/line-through/,'Contrato de contraste: texto sin tachado ni opacidad reducida');
 const luminancia=hex=>{const v=hex.match(/\w\w/g).map(c=>parseInt(c,16)/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
 const superficies=[...shell.matchAll(/--ipn-superficie:(#[a-f0-9]{6})/g)].map(m=>m[1]), textos=[...shell.matchAll(/--ipn-texto:(#[a-f0-9]{6})/g)].map(m=>m[1]);
 assert.equal(superficies.length,textos.length);
-superficies.forEach((f,i)=>{const a=luminancia(f.slice(1)),b=luminancia(textos[i].slice(1));assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,'Acreditadas: contraste AA en tema '+i)});
+const verdes=[...shell.matchAll(/--ipn-ok:(#[a-f0-9]{6})/g)].map(m=>m[1]);
+superficies.forEach((f,i)=>{const color=hex=>hex.slice(1).match(/\w\w/g).map(c=>parseInt(c,16)),mezcla=color(verdes[i]).map((c,j)=>Math.round(c*.12+color(f)[j]*.88)),fondo=mezcla.map(c=>c.toString(16).padStart(2,'0')).join(''),a=luminancia(fondo),b=luminancia(textos[i].slice(1));assert.ok((Math.max(a,b)+.05)/(Math.min(a,b)+.05)>=4.5,'Acreditadas: contraste AA en tema '+i)});
 const componentes=leer('web/sate/componentes.js'), desempeno=leer('web/sate/desempeno.js');
 // Regresiones de la fusión: el adaptador especializado usa los mismos componentes que el genérico.
 {
