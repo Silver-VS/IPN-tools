@@ -1,8 +1,8 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
 .sate-recorrido{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-m);overflow:hidden;box-sizing:border-box}
 .sate-recorrido::backdrop{background:transparent}
-.sate-recorrido__marco{position:fixed;box-sizing:border-box;border:3px solid var(--ipn-acento);border-radius:var(--ipn-radio);box-shadow:0 0 0 100vmax rgba(9,9,11,.55);pointer-events:none}
-.sate-recorrido[data-vista=pasos] .sate-recorrido__marco{box-shadow:0 0 0 100vmax rgba(9,9,11,.55)}
+.sate-recorrido__marco{position:fixed;box-sizing:border-box;border:3px solid var(--ipn-acento);border-radius:var(--ipn-radio);pointer-events:none}
+.sate-recorrido__marco::before{content:"";position:absolute;inset:0;border-radius:0;box-shadow:0 0 0 100vmax rgba(9,9,11,.55);pointer-events:none}
 .sate-recorrido__tarjeta{position:fixed;z-index:1;top:var(--ipn-esp-4);left:var(--ipn-esp-4);width:min(24rem,calc(100vw - var(--ipn-esp-6)));box-sizing:border-box;padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);max-height:48dvh;overflow:auto;overflow-wrap:anywhere}
 .sate-recorrido[data-vista=bienvenida] .sate-recorrido__marco{display:none}
 .sate-recorrido__bienvenida{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%);width:min(58rem,calc(100% - 32px));max-height:min(82dvh,48rem)}
@@ -851,8 +851,6 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
 .tramite-fila{padding-inline:0}
 .sate-enlace{display:inline-flex;align-items:center;min-height:44px;padding:0;border:0;background:transparent;color:var(--sate-realce);font:inherit;font-size:var(--ipn-tamano-s);text-decoration:underline;text-underline-offset:.18em;cursor:pointer}
 .sate-enlace:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
-.sate-recorrido-invitacion{display:flex;align-items:center;gap:var(--ipn-esp-1);width:fit-content;max-width:100%;margin-top:calc(-1 * var(--ipn-esp-5));margin-bottom:var(--ipn-esp-5);border:0;background:transparent;box-shadow:none}
-.sate-recorrido-invitacion .sate-btn{font-size:var(--ipn-tamano-xs);padding-inline:var(--ipn-esp-2)}
 .calendario-audiencia{margin:0}
 .calendario-item{border:0;border-top:1px solid var(--ipn-linea);border-radius:0;background:transparent}
 .calendario-item[aria-pressed=true]{box-shadow:inset 2px 0 var(--sate-realce)}

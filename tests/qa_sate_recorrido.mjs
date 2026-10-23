@@ -50,7 +50,7 @@ function nodo(tag='div'){
 }
 let cajaObjetivo={top:120,left:12,right:308,bottom:300,height:180};
 const objetivo={closest:()=>null,getClientRects:()=>[{}],scrollIntoView(op){if(op.block==='start')cajaObjetivo={...cajaObjetivo,top:8,bottom:658,height:650}},getBoundingClientRect:()=>cajaObjetivo};
-const documento={activeElement:{isConnected:true,focus(){}},querySelector:()=>objetivo,createElement:nodo};
+const eventosDocumento=new Map(),documento={activeElement:{isConnected:true,focus(){}},visibilityState:'visible',querySelector:()=>objetivo,createElement:nodo,addEventListener:(k,f)=>eventosDocumento.set(k,f),removeEventListener:k=>eventosDocumento.delete(k)};
 const entorno={console,document:documento,innerWidth:375,innerHeight:700,matchMedia:()=>({matches:false}),requestAnimationFrame:f=>f(),
   fetch:async()=>({ok:true,json:async()=>pasos}),addEventListener:(k,f)=>eventos.set(k,f),removeEventListener:k=>eventos.delete(k),
   SATE_CONFIG:{unidades:{ficticia:{pestanas:[...new Set(pasos.map(p=>p.pestana))]}}},SATE_UNIDAD:'ficticia',
@@ -103,5 +103,8 @@ assert.match(leer('web/dist/sate/mapa.js'),/boxHtml/);
 assert.match(leer('web/dist/sate/situacion.js'),/trayectoria-resumen/);
 assert.match(leer('web/dist/sate/situacion.js'),/trayectoria-orientacion/);
 assert.ok(pasos.every(p=>shell.includes(p.selector.split(/[ .]/)[0].slice(1))||p.selector.startsWith('.')),'Selectores ligados a raíces del cascarón');
-dialogo.escape();assert.ok(cerrada);assert.equal(eventos.size,0);
+documento.visibilityState='hidden';eventosDocumento.get('visibilitychange')();assert.ok(cerrada);assert.equal(eventos.size,0);assert.equal(eventosDocumento.size,0);
+cerrada=false;documento.visibilityState='visible';await entorno.SateRecorrido.iniciar();eventos.get('blur')();assert.ok(cerrada);assert.equal(eventos.size,0);assert.equal(eventosDocumento.size,0);
+assert.match(css,/\.sate-recorrido__marco::before\{[^}]*border-radius:0;[^}]*box-shadow:0 0 0 100vmax/);
+assert.doesNotMatch(css,/\.sate-recorrido__marco\{[^}]*box-shadow/);
 console.log('OK recorrido: anclas, pasos por pestaña, reposición y no solapamiento en anchos solicitados.');

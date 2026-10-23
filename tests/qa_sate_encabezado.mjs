@@ -16,6 +16,11 @@ assert.match(encabezado, /class="sate-controles"[\s\S]*class="sate-navegacion"[\
 assert.match(encabezado, /<label class="field"><span class="sate-sr">Carrera<\/span><select id="f-carrera">/);
 assert.equal((html.match(/id="f-carrera"/g) || []).length, 1);
 assert.equal((html.match(/id="saes-open"/g) || []).length, 1);
+assert.match(encabezado, /class="enc-btn sate-ayuda-recorrido" id="sate-ayuda-recorrido" type="button" aria-label="Ayuda: recorrido guiado de SATE" title="Ayuda: recorrido guiado de SATE"/);
+assert.match(encabezado, /id="sate-ayuda-recorrido"[^>]*>[\s\S]*?<svg[^>]*aria-hidden="true"/);
+assert.match(leer('web/sate/inicio.js'), /getElementById\('sate-ayuda-recorrido'\)\.onclick=\(\)=>iniciarRecorrido\(\)/);
+assert.doesNotMatch(leer('web/sate/inicio.js'), /sate-recorrido-invitacion|sate\.recorrido\.boton/);
+assert.doesNotMatch(html, /sate-recorrido-invitacion|sate\.recorrido\.boton/);
 const acciones = encabezado.slice(encabezado.indexOf('class="header-actions"'), encabezado.indexOf('class="enc-btn sate-opinar"'));
 // De derecha a izquierda: tema, sesión, SAES (en el HTML, de izquierda a derecha).
 assert.ok(acciones.indexOf('id="saes-open"') < acciones.indexOf('id="ipnt-open"') && acciones.indexOf('id="ipnt-open"') < acciones.indexOf('id="theme-btn"'), 'orden: SAES, sesión, tema');

@@ -54,7 +54,10 @@ def encabezado_sate(*, textos, unidad=None, contexto=True, acciones=True,
         contexto = f'<label class="field"><span class="sate-sr">{t("sate.encabezado.carrera")}</span><select id="f-carrera"></select></label>'
     contexto = f'<div class="sate-contexto"><div class="sate-controles">{contexto or ""}</div>{leyenda}</div>'
     if acciones is True:
-        acciones = ('<!--__SAES_CARD__--><!--__CUENTA_BTN__--><!--__THEME_BTN__-->'
+        acciones = ('<!--__SAES_CARD__--><!--__CUENTA_BTN__-->'
+                    f'<button class="enc-btn sate-ayuda-recorrido" id="sate-ayuda-recorrido" type="button" aria-label="{t("sate.encabezado.ayuda")}" title="{t("sate.encabezado.ayuda")}">'
+                    '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9a2.5 2.5 0 1 1 4.2 1.8c-1.1 1-1.8 1.4-1.8 3.2M12 17.5h.01"/></svg>'
+                    '</button><!--__THEME_BTN__-->'
                     f'<button class="enc-btn sate-opinar" type="button" data-encuesta hidden aria-label="{t("sate.encabezado.opinar")}" title="{t("sate.encabezado.opinar_titulo")}">'
                     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>'
                     f'<span>{t("sate.encabezado.opinar")}</span></button>')
