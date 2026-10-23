@@ -4,87 +4,87 @@
  "fuente": "Manual de Organización de la UPIITA, diciembre de 2023, pp. 27–28 del PDF: organigrama y estructura orgánica; estructura ratificada en octubre de 2021.",
  "nota": "Sin nombres de titulares. Los órganos colegiados se muestran como relaciones colegiadas, no como subordinación administrativa. Las funciones y procedimientos se consultan en las fichas de las mismas áreas.",
  "raiz": {
-  "nombre": "Dirección",
+  "nombre": "DIRECCIÓN",
   "colegiados": [
-   "Consejo Técnico Consultivo Escolar",
-   "Comité Interno de Proyectos",
-   "Decanato"
+   "CONSEJO TÉCNICO CONSULTIVO ESCOLAR",
+   "COMITÉ INTERNO DE PROYECTOS",
+   "DECANATO"
   ],
   "apoyo": [
-   "Coordinación de Enlace y Gestión Técnica",
-   "Unidad de Informática"
+   "COORDINACIÓN DE ENLACE Y GESTIÓN TÉCNICA",
+   "UNIDAD DE INFORMÁTICA"
   ],
   "areas": [
    {
-    "nombre": "Subdirección Académica",
+    "nombre": "SUBDIRECCIÓN ACADÉMICA",
     "dependencias": [
-     "Departamento de Ciencias Básicas",
-     "Departamento de Ingeniería",
-     "Departamento de Tecnologías Avanzadas",
-     "Departamento de Formación Integral e Institucional",
-     "Departamento de Innovación Educativa",
-     "Departamento de Evaluación y Seguimiento Académico",
-     "Unidad de Tecnología Educativa y Campus Virtual"
+     "DEPARTAMENTO DE CIENCIAS BÁSICAS",
+     "DEPARTAMENTO DE INGENIERÍA",
+     "DEPARTAMENTO DE TECNOLOGÍAS AVANZADAS",
+     "DEPARTAMENTO DE FORMACIÓN INTEGRAL E INSTITUCIONAL",
+     "DEPARTAMENTO DE INNOVACIÓN EDUCATIVA",
+     "DEPARTAMENTO DE EVALUACIÓN Y SEGUIMIENTO ACADÉMICO",
+     "UNIDAD DE TECNOLOGÍA EDUCATIVA Y CAMPUS VIRTUAL"
     ]
    },
    {
-    "nombre": "Sección de Estudios de Posgrado e Investigación",
+    "nombre": "SECCIÓN DE ESTUDIOS DE POSGRADO E INVESTIGACIÓN",
     "colegiados": [
-     "Colegio de Profesores"
+     "COLEGIO DE PROFESORES"
     ],
     "dependencias": [
-     "Departamento de Investigación",
-     "Departamento de Posgrado"
+     "DEPARTAMENTO DE INVESTIGACIÓN",
+     "DEPARTAMENTO DE POSGRADO"
     ]
    },
    {
-    "nombre": "Subdirección de Servicios Educativos e Integración Social",
+    "nombre": "SUBDIRECCIÓN DE SERVICIOS EDUCATIVOS E INTEGRACIÓN SOCIAL",
     "siglas": "SSEIS",
     "dependencias": [
-     "Departamento de Gestión Escolar",
-     "Departamento de Servicios Estudiantiles",
-     "Departamento de Extensión y Apoyos Educativos",
-     "Unidad Politécnica de Integración Social"
+     "DEPARTAMENTO DE GESTIÓN ESCOLAR",
+     "DEPARTAMENTO DE SERVICIOS ESTUDIANTILES",
+     "DEPARTAMENTO DE EXTENSIÓN Y APOYOS EDUCATIVOS",
+     "UNIDAD POLITÉCNICA DE INTEGRACIÓN SOCIAL"
     ]
    },
    {
-    "nombre": "Subdirección Administrativa",
+    "nombre": "SUBDIRECCIÓN ADMINISTRATIVA",
     "dependencias": [
-     "Departamento de Capital Humano",
-     "Departamento de Recursos Financieros",
-     "Departamento de Recursos Materiales y Servicios"
+     "DEPARTAMENTO DE CAPITAL HUMANO",
+     "DEPARTAMENTO DE RECURSOS FINANCIEROS",
+     "DEPARTAMENTO DE RECURSOS MATERIALES Y SERVICIOS"
     ]
    }
   ]
  },
  "ids": {
-  "Dirección": "direccion",
-  "Consejo Técnico Consultivo Escolar": "ctce",
-  "Comité Interno de Proyectos": "comite_proyectos",
-  "Decanato": "decanato",
-  "Coordinación de Enlace y Gestión Técnica": "enlace_gestion",
-  "Unidad de Informática": "unidad_informatica",
-  "Subdirección Académica": "subdireccion_academica",
-  "Departamento de Ciencias Básicas": "ciencias_basicas",
-  "Departamento de Ingeniería": "ingenieria",
-  "Departamento de Tecnologías Avanzadas": "tecnologias_avanzadas",
-  "Departamento de Formación Integral e Institucional": "formacion_integral",
-  "Departamento de Innovación Educativa": "innovacion_educativa",
-  "Departamento de Evaluación y Seguimiento Académico": "evaluacion_seguimiento",
-  "Unidad de Tecnología Educativa y Campus Virtual": "tecnologia_educativa",
-  "Sección de Estudios de Posgrado e Investigación": "sepi",
-  "Colegio de Profesores": "colegio_profesores",
-  "Departamento de Investigación": "investigacion",
-  "Departamento de Posgrado": "posgrado",
-  "Subdirección de Servicios Educativos e Integración Social": "sseis",
-  "Departamento de Gestión Escolar": "gestion_escolar",
-  "Departamento de Servicios Estudiantiles": "servicios_estudiantiles",
-  "Departamento de Extensión y Apoyos Educativos": "extension_apoyos",
-  "Unidad Politécnica de Integración Social": "upis",
-  "Subdirección Administrativa": "subdireccion_administrativa",
-  "Departamento de Capital Humano": "capital_humano",
-  "Departamento de Recursos Financieros": "recursos_financieros",
-  "Departamento de Recursos Materiales y Servicios": "recursos_materiales"
+  "DIRECCIÓN": "direccion",
+  "CONSEJO TÉCNICO CONSULTIVO ESCOLAR": "ctce",
+  "COMITÉ INTERNO DE PROYECTOS": "comite_proyectos",
+  "DECANATO": "decanato",
+  "COORDINACIÓN DE ENLACE Y GESTIÓN TÉCNICA": "enlace_gestion",
+  "UNIDAD DE INFORMÁTICA": "unidad_informatica",
+  "SUBDIRECCIÓN ACADÉMICA": "subdireccion_academica",
+  "DEPARTAMENTO DE CIENCIAS BÁSICAS": "ciencias_basicas",
+  "DEPARTAMENTO DE INGENIERÍA": "ingenieria",
+  "DEPARTAMENTO DE TECNOLOGÍAS AVANZADAS": "tecnologias_avanzadas",
+  "DEPARTAMENTO DE FORMACIÓN INTEGRAL E INSTITUCIONAL": "formacion_integral",
+  "DEPARTAMENTO DE INNOVACIÓN EDUCATIVA": "innovacion_educativa",
+  "DEPARTAMENTO DE EVALUACIÓN Y SEGUIMIENTO ACADÉMICO": "evaluacion_seguimiento",
+  "UNIDAD DE TECNOLOGÍA EDUCATIVA Y CAMPUS VIRTUAL": "tecnologia_educativa",
+  "SECCIÓN DE ESTUDIOS DE POSGRADO E INVESTIGACIÓN": "sepi",
+  "COLEGIO DE PROFESORES": "colegio_profesores",
+  "DEPARTAMENTO DE INVESTIGACIÓN": "investigacion",
+  "DEPARTAMENTO DE POSGRADO": "posgrado",
+  "SUBDIRECCIÓN DE SERVICIOS EDUCATIVOS E INTEGRACIÓN SOCIAL": "sseis",
+  "DEPARTAMENTO DE GESTIÓN ESCOLAR": "gestion_escolar",
+  "DEPARTAMENTO DE SERVICIOS ESTUDIANTILES": "servicios_estudiantiles",
+  "DEPARTAMENTO DE EXTENSIÓN Y APOYOS EDUCATIVOS": "extension_apoyos",
+  "UNIDAD POLITÉCNICA DE INTEGRACIÓN SOCIAL": "upis",
+  "SUBDIRECCIÓN ADMINISTRATIVA": "subdireccion_administrativa",
+  "DEPARTAMENTO DE CAPITAL HUMANO": "capital_humano",
+  "DEPARTAMENTO DE RECURSOS FINANCIEROS": "recursos_financieros",
+  "DEPARTAMENTO DE RECURSOS MATERIALES Y SERVICIOS": "recursos_materiales"
  },
  "pagina": 27
 }
