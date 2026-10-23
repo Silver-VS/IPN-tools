@@ -37,7 +37,7 @@ for (const apartado of ['situacion','tramites']) {
     assert.deepEqual([...caja.querySelectorAll('[data-pregunta]')].map(b=>b.getAttribute('data-pregunta')),datos.preguntas.filter(p=>p.apartado===apartado&&p.etapa===e.id).map(p=>p.id));
   }
 }
-for (ancho of [1440,768,375,320]) {
+for (ancho of [1440,1100,1024,768,375,320]) {
   await abrir('situacion','que-es-dictamen');
   const respuesta=caja.querySelector('#respuesta-que-es-dictamen');
   assert.ok(respuesta.querySelector('.sate-termino'),'glosario');
@@ -49,6 +49,7 @@ for (ancho of [1440,768,375,320]) {
 ancho=1440;
 await abrir('acudir','gestion_escolar');
 assert.ok(caja.querySelector('.guia-ficha .sate-termino'));
+assert.equal(datos.acudir.find(a=>a.id===caja.querySelector('.guia-directorio-lista [data-instancia]').getAttribute('data-instancia')).ambito,'unidad','Directorio comienza en la unidad académica');
 for (const ambito of ['unidad','ipn']) {
   clickTexto('.guia-controles button','sate.guia.acudir_'+ambito);
   for (const b of caja.querySelectorAll('.guia-directorio-lista [data-instancia]')) assert.equal([...datos.acudir,...datos.estructuraCentral].find(a=>a.id===b.getAttribute('data-instancia')).ambito,ambito);
@@ -62,6 +63,16 @@ for (const [consulta,id] of [['queja de un profesor','subdireccion_academica'],[
 }
 necesidad.value=''; necesidad.dispatchEvent(new Evento('input'));
 clickTexto('.guia-controles button','sate.guia.r10.jerarquia');
+assert.equal(caja.querySelector('.guia-ficha h3').textContent,datos.organigrama.raiz.nombre,'Cambiar a jerarquía selecciona Dirección');
+assert.ok(caja.querySelector('.guia-arbol ul ul ul'),'Tres niveles de árbol');
+assert.ok(caja.querySelector('.guia-arbol summary small'),'Ramas con número de dependencias');
+assert.equal(caja.querySelector('.guia-arbol').children.at(-1).className,'guia-arbol-fuente','Fuente al pie');
+const totalNodos=caja.querySelectorAll('.guia-arbol [data-instancia]').length;
+necesidad.value='gestión escolar';necesidad.dispatchEvent(new Evento('input'));
+assert.equal(caja.querySelectorAll('.guia-arbol [data-instancia]').length,totalNodos,'Buscar conserva el árbol completo');
+assert.ok(caja.querySelector('.guia-coincide'),'Resalta coincidencias');
+assert.ok(caja.querySelector('.guia-nodo--tenue'),'Atenúa las demás filas');
+necesidad.value='';necesidad.dispatchEvent(new Evento('input'));
 const nombres=[datos.organigrama.raiz.nombre,...datos.organigrama.raiz.colegiados,...datos.organigrama.raiz.apoyo];
 for (const a of datos.organigrama.raiz.areas) nombres.push(a.nombre,...a.dependencias,...a.colegiados||[]);
 for (const nombre of nombres) assert.ok([...caja.querySelectorAll('.guia-arbol [data-instancia]')].some(b=>b.textContent===nombre),nombre);
@@ -74,4 +85,12 @@ caja.querySelector('[data-instancia="gestion_escolar"]').click();
 assert.ok(document.querySelector('.sate-modal .guia-ficha'));
 c.SateUI.cerrarModal();
 pestana.ocultar(); assert.equal(cambios.size,0);
+// Validar texto renderizado con el catálogo compilado, además de los contratos por clave.
+const textos=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]).textos;
+c.SATE.texto=(k,v={})=>(textos[k]||k).replace(/\{(\w+)\}/g,(_,n)=>v[n]??'{'+n+'}');
+ancho=1100;
+for(const apartado of ['situacion','tramites','acudir','glosario']){
+  await abrir(apartado);
+  for(const n of caja.querySelectorAll('*'))if(!n.children.length)assert.doesNotMatch(n.textContent.trim(),/^sate\./,'Texto visible sin traducir en '+apartado);
+}
 console.log('Guía: etapas, búsqueda, marcado, directorio, organigrama completo y ficha móvil OK');

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 const config=JSON.parse(readFileSync('web/dist/sate/index.html','utf8').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
-const texto=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,n)=>v[n]??'{'+n+'}');
+const texto=(k,v={})=>{const s=(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,n)=>v[n]??'{'+n+'}');assert.doesNotMatch(s,/^sate\./,'Texto visible sin traducción: '+k);return s;};
 class Nodo{
   constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.value='';this.textContent='';this.className=''}
   appendChild(n){this.children.push(n);return n}replaceChildren(){this.children=[]}
@@ -528,4 +528,18 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   const cssV=readFileSync('web/sate/componentes.css','utf8');
   for(const regla of [/\.tramite-bloque\{/,/\.tramite-rejilla\{/,/\.tramite-fila\{/,/\.tramite-paso-ir\{/,/@media print\{/,/\.tramite-solo-impresion\{display:none\}/,/\.tramite-guardado\{/])assert.match(cssV,regla);
   console.log('Ventanilla BAJ2: bajas oficiales en PDF, uno o dos periodos, pasos, privacidad y descarga correctos.');
+  almacen.delete('hu.tramite.baja_temporal');t.mostrarLista(box);
+  const minis=box.todos().filter(n=>n.className==='tramite-miniatura');
+  assert.ok(minis.length>=2,'Cada definición disponible muestra su primera hoja');
+  for(const mini of minis){
+    assert.ok(mini.todos().some(n=>n.className==='tramite-miniatura-hoja'));
+    assert.ok(mini.todos().some(n=>n.className==='tramite-miniatura-cab'));
+    assert.ok(mini.todos().some(n=>n.className==='tramite-miniatura-firma'));
+    for(const n of mini.todos())assert.doesNotMatch(n.textContent,/^sate\./,'Texto visible traducido');
+  }
+  const ejemplo=box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Baja temporal. '));
+  assert.ok(ejemplo.todos().some(n=>n.textContent==='Ejemplo'));
+  assert.ok(ejemplo.todos().some(n=>n.textContent==='2099000000'),'Hoja con datos ficticios escritos');
+  assert.match(cssV,/aspect-ratio:612\/792/,'Marco carta');
+  assert.match(cssV,/transform:scale\(\.25\)/,'La hoja completa se reduce con transform');
 }

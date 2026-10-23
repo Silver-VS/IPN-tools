@@ -270,9 +270,8 @@
         ...parrafos(m.evaluacion).map(x => h('p', { texto: x })),
         h('p', { 'class': 'tmr-nota', texto: t('temarios.ficha.ponderacion') })
       ]);
-      const generales = h('section', { 'class': 'tmr-bloque', id: 'ficha-generales' }, [h('h3', { texto: t('temarios.ficha.generales_lector.titulo') }), cifras]);
       const oficial = h('section', { 'class': 'tmr-bloque', id: 'ficha-pdf' }, [h('h3', { texto: t('sate.guia.pdf') }), pdf]);
-      const bloques = [generales, objetivo, ...secciones.filter(x => x[0] !== 'bibliografia').map(x => x[2]), acreditacion, biblio, trayectoria, oficial].filter(Boolean);
+      const bloques = [objetivo, ...secciones.filter(x => x[0] !== 'bibliografia').map(x => x[2]), acreditacion, biblio].filter(Boolean);
       const nav = h('nav', { 'class': 'rgl-arbol tmr-indice', 'aria-label': t('temarios.ficha.indice') });
       const detalle = h('details', { 'class': 'rgl-indice', open: !raiz.matchMedia?.('(max-width:768.98px)').matches }, [h('summary', { 'class': 'rgl-resumen', texto: t('temarios.ficha.indice') }), h('div', { 'class': 'rgl-indice__cuerpo' }, [nav])]);
       const destinos = [];
@@ -290,7 +289,9 @@
         bloque.querySelectorAll('.tmr-pasos li').forEach((li, i) => {
           li.setAttribute('id', 'ficha-unidad-' + (i + 1));
           entrada(li, li.querySelector('h4').textContent, hijos);
-          li.querySelectorAll('p').forEach((p, j) => { p.setAttribute('id', 'ficha-unidad-' + (i + 1) + '-tema-' + (j + 1)); entrada(p, p.textContent, hijos); });
+          const temas = h('div', { 'class': 'rgl-grupo__cuerpo' });
+          li.querySelectorAll('p').forEach((p, j) => { p.setAttribute('id', 'ficha-unidad-' + (i + 1) + '-tema-' + (j + 1)); entrada(p, p.textContent, temas); });
+          if (temas.children.length) hijos.appendChild(temas);
         });
         if (hijos.children.length) nav.appendChild(hijos);
       }
@@ -307,7 +308,7 @@
       };
       raiz.addEventListener('resize', ajustar);
       if (raiz.requestAnimationFrame) raiz.requestAnimationFrame(ajustar);
-      cuerpo = [enc, SateUI.lector(detalle, lienzo, h('aside', { 'class': 'rgl-riel' }, [h('p', { texto: m.clave }), cambiar]))];
+      cuerpo = [enc, SateUI.lector(detalle, lienzo, h('aside', { 'class': 'rgl-riel tmr-lateral-datos' }, [trayectoria, cifras, oficial, cambiar]))];
     }
     const ficha = h('div', { 'class': 'tmr-ficha' + (vistazo ? ' tmr-ficha--vistazo' : '') }, cuerpo.filter(Boolean));
     if (ficha.style && ficha.style.setProperty) ficha.style.setProperty('--tmr-area', m.area?.color || 'var(--ipn-acento)');

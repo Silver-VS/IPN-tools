@@ -158,10 +158,13 @@
 @media(max-width:639.98px){.sel-controles{grid-template-columns:minmax(0,1fr)}}
 
 /* ---------- ficha única: índice de la página ---------- */
-.tmr-indice{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
-.tmr-indice a{box-sizing:border-box;display:inline-flex;align-items:center;min-height:2.5rem;padding:0 var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:999px;background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-s);text-decoration:none}
-.tmr-indice a:hover{border-color:var(--ipn-acento);color:var(--ipn-acento)}
-.tmr-indice a:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.tmr-indice{display:grid;gap:var(--ipn-esp-1)}
+.tmr-indice a{padding:var(--ipn-esp-2);border:0;border-radius:0;background:transparent;color:inherit;text-decoration:none}
+.tmr-indice a[aria-current]{background:var(--ipn-acento-suave);color:var(--ipn-acento)}
+.tmr-lateral-datos .tmr-cifras{grid-template-columns:1fr;gap:var(--ipn-esp-2)}
+.tmr-lateral-datos .tmr-cifras>div{display:flex;gap:var(--ipn-esp-2);align-items:baseline}
+.tmr-lateral-datos .tmr-cifras strong{font-size:var(--ipn-tamano-s)}
+.tmr-lateral-datos .tmr-rel-enlace{border:0;border-radius:0;padding:0}
 .tmr-bloque{scroll-margin-top:var(--ipn-esp-5)}
 
 /* Trayectoria escolar: una columna por semestre; ficha en ventana emergente */

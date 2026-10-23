@@ -28,12 +28,41 @@
   function miniatura(def,datos,ejemplo=false){
     const nodo=el('div',null,'tramite-miniatura');nodo.setAttribute('aria-label',ejemplo?tx('miniatura_ejemplo'):tx('miniatura_avance'));
     const marca=el('span',ejemplo?tx('ejemplo'):tx('miniatura_lleno'),'tramite-miniatura-marca');nodo.appendChild(marca);
-    const titulo=el('strong',def.titulo);nodo.appendChild(titulo);
-    const lista=el('dl',null,'tramite-miniatura-datos');
-    for(const p of def.pasos)for(const c of p.campos||[]){if(c.visible&&!c.visible(datos))continue;let filas=[];try{filas=c.revision?.(datos[c.id],datos)||[{texto:c.texto,valor:datos[c.id]}]}catch{}
-      for(const f of filas.slice(0,6)){const valor=String(f.valor||'');if(!valor)continue;lista.appendChild(el('dt',f.texto));lista.appendChild(el('dd',valor))}}
-    if(!lista.children.length)lista.appendChild(el('dd',tx('miniatura_datos_ejemplo')));
-    nodo.appendChild(lista);return nodo;
+    const hoja=el('div',null,'tramite-miniatura-hoja');nodo.appendChild(hoja);
+    const unidad=SATE_CONFIG.unidades[SATE_UNIDAD];
+    const cab=el('header',null,'tramite-miniatura-cab');cab.appendChild(el('b','IPN'));cab.appendChild(el('span',tx('miniatura_instituto')));cab.appendChild(el('b',unidad.siglas||SATE_UNIDAD.toUpperCase()));hoja.appendChild(cab);
+    const formato=['baja_temporal','baja_definitiva','dictamen','electivas'].includes(def.id);
+    hoja.appendChild(el('h4',formato?tx('miniatura_titulo_'+(def.id==='dictamen'?(datos.tipo==='externo'?'dictamen_externo':'dictamen'):def.id)):def.titulo));
+    const identidad=ejemplo?{}:leer('datos')?.datos||{};
+    const v={...identidad,...datos},nombre=[v.nombres,v.paterno,v.materno].filter(Boolean).join(' ');
+    const valor=(dato,ficticio)=>ejemplo?ficticio:String(dato||'');
+    // Coordenadas de la primera hoja (612 × 792), iguales a los estampadores PDF.
+    function campo(k,x,y,w,dato){const c=el('div',null,'tramite-miniatura-campo');c.setAttribute('style',`left:${x/612*100}%;top:${(y-22)/792*100}%;width:${w/612*100}%`);c.appendChild(el('small',tx('miniatura_'+k)));c.appendChild(el('span',dato));hoja.appendChild(c)}
+    const n=valor(nombre,tx('miniatura_persona')),bo=valor(v.boleta,'2099000000'),ca=valor(v.carrera,tx('miniatura_programa')),co=valor(v.correo,'ejemplo@example.test');
+    const ap=valor(v.paterno,'Ejemplo'),am=valor(v.materno,'Pérez'),no=valor(v.nombres,'Ana');
+    if(def.id.startsWith('baja_')){
+      const temporal=def.id==='baja_temporal';
+      campo('fecha',temporal?332:349,temporal?381:330,208,valor(v.fecha,'22/10/2026'));
+      campo('paterno',temporal?154:134,temporal?410:358,142,ap);campo('materno',temporal?307:288,temporal?410:358,temporal?115:112,am);campo('nombres',temporal?433:411,temporal?410:358,128,no);
+      campo('boleta',temporal?189:154,temporal?449:418,116,bo);campo('carrera',temporal?396:351,temporal?449:418,165,ca);
+      campo('motivos',temporal?62:27,511,temporal?492:542,valor(v.explicacion,tx('miniatura_motivo')));
+      campo('correo',temporal?260:111,temporal?635:458,temporal?294:170,co);
+      if(temporal)campo('periodos',365,678,189,valor(v.periodos,'1'));
+    }else if(def.id==='electivas'){
+      campo('nombre',130,172,250,n);campo('boleta',410,172,120,bo);campo('carrera',200,188,110,ca);campo('correo',178,204,290,co);
+      const actividad=v.actividades?.[0],catalogo=raiz.SateElectivas?.totales?.(v);
+      campo('modalidad',80,288,450,valor(actividad?.k,'C'));campo('horas',170,340,350,valor(actividad?[actividad.h,catalogo?.all].filter(x=>x!=null).join(' / '):'','50 / 1'));campo('evidencia',80,416,450,valor(actividad?.ev,tx('miniatura_actividad')));
+    }else{
+      const externo=v.tipo==='externo';
+      if(externo){campo('paterno',102,180,261,[ap,am].join(' '));campo('nombres',416,180,139,no)}else{campo('paterno',47,201,172,ap);campo('materno',229,201,133,am);campo('nombres',372,201,191,no)}
+      campo('boleta',externo?104:372,externo?194:238,externo?145:191,bo);campo('carrera',externo?466:47,externo?194:238,externo?89:315,ca);campo('correo',externo?372:334,externo?297:275,229,co);
+      campo('peticion',externo?58:48,externo?506:329,externo?491:514,valor(v.peticion,tx('miniatura_motivo')));
+      campo('periodos',229,446,334,valor(v.ingreso,'24/1'));
+      if(!externo){const filas=ejemplo?[{nombre:tx('miniatura_materia'),nivel:'1',cursada:'25/1',recursada:'26/1'}]:(v.filas||[]);const tabla=el('div',null,'tramite-miniatura-tabla');
+        for(let i=0;i<8;i++){const f=filas[i],fila=el('div');for(const dato of [f?.nombre,f?.nivel,[f?.cursada,f?.recursada].filter(Boolean).join(' / ')])fila.appendChild(el('span',dato||' '));tabla.appendChild(fila)}hoja.appendChild(tabla)}
+    }
+    const firma=el('footer',null,'tramite-miniatura-firma');firma.appendChild(el('span',n));firma.appendChild(el('small',tx('miniatura_firma')));hoja.appendChild(firma);
+    return nodo;
   }
   function estado(borrador,aplicacion,ahora=Date.now()){
     if(aplicacion?.aplica===false)return {id:'no_aplica',motivo:aplicacion.motivo,accion:null};
@@ -146,7 +175,8 @@
           for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.className+=' tramite-sin-impresion tramite-texto';b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
         }));bloque.appendChild(resumen);pantalla.appendChild(bloque);
         def.revisar?.(pantalla,m.datos,bloque);
-        pantalla.appendChild(miniatura(def,m.datos,!leer(def.id)));
+        const mini=miniatura(def,m.datos,false);pantalla.appendChild(mini);
+        if(def.generar){mini.tabIndex=0;mini.setAttribute('role','button');mini.onclick=()=>{if(url)window.open(url,'_blank','noopener')};mini.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mini.onclick()}}}
         if(def.confirmacion){const l=el('label',null,'tramite-campo'),n=el('input');n.type='checkbox';n.onchange=()=>confirmado=n.checked;l.appendChild(n);l.appendChild(el('span',def.confirmacion));pantalla.appendChild(l)}
       }else for(const c of def.pasos[m.paso].campos||[]){
         if(c.visible&&!c.visible(m.datos))continue;

@@ -624,8 +624,11 @@ est.click(); await dormir(30);
   assert.ok(ficha.querySelector('.rgl .rgl-indice'));
   assert.ok(ficha.querySelector('.rgl .rgl-texto'));
   assert.ok(ficha.querySelector('.rgl .rgl-riel'));
-  for (const id of ['generales', 'pdf', 'unidad-1']) assert.ok(secciones.includes(id), id);
-  for (const id of ['objetivo', 'contenidos', 'evaluacion', 'relaciones', 'bibliografia']) assert.ok(secciones.includes(id), id);
+  for (const id of ['unidad-1', 'objetivo', 'contenidos', 'evaluacion', 'bibliografia']) assert.ok(secciones.includes(id), id);
+  assert.ok(ficha.querySelector('.rgl-riel .tmr-trayectoria'), 'trayectoria en el panel derecho');
+  assert.ok(ficha.querySelector('.rgl-riel .tmr-cifras'), 'datos compactos en el panel derecho');
+  assert.ok(ficha.querySelector('.rgl-riel .tmr-pdf'), 'PDF oficial en el panel derecho');
+  assert.doesNotMatch(leer('web/sate/temarios.css'), /\.tmr-indice a\{[^}]*border-radius:999px/, 'índice sin pastillas');
   assert.equal(ficha.querySelector('#ficha-objetivo p').textContent, reg103.objetivo.split(/\n+/)[0].trim());
   assert.ok(ficha.querySelector('#ficha-bibliografia .tmr-biblio li'), 'la bibliografía del programa');
   // Buscar en bibliotecas, prellenado con el nombre de la materia

@@ -28,11 +28,22 @@
 .guia-ficha a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
 .guia-directorio-lista>li{padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea)}
 .guia-directorio-lista small{color:var(--ipn-tenue)}
-.guia-arbol ul{list-style:none;margin:0;padding-left:var(--ipn-esp-3);border-left:1px solid var(--ipn-linea)}
+.guia-arbol ul{list-style:none;margin:0 0 0 var(--ipn-esp-3);padding-left:var(--ipn-esp-5);border-left:1px solid var(--ipn-linea)}
 .guia-arbol section>ul{padding-left:0;border:0}
+.guia-arbol li{position:relative;min-width:0}
+.guia-arbol ul ul>li::before{content:'';position:absolute;left:calc(-1 * var(--ipn-esp-5));top:var(--ipn-esp-5);width:var(--ipn-esp-5);border-top:1px solid var(--ipn-linea)}
 .guia-arbol summary{min-height:44px;cursor:pointer;overflow-wrap:anywhere;padding:var(--ipn-esp-2);box-sizing:border-box}
-.guia-nodo{border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);margin-block:var(--ipn-esp-2)}
-.guia-nodo--colegiado{border-style:dashed}
+.guia-nodo{display:flex;align-items:center;gap:var(--ipn-esp-2);min-width:0;border-bottom:1px solid var(--ipn-linea)}
+.guia-nodo .guia-elegir{flex:1;min-width:0}
+.guia-nodo small,.guia-arbol summary>small,.guia-arbol-fuente{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
+.guia-arbol summary{display:flex;align-items:center;gap:var(--ipn-esp-2);padding:0}
+.guia-arbol summary::before{content:'▸';color:var(--ipn-tenue)}
+.guia-arbol details[open]>summary::before{content:'▾'}
+.guia-arbol summary>.guia-nodo{flex:1}
+.guia-arbol summary>small{flex:none}
+.guia-arbol section+section,.guia-arbol-fuente{margin-top:var(--ipn-esp-6)}
+.guia-nodo--tenue{opacity:.45}
+.guia-coincide{color:var(--ipn-acento);font-weight:600;text-decoration:underline}
 .guia-etapas button:focus-visible,.guia-elegir:focus-visible,.guia-controles button:focus-visible,.guia-arbol summary:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 @media(max-width:899px){.guia-panel,.guia-directorio{grid-template-columns:minmax(0,1fr)}.guia-etapa-nombre{display:none}.guia-preguntas-etapa .guia-detalle{padding:var(--ipn-esp-3)}.guia-ficha-panel{display:none}}
 @media(max-width:359px){.guia-etapas{flex-wrap:wrap;gap:var(--ipn-esp-2)}.guia-etapas li{flex:0 0 44px}.guia-etapas li+li::before{display:none}}

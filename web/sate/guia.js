@@ -710,7 +710,7 @@
     if (org) {
       const r = agregar(org.raiz.nombre, null);
       for (const nombre of org.raiz.colegiados || []) agregar(nombre, r, true);
-      for (const nombre of org.raiz.apoyo || []) agregar(nombre, r);
+      for (const nombre of org.raiz.apoyo || []) { const id = agregar(nombre, r); nodos.find(n => n.id === id).apoyo = true; }
       for (const area of org.raiz.areas || []) {
         const id = agregar(area.nombre, r);
         for (const nombre of area.dependencias || []) agregar(nombre, id);
@@ -757,10 +757,11 @@
       const preguntas = ts.length ? buscarPreguntas(d.preguntas, buscar.entrada.value) : [];
       const resultados = [...instancias.values()].filter(a => (vista === 'jerarquia' || a.para) && (!ambito || (a.ambito || 'unidad') === ambito) && (!ts.length || ts.every(w => norm([a.nombre, a.para, ...(a.palabras || []), ...(a.necesidades || []).flatMap(n => [t(n.texto), ...(n.palabras || [])])].join(' ')).includes(w)) || preguntas.some(p => (p.acudir || []).includes(a.id))));
       const ids = new Set(resultados.map(a => a.id));
-      if (!ids.has(elegido)) elegido = resultados[0]?.id;
+      resultados.sort((a, b) => Number(a.ambito === 'ipn') - Number(b.ambito === 'ipn'));
+      if (!instancias.has(elegido) || vista === 'directorio' && !ids.has(elegido)) elegido = resultados[0]?.id;
       barra.replaceChildren(...['directorio', 'jerarquia'].map(v => {
         const b = h('button', { type: 'button', 'aria-pressed': String(vista === v), texto: tx(v) });
-        b.addEventListener('click', () => { vista = v; pintar(); barra.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true }); }); return b;
+        b.addEventListener('click', () => { if (v === 'jerarquia' && vista !== v) elegido = nodos.find(n => !n.padre && instancias.get(n.id).ambito !== 'ipn')?.id; vista = v; pintar(); barra.querySelector('[aria-pressed="true"]')?.focus({ preventScroll: true }); }); return b;
       }));
       filtros.replaceChildren(...['', 'unidad', 'ipn'].map(v => {
         const b = h('button', { type: 'button', 'aria-pressed': String(ambito === v), texto: v ? t('sate.guia.acudir_' + v) : tx('todo') });
@@ -775,12 +776,24 @@
       }
       function nodo(n) {
         const hijos = nodos.filter(x => x.padre === n.id);
-        const rama = hijos.map(nodo).filter(Boolean);
-        if (!ids.has(n.id) && !rama.length) return null;
         const a = instancias.get(n.id);
-        const caja = h('div', { 'class': n.colegiado ? 'guia-nodo guia-nodo--colegiado' : 'guia-nodo' }, [boton(a)]);
+        if (ambito && (a.ambito || 'unidad') !== ambito) return null;
+        const rama = hijos.map(nodo).filter(Boolean);
+        const b = boton(a);
+        if (ts.length && ids.has(n.id)) b.classList.add('guia-coincide');
+        const caja = h('span', { 'class': 'guia-nodo' + (ts.length && !ids.has(n.id) ? ' guia-nodo--tenue' : '') }, [b,
+          n.colegiado || n.apoyo ? h('small', { texto: tx(n.colegiado ? 'colegiado' : 'apoyo') }) : null]);
         if (!rama.length) return h('li', {}, [caja]);
-        const det = h('details', { open: ts.length > 0 || abiertos.has(n.id) || n.padre === null }, [h('summary', { texto: a.nombre }), caja, h('ul', {}, rama)]);
+        const resumenRama = h('summary', {}, [caja, h('small', { texto: tx('dependencias').replace('{n}', String(hijos.length)) })]);
+        resumenRama.addEventListener('click', e => {
+          if (e.target === b) return;
+          elegido = a.id;
+          for (const actual of cuerpo.querySelectorAll('[data-instancia]')) actual.removeAttribute('aria-current');
+          b.setAttribute('aria-current', 'true');
+          if (raiz.matchMedia('(max-width:899px)').matches) SateUI.modal(a.nombre, ficha(a));
+          else cuerpo.querySelector('.guia-ficha-panel')?.replaceChildren(ficha(a));
+        });
+        const det = h('details', { open: ts.length > 0 || abiertos.has(n.id) || n.padre === null }, [resumenRama, h('ul', {}, rama)]);
         det.addEventListener('toggle', () => { if (det.open) abiertos.add(n.id); else abiertos.delete(n.id); });
         return h('li', {}, [det]);
       }
@@ -789,7 +802,7 @@
         const primera = a.para.match(/^(?:\[\[[\s\S]*?\]\]|[^.!?;])*[.!?;](?=\s|$)/)?.[0] || a.para;
         return h('li', {}, [boton(a), h('small', { texto: t('sate.guia.acudir_' + (a.ambito || 'unidad')) }), h('p', {}, enLinea(primera, d))]);
       }
-      const lista = vista === 'directorio' ? h('ul', { 'class': 'guia-directorio-lista' }, resultados.filter(a => a.para).map(fila)) : h('div', { 'class': 'guia-arbol' }, [org ? h('p', { texto: tx('fuente_estructura') }) : null, ...['unidad', 'ipn'].map(v => h('section', {}, [h('h3', { texto: t('sate.guia.acudir_' + v) }), h('ul', {}, nodos.filter(n => !n.padre && (instancias.get(n.id).ambito || 'unidad') === v).map(nodo))]))]);
+      const lista = vista === 'directorio' ? h('ul', { 'class': 'guia-directorio-lista' }, resultados.filter(a => a.para).map(fila)) : h('div', { 'class': 'guia-arbol' }, [...['unidad', 'ipn'].filter(v => !ambito || ambito === v).map(v => h('section', {}, [h('h3', { texto: t('sate.guia.acudir_' + v) }), h('ul', {}, nodos.filter(n => !n.padre && (instancias.get(n.id).ambito || 'unidad') === v).map(nodo))])), org ? h('p', { 'class': 'guia-arbol-fuente', texto: tx('fuente_estructura') }) : null]);
       const a = instancias.get(elegido);
       cuerpo.replaceChildren(lista, h('aside', { 'class': 'guia-ficha-panel' }, a ? [ficha(a)] : []));
       resumen.textContent = t(resultados.length ? 'sate.guia.detalle_instancias' : 'sate.guia.sin_resultados_preguntas', { n: resultados.length });
