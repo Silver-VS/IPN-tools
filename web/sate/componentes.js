@@ -662,6 +662,32 @@ function leyendaGrafica(items,esc){
 })(typeof window !== 'undefined' ? window : globalThis);
 
 /* Preferencia independiente del perfil: no vuelve a preguntar al actualizar el SAES. */
+(function (raiz) {
+  // La misma estructura mantiene las reglas responsivas del lector de reglamentos.
+  raiz.SateUI.lector = function (indice, texto, riel) {
+    const rejilla = document.createElement('div');
+    rejilla.className = 'rgl';
+    for (const nodo of [indice, texto, riel]) rejilla.appendChild(nodo);
+    return rejilla;
+  };
+  raiz.SateUI.lectorEncabezados = function colocar(contenedor, tope) {
+    for (const grupo of contenedor.children) {
+      if (!grupo.classList.contains('rgl-seccion')) continue;
+      const cabecera = grupo.firstChild;
+      cabecera.style.top = tope + 'px';
+      colocar(grupo, tope + (cabecera.offsetHeight || 48));
+    }
+  };
+  raiz.SateUI.lectorVisible = function (secciones) {
+    let visible = null;
+    for (const [id, seccion] of secciones) {
+      if (seccion.getBoundingClientRect().top > (parseFloat(seccion.style.scrollMarginTop) || 180)) break;
+      visible = id;
+    }
+    return visible;
+  };
+})(typeof window !== 'undefined' ? window : globalThis);
+
 (function(raiz){
   const clave='ipnt.recorrido.decision';
   raiz.SateUI.recorridoOfrecer=leer=>leer(clave)==null;

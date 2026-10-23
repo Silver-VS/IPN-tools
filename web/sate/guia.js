@@ -426,7 +426,7 @@
     const indice = h('details', { 'class': 'rgl-indice', open: true }, [h('summary', { 'class': 'rgl-resumen' }, [h('span', { texto: t('sate.guia.rgl_indice') }), resumen]), cuerpoIndice]);
     const texto = h('article', { 'class': 'rgl-texto', 'aria-label': reg.titulo });
     const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
-    const rejilla = h('div', { 'class': 'rgl' }, [indice, texto, riel]);
+    const rejilla = SateUI.lector(indice, texto, riel);
     const estrecho = () => pantallaChica() || (rejilla.clientWidth > 0 && rejilla.clientWidth <= 672);
     if (fuenteDoc || avisoOcr) cab.nodo.appendChild(h('div', { 'class': 'rgl-datos' }, [fuenteDoc, avisoOcr]));
     const mapa = mapaReglamento(reg);
@@ -567,15 +567,7 @@
       if (rielEnIndice && riel.parentNode !== cuerpoIndice) cuerpoIndice.insertBefore(riel, arbolNav);
       else if (!rielEnIndice && riel.parentNode !== rejilla) rejilla.appendChild(riel);
       // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
-      function colocar(contenedor, tope) {
-        for (const grupo of contenedor.children) {
-          if (!grupo.classList.contains('rgl-seccion')) continue;
-          const cabecera = grupo.firstChild;
-          cabecera.style.top = tope + 'px';
-          colocar(grupo, tope + (cabecera.offsetHeight || 48));
-        }
-      }
-      colocar(texto, chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
+      SateUI.lectorEncabezados(texto, chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
       for (const seccion of secciones.values()) {
         let tope = chico ? indice.querySelector('summary').offsetHeight || 48 : 0;
         for (let padre = seccion.parentNode; padre && padre !== texto; padre = padre.parentNode) {
@@ -594,11 +586,7 @@
       if (cuadro) return;
       cuadro = raiz.requestAnimationFrame(() => {
         cuadro = 0;
-        let visible = null;
-        for (const [n, seccion] of secciones) {
-          if (seccion.getBoundingClientRect().top > (parseFloat(seccion.style.scrollMarginTop) || 180)) break;
-          visible = n;
-        }
+        const visible = SateUI.lectorVisible(secciones);
         if (visible && visible !== actual) pintar(visible);
       });
     };

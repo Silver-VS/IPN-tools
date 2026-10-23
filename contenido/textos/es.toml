@@ -1815,3 +1815,10 @@ mi_horario = "Consulta los grupos que elegiste para tu horario."
 tramites = "Consulta los trámites y prepara sus formatos."
 calendario = "Consulta las fechas del calendario escolar."
 guia = "Elige un apartado para consultar sus temas."
+
+[temarios.desplazar]
+izquierda = "Desplazar a la izquierda"
+derecha = "Desplazar a la derecha"
+
+[temarios.ficha.generales_lector]
+titulo = "Datos generales"
