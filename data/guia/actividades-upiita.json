@@ -3,6 +3,7 @@
     "idiomas",
     "deporte",
     "cultura",
+    "salud",
     "servicios"
   ],
   "elementos": [
@@ -237,7 +238,7 @@
       "consulta": "2026-10-23"
     },
     {
-      "categoria": "servicios",
+      "categoria": "salud",
       "nombre": "Servicio Médico y Odontológico de la UPIITA",
       "ofrece": "Solicita consulta médica y atención preventiva odontológica en tu unidad académica.",
       "requisitos": "Ser alumno regular o activo de la UPIITA, presentar credencial del IPN o tira de materias vigente.",
@@ -257,7 +258,7 @@
       "consulta": "2026-10-23"
     },
     {
-      "categoria": "servicios",
+      "categoria": "salud",
       "nombre": "Orientación Juvenil y Atención Psicológica UPIITA",
       "ofrece": "Solicita orientación psicológica y apoyo para tus estrategias de aprendizaje.",
       "requisitos": "Alumno matriculado en UPIITA.",

@@ -892,35 +892,40 @@
     return { titulo: cab.titulo };
   }
 
-  function apartadoActividades(raizGuia, d) {
-    const cab = cabecera([...migasBase(), { texto: tituloApartado('actividades') }], tituloApartado('actividades'), t('sate.guia.actividades_descripcion'));
+  function apartadoActividades(raizGuia, d, id) {
+    const cab = cabecera([...migasBase(), { texto: tituloApartado('actividades') }], tituloApartado('actividades'));
     const contenido = d.actividades;
-    const filtros = h('div', { 'class': 'sate-chips sate-filtro-recursos', role: 'group', 'aria-label': t('sate.guia.actividades_filtrar') });
-    const lista = h('div', { 'class': 'sate-rejilla-recursos' });
+    const filtro = SateUI.buscador({ etiqueta: t('sate.guia.actividades_filtrar'), marcador: t('sate.guia.actividades_filtrar'), id: 'guia-actividades', alCambiar: valor => { consulta = valor; pintar(); } });
+    const zona = h('div', { 'class': 'guia-actividades-vista' });
     const estado = h('p', { 'class': 'sate-sr', role: 'status', 'aria-live': 'polite' });
-    let categoria = '';
-    const tarjetas = contenido.elementos.map(a => {
-      const campos = ['requisitos', 'inscripcion', 'donde'].filter(k => a[k]);
-      return { categoria: a.categoria, nodo: h('article', { 'class': 'sate-recurso' }, [
-        h('small', { texto: t('sate.guia.actividades_' + a.categoria) }), h('h3', { texto: a.nombre }), h('p', { texto: a.ofrece }),
-        campos.length ? h('dl', {}, campos.flatMap(k => [h('dt', { texto: t('sate.guia.actividades_' + k) }), h('dd', { texto: a[k] })])) : null,
-        enlaceExterno('sate-recurso__enlace', a.url, t('sate.guia.actividades_sitio')),
-        h('small', { texto: t('sate.guia.actividades_consulta', { fecha: fechaRevision(a.consulta) }) })
-      ]) };
-    });
+    let categoria = '', consulta = '';
+    const categorias = [...new Set(contenido.elementos.map(a => a.categoria))];
+    const nombres = new Map(contenido.elementos.map(a => [a.categoria, t('sate.guia.actividades_' + a.categoria)]));
+    const resumirLugar = a => /en l[ií]nea|a distancia|plataforma/i.test(a.donde) ? t('sate.guia.actividades_en_linea') : /upiita|unidad acad[eé]mica/i.test(a.donde) ? t('sate.guia.actividades_tu_unidad') : t('sate.guia.actividades_otra_sede');
+    const coincidencias = () => contenido.elementos.filter(a => !consulta || norm([a.nombre, a.ofrece, a.donde, a.requisitos, a.inscripcion, nombres.get(a.categoria)].join(' ')).includes(norm(consulta)));
+    const fila = a => {
+      const detalle = h('details', { 'class': 'guia-actividad-detalle' }, [h('summary', { texto: t('sate.guia.actividades_detalle') }), h('div', {}, [h('p', { texto: a.ofrece }), ...['requisitos', 'inscripcion', 'donde'].filter(k => a[k]).flatMap(k => [h('h4', { texto: t('sate.guia.actividades_' + k) }), h('p', { texto: a[k] })]), enlaceExterno('sate-recurso__enlace', a.url, t('sate.guia.actividades_sitio')), h('small', { texto: t('sate.guia.actividades_consulta', { fecha: fechaRevision(a.consulta) }) })])]);
+      return h('li', { 'class': 'guia-actividad' }, [h('div', {}, [h('strong', { texto: a.nombre }), h('small', { texto: resumirLugar(a) }), enlaceExterno('guia-actividad-enlace', a.url, t('sate.guia.actividades_sitio'))]), detalle]);
+    };
     function pintar() {
-      const visibles = tarjetas.filter(a => !categoria || a.categoria === categoria);
-      lista.replaceChildren(...visibles.map(a => a.nodo));
-      for (const b of filtros.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.getAttribute('data-categoria') === categoria));
-      estado.textContent = t('sate.guia.actividades_resultados', { n: visibles.length });
-    }
-    for (const id of ['', ...contenido.categorias]) {
-      const b = h('button', { 'class': 'sate-chip', type: 'button', 'data-categoria': id, texto: t('sate.guia.actividades_' + (id || 'todas')) });
-      b.addEventListener('click', () => { categoria = id; pintar(); });
-      filtros.appendChild(b);
+      const encontrados = coincidencias();
+      estado.textContent = t('sate.guia.actividades_resultados', { n: encontrados.length });
+      if (consulta) zona.replaceChildren(h('ul', { 'class': 'guia-actividades-lista' }, encontrados.map(fila)));
+      else if (categoria) {
+        const volver = h('a', { 'class': 'guia-actividades-volver', href: rutaGuia('actividades'), texto: '‹ ' + t('sate.guia.actividades_todas') });
+        zona.replaceChildren(volver, h('h2', { texto: nombres.get(categoria) }), h('ul', { 'class': 'guia-actividades-lista' }, encontrados.filter(a => a.categoria === categoria).map(fila)));
+      } else {
+        zona.replaceChildren(h('ul', { 'class': 'guia-actividades-categorias' }, categorias.map(id => {
+          const b = h('button', { type: 'button', 'class': 'guia-actividad-categoria', 'data-categoria': id }, [h('span', { 'class': 'guia-actividad-marca', 'aria-hidden': 'true' }), h('strong', { texto: nombres.get(id) }), h('small', { texto: t('sate.guia.actividades_resultados', { n: contenido.elementos.filter(a => a.categoria === id).length }) })]);
+          b.addEventListener('click', () => { categoria = id; pintar(); });
+          b.addEventListener('click', () => { raiz.location.hash = rutaGuia('actividades', id); });
+          return h('li', {}, [b]);
+        })));
+      }
     }
     raizGuia.appendChild(cab.nodo);
-    raizGuia.appendChild(h('section', { 'class': 'guia-apartado' }, [filtros, estado, lista]));
+    raizGuia.appendChild(h('section', { 'class': 'guia-apartado guia-actividades' }, [filtro.raiz, estado, zona]));
+    categoria = categorias.includes(id) ? id : '';
     pintar();
     return { titulo: cab.titulo };
   }
@@ -940,7 +945,7 @@
         const d = await datos();
         const a = infoApartado(apartado);
         if (mi !== token) return;
-        const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d) : a.datos === 'actividades' ? apartadoActividades(raizGuia, d) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);
+        const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d) : a.datos === 'actividades' ? apartadoActividades(raizGuia, d, id) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);
         foco = x.titulo;
         if (mi === token && x.enDocumento) return;
         if (mi === token && x.destino) { SateUI.revelar(x.destino); return; }

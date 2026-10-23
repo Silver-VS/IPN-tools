@@ -11,7 +11,7 @@ RAIZ = Path(__file__).resolve().parents[1]
 class Actividades(unittest.TestCase):
     def test_catalogo_documentado_sin_precios(self):
         datos = json.loads((RAIZ / 'data/guia/actividades-upiita.json').read_text(encoding='utf-8'))
-        self.assertEqual(datos['categorias'], ['idiomas', 'deporte', 'cultura', 'servicios'])
+        self.assertEqual(datos['categorias'], ['idiomas', 'deporte', 'cultura', 'salud', 'servicios'])
         self.assertEqual(set(datos['categorias']), {a['categoria'] for a in datos['elementos']})
         for a in datos['elementos']:
             with self.subTest(nombre=a['nombre']):

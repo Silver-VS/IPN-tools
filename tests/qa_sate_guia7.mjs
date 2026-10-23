@@ -16,10 +16,14 @@ Elemento.prototype.append = function (...nodos) { for (const n of nodos) if (n) 
 Elemento.prototype.prepend = function (n) { this.insertBefore(n, this.firstChild); };
 document.createElementNS = (_, tag) => document.createElement(tag);
 const datos = fixture('comun'), reg = fixture('demo'), solicitudes = [], scripts = [], desplazamientos = [];
+datos.actividades = {categorias:['idiomas','deporte'],elementos:[
+  {categoria:'idiomas',nombre:'Centro de Lenguas oficial',ofrece:'Clases',donde:'En línea',requisitos:'Requisito extenso',inscripcion:'Registro',url:'https://example.org/idiomas',consulta:'2026-01-01'},
+  {categoria:'deporte',nombre:'Coordinación Deportiva',ofrece:'Torneos',donde:'Unidad deportiva',url:'https://example.org/deporte',consulta:'2026-01-01'}
+]};
 datos.acudir = datos.acudir.map(a => ({...a, ambito:'ipn'})); // Contrato de la compilación.
 datos.acudir[0].para = 'Consulta [[a:demo:1|art. 1]]. Conserva [[g:credito|crédito]] y el texto normativo.';
 const config = JSON.parse(leer('data/sate.json'));
-config.unidades.ficticia = {guiaDatos:true, siglas:'Unidad ficticia', pestanas:['guia']};
+config.unidades.ficticia = {guiaDatos:true, actividadesDatos:true, siglas:'Unidad ficticia', pestanas:['guia']};
 let pestana, movil = false;
 const c = vm.createContext({document, console, setTimeout, clearTimeout,
   addEventListener(){}, removeEventListener(){}, requestAnimationFrame:fn=>setTimeout(fn,0), cancelAnimationFrame:clearTimeout,
@@ -96,6 +100,18 @@ await pestana.mostrar({partes:['glosario']});
 assert.ok(caja.textContent.includes('Crédito'));
 const buscar = caja.querySelector('input'); buscar.value='no-existe'; buscar.dispatchEvent(new Evento('input'));
 assert.equal(caja.querySelector('dl').textContent, '');
+const actividadCfg = config.guia.find(a => a.datos === 'actividades');
+assert.equal(actividadCfg.titulo, 'sate.guia.actividades');
+await pestana.mostrar({partes:['actividades']});
+assert.equal(caja.querySelectorAll('.guia-actividad-categoria').length, 2, 'entrada muestra categorías');
+assert.equal(caja.querySelectorAll('.guia-actividad-detalle[open]').length, 0, 'ningún detalle inicia desplegado');
+assert.equal(caja.querySelectorAll('.guia-actividad').length, 0, 'entrada no muestra opciones individuales');
+await pestana.mostrar({partes:['actividades','deporte']});
+assert.equal(caja.querySelectorAll('.guia-actividad').length, 1, 'la ruta profunda abre esa categoría');
+assert.ok(caja.textContent.includes('Coordinación Deportiva'));
+const buscarActividades = caja.querySelector('input'); buscarActividades.value='Centro de Lenguas'; buscarActividades.dispatchEvent(new Evento('input'));
+assert.ok(caja.textContent.includes('Centro de Lenguas oficial'), 'el filtro busca en otra categoría');
+assert.equal(caja.querySelectorAll('.guia-actividad').length, 1);
 for (const n of readdirSync('data/reglamentos').filter(n=>n.endsWith('.json'))) {
   assert.equal(leer('web/dist/sate/datos/reglamentos/'+n), leer('data/reglamentos/'+n), n+': copia publicada');
 }
