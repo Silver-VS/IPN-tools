@@ -43,7 +43,7 @@ assert.ok(!Object.keys(config.textos).some(k=>/sate\.(encabezado\.(datos|datos_m
 assert.ok(!encabezado.includes('Tu avance (opcional)'));
 assert.ok(!encabezado.includes('<hr'));
 assert.ok(!html.includes('/*__SATE_'));
-assert.match(html,/sate-barra-flotante/,'la barra flotante se genera para escritorio');
+assert.match(leer('web/sate/encabezado.js'),/bar\.className='sate-barra-flotante'/,'el módulo crea la barra flotante para escritorio');
 assert.match(leer('web/sate/encabezado.css'),/prefers-reduced-motion:reduce/,'la transición respeta movimiento reducido');
 assert.match(leer('web/sate/encabezado.css'),/scroll-padding-top/,'las anclas reservan espacio bajo la barra');
 const inicio = leer('web/sate/inicio.js');
@@ -254,23 +254,30 @@ assert.equal(medicion.inert,true);
   assert.match(leer('web/sate/componentes.css'), /body\.sate-flotante \.sate-barra\{display:flex\}/);
   assert.equal(config.unidades.upiita.pestanas.length, 6);
 }
-// El menú conserva su estado dentro de cada escalón y se restablece al cruzar 768 px.
+// El módulo externo conserva el menú y alterna la barra al cruzar la navegación.
 {
-  let cambio,teclado,enfocado=false;
-  const menu={open:true,querySelector(){return {focus(){enfocado=true}}}};
-  const cabecera={querySelector(){return menu},addEventListener(k,f){assert.equal(k,'keydown');teclado=f}};
-  const media={matches:false,addEventListener(k,f){assert.equal(k,'change');cambio=f}};
-  const script=[...html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/g)].find(m=>m[1].includes('document.currentScript.previousElementSibling'))[1];
-  vm.runInNewContext(script,{document:{currentScript:{previousElementSibling:cabecera}},matchMedia:()=>media});
-  for(const ancho of [2560,1920,1440,1200,1024,768,767,375,320]){
-    media.matches=ancho<768;cambio();assert.equal(menu.open,ancho>=768,String(ancho));
-  }
-  menu.open=true;teclado({key:'Escape'});assert.equal(menu.open,false);assert.equal(enfocado,true);
+  assert.match(html,/<script src="encabezado\.js"><\/script>/);
+  const js=leer('web/sate/encabezado.js');let scroll,navBottom=20,bar;
+  assert.equal(leer('web/dist/sate/encabezado.js'),js,'el builder copia y carga el módulo actualizado');
+  const menu={open:false,querySelector(){return {focus(){}}}};
+  const nav={getAttribute(){return 'Navegación'},getBoundingClientRect(){return {bottom:navBottom}}};
+  const links={cloneNode(){return {querySelectorAll(){return []}}}};
+  const makeEl=()=>({className:'',hidden:false,append(){},setAttribute(){},addEventListener(){},querySelectorAll(){return []}});
+  const h={querySelector(s){return s==='.sate-menu'?menu:s==='.sate-navegacion'?nav:links},after(x){bar=x},addEventListener(){}};
+  const doc={querySelector(){return h},createElement:makeEl,getElementById(){return null}};
+  const media={matches:true,addEventListener(){}};
+  vm.runInNewContext(js,{document:doc,matchMedia:()=>media,addEventListener(k,f){if(k==='scroll')scroll=f},requestAnimationFrame:f=>f()});
+  assert.equal(bar.hidden,true,'arriba, barra oculta');
+  navBottom=-1;scroll();assert.equal(bar.hidden,false,'al salir de la navegación, barra visible');
+  navBottom=20;scroll();assert.equal(bar.hidden,true,'al volver arriba, barra oculta');
 }
 let bloques = 0;
 const paginas = [...readdirSync('web/dist').filter(f=>/^horarios-.*\.html$/.test(f)).map(f=>'web/dist/'+f), ...readdirSync('web/dist/sate').filter(f=>f.endsWith('.html')).map(f=>'web/dist/sate/'+f)];
 for (const archivo of paginas) for (const m of leer(archivo).matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script\s*>/gi)) {
   if (/\bsrc\s*=|application\/(?:ld\+)?json/i.test(m[1])) continue;
+  const politica=leer(archivo).match(/http-equiv="Content-Security-Policy"[^>]*content="([^"]+)"/i)?.[1]||'';
+  const scripts=politica.match(/(?:^|;)\s*script-src\s+([^;]+)/i)?.[1]||'';
+  assert.match(scripts,/'unsafe-inline'/,archivo+': script inline sin permiso CSP');
   try { new Function(m[2]); bloques++; } catch (e) { throw new Error(archivo+': '+e.message); }
 }
 console.log(`Parseo con new Function: ${paginas.length} HTML, ${bloques} bloques. OK.`);
