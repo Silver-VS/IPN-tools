@@ -364,6 +364,10 @@ function el(document, tag, attrs = {}, hijos = []) {
   const zoomMetro = portada.querySelector('.gd-metro-lienzo'), escalaMetro = zoomMetro.style.zoom;
   portada.querySelector('[data-gd-zoom="1"]').click();
   assert.notEqual(zoomMetro.style.zoom, escalaMetro, 'el control aumenta la escala de rutas');
+  for (let i = 0; i < 20; i++) portada.querySelector('[data-gd-zoom="1"]').click();
+  assert.equal(Number(zoomMetro.style.zoom), 1.5, 'las rutas no superan 150 %');
+  for (let i = 0; i < 30; i++) portada.querySelector('[data-gd-zoom="-1"]').click();
+  assert.equal(Number(zoomMetro.style.zoom), 1, 'las rutas conservan el mínimo legible');
   const filas = T_.lineasDeAprendizaje(indice.materias, 'bionica', indice.carreras.bionica.areas);
   assert.ok(filas.at(-1).nombre === null && filas.at(-1).items.length > 0, 'las optativas van al final, en su propia fila');
   assert.ok(filas.every(f => f.items.every((i, k) => k === 0 || f.items[k - 1].v <= i.v)), 'cada línea ordenada por nivel');
@@ -391,9 +395,24 @@ est.click(); await dormir(30);
   const zoomMapa = portada.querySelector('.gd-mapa-lienzo'), escalaMapa = zoomMapa.style.zoom;
   portada.querySelector('[data-gd-zoom="1"]').click();
   assert.notEqual(zoomMapa.style.zoom, escalaMapa, 'el control aumenta la escala de la tabla');
+  const zoomMapaGuardado = zoomMapa.style.zoom;
+  vistas[0].click();
+  assert.equal(Number(portada.querySelector('.gd-metro-lienzo').style.zoom), 1, 'la escala de rutas se conserva al cambiar de vista');
+  vistas[1].click();
+  assert.equal(Number(portada.querySelector('.gd-mapa-lienzo').style.zoom), Number(zoomMapaGuardado), 'la escala de tabla se conserva al volver');
   const cssVistas = leer('web/sate/temarios.css');
   assert.match(cssVistas, /\.gd-mapa\{[^}]*overflow:auto[^}]*max-width:100%/, 'la tabla desplaza dentro de su lienzo');
   assert.match(cssVistas, /\.gd-metro-caja\{[^}]*overflow:auto[^}]*max-width:100%/, 'las rutas desplazan dentro de su lienzo');
+  assert.match(cssVistas, /\.gd-estacion-nombre\{font-size:11px/, 'las etiquetas de estación parten de 11 px');
+  assert.match(cssVistas, /\.gd-estacion small\{[^}]*font-size:11px/, 'las claves de estación parten de 11 px');
+  assert.match(cssVistas, /\.gd-chip\{[^}]*font-size:11px/, 'las celdas de la tabla parten de 11 px');
+  // A 1x, el ancho natural se mantiene o se desplaza; el zoom nunca sacrifica el mínimo tipográfico.
+  for (const ancho of [1440, 1100, 768, 375]) {
+    const natural = 1800, escalaMinima = 1, escala = Math.max(escalaMinima, Math.min(1.5, ancho / natural));
+    const usado = natural * escala;
+    assert.ok(usado >= Math.min(ancho, natural), `${ancho}px: se ocupa el ancho disponible o se conserva el lienzo desplazable`);
+    assert.ok(11 * escala >= 11, `${ancho}px: texto efectivo >= 11px`);
+  }
   assert.equal(portada.querySelectorAll('.gd-mapa .gd-chip').length, 72, 'matriz: todas las materias de la carrera, una vez');
   assert.equal(portada.querySelectorAll('.gd-fila').length, filas.length + 1, 'una fila por línea más el encabezado de niveles');
   assert.match(portada.querySelector('.gd-mapa .gd-chip[data-clave=B103]').getAttribute('class'), /gd-n1\b/, 'el chip va en la columna de su nivel');
