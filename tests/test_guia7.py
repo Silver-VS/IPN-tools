@@ -41,6 +41,8 @@ class TestGuia7(unittest.TestCase):
             (raiz / 'data/gestion_escolar').mkdir()
             (raiz / 'data/gestion_escolar/bajas.json').write_text('{}', encoding='utf-8')
             (raiz / 'data/guia/comun.json').write_text(json.dumps(leer('comun.json')), encoding='utf-8')
+            rutas = {'rutas': [{'id': 'nuevo', 'preguntas': [p['id'] for p in leer('comun.json')['preguntas']]}]}
+            (raiz / 'data/guia/rutas.json').write_text(json.dumps(rutas), encoding='utf-8')
             antes = ns['ROOT'], ns['UNIDAD']
             try:
                 ns['ROOT'] = raiz

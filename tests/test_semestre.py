@@ -227,7 +227,8 @@ class PdfSinCambios(unittest.TestCase):
                                            forzar=False, archivo=None)
         for k, v in zip(extra[::2], extra[1::2]):
             setattr(args, k, v)
-        with patch.object(semestre, 'DATA', self.dir / 'datos'), patch('salones.generar', self.generar):
+        # El repositorio ficticio es hermano de recursos incluso si TEMP vive dentro del worktree.
+        with patch.object(semestre, 'ROOT', self.dir / 'repo'), patch.object(semestre, 'DATA', self.dir / 'datos'), patch('salones.generar', self.generar):
             return semestre.cmd_pdf(args, abrir=self.abrir)
 
     def test_descubrir(self):
