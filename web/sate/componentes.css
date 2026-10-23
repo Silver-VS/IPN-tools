@@ -532,7 +532,7 @@ button.sate-chip{cursor:pointer}
 
 .sate-segmentado{box-sizing:border-box;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:var(--ipn-esp-1);max-width:100%;padding:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-hundido)}
 .sate-segmentado button{min-width:0;min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-4);border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-tenue);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);cursor:pointer;overflow-wrap:anywhere}
-.sate-segmentado button[aria-pressed=true],.sate-segmentado button[aria-selected=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);font-weight:600}
+.sate-segmentado button[aria-pressed=true],.sate-segmentado button[aria-selected=true]{background:var(--ipn-acento-suave);color:var(--ipn-acento);box-shadow:inset 0 0 0 1.5px var(--ipn-acento);font-weight:600}   /* igual que .seg: un solo estilo de segmento activo en SATE */
 .sate-segmentado button{overflow-wrap:normal;word-break:normal;hyphens:none}
 .sate-segmentado__corto{display:none}
 @media(max-width:559.98px){.sate-segmentado button:has(.sate-segmentado__corto){padding-inline:var(--ipn-esp-2);font-size:var(--ipn-tamano-s)}.sate-segmentado__largo{display:none}.sate-segmentado__corto{display:inline}}   /* etiqueta corta cuando no cabe la completa: nunca se parte una palabra */
