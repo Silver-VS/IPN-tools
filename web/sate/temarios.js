@@ -380,7 +380,7 @@
     function boton(m, colores) {
       const b = h('button', { type: 'button', 'class': 'sel-materia', 'data-clave': m.clave, 'aria-current': op && op.actual === m.clave ? 'true' : null }, [h('span', { texto: m.n }), h('small', { texto: [m.clave, SEL.orden === 'az' && m.v != null ? t('temarios.lista.nivel', { n: m.v }) : null].filter(Boolean).join(' · ') })]);
       const c = colores.get(m.a); if (c) b.style.setProperty('--sel-area', c);
-      b.addEventListener('click', () => { SateUI.cerrarModal(); raiz.location.hash = ir(m.c, m.clave); });
+      b.addEventListener('click', () => { SateUI.cerrarModal(); abrirFicha(m.clave); });
       return h('li', {}, [b]);
     }
     function pintar() {
@@ -419,7 +419,7 @@
 
   /* ---------- Programas de estudio: #/<unidad>/guia/programas[/<carrera>/<clave>[/<seccion>]] ---------- */
   const P = { token: 0, clave: null };
-  const G = { carrera: null, modo: 'trayectoria', vista: null, token: 0 };
+  const G = { carrera: null, modo: 'trayectoria', vista: null, token: 0, zoom: null, escala: 1 };
   const claseNivel = v => 'gd-n' + Math.min(Math.max(+v || 1, 1), 9);
   const reducido = () => !!(raiz.matchMedia && raiz.matchMedia('(prefers-reduced-motion:reduce)').matches);
 
@@ -455,28 +455,12 @@
   // Programas de estudio con dos formas de explorar (trayectoria escolar; líneas y especializaciones, en metro o en matriz). Elegir una materia abre su ficha
   // única en una ventana emergente (SateUI.modal): la página no cambia de ruta ni se desplaza, y al cerrar el foco vuelve a la materia.
   async function abrirFicha(clave) {
-    const k = claveNorm(clave), token = ++G.token, nombre = nombreDe(k);
-    SateUI.modal(nombre, h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }), { amplio: true });
-    try {
-      const r = await registro(k);
-      if (token !== G.token) return;
-      if (!r) throw new Error('sin registro ' + k);
-      const recursos = await cargarRecursos(r.carreraId);
-      if (token !== G.token) return;
-      const ficha = construirFicha(r, recursos[k] || [], { modo: 'completa', dialogo: true, alIr: (e, destino) => { e.preventDefault(); abrirFicha(destino); } });
-      SateUI.modal(r.registro.nombre, h('div', { 'class': 'tmr tmr-dialogo' }, [ficha]), { amplio: true });
-    } catch (e) {
-      if (token !== G.token) return;
-      console.warn('SATE: ficha no disponible', { unidad: unidad(), clave: k, mensaje: e.message });
-      const otra = h('button', { type: 'button', 'class': 'btn', texto: t('temarios.panel.reintentar') });
-      otra.addEventListener('click', () => abrirFicha(k));
-      SateUI.modal(nombre, h('div', {}, [h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra]), { amplio: true });
-    }
+    abrir(clave, document.activeElement);
   }
   /* Metro: una vía gruesa por área (mismo color que en el Mapa), una estación (anillo) por unidad de aprendizaje y una zona por nivel.
      Las vías y los transbordos se dibujan en un solo SVG; cada estación es un botón HTML encima. Si un nivel tiene varias unidades de la
      misma línea, la vía se ramifica en sub-vías paralelas. No hay panel lateral: elegir una estación abre la ficha. */
-  const METRO = { col: 170, caja: 150, carril: 81, enc: 40, tope: 3, margen: 16, r: 14 };
+  const METRO = { col: 120, caja: 108, carril: 55, enc: 30, tope: 3, margen: 12, r: 10 };
   const ROMANOS = ['', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX'];
   const hexRgb = c => { const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(c || ''); return m ? [1, 2, 3].map(i => parseInt(m[i], 16) / 255) : null; };
   const luz = c => { const v = hexRgb(c); if (!v) return null; const [r, g, b] = v.map(x => x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4)); return 0.2126 * r + 0.7152 * g + 0.0722 * b; };
@@ -594,7 +578,23 @@
     selCarrera.value = G.carrera;
     const tray = h('div', { 'class': 'gd-tray' }), lin = h('div', { 'class': 'gd-lin' }), metro = h('div', { 'class': 'gd-metro' }), mapa = h('div', { 'class': 'gd-mapa' }), esp = h('div', { 'class': 'gd-esp' });
     const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria'), corto: t('sate.guia.modo_trayectoria_corto') }, { id: 'lineas', texto: t('sate.guia.modo_lineas'), corto: t('sate.guia.modo_lineas_corto') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
-    const vista = SateUI.segmentado({ etiqueta: t('sate.guia.vista_etiqueta'), opciones: [{ id: 'metro', texto: t('sate.guia.vista_metro') }, { id: 'matriz', texto: t('sate.guia.vista_matriz') }], valor: G.vista, alCambiar: v => { G.vista = v; guardarVista(v); pintar(); } });
+    const vista = SateUI.segmentado({ etiqueta: t('sate.guia.vista_etiqueta'), opciones: [{ id: 'metro', texto: t('sate.guia.vista_metro') }, { id: 'matriz', texto: t('sate.guia.vista_matriz') }], valor: G.vista, alCambiar: v => { G.vista = v; G.zoom = null; guardarVista(v); pintar(); } });
+    const zoom = h('div', { 'class': 'seg gd-zoom', role: 'group', 'aria-label': t('sate.guia.vista_zoom') }, [
+      h('button', { type: 'button', 'data-gd-zoom': '-1', 'aria-label': t('sate.guia.vista_alejar'), texto: '−' }),
+      h('button', { type: 'button', 'data-gd-zoom': '0', texto: t('sate.guia.vista_ajustar') }),
+      h('button', { type: 'button', 'data-gd-zoom': '1', 'aria-label': t('sate.guia.vista_acercar'), texto: '+' })]);
+    const escala = () => {
+      const lienzo = metro.hidden ? mapa.querySelector('.gd-mapa-lienzo') : metro.querySelector('.gd-metro-lienzo');
+      if (!lienzo) return;
+      const caja = metro.hidden ? mapa : metro, ancho = caja.clientWidth || 1000, w = lienzo.scrollWidth || ancho, alto = lienzo.scrollHeight || 520;
+      lienzo.style.zoom = String(G.zoom ?? Math.max(.2, Math.min(1, ancho / w, 520 / alto)));
+      G.escala = Number(lienzo.style.zoom) || 1;
+    };
+    zoom.addEventListener('click', e => {
+      const b = e.target.closest('[data-gd-zoom]'); if (!b) return;
+      G.zoom = b.dataset.gdZoom === '0' ? null : Math.max(.2, Math.min(3, (G.zoom ?? G.escala) * (b.dataset.gdZoom === '1' ? 1.2 : 1 / 1.2)));
+      escala();
+    });
     // Una materia es siempre un botón: clic, Enter o espacio abren su ficha en la ventana emergente.
     function chip(i, clase, hijos, color) {
       const b = h('button', { type: 'button', 'class': 'gd-chip ' + clase, 'data-clave': i.clave, 'aria-haspopup': 'dialog' }, hijos);
@@ -613,7 +613,7 @@
       const filas = lineasDeAprendizaje(ind.materias, G.carrera, ind.carreras[G.carrera].areas);
       const niveles = [...new Set(filas.flatMap(f => f.items.map(i => i.v)))].filter(v => v != null).sort((a, b) => a - b);
       mapa.setAttribute('data-niveles', String(niveles.length));
-      mapa.replaceChildren(
+      const lienzo = h('div', { 'class': 'gd-mapa-lienzo' }, [
         h('div', { 'class': 'gd-fila gd-fila--enc', 'aria-hidden': 'true' }, [h('span', { 'class': 'gd-quien', texto: t('sate.guia.columna_linea') }),
           h('div', { 'class': 'gd-cols' }, niveles.map(v => h('span', { 'class': claseNivel(v), texto: t('temarios.lista.nivel', { n: v }) })))]),
         ...filas.map(f => {
@@ -626,7 +626,8 @@
             }))]);
           if (f.color && fila.style && fila.style.setProperty) fila.style.setProperty('--gd-area', f.color);
           return fila;
-        }));
+        })]);
+      mapa.replaceChildren(lienzo);
     }
     function pintarEsp() {
       const lineas = ind.carreras[G.carrera].lineas || [], porArea = new Map();
@@ -647,11 +648,13 @@
       if (G.modo === 'trayectoria') { pintarTrayectoria(); return; }
       if (G.vista === 'metro') { pintarMetro(metro, ind, G.carrera, abrirFicha); mapa.replaceChildren(); } else { pintarMapa(); metro.replaceChildren(); }
       pintarEsp();
+      if (raiz.requestAnimationFrame) raiz.requestAnimationFrame(escala); else escala();
     }
     selCarrera.addEventListener('change', () => { G.carrera = selCarrera.value; pintar(); });
+    raiz.addEventListener('resize', escala);
     pintar();
     const campo = ids.length > 1 ? h('label', { 'class': 'tmr-campo gd-campo' }, [h('span', { texto: t('temarios.filtro.carrera') }), selCarrera]) : null;
-    lin.replaceChildren(h('div', { 'class': 'gd-lin-barra' }, [vista.raiz]), metro, mapa,
+    lin.replaceChildren(h('div', { 'class': 'gd-lin-barra' }, [vista.raiz, zoom]), metro, mapa,
       h('section', { 'class': 'gd-esp-seccion' }, [h('h3', { texto: t('sate.guia.esp_titulo') }), esp]));
     return h('section', { 'class': 'gd-explorar', id: 'gd-explorar', 'aria-labelledby': 'gd-explorar-titulo' }, [
       h('header', { 'class': 'gd-explorar-enc' }, [h('div', {}, [h('h3', { id: 'gd-explorar-titulo', texto: t('sate.guia.explorar_seccion') }), h('p', { texto: t('sate.guia.explorar_intro') })]), campo, seg.raiz]),

@@ -12,6 +12,9 @@ const igual = (a, b, m) => assert.deepStrictEqual(plano(a), plano(b), m);
 const dormir = ms => new Promise(r => setTimeout(r, ms));
 const config = JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 const textos = config.textos;
+assert.equal(textos['sate.guia.vista_metro'], 'Rutas de aprendizaje');
+assert.equal(textos['sate.guia.vista_matriz'], 'Tabla por nivel');
+assert.equal(Object.values(textos).some(v => typeof v === 'string' && /\bmetro\b/i.test(v)), false, 'ningún texto visible conserva el nombre anterior');
 
 // Formateador de textos igual al de inicio.js; una clave inexistente es un error de la prueba.
 const reglaPlural = new Intl.PluralRules('es-MX'), numeroFmt = new Intl.NumberFormat('es-MX');
@@ -342,30 +345,25 @@ function el(document, tag, attrs = {}, hijos = []) {
   const scrolls = estado.scroll.length;
   chipTray.click();
   await dormir(30);
-  const fd = document.querySelector('dialog');
-  assert.equal(fd.open, true, 'la ficha se abre en un diálogo modal');
-  assert.equal(fd.querySelector('.sate-modal__titulo').textContent, 'Álgebra lineal');
-  assert.ok(fd.querySelector('.tmr-ficha'), 'es la ficha única');
-  assert.equal(fd.querySelector('.tmr-ficha h2'), null, 'el título lo pone el diálogo');
-  assert.ok(fd.querySelector('#ficha-contenidos'), 'temario'); assert.ok(fd.querySelector('#ficha-bibliografia'), 'bibliografía');
-  assert.ok(fd.querySelector('.tmr-pdf'), 'Ver programa original (PDF)');
+  const fd = document.querySelector('.tmr-panel');
+  assert.equal(fd.hidden, false, 'abre la ventana breve compartida con el Mapa');
+  assert.ok(fd.querySelector('.tmr-ficha--vistazo'));
+  assert.equal(fd.querySelector('.tmr-completa').textContent, 'Ver temario completo');
   assert.equal(estado.scroll.length, scrolls, 'la página no se desplaza');
-  assert.equal(portada.querySelectorAll('.tmr-ficha').length, 0, 'no se agrega un bloque a la página principal');
-  assert.equal(document.activeElement, fd.querySelector('.sate-modal__x'), 'el foco entra al diálogo');
-  // Desde la ficha, una materia relacionada cambia el contenido del mismo diálogo
-  const enlaceRel = fd.querySelector('.tmr-rel-enlace');
-  if (enlaceRel) { const dest = indice.materias[enlaceRel.getAttribute('href').split('/').at(-1)].n; enlaceRel.click(); await dormir(30); assert.equal(document.querySelector('dialog').querySelector('.sate-modal__titulo').textContent, dest); }
-  fd.dispatchEvent(new Evento('cancel', {target: fd}));
-  assert.equal(fd.open, false, 'Escape cierra');
+  assert.equal(portada.querySelectorAll('.tmr-ficha').length, 0, 'la ficha no se agrega a la página');
+  fd.querySelector('.tmr-panel-x').click();
   // Líneas y especializaciones: metro por omisión, matriz con el conmutador
   const rel = T_.relaciones(indice.materias, 'B103');
   assert.ok(rel.despues.length > 0, 'B103 desbloquea otras materias por la seriación real');
   modos[1].click();
   assert.equal(portada.querySelector('.gd-lin').hidden, false); assert.equal(portada.querySelector('.gd-tray').hidden, true);
   const vistas = portada.querySelectorAll('.gd-lin-barra .sate-segmentado button');
-  igual(vistas.map(b => b.textContent), ['Metro', 'Matriz']);
-  igual(vistas.map(b => b.getAttribute('aria-pressed')), ['true', 'false'], 'el metro es la vista por omisión');
+  igual(vistas.map(b => b.textContent), ['Rutas de aprendizaje', 'Tabla por nivel']);
+  igual(vistas.map(b => b.getAttribute('aria-pressed')), ['true', 'false']);
   assert.equal(portada.querySelector('.gd-metro').hidden, false); assert.equal(portada.querySelector('.gd-mapa').hidden, true);
+  const zoomMetro = portada.querySelector('.gd-metro-lienzo'), escalaMetro = zoomMetro.style.zoom;
+  portada.querySelector('[data-gd-zoom="1"]').click();
+  assert.notEqual(zoomMetro.style.zoom, escalaMetro, 'el control aumenta la escala de rutas');
   const filas = T_.lineasDeAprendizaje(indice.materias, 'bionica', indice.carreras.bionica.areas);
   assert.ok(filas.at(-1).nombre === null && filas.at(-1).items.length > 0, 'las optativas van al final, en su propia fila');
   assert.ok(filas.every(f => f.items.every((i, k) => k === 0 || f.items[k - 1].v <= i.v)), 'cada línea ordenada por nivel');
@@ -376,7 +374,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   const est = portada.querySelector('.gd-metro .gd-estacion[data-clave=B103]');
   assert.equal(est.tagName, 'BUTTON', 'cada estación es un botón (teclado)');
   assert.match(est.getAttribute('aria-label'), /^Álgebra lineal, B103, .+, nivel 1$/, 'nombre accesible: unidad, clave, línea y nivel');
-  assert.ok(est.getAttribute('style').includes('width:150px'));
+assert.ok(est.getAttribute('style').includes('width:108px'));
   assert.equal(portada.querySelector('.gd-metro-caja').getAttribute('tabindex'), '0', 'la caja se desplaza con el teclado');
   const nombres = portada.querySelectorAll('.gd-estacion-nombre').map(n => n.textContent);
   assert.ok(nombres.every(n => !n.includes('…')), 'ningún rótulo se trunca');
@@ -384,19 +382,27 @@ function el(document, tag, attrs = {}, hijos = []) {
   const enMas = new Map(); for (const l of indice.carreras.bionica.lineas) for (const k of new Set(l.claves)) enMas.set(k, (enMas.get(k) || 0) + 1);
   assert.ok(cruces.length >= [...enMas].filter(([k, n]) => n > 1 && indice.materias[k]).length, 'correspondencias: al menos las materias en más de una especialización');
   assert.match(portada.querySelector('.gd-metro-leyenda').textContent, /Anillo doble/);
-  est.click(); await dormir(30);
-  assert.equal(document.querySelector('dialog').open, true, 'la estación abre el diálogo de la ficha');
-  document.querySelector('dialog').dispatchEvent(new Evento('cancel', {target: document.querySelector('dialog')}));
-  vistas[1].click();
+est.click(); await dormir(30);
+  assert.equal(document.querySelector('.tmr-panel').hidden, false);
+  assert.equal(document.querySelector('.tmr-panel .tmr-completa').textContent, 'Ver temario completo');
+  document.querySelector('.tmr-panel-x').click();
+    vistas[1].click();
   assert.equal(portada.querySelector('.gd-mapa').hidden, false); assert.equal(portada.querySelector('.gd-metro').hidden, true);
+  const zoomMapa = portada.querySelector('.gd-mapa-lienzo'), escalaMapa = zoomMapa.style.zoom;
+  portada.querySelector('[data-gd-zoom="1"]').click();
+  assert.notEqual(zoomMapa.style.zoom, escalaMapa, 'el control aumenta la escala de la tabla');
+  const cssVistas = leer('web/sate/temarios.css');
+  assert.match(cssVistas, /\.gd-mapa\{[^}]*overflow:auto[^}]*max-width:100%/, 'la tabla desplaza dentro de su lienzo');
+  assert.match(cssVistas, /\.gd-metro-caja\{[^}]*overflow:auto[^}]*max-width:100%/, 'las rutas desplazan dentro de su lienzo');
   assert.equal(portada.querySelectorAll('.gd-mapa .gd-chip').length, 72, 'matriz: todas las materias de la carrera, una vez');
   assert.equal(portada.querySelectorAll('.gd-fila').length, filas.length + 1, 'una fila por línea más el encabezado de niveles');
   assert.match(portada.querySelector('.gd-mapa .gd-chip[data-clave=B103]').getAttribute('class'), /gd-n1\b/, 'el chip va en la columna de su nivel');
   const conAntes = portada.querySelector('.gd-chip-antes'); assert.ok(conAntes && /^Antes: /.test(conAntes.textContent), 'la seriación se ve en la línea');
-  portada.querySelector('.gd-mapa .gd-chip[data-clave=B103]').click(); await dormir(30);
-  assert.equal(document.querySelector('dialog').open, true, 'también abre el diálogo desde la matriz');
-  document.querySelector('dialog').dispatchEvent(new Evento('cancel', {target: document.querySelector('dialog')}));
-  // Bloques de especialización bajo ambas vistas
+portada.querySelector('.gd-mapa .gd-chip[data-clave=B103]').click(); await dormir(30);
+  assert.equal(document.querySelector('.tmr-panel').hidden, false);
+  assert.equal(document.querySelector('.tmr-panel .tmr-completa').textContent, 'Ver temario completo');
+  document.querySelector('.tmr-panel-x').click();
+    // Bloques de especialización bajo ambas vistas
   assert.equal(portada.querySelector('.gd-esp').hidden, false);
   assert.equal(portada.querySelectorAll('.gd-esp-linea').length, 6);
   assert.equal(portada.querySelectorAll('.gd-esp-area').length, 3);
@@ -409,8 +415,8 @@ function el(document, tag, attrs = {}, hijos = []) {
   const chipEsp = portada.querySelector('.gd-esp-linea .gd-chip');
   assert.ok(/^B/.test(chipEsp.getAttribute('data-clave')));
   chipEsp.click(); await dormir(30);
-  assert.equal(document.querySelector('dialog').open, true, 'también abre el diálogo desde las especializaciones');
-  document.querySelector('dialog').dispatchEvent(new Evento('cancel', {target: document.querySelector('dialog')}));
+  assert.equal(document.querySelector('.tmr-panel').hidden, false);
+  document.querySelector('.tmr-panel-x').click();
   const selC = portada.querySelector('#gd-carrera');
   selC.value = 'telematica'; selC.dispatchEvent(new Evento('change', {target: selC}));
   selC.value = 'bionica'; selC.dispatchEvent(new Evento('change', {target: selC}));
@@ -447,8 +453,10 @@ function el(document, tag, attrs = {}, hijos = []) {
   await dormir(40);
   assert.ok(dlg.querySelector('.sel-materia[data-clave=B103]') && dlg.querySelectorAll('.sel-materia').length < 72);
   dlg.querySelector('.sel-materia[data-clave=B103]').click();
-  assert.equal(dlg.open, false, 'al elegir, la ventana se cierra');
-  assert.equal(c.location.hash, '#/upiita/guia/programas/bionica/B103');
+  await dormir(30);
+  assert.ok(document.querySelector('.tmr-panel') && !document.querySelector('.tmr-panel').hidden);
+  assert.equal(document.querySelector('.tmr-panel .tmr-completa').textContent, 'Ver temario completo');
+  document.querySelector('.tmr-panel-x').click();
   T.abrirSelector({carrera: 'bionica'});
   assert.equal(document.querySelector('dialog').querySelectorAll('.sel-materia').length, 72, 'cada vez que se abre, sin la búsqueda anterior');
   document.querySelector('dialog').dispatchEvent(new Evento('cancel'));
@@ -467,7 +475,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(c.S.lfocus, 'B101', 'el nombre expande la ficha de la lista');
   fila.querySelector('.tl-want').dispatchEvent(new Evento('click', {target: fila.querySelector('.tl-want')}));
   igual(toggles, ['B101', 'B102', 'B106', 'B101', 'B101', 'B101']);
-  assert.equal(T.estado.panel, null, 'el mapa no abre el lector');
+  assert.equal(T.estado.panel.hidden, true, 'el panel compartido queda cerrado tras cerrar la ficha');
   igual(almacen, {mmodo: {B: 'explorar'}}, 'no se lee ni se escribe el modo antiguo');
   assert.equal(caja1.getAttribute('aria-label'), 'B101 · original');
   assert.equal(caja1.getAttribute('aria-pressed'), 'false');
@@ -502,7 +510,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(panel.querySelector('.tmr-recurso'), null, 'el vistazo no lista recursos: eso es de la ficha completa');
   assert.equal(panel.querySelector('.tmr-oficial'), null, 'ya no hay una tercera vista «Leer el programa completo aquí»');
   assert.equal(panel.querySelector('.tmr-completa').getAttribute('href'), '#/upiita/guia/programas/bionica/B101');
-  assert.equal(panel.querySelector('.tmr-completa').textContent, 'Ver ficha completa');
+  assert.equal(panel.querySelector('.tmr-completa').textContent, 'Ver temario completo');
   const pdf = panel.querySelector('.tmr-pdf'), regB101 = bionica.find(r => r.clave === 'B101');
   assert.equal(pdf.textContent, 'Ver programa original (PDF)');
   assert.equal(pdf.getAttribute('href'), regB101.pdf);
