@@ -66,6 +66,7 @@
     const p = document.getElementById('sate-carga'); p.hidden = false; p.textContent = 'No se pudo cargar la vista. Recarga la página. ' + e.message;
   }
   function script(src) {
+    const medida = !cargas.has(src) && window.SateMedicion?.iniciar('recurso', src);
     if (!cargas.has(src)) cargas.set(src, new Promise((ok, no) => {
       const s = document.createElement('script'); s.src = src;
       if(/^https?:/.test(src)){
@@ -73,17 +74,22 @@
         if(!integridad[src]){cargas.delete(src);no(new Error('Biblioteca externa sin integridad: '+src));return}
         s.integrity=integridad[src];s.crossOrigin='anonymous';
       }
-      s.onload = () => { window.SateMedicion?.instrumentar(); ok(); }; s.onerror = () => { cargas.delete(src); no(new Error('Archivo: ' + src)); };
+      s.onload = () => { window.SateMedicion?.terminar(medida); window.SateMedicion?.instrumentar(); ok(); }; s.onerror = () => { window.SateMedicion?.terminar(medida,{error:true}); cargas.delete(src); no(new Error('Archivo: ' + src)); };
       document.head.appendChild(s);
     }));
     return cargas.get(src);
   }
   const datosCache = new Map();
   function jsonURL(url) {
+    const medida = !datosCache.has(url) && window.SateMedicion?.iniciar('recurso', url);
     if (!datosCache.has(url)) datosCache.set(url, fetch(url).then(r => {
       if (!r.ok) throw new Error(url + ': HTTP ' + r.status);
-      return r.json();
-    }).catch(e => { datosCache.delete(url); throw e; }));
+      if (!window.SateMedicion) return r.json();
+      return r.text().then(src => {
+        window.SateMedicion?.terminar(medida);
+        return window.SateMedicion ? window.SateMedicion.render('parse JSON ' + url, () => JSON.parse(src)) : JSON.parse(src);
+      });
+    }).catch(e => { window.SateMedicion?.terminar(medida,{error:true}); datosCache.delete(url); throw e; }));
     return datosCache.get(url);
   }
   const json = nombre => jsonURL('datos/' + u + '/' + nombre + '.json');
@@ -248,10 +254,10 @@
     if (window.requestAnimationFrame) await new Promise(ok => requestAnimationFrame(() => setTimeout(ok, 0)));
     if (v !== version) return;
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
-    if (!cfg.generica && (r.pestana === 'mapa' || r.pestana === 'horarios')) await cargarOferta();
-    const m = await modulo(r.pestana);
-    if (r.pestana === 'guia' && cfg.guiaDatos) await json('guia');
-    if (r.pestana === 'temarios') await json('temarios/indice');
+    const [m] = await Promise.all([modulo(r.pestana),
+      !cfg.generica && (r.pestana === 'mapa' || r.pestana === 'horarios') ? cargarOferta() : null,
+      r.pestana === 'guia' && cfg.guiaDatos ? json('guia') : null,
+      r.pestana === 'temarios' ? json('temarios/indice') : null]);
     if (v !== version) return;
     if (r.pestana === 'tramites' && r.tramite) await prepararTramite(r.tramite);
     if (r.pestana === 'tramites' && r.tramite === 'electivas') await SateElectivas.preparar();
@@ -259,7 +265,11 @@
     actual = r;
     if (location.hash.startsWith('#/') && location.hash !== r.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
     api.estado.tab = r.pestana === 'horarios' ? 'hor' : 'tray';
-    if (!montados.has(r.pestana)) { m.montar?.(); montados.add(r.pestana); }
+    if (!montados.has(r.pestana)) {
+      if (window.SateMedicion) window.SateMedicion.render('montar ' + r.pestana, () => m.montar?.());
+      else m.montar?.();
+      montados.add(r.pestana);
+    }
     document.getElementById('v-tray').hidden = r.pestana !== 'mapa';
     document.getElementById('sate-trayectoria').hidden = r.pestana !== 'trayectoria';
     document.getElementById('sate-calendario').hidden = r.pestana !== 'calendario';
@@ -272,24 +282,24 @@
     panel.setAttribute('aria-labelledby',tabs.querySelector('[data-id="'+marca+'"]').id);
     api.store.set('ruta', r.hash);
     document.getElementById('sate-carga').hidden = true;
-    repintar();
+    await repintar();
     } catch (e) {
       if (v == null || v === version) throw e;
       console.debug('SATE: carga de ruta sustituida', {pestana:r.pestana, mensaje:e.message});
-    } finally { window.SateMedicion?.terminar(medida); }
+    } finally { window.SateMedicion?.terminar(medida, {desdeNavegacion:performance.now(), sustituida:v !== version}); }
   }
   function repintar() {
     if (!actual) return;
     if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios','guia'].includes(actual.pestana)) { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos();
     const m = window.SateMedicion;
-    if (m) m.render(actual.pestana, () => modulos[actual.pestana].mostrar(actual));
-    else modulos[actual.pestana].mostrar(actual);
+    const pendiente = m ? m.render(actual.pestana, () => modulos[actual.pestana].mostrar(actual)) : modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
     document.getElementById('sate-oferta-periodo').hidden=cfg.generica||actual.pestana!=='horarios';
     document.getElementById('notice').hidden=cfg.generica||actual.pestana!=='horarios';
     document.getElementById('mobnote').hidden=true;
+    return pendiente;
   }
   async function iniciarRecorrido() {
     try { await script('recorrido.js'); await SateRecorrido.iniciar(); }
@@ -339,6 +349,12 @@
       });
       recalcularPestanas();
       if(actual&&(actual.padre || actual.pestana)!==activa)activar(SateRutas.ruta('#/'+u+'/'+activa,u,config)).catch(error);
+  }
+  // Una fuente externa lenta no debe detener scripts ni la primera pintura.
+  const fuentes = document.getElementById('sate-fuentes');
+  if (fuentes) {
+    if (fuentes.sheet) fuentes.media = 'all';
+    else fuentes.addEventListener('load', () => { fuentes.media = 'all'; }, {once:true});
   }
   // Sin el parámetro no se descarga ni se ejecuta el módulo de diagnóstico.
   // Medición interna: solo con ?medir en un servidor local (el archivo no se publica).
