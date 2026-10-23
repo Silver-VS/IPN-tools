@@ -742,8 +742,8 @@ footer{margin-top:var(--ipn-esp-6);padding-top:var(--ipn-esp-4);border-top:1px s
 .plan-marca{font-weight:700;margin-right:var(--ipn-esp-1)}
 .box.want.plan-2,.box.want.plan-2.offered-no{background:var(--plan-segundo);border-color:var(--plan-segundo);color:var(--plan-segundo-fg)}
 .box.want::after{content:none}
-.box .plan-marca{position:absolute;top:0;right:6px;transform:translateY(-55%);margin:0;padding:0 3px;border-radius:4px;background:var(--ipn-superficie);color:var(--ipn-texto);font-size:.85em;line-height:1.3/* escala del mapa */}
-/* La marca va sobre el borde superior: la caja conserva su altura y su texto centrado al elegirla */
+.box .plan-marca{position:absolute;top:2px;right:3px;margin:0;padding:0 2px;border-radius:3px;background:color-mix(in srgb,var(--ipn-superficie) 70%,transparent);color:var(--ipn-texto);font-size:.72em;line-height:1.25/* escala del mapa */}
+/* La marca va dentro de la esquina (la caja recorta lo que sale); sin relleno extra: la caja conserva su altura y su texto centrado */
 .box.plan-otra,.tl-row.plan-otra{opacity:.6}
 .plan-resumen .plan-vista{font-weight:700;background:var(--ipn-acento-suave)}
 .plan-bandeja .plan-resumen:has(.plan-vista){display:flex;flex-wrap:wrap;white-space:normal}
