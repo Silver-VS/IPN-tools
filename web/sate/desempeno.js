@@ -11,25 +11,38 @@ const cargarPlot=()=>window.Plot?Promise.resolve():PLOT_P||(PLOT_P=LIB_PLOT.redu
   };document.head.appendChild(s)})),Promise.resolve()));
 
 let ST_RENDER=0;
-const trayectoriaAbierta=(id,inicial=false)=>store.get('trayectoria.seccion.'+id,!MQ_PHONE.matches&&inicial);
+const trayectoriaAbierta=(id,inicial=false)=>store.get('trayectoria.seccion.'+id,id==='kardex'||!MQ_PHONE.matches&&inicial);
 const KX_FILTRO={};
 const kardexFiltro=()=>({periodo:'*',estado:'*',...store.get('trayectoria.kardex.'+S.car,{}),...KX_FILTRO[S.car]});
 const filasKardex=()=>{
   const c=cur(), A=ALUMNO;
   return [...(A.acreditadas||[]).filter(r=>r&&notaValida(r[1])!=null).map(r=>({...r,acreditada:true})),
     ...(A.kardex_reprobadas||[]).filter(r=>r&&Number.isFinite(+r[1])&&+r[1]>=0&&+r[1]<6).map(r=>({...r,acreditada:false}))]
-    .map(r=>({clave:r[0],cal:+r[1],periodo:r[2]||'',codigo:r[3]||'',nombre:pretty(c[r[0]]?.[0]||r[0]),acreditada:r.acreditada}))
+    .map(r=>({clave:r[0],cal:+r[1],periodo:r[2]||'',codigo:r[3]||'',nombre:pretty(c[r[0]]?.[0]||ALUMNO.materias?.[r[0]]?.[0]||r[0]),cr:ALUMNO.creditos_materias?.[r[0]]??c[r[0]]?.[1]??null,acreditada:r.acreditada,adeudo:!r.acreditada&&!(A.acreditadas||[]).some(a=>a[0]===r[0])}))
     .sort((a,b)=>(perIdx(b.periodo)??-1)-(perIdx(a.periodo)??-1)||a.clave.localeCompare(b.clave,'es'));
 };
 function renderKardexLista(){
-  const rows=filasKardex(), filtro=kardexFiltro(), periodos=[...new Set(rows.map(r=>r.periodo).filter(Boolean))].sort((a,b)=>(perIdx(b)??-1)-(perIdx(a)??-1));
+  const rows=filasKardex(), filtro=kardexFiltro(), periodos=[...new Set(rows.map(r=>r.periodo).filter(Boolean))].sort((a,b)=>(perIdx(a)??-1)-(perIdx(b)??-1));
   const aprobadas=(ALUMNO.acreditadas||[]).map(r=>notaValida(r?.[1])).filter(v=>v!=null), media=aprobadas.length?aprobadas.reduce((a,b)=>a+b,0)/aprobadas.length:null;
-  const visibles=rows.filter(r=>(filtro.periodo==='*'||r.periodo===filtro.periodo)&&(filtro.estado==='*'||(filtro.estado==='acreditadas')===r.acreditada));
-  $('#kx-periodo').innerHTML=`<option value="*">${esc(SATE.texto('sate.trayectoria.kardex_todos'))}</option>${periodos.map(p=>`<option value="${esc(p)}"${p===filtro.periodo?' selected':''}>${esc(p)}</option>`).join('')}`;
-  $('#kx-estado').value=filtro.estado;
+  const tx=(k,v)=>esc(SATE.texto('sate.trayectoria.kardex_'+k,v)), veces=k=>Math.max(rows.filter(r=>r.clave===k).length,...(ALUMNO.reprobadas_periodo||[]).filter(r=>r[0]===k).map(r=>+r[2]||1));
+  const visibles=rows.filter(r=>(filtro.periodo==='*'||r.periodo===filtro.periodo)&&(filtro.estado==='*'||filtro.estado==='acreditadas'&&r.acreditada||filtro.estado==='reprobadas'&&!r.acreditada||filtro.estado==='multi'&&(veces(r.clave)>=2||/^(EXT|ETS|REC)$/.test(r.codigo))||filtro.estado==='eqv'&&/^(EQV|REV|DIC)$/.test(r.codigo))).sort((a,b)=>Number(b.adeudo)-Number(a.adeudo));
+  const chip=r=>`<span class="kx-nota kx-g${r.cal>=9?'9':r.cal>=8?'8':r.cal>=6?'6':'5'}" title="${esc(r.clave+' · '+r.nombre+' · '+(FORMAS[r.codigo]||r.codigo))}">${r.cal}${({EXT:'E',ETS:'T',REC:'R',EQV:'Q',REV:'Q',DIC:'Q'})[r.codigo]?`<sub>${({EXT:'E',ETS:'T',REC:'R',EQV:'Q',REV:'Q',DIC:'Q'})[r.codigo]}</sub>`:''}</span>`;
+  const medias=periodos.map(p=>{const rs=rows.filter(r=>r.periodo===p);return rs.reduce((s,r)=>s+r.cal,0)/rs.length});
+  $('#kx-periodos').innerHTML=periodos.map((p,i)=>{const rs=rows.filter(r=>r.periodo===p), delta=i?medias[i]-medias[i-1]:0, cr=rs.every(r=>r.cr!=null)?fmtCr(rs.reduce((s,r)=>s+(r.acreditada?+r.cr:0),0)):'—';return `<button type="button" class="kx-periodo" data-kx-periodo="${esc(p)}" aria-pressed="${filtro.periodo===p}"><span class="kx-periodo-cab"><b>${esc(p)}</b><strong>${medias[i].toFixed(2)} <small class="${delta<0?'kx-baja':'kx-sube'}">${i?delta>0?'▲':delta<0?'▼':'=':''}</small></strong></span><span class="kx-fichas">${rs.map(chip).join('')}</span><span class="kx-periodo-pie">${tx('unidades',{n:rs.length})}<span>${cr} ${tx('cr')}</span></span></button>`}).join('');
+  $('#kx-filtros').innerHTML=[['*','todos'],['reprobadas','riesgo'],['multi','multi'],['eqv','eqv']].map(([v,k])=>`<button type="button" class="kx-filtro" data-kx-estado="${v}" aria-pressed="${filtro.estado===v}">${tx(k)}</button>`).join('');
+  $('#kx-todos').setAttribute('aria-pressed',String(filtro.periodo==='*'));
+  $('#kx-cuenta').textContent=SATE.texto('sate.trayectoria.kardex_cuenta',{n:visibles.length,m:rows.length});
   $('#kx-prom-oficial').textContent=ALUMNO.promedio==null?'—':(+ALUMNO.promedio).toFixed(2);
   $('#kx-prom-acreditadas').textContent=media==null?'—':media.toFixed(2);
-  $('#kx-lista').innerHTML=visibles.length?visibles.map(r=>`<li><span><b>${esc(r.clave)}</b> · ${esc(r.nombre)}${!r.acreditada?` <strong class="kx-marca">${esc(SATE.texto('sate.trayectoria.kardex_adeudo'))}</strong>`:''}</span><span>${r.periodo?esc(r.periodo):'—'} · ${r.cal} · ${esc(r.codigo)}</span></li>`).join(''):`<li>${esc(SATE.texto('sate.trayectoria.kardex_vacio'))}</li>`;
+  const proy=promOficialSim();$('#kx-prom-proyeccion').textContent=proy?`${proy.exacto?'':'≈ '}${proy.despues.toFixed(2)}`:'—';
+  let grupo=null;
+  $('#kx-lista').innerHTML=visibles.length?visibles.map(r=>{const g=r.adeudo?tx('adeudos'):esc(r.periodo)||'—', cab=g!==grupo?`<tr class="kx-grupo"><th colspan="6">${g}</th></tr>`:'';grupo=g;return `${cab}<tr${r.adeudo?' class="kx-adeudo"':''}><td data-label="${tx('ua')}"><b>${esc(r.clave)}</b> · ${esc(r.nombre)}${r.adeudo?` <strong class="kx-marca">${tx('adeudo')}</strong>`:''}</td><td data-label="${tx('periodo')}">${esc(r.periodo)||'—'}</td><td data-label="${tx('nota')}">${chip(r)}</td><td data-label="${tx('forma')}">${esc(FORMAS[r.codigo]||r.codigo)||'—'}</td><td data-label="${tx('veces')}">${veces(r.clave)}</td><td data-label="${tx('creditos')}">${r.cr==null?'—':fmtCr(r.cr)}</td></tr>`}).join(''):`<tr><td colspan="6">${tx('vacio')}</td></tr>`;
+}
+function kardexCurso(){
+  const tx=k=>esc(SATE.texto('sate.trayectoria.kardex_'+k)), A=ALUMNO;
+  // El lector actual no exporta parciales. No se deducen de la simulación ni se rellenan con notas ficticias.
+  const claves=[...new Set(A.en_curso??(A.horario_inscrito||[]).map(h=>h[1]))];
+  return `<table class="kx-tabla kx-curso"><thead><tr>${['ua','grupo','creditos','p1','p2','p3','final'].map(k=>`<th scope="col">${tx(k)}</th>`).join('')}</tr></thead><tbody>${claves.map(k=>{const h=(A.horario_inscrito||[]).find(h=>h[1]===k), cr=A.creditos_materias?.[k]??cur()[k]?.[1];return `<tr><td data-label="${tx('ua')}"><b>${esc(k)}</b> · ${esc(pretty(cur()[k]?.[0]||h?.[2]||k))}</td><td data-label="${tx('grupo')}">${esc(h?.[0]||'—')}</td><td data-label="${tx('creditos')}">${cr==null?'—':fmtCr(cr)}</td>${['p1','p2','p3','final'].map(c=>`<td data-label="${tx(c)}">—</td>`).join('')}</tr>`}).join('')||`<tr><td colspan="7">${tx('sin_curso')}</td></tr>`}</tbody></table>`;
 }
 function prepararSeccion(el,id,dibujar){
   el.open=trayectoriaAbierta(id,id==='kardex'||id==='escenario'||id==='simulacion');
@@ -162,10 +175,13 @@ async function renderStatsVista(){
   const focoSim=$('#desempeno-simulacion').contains(document.activeElement)?document.activeElement:null;
   $('#sate-trayectoria').appendChild($('#desempeno-simulacion'));
   box.innerHTML=`${D.avisos.length?`<p class="st-note">${D.avisos.map(esc).join(' ')}</p>`:''}${SateUI.indicadoresTrayectoria(D,{esc,fmtCr,info,SATE})}
-    <section class="trayectoria-kardex-curso" aria-labelledby="kx-curso-titulo"><h3 id="kx-curso-titulo">${esc(SATE.texto('sate.trayectoria.kardex_curso'))}</h3><ul class="kx-lista">${(A.en_curso||[]).map(k=>`<li><span><b>${esc(k)}</b> · ${esc(pretty(cur()[k]?.[0]||k))}</span><span>${esc(SATE.texto('sate.desempeno.en_curso'))}</span></li>`).join('')||`<li>${esc(SATE.texto('sate.trayectoria.kardex_sin_curso'))}</li>`}</ul></section>
-    <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}<small>${esc(SATE.texto('sate.trayectoria.kardex_resumen',{n:Dk.rows.length}))}</small></summary><div>
-      <div class="kx-controles"><label>${esc(SATE.texto('sate.trayectoria.kardex_periodo'))}<select id="kx-periodo"></select></label><label>${esc(SATE.texto('sate.trayectoria.kardex_estado'))}<select id="kx-estado"><option value="*">${esc(SATE.texto('sate.trayectoria.kardex_todos'))}</option><option value="acreditadas">${esc(SATE.texto('sate.trayectoria.kardex_acreditadas'))}</option><option value="reprobadas">${esc(SATE.texto('sate.trayectoria.kardex_reprobadas'))}</option></select></label></div>
-      <div class="kx-promedios"><span>${esc(SATE.texto('sate.trayectoria.kardex_prom_oficial'))} <b id="kx-prom-oficial"></b></span><span>${esc(SATE.texto('sate.trayectoria.kardex_prom_acreditadas'))} <b id="kx-prom-acreditadas"></b></span></div><ul id="kx-lista" class="kx-lista"></ul>
+    <header class="kx-cabecera"><h3>${esc(SATE.texto('sate.trayectoria.kardex_calificaciones'))}</h3><div class="kx-promedios">${[['oficial','prom_oficial'],['acreditadas','prom_acreditadas'],['proyeccion','prom_proyeccion']].map(([id,key])=>`<div><span>${esc(SATE.texto('sate.trayectoria.kardex_'+key))}</span><strong id="kx-prom-${id}"></strong></div>`).join('')}</div></header>
+    <section class="trayectoria-kardex-curso" aria-labelledby="kx-curso-titulo"><h3 id="kx-curso-titulo">${esc(SATE.texto('sate.trayectoria.kardex_curso'))}</h3>${kardexCurso()}</section>
+    <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}</summary><div class="kx-bloque">
+      <button type="button" id="kx-todos" class="kx-filtro" data-kx-periodo="*">${esc(SATE.texto('sate.trayectoria.kardex_periodos_todos'))}</button><div id="kx-periodos" class="kx-periodos" role="group" aria-label="${esc(SATE.texto('sate.trayectoria.kardex_periodo'))}"></div>
+      <p class="kx-leyenda">${esc(SATE.texto('sate.trayectoria.kardex_leyenda'))}</p>
+      <div class="kx-controles"><div id="kx-filtros" role="group" aria-label="${esc(SATE.texto('sate.trayectoria.kardex_estado'))}"></div><span id="kx-cuenta" role="status" aria-live="polite"></span></div>
+      <table class="kx-tabla"><thead><tr>${['ua','periodo','nota','forma','veces','creditos'].map(k=>`<th scope="col">${esc(SATE.texto('sate.trayectoria.kardex_'+k))}</th>`).join('')}</tr></thead><tbody id="kx-lista"></tbody></table>
     </div></details>
     <div class="charts"><figure class="ch-wide"><figcaption><h3>Tu camino en la carrera ${simTag('camino')}</h3>${ley([['cuadro','var(--ipn-acento)','Acreditado'],['rayado','var(--ipn-acento)',Dc.simulado?'Simulado':'En curso'],['cuadro','var(--ipn-linea)','Te falta'],['marca','var(--ipn-acento)','Estimado a tu ritmo'],...(totalPer!=null&&plazo.max&&totalPer>plazo.max?[['anillo','var(--ch-alert)','Rebasa el plazo']]:[])])}</figcaption><div id="ch-camino"></div></figure></div>
     <div id="trayectoria-sim-slot"></div>
@@ -229,8 +245,13 @@ const cambiarMeta=e=>{
   $('#meta-periodos').setAttribute('aria-invalid',String(!metaCreditos(D,cfg.periodos,cfg.actual).valida));
 };
 $('#kstats').addEventListener('input',cambiarMeta);
-$('#kstats').addEventListener('change',e=>{if(!['kx-periodo','kx-estado'].includes(e.target.id))return;
-  const cfg={...kardexFiltro(),[e.target.id==='kx-periodo'?'periodo':'estado']:e.target.value};KX_FILTRO[S.car]=cfg;store.set('trayectoria.kardex.'+S.car,cfg);renderKardexLista()});
+$('#kstats').addEventListener('click',e=>{
+  const boton=e.target.closest('[data-kx-periodo],[data-kx-estado]');if(!boton)return;
+  const campo=boton.dataset.kxPeriodo!=null?'periodo':'estado', valor=boton.dataset.kxPeriodo??boton.dataset.kxEstado;
+  const cfg={...kardexFiltro(),[campo]:valor};KX_FILTRO[S.car]=cfg;store.set('trayectoria.kardex.'+S.car,cfg);renderKardexLista();
+  // La tira se reconstruye al filtrar: conservar el foco en el botón elegido.
+  document.querySelector(`[data-kx-${campo}="${CSS.escape(valor)}"]`)?.focus();
+});
 $('#kstats').addEventListener('input',e=>{if(e.target.id!=='prom-meta')return;const v=+e.target.value;if(!(v>=6&&v<=10))return;
   store.set('promMeta.'+S.car,v);store.set('pmCal.'+S.car,{});const D=statsDatos(),M=promMeta(D,v);
   $('#pm-res').innerHTML=promMetaHtml(M)});

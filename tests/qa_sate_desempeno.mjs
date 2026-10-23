@@ -4,6 +4,10 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
   const leer=f=>readFileSync(f,'utf8'), html=leer('web/dist/sate/index.html');
 const config=JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
+const cssKx=leer('web/sate/componentes.css');
+assert.match(cssKx,/\.kx-periodos\{[^}]*overflow-x:auto;[^}]*max-width:100%/,'R8: desplazamiento contenido en la tira');
+assert.match(cssKx,/@media\(max-width:639px\)\{[\s\S]*?\.kx-tabla[^}]*display:block/,'R8: a 375 y 320 la tabla usa tarjetas');
+assert.match(cssKx,/\.kx-bloque[^}]*min-width:0;max-width:100%/,'R8: el bloque puede encogerse sin expandir la página');
 assert.equal(config.textos['sate.trayectoria.y_si'],'Escenarios de avance');
 assert.equal(config.textos['sate.trayectoria.y_si_resumen'],'Proyecta tu trayectoria con distintas cargas y resultados');
 assert.match(html,/\.charts \.trayectoria-afinidades figcaption\{[^}]*min-height:0;[^}]*flex-wrap:wrap/,'Leyenda compacta y adaptable a teléfono');
@@ -79,7 +83,8 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(solicitudes.length,0);
   SATE.actual.pestana='trayectoria';pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.equal(solicitudes.length,0,'F: secciones cerradas no cargan Plot');
-  for(const id of ['kardex','escenario','areas','observaciones'])assert.equal(document.querySelector('#trayectoria-'+id).open,false,'F: teléfono cerrado '+id);
+  assert.equal(document.querySelector('#trayectoria-kardex').open,true,'R8: tira de periodos visible también en teléfono');
+  for(const id of ['escenario','areas','observaciones'])assert.equal(document.querySelector('#trayectoria-'+id).open,false,'F: teléfono cerrado '+id);
   const areas=document.querySelector('#trayectoria-areas');
   areas.open=true;pendiente=areas.eventos.toggle.at(-1)();
   areas.open=false;areas.eventos.toggle.at(-1)();vaciarCuadros();await pendiente;
@@ -111,16 +116,44 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.match(orden,/<details class="trayectoria-areas-detalle"><summary>Ver detalle<\/summary>/,'REV1: datos de áreas plegados por omisión');
   assert.match(orden,/Escala 6–10 · línea: tu promedio sin reprobadas \([^)]*\) · acento: tus 2 mejores áreas/);
   assert.match(document.querySelector('#est-sim').innerHTML,/Simular fin de semestre/);
-  vm.runInContext("ALUMNO.kardex_reprobadas=[[Object.keys(cur())[0],5,'23/2','ORD']];ALUMNO.en_curso=[Object.keys(cur())[1]]",c);
+  vm.runInContext("ALUMNO.kardex_reprobadas=[[Object.keys(cur())[0],5,'23/2','ORD']];ALUMNO.acreditadas=ALUMNO.acreditadas.filter(a=>a[0]!==Object.keys(cur())[0]);ALUMNO.en_curso=[Object.keys(cur())[1]]",c);
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.match(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'Perfil ficticio adeuda resalta junto a la materia');
-  document.querySelector('#kx-estado').id='kx-estado';document.querySelector('#kx-estado').value='reprobadas';document.querySelector('#kstats').eventos.change.forEach(fn=>fn({target:document.querySelector('#kx-estado')}));
+  const filtrar=dataset=>document.querySelector('#kstats').eventos.click.forEach(fn=>fn({target:{closest:()=>({dataset})}}));
+  filtrar({kxEstado:'reprobadas'});
   assert.equal(vm.runInContext('KX_FILTRO[S.car]?.estado',c),'reprobadas','El control actualiza el filtro');
   assert.match(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'El filtro de reprobadas muestra adeudos');
-  assert.equal((document.querySelector('#kx-lista').innerHTML.match(/<li>/g)||[]).length,1,'El filtro excluye acreditadas');
+  assert.equal((document.querySelector('#kx-lista').innerHTML.match(/data-label="Calificación"/g)||[]).length,1,'El filtro excluye acreditadas');
   assert.equal(vm.runInContext('kardexFiltro().estado',c),'reprobadas','El filtro queda recordado por carrera');
-  document.querySelector('#kx-estado').value='acreditadas';document.querySelector('#kstats').eventos.change.forEach(fn=>fn({target:document.querySelector('#kx-estado')}));
+  filtrar({kxEstado:'acreditadas'});
   assert.doesNotMatch(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'El filtro de acreditadas oculta adeudos');
+  if(unidad==='upiita'){
+    const anterior=vm.runInContext('ALUMNO',c);
+    for(const nombre of ['desfase-dictamen-bionica','regular-mecatronica']){
+      c.perfilKx=JSON.parse(leer('data/perfiles-prueba/'+nombre+'.json'));
+      vm.runInContext('ALUMNO=perfilKx;S.car=ALUMNO.carrera;KX_FILTRO[S.car]={periodo:"*",estado:"*"};renderKardexLista()',c);
+      const n=vm.runInContext('filasKardex().length',c);
+      assert.equal(document.querySelector('#kx-cuenta').textContent,`Mostrando ${n} de ${n}`);
+      assert.match(document.querySelector('#kx-periodos').innerHTML,/kx-fichas/);
+      const periodo=vm.runInContext('filasKardex()[0].periodo',c);
+      filtrar({kxPeriodo:periodo});
+      assert.equal(vm.runInContext('kardexFiltro().periodo',c),periodo);
+      const np=vm.runInContext('filasKardex().filter(r=>r.periodo===kardexFiltro().periodo).length',c);
+      assert.equal(document.querySelector('#kx-cuenta').textContent,`Mostrando ${np} de ${n}`);
+      filtrar({kxPeriodo:'*'});
+      for(const estado of ['reprobadas','multi','eqv','*']){
+        filtrar({kxEstado:estado});
+        assert.match(document.querySelector('#kx-filtros').innerHTML,new RegExp(`data-kx-estado="${estado.replace('*','\\*')}" aria-pressed="true"`));
+        assert.doesNotMatch(document.querySelector('#kx-lista').innerHTML,/undefined|NaN/);
+        const esperado=vm.runInContext(`filasKardex().filter(r=>${estado==='reprobadas'?'!r.acreditada':estado==='eqv'?'/^(EQV|REV|DIC)$/.test(r.codigo)':estado==='multi'?'Math.max(filasKardex().filter(a=>a.clave===r.clave).length,...(ALUMNO.reprobadas_periodo||[]).filter(a=>a[0]===r.clave).map(a=>+a[2]||1))>=2||/^(EXT|ETS|REC)$/.test(r.codigo)':'true'}).length`,c);
+        assert.equal(document.querySelector('#kx-cuenta').textContent,`Mostrando ${esperado} de ${n}`,'R8: el contador refleja cada chip');
+      }
+      if(nombre.startsWith('desfase'))assert.match(document.querySelector('#kx-lista').innerHTML,/^<tr class="kx-grupo"><th colspan="6">Adeudos activos/);
+      assert.doesNotMatch(vm.runInContext('kardexCurso()',c),/undefined|NaN/);
+      assert.equal(document.querySelector('#kx-prom-oficial').textContent,(+c.perfilKx.promedio).toFixed(2),'R8: promedio SAES conservado, incluidas reprobadas');
+    }
+    c.perfilKx=anterior;vm.runInContext('ALUMNO=perfilKx;S.car=ALUMNO.carrera;KX_FILTRO[S.car]={periodo:"*",estado:"*"}',c);
+  }
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;assert.equal(solicitudes.length,2,'Carga única');
   // El chip es global y Quitar desactiva todas las comparaciones sin alterar el SAES.
   const real=vm.runInContext('JSON.stringify(ALUMNO)',c);
