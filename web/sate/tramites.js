@@ -19,6 +19,22 @@
   function enlaceGuia(id){const u=SATE_CONFIG.unidades[SATE_UNIDAD],r=u?.guiaDatos&&u.guiaTramites?.[id];return r?'#/'+SATE_UNIDAD+'/guia/'+r:''}
   function leer(id){try{return JSON.parse((window.IPNT?.almacen||localStorage).getItem('hu.tramite.'+id)||'null')}catch{return null}}
   const completados=new Map();
+  const DESCARTAR='hu.tramite.';
+  function descartar(def){
+    if(!window.confirm(tx('descartar_confirmacion')))return false;
+    try{if(IPNT.borrar)IPNT.borrar(DESCARTAR+def.id);else (window.IPNT?.almacen||localStorage).removeItem(DESCARTAR+def.id)}catch(e){console.error('Ventanilla: descarte fallido',{tramite:def.id,error:e.name});return false}
+    completados.delete(def.id);return true;
+  }
+  function miniatura(def,datos,ejemplo=false){
+    const nodo=el('div',null,'tramite-miniatura');nodo.setAttribute('aria-label',ejemplo?tx('miniatura_ejemplo'):tx('miniatura_avance'));
+    const marca=el('span',ejemplo?tx('ejemplo'):tx('miniatura_lleno'),'tramite-miniatura-marca');nodo.appendChild(marca);
+    const titulo=el('strong',def.titulo);nodo.appendChild(titulo);
+    const lista=el('dl',null,'tramite-miniatura-datos');
+    for(const p of def.pasos)for(const c of p.campos||[]){if(c.visible&&!c.visible(datos))continue;let filas=[];try{filas=c.revision?.(datos[c.id],datos)||[{texto:c.texto,valor:datos[c.id]}]}catch{}
+      for(const f of filas.slice(0,6)){const valor=String(f.valor||'');if(!valor)continue;lista.appendChild(el('dt',f.texto));lista.appendChild(el('dd',valor))}}
+    if(!lista.children.length)lista.appendChild(el('dd',tx('miniatura_datos_ejemplo')));
+    nodo.appendChild(lista);return nodo;
+  }
   function estado(borrador,aplicacion,ahora=Date.now()){
     if(aplicacion?.aplica===false)return {id:'no_aplica',motivo:aplicacion.motivo,accion:null};
     if(borrador?.listo)return {id:'listo',accion:'descargar'};
@@ -99,8 +115,7 @@
       def.preparar?.(m.datos,m.paso);confirmado=false;
       box.replaceChildren();
       const ultimo=m.paso===def.pasos.length,nombres=[...def.pasos.map(p=>p.titulo),def.revisarTitulo||tx('revisar')];
-      if(def.volver){const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));cabeza.appendChild(regreso('tramite-volver'));box.appendChild(cabeza)}
-      else box.appendChild(el('h2',def.titulo));
+      const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));if(def.volver)cabeza.appendChild(regreso('tramite-volver'));cabeza.appendChild(boton(tx('descartar'),()=>{if(descartar(def)){m.listo=false;for(const c of m.campos)if(c.sensible)m.datos[c.id]='';revocar();SATE.ir('tramites')}}));box.appendChild(cabeza);
       const lead=typeof def.lead==='string'?def.lead:'';if(lead)box.appendChild(el('p',lead,'tramite-lead'));
       const guia=enlaceGuia(def.id);if(guia){const g=SateUI.tarjetaNav({href:guia,titulo:tx('guia_titulo'),detalle:tx('guia_detalle'),compacta:true});g.className+=' tramite-guia';box.appendChild(g)}
       // Los pasos ya hechos se pueden volver a abrir; el activo y los pendientes no son botones.
@@ -131,6 +146,7 @@
           for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.className+=' tramite-sin-impresion tramite-texto';b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
         }));bloque.appendChild(resumen);pantalla.appendChild(bloque);
         def.revisar?.(pantalla,m.datos,bloque);
+        pantalla.appendChild(miniatura(def,m.datos,!leer(def.id)));
         if(def.confirmacion){const l=el('label',null,'tramite-campo'),n=el('input');n.type='checkbox';n.onchange=()=>confirmado=n.checked;l.appendChild(n);l.appendChild(el('span',def.confirmacion));pantalla.appendChild(l)}
       }else for(const c of def.pasos[m.paso].campos||[]){
         if(c.visible&&!c.visible(m.datos))continue;
@@ -163,10 +179,6 @@
       const acciones=el('div',null,'tramite-acciones');acciones.appendChild(el('span',tx('guardado'),'tramite-guardado'));
       if(m.paso>0)acciones.appendChild(boton(tx('atras'),()=>{m.atras();pintar()}));
       const primario=b=>{b.className+=' sate-btn--primario';acciones.appendChild(b);return b};
-      if(def.descartar)acciones.appendChild(boton(tx('descartar'),()=>{
-        if(!def.descartar())return;
-        m.listo=false;for(const c of m.campos)if(c.sensible)m.datos[c.id]='';revocar();SATE.ir('tramites');
-      }));
       if(m.paso<def.pasos.length)primario(boton(tx('continuar'),()=>{
         // Validar también al continuar; la escritura por sí sola no muestra errores.
         for(const c of def.pasos[m.paso].campos||[]){const n=box.querySelector('#tramite-'+def.id+'-'+c.id);if(n){if(!c.pintar&&!c.render)m.datos[c.id]=n.value;n.onblur()}}
@@ -256,6 +268,8 @@
         accion.className+=' tramite-fila-boton';accion.setAttribute('aria-haspopup','dialog');
         accion.appendChild(el('span',SATE.texto('sate.tramite.'+id+'.titulo'),'tramite-fila-titulo'));
         accion.appendChild(el('span',tx(id+'_para'),'tramite-fila-para'));
+        const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada,borrador=leer(id);
+        if(def)accion.appendChild(miniatura(def,modelo(def,borrador).datos,!borrador));
         const estadoFila=el('span',tx('estado_'+e.id),'tramite-estado'+(e.id==='listo'?' ok':e.id==='progreso'?' curso':''));
         estadoFila.setAttribute('role','status');accion.appendChild(estadoFila);
         if(e.id==='progreso')accion.appendChild(el('span',tx('avance',e),'tramite-fila-meta'));

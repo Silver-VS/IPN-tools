@@ -118,7 +118,6 @@
         {titulo:tx('paso_motivo'),ayuda:tx('paso_motivo_ayuda_'+tipo),campos:[campoAviso(tipo),campoMotivo(tipo),campoExplicacion(tipo,n=>limiteExplicacion=n),campoPeriodo(tipo),...(tipo==='temporal'?[campoPeriodos()]:[])]}
       ],
       descargaTexto:tx('descargar'),archivo:id+'.pdf',faltante,generar,previsualizar:generar,
-      descartar:()=>{if(!window.confirm(tx('descartar_confirmacion')))return false;IPNT.borrar?.('hu.tramite.'+id);if(!IPNT.borrar)(window.IPNT?.almacen||localStorage).removeItem('hu.tramite.'+id);return true},
       revisar(pantalla){
         const oficial=el('section',null,'tramite-oficial');
         oficial.appendChild(el('h4',tx('oficial_titulo')));
