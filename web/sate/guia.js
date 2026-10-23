@@ -196,13 +196,19 @@
     return E.reglamentos.get(doc);
   }
   function botonArticulo(doc, n, texto) {
-    const b = h('button', { type: 'button', 'class': 'guia-enlace', texto });
+    const b = h('button', { type: 'button', 'class': 'sate-enlace-reglamento', texto });
     b.addEventListener('click', () => SATE.articulo(doc, n));
     return b;
   }
   function enLinea(texto, d) {
-    return marcas(String(texto || '').replace(/\{unidad\}/g, () => cfg().siglas || unidad())).map(p => {
-      if (p.tipo === 'a') return botonArticulo(p.clave, p.n, p.texto);
+    const partes = marcas(String(texto || '').replace(/\{unidad\}/g, () => cfg().siglas || unidad()));
+    return partes.map((p, i) => {
+      if (!p.tipo && i && partes[i - 1].tipo === 'a' && p.texto.startsWith(').')) return document.createTextNode(p.texto.slice(2));
+      if (p.tipo === 'a') {
+        const siguiente = partes[i + 1];
+        if (siguiente && !siguiente.tipo && siguiente.texto.startsWith(').')) return h('span', { 'class': 'sate-cita-reglamento' }, [botonArticulo(p.clave, p.n, p.texto), document.createTextNode(').')]);
+        return botonArticulo(p.clave, p.n, p.texto);
+      }
       if (p.tipo === 'g' && d.glosario?.[p.clave]) {
         const g = d.glosario[p.clave];
         return SateUI.definicion(p.texto, g.termino, g.definicion);
@@ -340,12 +346,11 @@
   /* ---------- apartado de preguntas ---------- */
   function apartadoPreguntas(raizGuia, d, apartado, abrirId) {
     const todas = d.preguntas.filter(p => p.apartado === apartado);
-    const etapas = (d.etapas || []).filter(e => todas.some(p => p.etapa === e.id));
+    const etapas = d.etapas || [];
     const cab = cabecera([...migasBase(), { texto: tituloApartado(apartado) }], tituloApartado(apartado), t('sate.guia.' + apartado + '_intro'));
     let etapa = todas.find(p => p.id === abrirId)?.etapa || etapas[0]?.id, elegido = abrirId;
     const pista = h('ol', { 'class': 'guia-etapas' });
     const panel = h('div', { 'class': 'guia-panel' });
-    const resumen = h('p', { 'class': 'guia-resumen', role: 'status', 'aria-live': 'polite' });
     const buscar = SateUI.buscador({ etiqueta: t('sate.guia.buscar_apartado_etiqueta'), marcador: t('sate.guia.buscar_apartado_marcador'), id: 'guia-qa', alCambiar: () => { elegido = null; pintar(); } });
     function pintar() {
       const consulta = terminos(buscar.entrada.value).length;
@@ -353,7 +358,8 @@
       const ancho = raiz.matchMedia('(min-width:900px)').matches;
       if (!visibles.some(p => p.id === elegido)) elegido = ancho ? visibles[0]?.id : null;
       pista.replaceChildren(...etapas.map((e, i) => {
-        const b = h('button', { type: 'button', 'aria-current': e.id === etapa && !consulta ? 'step' : null, 'aria-label': t(e.titulo), title: t(e.titulo) }, [h('span', { 'class': 'guia-etapa-num', texto: String((d.etapas || []).indexOf(e) + 1) }), h('span', { 'class': 'guia-etapa-nombre', texto: t(e.titulo) })]);
+        const habilitada = todas.some(p => p.etapa === e.id);
+        const b = h('button', { type: 'button', disabled: !habilitada, 'aria-current': e.id === etapa && !consulta ? 'step' : null, 'aria-label': t(e.titulo), title: t(e.titulo) }, [h('span', { 'class': 'guia-etapa-num', texto: String(i + 1) }), h('span', { 'class': 'guia-etapa-nombre', texto: t(e.titulo) })]);
         b.addEventListener('click', () => { etapa = e.id; elegido = null; buscar.entrada.value = ''; pintar(); pista.querySelector('[aria-current]')?.focus({ preventScroll: true }); });
         return h('li', {}, [b]);
       }));
@@ -375,14 +381,15 @@
         } else li.appendChild(h('div', { id: 'respuesta-' + p.id, hidden: true }));
         lista.appendChild(li);
       }
-      panel.replaceChildren(h('section', {}, [h('h3', { texto: consulta ? t('sate.guia.buscar_apartado_etiqueta') : t(etapas.find(e => e.id === etapa)?.titulo || 'sate.guia.buscar_apartado_etiqueta') }), lista]), detalle);
-      resumen.textContent = t(visibles.length ? 'sate.guia.resultados_preguntas' : 'sate.guia.sin_resultados_preguntas', { n: visibles.length });
+      const tituloEtapa = consulta ? t('sate.guia.buscar_apartado_etiqueta') : t(etapas.find(e => e.id === etapa)?.titulo || 'sate.guia.buscar_apartado_etiqueta');
+      const titulo = h('h3', {}, [document.createTextNode(tituloEtapa), document.createTextNode(' · ' + t('sate.guia.detalle_preguntas', { n: visibles.length }))]);
+      panel.replaceChildren(h('section', {}, [titulo, lista]), detalle);
     }
     const cambio = () => pintar();
     const mq = raiz.matchMedia('(min-width:900px)');
     mq.addEventListener?.('change', cambio);
     limpiarLector = () => mq.removeEventListener?.('change', cambio);
-    raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado' }, [buscar.raiz, resumen, pista, panel]));
+    raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado' }, [buscar.raiz, pista, panel]));
     pintar();
     return { titulo: cab.titulo };
   }

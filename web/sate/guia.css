@@ -3,13 +3,15 @@
    viven en web/sate/componentes.css. */
 .guia-etapas{display:flex;flex-wrap:wrap;list-style:none;margin:0;padding:0;min-width:0}
 .guia-etapas li{flex:1 1 44px;min-width:44px;position:relative}
-.guia-etapas li+li::before{content:"";position:absolute;top:22px;left:-50%;right:50%;height:2px;background:var(--ipn-linea)}
-.guia-etapas button{position:relative;display:flex;flex-direction:column;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:44px;min-height:var(--ipn-control-alto);padding:0;border:0;background:none;color:var(--ipn-tenue);font:inherit;cursor:pointer}
+.guia-etapas li+li::before{content:"";position:absolute;z-index:0;top:22px;left:-50%;right:50%;height:2px;background:var(--ipn-linea)}
+.guia-etapas button{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:44px;min-height:var(--ipn-control-alto);padding:0;border:0;background:none;color:var(--ipn-tenue);font:inherit;cursor:pointer}
+.guia-etapas button:disabled{cursor:not-allowed;opacity:.55}
 .guia-etapa-num{box-sizing:border-box;display:grid;place-items:center;width:44px;height:44px;border:2px solid var(--ipn-linea);border-radius:var(--ipn-radio-circulo);background:var(--ipn-fondo)}
 .guia-etapas [aria-current] .guia-etapa-num{background:var(--ipn-acento);border-color:var(--ipn-acento);color:var(--ipn-sobre-acento)}
 .guia-etapa-nombre{font-size:var(--ipn-tamano-s);text-align:center;overflow-wrap:anywhere}
 .guia-panel,.guia-directorio{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--ipn-esp-6);align-items:start;min-width:0}
 .guia-panel section,.guia-panel article,.guia-directorio>*{min-width:0}
+.guia-panel h3{margin:0 0 var(--ipn-esp-3);line-height:1.25}
 .guia-preguntas-etapa,.guia-directorio-lista{list-style:none;margin:var(--ipn-esp-4) 0 0;padding:0;display:grid;gap:var(--ipn-esp-2)}
 .guia-elegir{display:block;width:100%;min-height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);background:transparent;color:var(--ipn-texto);font:inherit;text-align:left;overflow-wrap:anywhere;cursor:pointer}
 .guia-elegir:hover,.guia-elegir[aria-expanded=true],.guia-elegir[aria-current]{background:var(--ipn-acento-suave);color:var(--ipn-acento)}
@@ -46,7 +48,7 @@
 .guia-coincide{color:var(--ipn-acento);font-weight:600;text-decoration:underline}
 .guia-etapas button:focus-visible,.guia-elegir:focus-visible,.guia-controles button:focus-visible,.guia-arbol summary:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 @media(max-width:899px){.guia-panel,.guia-directorio{grid-template-columns:minmax(0,1fr)}.guia-etapa-nombre{display:none}.guia-preguntas-etapa .guia-detalle{padding:var(--ipn-esp-3)}.guia-ficha-panel{display:none}}
-@media(max-width:359px){.guia-etapas{flex-wrap:wrap;gap:var(--ipn-esp-2)}.guia-etapas li{flex:0 0 44px}.guia-etapas li+li::before{display:none}}
+@media(max-width:479px){.guia-etapas{overflow-x:auto;flex-wrap:nowrap;gap:var(--ipn-esp-2);padding:0 0 var(--ipn-esp-2)}.guia-etapas li{flex:1 0 44px}.guia-etapas li+li::before{left:calc(-1 * (var(--ipn-esp-2) + 22px));right:calc(50% + 22px)}}
 .guia-cab{display:grid;gap:var(--ipn-esp-4);min-width:0}
 .guia-cab h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}
 .guia-cab .tmr-intro{margin:0}
@@ -87,7 +89,6 @@
 .guia-pronto small{display:block}
 @media(max-width:639.98px){.guia-cab h2{font-size:var(--ipn-tamano-xl);line-height:1.25}.guia-lista-acudir>li{padding:var(--ipn-esp-4)}}
 .guia-portal{display:inline-flex;align-items:center;min-height:var(--ipn-control-alto);justify-self:start}
-.guia-enlace{display:inline;padding:0;border:0;background:transparent;color:var(--ipn-acento);font:inherit;text-decoration:underline;cursor:pointer}
 .guia-actividades .sate-buscador{max-width:32rem}
 .guia-actividades-categorias{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:var(--ipn-esp-4);margin:0;padding:0;list-style:none}
 .guia-actividad-categoria{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:var(--ipn-esp-3);row-gap:var(--ipn-esp-1);width:100%;min-height:var(--ipn-control-alto);padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;text-align:left;cursor:pointer}
@@ -106,8 +107,7 @@
 .guia-actividad-detalle p,.guia-actividad-detalle h4{margin:0}
 .guia-actividades-volver{justify-self:start}
 @media(max-width:639.98px){.guia-actividad{grid-template-columns:minmax(0,1fr)}.guia-actividad-detalle{grid-column:auto}}
-.guia-enlace:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
-.guia-fuentes .guia-enlace{margin-inline-start:var(--ipn-esp-3);min-height:var(--ipn-control-alto)}
+.guia-fuentes .sate-enlace-reglamento{margin-inline-start:var(--ipn-esp-3)}
 .guia-articulo{display:grid;gap:var(--ipn-esp-3)}
 .guia-articulo .pc-oficial{display:block;width:auto;padding:0}
 .guia-aviso-ocr{margin:0;padding:var(--ipn-esp-2) var(--ipn-esp-3);border-left:3px solid var(--ipn-aviso);background:var(--ipn-aviso-suave);color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
