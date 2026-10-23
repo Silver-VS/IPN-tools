@@ -20,9 +20,9 @@ const CUPOS=(()=>{
     op.disabled=!hay;op.checked=omitir;op.title=vieja?tx('antigua_ayuda'):'';
     $('#cupos-omitir-ayuda').textContent=hay&&vieja?tx('antigua_ayuda'):'';
     const estado=hay?tx('ultima',{hora:C.fecha(datos)})+(vieja?' · '+tx('antigua'):''):'';
-    for(const id of ['#cupos-estado','#cupos-estado-horario']){const n=$(id);if(n){n.textContent=estado;n.classList.toggle('cupos-antigua',!!hay&&vieja)}}
+    for(const id of ['#cupos-estado','#cupos-estado-horario']){const n=$(id);if(n){n.textContent=id==='#cupos-estado-horario'&&window.SateHorarioInscrito?.()?'':estado;n.classList.toggle('cupos-antigua',!!hay&&vieja)}}
     ayuda.textContent=tx('ayuda')+(hay&&vieja?' '+tx('antigua_ayuda'):'');
-    const aviso=$('#cupos-llenos');if(aviso){aviso.hidden=!selected().some(c=>fila(c)?.disponibles===0);$('#cupos-llenos-texto').textContent=tx('horario_lleno')}
+    const aviso=$('#cupos-llenos');if(aviso){aviso.hidden=!!window.SateHorarioInscrito?.()||!selected().some(c=>fila(c)?.disponibles===0);$('#cupos-llenos-texto').textContent=tx('horario_lleno')}
     for(const n of document.querySelectorAll('[data-cupos-ayuda]'))(n.querySelector?.('[data-cupos-etiqueta]')||n).textContent=tx(hay?'actualizar_consulta':'consultar');
     seleccion();
   }
