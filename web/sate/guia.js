@@ -670,7 +670,8 @@
     limpiarLector = () => { detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchstart', soltarAncla); raiz.removeEventListener('pointerdown', soltarAncla); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
     const destino = ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null;
-    if (destino) SateUI.revelar(destino);
+    // Salto inmediato: un desplazamiento suave largo lo interrumpe el dibujo por partes y no llega al artículo.
+    if (destino) { destino.scrollIntoView({ block: 'start' }); SateUI.revelar(destino); }
     return { titulo: cab.titulo, enDocumento: !!destino };
   }
   async function apartadoReglamentos(raizGuia, d, doc, ancla, vigente) {
