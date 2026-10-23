@@ -50,6 +50,7 @@ function resalteArista(hot,a,b,mapHover){
 }
 function renderMap0(){
   MAPIDX=null;
+  $('#mapwrap').scrollTop=0;
   $('#mapcut').hidden=true;   // se vuelve a mostrar si aplica (mapa con trayectoria y datos del SAES)
   const mv=mview();document.querySelectorAll('[data-mview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mview===mv)));
   $('#zoomseg [data-zoom="0"]').textContent=SATE.texto('sate.planeacion.'+(MQ_PHONE.matches?'zoom_completo_corto':'zoom_completo'));

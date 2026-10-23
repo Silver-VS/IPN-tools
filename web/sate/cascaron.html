@@ -140,7 +140,7 @@ input[type=number]{width:5rem}
 .tag-rel.pre{background:var(--rel-pre)}.tag-rel.post{background:var(--rel-post)}
 .box.hpre{box-shadow:0 0 0 2.5px var(--rel-pre);opacity:1}.box.hpost{box-shadow:0 0 0 2.5px var(--rel-post);opacity:1}
 .edge.hot.pre{stroke:var(--rel-pre)}.edge.hot.post{stroke:var(--rel-post)}
-.areas{position:sticky;top:var(--sate-barra-alto);z-index:3;height:34px;background:var(--ipn-superficie);border-bottom:1px solid var(--ipn-linea)}
+.areas{position:relative;z-index:3;height:34px;background:var(--ipn-superficie);border-bottom:1px solid var(--ipn-linea)}
 .areas div{position:absolute;font-stretch:75%;top:0;bottom:0;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--ipn-fuente-titulos);font-weight:600;letter-spacing:.02em;color:var(--ipn-tenue);border-left:1px solid var(--ipn-linea);line-height:1;padding:0 var(--ipn-esp-1);overflow:hidden}
 .edge.prop{stroke-dasharray:5 4}
 .maptools{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-3) var(--ipn-esp-4);align-items:flex-start;margin-bottom:var(--ipn-esp-4)}
@@ -150,7 +150,7 @@ input[type=number]{width:5rem}
 .legend{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2) var(--ipn-esp-4);font-size:var(--ipn-tamano-s)}
 .legend span{display:inline-flex;gap:var(--ipn-esp-2);align-items:center}
 .legend i{width:14px;height:14px;border-radius:var(--ipn-radio);border:1px solid var(--ipn-linea);display:inline-block}
-.mapwrap{touch-action:pan-x pan-y;overflow:auto;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);max-height:calc(88vh / var(--ui-zoom,1))}
+.mapwrap{touch-action:pan-x pan-y;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
 .map{position:relative;will-change:transform}
 .areas{will-change:transform}
 .map svg{position:absolute;inset:0;overflow:visible}
@@ -705,7 +705,6 @@ footer{margin-top:var(--ipn-esp-6);padding-top:var(--ipn-esp-4);border-top:1px s
 }
 @media (max-height:520px) and (orientation:landscape){
   .brand p{display:none}
-  .mapwrap{max-height:calc(100vh - 24px)}
   .ftoggle{display:inline-flex}
 }
 /* Los bloques fijos (filtros y panel del horario) solo se fijan si hay pantalla suficiente; en pantallas bajas o
