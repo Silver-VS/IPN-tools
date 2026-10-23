@@ -1221,7 +1221,7 @@ def escribir_sate(data):
         shutil.copy(fuente / "medicion.js", destino / "medicion.js")
     else:
         (destino / "medicion.js").unlink(missing_ok=True)
-    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "bajas.js", "temarios.js", "temarios.css", "guia.js", "guia.css", "bibliotecas.js"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "encabezado.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "bajas.js", "temarios.js", "temarios.css", "guia.js", "guia.css", "bibliotecas.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
     shutil.copytree(ROOT / 'web/assets/vendor', dist / 'assets/vendor', dirs_exist_ok=True)
