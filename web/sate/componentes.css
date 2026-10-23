@@ -657,12 +657,15 @@ body.sate-flotante .sate-barra{display:flex}
 .kx-controles{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--ipn-esp-3);margin-block:var(--ipn-esp-3)}
 .kx-cabecera{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--ipn-esp-5);align-items:end;margin-block:var(--ipn-esp-5);padding-bottom:var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
 .kx-cabecera h3{margin:0;font-size:var(--ipn-tamano-l)}
-.kx-promedios{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-3)}
+.kx-promedios{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:var(--ipn-esp-3);scroll-margin-top:var(--ipn-esp-5)}
 .kx-promedios>div{padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
 .kx-promedios>div:first-child{border-color:var(--ipn-acento);background:var(--ipn-acento-suave)}
 .kx-promedios span{display:block;font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
 .kx-promedios strong{display:block;font-size:var(--ipn-tamano-xl);font-variant-numeric:tabular-nums}
 .kx-bloque,.trayectoria-kardex-curso,#trayectoria-kardex{min-width:0;max-width:100%}
+.kx-curso-lista{display:grid;gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}
+.kx-curso-lista li{display:flex;justify-content:space-between;gap:var(--ipn-esp-3);padding:var(--ipn-esp-2) 0;border-bottom:1px solid var(--ipn-linea)}
+.kx-curso-lista li span{color:var(--ipn-tenue);white-space:nowrap}
 .kx-periodos{display:flex;gap:var(--ipn-esp-3);overflow-x:auto;max-width:100%;padding-block:var(--ipn-esp-3);scroll-snap-type:x proximity}
 .kx-periodo{flex:0 0 calc(var(--ipn-esp-8)*4);min-width:0;display:flex;flex-direction:column;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);cursor:pointer;scroll-snap-align:start}
 .kx-periodo-cab,.kx-periodo-pie{display:flex;justify-content:space-between;gap:var(--ipn-esp-2)}

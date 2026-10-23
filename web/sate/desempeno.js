@@ -34,15 +34,18 @@ function renderKardexLista(){
   $('#kx-cuenta').textContent=SATE.texto('sate.trayectoria.kardex_cuenta',{n:visibles.length,m:rows.length});
   $('#kx-prom-oficial').textContent=ALUMNO.promedio==null?'—':(+ALUMNO.promedio).toFixed(2);
   $('#kx-prom-acreditadas').textContent=media==null?'—':media.toFixed(2);
-  const proy=promOficialSim();$('#kx-prom-proyeccion').textContent=proy?`${proy.exacto?'':'≈ '}${proy.despues.toFixed(2)}`:'—';
+  const proy=promOficialSim(), proyEl=$('#kx-prom-proyeccion');proyEl.textContent=proy?`${proy.exacto?'':'≈ '}${proy.despues.toFixed(2)}`:'';proyEl.parentElement.hidden=!proy;
   let grupo=null;
   $('#kx-lista').innerHTML=visibles.length?visibles.map(r=>{const g=r.adeudo?tx('adeudos'):esc(r.periodo)||'—', cab=g!==grupo?`<tr class="kx-grupo"><th colspan="6">${g}</th></tr>`:'';grupo=g;return `${cab}<tr${r.adeudo?' class="kx-adeudo"':''}><td data-label="${tx('ua')}"><b>${esc(r.clave)}</b> · ${esc(r.nombre)}${r.adeudo?` <strong class="kx-marca">${tx('adeudo')}</strong>`:''}</td><td data-label="${tx('periodo')}">${esc(r.periodo)||'—'}</td><td data-label="${tx('nota')}">${chip(r)}</td><td data-label="${tx('forma')}">${esc(FORMAS[r.codigo]||r.codigo)||'—'}</td><td data-label="${tx('veces')}">${veces(r.clave)}</td><td data-label="${tx('creditos')}">${r.cr==null?'—':fmtCr(r.cr)}</td></tr>`}).join(''):`<tr><td colspan="6">${tx('vacio')}</td></tr>`;
 }
 function kardexCurso(){
   const tx=k=>esc(SATE.texto('sate.trayectoria.kardex_'+k)), A=ALUMNO;
-  // El lector actual no exporta parciales. No se deducen de la simulación ni se rellenan con notas ficticias.
   const claves=[...new Set(A.en_curso??(A.horario_inscrito||[]).map(h=>h[1]))];
-  return `<table class="kx-tabla kx-curso"><thead><tr>${['ua','grupo','creditos','p1','p2','p3','final'].map(k=>`<th scope="col">${tx(k)}</th>`).join('')}</tr></thead><tbody>${claves.map(k=>{const h=(A.horario_inscrito||[]).find(h=>h[1]===k), cr=A.creditos_materias?.[k]??cur()[k]?.[1];return `<tr><td data-label="${tx('ua')}"><b>${esc(k)}</b> · ${esc(pretty(cur()[k]?.[0]||h?.[2]||k))}</td><td data-label="${tx('grupo')}">${esc(h?.[0]||'—')}</td><td data-label="${tx('creditos')}">${cr==null?'—':fmtCr(cr)}</td>${['p1','p2','p3','final'].map(c=>`<td data-label="${tx(c)}">—</td>`).join('')}</tr>`}).join('')||`<tr><td colspan="7">${tx('sin_curso')}</td></tr>`}</tbody></table>`;
+  const filas=claves.map(k=>{const h=(A.horario_inscrito||[]).find(h=>h[1]===k), cr=A.creditos_materias?.[k]??cur()[k]?.[1], dato=c=>h?.[c]??(c==='grupo'?h?.[0]:null);return {ua:`<b>${esc(k)}</b> · ${esc(pretty(cur()[k]?.[0]||h?.[2]||k))}`,grupo:dato('grupo'),creditos:cr==null?'':fmtCr(cr),p1:dato('p1'),p2:dato('p2'),p3:dato('p3'),final:dato('final')}});
+  const cols=['ua','grupo','creditos','p1','p2','p3','final'].filter(c=>c==='ua'||filas.some(f=>f[c]!=null&&String(f[c]).trim()!==''));
+  const celda=(c,f)=>`<td${c==='ua'?' class="kx-curso-ua"':''} data-label="${tx(c)}">${c==='ua'?f[c]:esc(f[c]??'')}</td>`;
+  if(cols.every(c=>c==='ua'||c==='creditos'))return `<ul class="kx-curso-lista">${filas.map(f=>`<li>${f.ua}${f.creditos?`<span>${esc(f.creditos)} cr</span>`:''}</li>`).join('')||`<li>${tx('sin_curso')}</li>`}</ul>`;
+  return `<table class="kx-tabla kx-curso"><thead><tr>${cols.map(k=>`<th scope="col">${tx(k)}</th>`).join('')}</tr></thead><tbody>${filas.map(f=>`<tr>${cols.map(c=>celda(c,f)).join('')}</tr>`).join('')||`<tr><td colspan="${cols.length}">${tx('sin_curso')}</td></tr>`}</tbody></table>`;
 }
 function prepararSeccion(el,id,dibujar){
   el.open=trayectoriaAbierta(id,id==='kardex'||id==='escenario'||id==='simulacion');
