@@ -12,10 +12,10 @@ const regla = selector => {
 };
 assert.match(regla('.sate-ayuda--termino'), /display:inline;/);
 const terminoCSS = regla('.sate-ayuda__btn.sate-termino');
-for (const propiedad of ['display:inline;', 'padding:0;', 'color:inherit;', 'font:inherit;',
-  'text-decoration:underline dotted 1px;', 'text-decoration-color:var(--ipn-tenue);',
-  'text-underline-offset:.22em;', 'cursor:help']) assert.ok(terminoCSS.includes(propiedad), propiedad);
-assert.doesNotMatch(terminoCSS, /vertical-align|line-height/);
+for (const propiedad of ['display:inline;', 'padding:0;', 'color:inherit;', 'font:inherit;', 'line-height:inherit;',
+  'text-decoration-style:dotted;', 'text-decoration-thickness:max(1px,.08em);',
+  'text-decoration-color:var(--ipn-tenue);', 'text-underline-offset:.08em;', 'cursor:help']) assert.ok(terminoCSS.includes(propiedad), propiedad);
+assert.doesNotMatch(terminoCSS, /vertical-align/);
 assert.match(regla('.sate-globo'), /position:fixed;/);
 assert.match(regla('.sate-globo'), /max-width:min\(320px,40ch,calc\(100vw - 16px\)\)/);
 const tactil = css.split('@media(hover:none){')[1].split('\n}')[0];
@@ -24,7 +24,8 @@ assert.equal(objetivos.length, 3);
 for (const [, selector] of objetivos) assert.ok(selector.trim().endsWith(':not(.sate-termino)'), selector);
 assert.match(regla('.sate-termino::before'), /position:absolute;/);
 assert.match(regla('.sate-termino::before'), /height:max\(100%,44px\)/);
-assert.match(regla('.sate-ayuda__btn.sate-termino:focus-visible'), /outline:1px solid currentColor/);
+assert.match(regla('.sate-ayuda__btn.sate-termino:focus-visible'), /outline:1px solid var\(--ipn-acento\)/);
+assert.match(regla('.sate-ayuda__btn.sate-termino:hover,.sate-ayuda__btn.sate-termino:focus-visible'), /color:var\(--ipn-acento\)/);
 
 // El token tenue conserva contraste >= 3:1 con fondo y superficie en ambos temas.
 const cascaron = leer('web/sate/cascaron.html');
@@ -60,7 +61,7 @@ assert.ok(b.classList.contains('sate-termino'));
 assert.equal(b.textContent, 'dictamen');
 assert.equal(g.getAttribute('role'), 'tooltip');
 assert.equal(b.getAttribute('aria-describedby'), null);
-let rect = {left:210, top:100, bottom:120, width:70};
+let rect = {left:210, right:280, top:100, bottom:120, width:70};
 b.getBoundingClientRect = () => rect;
 g.getBoundingClientRect = () => ({width:300});
 g.offsetHeight = 90;
@@ -81,9 +82,9 @@ document.dispatchEvent(new Evento('keydown', {key:'Escape'}));
 assert.ok(g.hidden, 'Escape no reabre al devolver el foco');
 assert.equal(document.activeElement, b);
 assert.equal(b.getAttribute('aria-describedby'), null);
-rect = {left:970, top:650, bottom:670, width:25};
+rect = {left:970, right:995, top:650, bottom:670, width:25};
 b.click();
-assert.equal(g.style.left, '692px', 'margen derecho de 8 px');
+assert.equal(g.style.left, '692px', 'junto a la palabra y dentro del margen derecho');
 assert.equal(g.style.top, '554px', 'voltea arriba');
 eventos.scroll();
 assert.ok(g.hidden);
