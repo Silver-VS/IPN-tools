@@ -566,6 +566,7 @@
       secciones.set('transitorios', seccion);
     }
     // Muestra el artículo o la fracción de un ancla; sin ancla válida, el primer artículo. Devuelve el nodo de la fracción, si hay.
+    let anclaFijada = null;
     function ir(anclaDestino, empujar) {
       const p = leerAncla(anclaDestino);
       const clave = anclaDestino === 'transitorios' && transitorios.length ? 'transitorios' : p && posicion.has(p.n) ? p.n : articulos.length ? articulos[0].n : 'transitorios';
@@ -576,6 +577,8 @@
       const fr = final.includes('.') ? Array.from(texto.querySelectorAll('li[data-ancla]')).find(x => x.getAttribute('data-ancla') === final) : null;
       for (const x of texto.querySelectorAll('.rgl-activa')) x.classList.remove('rgl-activa');
       if (fr) fr.classList.add('rgl-activa');
+      // La hidratación incremental conserva el destino de ruta aunque el lector visible cambie.
+      anclaFijada = secciones.get(clave) || null;
       enlaceActual = rutaReglamento(doc, fr ? final : clave === 'transitorios' ? clave : anclaArticulo(clave));
       if (empujar) {
         try { history[cambio ? 'pushState' : 'replaceState'](null, '', enlaceActual); } catch (e) { /* sin historial */ }
@@ -635,10 +638,16 @@
       });
     };
     raiz.addEventListener('scroll', seguir, { passive: true });
+    const soltarAncla = () => { anclaFijada = null; };
+    raiz.addEventListener('wheel', soltarAncla, { passive: true });
+    raiz.addEventListener('touchstart', soltarAncla, { passive: true });
+    raiz.addEventListener('pointerdown', soltarAncla, { passive: true });
+    const soltarAnclaTeclado = e => { if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(e.key)) soltarAncla(); };
+    raiz.addEventListener('keydown', soltarAnclaTeclado);
     let detenido = false, tarea;
     const enReposo = fn => raiz.requestIdleCallback ? raiz.requestIdleCallback(fn, {timeout:1000}) : raiz.setTimeout(fn, 50);
     function sinSalto(fn) {
-      const anclaVista = secciones.get(actual), antes = anclaVista?.getBoundingClientRect().top;
+      const anclaVista = anclaFijada || secciones.get(actual), antes = anclaVista?.getBoundingClientRect().top;
       fn();
       if (antes != null && raiz.scrollBy) {
         const diferencia = anclaVista.getBoundingClientRect().top - antes;
@@ -658,7 +667,7 @@
     for (const n of secciones.values()) interseccion?.observe(n);
     raiz.addEventListener('beforeprint', completarTodo);
     tarea = enReposo(continuar);
-    limpiarLector = () => { detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.cancelAnimationFrame(cuadro); };
+    limpiarLector = () => { detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchstart', soltarAncla); raiz.removeEventListener('pointerdown', soltarAncla); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
     const destino = ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null;
     if (destino) SateUI.revelar(destino);
