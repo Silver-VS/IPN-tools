@@ -951,8 +951,8 @@ section.meta-panel,.trayectoria-plegable{margin-block:var(--ipn-esp-7)}
 .tmr .gd-chip,.tmr .sel-materia{border:0;border-radius:0;background:transparent;box-shadow:none}
 .tmr .gd-chip:hover,.tmr .sel-materia:hover{background:var(--ipn-hundido);text-decoration:underline}
 .tmr .sel-materia{padding-block:var(--ipn-esp-2)}
-.mapwrap{padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7));scroll-padding-bottom:var(--sate-plan-alto,var(--ipn-esp-7))}
 body.sate-flotante .wrap>[role=tabpanel]{padding-bottom:var(--ipn-esp-7)}
+.mapwrap{padding-bottom:var(--ipn-esp-5)}   /* margen corto para que la última fila no la recorte la barra horizontal; la reserva de la bandeja va en #v-tray */
 body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-esp-7)) + var(--ipn-barra-alto) + var(--ipn-esp-7) + env(safe-area-inset-bottom,0px))}
 
 /* R2-PER: avisos anclados a cada materia y retícula del perfil. */

@@ -9,7 +9,8 @@ const cascaron=leer('web/sate/cascaron.html'), fuenteInicio=leer('web/sate/inici
 assert.match(cascaron,/\.mapwrap\{[^}]*overflow-x:auto;overflow-y:hidden/,'el mapa solo desplaza horizontalmente');
 assert.doesNotMatch(cascaron,/\.mapwrap\{[^}]*max-height:[^}]*vh/,'el mapa crece al alto de su contenido');
 assert.doesNotMatch(cascaron,/\.areas\{position:sticky/,'el encabezado de columnas no tapa niveles al inicio');
-assert.match(css,/\.mapwrap\{padding-bottom:var\(--sate-plan-alto,var\(--ipn-esp-7\)\)/,'la caja reserva el alto medido de la bandeja flotante');
+assert.doesNotMatch(css,/\.mapwrap\{padding-bottom:var\(--sate-plan-alto/,'la caja del mapa no reserva espacio vacío bajo el último nivel (dueño 2026-10-23)');
+assert.match(css,/#v-tray\{padding-bottom:calc\(var\(--sate-plan-alto/,'la reserva de la bandeja flotante va al final de la página');
 assert.match(fuenteInicio,/new ResizeObserver\(\(\)=>\{\s*document\.documentElement\.style\.setProperty\('--sate-plan-alto',Math\.ceil\(bandeja\.getBoundingClientRect\(\)\.height\)\+'px'\)/,'la reserva sigue el alto real de la bandeja');
 assert.match(mapa,/\$\('#mapwrap'\)\.scrollTop=0/,'cada render inicia el nivel 1 bajo el encabezado');
 assert.match(cascaron,/\.box\.done\{opacity:\.45;color:var\(--ipn-tenue\);background:var\(--ipn-superficie\)/,'acreditadas deslavadas y neutras, sin verde (dueño 2026-10-23)');
