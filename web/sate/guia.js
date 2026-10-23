@@ -805,9 +805,16 @@
       const f = fuente(d, a.fuente, t), padre = nodos.find(n => n.id === a.id)?.padre;
       const rel = d.preguntas.filter(p => (p.acudir || []).includes(a.id));
       const campo = (titulo, contenido) => h('div', {}, [h('dt', { texto: titulo }), h('dd', {}, contenido)]);
+      const cita = ref => {
+        const s = fuente(d, ref, t);
+        return s ? enlaceExterno('', s.url + (ref.pagina ? '#page=' + ref.pagina : ''), s.texto) : null;
+      };
       return h('article', { 'class': 'guia-ficha' }, [h('small', { texto: t('sate.guia.acudir_' + (a.ambito || 'unidad')) }), a.pendiente ? h('strong', { texto: tx('confirmar') }) : null, h('h3', { texto: a.nombre }),
-        h('dl', {}, [campo(tx('atiende'), [h('p', {}, enLinea(a.para || tx('sin_descripcion'), d)), ...(a.necesidades || []).map(n => h('p', { texto: t(n.texto) + (n.pendiente ? ' · ' + tx('confirmar') : '') }))]),
-          campo(tx('depende'), [instancias.get(padre)?.nombre || tx('confirmar')]),
+        h('dl', {}, [campo(a.objetivo ? tx('objetivo_sintesis') : tx('atiende'), [h('p', {}, enLinea(a.objetivo?.texto || a.para || tx('sin_descripcion'), d)), a.objetivo ? cita(a.objetivo.fuente) : null,
+          ...(a.necesidades || []).map(n => h('p', { texto: t(n.texto) + (n.pendiente ? ' · ' + tx('confirmar') : '') }))]),
+          a.funciones?.length ? campo(t('sate.guia.funciones_manual'), [h('ul', { 'class': 'guia-funciones' }, a.funciones.map(x => h('li', {}, [h('p', {}, enLinea(x.texto, d)), cita(x.fuente)])))]) : null,
+          campo(tx('depende'), [instancias.get(padre)?.nombre || a.dependenciaTexto || tx('confirmar'), a.fuenteDependencia ? cita(a.fuenteDependencia) : null]),
+          a.procedimientos ? campo(tx('procedimientos'), [h('ul', { 'class': 'guia-procedimientos' }, a.procedimientos.map(x => h('li', {}, [h('strong', { texto: x.nombre }), h('p', { texto: x.participacion }), cita(x.fuente)]))), h('p', { texto: a.procedimientosNota })]) : null,
           campo(tx('contacto'), enLinea(a.contacto || tx('confirmar'), d)),
           campo(t('sate.guia.fuentes_titulo', { n: f ? 1 : 0 }), [f ? enlaceExterno('', f.url, f.texto) : tx('confirmar'), a.ambito !== 'ipn' && org ? h('p', { texto: tx('fuente_estructura') }) : null]),
           rel.length ? campo(tx('relacionadas'), [h('ul', {}, rel.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]) : null])]);
@@ -815,7 +822,7 @@
     function pintar() {
       const ts = terminos(buscar.entrada.value);
       const preguntas = ts.length ? buscarPreguntas(d.preguntas, buscar.entrada.value) : [];
-      const resultados = [...instancias.values()].filter(a => (vista === 'jerarquia' || a.para) && (!ambito || (a.ambito || 'unidad') === ambito) && (!ts.length || ts.every(w => norm([a.nombre, a.para, ...(a.palabras || []), ...(a.necesidades || []).flatMap(n => [t(n.texto), ...(n.palabras || [])])].join(' ')).includes(w)) || preguntas.some(p => (p.acudir || []).includes(a.id))));
+      const resultados = [...instancias.values()].filter(a => (vista === 'jerarquia' || a.para) && (!ambito || (a.ambito || 'unidad') === ambito) && (!ts.length || ts.every(w => norm([a.nombre, a.para, ...(a.funciones || []).map(x => x.texto), ...(a.procedimientos || []).map(x => x.nombre), ...(a.palabras || []), ...(a.necesidades || []).flatMap(n => [t(n.texto), ...(n.palabras || [])])].join(' ')).includes(w)) || preguntas.some(p => (p.acudir || []).includes(a.id))));
       const ids = new Set(resultados.map(a => a.id));
       resultados.sort((a, b) => Number(a.ambito === 'ipn') - Number(b.ambito === 'ipn'));
       if (!instancias.has(elegido) || vista === 'directorio' && !ids.has(elegido)) elegido = resultados[0]?.id;

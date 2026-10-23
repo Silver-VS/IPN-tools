@@ -1,7 +1,7 @@
 {
- "_fuente": "Guía politécnica, lo propio de la UPIITA: áreas de la unidad con su función según el Manual de Organización (MAN1-acudir; página del archivo PDF) y respuestas que dependen de la unidad. Lo genérico del IPN está en comun.json. Formato: coordinacion-wt/ipt-estado/ipn-tools/diseno/FORMATO-GUIA7.md.",
+ "_fuente": "R13-MAN: extracción local con pypdf del MO de diciembre de 2023 y MP de noviembre de 2022. Todas las páginas se cuentan desde 1 en el PDF; en el MO, hoja impresa = página PDF - 1. Los objetivos por área son síntesis de sus funciones, no citas de objetivos independientes.",
  "version": "2026.10.2",
- "revisado": "2026-10-16",
+ "revisado": "2026-10-23",
  "documentos": {
   "upiita": {
    "titulo": "Portal de la UPIITA",
@@ -16,9 +16,15 @@
    "reglamento": false
   },
   "mo_upiita": {
-   "titulo": "Manual de Organización de la UPIITA",
+   "titulo": "Manual de Organización de la UPIITA (diciembre de 2023; páginas del PDF)",
    "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/MOP/NS/UPIITA/MO_UPIITA.pdf",
    "resumen": "Áreas de la UPIITA, sus funciones y a qué dependencia pertenecen.",
+   "reglamento": false
+  },
+  "mp_upiita": {
+   "titulo": "Manual de Procedimientos de la UPIITA (noviembre de 2022; páginas del PDF)",
+   "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/MOP/NS/UPIITA/MP_UPIITA.pdf",
+   "resumen": "Procedimientos académicos, escolares y administrativos; participación de las áreas.",
    "reglamento": false
   }
  },
@@ -26,11 +32,109 @@
   {
    "id": "gestion_escolar",
    "nombre": "Departamento de Gestión Escolar",
-   "para": "Recibe tus formatos y coordina inscripciones, reinscripciones, altas, bajas y cambios de programa; expide constancias de inscripción, reinscripción y boletas certificadas; vigila la captura de calificaciones en el [[g:saes|SAES]]; coordina el trámite de [[g:dictamen|dictamen]] ante la comisión que corresponda y atiende la ventanilla de información.",
+   "para": "Tramita tu inscripción, tus documentos y los cambios de tu trayectoria en el [[g:saes|SAES]].",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 91
-   }
+   },
+   "objetivo": {
+    "texto": "Tramita tu inscripción, tus documentos y los cambios de tu trayectoria en el [[g:saes|SAES]].",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 91
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Coordina inscripción, reinscripción, altas, bajas, cambios, electivas y revalidaciones.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 91
+     }
+    },
+    {
+     "texto": "Publica grupos y horarios y vigila la captura de calificaciones en el SAES.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 91
+     }
+    },
+    {
+     "texto": "Expide constancias de inscripción y reinscripción y boletas certificadas.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 91
+     }
+    },
+    {
+     "texto": "Coordina el trámite de [[g:dictamen|dictamen]] ante la comisión escolar que corresponda.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 91
+     }
+    },
+    {
+     "texto": "Atiende consultas por ventanilla y realiza trámites de titulación con las áreas responsables.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 91
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sseis",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-05",
+     "nombre": "Solicitud de documentos en el sistema de administración escolar (trámites)",
+     "participacion": "Revisa y libera las solicitudes de documentos.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 88
+     }
+    },
+    {
+     "clave": "UPIITA-PO-08",
+     "nombre": "Seguimiento de egresados",
+     "participacion": "Proporciona las listas del último semestre.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 132
+     }
+    },
+    {
+     "clave": "UPIITA-PO-09",
+     "nombre": "Inscripción de alumnos de nuevo ingreso a nivel superior",
+     "participacion": "Publica lineamientos y revisa documentos; asigna grupo y genera expediente (p. 147).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 146
+     }
+    },
+    {
+     "clave": "UPIITA-PO-10",
+     "nombre": "Reinscripción de alumnos de nivel superior",
+     "participacion": "Publica lineamientos, revisa requisitos y valida la reinscripción.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 158
+     }
+    },
+    {
+     "clave": "UPIITA-PO-11",
+     "nombre": "Gestión para la titulación profesional",
+     "participacion": "Recibe un tanto del acta de titulación.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 169
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
   },
   {
    "id": "cosie_ctce",
@@ -45,7 +149,7 @@
   {
    "id": "subdireccion_academica",
    "nombre": "Subdirección Académica",
-   "para": "Coordina las evaluaciones ordinarias, extraordinarias y a título de suficiencia; emite la convocatoria de la evaluación de saberes previamente adquiridos; atiende la revisión de calificaciones; promueve la titulación y designa a los tutores.",
+   "para": "Coordina la enseñanza, las evaluaciones y los apoyos para tu formación y titulación.",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 42
@@ -58,12 +162,83 @@
      ],
      "pendiente": true
     }
-   ]
+   ],
+   "objetivo": {
+    "texto": "Coordina la enseñanza, las evaluaciones y los apoyos para tu formación y titulación.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 42
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Emite la convocatoria de evaluación por saberes previamente adquiridos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 42
+     }
+    },
+    {
+     "texto": "Coordina las evaluaciones ordinarias, extraordinarias y a título de suficiencia.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 42
+     }
+    },
+    {
+     "texto": "Promueve las opciones de titulación y la participación en investigación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 44
+     }
+    },
+    {
+     "texto": "Supervisa el Plan de Acción Tutorial y designa a los tutores.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 44
+     }
+    },
+    {
+     "texto": "Coordina la actualización de los planes y programas de estudio.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 42
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-02",
+     "nombre": "Diseño y rediseño de planes y programas de estudio",
+     "participacion": "Turna el informe curricular y convoca a presentar las unidades de aprendizaje (p. 39).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 36
+     }
+    },
+    {
+     "clave": "UPIITA-PO-03",
+     "nombre": "Planeación didáctica",
+     "participacion": "Recibe la solicitud de planeación y el reporte (p. 63).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 62
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
   },
   {
    "id": "sseis",
    "nombre": "Subdirección de Servicios Educativos e Integración Social",
-   "para": "Coordina la gestión escolar, el proceso de becas, el servicio social y la bolsa de trabajo, y supervisa el trámite de dictámenes con la Comisión de Situación Escolar. Recibe las solicitudes de baja de materias.",
+   "para": "Coordina la gestión escolar y los servicios que apoyan tu permanencia y vinculación.",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 87
@@ -83,43 +258,1545 @@
      ],
      "pendiente": true
     }
-   ]
+   ],
+   "objetivo": {
+    "texto": "Coordina la gestión escolar y los servicios que apoyan tu permanencia y vinculación.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 87
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Coordina becas, seguro facultativo, orientación juvenil y servicios de salud.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 87
+     }
+    },
+    {
+     "texto": "Supervisa el trámite de dictámenes con la Comisión de Situación Escolar del CTCE.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 87
+     }
+    },
+    {
+     "texto": "Supervisa inscripciones, reinscripciones, altas, bajas, cambios y documentos escolares.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 88
+     }
+    },
+    {
+     "texto": "Organiza el servicio social, los servicios bibliotecarios y la bolsa de trabajo.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 88
+     }
+    },
+    {
+     "texto": "Coordina con la Subdirección Académica los trámites de titulación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 88
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
   },
   {
    "id": "extension_apoyos",
    "nombre": "Departamento de Extensión y Apoyos Educativos",
-   "para": "Hace los estudios socioeconómicos y tramita las becas; asesora sobre las opciones de servicio social y tramita las constancias; difunde la convocatoria de movilidad académica y apoya las prácticas profesionales.",
+   "para": "Tramita becas y servicio social y te apoya en movilidad académica.",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 98
-   }
+   },
+   "objetivo": {
+    "texto": "Tramita becas y servicio social y te apoya en movilidad académica.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 98
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Integra expedientes, realiza estudios socioeconómicos y tramita becas.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 98
+     }
+    },
+    {
+     "texto": "Te orienta y da seguimiento al servicio social y tramita su acreditación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 98
+     }
+    },
+    {
+     "texto": "Difunde movilidad, postula candidaturas y gestiona el dictamen de las unidades cursadas.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 98
+     }
+    },
+    {
+     "texto": "Apoya prácticas profesionales y estancias industriales y coordina el programa DELFÍN o equivalentes.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 98
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sseis",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-07",
+     "nombre": "Trámite de liberación de servicio social",
+     "participacion": "Valida el registro y tramita la liberación del servicio social (pp. 113–115).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 113
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
   },
   {
    "id": "servicios_estudiantiles",
    "nombre": "Departamento de Servicios Estudiantiles",
-   "para": "Atiende las actividades culturales y deportivas, los servicios de biblioteca, el seguro facultativo del IMSS y el servicio médico, el programa de orientación juvenil, la inducción de nuevo ingreso y el Comité de Seguridad y Contra la Violencia.",
+   "para": "Atiende los servicios culturales, deportivos, bibliotecarios y de salud que tienes en la unidad.",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 94
-   }
+   },
+   "objetivo": {
+    "texto": "Atiende los servicios culturales, deportivos, bibliotecarios y de salud que tienes en la unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 94
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Organiza actividades culturales y deportivas y promueve tu participación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 94
+     }
+    },
+    {
+     "texto": "Presta servicios de biblioteca y préstamo interbibliotecario.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 94
+     }
+    },
+    {
+     "texto": "Coordina tu incorporación al seguro facultativo del IMSS y los servicios médico y dental.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 95
+     }
+    },
+    {
+     "texto": "Da seguimiento a Orientación Juvenil y a las actividades del COSECOVI.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 95
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sseis",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-06",
+     "nombre": "Servicios bibliotecarios",
+     "participacion": "Presta los servicios bibliotecarios, de espacio lúdico y de cómputo (pp. 99–101).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 99
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
   },
   {
    "id": "unidad_informatica",
    "nombre": "Unidad de Informática",
-   "para": "Da soporte técnico a alumnos y docentes, administra las aulas de cómputo y la red y gestiona con la Dirección de Sistemas Informáticos las cuentas de correo electrónico institucional.",
+   "para": "Te da soporte informático y gestiona servicios de cómputo y comunicaciones.",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 39
-   }
+   },
+   "objetivo": {
+    "texto": "Te da soporte informático y gestiona servicios de cómputo y comunicaciones.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 39
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Te asesora y da soporte técnico en cómputo y comunicaciones.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 39
+     }
+    },
+    {
+     "texto": "Administra la red y las aulas de cómputo y mantiene el portal de la unidad.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 39
+     }
+    },
+    {
+     "texto": "Gestiona con la Dirección de Sistemas Informáticos las solicitudes de correo institucional.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 40
+     }
+    },
+    {
+     "texto": "Da seguimiento al mantenimiento de los equipos y a la seguridad de los sistemas de información.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 40
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
   },
   {
    "id": "upis",
    "nombre": "Unidad Politécnica de Integración Social",
-   "para": "Organiza los cursos de lenguas extranjeras (CELEX), el seguimiento de egresados y la bolsa de trabajo.",
+   "para": "Vincula tu formación con idiomas, empleo, emprendimiento y proyectos con otros sectores.",
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 101
-   }
+   },
+   "objetivo": {
+    "texto": "Vincula tu formación con idiomas, empleo, emprendimiento y proyectos con otros sectores.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 101
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Gestiona convenios para intercambio, prácticas profesionales y proyectos de investigación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 101
+     }
+    },
+    {
+     "texto": "Promueve el emprendimiento y canaliza proyectos para incubación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 101
+     }
+    },
+    {
+     "texto": "Organiza los Cursos Extracurriculares de Lenguas Extranjeras (CELEX).",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 102
+     }
+    },
+    {
+     "texto": "Coordina seguimiento de egresados y bolsa de trabajo y apoya el registro de empresas para prácticas.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 102
+     }
+    },
+    {
+     "texto": "Asesora y tramita solicitudes de protección de propiedad industrial y derechos de autor.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 102
+     }
+    }
+   ],
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sseis",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "direccion",
+   "nombre": "Dirección",
+   "para": "Coordina tu formación y los servicios académicos y administrativos de la unidad.",
+   "objetivo": {
+    "texto": "Coordina tu formación y los servicios académicos y administrativos de la unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 30
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Opera los programas de licenciatura y posgrado y coordina su actualización.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 30
+     }
+    },
+    {
+     "texto": "Coordina los servicios educativos, culturales, deportivos y de vinculación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 30
+     }
+    },
+    {
+     "texto": "Dirige los servicios de bibliotecas, talleres y laboratorios.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 31
+     }
+    },
+    {
+     "texto": "Promueve tu titulación o graduación y preside los órganos consultivos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 31
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 30
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "dependenciaTexto": "Por confirmar: el organigrama del manual comienza en la Dirección de la unidad.",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-01",
+     "nombre": "Formación y actualización del personal docente",
+     "participacion": "Recibe y turna la comunicación de formación docente.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 25
+     }
+    },
+    {
+     "clave": "UPIITA-PO-02",
+     "nombre": "Diseño y rediseño de planes y programas de estudio",
+     "participacion": "Gestiona la evaluación curricular y los acuerdos de aprobación.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 36
+     }
+    },
+    {
+     "clave": "UPIITA-PO-03",
+     "nombre": "Planeación didáctica",
+     "participacion": "Envía el reporte de planeaciones didácticas.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 63
+     }
+    },
+    {
+     "clave": "UPIITA-PO-04",
+     "nombre": "Gestión de prácticas y visitas escolares",
+     "participacion": "Envía el programa anual y recibe la autorización de reintegro.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 74
+     }
+    },
+    {
+     "clave": "UPIITA-PO-08",
+     "nombre": "Seguimiento de egresados",
+     "participacion": "Aprueba la solicitud de resultados del seguimiento.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 133
+     }
+    },
+    {
+     "clave": "UPIITA-PO-11",
+     "nombre": "Gestión para la titulación profesional",
+     "participacion": "Firma las actas de titulación.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 168
+     }
+    },
+    {
+     "clave": "UPIITA-PA-03",
+     "nombre": "Adquisición de materiales y/o servicios por adjudicación directa",
+     "participacion": "Revisa y aprueba el oficio de adquisición; firma el comprobante (p. 206).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 204
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "ctce",
+   "nombre": "Consejo Técnico Consultivo Escolar",
+   "para": "Acuerda propuestas y asuntos académicos y de organización que afectan a tu unidad.",
+   "objetivo": {
+    "texto": "Acuerda propuestas y asuntos académicos y de organización que afectan a tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 33
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Acuerda propuestas de creación o modificación de planes y programas de estudio.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 33
+     }
+    },
+    {
+     "texto": "Conoce y acuerda propuestas de intercambio y vinculación académica.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 33
+     }
+    },
+    {
+     "texto": "Acuerda asuntos de disciplina y participa en la Comisión de Situación Escolar.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 33
+     }
+    },
+    {
+     "texto": "Elabora proyectos de normas internas y propone ternas para Dirección y subdirecciones.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 33
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 33
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-02",
+     "nombre": "Diseño y rediseño de planes y programas de estudio",
+     "participacion": "Inicia el diseño o rediseño; su comisión revisa la propuesta (p. 37).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 36
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "comite_proyectos",
+   "nombre": "Comité Interno de Proyectos",
+   "para": "Apoya las decisiones internas sobre la operación y los proyectos de tu unidad.",
+   "objetivo": {
+    "texto": "Apoya las decisiones internas sobre la operación y los proyectos de tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 35
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Define criterios para el desarrollo técnico y administrativo de la Dirección.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 35
+     }
+    },
+    {
+     "texto": "Propone estrategias para cumplir los programas de desarrollo y de trabajo anual.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 35
+     }
+    },
+    {
+     "texto": "Analiza metas y resultados y da seguimiento a los acuerdos del Comité.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 35
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 35
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "decanato",
+   "nombre": "Decanato",
+   "para": "Te asesora sobre la historia, la vida académica y la identidad politécnica.",
+   "objetivo": {
+    "texto": "Te asesora sobre la historia, la vida académica y la identidad politécnica.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 36
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Te orienta sobre aspectos históricos, académicos y de identidad politécnica.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 36
+     }
+    },
+    {
+     "texto": "Conserva el archivo histórico y difunde la historia y los símbolos del IPN.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 36
+     }
+    },
+    {
+     "texto": "Promueve investigaciones de carácter académico, histórico y cultural.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 36
+     }
+    },
+    {
+     "texto": "Preside, cuando se solicita, la elección de ternas para autoridades en los órganos colegiados.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 36
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 36
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "enlace_gestion",
+   "nombre": "Coordinación de Enlace y Gestión Técnica",
+   "para": "Coordina la planeación y la organización de los servicios de tu unidad.",
+   "objetivo": {
+    "texto": "Coordina la planeación y la organización de los servicios de tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 37
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Integra y actualiza los manuales de organización y de procedimientos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 37
+     }
+    },
+    {
+     "texto": "Coordina con las áreas competentes la acreditación de los programas académicos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 37
+     }
+    },
+    {
+     "texto": "Integra la planeación institucional, las estadísticas y el informe anual de actividades.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 37
+     }
+    },
+    {
+     "texto": "Coordina el archivo documental de tránsito de la unidad.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 38
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 37
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "ciencias_basicas",
+   "nombre": "Departamento de Ciencias Básicas",
+   "para": "Organiza la enseñanza y las evaluaciones de las unidades de aprendizaje de su área.",
+   "objetivo": {
+    "texto": "Organiza la enseñanza y las evaluaciones de las unidades de aprendizaje de su área.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 47
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Participa en la actualización de los programas y en la evaluación por saberes previamente adquiridos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 47
+     }
+    },
+    {
+     "texto": "Supervisa las evaluaciones ordinarias, extraordinarias y a título de suficiencia de su área.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 48
+     }
+    },
+    {
+     "texto": "Organiza el uso y mantenimiento de sus talleres y laboratorios.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 49
+     }
+    },
+    {
+     "texto": "Colabora en Trabajo Terminal o Proyecto Terminal y promueve la tutoría.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 50
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 47
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "ingenieria",
+   "nombre": "Departamento de Ingeniería",
+   "para": "Organiza la enseñanza, las evaluaciones y las actividades académicas de su área.",
+   "objetivo": {
+    "texto": "Organiza la enseñanza, las evaluaciones y las actividades académicas de su área.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 52
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Participa en la actualización de programas y en la evaluación por saberes previamente adquiridos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 52
+     }
+    },
+    {
+     "texto": "Supervisa las evaluaciones ordinarias, extraordinarias y a título de suficiencia de su área.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 53
+     }
+    },
+    {
+     "texto": "Organiza el uso de talleres y laboratorios y apoya las prácticas y visitas escolares.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 54
+     }
+    },
+    {
+     "texto": "Participa en Trabajo Terminal o Proyecto Terminal, titulación y formación de jurados.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 55
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 52
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "tecnologias_avanzadas",
+   "nombre": "Departamento de Tecnologías Avanzadas",
+   "para": "Coordina actividades académicas de su área, Trabajo Terminal o Proyecto Terminal y titulación.",
+   "objetivo": {
+    "texto": "Coordina actividades académicas de su área, Trabajo Terminal o Proyecto Terminal y titulación.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 57
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Participa en la actualización de programas y en la evaluación por saberes previamente adquiridos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 57
+     }
+    },
+    {
+     "texto": "Supervisa las evaluaciones ordinarias, extraordinarias y a título de suficiencia de su área.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 58
+     }
+    },
+    {
+     "texto": "Coordina Trabajo Terminal o Proyecto Terminal y Metodología de la Investigación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 59
+     }
+    },
+    {
+     "texto": "Te informa sobre modalidades de titulación, coordina jurados y programa exámenes profesionales.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 60
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 57
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "formacion_integral",
+   "nombre": "Departamento de Formación Integral e Institucional",
+   "para": "Organiza la enseñanza y los apoyos académicos de las unidades de aprendizaje de su área.",
+   "objetivo": {
+    "texto": "Organiza la enseñanza y los apoyos académicos de las unidades de aprendizaje de su área.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 62
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Participa en la actualización de programas y en la evaluación por saberes previamente adquiridos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 62
+     }
+    },
+    {
+     "texto": "Supervisa las evaluaciones ordinarias, extraordinarias y a título de suficiencia de su área.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 63
+     }
+    },
+    {
+     "texto": "Participa en la inducción de nuevo ingreso y promueve tu permanencia escolar.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 64
+     }
+    },
+    {
+     "texto": "Apoya prácticas y visitas escolares y colabora en Trabajo Terminal o Proyecto Terminal.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 64
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 62
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "innovacion_educativa",
+   "nombre": "Departamento de Innovación Educativa",
+   "para": "Mejora la enseñanza mediante el diseño curricular, la planeación didáctica y la formación docente.",
+   "objetivo": {
+    "texto": "Mejora la enseñanza mediante el diseño curricular, la planeación didáctica y la formación docente.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 67
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Asesora a docentes en su planeación didáctica semestral.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 67
+     }
+    },
+    {
+     "texto": "Coordina el diseño y rediseño de planes y programas de estudio.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 67
+     }
+    },
+    {
+     "texto": "Elabora con las áreas académicas equivalencias para movilidad y cooperación académica.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 67
+     }
+    },
+    {
+     "texto": "Organiza la formación y actualización docente y participa en el Plan de Acción Tutorial.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 68
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 67
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-02",
+     "nombre": "Diseño y rediseño de planes y programas de estudio",
+     "participacion": "Integra la comisión y gestiona la propuesta curricular.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 36
+     }
+    },
+    {
+     "clave": "UPIITA-PO-03",
+     "nombre": "Planeación didáctica",
+     "participacion": "Revisa y valida planeaciones didácticas y elabora el reporte.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 62
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "evaluacion_seguimiento",
+   "nombre": "Departamento de Evaluación y Seguimiento Académico",
+   "para": "Da seguimiento a la docencia y coordina las prácticas y visitas escolares.",
+   "objetivo": {
+    "texto": "Da seguimiento a la docencia y coordina las prácticas y visitas escolares.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 70
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Organiza la evaluación del desempeño docente para mejorar la enseñanza.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 70
+     }
+    },
+    {
+     "texto": "Apoya la estructura educativa y asigna espacios para actividades académicas.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 70
+     }
+    },
+    {
+     "texto": "Coordina el Programa Anual de Prácticas y Visitas Escolares y gestiona su presupuesto.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 70
+     }
+    },
+    {
+     "texto": "Da seguimiento a las actividades de prefectura y participa en el Plan de Acción Tutorial.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 71
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 70
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-01",
+     "nombre": "Formación y actualización del personal docente",
+     "participacion": "Recibe la comunicación turnada por Dirección; las actividades posteriores dicen «área designada».",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 25
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "tecnologia_educativa",
+   "nombre": "Unidad de Tecnología Educativa y Campus Virtual",
+   "para": "Apoya tu aprendizaje con materiales y herramientas para la educación virtual.",
+   "objetivo": {
+    "texto": "Apoya tu aprendizaje con materiales y herramientas para la educación virtual.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 73
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Produce materiales audiovisuales, multimedia y software educativo.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 73
+     }
+    },
+    {
+     "texto": "Asesora y capacita a docentes en el uso educativo de tecnologías.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 73
+     }
+    },
+    {
+     "texto": "Da soporte a usuarios de herramientas de educación no escolarizada y mixta, con Informática.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 74
+     }
+    },
+    {
+     "texto": "Gestiona la publicación y difusión del Boletín UPIITA.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 74
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 73
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_academica",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "sepi",
+   "nombre": "Sección de Estudios de Posgrado e Investigación",
+   "para": "Coordina los estudios de posgrado y los proyectos de investigación de la unidad.",
+   "objetivo": {
+    "texto": "Coordina los estudios de posgrado y los proyectos de investigación de la unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 76
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Gestiona proyectos de investigación y apoyos para desarrollarlos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 76
+     }
+    },
+    {
+     "texto": "Coordina la difusión y selección de candidaturas para la beca BEIFI.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 76
+     }
+    },
+    {
+     "texto": "Facilita que estudiantes de licenciatura y posgrado participen en investigación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 77
+     }
+    },
+    {
+     "texto": "Coordina tu trayectoria de posgrado, documentos escolares, inscripción y reinscripción.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 78
+     }
+    },
+    {
+     "texto": "Promueve la obtención del grado académico.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 78
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 76
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "colegio_profesores",
+   "nombre": "Colegio de Profesores",
+   "para": "Acuerda asuntos académicos de posgrado, desde tu admisión hasta el examen de grado.",
+   "objetivo": {
+    "texto": "Acuerda asuntos académicos de posgrado, desde tu admisión hasta el examen de grado.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 80
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Dictamina propuestas de admisión al posgrado.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 80
+     }
+    },
+    {
+     "texto": "Avala consejeros de estudios, directores de tesis y comités tutoriales.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 80
+     }
+    },
+    {
+     "texto": "Avala temas de tesis y programas individuales y nombra jurados de examen de grado.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 80
+     }
+    },
+    {
+     "texto": "Atiende asuntos académico-administrativos que someten autoridades, docentes o estudiantes.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 80
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 80
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sepi",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "investigacion",
+   "nombre": "Departamento de Investigación",
+   "para": "Te orienta para participar en investigación y en la formación de investigadores.",
+   "objetivo": {
+    "texto": "Te orienta para participar en investigación y en la formación de investigadores.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 81
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Difunde convocatorias de investigación y formación de investigadores.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 81
+     }
+    },
+    {
+     "texto": "Propone la incorporación de estudiantes de licenciatura a proyectos de investigación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 81
+     }
+    },
+    {
+     "texto": "Orienta y selecciona candidaturas para la beca BEIFI.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 81
+     }
+    },
+    {
+     "texto": "Revisa protocolos, tramita su autorización y da seguimiento a los proyectos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 81
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 81
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sepi",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "posgrado",
+   "nombre": "Departamento de Posgrado",
+   "para": "Te orienta y tramita tu trayectoria académica y graduación de posgrado.",
+   "objetivo": {
+    "texto": "Te orienta y tramita tu trayectoria académica y graduación de posgrado.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 84
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Coordina los servicios educativos y actualiza los programas de posgrado.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 84
+     }
+    },
+    {
+     "texto": "Te orienta en cambios de programa, revalidaciones, revocación de bajas y graduación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 85
+     }
+    },
+    {
+     "texto": "Organiza el control escolar, las becas y la expedición de documentos de posgrado.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 85
+     }
+    },
+    {
+     "texto": "Registra jurados de examen de grado e informa lugar y hora de los exámenes.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 85
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 84
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "sepi",
+   "procedimientos": [],
+   "procedimientosNota": "Por confirmar: el Manual de Procedimientos no asigna una participación con el nombre de esta área."
+  },
+  {
+   "id": "subdireccion_administrativa",
+   "nombre": "Subdirección Administrativa",
+   "para": "Coordina los recursos y servicios necesarios para que funcione tu unidad.",
+   "objetivo": {
+    "texto": "Coordina los recursos y servicios necesarios para que funcione tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 105
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Supervisa la gestión del personal y su capacitación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 105
+     }
+    },
+    {
+     "texto": "Coordina el presupuesto y revisa los recursos de prácticas y visitas escolares.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 105
+     }
+    },
+    {
+     "texto": "Dirige las adquisiciones y el suministro de materiales y equipo.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 106
+     }
+    },
+    {
+     "texto": "Supervisa el mantenimiento de instalaciones y vehículos y los servicios de transporte.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 106
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 105
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "direccion",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-04",
+     "nombre": "Gestión de prácticas y visitas escolares",
+     "participacion": "Recibe copia del oficio de salida del transporte.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 75
+     }
+    },
+    {
+     "clave": "UPIITA-PA-03",
+     "nombre": "Adquisición de materiales y/o servicios por adjudicación directa",
+     "participacion": "Revisa y firma el cuadro comparativo de adquisición.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 205
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "capital_humano",
+   "nombre": "Departamento de Capital Humano",
+   "para": "Gestiona al personal que presta los servicios académicos y administrativos de tu unidad.",
+   "objetivo": {
+    "texto": "Gestiona al personal que presta los servicios académicos y administrativos de tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 108
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Tramita necesidades de personal y sus prestaciones, pagos e incidencias.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 108
+     }
+    },
+    {
+     "texto": "Organiza la capacitación del personal directivo y de apoyo y asistencia a la educación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 108
+     }
+    },
+    {
+     "texto": "Integra y controla los expedientes del personal.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 108
+     }
+    },
+    {
+     "texto": "Coordina con las áreas académicas la estructura para contratar docentes interinos de nuevo ingreso.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 109
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 108
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_administrativa",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PA-01",
+     "nombre": "Capacitación del personal de apoyo y asistencia a la educación",
+     "participacion": "Difunde, gestiona y da seguimiento a la capacitación y entrega constancias (p. 182).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 181
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "recursos_financieros",
+   "nombre": "Departamento de Recursos Financieros",
+   "para": "Gestiona y controla el presupuesto que sostiene las actividades de tu unidad.",
+   "objetivo": {
+    "texto": "Gestiona y controla el presupuesto que sostiene las actividades de tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 111
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Integra el programa presupuestario anual y gestiona los recursos asignados y propios.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 111
+     }
+    },
+    {
+     "texto": "Controla ingresos y egresos autorizados e integra informes financieros.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 111
+     }
+    },
+    {
+     "texto": "Coordina el presupuesto de prácticas y visitas escolares y de proyectos de investigación.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 111
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 111
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_administrativa",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-04",
+     "nombre": "Gestión de prácticas y visitas escolares",
+     "participacion": "Es destinatario de la solicitud de información presupuestal de la actividad 3; la 4 nombra a Recursos Materiales.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 74
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
+  },
+  {
+   "id": "recursos_materiales",
+   "nombre": "Departamento de Recursos Materiales y Servicios",
+   "para": "Atiende los materiales, el mantenimiento y los servicios generales de tu unidad.",
+   "objetivo": {
+    "texto": "Atiende los materiales, el mantenimiento y los servicios generales de tu unidad.",
+    "sintesis": true,
+    "fuente": {
+     "doc": "mo_upiita",
+     "pagina": 113
+    }
+   },
+   "funciones": [
+    {
+     "texto": "Gestiona compras y suministro de materiales y equipo para las áreas.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 113
+     }
+    },
+    {
+     "texto": "Registra y actualiza el inventario de bienes.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 113
+     }
+    },
+    {
+     "texto": "Atiende mantenimiento, vigilancia, limpieza y jardinería.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 113
+     }
+    },
+    {
+     "texto": "Proporciona transporte y realiza acciones de seguridad, higiene y uso sustentable de recursos.",
+     "fuente": {
+      "doc": "mo_upiita",
+      "pagina": 114
+     }
+    }
+   ],
+   "fuente": {
+    "doc": "mo_upiita",
+    "pagina": 113
+   },
+   "fuenteDependencia": {
+    "doc": "mo_upiita",
+    "pagina": 28
+   },
+   "depende": "subdireccion_administrativa",
+   "procedimientos": [
+    {
+     "clave": "UPIITA-PO-04",
+     "nombre": "Gestión de prácticas y visitas escolares",
+     "participacion": "La actividad 4 lo nombra para enviar información presupuestal; recibe copia del oficio de transporte (p. 75).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 74
+     }
+    },
+    {
+     "clave": "UPIITA-PA-02",
+     "nombre": "Mantenimiento y servicio a la infraestructura",
+     "participacion": "Recibe la solicitud de compra de material para mantenimiento (actividad 5). La adscripción del «Departamento de Mantenimiento y Servicios» que ejecuta el trabajo está por confirmar.",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 193
+     }
+    },
+    {
+     "clave": "UPIITA-PA-03",
+     "nombre": "Adquisición de materiales y/o servicios por adjudicación directa",
+     "participacion": "Gestiona requisiciones, cotizaciones, pedidos y registros de adquisición (pp. 204–206).",
+     "fuente": {
+      "doc": "mp_upiita",
+      "pagina": 204
+     }
+    }
+   ],
+   "procedimientosNota": "Se indica la participación documentada, que puede ser de recepción, apoyo o firma; no implica que el área tramite todo el procedimiento."
   }
  ],
  "preguntas": [

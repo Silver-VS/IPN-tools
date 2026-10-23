@@ -64,7 +64,7 @@ class TestEncabezados(unittest.TestCase):
             with self.subTest(archivo=nombre):
                 self.assertTrue(g['_fuente'].strip())
                 self.assertRegex(g['version'], r'^\d{4}\.\d{2}\.\d+$')
-                self.assertEqual(g['revisado'], '2026-10-16')
+                self.assertEqual(g['revisado'], '2026-10-23' if nombre == 'upiita' else '2026-10-16')
                 for id_, d in g['documentos'].items():
                     self.assertRegex(id_, r'^[a-z0-9_]+$')
                     self.assertTrue(d['titulo'].strip() and d['resumen'].strip())

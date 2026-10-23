@@ -76,6 +76,17 @@ necesidad.value='';necesidad.dispatchEvent(new Evento('input'));
 const nombres=[datos.organigrama.raiz.nombre,...datos.organigrama.raiz.colegiados,...datos.organigrama.raiz.apoyo];
 for (const a of datos.organigrama.raiz.areas) nombres.push(a.nombre,...a.dependencias,...a.colegiados||[]);
 for (const nombre of nombres) assert.ok([...caja.querySelectorAll('.guia-arbol [data-instancia]')].some(b=>b.textContent===nombre),nombre);
+// Cada nodo institucional debe abrir sus funciones citadas también desde la jerarquía.
+for (const nombre of nombres) {
+  const a=datos.acudir.find(a=>a.nombre===nombre);
+  assert.ok(a, 'Ficha documentada: '+nombre);
+  caja.querySelector('.guia-arbol [data-instancia="'+a.id+'"]').click();
+  const ficha=caja.querySelector('.guia-ficha');
+  assert.equal(ficha.querySelectorAll('.guia-funciones li').length,a.funciones.length,nombre);
+  for (const f of a.funciones) assert.ok([...ficha.querySelectorAll('.guia-funciones a')].some(n=>n.getAttribute('href').endsWith('#page='+f.fuente.pagina)),nombre+' p. '+f.fuente.pagina);
+  assert.equal(ficha.querySelectorAll('.guia-procedimientos li').length,a.procedimientos.length,nombre);
+  assert.ok(ficha.textContent.includes(a.objetivo.texto.replace(/\[\[g:[^|]+\|([^\]]+)\]\]/g,'$1')),nombre+' objetivo');
+}
 for (const a of datos.acudir.filter(a=>a.ambito==='ipn')) assert.ok(caja.querySelector('.guia-arbol [data-instancia="'+a.id+'"]'),a.id);
 caja.querySelector('.guia-arbol [data-instancia="gestion_escolar"]').click();
 assert.ok(caja.querySelector('.guia-ficha').textContent.includes('Subdirección de Servicios Educativos'));
@@ -83,7 +94,19 @@ ancho=375;
 await abrir('acudir');
 caja.querySelector('[data-instancia="gestion_escolar"]').click();
 assert.ok(document.querySelector('.sate-modal .guia-ficha'));
+assert.equal(document.querySelectorAll('.sate-modal .guia-funciones li').length,5,'Funciones con fuente también en teléfono');
 c.SateUI.cerrarModal();
+for (ancho of [1440,1024,768,375,320]) {
+  for (const nombre of nombres) {
+    const a=datos.acudir.find(a=>a.nombre===nombre);
+    await abrir('acudir',a.id);
+    const ficha=ancho<900 ? document.querySelector('.sate-modal .guia-ficha') : caja.querySelector('.guia-ficha');
+    assert.ok(ficha,nombre+' a '+ancho);
+    assert.equal(ficha.querySelectorAll('.guia-funciones li').length,a.funciones.length,nombre+' a '+ancho);
+    assert.equal(ficha.querySelectorAll('.guia-procedimientos li').length,a.procedimientos.length,nombre+' a '+ancho);
+    if(ancho<900)c.SateUI.cerrarModal();
+  }
+}
 pestana.ocultar(); assert.equal(cambios.size,0);
 // Validar texto renderizado con el catálogo compilado, además de los contratos por clave.
 const textos=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]).textos;

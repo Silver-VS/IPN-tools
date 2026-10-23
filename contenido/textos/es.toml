@@ -1869,6 +1869,8 @@ titulo = "Datos generales"
 
 # Guía por etapas y directorio
 [sate.guia.r10]
+objetivo_sintesis = "Objetivo del área (síntesis de funciones)"
+procedimientos = "Participación en procedimientos"
 "etapa_1" = "Inscribirte y cursar"
 "etapa_2" = "Evaluaciones"
 "etapa_3" = "Si repruebas"
