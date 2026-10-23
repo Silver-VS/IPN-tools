@@ -145,7 +145,7 @@
   const BASE = (document.currentScript && document.currentScript.src || '').replace(/[^\/]*$/, '');
   const unidad = () => raiz.SATE_UNIDAD;
   const cfg = () => SATE_CONFIG.unidades[unidad()] || {};
-  const E = { datos: new Map(), reglamentos: new Map() };
+  const E = { datos: new Map(), reglamentos: new Map(), partes: new WeakMap() };
   function h(etiqueta, atributos, hijos) {
     const n = document.createElement(etiqueta);
     for (const k in atributos || {}) {
@@ -178,10 +178,10 @@
   }
   function cargarReglamento(doc) {
     if (!/^[\w-]+$/.test(doc)) return Promise.reject(new Error('Documento inválido: ' + doc));
-    if (!E.reglamentos.has(doc)) E.reglamentos.set(doc, fetch('datos/reglamentos/' + doc + '.json').then(r => {
+    if (!E.reglamentos.has(doc)) E.reglamentos.set(doc, (SATE.json ? SATE.json('datos/reglamentos/' + doc + '.json') : fetch('datos/reglamentos/' + doc + '.json').then(r => {
       if (!r.ok) throw new Error('Reglamento ' + doc + ': HTTP ' + r.status);
       return r.json();
-    }).catch(e => { E.reglamentos.delete(doc); throw e; }));
+    })).catch(e => { E.reglamentos.delete(doc); throw e; }));
     return E.reglamentos.get(doc);
   }
   function botonArticulo(doc, n, texto) {
@@ -468,7 +468,8 @@
       return h('li', { 'class': clase, 'data-ancla': anclaDe }, [enlaceAncla('rgl-marca', anclaDe, marca, { 'aria-label': etiqueta }), h('div', {}, contenido)]);
     }
     function cuerpoArticulo(a) {
-      const p = partesArticulo(a), nodos = [];
+      if (!E.partes.has(a)) E.partes.set(a, partesArticulo(a));
+      const p = E.partes.get(a), nodos = [];
       if (p.intro) nodos.push(h('p', { texto: p.intro }));
       if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones' }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
       if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
@@ -517,7 +518,19 @@
         else tramo.removeAttribute('aria-current');
       }
     }
-    const secciones = new Map();
+    const secciones = new Map(), pendientes = new Map();
+    const inicial = leerAncla(ancla || ''), centro = posicion.get(inicial?.n) ?? 0;
+    function completar(clave) {
+      const pendiente = pendientes.get(clave);
+      if (!pendiente) return;
+      pendientes.delete(clave);
+      pendiente();
+    }
+    function vecindad(clave) {
+      const i = posicion.get(clave);
+      if (i == null) { completar(clave); return; }
+      for (let j = Math.max(0, i - 2); j <= Math.min(articulos.length - 1, i + 3); j++) completar(articulos[j].n);
+    }
     let ubicacionAnterior = [], contenedores = [texto];
     for (const a of articulos) {
       const ubicacion = a.ubicacion || [];
@@ -536,7 +549,11 @@
         () => { estado.textContent = t('sate.guia.rgl_copiado'); },
         () => { estado.textContent = t('sate.guia.rgl_copiar_error'); }));
       const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-' + anc, 'data-articulo': a.n }, [
-        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, estado]), cuerpoArticulo(a)]);
+        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, estado])]);
+      // Reservar altura evita que los títulos posteriores colapsen mientras llega su texto.
+      seccion.style.minHeight = Math.max(110, Math.ceil((a.texto || '').length / 80) * 24 + 64) + 'px';
+      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a)); seccion.style.minHeight = ''; });
+      if (Math.abs(posicion.get(a.n) - centro) <= 3) completar(a.n);
       contenedores[contenedores.length - 1].appendChild(seccion);
       secciones.set(a.n, seccion);
       ubicacionAnterior = ubicacion;
@@ -553,6 +570,7 @@
       const p = leerAncla(anclaDestino);
       const clave = anclaDestino === 'transitorios' && transitorios.length ? 'transitorios' : p && posicion.has(p.n) ? p.n : articulos.length ? articulos[0].n : 'transitorios';
       const cambio = clave !== actual;
+      vecindad(clave);
       if (cambio) pintar(clave);
       const final = p && clave === p.n && p.fr ? anclaArticulo(p.n, p.fr, p.inciso) : clave === 'transitorios' ? 'transitorios' : anclaArticulo(clave);
       const fr = final.includes('.') ? Array.from(texto.querySelectorAll('li[data-ancla]')).find(x => x.getAttribute('data-ancla') === final) : null;
@@ -583,14 +601,24 @@
       if (rielEnIndice && riel.parentNode !== cuerpoIndice) cuerpoIndice.insertBefore(riel, arbolNav);
       else if (!rielEnIndice && riel.parentNode !== rejilla) rejilla.appendChild(riel);
       // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
-      SateUI.lectorEncabezados(texto, chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
-      for (const seccion of secciones.values()) {
-        let tope = chico ? indice.querySelector('summary').offsetHeight || 48 : 0;
-        for (let padre = seccion.parentNode; padre && padre !== texto; padre = padre.parentNode) {
-          if (padre.classList.contains('rgl-seccion')) tope += padre.firstChild.offsetHeight || 48;
-        }
-        seccion.style.scrollMarginTop = (tope + 16) + 'px';
+      const base = chico ? indice.querySelector('summary').offsetHeight || 48 : 0;
+      const alturas = new Map(Array.from(texto.querySelectorAll('.rgl-encabezado'), n => [n, n.offsetHeight || 48]));
+      const cambios = [];
+      for (const [cab, alto] of alturas) {
+        let tope = base;
+        for (let padre = cab.parentNode.parentNode; padre && padre !== texto; padre = padre.parentNode)
+          if (padre.classList.contains('rgl-seccion')) tope += alturas.get(padre.firstChild) || 48;
+        cambios.push([cab, 'top', tope + 'px']);
       }
+      for (const seccion of secciones.values()) {
+        let tope = base;
+        for (let padre = seccion.parentNode; padre && padre !== texto; padre = padre.parentNode) {
+          if (padre.classList.contains('rgl-seccion')) tope += alturas.get(padre.firstChild) || 48;
+        }
+        cambios.push([seccion, 'scrollMarginTop', (tope + 16) + 'px']);
+      }
+      // Leer toda la geometría antes de escribir estilos: un layout por ajuste.
+      for (const [n, propiedad, valor] of cambios) if (n.style[propiedad] !== valor) n.style[propiedad] = valor;
     };
     if (consulta?.addEventListener) consulta.addEventListener('change', ajustar);
     ajustar();
@@ -603,11 +631,34 @@
       cuadro = raiz.requestAnimationFrame(() => {
         cuadro = 0;
         const visible = SateUI.lectorVisible(secciones);
-        if (visible && visible !== actual) pintar(visible);
+        if (visible) { vecindad(visible); if (visible !== actual) pintar(visible); }
       });
     };
     raiz.addEventListener('scroll', seguir, { passive: true });
-    limpiarLector = () => { if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.cancelAnimationFrame(cuadro); };
+    let detenido = false, tarea;
+    const enReposo = fn => raiz.requestIdleCallback ? raiz.requestIdleCallback(fn, {timeout:1000}) : raiz.setTimeout(fn, 50);
+    function sinSalto(fn) {
+      const anclaVista = secciones.get(actual), antes = anclaVista?.getBoundingClientRect().top;
+      fn();
+      if (antes != null && raiz.scrollBy) {
+        const diferencia = anclaVista.getBoundingClientRect().top - antes;
+        if (diferencia) raiz.scrollBy(0, diferencia);
+      }
+    }
+    const completarTodo = () => { for (const clave of pendientes.keys()) completar(clave); };
+    const continuar = () => {
+      if (detenido) return;
+      // Lotes pequeños también en el respaldo, para ceder a navegación y scroll.
+      sinSalto(() => { for (const clave of Array.from(pendientes.keys()).slice(0, 6)) completar(clave); });
+      if (pendientes.size) tarea = enReposo(continuar);
+    };
+    const interseccion = raiz.IntersectionObserver ? new raiz.IntersectionObserver(entradas => {
+      sinSalto(() => { for (const e of entradas) if (e.isIntersecting) vecindad(e.target.getAttribute('data-articulo')); });
+    }, {rootMargin:'800px'}) : null;
+    for (const n of secciones.values()) interseccion?.observe(n);
+    raiz.addEventListener('beforeprint', completarTodo);
+    tarea = enReposo(continuar);
+    limpiarLector = () => { detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.cancelAnimationFrame(cuadro); };
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
     const destino = ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null;
     if (destino) SateUI.revelar(destino);
@@ -617,7 +668,7 @@
     if (doc) {
       const reg = await cargarReglamento(doc);
       if (!vigente()) return {};
-      return montarReglamento(raizGuia, d, reg, doc, ancla);
+      return raiz.SateMedicion ? raiz.SateMedicion.render('reglamento ' + doc, () => montarReglamento(raizGuia, d, reg, doc, ancla)) : montarReglamento(raizGuia, d, reg, doc, ancla);
     }
     const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos') }], tituloApartado('reglamentos'), t('sate.guia.reglamentos_intro'));
     const indice = await cargarReglamento('indice');

@@ -1,7 +1,7 @@
 /* Diagnóstico voluntario: solo metadatos de rendimiento, nunca contenido del perfil. */
 (function () {
   if (!new URLSearchParams(location.search).has('medir')) return;
-  const p = globalThis.performance, datos = {version:1, pinturas:{}, tareasLargas:[], interacciones:[], renders:[], rutas:[], generaciones:[], errores:[]};
+  const p = globalThis.performance, datos = {version:1, pinturas:{}, tareasLargas:[], interacciones:[], renders:[], rutas:[], recursos:[], generaciones:[], errores:[]};
   const limite = 500;
   const agregar = (lista, valor) => { lista.push(valor); if (lista.length>limite) lista.shift(); };
   function observar(tipo, recibir, opciones={}) {
@@ -30,7 +30,7 @@
     const ms=(p?.now?.()??0)-m.inicio;
     try { p?.mark?.(m.id+'-fin'); p?.measure?.('sate:'+m.tipo+':'+m.nombre,m.id,m.id+'-fin');
       p?.clearMarks?.(m.id); p?.clearMarks?.(m.id+'-fin'); p?.clearMeasures?.('sate:'+m.tipo+':'+m.nombre); } catch {}
-    const lista=m.tipo==='ruta'?datos.rutas:m.tipo==='generacion'?datos.generaciones:datos.renders;
+    const lista=m.tipo==='ruta'?datos.rutas:m.tipo==='recurso'?datos.recursos:m.tipo==='generacion'?datos.generaciones:datos.renders;
     agregar(lista,{nombre:m.nombre,inicio:m.inicio,ms,...extra});
     actualizar();
   }

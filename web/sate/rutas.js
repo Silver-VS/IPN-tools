@@ -2,6 +2,8 @@
 (function (raiz) {
   function ruta(hash, unidad, config) {
     if (!hash.startsWith('#/')) return null;
+    // Compatibilidad con enlaces de artículo que usan un segundo #.
+    hash = hash.replace(/(\/reglamentos\/[A-Za-z0-9_-]+)#(art-[\w.-]+|transitorios)$/, '$1/$2');
     const partes = hash.slice(2).split('?')[0].split('/');
     if (config[partes[0]]) unidad = partes.shift();
     let pestaña = partes.shift() || 'mapa';
