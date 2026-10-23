@@ -74,6 +74,7 @@
     dlg.querySelector('.sate-modal__x').setAttribute('aria-label', traducir('componentes.cerrar'));
     dlg.classList.toggle('sate-modal--pequeno', !!op.pequeno);
     dlg.classList.toggle('sate-modal--amplio', !!op.amplio);
+    dlg.classList.toggle('sate-modal--lectura', !!op.lectura);
     var cuerpo = dlg.querySelector('.sate-modal__cuerpo');
     cuerpo.textContent = '';
     var c = typeof contenido === 'function' ? contenido() : contenido;

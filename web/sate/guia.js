@@ -211,11 +211,9 @@
       console.warn('SATE: artículo no disponible', { doc, n, mensaje: e.message });
     }
     const a = !reg?.sin_texto && reg?.articulos?.find(x => String(x.n) === String(n));
-    const inicioFracciones = a?.fracciones?.length ? a.texto.indexOf(a.fracciones[0].fr + '. ' + a.fracciones[0].texto) : -1;
     const cuerpo = h('div', { 'class': 'guia-articulo' }, a ? [
       h('p', { texto: (a.ubicacion || []).join(' · ') }),
-      h('div', { 'class': 'pc-lector pc-oficial' }, [h('p', { texto: inicioFracciones >= 0 ? a.texto.slice(0, inicioFracciones) : a.texto }),
-        a.fracciones?.length ? h('ol', { 'class': 'rgl-fracciones' }, a.fracciones.map(f => h('li', { 'class': 'rgl-fr' }, [h('span', { 'class': 'rgl-marca', texto: f.fr + '.' }), ' ', h('div', { texto: f.texto })]))) : null])
+      h('div', { 'class': 'pc-lector pc-oficial' }, [h('p', { 'class': 'guia-articulo-literal', texto: a.texto })])
     ] : [h('p', { role: 'status', texto: t(error ? 'sate.guia.error_articulo' : 'sate.guia.sin_articulo') })]);
     if (a && reg.ocr) cuerpo.appendChild(h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }));
     const leer = h('a', { href: rutaReglamento(doc, 'art-' + n), texto: t('sate.guia.leer_reglamento') });
@@ -223,7 +221,7 @@
     cuerpo.appendChild(leer);
     const url = reg?.url || meta.url;
     if (url) cuerpo.appendChild(enlaceExterno('', url, t('sate.guia.pdf_oficial')));
-    return SateUI.modal(t('sate.guia.articulo_titulo', { n, reglamento: reg?.titulo || meta.titulo || doc }), cuerpo);
+    return SateUI.modal(t('sate.guia.articulo_titulo', { n, reglamento: reg?.titulo || meta.titulo || doc }), cuerpo, {lectura:true});
   };
   const apartados = () => apartadosDisponibles(SATE_CONFIG.guia, cfg());
   const infoApartado = id => (SATE_CONFIG.guia || []).find(a => a.id === id);

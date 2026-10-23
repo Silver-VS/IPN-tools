@@ -1,5 +1,18 @@
 {
   "_fuente": "Qué pestañas y trámites muestra SATE en cada unidad (plan de la plataforma, secciones 1.2 y 5). Los textos van por clave en contenido/textos/es.toml (sate.pestana.<id>, sate.tramite.<id>); lo valida tools/contenido.py.",
+  "citasVentanilla": {
+    "dictamen.fund_i1": [["ri", "98"]],
+    "dictamen.fund_i2": [["rge", "52"]],
+    "dictamen.fund_i3": [["rge", "60"]],
+    "dictamen.fund_e1": [["rge", "48"], ["rge", "52"], ["rge", "57"]],
+    "dictamen.fund_e2": [["rge", "49"]],
+    "dictamen.fund_e3": [["rge", "52"]],
+    "dictamen.fund_e4": [["cgc", "45"]],
+    "sate.baja.aviso_temporal_1": [["rge", "55"]],
+    "sate.baja.aviso_temporal_2": [["rge", "55"]],
+    "sate.baja.aviso_definitiva_3": [["rge", "57"]],
+    "sate.baja.periodos_ayuda": [["rge", "55"]]
+  },
   "pestanasOcultas": [],
   "_pestanasOcultas": "Pestañas que no se muestran en ninguna unidad mientras se rediseñan.",
   "_vistas": "Vistas con ruta propia (#/<unidad>/<id>) que no ocupan una pestaña: `padre` es la pestaña que se marca al estar en ellas. La compilación las quita de una unidad que no tenga datos (temarios: data/temarios/<unidad>/). Textos: sate.vista.<id>.titulo.",
