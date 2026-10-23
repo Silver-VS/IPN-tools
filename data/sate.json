@@ -87,6 +87,7 @@
         "tramite": "electivas"
       },
       "biblioteca": "UPITA",
+      "actividadesDatos": "actividades-upiita.json",
       "guiaTramites": {
         "dictamen": "situacion/que-es-dictamen",
         "baja_temporal": "tramites/baja-temporal",
@@ -187,6 +188,14 @@
     "DC"
   ],
   "guia": [
+    {
+      "id": "actividades",
+      "titulo": "sate.guia.actividades",
+      "descripcion": "sate.guia.actividades_descripcion",
+      "icono": "◈",
+      "capacidad": "actividadesDatos",
+      "datos": "actividades"
+    },
     {
       "id": "situacion",
       "titulo": "sate.guia.situacion",

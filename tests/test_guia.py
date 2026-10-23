@@ -240,6 +240,9 @@ class TestCompilacion(unittest.TestCase):
         for u, guia in GUIAS.items():
             esperado = deepcopy(guia)
             esperado.pop('_fuente', None)
+            capacidad = json.loads((RAIZ / 'data/sate.json').read_text(encoding='utf-8'))['unidades'][u].get('actividadesDatos')
+            if capacidad:
+                esperado['actividades'] = json.loads((RAIZ / 'data/guia' / capacidad).read_text(encoding='utf-8'))
             if isinstance(esperado.get('organigrama'), str):
                 esperado['organigrama'] = json.loads((RAIZ / 'data/guia' / esperado['organigrama']).read_text(encoding='utf-8'))
             for p in esperado['preguntas']:
