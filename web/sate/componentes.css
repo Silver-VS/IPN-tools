@@ -655,24 +655,20 @@ body.sate-flotante .sate-barra{display:flex}
 .trayectoria-plegable>summary:focus-visible,.plan-menu>summary:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .trayectoria-plegable>div{padding:var(--ipn-esp-3);min-width:0}
 .kx-controles{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--ipn-esp-3);margin-block:var(--ipn-esp-3)}
-.kx-cabecera{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--ipn-esp-5);align-items:end;margin-block:var(--ipn-esp-5);padding-bottom:var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
+.kx-cabecera{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-5);align-items:end;margin-block:var(--ipn-esp-5);padding-bottom:var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
 .kx-cabecera h3{margin:0;font-size:var(--ipn-tamano-l)}
 .kx-promedios{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr));gap:var(--ipn-esp-3);scroll-margin-top:var(--ipn-esp-5)}
-.kx-promedios>div{padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
-.kx-promedios>div:first-child{border-color:var(--ipn-acento);background:var(--ipn-acento-suave)}
-.kx-promedios span{display:block;font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
-.kx-promedios strong{display:block;font-size:var(--ipn-tamano-xl);font-variant-numeric:tabular-nums}
 .kx-bloque,.trayectoria-kardex-curso,#trayectoria-kardex{min-width:0;max-width:100%}
-.kx-curso-lista{display:grid;gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}
+.kx-curso-lista{display:grid;gap:0;margin:0;padding:0;list-style:none}
 .kx-curso-lista li{display:flex;justify-content:space-between;gap:var(--ipn-esp-3);padding:var(--ipn-esp-2) 0;border-bottom:1px solid var(--ipn-linea)}
-.kx-curso-lista li span{color:var(--ipn-tenue);white-space:nowrap}
+.kx-curso-lista li>span:last-child:not(.kx-curso-materia){color:var(--ipn-tenue);white-space:nowrap}
 .kx-periodos{display:flex;gap:var(--ipn-esp-3);overflow-x:auto;max-width:100%;padding-block:var(--ipn-esp-3);scroll-snap-type:x proximity}
 .kx-periodo{flex:0 0 calc(var(--ipn-esp-8)*4);min-width:0;display:flex;flex-direction:column;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);cursor:pointer;scroll-snap-align:start}
 .kx-periodo-cab,.kx-periodo-pie{display:flex;justify-content:space-between;gap:var(--ipn-esp-2)}
 .kx-periodo-cab{font-size:var(--ipn-tamano-s);font-variant-numeric:tabular-nums}
 .kx-periodo-pie{margin-top:auto;border-top:1px solid var(--ipn-linea);padding-top:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
 .kx-fichas{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1)}
-.kx-nota{display:inline-flex;align-items:center;justify-content:center;min-width:var(--ipn-esp-6);padding:var(--ipn-esp-1);border:1px solid currentColor;border-radius:var(--ipn-radio);font-family:var(--ipn-fuente-mono);font-size:var(--ipn-tamano-xs);font-variant-numeric:tabular-nums}
+.kx-nota{display:inline-flex;align-items:center;justify-content:center;min-width:var(--ipn-esp-6);padding:var(--ipn-esp-1);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);font-family:var(--ipn-fuente-mono);font-size:var(--ipn-tamano-xs);font-weight:600;font-variant-numeric:tabular-nums}
 .kx-nota sub{margin-left:var(--ipn-esp-1)}
 .kx-g9{background:var(--ipn-ok-suave);color:var(--ipn-ok)}
 .kx-g8{background:var(--ipn-info-suave);color:var(--ipn-info)}
@@ -681,10 +677,7 @@ body.sate-flotante .sate-barra{display:flex}
 .kx-g5,.kx-baja{color:var(--ipn-error)}
 .kx-sube{color:var(--ipn-ok)}
 #kx-filtros{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
-.kx-filtro{min-height:2.75rem;padding:var(--ipn-esp-2) var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido);color:var(--ipn-texto);font:inherit;font-size:var(--ipn-tamano-xs);cursor:pointer}
-.kx-filtro[aria-pressed="true"],.kx-periodo[aria-pressed="true"]{background:var(--ipn-acento-suave);border-color:var(--ipn-acento);color:var(--ipn-acento)}
-.kx-filtro:hover,.kx-periodo:hover{border-color:var(--ipn-acento)}
-.kx-filtro:focus-visible,.kx-periodo:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
+.kx-periodo:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
 .kx-leyenda,#kx-cuenta{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
 .kx-tabla{width:100%;border-collapse:collapse;font-size:var(--ipn-tamano-s)}
 .kx-tabla th,.kx-tabla td{padding:var(--ipn-esp-2) var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea);text-align:left;overflow-wrap:anywhere}
@@ -955,7 +948,7 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 #hor-desfase{display:grid;gap:var(--ipn-esp-3);margin-bottom:var(--ipn-esp-4)}
 #hor-desfase:empty{display:none}
 
-#trayectoria-escenario>summary{font-size:var(--ipn-tamano-l);font-weight:700;padding-bottom:var(--ipn-esp-2)}
+:is(#trayectoria-escenario,#trayectoria-kardex)>summary{font-size:var(--ipn-tamano-l);font-weight:700;padding-bottom:var(--ipn-esp-2)}
 #trayectoria-escenario>summary small{font-size:var(--ipn-tamano-s)}
 #trayectoria-escenario>div{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-5);padding-top:var(--ipn-esp-2)}
 #trayectoria-escenario:not([open])>div{display:none}
@@ -1034,3 +1027,13 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 
 /* Pie: el botón del recorrido no queda pegado al enlace de opinión. */
 .foot .sate-btn{margin-inline-start:var(--ipn-esp-3)}
+
+/* Kárdex: mismos ejes, indicadores y controles que Tu perfil. */
+.kx-curso-materia{min-width:0;overflow-wrap:anywhere;text-align:left}
+.kx-curso-materia b{font-family:var(--ipn-fuente-mono);font-size:var(--ipn-tamano-xs);font-weight:400;color:var(--ipn-tenue);margin-right:var(--ipn-esp-2)}
+.kx-curso-lista li{align-items:baseline;font-size:var(--ipn-tamano-s);line-height:1.5}
+.kx-chips{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);min-width:0}
+#kx-cuenta{margin-inline-start:auto}
+.kx-leyenda{margin:0;text-align:left;line-height:1.5}
+.kx-nota sub{font-size:inherit;font-weight:400}
+.kx-promedios .kpi[hidden]{display:none}

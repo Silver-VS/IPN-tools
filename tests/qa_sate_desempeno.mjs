@@ -26,7 +26,7 @@ for(const unidad of ['upiita','escom','upibi']){
     const n=Number(v[k]),op={};c.replace(/(=?\w+)\s*\{([^{}]*)\}/g,(_,k,t)=>{op[k]=t});
     return (op['='+n]??op[new Intl.PluralRules('es-MX').select(n)]??op.other??'').replace(/#/g,String(n));
   }).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}');
-  function nodo(id='') {return {id,hidden:true,innerHTML:'',textContent:'',value:'',options:[],dataset:{},parentElement:{hidden:false},clientWidth:375,offsetWidth:375,offsetHeight:800,
+  function nodo(id='') {return {id,hidden:true,innerHTML:'',textContent:'',value:'',options:[],dataset:{},parentElement:{hidden:false,parentElement:{hidden:false}},clientWidth:375,offsetWidth:375,offsetHeight:800,
     style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains(){return false}},eventos:{},
     addEventListener(k,fn){(this.eventos[k]??=[]).push(fn)},setAttribute(){},removeAttribute(){},getAttribute(){return null},appendChild(){},insertAdjacentHTML(){},
     querySelector:s=>s==='svg'?null:nodo(),querySelectorAll:s=>s==='.charts'?[nodo(),nodo()]:[],closest:()=>null,contains:()=>false,
@@ -102,6 +102,9 @@ for(const unidad of ['upiita','escom','upibi']){
   areas.open=false;areas.eventos.toggle.at(-1)();
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.match(vm.runInContext('kardexCurso()',c),/^<ul class="kx-curso-lista">/,'R9: si grupo y parciales faltan, el curso se muestra como lista compacta');
+  assert.match(vm.runInContext('kardexCurso()',c),/<li><span class="kx-curso-materia"><b>[^<]+<\/b> [^<]+<\/span><span>/,'R10: clave y nombre agrupados antes de los créditos');
+  assert.match(document.querySelector('#kstats').innerHTML,/<div class="kpi"><span>[^<]+<\/span><div class="kpi-v"><b id="kx-prom-oficial">/,'R10: promedio con el componente común de indicadores');
+  assert.match(document.querySelector('#kstats').innerHTML,/<div class="kx-chips"><button[^>]+id="kx-todos"[^>]+class="chip"/,'R10: todos los periodos comparte fila y componente con los filtros');
   vm.runInContext("ALUMNO.en_curso=[Object.keys(cur())[0]];ALUMNO.horario_inscrito=[['7FV1',ALUMNO.en_curso[0],cur()[ALUMNO.en_curso[0]][0],[],[]]];ALUMNO.horario_inscrito[0].p1=8",c);
   const cursoConDatos=vm.runInContext('kardexCurso()',c);
   assert.match(cursoConDatos,/<th scope="col">Grupo<\/th>/,'R9: aparece una columna con datos');
@@ -118,7 +121,7 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(kardex.open,false,'F: preferencia explícita prevalece');
   assert.match(document.querySelector('#kstats').innerHTML,/Tu camino|kpis/);
   const orden=document.querySelector('#kstats').innerHTML;
-  const bloques=['class="kpis"','id="kx-curso-titulo"','id="trayectoria-kardex"','id="kx-lista"','id="ch-camino"','id="trayectoria-sim-slot"','id="trayectoria-escenario-titulo"','id="meta-periodos"','id="prom-meta"','id="ch-cat"'];
+  const bloques=['class="kpis"','id="kx-curso-titulo"','id="trayectoria-kardex"','id="kx-lista"','id="ch-camino"','id="trayectoria-sim-slot"','id="trayectoria-escenario-titulo"','id="prom-meta"','id="meta-periodos"','id="ch-cat"'];
   assert.ok(bloques.every((x,i)=>orden.includes(x)&&(!i||orden.indexOf(bloques[i-1])<orden.indexOf(x))),'B1: orden del desempeño y metas agrupadas');
   assert.ok(orden.indexOf('id="trayectoria-kardex"')<orden.indexOf('id="ch-camino"')&&orden.indexOf('id="ch-camino"')<orden.indexOf('id="trayectoria-sim-slot"'),'B1: kárdex antes de trayectoria y escenarios');
   assert.match(orden,/<details class="trayectoria-areas-detalle"><summary>Ver detalle<\/summary>/,'REV1: datos de áreas plegados por omisión');
@@ -225,3 +228,8 @@ for(const unidad of ['upiita','escom','upibi']){
   c.statsDatos=motor;
   console.log(unidad+': módulo independiente, Plot/D3 diferidos, cancelación, error/reintento, DEMO, plurales, chip global y áreas 6–10, ranking, muestra mínima, créditos, teléfono y temas correctos.');
 }
+
+assert.match(leer("web/sate/desempeno.js"), /class="kpis kx-promedios"/);
+assert.doesNotMatch(cssKx, /\.kx-promedios>div:first-child/);
+assert.match(cssKx, /\.kx-curso-materia\{[^}]*text-align:left/);
+assert.match(leer("web/sate/desempeno.js"), /class="chip kx-periodo"/);
