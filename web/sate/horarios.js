@@ -1,4 +1,119 @@
 const txH=(clave,vars)=>SATE.texto('sate.horarios.'+clave,vars);
+// Prueba privada: no modifica los controles existentes si está apagada.
+const FILTROS_D=(()=>{const url=globalThis.SATE_CONFIG?.pruebaFiltrosD||globalThis.location?.hash?.includes('#filtros-d');try{return url||localStorage.getItem('sate.prueba.filtrosD')==='1'}catch{return !!url}})();
+function montarFiltrosD(){
+  if(!FILTROS_D||$('#filters').classList.contains('filtros-d'))return;
+  const filtros=$('#filters'),mas=$('#f-more .more-filters');
+  filtros.classList.add('filtros-d');
+  filtros.prepend($('#f-q').closest('.field'));
+  mas.prepend($('#f-nivel').closest('.field'));
+  for(const id of ['f-cupo','f-fit'])filtros.insertBefore($('#'+id).closest('label'),$('#f-more'));
+  $('#f-fit').closest('label').lastChild.textContent=txH('d_sin_choques');
+  const impacto=document.createElement('section');impacto.className='filtros-d-impacto';
+  impacto.innerHTML=`<strong id="d-cuenta" role="status"></strong><details><summary>${esc(txH('d_por_que'))}</summary><ul id="d-reglas"></ul></details><div id="d-activos" class="active"></div>`;
+  filtros.after(impacto);
+  $('#active').hidden=true;
+  $('#f-hide').closest('label').hidden=true;
+  $('#b-reset').hidden=true;
+  for(const id of ['g-src'])$('#'+id).closest('.field').hidden=true;
+  $('[data-gt]').closest('.field').hidden=true;
+  $('#cupos-omitir').closest('label').hidden=true;
+  $('#cupos-omitir-ayuda').hidden=true;
+  $('#h-offer').parentElement.appendChild($('[data-view]').closest('.field'));
+  $('.planner').appendChild($('#gen'));
+  const salida=document.createElement('label');salida.className='field';
+  const titulo=document.createElement('span');titulo.textContent=txH('d_salida');salida.append(titulo,$('#g-to'));
+  filtros.insertBefore(salida,$('#f-more'));
+  const panel=document.createElement('dialog');panel.className='filtros-d-panel';panel.setAttribute('aria-label',txH('mas_filtros'));
+  const cerrar=document.createElement('button');cerrar.type='button';cerrar.className='btn';cerrar.textContent=txH('d_cerrar');
+  panel.append(cerrar,mas);$('#v-hor').appendChild(panel);
+  $('#f-more-title').addEventListener('click',e=>{e.preventDefault();panel.showModal();cerrar.focus()});
+  cerrar.addEventListener('click',()=>{panel.close();$('#f-more-title').focus()});
+  panel.addEventListener('cancel',()=>$('#f-more-title').focus());
+  const limpiar=document.createElement('button');limpiar.type='button';limpiar.className='link';limpiar.textContent=txH('d_limpiar');
+  impacto.prepend(limpiar);
+  limpiar.addEventListener('click',()=>{
+    Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],onlyWant:false,hideDone:false,soloCupo:false,fit:false,gap:null});
+    Object.assign(GT,{a:'',b:''});gtSave();$('#f-q').value='';
+    for(const k of ['tur','niv','onlyWant','hideDone','soloCupo'])store.set(k,S[k]);
+    renderHFilters();renderGTime();renderOffer();
+  });
+  const quitar=e=>{
+    const b=e.target.closest('[data-d-quitar]');if(!b)return;
+    const k=b.dataset.dQuitar;
+    if(k.startsWith('chip:'))S.chips.splice(+k.slice(5),1);
+    else if(k.startsWith('prof:')){S.gavoid.splice(+k.slice(5),1);store.set('excl',S.gavoid)}
+    else if(k.startsWith('no:')){delete ws().marks[k.slice(3)];save()}
+    else if(k==='a'||k==='b'){GT[k]='';gtSave()}
+    else{S[k]=['tur','niv'].includes(k)?'*':k==='q'?'':k==='gap'?null:false;store.set(k,S[k])}
+    $('#f-q').value=S.q;renderHFilters();renderGTime();renderOffer();
+  };
+  $('#d-activos').addEventListener('click',quitar);
+  const oferta=$('#offer');oferta.addEventListener('click',quitar);
+}
+function ocultosFiltrosD(list){
+  const visibles=new Set(list.map(keyOf)),grupos=new Map();
+  for(const c of classes().filter(c=>c[0]===S.car&&!visibles.has(keyOf(c)))){
+    const r=[];
+    if(S.tur!=='*'&&c[1]!==S.tur)r.push(['tur',txH('d_turno',{valor:TURNOS[S.tur]||S.tur})]);
+    if(S.niv!=='*'&&c[2]!==S.niv)r.push(['niv',txH('nivel',{n:S.niv})]);
+    if(S.onlyWant&&!tr().want.includes(c[8])&&!S.fit&&!S.gap)r.push(['onlyWant',txH('d_mis_materias')]);
+    if(outWin(c))r.push([GT.b?'b':'a',txH('d_fuera_hora')]);
+    if(isExcl(c))r.push(['prof:'+S.gavoid.findIndex(p=>c[5].some(i=>norm(DATA.prof[i]).includes(norm(p)))),txH('profesor_excluido')]);
+    if(ws().marks[keyOf(c)]?.s==='no')r.push(['no:'+keyOf(c),txH('no')]);
+    if(S.hideDone&&isPersonal()&&tr().done.includes(c[8]))r.push(['hideDone',txH('acreditada')]);
+    if(S.soloCupo&&typeof CUPOS!=='undefined'&&CUPOS.fila(c)?.disponibles===0)r.push(['soloCupo',txH('d_lleno')]);
+    if(S.q.trim()&&!norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(norm(S.q.trim())))r.push(['q',txH('d_busqueda',{valor:S.q})]);
+    if(S.fit||S.gap){
+      const sel=selected(),done=new Set(isPersonal()?tr().done:[]);
+      const cabe=c[6].length&&!sel.some(x=>x[4]===c[4])&&!done.has(c[8])&&![...sel,...ownAsClasses()].some(x=>overlaps(x,c));
+      if(!cabe)r.push([S.fit?'fit':'gap',txH('d_sin_choques')]);
+      if(S.gap&&!c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b))r.push(['gap',txH('d_fuera_hueco')]);
+    }
+    if(!r.length)r.push(['chips',txH('d_seleccion_busqueda')]);
+    const g=grupos.get(c[4])||{c,items:[]};g.items.push({c,r});grupos.set(c[4],g);
+  }
+  let ceros=0;
+  const html=[...grupos.values()].map(({c,items})=>{
+    const cero=!list.some(x=>x[4]===c[4]);if(cero)ceros++;
+    return `<article class="subj"><header><h3>${esc(name(c))}</h3></header>${cero?`<p>${esc(txH('d_cero',{n:items.length}))}</p>`:''}<details><summary>${esc(txH('d_ocultos',{n:items.length}))}</summary>${items.map(({c,r})=>`<p>${esc(c[3])} · ${esc(r.map(x=>x[1]).join(' · '))}${cero&&r[0][0]!=='chips'?` <button type="button" class="link" data-d-quitar="${esc(r[0][0])}">${esc(txH('d_quitar_regla',{nombre:r[0][1]}))}</button>`:''}</p>`).join('')}</details></article>`;
+  }).join('');
+  $('#d-cuenta').textContent=txH('d_cuenta',{n:list.length,total:classes().filter(c=>c[0]===S.car).length})+' · '+txH('d_sin_grupos',{n:ceros});
+  return html;
+}
+function reglasFiltrosD(){
+  const r=[];
+  if(S.onlyWant)r.push(txH('d_mis_materias'));
+  if(S.tur!=='*')r.push(txH('d_turno',{valor:TURNOS[S.tur]||S.tur}));
+  if(S.niv!=='*')r.push(txH('nivel',{n:S.niv}));
+  if(S.q.trim())r.push(txH('d_busqueda',{valor:S.q.trim()}));
+  for(const x of S.chips)r.push(x.t==='m'?DATA.asig[x.v]:x.t==='p'?DATA.prof[x.v]:x.v);
+  if(S.soloCupo)r.push(txH('solo_cupo'));
+  if(S.fit)r.push(txH('d_sin_choques'));
+  if(S.hideDone&&isPersonal())r.push(txH('ocultar_acreditadas'));
+  if(GT.a)r.push(txH('d_desde',{hora:GT.a}));
+  if(GT.b)r.push(txH('d_hasta',{hora:GT.b}));
+  for(const p of S.gavoid)r.push(txH('d_sin_profesor',{nombre:p}));
+  for(const [k,m] of Object.entries(ws().marks))if(m.s==='no')r.push(txH('d_marca_no',{grupo:k}));
+  if(S.gap)r.push(txH('d_hueco',{valor:DAYS[S.gap.d]+' '+hm(S.gap.a)+'–'+hm(S.gap.b)}));
+  return r;
+}
+function renderFiltrosD(){
+  if(!FILTROS_D)return;
+  montarFiltrosD();
+  const reglas=reglasFiltrosD();
+  $('#f-want-l').textContent=txH('d_mis_materias');
+  $('#d-cuenta').textContent=txH('d_cuenta',{n:filtered().length,total:classes().filter(c=>c[0]===S.car).length});
+  $('#d-reglas').innerHTML=(reglas.length?reglas:[txH('d_sin_filtros')]).map(r=>`<li>${esc(r)}</li>`).join('');
+  $('#d-reglas').innerHTML+=`<li>${esc(txH('d_fijos'))}</li>`;
+  const generador=[];
+  if(GT.days)generador.push(txH('d_gen_dias',{n:GT.days}));
+  if(GT.n)generador.push(txH('d_gen_materias',{n:GT.n==='auto'?txH('d_automatico'):GT.n}));
+  for(const b of GT.breaks||[])generador.push(txH('d_gen_descanso',{minutos:b.d,desde:b.a,hasta:b.b,dias:(b.days?.length?b.days.map(d=>DAYS[d]):DAYS.slice(0,5)).join(', ')}));
+  $('#d-reglas').innerHTML+=generador.map(r=>`<li>${esc(r)}</li>`).join('');
+  const claves=[...(S.onlyWant?['onlyWant']:[]),...(S.tur!=='*'?['tur']:[]),...(S.niv!=='*'?['niv']:[]),...(S.q.trim()?['q']:[]),...S.chips.map((_,i)=>'chip:'+i),...(S.soloCupo?['soloCupo']:[]),...(S.fit?['fit']:[]),...(S.hideDone&&isPersonal()?['hideDone']:[]),...(GT.a?['a']:[]),...(GT.b?['b']:[]),...S.gavoid.map((_,i)=>'prof:'+i),...Object.entries(ws().marks).filter(([,m])=>m.s==='no').map(([k])=>'no:'+k),...(S.gap?['gap']:[])];
+  $('#d-activos').innerHTML=reglas.map((r,i)=>`<span class="chip">${esc(r)}<button type="button" data-d-quitar="${esc(claves[i])}" aria-label="${esc(txH('quitar_filtro',{nombre:r}))}">×</button></span>`).join('');
+}
 if(typeof CUPOS!=='undefined')CUPOS.montar();
 $('#offer').addEventListener('click',e=>{
   if(e.target.closest('[data-oferta-mapa]'))SATE.ir('mapa');
@@ -99,6 +214,7 @@ $('#b-clear').addEventListener('click',()=>{plan().sel=[];plan().own=[];$('#copy
 $('#equiv').addEventListener('toggle',renderEquiv);
 function base(){return classes().filter(c=>c[0]===S.car&&(S.tur==='*'||c[1]===S.tur)&&(S.niv==='*'||c[2]===S.niv))}
 function filtered(){
+  const filtrosD=typeof FILTROS_D!=='undefined'&&FILTROS_D;
   const q=norm(S.q.trim()), marks=ws().marks, want=new Set(tr().want);
   const m=S.chips.filter(x=>x.t==='m').map(x=>x.v), p=S.chips.filter(x=>x.t==='p').map(x=>x.v), g=S.chips.filter(x=>x.t==='g').map(x=>x.v);
   // llenar huecos: en toda la carrera, sin lo ya elegido/acreditado, sin choques y (si hay hueco) con clase en ese bloque
@@ -106,8 +222,8 @@ function filtered(){
   const fits=c=>c[6].length&&!have.has(c[4])&&!done.has(c[8])&&![...sel,...own].some(x=>overlaps(x,c))&&
     (!S.gap||c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b));
   const mine=new Set(plan().sel);
-  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!S.hide||mine.has(keyOf(c))||!isExcl(c))&&(!S.soloCupo||mine.has(keyOf(c))||typeof CUPOS==='undefined'||!CUPOS.fila(c)||CUPOS.fila(c).disponibles>0)&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
-    (!S.hideDone||mine.has(keyOf(c))||!done.has(c[8]))&&(!S.hide||marks[keyOf(c)]?.s!=='no'||mine.has(keyOf(c)))&&
+  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!(filtrosD||S.hide)||mine.has(keyOf(c))||!isExcl(c))&&(!S.soloCupo||mine.has(keyOf(c))||typeof CUPOS==='undefined'||!CUPOS.fila(c)||CUPOS.fila(c).disponibles>0)&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
+    (!S.hideDone||mine.has(keyOf(c))||!done.has(c[8]))&&(!(filtrosD||S.hide)||marks[keyOf(c)]?.s!=='no'||mine.has(keyOf(c)))&&
     (!q||norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(q)));
 }
 function suggest(q){
@@ -160,9 +276,10 @@ function renderHFilters(){
   renderActive();renderGPrefs();
 }
 function renderMasFiltros(){
+  if(typeof renderFiltrosD==='function')renderFiltrosD();
   const n=[S.hide,S.fit,!!(GT.a||GT.b),S.gavoid.length>0,S.hideDone&&isPersonal(),S.soloCupo].filter(Boolean).length;
   $('#f-more-title').textContent=txH(n?'mas_filtros_activos':'mas_filtros',{n});
-  if(n)$('#f-more').open=true;
+  if(n&&(typeof FILTROS_D==='undefined'||!FILTROS_D))$('#f-more').open=true;
 }
 /* Salones (índice 10, paralelo a los bloques; solo periodo actual, del PDF de horarios por aula de la unidad) */
 const shortRoom=r=>String(r||'').replace(/^Aula\s+/,'');
@@ -473,25 +590,27 @@ async function iniciarGeneracion(){
 // La API síncrona se conserva para las invariantes del motor; consume el mismo algoritmo.
 function generate(materias,rescate=false){const iter=generarPasos({start:performance.now(),nodes:0,limited:false},materias,rescate);let r;do{r=iter.next()}while(!r.done);return r.value}
 function* generarPasos(run,materias,rescate=false){
+  const filtrosD=typeof FILTROS_D!=='undefined'&&FILTROS_D;
   // materias y grupos: los mismos que muestra la oferta con sus filtros (turno, nivel, búsqueda, materia, profesor, grupo,
   // «solo las elegidas», horario en la escuela, excluidos). «Solo lo que cabe» y la búsqueda de huecos no aplican aquí.
-  const todo=Array.isArray(materias)||GT.src==='todo';   // Las alternativas abarcan los grupos de las materias del horario armado.
-  const pool=todo?classes().filter(c=>c[0]===S.car):(()=>{const f=S.fit,g=S.gap;S.fit=false;S.gap=null;try{return filtered()}finally{S.fit=f;S.gap=g}})();
+  const todo=!filtrosD&&(Array.isArray(materias)||GT.src==='todo');   // Las alternativas abarcan los grupos de las materias del horario armado.
+  const pool=filtrosD?[...new Map([...filtered(),...selected()].map(c=>[keyOf(c),c])).values()]:todo?classes().filter(c=>c[0]===S.car):(()=>{const f=S.fit,g=S.gap;S.fit=false;S.gap=null;try{return filtered()}finally{S.fit=f;S.gap=g}})();
   let want=Array.isArray(materias)?materias.slice():todo?(tr().want.length?tr().want.slice():[...new Set(S.chips.filter(x=>x.t==='m').map(x=>classes().find(c=>c[4]===x.v)?.[8]).filter(Boolean))]):[...new Set(pool.map(c=>c[8]))];
   if(!todo&&!S.onlyWant&&!S.chips.some(x=>x.t==='m')&&tr().want.length){const w=new Set(tr().want);want=want.filter(k=>w.has(k))}   // sin filtro de materias: las elegidas
   // El rescate conserva exactamente las materias del horario, incluidas las inscritas.
   if(!rescate){tr().oblig.forEach(k=>{if(!want.includes(k))want.unshift(k)});
     const ya=new Set([...tr().done,...tr().curso]);want=want.filter(k=>!ya.has(k))}
   const t=tr();want=want.filter(k=>!t.adeudos?.includes(k)||t.elecciones[k]==='actual');
+  if(filtrosD)for(const c of selected())if(!want.includes(c[8]))want.push(c[8]);
   const marks=ws().marks, own=ownAsClasses();
   const pref=S.gpref.map(norm), avoid=S.gavoid.map(norm);
   const pscore=c=>c[5].reduce((s,i)=>s+(pref.some(p=>norm(DATA.prof[i]).includes(p))?4:0),0);
-  const bad=c=>(typeof CUPOS!=='undefined'&&(CUPOS.excluir(c)||(S.soloCupo&&!plan().sel.includes(keyOf(c))&&CUPOS.fila(c)?.disponibles===0)))||marks[keyOf(c)]?.s==='no'||c[5].some(i=>avoid.some(p=>norm(DATA.prof[i]).includes(p)))||(S.gt!=='*'&&c[1]!==S.gt)||own.some(o=>overlaps(o,c))||outside(c);
+  const bad=c=>!(filtrosD&&plan().sel.includes(keyOf(c)))&&((typeof CUPOS!=='undefined'&&((!filtrosD&&CUPOS.excluir(c))||(S.soloCupo&&!plan().sel.includes(keyOf(c))&&CUPOS.fila(c)?.disponibles===0)))||marks[keyOf(c)]?.s==='no'||c[5].some(i=>avoid.some(p=>norm(DATA.prof[i]).includes(p)))||(!filtrosD&&S.gt!=='*'&&c[1]!==S.gt)||own.some(o=>overlaps(o,c))||outside(c));
   const ga=tmin(GT.a), gb=tmin(GT.b);
   function outside(c){return c[6].some(([d,a,b])=>(ga!=null&&a<ga)||(gb!=null&&b>gb))}
   const inPool=new Set(pool.map(keyOf));
   const subj=want.map(k=>{const all=classes().filter(c=>c[0]===S.car&&c[8]===k&&!bad(c)), f=all.filter(c=>inPool.has(keyOf(c)));
-    return {k,must:tr().oblig.includes(k),opts:f.length||!tr().oblig.includes(k)?f:all}}).filter(s=>cur()[s.k]||s.opts.length);
+    return {k,must:tr().oblig.includes(k)||(filtrosD&&selected().some(c=>c[8]===k)),opts:filtrosD?(plan().sel.some(id=>all.some(c=>keyOf(c)===id))?all.filter(c=>plan().sel.includes(keyOf(c))):f):f.length||!tr().oblig.includes(k)?f:all}}).filter(s=>cur()[s.k]||s.opts.length);
   if(!subj.length) return {msg:txH('generador_vacio')};
   // optativas por nivel: una opción no lleva más optativas de un nivel que espacios libres tenga el plan en ese nivel
   const oq=optCupo(), oex=optExceso(subj.map(s=>s.k),oq);
@@ -632,7 +751,7 @@ function renderOffer(){
     const html=desfaseAcciones(k);if(html)avisadas.add(k);return html;
   };
   const pendientes=()=>{$('#hor-desfase').innerHTML=isPersonal()?desfaseAvisos(avisadas):''};
-  if(S.onlyWant&&!tr().want.length){
+  if(S.onlyWant&&!tr().want.length&&!FILTROS_D){
     pendientes();
     $('#offer-count').textContent='';
     $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;
@@ -661,6 +780,7 @@ function renderOffer(){
     html=items.map(([grp,cs])=>`<article class="subj"><header><h3 class="grp">${esc(grp)}</h3><span class="meta">${fmtCr(cs.reduce((s,c)=>s+c[7],0))} créditos ${ayudaCreditos()} <button class="link" data-group="${esc(grp)}">${esc(txH('agregar_grupo'))}</button></span></header>${cs.map(c=>aviso(c[8])+optRow(c,sel,true)).join('')}</article>`).join('');
     $('#offer-count').textContent=txH('cuenta_grupos',{n:g.size,materias:list.length});
   }
+  if(FILTROS_D)html+=ocultosFiltrosD(list);
   $('#offer').innerHTML=html||`<p class="empty">${esc(txH('oferta_sin_resultados'))}</p>`;
   pendientes();
   montarAyudasCreditos();

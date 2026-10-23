@@ -1,6 +1,8 @@
 /* Los módulos clásicos comparten los globales históricos. Cambiar de unidad recarga
    el mismo punto de entrada para no mezclar estado ni registrar eventos dos veces. */
 (function () {
+  // Conserva el interruptor de la URL mientras se cargan las pestañas bajo demanda.
+  if(location.hash?.includes('#filtros-d'))SATE_CONFIG.pruebaFiltrosD=true;
   const config = SATE_CONFIG.unidades, cargas = new Map(), modulos = {}, montados = new Set();
   // Pestañas en rediseño: se ocultan en todas las unidades desde data/sate.json (pestanasOcultas).
   const oculta = t => (SATE_CONFIG.pestanasOcultas || []).includes(t);
