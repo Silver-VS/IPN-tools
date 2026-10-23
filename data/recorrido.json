@@ -1,9 +1,11 @@
 [
-  {"pestana":"trayectoria","selector":"#sate-trayectoria","texto":"trayectoria","personal":"trayectoria_personal","condicion":"siempre","control":"flotante"},
-  {"pestana":"trayectoria","selector":"#sate-presente","texto":"pendientes","personal":"pendientes_personal","condicion":"personal","control":"barra"},
-  {"pestana":"mapa","selector":"#v-tray","texto":"mapa","condicion":"siempre","control":"barra"},
-  {"pestana":"horarios","selector":"#v-hor","texto":"horarios","condicion":"siempre","control":"flotante"},
-  {"pestana":"tramites","selector":"#sate-tramites","texto":"tramites","condicion":"siempre","control":"barra"},
-  {"pestana":"calendario","selector":"#sate-calendario","texto":"calendario","condicion":"siempre"},
-  {"pestana":"guia","selector":"#sate-guia","texto":"guia","condicion":"siempre","control":"flotante"}
+  {"pestana":"trayectoria","selector":"#sate-presente .trayectoria-resumen","texto":"trayectoria","personal":"trayectoria_personal","condicion":"siempre"},
+  {"pestana":"trayectoria","selector":"#sate-presente .trayectoria-orientacion","texto":"pendientes","personal":"pendientes_personal","condicion":"personal"},
+  {"pestana":"mapa","selector":"#maptools","texto":"mapa","condicion":"siempre"},
+  {"pestana":"mapa","selector":"#map .box","texto":"mapa_materia","condicion":"siempre"},
+  {"pestana":"horarios","selector":"#filters","texto":"horarios","condicion":"siempre"},
+  {"pestana":"horarios","selector":"#h-plan","texto":"mi_horario","condicion":"siempre"},
+  {"pestana":"tramites","selector":".tramite-grupo","texto":"tramites","condicion":"siempre"},
+  {"pestana":"calendario","selector":".calendario-principal","texto":"calendario","condicion":"siempre"},
+  {"pestana":"guia","selector":".sate-tarjetas-nav","texto":"guia","condicion":"siempre"}
 ]

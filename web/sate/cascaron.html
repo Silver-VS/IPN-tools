@@ -873,7 +873,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
   <section hidden id="v-tray" data-view-panel="tray" role="tabpanel" aria-labelledby="t-tray">
     <div id="map-primera-visita" hidden></div>
     <!-- La planeación anual se activa por unidad desde los datos. -->
-    <div class="maptools">
+    <div class="maptools" id="maptools">
       <div class="seg" role="group" aria-label="Vista de la trayectoria"><button data-mview="mapa">Mapa</button><button data-mview="lista">Lista</button></div>
       <div class="seg" role="group" aria-label="Zoom" id="zoomseg">
         <button data-zoom="-1" aria-label="Alejar">−</button><button data-zoom="0" aria-label="Mapa completo">Mapa completo</button><button data-zoom="1" aria-label="Acercar">+</button>
@@ -929,7 +929,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
     <div hidden><p id="cupos-ayuda"></p><a id="cupos-instalar" class="saes-bm" href="/*__CUPOS_MARCADOR__*/" draggable="true" onclick="event.preventDefault()"></a></div>
     <div class="est-eqv" id="est-eqv" hidden></div>
     <div id="hor-desfase"></div>
-    <section class="filters" aria-label="Filtros">
+    <section class="filters" id="filters" aria-label="Filtros">
       <div class="field"><span>Turno</span><div class="chips" id="f-turno"></div></div>
       <div class="field"><span>Nivel</span><div class="chips" id="f-nivel"></div></div>
       <div class="field search">

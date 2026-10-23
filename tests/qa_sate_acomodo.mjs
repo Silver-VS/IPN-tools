@@ -2,7 +2,7 @@
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const html=readFileSync('web/dist/sate/index.html','utf8');
-const controles=html.split('<div class="maptools">')[1].split('<div class="legend"')[0];
+const controles=html.split('<div class="maptools" id="maptools">')[1].split('<div class="legend"')[0];
 const derecha=controles.split('<div class="maptools-derecha">')[1];
 assert.ok(derecha,'REV1: bloque derecho dentro de controles');
 assert.ok(derecha.indexOf('id="plan-opciones"')<derecha.indexOf('id="map-ayuda"'),'Selector arriba de ayuda');
