@@ -43,6 +43,9 @@ assert.ok(!Object.keys(config.textos).some(k=>/sate\.(encabezado\.(datos|datos_m
 assert.ok(!encabezado.includes('Tu avance (opcional)'));
 assert.ok(!encabezado.includes('<hr'));
 assert.ok(!html.includes('/*__SATE_'));
+assert.match(html,/sate-barra-flotante/,'la barra flotante se genera para escritorio');
+assert.match(leer('web/sate/encabezado.css'),/prefers-reduced-motion:reduce/,'la transición respeta movimiento reducido');
+assert.match(leer('web/sate/encabezado.css'),/scroll-padding-top/,'las anclas reservan espacio bajo la barra');
 const inicio = leer('web/sate/inicio.js');
 // Identidad publicada y comportamiento real del arranque, con DOM local en memoria.
 assert.deepEqual(config.identidadUnidades, JSON.parse(leer('data/unidades_identidad.json')).unidades);
