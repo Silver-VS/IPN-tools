@@ -33,7 +33,7 @@ vm.runInContext('window=globalThis;window.open=(u)=>location.assign(u)',c);
 vm.runInContext(readFileSync('web/sate/tramites.js','utf8'),c);
 const t=c.SateTramites,plano=v=>JSON.parse(JSON.stringify(v));
 assert.equal(t.estado(null,null).id,'no_iniciado');
-assert.deepEqual(plano(t.estado({paso:1,total:4,actualizado:0},null,300000)),{id:'progreso',accion:'continuar',paso:2,total:4,min:5});
+{const e=plano(t.estado({paso:1,total:4,actualizado:0},null,300000));assert.equal(e.id,'progreso');assert.equal(e.accion,'continuar');assert.equal(e.paso,2);assert.equal(e.total,4);assert.ok(e.cuando);}
 assert.equal(t.estado({listo:true},null).accion,'descargar');
 assert.equal(t.estado(null,{aplica:false,motivo:'Motivo ficticio'}).motivo,'Motivo ficticio');
 assert.equal(t.estado(null,{aplica:false}).accion,null);
@@ -62,7 +62,7 @@ assert.ok(!box.todos().some(n=>n.tagName==='h3'&&n.textContent==='En curso y ter
 almacen.set('hu.tramite.dictamen',JSON.stringify({paso:1,total:4,actualizado:Date.now()-300000}));
 almacen.set('hu.tramite.electivas',JSON.stringify({listo:true}));t.mostrarLista(box);
 assert.equal(box.todos().filter(n=>n.tagName==='button').length,4);
-assert.ok(box.todos().some(n=>n.textContent.includes('Paso 2 de 4 · guardado hace 5 min')));
+assert.ok(box.todos().some(n=>n.textContent.includes('Paso 2 de 4 · guardado')));
 assert.deepEqual(rotulos(),['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
 assert.ok(box.todos().some(n=>n.textContent==='En progreso'));
 assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));

@@ -20,9 +20,12 @@
   function leer(id){try{return JSON.parse((window.IPNT?.almacen||localStorage).getItem('hu.tramite.'+id)||'null')}catch{return null}}
   const completados=new Map();
   const DESCARTAR='hu.tramite.';
+  // «guardado hace …» legible: minutos, horas, días o la fecha si pasó más de una semana.
+  function cuandoGuardado(t,ahora){const m=Math.max(0,Math.floor((ahora-t)/60000));if(m<60)return tx('guardado_min',{n:m});const h=Math.floor(m/60);if(h<24)return tx('guardado_horas',{n:h});const d=Math.floor(h/24);if(d<7)return tx('guardado_dias',{n:d});return tx('guardado_fecha',{fecha:new Date(t).toLocaleDateString('es-MX',{day:'numeric',month:'short'})})}
+  // IPNT.borrar solo registra el borrado para la sincronización: el avance local se quita aparte.
   function descartar(def){
     if(!window.confirm(tx('descartar_confirmacion')))return false;
-    try{if(IPNT.borrar)IPNT.borrar(DESCARTAR+def.id);else (window.IPNT?.almacen||localStorage).removeItem(DESCARTAR+def.id)}catch(e){console.error('Ventanilla: descarte fallido',{tramite:def.id,error:e.name});return false}
+    try{(window.IPNT?.almacen||localStorage).removeItem(DESCARTAR+def.id);window.IPNT?.borrar?.(DESCARTAR+def.id)}catch(e){console.error('Ventanilla: descarte fallido',{tramite:def.id,error:e.name});return false}
     completados.delete(def.id);return true;
   }
   function miniatura(def,datos,ejemplo=false){
@@ -67,7 +70,7 @@
   function estado(borrador,aplicacion,ahora=Date.now()){
     if(aplicacion?.aplica===false)return {id:'no_aplica',motivo:aplicacion.motivo,accion:null};
     if(borrador?.listo)return {id:'listo',accion:'descargar'};
-    if(borrador)return {id:'progreso',accion:'continuar',paso:Math.min((borrador.paso||0)+1,borrador.total||1),total:borrador.total||1,min:Math.max(0,Math.floor((ahora-borrador.actualizado)/60000))};
+    if(borrador)return {id:'progreso',accion:'continuar',paso:Math.min((borrador.paso||0)+1,borrador.total||1),total:borrador.total||1,cuando:cuandoGuardado(borrador.actualizado,ahora)};
     return {id:'no_iniciado',accion:'empezar'};
   }
   function separarNombre(nombre){
