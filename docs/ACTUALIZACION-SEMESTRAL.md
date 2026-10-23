@@ -26,6 +26,19 @@ integrado. Los PDF viven en `recursos/ipn-tools/horarios-upiita/<aaaa>-<n>/` (fu
    --solo-datos`, con `UNIDAD=…`). No toca plantillas, JS ni CSS.
 7. Compilación completa, pruebas (`pytest`, `tests/qa_sate*.mjs`) y publicar con aviso al dueño (`tools/publicar.sh`).
 
+## Vigilancia automática
+
+`.github/workflows/salones.yml` consulta diariamente la página de horarios, sin descargar el PDF. `semestre.py vigilar`
+compara la URL y el texto «Actualizados al» con `fuente` y `actualizado` del JSON del periodo: código 0 indica que
+coinciden, 10 que hay una versión nueva y 2 que la página no pudo leerse o cambió de estructura. Para comprobarlo sin
+red: `python tools/semestre.py vigilar --html tests/muestras/horariosnuevo.html`.
+
+El calendario de `data/vigilancia_salones.json` define inicios aproximados en febrero y agosto, diez semanas de
+revisión diaria y revisión semanal los lunes después de esa ventana. El workflow corre una vez al día y el script
+decide si corresponde consultar. Ante una versión nueva descarga y procesa el PDF en `$RUNNER_TEMP`, prueba
+`tests/test_salones.py` y abre un PR con las aulas que cambiaron. Los errores se anotan como advertencia y resumen del
+job para reintentar en la siguiente corrida. El workflow no publica ni fusiona.
+
 ## Qué basta publicar si solo cambian los datos
 
 De `web/dist/sate/datos/upiita/`: `oferta.json` (periodos, asignaturas, profesores, salones), `nucleo.json` (fecha de

@@ -3,6 +3,7 @@
 Uso:  python tools/semestre.py <comando> [opciones]
   estado        resumen de una pantalla: ciclo del PDF, fecha, cobertura, discrepancias y qué falta
   pdf           lee la página de horarios de la UPIITA, descarga el PDF solo si cambió y genera data/salones_<per>.json
+  vigilar       compara la versión publicada con data/salones_<per>.json, sin descargar el PDF (código 10 = nueva)
   snippet-saes  genera tmp-horarios/snippet-saes.js para pegarlo en el SAES (navegador integrado, solo lectura)
   aplicar-saes  reconstruye la oferta desde el diff que dejó el snippet (window.SEM), verifica la SHA-256 y la escribe
   cruce         cruza el PDF con la oferta, corre el OCR local si Ollama responde y escribe REVISION-SALONES-<per>.md
@@ -153,6 +154,34 @@ def cmd_pdf(args, abrir=_abrir):
     print(f"{_rel(dst)}: {len(data['aulas'])} aulas, {len(data['clases'])} clases")
     print('Siguiente: snippet-saes -> aplicar-saes -> cruce -> datos.')
     return 0
+
+
+def cmd_vigilar(args, abrir=_abrir):
+    """Compara URL y fecha publicada con los datos guardados; no descarga el PDF."""
+    try:
+        pagina = (Path(args.html).read_text(encoding='utf-8', errors='replace') if args.html
+                  else abrir(PAGINA).decode('utf-8', 'replace'))
+        info = descubrir(pagina)
+        guardado = DATA / f"salones_{info['periodo'].replace('/', '-')}.json"
+        previo = leer_json(guardado) if guardado.is_file() else {}
+        antes = {'url': previo.get('fuente', ''), 'actualizado': previo.get('actualizado', '')}
+        despues = {'url': info['url'], 'actualizado': info['actualizado']}
+        cambio = antes != despues
+        resultado = {'periodo': info['periodo'], 'antes': antes, 'despues': despues, 'nueva': cambio}
+        if args.json:
+            print(json.dumps(resultado, ensure_ascii=False))
+        elif cambio:
+            print(f"Versión nueva para {info['periodo']}:\n  antes: {antes['url']} · {antes['actualizado'] or 'sin fecha'}\n  ahora: {despues['url']} · {despues['actualizado'] or 'sin fecha'}")
+        else:
+            print(f"Sin cambios para {info['periodo']}: {despues['actualizado'] or despues['url']}")
+        return 10 if cambio else 0
+    except (OSError, ValueError, urllib.error.URLError, TimeoutError, json.JSONDecodeError, SystemExit) as e:
+        mensaje = str(e) or type(e).__name__
+        if args.json:
+            print(json.dumps({'error': mensaje}, ensure_ascii=False))
+        else:
+            print(f'Error al vigilar salones: {mensaje}', file=sys.stderr)
+        return 2
 
 
 # ---------------------------------------------------------------- snippet-saes / aplicar-saes
@@ -473,6 +502,10 @@ def main(argv=None):
     p.add_argument('--html', help='leer la página desde un archivo local (pruebas)')
     p.add_argument('--archivo', help='usar este PDF ya descargado en vez de bajarlo (se registra igual)')
     p.set_defaults(f=cmd_pdf)
+    p = sub.add_parser('vigilar', help='compara URL y fecha de la página sin descargar el PDF')
+    p.add_argument('--json', action='store_true', help='imprime resultado como JSON')
+    p.add_argument('--html', help='leer la página desde un archivo local (pruebas)')
+    p.set_defaults(f=cmd_vigilar)
     p = sub.add_parser('snippet-saes', parents=[comunes], help='genera el JS para pegar en el SAES')
     p.add_argument('--saes', choices=('ambos', 'actual', 'proximo'), default='ambos', help='qué periodo(s) del SAES capturar')
     p.set_defaults(f=cmd_snippet)

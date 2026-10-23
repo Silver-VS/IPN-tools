@@ -3,6 +3,7 @@
 Todo con datos sintéticos; no abre navegadores, no entra al SAES y no usa red.
 """
 import copy
+import datetime as dt
 import hashlib
 import json
 import os
@@ -19,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
 import semestre
 import semestre_huellas as hu
+import vigilancia_salones
 
 NODE = shutil.which('node') or (r'D:\Tools\nodejs\node.exe' if Path(r'D:\Tools\nodejs\node.exe').exists() else None)
 SAL = 'Sal\ufffdn'   # así llega la clave del SAES con la codificación rota
@@ -274,6 +276,41 @@ class PdfSinCambios(unittest.TestCase):
         with self.assertRaises(SystemExit):
             semestre.dir_recursos(str(ROOT / 'recursos'))
 
+
+class VigilanciaSalones(unittest.TestCase):
+    def setUp(self):
+        self.t = tempfile.TemporaryDirectory()
+        self.addCleanup(self.t.cleanup)
+        self.dir = Path(self.t.name)
+        self.html = self.dir / 'pagina.html'
+        self.html.write_text(PAGINA, encoding='utf-8')
+        self.data = self.dir / 'salones_99-9.json'
+
+    def correr(self):
+        args = semestre.argparse.Namespace(html=str(self.html), json=False)
+        with patch.object(semestre, 'DATA', self.dir):
+            return semestre.cmd_vigilar(args, abrir=lambda _: self.fail('No debe abrir la red'))
+
+    def test_detecta_nueva_y_luego_sin_cambios(self):
+        self.assertEqual(self.correr(), 10)
+        self.data.write_text(json.dumps({'fuente': semestre.descubrir(PAGINA)['url'],
+                                         'actualizado': semestre.descubrir(PAGINA)['actualizado']}), encoding='utf-8')
+        self.assertEqual(self.correr(), 0)
+
+    def test_fecha_o_url_diferente_es_nueva(self):
+        info = semestre.descubrir(PAGINA)
+        self.data.write_text(json.dumps({'fuente': info['url'], 'actualizado': 'fecha anterior'}), encoding='utf-8')
+        self.assertEqual(self.correr(), 10)
+
+    def test_html_invalido_devuelve_dos(self):
+        self.html.write_text('<html>sin PDF</html>', encoding='utf-8')
+        self.assertEqual(self.correr(), 2)
+
+    def test_ritmo_diario_y_semanal_desde_configuracion(self):
+        self.assertTrue(vigilancia_salones.toca_hoy(dt.date(2026, 8, 10)))
+        self.assertTrue(vigilancia_salones.toca_hoy(dt.date(2026, 10, 9)))
+        self.assertFalse(vigilancia_salones.toca_hoy(dt.date(2026, 10, 11)))
+        self.assertTrue(vigilancia_salones.toca_hoy(dt.date(2026, 10, 12)))
 
 class Revision(unittest.TestCase):
     def test_md(self):
