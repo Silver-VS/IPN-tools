@@ -825,7 +825,8 @@
           a.objetivo ? campo(tx(a.objetivo.alcance === 'unidad' ? 'objetivo_unidad' : 'objetivo_oficial'), [h('blockquote', { 'class': 'pc-lector pc-oficial', 'data-oficial': a.objetivo.fuente.doc, texto: a.objetivo.texto }), cita(a.objetivo.fuente)]) : null,
           a.funciones?.length ? campo(t('sate.guia.funciones_manual'), [h('ul', { 'class': 'guia-funciones pc-lector pc-oficial', 'data-oficial': a.funciones[0].fuente.doc }, a.funciones.map(x => h('li', { 'data-oficial': x.fuente.doc }, [h('p', { texto: x.texto }), cita(x.fuente)])))]) : null,
           campo(tx('depende'), [instancias.get(padre)?.nombre || a.dependenciaTexto || tx('confirmar'), a.fuenteDependencia ? cita(a.fuenteDependencia) : null]),
-          a.procedimientos ? campo(tx('procedimientos'), [h('ul', { 'class': 'guia-procedimientos' }, a.procedimientos.map(x => h('li', {}, [h('strong', { 'data-oficial': x.fuente.doc, texto: x.nombre }), h('p', { texto: x.participacion }), cita(x.fuente)]))), h('p', { texto: a.procedimientosNota })]) : null,
+          // Sin procedimientos asignados en el manual no se muestra el bloque (la nota queda en los datos).
+          a.procedimientos?.length ? campo(tx('procedimientos'), [h('ul', { 'class': 'guia-procedimientos' }, a.procedimientos.map(x => h('li', {}, [h('strong', { 'data-oficial': x.fuente.doc, texto: x.nombre }), h('p', { texto: x.participacion }), cita(x.fuente)]))), h('p', { texto: a.procedimientosNota })]) : null,
           campo(tx('contacto'), enLinea(a.contacto || tx('confirmar'), d)),
           campo(t('sate.guia.fuentes_titulo', { n: f ? 1 : 0 }), [f ? enlaceExterno('', f.url, f.texto) : tx('confirmar'), a.ambito !== 'ipn' && org ? h('p', { texto: tx('fuente_estructura') }) : null]),
           rel.length ? campo(tx('relacionadas'), [h('ul', {}, rel.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]) : null])]);
