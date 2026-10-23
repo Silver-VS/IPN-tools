@@ -331,7 +331,8 @@ for(const componente of ['indicadoresTrayectoria','caminoTrayectoria','leyendaGr
 assert.ok(componentes.includes('function fichasKardex')&&generico.includes('SateUI.fichasKardex'),'Kárdex genérico conserva sus fichas');
 assert.match(css,/\[data-sate-generico\] #v-tray[^}]*min-width:0;max-width:100%/);
 assert.match(css,/\[data-sate-generico\] \.mapwrap[^}]*max-width:100%;min-width:0/);
-assert.match(shell,/\.mapwrap\{[^}]*overflow:auto/);
+assert.match(shell,/\.mapwrap\{[^}]*overflow-x:auto;overflow-y:hidden/);
+assert.doesNotMatch(shell,/\.mapwrap\{[^}]*max-height:[^}]*vh/);
 assert.match(shell,/\.calwrap\{overflow-x:auto/);
 // Sesión cerrada o lectura fallida: devuelve ausencia de datos a la ventana común.
 for(const codigo of ['sesion','fallo-ficticio']){
