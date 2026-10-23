@@ -292,9 +292,9 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-linea-fila+.calendario-linea-fila{border-top:1px dashed var(--cal-linea)}
 .calendario-linea-fila>b{display:flex;align-items:center;gap:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);font-weight:600;color:var(--cal-tenue)}
 .calendario-linea-pista{position:relative;min-width:0;min-height:34px}
-.calendario-ev{position:absolute;height:var(--ipn-control-alto);min-width:6px;padding:0;border:0;border-radius:var(--ipn-radio);background:var(--cal-color);cursor:pointer}
+.calendario-ev{position:absolute;height:20px;min-width:6px;padding:0;border:0;border-radius:var(--ipn-radio);background:var(--cal-color);cursor:pointer}
 .calendario-ev::before{content:"";position:absolute;inset:-6px -3px}
-.calendario-ev[data-puntual=true]{width:12px;height:var(--ipn-control-alto);min-width:0;border-radius:var(--ipn-radio);transform:translateX(-6px)}
+.calendario-ev[data-puntual=true]{width:12px;height:12px;min-width:0;border-radius:var(--ipn-radio);transform:translateX(-6px)}
 .calendario-ev[data-rayado=true]{background:repeating-linear-gradient(135deg,var(--cal-color) 0 3px,transparent 3px 6px);outline:1px solid var(--cal-color)}
 .calendario-ev[data-pasado=true]:not([data-seleccionado=true]){opacity:.35}
 .calendario-ev[data-seleccionado=true]{outline:2px solid var(--cal-texto);outline-offset:2px;opacity:1}
@@ -1121,6 +1121,6 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 @media(max-width:639px){.filtros-d-panel{inset:auto 0 0;width:100%;height:80dvh}.filtros-d .search{min-width:0}.filtros-d-impacto{position:relative}.filtros-d .pill{white-space:normal}}
 @media(max-width:639px){.filtros-d-impacto{position:sticky;top:calc(var(--sate-barra-alto) + env(safe-area-inset-top,0px));z-index:5}}
 
-.calendario-linea-fila,.calendario-linea-pista{min-height:var(--ipn-control-alto)}
+
 @media(max-width:767px){.sate-termino::before{content:"";position:absolute;inset:50% auto auto 50%;width:max(100%,var(--ipn-objetivo-tactil));height:max(100%,var(--ipn-objetivo-tactil));transform:translate(-50%,-50%)}}
 @media(max-width:767px){:is(button,[role=button],.btn,.sate-btn):not(.sate-termino){min-width:var(--ipn-objetivo-tactil)}}

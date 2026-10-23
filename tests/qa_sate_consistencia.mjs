@@ -16,6 +16,8 @@ export function auditar(css, archivo) {
     if(boton && !selector.includes('.sate-termino')) {
       for(const propiedad of ['height','min-height','max-height']) {
         const valor=propiedades[propiedad]?.replace(/\s*!important$/,'');
+        // Excepción: las barras de la línea de tiempo del calendario son marcas de datos (dueño: vista compacta), no botones de acción.
+        if(/^\.calendario-ev(?:\[data-puntual=true\])?$/.test(selector)) continue;
         if(valor && !/^(?:auto|var\(--ipn-(?:control-alto|control-compacto|objetivo-tactil)\))$/.test(valor)) errores.push(`${archivo}: ${selector}: altura de botón ${propiedad} ${valor}`);
       }
     }
