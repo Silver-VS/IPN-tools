@@ -6,15 +6,16 @@ import {crearEntorno} from './dom_minimo.mjs';
 const leer = p => readFileSync(p, 'utf8');
 const datos = JSON.parse(leer('web/dist/sate/datos/upiita/guia.json'));
 const config = JSON.parse(leer('data/sate.json'));
+assert.match(leer('contenido/textos/es.toml'),/actividades = "Actividades y servicios"/,'título de actividades');
 config.unidades.upiita.guiaDatos = true; // Capacidad que agrega la compilación.
-const css = leer('web/sate/componentes.css');
-assert.match(css,/\.sate-rejilla-recursos\{[^}]*repeat\(3,minmax\(0,1fr\)\)/,'rejilla de 3 columnas en escritorio');assert.match(css,/\.sate-rejilla-recursos>:last-child:nth-child\(3n\+2\)\{grid-column:span 2\}/,'la última tarjeta ocupa lo que sobra de su fila (sin celdas vacías)');
-assert.match(css, /\.sate-recurso\{[^}]*min-width:0[^}]*overflow-wrap:anywhere/);
-assert.match(css, /\.sate-filtro-recursos \.sate-chip\{[^}]*min-height:var\(--ipn-control-alto\)/);
-assert.match(css, /body:has\(\.sate-barra\)\{padding-bottom:calc\(var\(--ipn-barra-alto\)/, 'reserva común para la barra móvil');
+const css = leer('web/sate/guia.css');
+const componentes = leer('web/sate/componentes.css');
+assert.match(css,/\.guia-actividades-categorias\{[^}]*repeat\(auto-fit,minmax/,'categorías fluyen sin huecos fijos');
+assert.match(css,/\.guia-actividad-detalle summary[^}]*min-height:var\(--ipn-control-alto\)/,'detalle táctil desplegable');
+assert.match(componentes, /body:has\(\.sate-barra\)\{padding-bottom:calc\(var\(--ipn-barra-alto\)/, 'reserva común para la barra móvil');
 assert.deepEqual(datos.actividades, JSON.parse(leer('data/guia/actividades-upiita.json')), 'compilación conserva la fuente única');
-for (const ancho of [1300, 768, 375]) for (const tema of ['claro', 'oscuro']) {
-  const {document, Elemento} = crearEntorno();
+for (const ancho of [1300, 1024, 768, 375]) for (const tema of ['claro', 'oscuro']) {
+  const {document, Elemento, Evento} = crearEntorno();
   Elemento.prototype.append = function (...ns) { for (const n of ns) if (n) this.appendChild(n); };
   document.createElementNS = (_, tag) => document.createElement(tag);
   document.documentElement.setAttribute('data-tema', tema);
@@ -35,18 +36,16 @@ for (const ancho of [1300, 768, 375]) for (const tema of ['claro', 'oscuro']) {
   await pestana.mostrar({partes:[]});
   assert.ok(caja.querySelector('a[href="#/upiita/guia/actividades"]'), `${ancho}/${tema}: portada`);
   await pestana.mostrar({partes:['actividades']});
-  assert.equal(caja.querySelectorAll('.sate-recurso').length,datos.actividades.elementos.length);
-  for (const categoria of ['', ...datos.actividades.categorias]) {
-    caja.querySelector('[data-categoria="'+categoria+'"]').click();
-    const esperados=datos.actividades.elementos.filter(a=>!categoria||a.categoria===categoria);
-    assert.deepEqual(caja.querySelectorAll('.sate-recurso h3').map(n=>n.textContent),esperados.map(a=>a.nombre), `${ancho}/${tema}/${categoria}`);
-    assert.equal(caja.querySelectorAll('[aria-pressed="true"]').length,1);
-    assert.ok(caja.querySelector('[role="status"]').textContent.includes(String(esperados.length)));
-    for (const enlace of caja.querySelectorAll('.sate-recurso__enlace')) {
-      assert.ok(enlace.getAttribute('href').startsWith('https://'));
-      assert.equal(enlace.getAttribute('target'),'_blank');
-      assert.ok(enlace.getAttribute('rel').includes('noopener'));
-    }
-  }
+  const categorias=[...new Set(datos.actividades.elementos.map(a=>a.categoria))];
+  assert.equal(caja.querySelectorAll('.guia-actividad-categoria').length,categorias.length,`${ancho}/${tema}: categorías`);
+  assert.equal(caja.querySelectorAll('.guia-actividad').length,0,`${ancho}/${tema}: sin opciones expuestas`);
+  assert.equal(caja.querySelectorAll('.guia-actividad-detalle[open]').length,0,`${ancho}/${tema}: detalles cerrados`);
+  caja.querySelector('[data-categoria="'+categorias[0]+'"]').click();
+  const esperados=datos.actividades.elementos.filter(a=>a.categoria===categorias[0]);
+  assert.equal(caja.querySelectorAll('.guia-actividad').length,esperados.length,`${ancho}/${tema}: selección`);
+  for (const enlace of caja.querySelectorAll('.guia-actividad-enlace')) assert.ok(enlace.getAttribute('href').startsWith('https://'));
+  const objetivo=datos.actividades.elementos.find(a=>a.categoria!==categorias[0]);
+  const buscador=caja.querySelector('input'); buscador.value=objetivo.nombre.split(' ')[0]; buscador.dispatchEvent(new Evento('input'));
+  assert.ok(caja.textContent.includes(objetivo.nombre),`${ancho}/${tema}: filtro de otra categoría`);
 }
 console.log('OK actividades: fuente compilada, portada, filtros y enlaces en DOM a 1300/768/375, claro/oscuro. El DOM mínimo no mide geometría CSS.');
