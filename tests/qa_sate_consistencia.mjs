@@ -13,7 +13,7 @@ export function auditar(css, archivo) {
     const propiedades=Object.fromEntries([...cuerpo.matchAll(/([\w-]+)\s*:\s*([^;]+)(?:;|$)/g)].map(m=>[m[1],m[2].trim()]));
     const radio=propiedades['border-radius'];
     const boton=!/::|\binput\b/.test(selector) && (selector.split(',').some(s=>/(?:^|[ >+~])(?:button|\.[\w-]*btn[\w-]*|\.add|\.x|\.link)(?:[.:#\[][^ ]*)?$/.test(s.trim()) || [...botones].some(b=>s.trim()===b || (s.trim().startsWith(b) && /^[\[.:#][^ ]*$/.test(s.trim().slice(b.length))))) || propiedades.cursor==='pointer');
-    if(boton && !selector.includes('.sate-termino')) {
+    if(boton && !selector.includes('.sate-termino') && !selector.includes('.sate-enlace-reglamento')) {   // enlaces dentro del texto: no alteran el renglón
       for(const propiedad of ['height','min-height','max-height']) {
         const valor=propiedades[propiedad]?.replace(/\s*!important$/,'');
         // Excepción: las barras de la línea de tiempo del calendario son marcas de datos (dueño: vista compacta), no botones de acción.

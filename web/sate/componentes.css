@@ -572,11 +572,12 @@ button.sate-chip{cursor:pointer}
 .sate-ayuda__btn{display:inline-grid;place-items:center;min-width:1.75rem;min-height:var(--ipn-control-alto);border:0;background:none;color:var(--ipn-tenue);cursor:pointer;border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-m);padding:0}
 .sate-ayuda__btn:hover{color:var(--ipn-acento)}
 .sate-ayuda--termino{display:inline;position:static;vertical-align:baseline}
-.sate-ayuda__btn.sate-termino{display:inline;position:relative;width:auto;height:auto;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:max(1px,.08em);text-decoration-color:var(--ipn-tenue);text-underline-offset:.08em;cursor:help}
+.sate-ayuda__btn.sate-termino{display:inline;position:relative;width:auto;height:auto;min-width:0!important;min-height:0!important;margin:0;padding:0;border:0;border-radius:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:max(1px,.08em);text-decoration-color:var(--ipn-tenue);text-underline-offset:.08em;cursor:help}
 /* En reposo, el glosario usa puntos tenues y las citas reglamentarias puntos de acento. */
 .sate-ayuda__btn.sate-termino:hover,.sate-ayuda__btn.sate-termino:focus-visible{color:var(--ipn-acento);text-decoration-color:var(--ipn-acento);background:none}
-.sate-enlace-reglamento{display:inline;position:relative;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--ipn-acento);text-decoration-thickness:1px;text-underline-offset:.2em;cursor:pointer}
+.sate-enlace-reglamento{display:inline;position:relative;min-width:0!important;min-height:0!important;height:auto;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--ipn-acento);text-decoration-thickness:max(1.5px,.1em);text-underline-offset:.2em;cursor:pointer}
 .sate-cita-reglamento{display:inline;white-space:nowrap}
+/* Enlaces y términos dentro del texto: nunca alteran el renglón (la regla táctil general de botones los subía a 44 px); el área táctil la da ::after en teléfono */
 .sate-enlace-reglamento:hover,.sate-enlace-reglamento:focus-visible{color:inherit;text-decoration-style:solid;text-decoration-color:var(--ipn-acento)}
 .sate-enlace-reglamento:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .sate-ayuda__btn.sate-termino:focus-visible{outline:1px solid var(--ipn-acento);outline-offset:2px}
