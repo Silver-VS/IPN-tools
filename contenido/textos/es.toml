@@ -1294,6 +1294,9 @@ busqueda_prioridad = "Se analizaron las combinaciones de mayor prioridad (desfas
 busqueda_limitada = "Búsqueda limitada por el número de combinaciones; reduce las materias seleccionadas para un análisis completo."
 
 [sate.ventanilla]
+consultar_articulo = "Consultar artículo {n} · {doc}"
+cita_error = "No se pudo abrir el artículo"
+cita_reintentar = "Cierra esta ventana e inténtalo de nuevo."
 miniatura_titulo_baja_temporal = "Solicitud de baja temporal"
 miniatura_titulo_baja_definitiva = "Solicitud de baja definitiva"
 miniatura_titulo_dictamen = "Solicitud de dictamen · COSIE del CTCE"
@@ -1745,7 +1748,7 @@ fuente_articulo = "{documento}, art. {articulo}"
 fuente_pagina = "{documento}, p. {pagina}"
 articulo_rotulo = "Artículo {n}"
 articulo_titulo = "Artículo {n} · {reglamento}"
-leer_reglamento = "Leer en el reglamento"
+leer_reglamento = "Abrir en Reglamentos"
 pdf_oficial = "PDF oficial"
 sin_articulo = "El artículo no existe o este documento aún no tiene texto disponible. Consulta el PDF oficial."
 aviso_ocr = "Transcripción automática de un PDF escaneado; puede tener errores. Antes de usarlo en un trámite, compáralo con el PDF oficial."

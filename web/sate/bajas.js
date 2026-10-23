@@ -38,7 +38,7 @@
   function campoAviso(tipo){
     return {id:'aviso',texto:tx('aviso_titulo'),revision:()=>[],render(caja){
       const aviso=el('aside',null,'tramite-aviso');aviso.appendChild(el('h4',tx('aviso_titulo')));
-      const lista=el('ul');for(const n of [1,2,3])lista.appendChild(el('li',tx('aviso_'+tipo+'_'+n)));
+      const lista=el('ul');for(const n of [1,2,3])lista.appendChild(SateTramites.citas(el('li',tx('aviso_'+tipo+'_'+n)),'sate.baja.aviso_'+tipo+'_'+n));
       aviso.appendChild(lista);caja.appendChild(aviso);
       if(tipo==='temporal'&&raiz.SATE_DATA?.bajas?.reglamento){const a=el('a',tx('fundamento'));a.href=raiz.SATE_DATA.bajas.reglamento;a.target='_blank';a.rel='noopener';aviso.appendChild(a)}
     }};
@@ -93,7 +93,7 @@
     return {id:'periodos',texto:tx('periodos_texto'),grupo:tx('grupo_periodo'),requerido:true,
       validar:v=>['1','2'].includes(String(v))?'':tx('periodos_error'),resumen:v=>tx('periodos_n',{n:+v||0}),
       render(caja,ctx){
-        const etiqueta=el('label',null,'tramite-campo'),selector=el('select'),ayuda=el('small',tx('periodos_ayuda'));
+        const etiqueta=el('label',null,'tramite-campo'),selector=el('select'),ayuda=SateTramites.citas(el('small',tx('periodos_ayuda')),'sate.baja.periodos_ayuda');
         for(const n of ['1','2']){const o=el('option',tx('periodos_n',{n:+n}));o.value=n;selector.appendChild(o)}
         selector.value=ctx.datos.periodos||'1';if(!ctx.datos.periodos)ctx.cambiar('1');
         selector.onchange=()=>ctx.cambiar(selector.value);
