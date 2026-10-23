@@ -8,7 +8,7 @@ const datos = JSON.parse(leer('web/dist/sate/datos/upiita/guia.json'));
 const config = JSON.parse(leer('data/sate.json'));
 config.unidades.upiita.guiaDatos = true; // Capacidad que agrega la compilación.
 const css = leer('web/sate/componentes.css');
-assert.match(css, /\.sate-rejilla-recursos\{[^}]*repeat\(auto-fit,minmax\(min\(100%,20rem\),1fr\)\)/, 'rejilla fluida sin ancho mínimo que desborde');
+assert.match(css,/\.sate-rejilla-recursos\{[^}]*repeat\(3,minmax\(0,1fr\)\)/,'rejilla de 3 columnas en escritorio');assert.match(css,/\.sate-rejilla-recursos>:last-child:nth-child\(3n\+2\)\{grid-column:span 2\}/,'la última tarjeta ocupa lo que sobra de su fila (sin celdas vacías)');
 assert.match(css, /\.sate-recurso\{[^}]*min-width:0[^}]*overflow-wrap:anywhere/);
 assert.match(css, /\.sate-filtro-recursos \.sate-chip\{[^}]*min-height:var\(--ipn-control-alto\)/);
 assert.match(css, /body:has\(\.sate-barra\)\{padding-bottom:calc\(var\(--ipn-barra-alto\)/, 'reserva común para la barra móvil');
