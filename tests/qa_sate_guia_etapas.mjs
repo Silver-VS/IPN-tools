@@ -85,16 +85,19 @@ for (const nombre of nombres) {
   assert.equal(ficha.querySelectorAll('.guia-funciones li').length,a.funciones.length,nombre);
   for (const f of a.funciones) assert.ok([...ficha.querySelectorAll('.guia-funciones a')].some(n=>n.getAttribute('href').endsWith('#page='+f.fuente.pagina)),nombre+' p. '+f.fuente.pagina);
   assert.equal(ficha.querySelectorAll('.guia-procedimientos li').length,a.procedimientos.length,nombre);
-  assert.ok(ficha.textContent.includes(a.objetivo.texto.replace(/\[\[g:[^|]+\|([^\]]+)\]\]/g,'$1')),nombre+' objetivo');
+  assert.ok(ficha.textContent.includes(a.orientacion.texto.replace(/\[\[g:[^|]+\|([^\]]+)\]\]/g,'$1')),nombre+' orientación propia');
+  assert.ok(ficha.textContent.includes('sate.guia.r10.orientacion_propia'),nombre+' etiqueta propia');
+  assert.equal(ficha.querySelectorAll('.guia-funciones.pc-oficial li').length,a.funciones.length,nombre+' texto oficial diferenciado');
+  if(a.objetivo) assert.ok(ficha.textContent.includes(a.objetivo.texto),nombre+' objetivo literal');
 }
 for (const a of datos.acudir.filter(a=>a.ambito==='ipn')) assert.ok(caja.querySelector('.guia-arbol [data-instancia="'+a.id+'"]'),a.id);
 caja.querySelector('.guia-arbol [data-instancia="gestion_escolar"]').click();
-assert.ok(caja.querySelector('.guia-ficha').textContent.includes('Subdirección de Servicios Educativos'));
+assert.ok(caja.querySelector('.guia-ficha').textContent.includes(datos.acudir.find(a=>a.id==='sseis').nombre));
 ancho=375;
 await abrir('acudir');
 caja.querySelector('[data-instancia="gestion_escolar"]').click();
 assert.ok(document.querySelector('.sate-modal .guia-ficha'));
-assert.equal(document.querySelectorAll('.sate-modal .guia-funciones li').length,5,'Funciones con fuente también en teléfono');
+assert.equal(document.querySelectorAll('.sate-modal .guia-funciones li').length,datos.acudir.find(a=>a.id==='gestion_escolar').funciones.length,'Funciones con fuente también en teléfono');
 c.SateUI.cerrarModal();
 for (ancho of [1440,1024,768,375,320]) {
   for (const nombre of nombres) {

@@ -41,13 +41,14 @@ class TestDatosGuia(unittest.TestCase):
                 self.assertEqual(len(areas), 1, 'Toda área necesita ficha propia')
                 a = areas[0]
                 self.assertEqual(a['id'], org['ids'][nombre])
-                self.assertTrue(3 <= len(a['funciones']) <= 6)
+                self.assertGreaterEqual(len(a['funciones']), 6)
                 self.assertNotIn('por confirmar', a['para'].lower())
-                self.assertTrue(a['objetivo']['sintesis'])
-                for f in [a['objetivo'], *a['funciones']]:
+                self.assertTrue(a['orientacion']['propio'])
+                for f in ([a['objetivo']] if a.get('objetivo') else []) + a['funciones']:
+                    self.assertTrue(f['oficial'])
                     self.assertTrue(f['texto'].strip())
                     self.assertEqual(f['fuente']['doc'], 'mo_upiita')
-                    self.assertTrue(30 <= f['fuente']['pagina'] <= 115)
+                    self.assertTrue(29 <= f['fuente']['pagina'] <= 115)
                 if nombre in padres:
                     self.assertEqual(a['depende'], padres[nombre])
                 self.assertEqual(a['fuenteDependencia'], {'doc': 'mo_upiita', 'pagina': 28})
@@ -189,7 +190,7 @@ class TestDatosGuia(unittest.TestCase):
         self.assertNotIn('upiita.ipn.mx/coordinaciones/cosie.html', crudo)
         # El organigrama aportado documenta el Decanato sin identificar titulares.
         organigrama = json.loads((RAIZ / 'data/guia' / GUIA['organigrama']).read_text(encoding='utf-8'))
-        self.assertIn('Decanato', organigrama['raiz']['colegiados'])
+        self.assertIn('DECANATO', organigrama['raiz']['colegiados'])
         self.assertIn('octubre de 2021', organigrama['fuente'])
 
 
