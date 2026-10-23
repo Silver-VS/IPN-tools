@@ -293,22 +293,7 @@
   }
   async function iniciarRecorrido() {
     try { await script('recorrido.js'); await SateRecorrido.iniciar(); }
-    catch(e) { console.error('SATE: recorrido fallido',{mensaje:e.message,pila:e.stack}); SateUI.modal(texto('sate.recorrido.boton'),texto('sate.recorrido.error'),{pequeno:true}); }
-  }
-  function invitarRecorrido() {
-    const a=SATE.alumno?.();
-    if(cuposReducida || !a || a.demo || !SateUI.recorridoOfrecer(leer))return;
-    const caja=document.querySelector('header.top');
-    if(document.getElementById('sate-recorrido-invitacion'))return;
-    const aviso=document.createElement('div');aviso.className='sate-recorrido-invitacion';
-    aviso.id='sate-recorrido-invitacion';
-    for(const [clave,acepta] of [['si',true],['ahora_no',false]]){
-      const b=document.createElement('button');b.type='button';b.className='sate-btn';b.textContent=acepta?texto('sate.recorrido.invitacion_breve'):'×';
-      if(!acepta)b.setAttribute('aria-label',texto('sate.recorrido.'+clave));
-      b.onclick=()=>{SateUI.recorridoDecidir((k,v)=>IPNT.set(k,v),acepta);aviso.remove();if(acepta)iniciarRecorrido()};aviso.appendChild(b);
-    }
-    // Fuera del encabezado: los repintados de avisos conservan la decisión pendiente.
-    caja.after(aviso);
+    catch(e) { console.error('SATE: recorrido fallido',{mensaje:e.message,pila:e.stack}); SateUI.modal(texto('sate.encabezado.ayuda'),texto('sate.recorrido.error'),{pequeno:true}); }
   }
   window.SATE = {texto, modulos, error, script, json:jsonURL, prepararTramite, identidadSaes, cargarTemarios, get actual(){return actual}, get almacen(){return api?.store}, pestana(id, m) { modulos[id] = m; }, ir, elegirUnidad, repintar, cargarOferta,
     async visitar(id) { const r=SateRutas.ruta('#/'+u+'/'+id,u,config);if(!r)return;history.replaceState(null,'',location.pathname+location.search+r.hash);await activar(r); },
@@ -324,9 +309,7 @@
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
       await activar(r);
       if (!cfg.generica) precarga.reposo([...cfg.pestanas, ...(cfg.vistas || []).map(v=>v.id)].filter(id=>id!==r.pestana));
-      const recorrido=document.createElement('button');recorrido.type='button';recorrido.className='sate-btn';recorrido.textContent=texto('sate.recorrido.boton');recorrido.onclick=()=>{SateUI.recorridoDecidir((k,v)=>IPNT.set(k,v),true);document.getElementById('sate-recorrido-invitacion')?.remove();iniciarRecorrido()};
-      document.getElementById('foot').appendChild(recorrido);
-      invitarRecorrido();addEventListener('sate-saes-actualizado',invitarRecorrido);
+      document.getElementById('sate-ayuda-recorrido').onclick=()=>iniciarRecorrido();
       if(cuposReducida&&cfg.cupos){await script('cupos-vista.js');await SateCuposVista.montar();await script('cupos-receptor.js')}
     }, actualizarPestanas
   };

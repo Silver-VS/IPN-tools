@@ -88,7 +88,6 @@ for(const selector of ['.sate-aviso__cuerpo','.sate-recorte-calendario__texto','
   assert.match(regla,/overflow-wrap:anywhere/,selector);
 }
 assert.match(css,/\.calendario-linea-nombre\{display:none\}/);
-assert.match(css,/\.sate-recorrido-invitacion\{[^}]*align-items:center;[^}]*gap:var\(--ipn-esp-1\)/);
 assert.match(css,/\[data-pestanas=v3\] \.sate-pestana__icono\{display:none/);
 assert.match(css,/\[data-pestanas\] \.sate-barra \.sate-pestana__icono\{display:inline-flex/);
 assert.match(css,/aria-selected=true\]::after.*background:var\(--sate-realce\)/);
@@ -385,33 +384,8 @@ vm.runInNewContext(nucleoDis7.slice(nucleoDis7.indexOf('  const f=new Date(DATA.
 assert.equal(capturaDis7.textContent.split(' · ').length,4,'DIS7: captura, grupos, oferta y salones en un bloque');
 assert.match(capturaDis7.textContent,/1 grupos de esta carrera · La oferta del próximo periodo/);
 assert.match(movilDis5,/#sate-avisos-globales \.sate-chips\{[^}]*overflow-x:auto;[^}]*scroll-snap-type:x proximity;[^}]*mask-image:/);
-const invitacionDis5=leer('web/sate/inicio.js').split('  function invitarRecorrido()')[1].split('  window.SATE')[0];
-assert.ok(invitacionDis5.includes("aviso.id='sate-recorrido-invitacion'"));
-assert.doesNotMatch(invitacionDis5,/SateUI\.aviso|sate-aviso/);
-assert.ok(invitacionDis5.includes('SateUI.recorridoDecidir'));
+assert.match(leer('tools/encabezado.py'),/id="sate-ayuda-recorrido"[^\n]*aria-label=/);
+assert.match(cssEnc,/\.sate-encabezado \.header-actions \.sate-ayuda-recorrido\{width:var\(--ipn-objetivo-tactil\);padding:0\}/);
 assert.match(css,/#f-nivel,#plan-opciones\{display:flex;flex-wrap:wrap\}/);
 assert.match(css,/env\(safe-area-inset-bottom,0px\)/);
 console.log('DIS5: encabezado y paneles abiertos, chips desplazables, filas numéricas adaptables y recorrido sin aviso. OK.');
-
-// Integración del ofrecimiento real con persistencia y arranque, para ambas decisiones.
-for(const acepta of [true,false]){
-  let ofrecida,decidido,inicios=0,escritura;
-  const c={cuposReducida:false,leer(){},texto:k=>config.textos[k],
-    SATE:{alumno:()=>({demo:false})},IPNT:{set:(k,v)=>{escritura=[k,v]}},
-    SateUI:{recorridoOfrecer:()=>decidido===undefined,recorridoDecidir(guardar,v){decidido=v;guardar('decision',v)}},
-    iniciarRecorrido(){inicios++},document:{
-      querySelector:()=>({after(n){ofrecida=n}}),getElementById:()=>ofrecida&&!ofrecida.retirada?ofrecida:null,
-      createElement:()=>({children:[],attrs:{},setAttribute(k,v){this.attrs[k]=v},appendChild(n){this.children.push(n)},remove(){this.retirada=true}})
-    }};
-  vm.runInNewContext('function invitarRecorrido()'+invitacionDis5+'\ninvitarRecorrido();',c);
-  assert.equal(ofrecida.className,'sate-recorrido-invitacion');
-  assert.equal(ofrecida.children[0].textContent,config.textos['sate.recorrido.invitacion_breve']);
-  assert.equal(ofrecida.children[0].className,'sate-btn');
-  assert.equal(ofrecida.children[1].className,'sate-btn');
-  assert.equal(ofrecida.children[1].textContent,'×');
-  assert.equal(ofrecida.children[1].attrs['aria-label'],config.textos['sate.recorrido.ahora_no']);
-  ofrecida.children[acepta?0:1].onclick();
-  assert.equal(ofrecida.retirada,true);assert.equal(decidido,acepta);assert.equal(escritura[1],acepta);
-  assert.equal(inicios,acepta?1:0);
-  const anterior=ofrecida;c.invitarRecorrido();assert.equal(ofrecida,anterior,'No vuelve a ofrecerse tras decidir');
-}
