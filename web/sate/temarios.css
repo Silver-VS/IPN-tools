@@ -76,8 +76,8 @@
 .tmr-vacio{margin:0;color:var(--ipn-tenue)}
 @media(max-width:30rem){.tmr-enc h2{font-size:var(--ipn-tamano-xl);line-height:1.25}}
 
-/* ---------- vista única: la ficha completa es una tarjeta de página ---------- */
-.tmr-pagina>.tmr-ficha{display:block;background:var(--ipn-superficie)}
+/* ---------- vista única: la ficha completa va sobre el fondo de la página (sin bloque de otro color que se corte) ---------- */
+.tmr-pagina>.tmr-ficha{display:block;background:transparent}
 .tmr-principal{grid-area:principal;display:grid;gap:var(--ipn-esp-5);min-width:0}
 .tmr-col-resto{grid-area:resto;display:grid;gap:var(--ipn-esp-6);min-width:0}
 .tmr-lateral{grid-area:lateral;position:sticky;top:var(--ipn-esp-5);align-self:start;display:grid;gap:var(--ipn-esp-6);min-width:0}

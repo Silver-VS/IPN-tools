@@ -288,10 +288,10 @@
     const cfg=SATE_CONFIG.unidades[SATE_UNIDAD];
     if(!cfg.tramites.length){box.replaceChildren(el('h2',tx('titulo')),el('p',tx('sin_tramites')));return}
     const grupos=cfg.gruposVentanilla||[{id:'todos',titulo:'sate.ventanilla.titulo',tramites:cfg.tramites}];
+    // Todos los trámites en una sola rejilla de rectángulos contiguos; el grupo va como etiqueta dentro de cada tarjeta.
+    const lista=el('ul',null,'tramite-filas tramite-rejilla');lista.setAttribute('aria-label',tx('titulo'));
     for(const g of grupos){
       const ids=g.tramites.filter(id=>cfg.tramites.includes(id));if(!ids.length)continue;
-      const grupo=el('section',null,'tramite-grupo'),rotulo=el('h3',SATE.texto(g.titulo),'tramite-grupo-rotulo'),lista=el('ul',null,'tramite-filas');
-      rotulo.id='tramite-grupo-'+g.id;lista.setAttribute('aria-labelledby',rotulo.id);grupo.appendChild(rotulo);
       for(const id of ids){
         const aplica=SATE.presente.aplicaTramite(id),e=estado(completados.get(id)||leer(id),aplica);
         const fila=el('li',null,'tramite-fila'),accion=boton('',()=>{
@@ -299,6 +299,7 @@
           if(def)abrirResumen(id,def);
         });
         accion.className+=' tramite-fila-boton';accion.setAttribute('aria-haspopup','dialog');
+        if(grupos.length>1)accion.appendChild(el('span',SATE.texto(g.titulo),'tramite-fila-grupo'));
         accion.appendChild(el('span',SATE.texto('sate.tramite.'+id+'.titulo'),'tramite-fila-titulo'));
         accion.appendChild(el('span',tx(id+'_para'),'tramite-fila-para'));
         const entrada=definiciones.get(id),def=typeof entrada==='function'?entrada():entrada,borrador=leer(id);
@@ -311,8 +312,8 @@
         accion.setAttribute('aria-label',SATE.texto('sate.tramite.'+id+'.titulo')+'. '+tx(id+'_para'));
         fila.appendChild(accion);lista.appendChild(fila);
       }
-      grupo.appendChild(lista);box.appendChild(grupo);
     }
+    box.appendChild(lista);
   }
   function abrirResumen(id,def){
     const contenido=el('div',null,'tramite-resumen');

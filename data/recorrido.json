@@ -5,7 +5,7 @@
   {"pestana":"mapa","selector":"#map .box","texto":"mapa_materia","condicion":"siempre"},
   {"pestana":"horarios","selector":"#filters","texto":"horarios","condicion":"siempre"},
   {"pestana":"horarios","selector":"#h-plan","texto":"mi_horario","condicion":"siempre"},
-  {"pestana":"tramites","selector":".tramite-grupo","texto":"tramites","condicion":"siempre"},
+  {"pestana":"tramites","selector":".tramite-rejilla","texto":"tramites","condicion":"siempre"},
   {"pestana":"calendario","selector":".calendario-principal","texto":"calendario","condicion":"siempre"},
   {"pestana":"guia","selector":".sate-tarjetas-nav","texto":"guia","condicion":"siempre"}
 ]

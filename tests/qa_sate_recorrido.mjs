@@ -96,7 +96,7 @@ for(const selector of ['#sate-presente','#maptools','#filters','#h-plan','#map',
   assert.ok(shell.includes(`id="${raiz}"`),`Ancla ${selector} está en el cascarón`);
 }
 assert.ok(compilado.includes('id="maptools"')&&compilado.includes('id="sate-presente"'),'Las anclas del cascarón están en el HTML compilado');
-assert.match(leer('web/dist/sate/tramites.js'),/tramite-grupo/);
+assert.match(leer('web/dist/sate/tramites.js'),/tramite-rejilla/);
 assert.match(leer('web/dist/sate/calendario.js'),/calendario-principal/);
 assert.match(leer('web/dist/sate/guia.js'),/sate-tarjetas-nav/);
 assert.match(leer('web/dist/sate/mapa.js'),/boxHtml/);

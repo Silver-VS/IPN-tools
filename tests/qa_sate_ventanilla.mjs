@@ -53,7 +53,8 @@ assert.equal(t.validarDatos('correo','ficticio@example.test'),'');assert.ok(t.va
 assert.equal(t.prellenar({upiita_saes:1,unidad:'escom',boleta:'2099000000'}).boleta,'2099000000');
 aplicacion={aplica:true,motivo:'Causal ficticia'};t.mostrarLista(box);
 const filasLista=()=>box.todos().filter(n=>n.tagName==='li'&&n.className==='tramite-fila');
-const rotulos=()=>box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent);
+// Rejilla única: el grupo va como etiqueta dentro de cada tarjeta (se cuentan los grupos distintos, en orden)
+const rotulos=()=>[...new Set(box.todos().filter(n=>String(n.className||'').includes('tramite-fila-grupo')).map(n=>n.textContent))];
 assert.equal(filasLista().length,4,'Los trámites aparecen una sola vez en la portada');
 assert.deepEqual(rotulos(),['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
 assert.equal(box.todos().filter(n=>n.tagName==='button').length,4,'Cada trámite abre su resumen');
@@ -487,7 +488,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   modulo.ocultar();t.mostrarLista(box);
   assert.ok(box.todos().some(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Baja temporal. ')),'El resumen de baja sigue disponible en la portada');
   assert.ok(box.todos().some(n=>n.textContent==='Listo para imprimir'));
-  assert.deepEqual(box.todos().filter(n=>n.tagName==='h3').map(n=>n.textContent),['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
+  assert.deepEqual([...new Set(box.todos().filter(n=>String(n.className||'').includes('tramite-fila-grupo')).map(n=>n.textContent))],['Revisar mi situación escolar','Solicitar una baja','Acreditar actividades electivas']);
 
   // Baja definitiva: mismo asistente, motivo propio y enlace a su formato.
   modulo.mostrar({tramite:'baja_definitiva'});
