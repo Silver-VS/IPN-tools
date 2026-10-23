@@ -127,9 +127,8 @@
           l.appendChild(n);l.appendChild(texto);grupo.appendChild(l);
           const ul=el('ul');ul.className='dictamen-situaciones';
           for(const m of base.motivos[k]){
-            const li=el('li'),a=el('a',tx('fundamento'));li.appendChild(el('span',tx('motivo_'+m.id)));
-            const fund=el('small',tx('fund_'+m.id)+' · ');a.href=base.motivos.documentos[m.doc];a.target='_blank';a.rel='noopener';a.setAttribute('aria-label',tx('fundamento_abre',{fundamento:tx('fund_'+m.id)}));
-            fund.appendChild(a);SateTramites.citas(fund,'dictamen.fund_'+m.id);li.appendChild(fund);ul.appendChild(li);
+            const li=el('li');li.appendChild(el('span',tx('motivo_'+m.id)));
+            const fund=el('small');SateTramites.citas(fund,'dictamen.fund_'+m.id,tx('fund_'+m.id));li.appendChild(fund);ul.appendChild(li);
           }
           grupo.appendChild(ul);f.appendChild(grupo);
         }

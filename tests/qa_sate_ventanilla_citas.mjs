@@ -7,7 +7,7 @@ const leer=p=>readFileSync(p,'utf8');
 const config=JSON.parse(leer('data/sate.json'));
 const compilado=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 assert.deepEqual(compilado.citasVentanilla,config.citasVentanilla);
-for(const ancho of [1300,768,375])for(const oscuro of [false,true]){
+for(const ancho of [1300,1024,768,375])for(const oscuro of [false,true]){
   const {document,Elemento,Evento}=crearEntorno();
   document.contains=n=>document.documentElement.contains(n);
   Object.defineProperty(Elemento.prototype,'open',{get(){return this.hasAttribute('open')},set(v){if(v)this.setAttribute('open','');else this.removeAttribute('open')}});
@@ -22,9 +22,9 @@ for(const ancho of [1300,768,375])for(const oscuro of [false,true]){
   for(const [clave,refs] of Object.entries(config.citasVentanilla)){
     const nodo=document.createElement('div');document.body.appendChild(nodo);
     c.SateTramites.citas(nodo,clave);
-    assert.equal(nodo.children.length,refs.length);
+    const botones=nodo.querySelectorAll('button');assert.equal(botones.length,refs.length);
     for(let i=0;i<refs.length;i++){
-      const [doc,n]=refs[i],b=nodo.children[i];
+      const [doc,n]=refs[i],b=botones[i];
       assert.equal(b.getAttribute('aria-haspopup'),'dialog');b.focus();await b.onclick();
       const modal=document.querySelector('dialog');assert.ok(modal.open);
       assert.equal(modal.getAttribute('aria-labelledby'),'sate-modal-titulo');
@@ -44,4 +44,4 @@ for(const ancho of [1300,768,375])for(const oscuro of [false,true]){
 }
 const css=leer('web/sate/componentes.css');
 assert.match(css,/sate-modal\.sate-modal--lectura\{[^}]*height:100dvh;[^}]*border-radius:0;animation:none/);
-console.log('Ventanilla: claves, literalidad, foco y cierre DOM en 1300/768/375, claro y oscuro OK');
+console.log('Ventanilla: claves, literalidad, foco y cierre DOM en 1300/1024/768/375, claro y oscuro OK');

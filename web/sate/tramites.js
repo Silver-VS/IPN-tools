@@ -4,16 +4,18 @@
   const el=(tag,texto,clase)=>{const n=document.createElement(tag);if(texto!=null)n.textContent=texto;if(clase)n.className=clase;return n};
   const boton=(texto,accion)=>{const b=el('button',texto,'sate-btn');b.type='button';b.onclick=accion;return b};
   // Las referencias pertenecen a la clave del texto, no a patrones sobre su redacción.
-  function citas(nodo,clave){
-    for(const [doc,n] of SATE_CONFIG.citasVentanilla?.[clave]||[]){
-      const b=boton(tx('consultar_articulo',{n,doc:doc.toUpperCase()}),async()=>{
+  function citas(nodo,clave,etiqueta){
+    const refs=SATE_CONFIG.citasVentanilla?.[clave]||[],fila=el('span',null,'tramite-citas');
+    for(const [doc,n] of refs){
+      const b=boton(etiqueta&&refs.length===1?etiqueta:tx('consultar_articulo',{n,doc:doc.toUpperCase()}),async()=>{
         try{await SATE.articulo(doc,n)}catch(e){
           console.error('Ventanilla: no se pudo abrir la cita',{clave,doc,n,error:e.message});
           SateUI.modal(tx('cita_error'),tx('cita_reintentar'));
         }
       });
-      b.setAttribute('aria-haspopup','dialog');nodo.appendChild(b);
+      b.className='tramite-cita';b.setAttribute('aria-haspopup','dialog');fila.appendChild(b);
     }
+    if(refs.length)nodo.appendChild(fila);
     return nodo;
   }
   function bajar(bytes,archivo){
@@ -43,8 +45,8 @@
   }
   function miniatura(def,datos,ejemplo=false){
     const nodo=el('div',null,'tramite-miniatura');nodo.setAttribute('aria-label',ejemplo?tx('miniatura_ejemplo'):tx('miniatura_avance'));
-    const marca=el('span',ejemplo?tx('ejemplo'):tx('miniatura_lleno'),'tramite-miniatura-marca');nodo.appendChild(marca);
     const hoja=el('div',null,'tramite-miniatura-hoja');nodo.appendChild(hoja);
+    const marca=el('span',ejemplo?tx('ejemplo'):tx('miniatura_lleno'),'tramite-miniatura-marca');hoja.appendChild(marca);
     const unidad=SATE_CONFIG.unidades[SATE_UNIDAD];
     const cab=el('header',null,'tramite-miniatura-cab');cab.appendChild(el('b','IPN'));const instituto=el('span',tx('miniatura_instituto'));instituto.setAttribute('data-oficial','lo');cab.appendChild(instituto);cab.appendChild(el('b',unidad.siglas||SATE_UNIDAD.toUpperCase()));hoja.appendChild(cab);
     const formato=['baja_temporal','baja_definitiva','dictamen','electivas'].includes(def.id);
@@ -52,28 +54,29 @@
     const identidad=ejemplo?{}:leer('datos')?.datos||{};
     const v={...identidad,...datos},nombre=[v.nombres,v.paterno,v.materno].filter(Boolean).join(' ');
     const valor=(dato,ficticio)=>ejemplo?ficticio:String(dato||'');
-    // Coordenadas de la primera hoja (612 × 792), iguales a los estampadores PDF.
-    function campo(k,x,y,w,dato){const c=el('div',null,'tramite-miniatura-campo');c.setAttribute('style',`left:${x/612*100}%;top:${(y-22)/792*100}%;width:${w/612*100}%`);c.appendChild(el('small',tx('miniatura_'+k)));c.appendChild(el('span',dato));hoja.appendChild(c)}
+    const campos=el('div',null,'tramite-miniatura-campos');hoja.appendChild(campos);let indiceCampo=0;
+    // La orientación HTML fluye por filas; las coordenadas oficiales pertenecen solo al PDF.
+    function campo(k,dato){const c=el('div',null,'tramite-miniatura-campo');const i=indiceCampo++;c.setAttribute('style',`grid-row:${Math.floor(i/2)+1};grid-column:${i%2+1}`);c.appendChild(el('small',tx('miniatura_'+k)));c.appendChild(el('span',dato));campos.appendChild(c)}
     const n=valor(nombre,tx('miniatura_persona')),bo=valor(v.boleta,'2099000000'),ca=valor(v.carrera,tx('miniatura_programa')),co=valor(v.correo,'ejemplo@example.test');
     const ap=valor(v.paterno,'Ejemplo'),am=valor(v.materno,'Pérez'),no=valor(v.nombres,'Ana');
     if(def.id.startsWith('baja_')){
       const temporal=def.id==='baja_temporal';
-      campo('fecha',temporal?332:349,temporal?381:330,208,valor(v.fecha,'22/10/2026'));
-      campo('paterno',temporal?154:134,temporal?410:358,142,ap);campo('materno',temporal?307:288,temporal?410:358,temporal?115:112,am);campo('nombres',temporal?433:411,temporal?410:358,128,no);
-      campo('boleta',temporal?189:154,temporal?449:418,116,bo);campo('carrera',temporal?396:351,temporal?449:418,165,ca);
-      campo('motivos',temporal?62:27,511,temporal?492:542,valor(v.explicacion,tx('miniatura_motivo')));
-      campo('correo',temporal?260:111,temporal?635:458,temporal?294:170,co);
-      if(temporal)campo('periodos',365,678,189,valor(v.periodos,'1'));
+      campo('fecha',valor(v.fecha,'22/10/2026'));
+      campo('paterno',ap);campo('materno',am);campo('nombres',no);
+      campo('boleta',bo);campo('carrera',ca);
+      campo('motivos',valor(v.explicacion,tx('miniatura_motivo')));
+      campo('correo',co);
+      if(temporal)campo('periodos',valor(v.periodos,'1'));
     }else if(def.id==='electivas'){
-      campo('nombre',130,172,250,n);campo('boleta',410,172,120,bo);campo('carrera',200,188,110,ca);campo('correo',178,204,290,co);
+      campo('nombre',n);campo('boleta',bo);campo('carrera',ca);campo('correo',co);
       const actividad=v.actividades?.[0],catalogo=raiz.SateElectivas?.totales?.(v);
-      campo('modalidad',80,288,450,valor(actividad?.k,'C'));campo('horas',170,340,350,valor(actividad?[actividad.h,catalogo?.all].filter(x=>x!=null).join(' / '):'','50 / 1'));campo('evidencia',80,416,450,valor(actividad?.ev,tx('miniatura_actividad')));
+      campo('modalidad',valor(actividad?.k,'C'));campo('horas',valor(actividad?[actividad.h,catalogo?.all].filter(x=>x!=null).join(' / '):'','50 / 1'));campo('evidencia',valor(actividad?.ev,tx('miniatura_actividad')));
     }else{
       const externo=v.tipo==='externo';
-      if(externo){campo('paterno',102,180,261,[ap,am].join(' '));campo('nombres',416,180,139,no)}else{campo('paterno',47,201,172,ap);campo('materno',229,201,133,am);campo('nombres',372,201,191,no)}
-      campo('boleta',externo?104:372,externo?194:238,externo?145:191,bo);campo('carrera',externo?466:47,externo?194:238,externo?89:315,ca);campo('correo',externo?372:334,externo?297:275,229,co);
-      campo('peticion',externo?58:48,externo?506:329,externo?491:514,valor(v.peticion,tx('miniatura_motivo')));
-      campo('periodos',229,446,334,valor(v.ingreso,'24/1'));
+      if(externo){campo('paterno',[ap,am].join(' '));campo('nombres',no)}else{campo('paterno',ap);campo('materno',am);campo('nombres',no)}
+      campo('boleta',bo);campo('carrera',ca);campo('correo',co);
+      campo('peticion',valor(v.peticion,tx('miniatura_motivo')));
+      campo('periodos',valor(v.ingreso,'24/1'));
       if(!externo){const filas=ejemplo?[{nombre:tx('miniatura_materia'),nivel:'1',cursada:'25/1',recursada:'26/1'}]:(v.filas||[]);const tabla=el('div',null,'tramite-miniatura-tabla');
         for(let i=0;i<8;i++){const f=filas[i],fila=el('div');for(const dato of [f?.nombre,f?.nivel,[f?.cursada,f?.recursada].filter(Boolean).join(' / ')])fila.appendChild(el('span',dato||' '));tabla.appendChild(fila)}hoja.appendChild(tabla)}
     }
