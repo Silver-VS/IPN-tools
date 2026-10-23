@@ -22,7 +22,8 @@ const config = JSON.parse(leer('data/sate.json'));
 config.unidades.ficticia = {guiaDatos:true, siglas:'Unidad ficticia', pestanas:['guia']};
 let pestana, movil = false;
 const c = vm.createContext({document, console, setTimeout, clearTimeout,
-  addEventListener(){}, matchMedia: () => ({matches:movil}), innerWidth:1200, innerHeight:900,
+  addEventListener(){}, removeEventListener(){}, requestAnimationFrame:fn=>setTimeout(fn,0), cancelAnimationFrame:clearTimeout,
+  matchMedia: () => ({matches:movil}), innerWidth:1200, innerHeight:900,
   scrollTo:(...p) => desplazamientos.push(p),
   location:{hash:'#/ficticia/guia', pathname:'/', search:'', href:'https://example.org/'},
   history:{replaceState(){}}, SATE_UNIDAD:'ficticia', SATE_CONFIG:config,
