@@ -130,7 +130,8 @@ assert.equal(caja.querySelectorAll('.rgl-articulo').length,ri.articulos.length+1
 assert.equal(caja.querySelectorAll('.rgl-mapa__tramo').length,12);
 assert.equal(caja.querySelectorAll('.rgl-mapa__etiqueta')[2].textContent, 'De los alumnos');
 assert.equal(caja.querySelectorAll('.rgl-mapa__titulos').length,0,'cada etiqueta pertenece a su segmento');
-assert.equal(caja.querySelector('.rgl-riel').hidden,true,'sin columna vacía cuando no hay citas');
+assert.notEqual(caja.querySelector('.rgl-riel').hidden,true,'el riel no se oculta: la rejilla no salta al desplazarse');
+assert.ok(caja.querySelector('.rgl-riel-vacio'),'aviso discreto cuando el artículo no tiene citas');
 const rutas = new Set(ri.articulos.flatMap(a=>a.ubicacion.map((_,i)=>a.ubicacion.slice(0,i+1).join(' / '))));
 assert.equal(caja.querySelectorAll('.rgl-encabezado').length,rutas.size,'encabezados de todos los títulos, capítulos y secciones');
 const tramo = caja.querySelectorAll('.rgl-mapa__tramo')[2];
@@ -155,7 +156,8 @@ assert.equal(caja.querySelector('.rgl-riel').hidden,false,'panel con preguntas r
 assert.ok(caja.querySelectorAll('.rgl-riel a').length>0);
 assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'));
 await pestana.mostrar({partes:['reglamentos','rge','art-1']});
-assert.equal(caja.querySelector('.rgl-riel').hidden,true,'el texto recupera espacio al cambiar a un artículo sin citas');
+assert.notEqual(caja.querySelector('.rgl-riel').hidden,true,'la rejilla se conserva al cambiar a un artículo sin citas (sin saltos)');
+assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'),'sin cambio de columnas');
 pestana.ocultar();
 assert.equal(eventos.has('scroll'),false,'se retira el seguimiento al salir');
 assert.equal(eventos.has('resize'),false,'se retira el ajuste al salir');

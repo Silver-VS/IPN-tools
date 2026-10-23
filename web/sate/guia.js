@@ -482,9 +482,8 @@
       const bloques = [];
       if (rel.tramites.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_tramites') }), h('ul', {}, rel.tramites.map(id => h('li', {}, [h('a', { href: '#/' + unidad() + '/tramites/' + id, texto: t('sate.tramite.' + id + '.titulo') })])))]));
       if (rel.preguntas.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_preguntas') }), h('ul', {}, rel.preguntas.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]));
-      riel.replaceChildren(...(bloques.length ? [h('h3', { texto: t('sate.guia.rgl_contexto') }), ...bloques] : []));
-      riel.hidden = !bloques.length;
-      rejilla.classList.toggle('rgl--sin-riel', !bloques.length);
+      // El riel no se oculta: si cambiara la rejilla al desplazarse, el índice y el texto saltarían.
+      riel.replaceChildren(h('h3', { texto: t('sate.guia.rgl_contexto') }), ...(bloques.length ? bloques : [h('p', { 'class': 'rgl-riel-vacio', texto: t('sate.guia.rgl_sin_citas') })]));
     }
     function marcarIndice(clave) {
       for (const [n, a] of enlaces) { if (n === clave) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }

@@ -155,6 +155,7 @@
 .rgl-pagina:hover span{text-decoration:underline}
 .rgl-riel{position:sticky;top:var(--ipn-esp-4);display:grid;gap:var(--ipn-esp-5);min-width:0;font-size:var(--ipn-tamano-s)}
 .rgl-riel[hidden]{display:none}
+.rgl-riel-vacio{margin:0;color:var(--ipn-tenue)}
 .rgl-riel h3{margin:0;font-size:var(--ipn-tamano-m)}
 .rgl-riel section{display:grid;gap:var(--ipn-esp-2)}
 .rgl-riel h4{margin:0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s);font-weight:600}
