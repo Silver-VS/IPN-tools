@@ -26,7 +26,7 @@ for(const unidad of ['upiita','escom','upibi']){
     const n=Number(v[k]),op={};c.replace(/(=?\w+)\s*\{([^{}]*)\}/g,(_,k,t)=>{op[k]=t});
     return (op['='+n]??op[new Intl.PluralRules('es-MX').select(n)]??op.other??'').replace(/#/g,String(n));
   }).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}');
-  function nodo(id='') {return {id,hidden:true,innerHTML:'',textContent:'',value:'',options:[],dataset:{},clientWidth:375,offsetWidth:375,offsetHeight:800,
+  function nodo(id='') {return {id,hidden:true,innerHTML:'',textContent:'',value:'',options:[],dataset:{},parentElement:{hidden:false},clientWidth:375,offsetWidth:375,offsetHeight:800,
     style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains(){return false}},eventos:{},
     addEventListener(k,fn){(this.eventos[k]??=[]).push(fn)},setAttribute(){},removeAttribute(){},getAttribute(){return null},appendChild(){},insertAdjacentHTML(){},
     querySelector:s=>s==='svg'?null:nodo(),querySelectorAll:s=>s==='.charts'?[nodo(),nodo()]:[],closest:()=>null,contains:()=>false,
@@ -101,6 +101,14 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.match(document.querySelector('#trayectoria-areas-datos').innerHTML,/<ol.*Promedio.*cr.*materias/,'K: ranking accesible con los mismos datos');
   areas.open=false;areas.eventos.toggle.at(-1)();
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;
+  assert.match(vm.runInContext('kardexCurso()',c),/^<ul class="kx-curso-lista">/,'R9: si grupo y parciales faltan, el curso se muestra como lista compacta');
+  vm.runInContext("ALUMNO.en_curso=[Object.keys(cur())[0]];ALUMNO.horario_inscrito=[['7FV1',ALUMNO.en_curso[0],cur()[ALUMNO.en_curso[0]][0],[],[]]];ALUMNO.horario_inscrito[0].p1=8",c);
+  const cursoConDatos=vm.runInContext('kardexCurso()',c);
+  assert.match(cursoConDatos,/<th scope="col">Grupo<\/th>/,'R9: aparece una columna con datos');
+  assert.match(cursoConDatos,/<th scope="col">P1<\/th>/,'R9: aparecen parciales cuando existen');
+  assert.doesNotMatch(cursoConDatos,/<th scope="col">P2<\/th>/,'R9: se ocultan columnas vacías');
+  assert.match(cssKx,/\.kx-promedios\{[^}]*auto-fit/,'R9: las tarjetas visibles reparten el ancho');
+  assert.match(cssKx,/\.kx-promedios\{[^}]*scroll-margin-top/,'R9: el ancla respeta el encabezado fijo');
   assert.equal(areas.open,false,'F: cierre recordado');assert.equal(trazados,1,'F: no redibujar sección cerrada');
   movil=false;pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.equal(document.querySelector('#trayectoria-kardex').open,true,'F: escritorio kárdex abierto por omisión');
