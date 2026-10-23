@@ -21,10 +21,15 @@ for(const ancho of [1300,1024,768,375])for(const oscuro of [false,true]){
   for(const f of ['componentes','tramites','guia'])vm.runInContext(leer('web/sate/'+f+'.js'),c);
   for(const [clave,refs] of Object.entries(config.citasVentanilla)){
     const nodo=document.createElement('div');document.body.appendChild(nodo);
-    c.SateTramites.citas(nodo,clave);
+    const etiqueta=clave.startsWith('dictamen.')?leer('contenido/textos/es.toml').match(new RegExp('^'+clave.split('.')[1]+' = "([^"]+)"','m'))?.[1]:undefined;
+    c.SateTramites.citas(nodo,clave,etiqueta);
     const botones=nodo.querySelectorAll('button');assert.equal(botones.length,refs.length);
     for(let i=0;i<refs.length;i++){
       const [doc,n]=refs[i],b=botones[i];
+      if(clave==='dictamen.fund_e1'&&n==='57')assert.match(b.textContent,/fracc\. III y VI/,'Conserva ambas fracciones en el chip del artículo 57');
+      if(clave==='dictamen.fund_e3')assert.match(b.textContent,/último párrafo/);
+      if(clave==='sate.baja.aviso_temporal_2')assert.match(b.textContent,/fracciones I y II/);
+      if(clave==='sate.baja.aviso_definitiva_3')assert.match(b.textContent,/fracción I/);
       assert.equal(b.getAttribute('aria-haspopup'),'dialog');b.focus();await b.onclick();
       const modal=document.querySelector('dialog');assert.ok(modal.open);
       assert.equal(modal.getAttribute('aria-labelledby'),'sate-modal-titulo');

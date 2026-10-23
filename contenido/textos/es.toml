@@ -1047,6 +1047,15 @@ error_plan = "El plan elegido no corresponde a esta carrera. Se cargaron sus pla
 error_red = "No se pudo consultar el SAES. Revisa tu conexión y vuelve a pulsar «Actualizar»."
 
 [sate.horarios]
+d_filtros = "Filtros"
+d_editar_opciones = "Opciones del generador"
+d_opciones_resumen = "{n} materias · {dias} · Editar"
+d_dias_sin_limite = "sin límite de días"
+d_opcion_fila = "Opción {n} · {cr} cr · {dias} días · {huecos}"
+d_con_huecos = "con huecos"
+d_sin_huecos = "sin huecos"
+d_optativas_aviso = "Optativas · Ver más"
+d_generacion_aviso = "Generación · Ver más"
 captura_fecha = "Captura del SAES: {fecha}"
 captura_grupos = "{n} grupos de esta carrera"
 captura_sin_proximo = "El SAES aún no publica la oferta del próximo periodo; se muestra el periodo actual"

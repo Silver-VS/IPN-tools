@@ -7,7 +7,9 @@
   function citas(nodo,clave,etiqueta){
     const refs=SATE_CONFIG.citasVentanilla?.[clave]||[],fila=el('span',null,'tramite-citas');
     for(const [doc,n] of refs){
-      const b=boton(etiqueta&&refs.length===1?etiqueta:tx('consultar_articulo',{n,doc:doc.toUpperCase()}),async()=>{
+      const fuente=etiqueta||SATE.texto(clave);
+      const detalle=fuente.match(new RegExp('(?:arts?\\.|artículos?)\\s*'+n+'(?![0-9])\\s*,\\s*((?:fracc\\.|fracci[oó]n(?:es)?)\\s+[IVXLCDM]+(?:\\s*(?:,|y)\\s*[IVXLCDM]+)*|(?:último|primer|segundo|tercer) párrafo|párr\\.[^;]*)','i'))?.[1];
+      const b=boton(etiqueta&&refs.length===1?etiqueta:tx('consultar_articulo',{n,doc:doc.toUpperCase()})+(detalle?', '+detalle:''),async()=>{
         try{await SATE.articulo(doc,n)}catch(e){
           console.error('Ventanilla: no se pudo abrir la cita',{clave,doc,n,error:e.message});
           SateUI.modal(tx('cita_error'),tx('cita_reintentar'));
@@ -156,6 +158,10 @@
       }catch(e){console.error('Ventanilla: descarga fallida',{tramite:def.id,paso:m.paso,error:e.name});box.querySelector('[data-pdf-estado]').textContent=e.message||tx('pdf_error')}
       finally{if(!destruido)b.disabled=!!def.faltante?.(m.datos,true)}
     }
+    function ampliarFormato(){
+      const hoja=miniatura(def,m.datos,false);hoja.className+=' tramite-miniatura--ampliada';
+      SateUI.modal(tx('ver_formato'),hoja,{amplio:true});
+    }
     let confirmado=false;
     // Regreso a la lista: el avance ya está guardado, así que no pide confirmación.
     function regreso(clase){const b=boton(tx('volver'),()=>SATE.ir('tramites'));b.className+=' sate-volver tramite-regreso '+clase;return b}
@@ -195,7 +201,7 @@
         }));bloque.appendChild(resumen);pantalla.appendChild(bloque);
         def.revisar?.(pantalla,m.datos,bloque);
         const mini=miniatura(def,m.datos,false);pantalla.appendChild(mini);
-        if(def.generar){mini.tabIndex=0;mini.setAttribute('role','button');mini.onclick=()=>{if(url)window.open(url,'_blank','noopener')};mini.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mini.onclick()}}}
+        if(def.generar){mini.tabIndex=0;mini.setAttribute('role','button');mini.onclick=ampliarFormato;mini.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mini.onclick()}}}
         if(def.confirmacion){const l=el('label',null,'tramite-campo'),n=el('input');n.type='checkbox';n.onchange=()=>confirmado=n.checked;l.appendChild(n);l.appendChild(el('span',def.confirmacion));pantalla.appendChild(l)}
       }else for(const c of def.pasos[m.paso].campos||[]){
         if(c.visible&&!c.visible(m.datos))continue;
@@ -219,7 +225,7 @@
       // La vista previa y «Ver formato» solo en el último paso: antes se podía sacar un PDF casi vacío.
       if(conVista){
         const lateral=el('aside',null,'tramite-preview'),iframe=el('iframe');iframe.title=tx('vista_previa');if(url)iframe.src=url;lateral.appendChild(iframe);layout.appendChild(lateral);
-        const fila=el('div',null,'tramite-ver-fila'),ver=boton(tx('ver_formato'),()=>{if(url)window.open(url,'_blank','noopener')});ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;
+        const fila=el('div',null,'tramite-ver-fila'),ver=boton(tx('ver_formato'),ampliarFormato);ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;
         fila.appendChild(ver);fila.appendChild(el('small',tx('ver_formato_ayuda')));pantalla.appendChild(fila);
         programar();
       }

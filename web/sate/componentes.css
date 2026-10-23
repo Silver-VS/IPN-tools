@@ -74,7 +74,7 @@
 .tramite-encabezado h2{margin:0;min-width:0;line-height:1.25}
 .tramite-encabezado .tramite-regreso{margin-left:auto}
 .tramite-citas{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2);align-items:center}
-.tramite-cita{font:inherit;color:var(--ipn-acento);background:transparent;border:0;text-decoration:underline;text-underline-offset:var(--ipn-esp-1);padding:var(--ipn-esp-1);cursor:pointer;white-space:nowrap}
+.tramite-cita{position:relative;min-height:var(--ipn-control-alto);font:inherit;color:var(--ipn-acento);background:transparent;border:0;text-decoration:underline;text-underline-offset:var(--ipn-esp-1);padding:var(--ipn-esp-1);cursor:pointer;white-space:nowrap}
 #sate-tramites .tramite-cita{white-space:nowrap;overflow-wrap:normal}
 .tramite-cita:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .tramite-miniatura{position:relative;box-sizing:border-box;display:block;width:min(100%,12rem);margin-top:var(--ipn-esp-2);border:1px solid var(--ipn-linea);background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-xs);line-height:1.5;aspect-ratio:612/792;overflow:hidden}
@@ -95,6 +95,7 @@
 .tramite-miniatura-tabla span{min-width:0;overflow-wrap:anywhere;padding:var(--ipn-esp-1);border-right:1px solid var(--ipn-linea);min-height:var(--ipn-esp-4);font-size:var(--ipn-tamano-xs)}
 .tramite-miniatura-marca{position:absolute;inset:50% auto auto 50%;z-index:-1;pointer-events:none;transform:translate(-50%,-50%) rotate(-30deg);opacity:.1;color:var(--ipn-acento);font-size:var(--ipn-tamano-xl);font-weight:600;white-space:nowrap}
 .tramite-miniatura[role=button]{cursor:pointer}
+.tramite-miniatura--ampliada{width:100%;margin:0}
 .tramite-miniatura:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .tramite-pie{display:flex;justify-content:flex-start;margin-top:var(--ipn-esp-5);padding-top:var(--ipn-esp-3);border-top:1px solid var(--ipn-borde-control)}
 .tramite-falta{margin-block:var(--ipn-esp-2);color:var(--ipn-tenue)}
@@ -531,7 +532,7 @@ button.sate-chip{cursor:pointer}
 
 .sate-segmentado{box-sizing:border-box;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:var(--ipn-esp-1);max-width:100%;padding:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-hundido)}
 .sate-segmentado button{min-width:0;min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-4);border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-tenue);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);cursor:pointer;overflow-wrap:anywhere}
-.sate-segmentado button[aria-pressed=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);font-weight:600}
+.sate-segmentado button[aria-pressed=true],.sate-segmentado button[aria-selected=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento);font-weight:600}
 .sate-segmentado button{overflow-wrap:normal;word-break:normal;hyphens:none}
 .sate-segmentado__corto{display:none}
 @media(max-width:559.98px){.sate-segmentado button:has(.sate-segmentado__corto){padding-inline:var(--ipn-esp-2);font-size:var(--ipn-tamano-s)}.sate-segmentado__largo{display:none}.sate-segmentado__corto{display:inline}}   /* etiqueta corta cuando no cabe la completa: nunca se parte una palabra */
@@ -1005,7 +1006,18 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 }
 /* R2-HOR: cupos reservados dentro del bloque y columnas legibles con traslapes. */
 .cal:has(>.day){--ipn-horario-columna:calc(var(--ipn-esp-8) + var(--ipn-esp-6));grid-template-columns:calc(var(--ipn-esp-6) + var(--ipn-esp-5)) repeat(var(--days),minmax(var(--ipn-horario-columna-min,var(--ipn-horario-columna)),1fr));min-width:max-content}
-.cal .blk .horario-contenido{display:block;min-width:0;min-height:0;overflow:hidden;flex:1 1 100%;overflow-wrap:anywhere}
+.cal .blk .horario-contenido{display:block;min-width:0;min-height:0;overflow:hidden;flex:1 1 100%;overflow-wrap:normal;word-break:normal;hyphens:none}
+.cal .blk b{overflow-wrap:normal;word-break:normal;hyphens:none;text-overflow:ellipsis}
+.hor-propuestas-opciones{min-width:0}
+.hor-propuestas-opciones .genrow,.hor-propuestas-opciones .gtime{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-3)}
+.hor-propuestas-opciones summary{min-height:var(--ipn-control-alto);cursor:pointer}
+.hor-propuestas-opciones #b-gen{width:100%;margin-top:var(--ipn-esp-3)}
+.hor-propuestas .calwrap{overflow:visible}
+.hor-propuestas .cal:has(>.day){min-width:0;grid-template-columns:var(--ipn-esp-7) repeat(var(--days),minmax(0,1fr))}
+.hor-propuestas .gen>div{min-width:0;width:100%}
+.hor-propuestas .gen [data-propuesta]{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--ipn-tamano-s);text-align:left}
+.hor-propuestas .gen .acts{display:none}
+#d-panel-resumen{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
 .cal .blk.blk-cupo{display:grid;grid-template-rows:auto minmax(0,1fr);align-content:stretch;align-items:start;gap:var(--ipn-esp-1);padding-block:0}
 .cal .blk-cupo>.cupos-insignia{max-width:100%;justify-self:start;white-space:nowrap;line-height:1.2;padding:0 var(--ipn-esp-1);margin:0;box-sizing:border-box}
 .cal .blk-cupo>.horario-contenido{max-height:100%}
@@ -1076,7 +1088,8 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 .kx-promedios .kpi[hidden]{display:none}
 
 /* Ventanilla: tarjetas de trámite como rectángulos contiguos en rejilla (líneas de 1 px compartidas) */
-.tramite-rejilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,17rem),1fr));gap:1px;margin-top:var(--ipn-esp-4);background:var(--ipn-linea);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);overflow:hidden}
+.tramite-rejilla{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:var(--ipn-esp-4);background:var(--ipn-linea);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);overflow:hidden}
+@media(max-width:639px){.tramite-rejilla{grid-template-columns:minmax(0,1fr)}}
 .tramite-rejilla .tramite-fila{border:0;display:flex}
 .tramite-rejilla .sate-btn.tramite-fila-boton{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:var(--ipn-esp-1);border:0;border-radius:0;background:var(--ipn-superficie);padding:var(--ipn-esp-4)}
 .tramite-rejilla .sate-btn.tramite-fila-boton:hover{background:var(--ipn-hundido)}
