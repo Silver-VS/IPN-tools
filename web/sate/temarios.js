@@ -213,6 +213,7 @@
     const lista = claves.length ? h('div', { 'class': 'tmr-rel-lista' }, claves.map(k => {
       const a = h('a', { 'class': 'tmr-rel-enlace', href: ir(E.indice.materias[k].c, k), texto: E.indice.materias[k].n });
       if (alIr) a.addEventListener('click', e => alIr(e, k));
+      else a.addEventListener('click', e => { if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return; e.preventDefault(); abrir(k, a); });
       return a;
     })) : h('p', { 'class': 'tmr-nota', texto: ninguna });
     return h('div', { 'class': 'tmr-rel' }, [h('h4', { texto: titulo }), lista]);
@@ -255,12 +256,6 @@
       const secciones = [['contenidos', t('sate.guia.veras'), unidades],
         ['orientacion', t('temarios.seccion.orientacion'), texto('orientacion', t('temarios.seccion.orientacion'), m.orientacion)],
         ['recursos', t('sate.guia.recursos'), rec], ['bibliografia', t('sate.guia.bibliografia'), biblio]].filter(x => x[2]);
-      const indiceSecciones = [['objetivo', t('temarios.seccion.objetivo')], ['relaciones', t('temarios.ficha.trayectoria')], ['evaluacion', t('temarios.ficha.acreditacion')], ...secciones.map(([id, titulo]) => [id, titulo])];
-      const indice = h('nav', { 'class': 'tmr-indice', 'aria-label': t('temarios.ficha.indice') }, indiceSecciones.map(([id, titulo]) => {
-        const a = h('a', { href: ir(r.carreraId, m.clave, id), 'data-seccion': id, texto: titulo });
-        if (dialogo) a.addEventListener('click', e => { e.preventDefault(); const n = document.getElementById('ficha-' + id); if (n && n.scrollIntoView) n.scrollIntoView({ behavior: reducido() ? 'auto' : 'smooth', block: 'start' }); });   // dentro de la ventana, sin cambiar de ruta
-        return a;
-      }));
       const colorArea = m.area?.color || 'var(--ipn-acento)';
       const trayectoria = h('section', { 'class': 'tmr-lateral-bloque tmr-trayectoria', id: 'ficha-relaciones' }, [
         h('h3', { texto: t('temarios.ficha.trayectoria') }),
@@ -275,9 +270,44 @@
         ...parrafos(m.evaluacion).map(x => h('p', { texto: x })),
         h('p', { 'class': 'tmr-nota', texto: t('temarios.ficha.ponderacion') })
       ]);
-      cuerpo = [h('div', { 'class': 'tmr-principal' }, [enc, cifras, indice, objetivo]),
-        h('aside', { 'class': 'tmr-lateral' }, [trayectoria, acreditacion]),
-        h('div', { 'class': 'tmr-col-resto' }, [...secciones.map(x => x[2]), h('footer', { 'class': 'tmr-bloque' }, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))])];
+      const generales = h('section', { 'class': 'tmr-bloque', id: 'ficha-generales' }, [h('h3', { texto: t('temarios.ficha.generales_lector.titulo') }), cifras]);
+      const oficial = h('section', { 'class': 'tmr-bloque', id: 'ficha-pdf' }, [h('h3', { texto: t('sate.guia.pdf') }), pdf]);
+      const bloques = [generales, objetivo, ...secciones.filter(x => x[0] !== 'bibliografia').map(x => x[2]), acreditacion, biblio, trayectoria, oficial].filter(Boolean);
+      const nav = h('nav', { 'class': 'rgl-arbol tmr-indice', 'aria-label': t('temarios.ficha.indice') });
+      const detalle = h('details', { 'class': 'rgl-indice', open: !raiz.matchMedia?.('(max-width:768.98px)').matches }, [h('summary', { 'class': 'rgl-resumen', texto: t('temarios.ficha.indice') }), h('div', { 'class': 'rgl-indice__cuerpo' }, [nav])]);
+      const destinos = [];
+      const entrada = (n, titulo, padre) => {
+        const id = n.getAttribute('id').replace('ficha-', '');
+        const a = h('a', { 'class': 'rgl-indice-titulo', href: ir(r.carreraId, m.clave, id), 'data-seccion': id, texto: titulo });
+        a.addEventListener('click', () => { if (raiz.matchMedia?.('(max-width:768.98px)').matches) detalle.open = false; });
+        padre.appendChild(a); destinos.push([n, a]);
+      };
+      for (const bloque of bloques) {
+        bloque.classList.add('rgl-seccion');
+        const titulo = bloque.querySelector('h3'); titulo.classList.add('rgl-encabezado');
+        entrada(bloque, titulo.textContent, nav);
+        const hijos = h('div', { 'class': 'rgl-grupo__cuerpo' });
+        bloque.querySelectorAll('.tmr-pasos li').forEach((li, i) => {
+          li.setAttribute('id', 'ficha-unidad-' + (i + 1));
+          entrada(li, li.querySelector('h4').textContent, hijos);
+          li.querySelectorAll('p').forEach((p, j) => { p.setAttribute('id', 'ficha-unidad-' + (i + 1) + '-tema-' + (j + 1)); entrada(p, p.textContent, hijos); });
+        });
+        if (hijos.children.length) nav.appendChild(hijos);
+      }
+      const seguir = () => {
+        if (!document.contains(nav)) { raiz.removeEventListener?.('scroll', seguir); return; }
+        const activo = SateUI.lectorVisible(destinos.map(d => [d, d[0]])) || destinos[0];
+        for (const d of destinos) { if (d === activo) d[1].setAttribute('aria-current', 'location'); else d[1].removeAttribute('aria-current'); }
+      };
+      raiz.addEventListener('scroll', seguir, { passive: true });
+      const lienzo = h('div', { 'class': 'rgl-texto' }, [...bloques, h('footer', {}, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))]);
+      const ajustar = () => {
+        if (!document.contains(nav)) { raiz.removeEventListener?.('resize', ajustar); return; }
+        SateUI.lectorEncabezados(lienzo, raiz.matchMedia?.('(max-width:768.98px)').matches ? detalle.querySelector('summary').offsetHeight || 48 : 0);
+      };
+      raiz.addEventListener('resize', ajustar);
+      if (raiz.requestAnimationFrame) raiz.requestAnimationFrame(ajustar);
+      cuerpo = [enc, SateUI.lector(detalle, lienzo, h('aside', { 'class': 'rgl-riel' }, [h('p', { texto: m.clave }), cambiar]))];
     }
     const ficha = h('div', { 'class': 'tmr-ficha' + (vistazo ? ' tmr-ficha--vistazo' : '') }, cuerpo.filter(Boolean));
     if (ficha.style && ficha.style.setProperty) ficha.style.setProperty('--tmr-area', m.area?.color || 'var(--ipn-acento)');
@@ -564,6 +594,32 @@
     destino.replaceChildren(caja, h('p', { 'class': 'tmr-nota gd-metro-leyenda', texto: t('sate.guia.metro_leyenda_correspondencia') }));
   }
   const VISTA_CLAVE = 'ipnt.programasVista';
+  function desplazamiento(caja) {
+    if (caja.parentNode.classList.contains('gd-desplazamiento')) return caja.parentNode.actualizar;
+    const marco = h('div', { 'class': 'gd-desplazamiento' });
+    caja.parentNode.insertBefore(marco, caja); marco.appendChild(caja);
+    const botones = [-1, 1].map(dir => {
+      const b = h('button', { type: 'button', 'class': 'gd-desplazar gd-desplazar--' + (dir < 0 ? 'izquierda' : 'derecha'), 'aria-label': t('temarios.desplazar.' + (dir < 0 ? 'izquierda' : 'derecha')), texto: dir < 0 ? '‹' : '›' });
+      b.addEventListener('click', () => caja.scrollBy({ left: dir * caja.clientWidth * .75, behavior: reducido() ? 'auto' : 'smooth' }));
+      marco.appendChild(b); return b;
+    });
+    const actualizar = () => {
+      botones[0].hidden = !(caja.scrollLeft > 1);
+      botones[1].hidden = !(caja.scrollWidth - caja.clientWidth - caja.scrollLeft > 1);
+    };
+    let inicio = null, movido = false;
+    caja.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse' || e.button !== 0) return; inicio = { x: e.clientX, scroll: caja.scrollLeft }; movido = false; });
+    caja.addEventListener('pointermove', e => {
+      if (!inicio) return;
+      if (Math.abs(e.clientX - inicio.x) > 5) { movido = true; caja.setPointerCapture?.(e.pointerId); e.preventDefault(); caja.scrollLeft = inicio.scroll - (e.clientX - inicio.x); }
+    });
+    const terminar = () => { inicio = null; };
+    caja.addEventListener('pointerup', terminar); caja.addEventListener('pointercancel', terminar);
+    caja.addEventListener('pointerleave', e => { if (!caja.hasPointerCapture?.(e.pointerId)) terminar(); });
+    caja.addEventListener('click', e => { if (movido) { e.preventDefault(); e.stopPropagation(); movido = false; } }, true);
+    caja.addEventListener('scroll', actualizar, { passive: true });
+    marco.actualizar = actualizar; actualizar(); return actualizar;
+  }
   function vistaGuardada() {
     try { const v = (raiz.IPNT?.almacen || raiz.localStorage).getItem(VISTA_CLAVE); if (v === 'metro' || v === 'matriz') return v; } catch (e) { /* sin almacén: se usa la vista por omisión */ }
     return raiz.matchMedia && raiz.matchMedia('(max-width:639.98px)').matches ? 'matriz' : 'metro';   // en teléfono, la matriz
@@ -593,6 +649,7 @@
       const ajustar = Math.min(1.5, ancho / w);
       lienzo.style.zoom = String(G.zoom[id] ?? Math.max(1, ajustar));
       G.escala = Number(lienzo.style.zoom) || 1;
+      desplazamiento(metro.hidden ? mapa : metro.querySelector('.gd-metro-caja'))();
     };
     zoom.addEventListener('click', e => {
       const b = e.target.closest('[data-gd-zoom]'); if (!b) return;
@@ -650,6 +707,7 @@
       seg.fijar(G.modo); vista.fijar(G.vista);
       tray.hidden = G.modo !== 'trayectoria'; lin.hidden = G.modo !== 'lineas';
       metro.hidden = G.vista !== 'metro'; mapa.hidden = G.vista !== 'matriz';
+      if (mapa.parentNode?.classList.contains('gd-desplazamiento')) mapa.parentNode.hidden = mapa.hidden;
       if (G.modo === 'trayectoria') { pintarTrayectoria(); return; }
       if (G.vista === 'metro') { pintarMetro(metro, ind, G.carrera, abrirFicha); mapa.replaceChildren(); } else { pintarMapa(); metro.replaceChildren(); }
       pintarEsp();
