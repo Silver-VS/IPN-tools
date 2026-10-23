@@ -341,6 +341,15 @@
       barra?.remove?.();
       barra = SateUI.barraInferior({items:items.map(it=>({id:it.id,href:it.href,grupo:it.grupo,texto:it.corto,titulo:it.texto})),activa,alElegir:ir});
       document.body.appendChild(barra);
+      const selectorPlan=document.getElementById('plan-periodos'), etiquetaPlan=document.getElementById('plan-vista-etiqueta'), anclaPlan=document.getElementById('plan-periodos-ancla');
+      if(selectorPlan&&anclaPlan?.after){
+        const botonMapa=barra.querySelector?.('[data-id="mapa"]');
+        if(activa==='mapa'&&botonMapa){
+          const envoltura=document.createElement('div');envoltura.className='sate-barra__plan';envoltura.setAttribute('aria-label',texto('sate.planeacion.periodos'));
+          if(etiquetaPlan)envoltura.appendChild(etiquetaPlan);
+          envoltura.appendChild(selectorPlan);barra.insertBefore(envoltura,botonMapa.nextSibling);
+        }else{const destino=etiquetaPlan?.after?etiquetaPlan:anclaPlan;if(etiquetaPlan?.after)anclaPlan.after(etiquetaPlan);destino.after(selectorPlan)}
+      }
       for (const nav of [tabs, barra]) for (const evento of ['pointerover','focusin']) nav.addEventListener?.(evento, e => {
         const id = e.target.closest?.('[data-id]')?.dataset.id;
         if (cfg.pestanas.includes(id)) precarga.precargar(id);

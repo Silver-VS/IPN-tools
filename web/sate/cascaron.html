@@ -163,7 +163,7 @@ input[type=number]{width:5rem}
 .edge.past{opacity:.3}   /* con datos del SAES: llega a una materia ya acreditada */
 .box{position:absolute;font-stretch:75%;display:flex;align-items:center;justify-content:center;text-align:center;border-radius:7px;border:1.5px solid var(--ipn-linea);background:var(--st-rest);color:var(--ipn-texto);font-weight:600;line-height:1.08;padding:var(--ipn-esp-1) var(--ipn-esp-1) var(--ipn-esp-1) var(--ipn-esp-2);cursor:pointer;overflow:hidden;letter-spacing:.01em;transition:opacity .12s, box-shadow .12s}
 .box::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--nv,transparent)}
-.box.done{opacity:1;color:var(--ipn-texto);background:var(--ipn-superficie);font-weight:500;border-style:dotted;border-color:var(--ipn-ok)}
+.box.done{opacity:1;color:var(--ipn-texto);background:color-mix(in srgb,var(--ipn-ok) 12%,var(--ipn-superficie));font-weight:500;border-style:dotted;border-color:var(--ipn-ok)}
 .box.done.want,.box.done.hot{opacity:1}
 .box.late{border:2px solid var(--st-late)}
 .box.fail{background:var(--ipn-error-suave)}
@@ -877,7 +877,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       </div>
       <div class="maptools-derecha">
         <div id="plan-opciones" hidden>
-          <span id="plan-vista-etiqueta" hidden>Planear:</span><div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button><button class="link" type="button" id="plan-supuesto" hidden>ⓘ</button></div>
+          <span id="plan-periodos-ancla"></span><span id="plan-vista-etiqueta" hidden>Planear:</span><div class="seg" role="group" id="plan-periodos"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button><button class="link" type="button" id="plan-supuesto" hidden>ⓘ</button></div>
           <span id="plan-activo" role="status" aria-live="polite"></span>
           <div class="plan-leyenda" id="plan-leyenda"></div>
         </div>
