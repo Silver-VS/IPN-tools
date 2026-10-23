@@ -2,6 +2,7 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
+import {crearEntorno} from './dom_minimo.mjs';
 const leer=f=>readFileSync(f,'utf8'),c=vm.createContext({document:{addEventListener(){}},addEventListener(){}});
 vm.runInContext(leer('web/sate/componentes.js'),c);
 const propiedades={},animaciones=[],cal={innerHTML:'',dataset:{},animate:(...args)=>animaciones.push(args),style:{setProperty:(k,v)=>propiedades[k]=v}};
@@ -95,6 +96,70 @@ assert.match(css,/minmax\(var\(--ipn-horario-columna-min/,'Los traslapes conserv
 assert.match(css,/\.sate-cupos-consultar\.btn\{[^}]*min-height:var\(--ipn-control-alto\)/);
 assert.match(css,/:focus-visible/);
 const html=leer('web/sate/cascaron.html');
+const horarios=leer('web/sate/horarios.js');
+assert.doesNotMatch(html+horarios,/<input[^>]*type=["']time["']/,'Horarios no abre el reloj nativo');
+for(const id of ['g-from','g-to'])assert.match(html,new RegExp('<select id="'+id+'"'),'Ambos límites son selects');
+assert.match(html,/\.planner\{[^}]*max-height:none;overflow:visible/,'Mi horario crece sin recortar clases');
+const limites=vm.createContext({classes:()=>[grupo(420,510),grupo(600,690)],S:{car:'X'},hm,esc,txH:k=>k,toMin:s=>s.split(':').reduce((a,b)=>a*60+Number(b),0)});
+vm.runInContext(horarios.slice(horarios.indexOf('function opcionesHoras('),horarios.indexOf('function renderGTime(')),limites);
+const opciones=limites.opcionesHoras();
+assert.match(opciones,/>7:00<\/option>/);assert.match(opciones,/>8:30<\/option>/);assert.match(opciones,/>11:30<\/option>/);
+assert.doesNotMatch(opciones,/>9:00<\/option>/,'No inventa horas que no están en la oferta');
+assert.match(limites.opcionesHoras('09:00'),/value="09:00" selected/,'Conserva el límite guardado');
+const espacio={plan:'A',plans:{A:{sel:['viejo'],own:[{n:'Actividad ficticia'}]}}};let cierres=0,guardados=0;
+const aplicar=vm.createContext({S:{gen:{top:[{cs:[grupo(600,690)]}]}},ws:()=>espacio,plan:()=>espacio.plans[espacio.plan],nextPlan:()=> 'B',keyOf:op.keyOf,refresh:()=>guardados++,ventanaPropuestas:{cerrar:()=>cierres++},indicePropuesta:0});
+vm.runInContext(horarios.slice(horarios.indexOf('function aplicarPropuesta('),horarios.indexOf('function renderPropuesta(')),aplicar);
+aplicar.aplicarPropuesta(false);assert.equal(cierres,1);assert.equal(guardados,1);assert.equal(espacio.plan,'A');assert.equal(espacio.plans.A.own.length,1);
+aplicar.aplicarPropuesta(true);assert.equal(espacio.plan,'B');assert.equal(espacio.plans.B.own.length,1);assert.notEqual(espacio.plans.B.own,espacio.plans.A.own);
+assert.match(horarios,/SateUI\.modal\(txH\('d_propuestas'\),cuerpo/,'Usa el modal común');
+assert.match(horarios,/ArrowLeft','ArrowRight/,'Recorre propuestas sin salir');
+// Integración con el modal y la cuadrícula comunes: abrir una vez, recorrer,
+// comparar sin persistir y aplicar desde la misma ventana.
+for(const ancho of [1300,1024,768,375])for(const tema of ['claro','oscuro']){
+  const {document,Elemento,Evento}=crearEntorno();
+  Object.defineProperty(Elemento.prototype,'id',{get(){return this.getAttribute('id')||''},set(v){this.setAttribute('id',v)},configurable:true});
+  Object.defineProperty(Elemento.prototype,'innerHTML',{set(html){
+    this.replaceChildren();const pila=[this];
+    for(const m of html.matchAll(/<\/([\w-]+)\s*>|<([\w-]+)([^>]*)>|([^<]+)/g)){
+      if(m[1]){if(pila.length>1)pila.pop();continue}
+      if(m[4]){pila.at(-1).appendChild(document.createTextNode(m[4]));continue}
+      const n=document.createElement(m[2]);
+      for(const a of m[3].matchAll(/([\w-]+)(?:="([^"]*)")?/g))n.setAttribute(a[1],a[2]||'');
+      pila.at(-1).appendChild(n);if(!['input','br','hr'].includes(m[2]))pila.push(n);
+    }
+  },configurable:true});
+  Elemento.prototype.append=function(...ns){for(const n of ns)this.appendChild(n)};
+  let aperturas=0;
+  Elemento.prototype.showModal=function(){this.open=true;aperturas++};
+  Elemento.prototype.close=function(){this.open=false};
+  document.contains=n=>document.documentElement.contains(n);
+  document.documentElement.clientWidth=ancho;document.documentElement.dataset.tema=tema;
+  document.body.innerHTML='<section id="v-hor"><button id="b-propuestas"></button><details id="gen"><div id="genres"></div></details><details id="ownform"></details><details id="mi-semana"></details></section>';
+  const espacio={plan:'A',plans:{A:{sel:[op.keyOf(grupo(420,510))],own:[]}}};
+  const filas=[grupo(420,510),grupo(600,690),grupo(900,990)];
+  filas.forEach((c,i)=>c[3]='G'+i);espacio.plans.A.sel=[op.keyOf(filas[0])];
+  const contexto=vm.createContext({...op,document,console,addEventListener(){},$:s=>document.querySelector(s),
+    S:{weekend:false,gen:{top:[{cs:[filas[1]]},{cs:[filas[2]]}]}},SEMANA_ACTIVA:false,
+    ws:()=>espacio,plan:()=>espacio.plans[espacio.plan],nextPlan:()=> 'B',
+    selected:()=>filas.filter(c=>espacio.plans[espacio.plan].sel.includes(op.keyOf(c))),ownAsClasses:()=>[],
+    cancelarGeneracion(){},renderCal(){},refresh(){},renderGen(){}});
+  vm.runInContext(leer('web/sate/componentes.js'),contexto);
+  vm.runInContext(horarios.slice(horarios.indexOf('let ventanaPropuestas='),horarios.indexOf('/* ---------- generador de horarios ---------- */')),contexto);
+  vm.runInContext('montarPropuestas();abrirPropuestas()',contexto);
+  const dlg=document.querySelector('.sate-modal');assert.equal(dlg.open,true);
+  const original=JSON.stringify(espacio);
+  document.querySelector('[data-paso="1"]').click();
+  assert.match(document.querySelector('#d-propuesta-n').textContent,/d_propuesta_numero/);
+  document.querySelector('#d-preview').dispatchEvent(new Evento('keydown',{key:'ArrowLeft'}));
+  document.querySelector('#d-comparar').click();
+  assert.equal(JSON.stringify(espacio),original,'Comparar conserva la versión guardada');
+  assert.ok(document.querySelector('.d-agregado'));assert.ok(document.querySelector('.d-retirado'));
+  document.querySelector('#d-tab-actividades').click();assert.equal(document.querySelector('#ownform').hidden,false);
+  document.querySelector('#d-tab-generar').click();document.querySelector('#d-usar').click();
+  assert.equal(aperturas,1,'No sale y entra al recorrer o aplicar');assert.equal(dlg.open,false);
+  assert.deepEqual(espacio.plans.A.sel,[op.keyOf(filas[1])]);
+  assert.equal(document.querySelector('#gen').parentNode.id,'d-propuestas-deposito');
+}
 assert.match(html,/id="f-cupo"/,'El filtro de cupo aparece en Más filtros');
 assert.match(html,/id="f-cupo-ayuda"/,'El filtro explica si faltan datos y cuándo se consultaron');
 assert.match(leer('web/sate/horarios.js'),/S\.soloCupo&&!plan\(\)\.sel\.includes\(keyOf\(c\)\)/,'El generador conserva los grupos elegidos al filtrar cupos');
