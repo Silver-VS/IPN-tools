@@ -23,7 +23,7 @@
   // Apartados que una unidad puede mostrar: con datos de la Guía o con su vista propia (programas); `pronto` aún no tiene contenido.
   function apartadosDisponibles(guia, unidad) {
     const vistas = (unidad && unidad.vistas || []).map(v => v.id);
-    return (guia || []).filter(a => !a.pronto && (a.vista ? vistas.includes(a.vista) : !!(unidad && unidad.guiaDatos)));
+    return (guia || []).filter(a => !a.pronto && (!a.capacidad || !!unidad?.[a.capacidad]) && (a.vista ? vistas.includes(a.vista) : !!(unidad && unidad.guiaDatos)));
   }
   // Fuente de una respuesta: {texto, url}. `documentos` se declara una vez y las preguntas lo citan por id.
   function fuente(datos, f, t) {
@@ -242,6 +242,7 @@
   }
   const conteo = (apartado, d) => {
     const a = infoApartado(apartado);
+    if (a.datos === 'actividades') return t('sate.guia.actividades_detalle');
     if (a.datos === 'documentos') return t('sate.guia.detalle_documentos', { n: Object.values(d.documentos).filter(x => x.reglamento).length });
     if (a.datos === 'acudir') return t('sate.guia.detalle_instancias', { n: d.acudir.length });
     return t('sate.guia.detalle_preguntas', { n: d.preguntas.filter(p => p.apartado === apartado).length });
@@ -880,6 +881,39 @@
     return { titulo: cab.titulo };
   }
 
+  function apartadoActividades(raizGuia, d) {
+    const cab = cabecera([...migasBase(), { texto: tituloApartado('actividades') }], tituloApartado('actividades'), t('sate.guia.actividades_descripcion'));
+    const contenido = d.actividades;
+    const filtros = h('div', { 'class': 'sate-chips sate-filtro-recursos', role: 'group', 'aria-label': t('sate.guia.actividades_filtrar') });
+    const lista = h('div', { 'class': 'sate-rejilla-recursos' });
+    const estado = h('p', { 'class': 'sate-sr', role: 'status', 'aria-live': 'polite' });
+    let categoria = '';
+    const tarjetas = contenido.elementos.map(a => {
+      const campos = ['requisitos', 'inscripcion', 'donde'].filter(k => a[k]);
+      return { categoria: a.categoria, nodo: h('article', { 'class': 'sate-recurso' }, [
+        h('small', { texto: t('sate.guia.actividades_' + a.categoria) }), h('h3', { texto: a.nombre }), h('p', { texto: a.ofrece }),
+        campos.length ? h('dl', {}, campos.flatMap(k => [h('dt', { texto: t('sate.guia.actividades_' + k) }), h('dd', { texto: a[k] })])) : null,
+        enlaceExterno('sate-recurso__enlace', a.url, t('sate.guia.actividades_sitio')),
+        h('small', { texto: t('sate.guia.actividades_consulta', { fecha: fechaRevision(a.consulta) }) })
+      ]) };
+    });
+    function pintar() {
+      const visibles = tarjetas.filter(a => !categoria || a.categoria === categoria);
+      lista.replaceChildren(...visibles.map(a => a.nodo));
+      for (const b of filtros.querySelectorAll('button')) b.setAttribute('aria-pressed', String(b.getAttribute('data-categoria') === categoria));
+      estado.textContent = t('sate.guia.actividades_resultados', { n: visibles.length });
+    }
+    for (const id of ['', ...contenido.categorias]) {
+      const b = h('button', { 'class': 'sate-chip', type: 'button', 'data-categoria': id, texto: t('sate.guia.actividades_' + (id || 'todas')) });
+      b.addEventListener('click', () => { categoria = id; pintar(); });
+      filtros.appendChild(b);
+    }
+    raizGuia.appendChild(cab.nodo);
+    raizGuia.appendChild(h('section', { 'class': 'guia-apartado' }, [filtros, estado, lista]));
+    pintar();
+    return { titulo: cab.titulo };
+  }
+
   /* ---------- pestaña ---------- */
   let token = 0;
   async function mostrar(r) {
@@ -895,7 +929,7 @@
         const d = await datos();
         const a = infoApartado(apartado);
         if (mi !== token) return;
-        const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);
+        const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d) : a.datos === 'actividades' ? apartadoActividades(raizGuia, d) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);
         foco = x.titulo;
         if (mi === token && x.enDocumento) return;
         if (mi === token && x.destino) { SateUI.revelar(x.destino); return; }
