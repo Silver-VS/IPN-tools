@@ -23,11 +23,8 @@ assert.equal(r.cumple({condicion:'desconocida'},a),false);
 assert.equal(pasos.filter(p=>r.cumple(p,null)).length,6);
 assert.deepEqual([...new Set(pasos.map(p=>p.pestana))],['trayectoria','mapa','horarios','tramites','calendario','guia']);
 assert.ok(pasos.every(p=>['barra','flotante',undefined].includes(p.control)));
-assert.equal(pasos.find(p=>p.pestana==='mapa').control,'barra');
-assert.equal(pasos.find(p=>p.pestana==='horarios').control,'flotante');
-assert.equal(r.control({}, {top:40},1440),'flotante');
-assert.equal(r.control({}, {top:120},1440),'barra');
-assert.equal(r.control({}, {top:120},375),'flotante');
+assert.equal(r.control(), 'flotante');
+assert.equal(r.control({control:'barra'}), 'flotante');
 assert.equal(r.siguiente(pasos,0,1,p=>p.pestana==='horarios'),3);
 assert.equal(r.siguiente(pasos,6,-1,p=>p.pestana==='horarios'),3);
 assert.equal(r.siguiente(pasos,0,1,()=>false),-1);
@@ -44,7 +41,7 @@ for(const p of pasos){assert.ok(textos[p.texto]);if(p.personal)assert.ok(textos[
 // La bienvenida muestra las pestañas y el paso conserva el control declarado.
 const eventos=new Map(),vistas=[],creados=[];let cerrada=false,dialogo;
 function nodo(tag='div'){
-  const n={tag,children:[],dataset:{},style:{},hidden:false,textContent:'',className:'',
+  const n={tag,children:[],dataset:{},style:{},hidden:false,textContent:'',className:'',offsetWidth:320,offsetHeight:120,
     classList:{add(){},remove(){}},append(...xs){this.children.push(...xs)},appendChild(x){this.children.push(x)},
     insertBefore(x){this.children.unshift(x)},setAttribute(k,v){this[k]=v},addEventListener(k,f){this['on'+k]=f},
     querySelector(sel){return sel==='button'?this.children.find(x=>x.tag==='button'):null},querySelectorAll(){return this.children.filter(x=>x.tag==='button')},
@@ -52,7 +49,8 @@ function nodo(tag='div'){
     scrollIntoView(){},focus(){}};
   if(tag==='button')n.type='button';creados.push(n);return n;
 }
-const objetivo={closest:()=>null,getClientRects:()=>[{}],scrollIntoView(){},getBoundingClientRect:()=>({top:120,left:12,right:308,bottom:300,height:180})};
+let cajaObjetivo={top:120,left:12,right:308,bottom:300,height:180};
+const objetivo={closest:()=>null,getClientRects:()=>[{}],scrollIntoView(){},getBoundingClientRect:()=>cajaObjetivo};
 const documento={activeElement:{isConnected:true,focus(){}},querySelector:()=>objetivo,createElement:nodo};
 const entorno={console,document:documento,innerWidth:375,innerHeight:700,matchMedia:()=>({matches:false}),requestAnimationFrame:f=>f(),
   fetch:async()=>({ok:true,json:async()=>pasos}),addEventListener:(k,f)=>eventos.set(k,f),removeEventListener:k=>eventos.delete(k),
@@ -70,8 +68,15 @@ assert.equal(dialogo.lista.children.length,6);
 assert.deepEqual(dialogo.lista.children.map(x=>x.children[0].textContent),['Tu perfil','Mapa curricular','Horarios de clase','Ventanilla digital','Calendario escolar','Guía politécnica']);
 dialogo.lista.children.find(x=>x.children[0].textContent==='Mapa curricular').children[2].onclick();
 await new Promise(resolve=>setTimeout(resolve,0));
-assert.equal(dialogo.tarjeta.dataset.control,'barra');
+assert.equal(dialogo.tarjeta.dataset.control,'flotante');
+assert.equal(dialogo.tarjeta.style.top,'312px');
+assert.equal(dialogo.tarjeta.style.left,'12px');
 assert.equal(vistas.at(-1),'mapa');
 assert.equal(dialogo.acciones.children.length,3);
+cajaObjetivo={top:180,left:28,right:324,bottom:360,height:180};eventos.get('resize')();
+assert.equal(dialogo.tarjeta.style.top,'372px');assert.equal(dialogo.tarjeta.style.left,'28px');
+const css=leer('web/sate/componentes.css');
+assert.match(css,/\.sate-recorrido__acciones\{position:fixed;[^}]*right:var\(--ipn-esp-3\);[^}]*bottom:max\(var\(--ipn-esp-3\),env\(safe-area-inset-bottom\)\)/);
+assert.doesNotMatch(css,/\.sate-recorrido__tarjeta\[data-control=barra\]/);
 dialogo.escape();assert.ok(cerrada);assert.equal(eventos.size,0);
-console.log('OK recorrido: bienvenida, pestañas, control declarado, omisión en 375 px y Escape.');
+console.log('OK recorrido: bienvenida, control flotante fijo, ayuda anclada y reposicionada al cambiar tamaño, Escape.');

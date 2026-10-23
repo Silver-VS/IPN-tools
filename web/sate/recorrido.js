@@ -10,7 +10,7 @@
   function cumple(p,a){return p.condicion==='siempre'||p.condicion==='personal'&&!!a}
   function contenido(p,a,texto=tx){const v=variables(a);return texto(a&&p.personal&&(p.texto!=='trayectoria'||v.avance!=null)?p.personal:p.texto,v)}
   function siguiente(pasos,desde,direccion,existe){for(let i=desde;i>=0&&i<pasos.length;i+=direccion)if(existe(pasos[i]))return i;return -1}
-  function control(p,rect,ancho){return p.control||((ancho<=639||rect.top<88)?'flotante':'barra')}
+  function control(){return 'flotante'}
   let activo=false;
   async function iniciar(){
     if(activo)return;
@@ -19,9 +19,12 @@
     const salir=()=>{cerrado=true;activo=false;removeEventListener('resize',colocar);removeEventListener('scroll',colocar,true);ui?.elemento.remove();if(origen?.isConnected)origen.focus()};
     function colocar(){
       if(!elemento||!ui||!ui.elemento.open)return;
-      const r=elemento.getBoundingClientRect(),limite=ui.tarjeta.getBoundingClientRect();
-      const top=Math.max(8,r.top),left=Math.max(8,r.left);
-      Object.assign(ui.marco.style,{top:top+'px',left:left+'px',width:Math.max(0,Math.min(r.right,innerWidth-8)-left)+'px',height:Math.max(0,Math.min(r.bottom,innerHeight-8)-top)+'px'});
+      const r=elemento.getBoundingClientRect(),ancho=ui.tarjeta.offsetWidth,alto=ui.tarjeta.offsetHeight,gap=12,margen=8;
+      const x=Math.max(margen,Math.min(r.left,innerWidth-ancho-margen));
+      const debajo=r.bottom+gap+alto<=innerHeight-margen;
+      const y=Math.max(margen,Math.min(debajo?r.bottom+gap:r.top-alto-gap,innerHeight-alto-margen));
+      Object.assign(ui.tarjeta.style,{top:y+'px',left:x+'px',right:'auto',bottom:'auto'});
+      Object.assign(ui.marco.style,{top:Math.max(0,r.top)+'px',left:Math.max(0,r.left)+'px',width:Math.max(0,Math.min(r.right,innerWidth)-Math.max(0,r.left))+'px',height:Math.max(0,Math.min(r.bottom,innerHeight)-Math.max(0,r.top))+'px'});
     }
     try{
       const r=await fetch('recorrido.json');if(!r.ok)throw new Error('recorrido.json: HTTP '+r.status);
@@ -58,11 +61,8 @@
           indice=i;const paso=pasos[i];ui.titulo.textContent=tx('paso',{n:i+1,total:pasos.length});ui.texto.textContent=contenido(paso,a);
           ui.tarjeta.dataset.control=control(paso,elemento.getBoundingClientRect(),innerWidth);
           botones.anterior.disabled=i===0;botones.siguiente.textContent=i===pasos.length-1?tx('terminar'):tx('siguiente');
-          elemento.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'});
+          elemento.scrollIntoView({block:'nearest',behavior:'instant'});
           await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-          const caja=elemento.getBoundingClientRect(),alto=ui.tarjeta.getBoundingClientRect().height;
-          if(ui.tarjeta.dataset.control==='barra'&&caja.top<80)window.scrollBy({top:caja.top-96,behavior:'instant'});
-          if(ui.tarjeta.dataset.control==='flotante'&&caja.bottom>innerHeight-alto-16)window.scrollBy({top:caja.bottom-(innerHeight-alto-24),behavior:'instant'});
           colocar();botones.salir.focus({preventScroll:true});
         }catch(e){salir();console.error('SATE: paso de recorrido fallido',{paso:i,mensaje:e.message,pila:e.stack});throw e}
         finally{ocupado=false}
