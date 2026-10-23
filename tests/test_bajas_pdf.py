@@ -4,7 +4,9 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 import unittest
+import shutil
 
 import pdfplumber
 
@@ -21,7 +23,10 @@ class BajasPDF(unittest.TestCase):
                              (ROOT / 'data/gestion_escolar' / datos[tipo]).read_bytes())
 
     def test_campos_pdf(self):
-        resultado = subprocess.run([r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_bajas_pdf.mjs'],
+        tmp_path = Path(tempfile.mkdtemp(prefix='qa-bajas-pdf-'))
+        self.addCleanup(shutil.rmtree, tmp_path)
+        resultado = subprocess.run([r'D:\Tools\nodejs\node.exe', 'tests/qa_sate_bajas_pdf.mjs',
+                                    f'--salida={tmp_path}'],
                                    cwd=ROOT, capture_output=True, text=True, encoding='utf-8')
         self.assertEqual(resultado.returncode, 0, resultado.stdout + resultado.stderr)
         alumno = json.loads((ROOT / 'data/perfiles-prueba/regular-mecatronica.json').read_text(encoding='utf-8'))
@@ -42,12 +47,12 @@ class BajasPDF(unittest.TestCase):
                        celular='5500000000', periodos='27/1, 27/2',
                        motivos='Salud. Solicitud ficticia para verificar el formato.')
         for tipo, recuadros in campos.items():
-            with pdfplumber.open(ROOT / f'tmp-baj2/baja-{tipo}-ejemplo.pdf') as pdf:
+            with pdfplumber.open(tmp_path / f'baja-{tipo}-ejemplo.pdf') as pdf:
                 for campo, bbox in recuadros.items():
                     with self.subTest(tipo=tipo, campo=campo):
                         texto = pdf.pages[0].crop(bbox).extract_text() or ''
                         self.assertIn(valores[campo], texto)
-                pdf.pages[0].to_image(resolution=110).save(ROOT / f'tmp-baj2/baja-{tipo}-ejemplo.png')
+                pdf.pages[0].to_image(resolution=110).save(tmp_path / f'baja-{tipo}-ejemplo.png')
 
 
 if __name__ == '__main__':

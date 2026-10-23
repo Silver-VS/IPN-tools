@@ -35,7 +35,7 @@ class TestGuia7(unittest.TestCase):
         self.assertNotIn('ambito', comun['acudir'][0])
 
     def test_solo_comun(self):
-        with tempfile.TemporaryDirectory(dir=FIX) as tmp:
+        with tempfile.TemporaryDirectory() as tmp:
             raiz = Path(tmp)
             (raiz / 'data/guia').mkdir(parents=True)
             (raiz / 'data/gestion_escolar').mkdir()

@@ -2,10 +2,14 @@
 import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync,writeFileSync,mkdirSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join,resolve} from 'node:path';
+import {mkdtempSync} from 'node:fs';
 import {createRequire} from 'node:module';
 const leer=p=>readFileSync(p,'utf8'), require=createRequire(import.meta.url), PDFLib=require('../web/assets/vendor/pdf-lib.min.js');
 PDFLib._point=(x,y)=>({x,y});
-const output='muestras-r5-pdf';mkdirSync(output,{recursive:true});
+const destino=process.argv.find(a=>a.startsWith('--salida='))?.slice(9);
+const output=destino?resolve(destino):mkdtempSync(join(tmpdir(),'qa-exportacion-vectorial-'));mkdirSync(output,{recursive:true});
 const planes={A:[['B','M',1,'G-A','Docente ficticio',[],[[0,540,630]],4,'B101',[ ],['Aula A-101']],['B','M',1,'G-B','Docente ficticio',[],[[2,600,690]],5,'B102',[],['Lab. Física 2']]],B:[['B','M',1,'G-C','Docente ficticio',[],[[1,570,660]],6,'B201',[],['Aula B-201']]],C:[['B','M',1,'G-D','Docente ficticio',[],[[4,630,720]],7,'B301',[],['Laboratorio 3']]]};
 const store={expPer:1,expDark:false,expStyle:'color',expOwn:'#dbe7f5',expShow:{g:true,p:false},get(k,d){return this[k]??d},set(k,v){this[k]=v}};
 const workspace={plan:'A',plans:Object.fromEntries(Object.entries(planes).map(([k,v])=>[k,{sel:v.map(x=>x[8]+'|'+x[3]),own:[]}]))};

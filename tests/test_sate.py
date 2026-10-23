@@ -59,7 +59,7 @@ class SateBuild(unittest.TestCase):
         for url in ('javascript:alert(1)', 'data:text/html,test', '//example.org', 'file:///test'):
             self.assertFalse(build_sate.recursos_validos({'DEMO101': [{**recurso, 'url': url}]}))
         self.assertFalse(build_sate.recursos_validos({'DEMO101': [{**recurso, 'unidades': [True]}]}))
-        with tempfile.TemporaryDirectory(dir=ROOT) as temporal:
+        with tempfile.TemporaryDirectory() as temporal:
             raiz = pathlib.Path(temporal)
             origen = raiz / 'data/recursos/demo'
             origen.mkdir(parents=True)

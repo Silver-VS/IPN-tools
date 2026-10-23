@@ -31,3 +31,6 @@ web/qa-*.html
 /CODEX-INFORME.md
 # Salidas de tools/semestre.py (cruce, OCR, snippet del SAES)
 /tmp-horarios/
+/muestras-r5-pdf/
+/tmp-baj2/
+/.pytest-tmp/
