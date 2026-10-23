@@ -20,5 +20,13 @@ class TestSelectorCalendario(unittest.TestCase):
             self.assertIsNone(re.search(r"SATE\.actual\s*===?\s*['\"]", texto), js.name)
 
 
+    def test_barra_flotante_usa_pestanas_de_sate(self):
+        # En SATE las pestañas (.sate-pestanas) se crean después del encabezado y fuera de él
+        js = (RAIZ / 'web/sate/encabezado.js').read_text(encoding='utf-8')
+        self.assertIn('.sate-pestanas', js)
+        self.assertIn('MutationObserver', js)
+        self.assertNotIn('<script>', (RAIZ / 'tools/encabezado.py').read_text(encoding='utf-8'))
+
+
 if __name__ == '__main__':
     unittest.main()
