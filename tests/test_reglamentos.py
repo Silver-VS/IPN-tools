@@ -17,8 +17,7 @@ CONTEOS = {'rge': (77, 7), 'ri': (295, 6), 'ro': (103, 4), 'lo': (34, 4),
 
 class Extraccion(unittest.TestCase):
     def test_regenerar_conserva_aplicacion_editorial(self):
-        r.CACHE.mkdir(parents=True, exist_ok=True)
-        with tempfile.TemporaryDirectory(dir=r.CACHE) as carpeta:
+        with tempfile.TemporaryDirectory() as carpeta:
             destino = Path(carpeta)
             (destino / 'prueba.pdf').write_bytes(b'%PDF-ficticio')
             (destino / 'prueba.json').write_text(json.dumps({'estructura': [
@@ -26,7 +25,7 @@ class Extraccion(unittest.TestCase):
             ]}), encoding='utf-8')
             textos = ['TÍTULO TERCERO\nDE LOS ALUMNOS\nArtículo 1. ' + 'Texto ficticio. ' * 30]
             fuente = {'titulo': 'Prueba', 'url': 'https://example.org/prueba.pdf', 'gaceta': 'Prueba ficticia'}
-            with patch.object(r, 'CACHE', destino), patch.object(r, 'DESTINO', destino), \
+            with patch.object(r, 'ROOT', destino.parent), patch.object(r, 'CACHE', destino), patch.object(r, 'DESTINO', destino), \
                     patch.object(r, 'fuentes', return_value={'prueba': fuente}), \
                     patch.object(r, 'paginas', return_value=textos), patch('sys.argv', ['reglamentos.py']), \
                     self.assertLogs(r.LOG, level='INFO'):
@@ -93,13 +92,12 @@ class Extraccion(unittest.TestCase):
     def test_verificar_detecta_cambios_sin_sustituir_datos(self):
         fuente = r.fuentes()['rge']
         pdf = b'%PDF-prueba-ficticia'
-        r.CACHE.mkdir(parents=True, exist_ok=True)  # en un clon limpio la caché aún no existe
-        with tempfile.TemporaryDirectory(dir=r.CACHE) as carpeta:
+        with tempfile.TemporaryDirectory() as carpeta:
             destino = Path(carpeta)
             archivo = destino / 'rge.json'
             previo = json.dumps({'sha256': hashlib.sha256(pdf).hexdigest()})
             archivo.write_text(previo, encoding='utf-8')
-            with patch.object(r, 'DESTINO', destino), patch.object(r, 'fuentes', return_value={'rge': fuente}), \
+            with patch.object(r, 'ROOT', destino.parent), patch.object(r, 'DESTINO', destino), patch.object(r, 'fuentes', return_value={'rge': fuente}), \
                     patch.object(r, 'descargar', return_value=pdf) as descargar, \
                     patch('sys.argv', ['reglamentos.py', '--verificar']), self.assertLogs(r.LOG, level='INFO'):
                 r.main()

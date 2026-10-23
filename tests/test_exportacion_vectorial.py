@@ -5,12 +5,9 @@ import subprocess
 from pypdf import PdfReader
 
 ROOT = Path(__file__).resolve().parents[1]
-MUESTRAS = ROOT / "muestras-r5-pdf"
-
-
-def test_exportacion_pdf_vectorial_sin_imagenes():
+def test_exportacion_pdf_vectorial_sin_imagenes(tmp_path):
     subprocess.run(
-        [r"D:\Tools\nodejs\node.exe", "tests/qa_sate_exportacion_vectorial.mjs"],
+        [r"D:\Tools\nodejs\node.exe", "tests/qa_sate_exportacion_vectorial.mjs", f"--salida={tmp_path}"],
         cwd=ROOT, check=True, capture_output=True, text=True,
     )
     nombres = [
@@ -19,7 +16,7 @@ def test_exportacion_pdf_vectorial_sin_imagenes():
         for caso in ("uno", "todos-uno-por-hoja", "todos-dos-por-hoja")
     ]
     for nombre in nombres:
-        lector = PdfReader(MUESTRAS / nombre)
+        lector = PdfReader(tmp_path / nombre)
         paginas = lector.pages
         texto = "\n".join(p.extract_text() or "" for p in paginas)
         assert "Álgebra y análisis" in texto, (nombre, texto)
