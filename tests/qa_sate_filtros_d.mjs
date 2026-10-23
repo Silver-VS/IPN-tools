@@ -9,7 +9,7 @@ const filtrosAnteriores=anterior.slice(anterior.indexOf('function base()'),anter
 const head=src.slice(0,src.indexOf("if(typeof CUPOS"));
 const legacy=src.slice(src.indexOf('function base()'),src.indexOf('function suggest('));
 const fila=['C','M',1,'G',0,[0],[[0,480,540]],4,'K'];
-for(const width of [1300,768,375])for(const tema of ['claro','oscuro'])for(const modo of ['apagado','hash','local','denegado']){
+for(const width of [1300,1024,768,375])for(const tema of ['claro','oscuro'])for(const modo of ['apagado','hash','local','denegado']){
   let mutations=0;
   class Nodo{
     constructor(){this.children=[];this.classList={contains:()=>this.montado,add:()=>{this.montado=true;mutations++}};this.lastChild={};this.dataset={};this.parentElement={appendChild:()=>{mutations++}}}

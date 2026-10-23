@@ -548,8 +548,35 @@ details.box2>summary{cursor:pointer;font-weight:600;font-size:var(--ipn-tamano-s
 .gen .ls{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue);line-height:1.5}.gen .ls .grp{font-family:var(--ipn-fuente-mono);font-size:var(--ipn-tamano-xs);color:var(--ipn-texto)}
 .gen .acts{display:flex;gap:var(--ipn-esp-1);flex-wrap:wrap}
 
-/* fijo al desplazar, con su propio scroll: nunca más alto que la ventana (aunque la columna de la oferta sea larga) */
-.planner{position:sticky;top:calc(var(--sate-barra-alto) + var(--ipn-filtros-alto));max-height:calc(100vh / var(--ui-zoom,1) - 96px - 12px);overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;padding-right:var(--ipn-esp-1)}
+/* El horario completo participa en el desplazamiento de la página. */
+.planner{position:static;max-height:none;overflow:visible;min-width:0}
+.hor-propuestas-modal.sate-modal{width:calc(100% - var(--ipn-esp-5));max-width:none}
+.hor-propuestas{min-width:0}
+.hor-propuestas>[role=tablist]{display:flex;flex-wrap:wrap}
+.hor-propuestas [role=tab]{flex:1;white-space:normal}
+.hor-propuestas [role=tab][aria-selected=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento)}
+.hor-propuestas .seg{flex-wrap:wrap;max-width:100%}
+.hor-propuestas [hidden]{display:none!important}
+.hor-propuestas>#gen,.hor-propuestas>#ownform{border:0;padding:0;margin-top:var(--ipn-esp-5)}
+.hor-propuestas>#gen>summary,.hor-propuestas>#ownform>summary{display:none}
+.hor-propuestas-rejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--ipn-esp-5);align-items:start}
+.hor-propuestas .genres{min-width:0;max-height:60dvh;overflow:auto}
+.hor-propuestas .gen{flex-direction:column;align-items:start}
+.hor-propuestas .gen:has([data-propuesta][aria-pressed=true]){border-color:var(--ipn-acento);background:var(--ipn-acento-suave)}
+.hor-propuestas .gen .acts [data-useg]{display:none}
+.hor-propuesta-previa{min-width:0}
+.hor-propuestas button,.hor-propuestas select,.hor-propuestas input,.filtros-d-panel select,.filtros-d-panel .check,#g-window select{min-height:var(--ipn-control-alto)}
+.hor-propuestas button{min-width:var(--ipn-control-alto)}
+.hor-propuestas .d-agregado{outline:3px solid var(--ipn-acento);outline-offset:-3px}
+.hor-propuestas .d-retirado{opacity:.6;border:2px dashed var(--ipn-texto);text-decoration:line-through}
+.filtros-d-panel .more-filters>section{display:grid;gap:var(--ipn-esp-3);min-width:0}
+.filtros-d-panel h3{font-size:var(--ipn-tamano-m);margin:0;font-weight:600}
+.filtros-d-panel .trange{flex-wrap:wrap}
+#g-window .trange,.filtros-d-panel .trange{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.filtros-d-panel select{max-width:100%}
+.d-cupo{display:grid;gap:var(--ipn-esp-1)}
+#v-hor .filtros-d-impacto{height:auto;overflow:visible;position:static}
+@media(max-width:639px){.hor-propuestas-rejilla{grid-template-columns:minmax(0,1fr)}.hor-propuestas .genres{display:flex;flex-direction:row;overflow-x:auto}.hor-propuestas .gen{min-width:70%}}
 @media (max-width:1024px){.planner{position:static;max-height:none;overflow:visible;padding-right:0;order:-1}}
 .horario-flotante{display:none}
 .horario-compacto{width:calc(100% - 24px);max-width:680px;max-height:85dvh;box-sizing:border-box;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);overflow:auto}
@@ -950,7 +977,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       <label class="check"><input type="checkbox" id="f-done" checked> <span data-htexto="ocultar_acreditadas">Ocultar las ya acreditadas</span></label>
       <label class="check"><input type="checkbox" id="f-cupo"> <span data-htexto="solo_cupo">Solo con cupo</span></label><small id="f-cupo-ayuda" aria-live="polite"></small>
       <label class="check" title="Muestra los grupos de la carrera compatibles con el horario actual"><input type="checkbox" id="f-fit"> Solo lo que cabe en mi horario</label>
-      <div class="field"><span>En la escuela</span><div class="trange"><input type="time" id="g-from" step="1800" aria-label="Llegar desde"><span>a</span><input type="time" id="g-to" step="1800" aria-label="Salir a más tardar"></div></div>
+      <div class="field" id="g-window"><div class="trange"><label class="field"><span data-htexto="d_entrada"></span><select id="g-from" aria-label="Llegar desde"></select></label><label class="field"><span data-htexto="d_salida"></span><select id="g-to" aria-label="Salir a más tardar"></select></label></div></div>
       <label class="field"><span>Excluir profesores</span><input type="text" id="g-avoid" list="proflist" autocomplete="off"></label>
       <button type="button" class="btn" id="b-reset" title="Regresa a su valor inicial los filtros de la oferta, los profesores excluidos, el horario en la escuela y las preferencias del generador, y quita las marcas «Sí / Quizá / No». No borra tus horarios.">Restablecer filtros</button>
       </div></details>
@@ -1017,6 +1044,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
         <p id="cupos-llenos" hidden><span id="cupos-llenos-texto"></span> <button class="link" type="button" id="cupos-alternativas"></button></p>
         <div class="colhead"><h2 id="h-plan">Mi horario</h2>
           <div class="actions">
+            <button class="btn" id="b-propuestas" type="button" aria-haspopup="dialog" data-htexto="d_propuestas"></button>
             <div class="seg calview" role="group" aria-label="Vista del horario"><button type="button" data-cview="semana">Semana</button><button type="button" data-cview="dia">Por día</button></div>
             <label class="check"><input type="checkbox" id="f-weekend"> Mostrar fin de semana</label>
             <button class="btn" id="b-export" type="button" aria-haspopup="dialog">Exportar horario</button>
@@ -1041,8 +1069,8 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
             <form class="ownrow" id="own-f">
               <label class="field"><span>Nombre</span><input type="text" id="own-n" placeholder="Inglés CELEX" required></label>
               <div class="field"><span>Días</span><div class="daypick" id="own-d"></div></div>
-              <label class="field"><span>De</span><input type="time" id="own-a" value="09:00" step="1800" required></label>
-              <label class="field"><span>A</span><input type="time" id="own-b" value="12:00" step="1800" required></label>
+              <label class="field"><span>De</span><select id="own-a" required></select></label>
+              <label class="field"><span>A</span><select id="own-b" required></select></label>
               <button class="btn primary" type="submit">Agregar</button>
             </form>
           </details>

@@ -20,20 +20,36 @@ function montarFiltrosD(){
   $('#cupos-omitir').closest('label').hidden=true;
   $('#cupos-omitir-ayuda').hidden=true;
   $('#h-offer').parentElement.appendChild($('[data-view]').closest('.field'));
-  $('.planner').appendChild($('#gen'));
-  const salida=document.createElement('label');salida.className='field';
-  const titulo=document.createElement('span');titulo.textContent=txH('d_salida');salida.append(titulo,$('#g-to'));
-  filtros.insertBefore(salida,$('#f-more'));
+  filtros.insertBefore($('#g-window'),$('#f-more'));
   const panel=document.createElement('dialog');panel.className='filtros-d-panel';panel.setAttribute('aria-label',txH('mas_filtros'));
   const cerrar=document.createElement('button');cerrar.type='button';cerrar.className='btn';cerrar.textContent=txH('d_cerrar');
   panel.append(cerrar,mas);$('#v-hor').appendChild(panel);
+  const resumen=document.createElement('p');resumen.id='d-panel-resumen';resumen.setAttribute('role','status');
+  panel.insertBefore(resumen,mas);
+  const grupo=(clave,elementos)=>{
+    const seccion=document.createElement('section'),titulo=document.createElement('h3');
+    titulo.textContent=txH(clave);seccion.appendChild(titulo);
+    for(const el of elementos)seccion.appendChild(el);
+    mas.appendChild(seccion);
+  };
+  const cupo=document.createElement('div');cupo.className='d-cupo';cupo.append($('#f-cupo').closest('label'),$('#f-cupo-ayuda'));
+  grupo('d_que',[$('#f-nivel').closest('.field'),$('#f-done').closest('label'),cupo]);
+  const horas=document.createElement('div');horas.className='trange';
+  for(const [id,k] of [['d-from','d_entrada'],['d-to','d_salida']]){
+    const campo=document.createElement('label');campo.className='field';
+    campo.innerHTML=`<span>${esc(txH(k))}</span><select id="${id}" aria-label="${esc(txH(k))}"></select>`;horas.appendChild(campo);
+  }
+  grupo('d_cuando',[horas,$('#f-fit').closest('label')]);
+  grupo('d_quien',[$('#g-avoid').closest('.field')]);
+  for(const [id,k] of [['#d-from','a'],['#d-to','b']])$(id).addEventListener('change',e=>{GT[k]=e.target.value;renderGTime();gtChanged()});
   $('#f-more-title').addEventListener('click',e=>{e.preventDefault();panel.showModal();cerrar.focus()});
   cerrar.addEventListener('click',()=>{panel.close();$('#f-more-title').focus()});
   panel.addEventListener('cancel',()=>$('#f-more-title').focus());
   const limpiar=document.createElement('button');limpiar.type='button';limpiar.className='link';limpiar.textContent=txH('d_limpiar');
-  impacto.prepend(limpiar);
+  panel.insertBefore(limpiar,mas);
   limpiar.addEventListener('click',()=>{
-    Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],onlyWant:false,hideDone:false,soloCupo:false,fit:false,gap:null});
+    Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],onlyWant:false,hideDone:false,soloCupo:false,fit:false,gap:null,gavoid:[]});
+    store.set('excl',[]);
     Object.assign(GT,{a:'',b:''});gtSave();$('#f-q').value='';
     for(const k of ['tur','niv','onlyWant','hideDone','soloCupo'])store.set(k,S[k]);
     renderHFilters();renderGTime();renderOffer();
@@ -50,6 +66,7 @@ function montarFiltrosD(){
   };
   $('#d-activos').addEventListener('click',quitar);
   const oferta=$('#offer');oferta.addEventListener('click',quitar);
+  if(typeof renderGTime==='function')renderGTime();
 }
 function ocultosFiltrosD(list){
   const visibles=new Set(list.map(keyOf)),grupos=new Map();
@@ -102,6 +119,7 @@ function renderFiltrosD(){
   if(!FILTROS_D)return;
   montarFiltrosD();
   const reglas=reglasFiltrosD();
+  $('#d-panel-resumen').textContent=reglas.join(' · ')||txH('d_sin_filtros');
   $('#f-want-l').textContent=txH('d_mis_materias');
   $('#d-cuenta').textContent=txH('d_cuenta',{n:filtered().length,total:classes().filter(c=>c[0]===S.car).length});
   $('#d-reglas').innerHTML=(reglas.length?reglas:[txH('d_sin_filtros')]).map(r=>`<li>${esc(r)}</li>`).join('');
@@ -146,8 +164,8 @@ for(const [id,list] of [['#g-pref','gpref'],['#g-avoid','gavoid']]){
 }
 // horario en la escuela y descansos (se vuelven a generar las opciones si ya había resultados)
 const gtChanged=()=>{gtSave();renderOffer();if(S.gen||generacion)iniciarGeneracion()};
-$('#g-from').addEventListener('change',e=>{GT.a=e.target.value;gtChanged()});
-$('#g-to').addEventListener('change',e=>{GT.b=e.target.value;gtChanged()});
+$('#g-from').addEventListener('change',e=>{GT.a=e.target.value;renderGTime();gtChanged()});
+$('#g-to').addEventListener('change',e=>{GT.b=e.target.value;renderGTime();gtChanged()});
 $('#b-reset').addEventListener('click',()=>{
   Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,soloCupo:false,fit:false,gap:null,onlyWant:true,gavoid:[],gt:'*',gpref:[],gen:null});S.expand=new Set();
   ws().marks={};save();   // también quita las marcas «Sí / Quizá / No» (y sus notas) del periodo consultado
@@ -274,6 +292,7 @@ function renderHFilters(){
   $('#f-nivel').innerHTML=[['*',txH('todos')],...nivs.map(n=>[n,n])].map(([v,l])=>`<button class="chip" data-niv="${esc(v)}" aria-pressed="${v===S.niv}">${esc(l)}</button>`).join('');
   $('#proflist').innerHTML=[...new Set(mine.flatMap(c=>c[5]))].map(i=>`<option value="${esc(DATA.prof[i])}">`).join('');
   renderActive();renderGPrefs();
+  renderGTime();
 }
 function renderMasFiltros(){
   if(typeof renderFiltrosD==='function')renderFiltrosD();
@@ -312,6 +331,76 @@ const isExcl=c=>{const ex=S.gavoid.map(norm);return ex.length>0&&c[5].some(i=>ex
 const outWin=c=>{const ga=tmin(GT.a),gb=tmin(GT.b);return c[6].some(([d,a,b])=>(ga!=null&&a<ga)||(gb!=null&&b>gb))};
 // Las elegidas encabezan la oferta; después vienen los adeudos y el desfase.
 const prio=k=>{if(tr().want.includes(k))return 0;if(!isPersonal()||!cur()[k])return 2;const st=statusOf(k);return st.startsWith('late')||st.startsWith('fail')?1:2};
+/* ---------- propuestas y actividades en una sola ventana ---------- */
+let ventanaPropuestas=null,indicePropuesta=0,compararPropuesta=false;
+function montarPropuestas(){
+  const deposito=document.createElement('div');deposito.id='d-propuestas-deposito';deposito.hidden=true;
+  $('#v-hor').appendChild(deposito);deposito.appendChild($('#gen'));deposito.appendChild($('#ownform'));deposito.appendChild($('#mi-semana'));
+  $('#b-propuestas').addEventListener('click',abrirPropuestas);
+}
+function abrirPropuestas(){
+  const cuerpo=document.createElement('div');cuerpo.className='hor-propuestas';
+  cuerpo.innerHTML=`<div class="seg" role="tablist"><button type="button" role="tab" id="d-tab-generar" aria-controls="gen" aria-selected="true">${esc(txH('d_generar'))}</button><button type="button" role="tab" id="d-tab-actividades" aria-controls="ownform" aria-selected="false">${esc(txH('d_actividades'))}</button></div>`;
+  // El cuerpo debe estar conectado antes de mover controles consultados por id.
+  ventanaPropuestas=SateUI.modal(txH('d_propuestas'),cuerpo,{amplio:true,alCerrar:()=>{
+    cancelarGeneracion();$('#d-propuestas-deposito').append($('#gen'),$('#ownform'),$('#mi-semana'));ventanaPropuestas.elemento.classList.remove('hor-propuestas-modal');ventanaPropuestas=null;renderCal();
+  }});
+  cuerpo.append($('#gen'),$('#ownform'),$('#mi-semana'));
+  for(const id of ['#gen','#ownform']){$(id).open=true;$(id).setAttribute('role','tabpanel')}
+  $('#gen').hidden=false;$('#ownform').hidden=true;$('#mi-semana').hidden=true;$('#mi-semana').open=true;
+  if(!$('#d-preview')){
+    const rejilla=document.createElement('div');rejilla.className='hor-propuestas-rejilla';
+    const previa=document.createElement('section');previa.className='hor-propuesta-previa';
+    previa.innerHTML=`<div class="actions"><button type="button" class="btn" data-paso="-1" aria-label="${esc(txH('d_anterior'))}">←</button><strong id="d-propuesta-n" role="status"></strong><button type="button" class="btn" data-paso="1" aria-label="${esc(txH('d_siguiente'))}">→</button><button type="button" class="btn" id="d-comparar" aria-pressed="false">${esc(txH('d_comparar'))}</button></div><p id="d-diferencias" role="status"></p><div class="calwrap"><div class="cal" id="d-preview"></div></div><div class="actions"><button type="button" class="btn primary" id="d-usar">${esc(txH('d_usar'))}</button><button type="button" class="btn" id="d-usar-nueva">${esc(txH('d_nueva'))}</button></div>`;
+    rejilla.append($('#genres'),previa);$('#gen').appendChild(rejilla);
+  }
+  const tab=actividad=>{
+    $('#gen').hidden=actividad;$('#ownform').hidden=!actividad;$('#mi-semana').hidden=!actividad||!SEMANA_ACTIVA;
+    $('#d-tab-generar').setAttribute('aria-selected',String(!actividad));$('#d-tab-actividades').setAttribute('aria-selected',String(actividad));
+  };
+  cuerpo.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    if(b.id==='d-tab-generar'||b.id==='d-tab-actividades')tab(b.id==='d-tab-actividades');
+    if(b.dataset.paso){indicePropuesta+=Number(b.dataset.paso);renderPropuesta()}
+    if(b.dataset.propuesta!==undefined){indicePropuesta=Number(b.dataset.propuesta);renderPropuesta()}
+    if(b.id==='d-comparar'){compararPropuesta=!compararPropuesta;renderPropuesta()}
+    if(b.id==='d-usar'||b.id==='d-usar-nueva'||b.dataset.useg!==undefined){
+      e.stopPropagation();aplicarPropuesta(b.id==='d-usar-nueva'||b.dataset.to==='+',b.dataset.useg);
+    }
+  });
+  cuerpo.addEventListener('keydown',e=>{
+    if(!['ArrowLeft','ArrowRight'].includes(e.key)||e.target.closest('input,select,textarea,[role="tablist"]'))return;
+    e.preventDefault();indicePropuesta+=e.key==='ArrowRight'?1:-1;renderPropuesta();
+  });
+  ventanaPropuestas.elemento.classList.add('hor-propuestas-modal');renderGen();renderPropuesta();
+}
+function aplicarPropuesta(nueva,indice){
+  const r=S.gen?.top?.[indice===undefined?indicePropuesta:Number(indice)];if(!r)return;
+  const to=nueva?nextPlan():ws().plan;
+  if(nueva)ws().plans[to]={sel:[],own:JSON.parse(JSON.stringify(plan().own))};
+  ws().plans[to].sel=r.cs.map(keyOf);ws().plan=to;refresh();ventanaPropuestas?.cerrar();
+}
+function renderPropuesta(){
+  const previa=$('#d-preview');if(!previa)return;
+  const top=S.gen?.top||[];indicePropuesta=top.length?(indicePropuesta+top.length)%top.length:0;
+  const r=top[indicePropuesta],actual=selected(),cs=r?.cs||actual;
+  for(const b of $('#genres').querySelectorAll('[data-propuesta]'))b.setAttribute('aria-pressed',String(Number(b.dataset.propuesta)===indicePropuesta));
+  $('#d-propuesta-n').textContent=r?txH('d_propuesta_numero',{n:indicePropuesta+1,total:top.length}):txH('d_sin_propuestas');
+  $('#d-usar').hidden=$('#d-usar-nueva').hidden=!r;
+  $('#d-comparar').setAttribute('aria-pressed',String(compararPropuesta));
+  const claves=new Set(cs.map(keyOf)),anteriores=new Set(actual.map(keyOf));
+  const nuevos=cs.filter(c=>!anteriores.has(keyOf(c))),quitados=actual.filter(c=>!claves.has(keyOf(c)));
+  $('#d-diferencias').textContent=compararPropuesta&&r?txH('d_diferencias',{n:nuevos.length,m:quitados.length}):'';
+  SateUI.cuadriculaHorario([...cs,...ownAsClasses(),...(compararPropuesta?quitados:[])],{S,slots,START,BLOCK,SLOT,SLOTPX,$:()=>previa,DAYS,hm,esc,txH,hue,keyOf,name,profs,roomAt,soloLectura:true});
+  if(compararPropuesta){
+    // El contorno distingue grupos agregados; el rayado distingue los retirados.
+    for(const bloque of previa.querySelectorAll('.blk')){
+      const contenido=bloque.textContent;
+      if(nuevos.some(c=>contenido.includes(c[3])&&contenido.includes(name(c))))bloque.classList.add('d-agregado');
+      if(quitados.some(c=>contenido.includes(c[3])&&contenido.includes(name(c))))bloque.classList.add('d-retirado');
+    }
+  }
+}
 /* ---------- generador de horarios ---------- */
 /* horario en la escuela y descansos: preferencias del alumno para el generador (se guardan en este navegador) */
 const GT=Object.assign({a:'',b:'',breaks:[],days:'',n:'',src:''},store.get('gtime',{}));
@@ -328,7 +417,7 @@ function montarSemana(){
   $('#mi-semana').hidden=false;
   const principales=['ida','vuelta','antes','dias'];
   for(const [id,campos] of [['principales',semanaCampos.filter(c=>principales.includes(c[0]))],['secundarios',semanaCampos.filter(c=>!principales.includes(c[0]))]]){
-    $(`#semana-${id}`).innerHTML=campos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${SEMANA_ETQ[k]||k}`))}</span><input id="semana-${esc(k)}" data-semana="${esc(k)}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}"></label>`).join('');
+    $(`#semana-${id}`).innerHTML=campos.map(([k,t,max])=>`<label class="field"><span>${esc(txH(`semana_${SEMANA_ETQ[k]||k}`))}</span>${t==='time'?`<select id="semana-${esc(k)}" data-semana="${esc(k)}">${opcionesHoras(MS[k]||'')}</select>`:`<input id="semana-${esc(k)}" data-semana="${esc(k)}" type="${t}"${max?` min="${k==='dias'?1:0}" max="${max}" step="${k==='dias'?'1':'0.5'}"`:''} value="${esc(MS[k]??'')}">`}</label>`).join('');
   }
   // Se mueve el formulario existente: conserva días, calendario y persistencia por versión.
   $('#semana-form').appendChild($('#ownform'));
@@ -450,17 +539,19 @@ function deshacerPropia(){
 }
 function confirmarEliminarPropia(i){
   const o=plan().own[i];if(!o)return;
+  if(typeof ventanaPropuestas!=='undefined')ventanaPropuestas?.cerrar();
   SateUI.modal(txH('semana_eliminar'),txH('semana_confirmar_eliminar',{nombre:o.n}),{pequeno:true,acciones:[
     {texto:txH('semana_eliminar'),primaria:true,onclick:()=>eliminarPropia(i)},{texto:txH('semana_cancelar')}]});
 }
 function abrirFichaPropia(i){
   const o=plan().own[i];if(!o||o.saes)return;
+  if(typeof ventanaPropuestas!=='undefined')ventanaPropuestas?.cerrar();
   let dias=[...(o.d||[])];const solo=!!o.oculto,conHoras=solo&&o.hs!=null;
   const f=document.createElement('form');f.className='semana-ficha';
   f.innerHTML=`<label class="field"><span>${esc(txH('semana_nombre'))}</span><input type="text" id="ficha-n" required></label>`+
     (SEMANA_ACTIVA?`<label class="field"><span>${esc(txH('semana_tipo'))}</span><select id="ficha-tipo"><option value="trabajo">${esc(txH('semana_trabajo_bloque'))}</option><option value="otras">${esc(txH('semana_otras'))}</option></select></label>`:'')+
     `<div class="field"><span>${esc(txH('semana_dias_ficha'))}</span><div class="daypick" id="ficha-dias"></div></div>`+
-    `<label class="field"><span>${esc(txH('semana_de'))}</span><input type="time" id="ficha-a" step="1800"></label><label class="field"><span>${esc(txH('semana_a'))}</span><input type="time" id="ficha-b" step="1800"></label>`+
+    `<label class="field"><span>${esc(txH('semana_de'))}</span><select id="ficha-a">${opcionesHoras(hm(o.a),false)}</select></label><label class="field"><span>${esc(txH('semana_a'))}</span><select id="ficha-b">${opcionesHoras(hm(o.b),false)}</select></label>`+
     (SEMANA_ACTIVA?`<label class="check"><input type="checkbox" id="ficha-mostrar"> ${esc(txH('semana_mostrar'))}</label><label class="field"><span>${esc(txH('semana_horas_semana'))}</span><input type="number" id="ficha-hs" min="0" max="168" step="0.5"></label>`:'')+
     `<p class="err" id="ficha-err" role="alert"></p>`;
   const q=s=>f.querySelector(s),pintar=()=>{q('#ficha-dias').innerHTML=DAYS.map((d,k)=>`<button type="button" class="chip" data-fd="${esc(k)}" aria-pressed="${dias.includes(k)}">${d}</button>`).join('')};
@@ -511,12 +602,23 @@ function renderSemana(){
   presupuesto.innerHTML=`<p id="semana-presupuesto-titulo">${esc(txH('semana_presupuesto'))}</p><div class="semana-barra" role="img" aria-label="${esc(descripcion)}">${partes.map(([k,v],i)=>`<span class="semana-parte semana-parte-${i}" style="width:${v/168*100}%"></span>`).join('')}</div><p>${esc(descripcion)}</p>${avisos.map(t=>`<p>${esc(t)}</p>`).join('')}`;
   $('#semana-presupuesto-titulo').appendChild(SateUI.ayuda('sate.horarios.semana_supuestos'));
 }
+function opcionesHoras(valor='',libre=true){
+  const minutos=new Set(classes().filter(c=>c[0]===S.car).flatMap(c=>c[6].flatMap(([,a,b])=>[a,b])));
+  // Conserva límites guardados aunque cambie la oferta del periodo.
+  if(valor)minutos.add(toMin(valor));
+  return (libre?`<option value="">${esc(txH('d_sin_limite'))}</option>`:'')+[...minutos].filter(Number.isFinite).sort((a,b)=>a-b).map(m=>{
+    const v=hm(m);return `<option value="${v}"${v===valor?' selected':''}>${Math.floor(m/60)}:${String(m%60).padStart(2,'0')}</option>`;
+  }).join('');
+}
 function renderGTime(){
-  $('#g-from').value=GT.a;$('#g-to').value=GT.b;
+  for(const [id,v] of [['#g-from',GT.a],['#g-to',GT.b],['#d-from',GT.a],['#d-to',GT.b]]){
+    const el=$(id);if(el){el.innerHTML=opcionesHoras(v);el.value=v}
+  }
+  for(const id of ['#own-a','#own-b']){const el=$(id),v=el.value||'';el.innerHTML=opcionesHoras(v,false);if(v)el.value=v}
   document.querySelectorAll('[data-gdays]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gdays===String(GT.days||''))));
   document.querySelectorAll('[data-gsrc]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gsrc===String(GT.src||''))));
   document.querySelectorAll('[data-gn]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.gn===String(GT.n||''))));
-  $('#gbreaks').innerHTML=GT.breaks.map((b,i)=>`<div class="gbrk" data-brk="${i}"><label class="field"><span>${esc(txH('descanso_duracion'))}</span><select data-f="d" aria-label="${esc(txH('descanso_duracion'))}">${[30,60,90,120].map(m=>`<option value="${m}"${+b.d===m?' selected':''}>${({30:txH('minutos_30'),60:txH('hora_1'),90:txH('hora_media'),120:txH('horas_2')})[m]}</option>`).join('')}</select></label><div class="gbrk-horas"><label class="field"><span>${esc(txH('desde'))}</span><input type="time" step="1800" data-f="a" value="${esc(b.a)}" aria-label="${esc(txH('desde'))}"></label><label class="field"><span>${esc(txH('hasta'))}</span><input type="time" step="1800" data-f="b" value="${esc(b.b)}" aria-label="${esc(txH('hasta'))}"></label></div><span class="brkdays" role="group" aria-label="${esc(txH('descanso_dias'))}"><button type="button" class="chip" data-bday="all" aria-pressed="${!(b.days||[]).length}">${esc(txH('todos_dias'))}</button>${DAYS.slice(0,6).map((n,d)=>`<button type="button" class="chip" data-bday="${d}" aria-pressed="${(b.days||[]).includes(d)}">${n}</button>`).join('')}</span><button type="button" class="x" data-unbrk="${i}" aria-label="${esc(txH('quitar_descanso'))}">×</button></div>`).join('')+
+  $('#gbreaks').innerHTML=GT.breaks.map((b,i)=>`<div class="gbrk" data-brk="${i}"><label class="field"><span>${esc(txH('descanso_duracion'))}</span><select data-f="d" aria-label="${esc(txH('descanso_duracion'))}">${[30,60,90,120].map(m=>`<option value="${m}"${+b.d===m?' selected':''}>${({30:txH('minutos_30'),60:txH('hora_1'),90:txH('hora_media'),120:txH('horas_2')})[m]}</option>`).join('')}</select></label><div class="gbrk-horas"><label class="field"><span>${esc(txH('desde'))}</span><select data-f="a" aria-label="${esc(txH('desde'))}">${opcionesHoras(b.a,false)}</select></label><label class="field"><span>${esc(txH('hasta'))}</span><select data-f="b" aria-label="${esc(txH('hasta'))}">${opcionesHoras(b.b,false)}</select></label></div><span class="brkdays" role="group" aria-label="${esc(txH('descanso_dias'))}"><button type="button" class="chip" data-bday="all" aria-pressed="${!(b.days||[]).length}">${esc(txH('todos_dias'))}</button>${DAYS.slice(0,6).map((n,d)=>`<button type="button" class="chip" data-bday="${d}" aria-pressed="${(b.days||[]).includes(d)}">${n}</button>`).join('')}</span><button type="button" class="x" data-unbrk="${i}" aria-label="${esc(txH('quitar_descanso'))}">×</button></div>`).join('')+
     `<button type="button" class="link" id="b-addbrk">${esc(txH('agregar_descanso'))}</button>`;
 }
 // ¿cada día con clases deja un hueco de al menos d minutos dentro de [a,b]?
@@ -720,6 +822,7 @@ function* generateBank(subj,N,{marks,pscore,oq,run}){
 }
 function renderGen(){
   const g=S.gen;
+  if(typeof ventanaPropuestas!=='undefined'&&ventanaPropuestas)renderPropuesta();
   $('#b-gen-clear').hidden=!g?.top?.length;
   if(!g){$('#genres').innerHTML='';return}
   if(g.msg){$('#genres').innerHTML=`<p class="empty">${esc(g.msg)}</p>`;return}
@@ -735,7 +838,7 @@ function renderGen(){
     (none.length?`<small class="warn">${esc(txH('sin_grupos',{nombre:none.map(k=>cur()[k]?.[0]||k).join(', ')}))}</small>`:'')+
     g.top.map((r,i)=>{const cr=r.cs.reduce((s,c)=>s+c[7],0);
       return `<div class="gen"><div><b>${esc(txH('opcion',{n:i+1}))}</b> · ${esc(txH('cantidad_materias',{n:r.cs.length}))} · ${fmtCr(cr)} créditos · ${esc(txH('cantidad_dias',{n:r.days.length}))}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?' · '+esc(txH('jornada_comida',{n:(r.q.span/60).toFixed(1).replace('.0','')})):''}${r.miss.length?` · <span class="warn">${esc(txH('sin_materias',{n:r.miss.length,nombre:r.miss.map(k=>pretty(cur()[k]?.[0]||k)).join(', ')}))}</span>`:''}<div class="ls">${r.cs.map(c=>`<span class="grp">${c[3]}</span> ${esc(pretty(name(c)))}`).join(' · ')}</div></div>
-        <div class="acts"><button class="btn" data-useg="${i}" data-to="${ws().plan}">${esc(txH('usar',{version:ws().plan}))}</button><button class="btn" data-useg="${i}" data-to="+">${esc(txH('usar_nuevo'))}</button><button class="btn" data-peekg="${i}">${esc(txH('ver'))}</button></div></div>`}).join('')+
+        <div class="acts"><button class="btn" data-useg="${i}" data-to="${ws().plan}">${esc(txH('usar',{version:ws().plan}))}</button><button class="btn" data-useg="${i}" data-to="+">${esc(txH('usar_nuevo'))}</button><button class="btn" data-propuesta="${i}">${esc(txH('ver'))}</button></div></div>`}).join('')+
     (g.trunc?`<small>${esc(txH(g.bank?'busqueda_prioridad':'busqueda_limitada'))}</small>`:'');
 }
 
@@ -862,7 +965,7 @@ function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="bu
    escala final. La respuesta es proporcional y amplificada (exponente GAIN): un pellizco amplio acerca mucho más que
    uno pequeño. Usa el mismo ZOOM que los botones +/−; desplazar con un dedo sigue siendo nativo. */
 
-SATE.pestana('horarios',{montar(){montarSemana();drawCals();renderGTime();SATE.cargarTemarios?.()?.then(()=>{if(SATE.actual?.pestana==='horarios')renderHor()})},mostrar(){renderHor()},ocultar(){cancelarGeneracion();if($('#horario-compacto').open)$('#horario-compacto').close();S.hover=null}});
+SATE.pestana('horarios',{montar(){montarSemana();montarPropuestas();drawCals();renderGTime();SATE.cargarTemarios?.()?.then(()=>{if(SATE.actual?.pestana==='horarios')renderHor()})},mostrar(){renderHor()},ocultar(){cancelarGeneracion();if($('#horario-compacto').open)$('#horario-compacto').close();S.hover=null}});
 
 $('#b-export').addEventListener('click', async () => {
   try { await SATE.script('exportacion.js'); abrirExportacion(); }
