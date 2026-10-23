@@ -6,7 +6,7 @@ import {performance} from 'node:perf_hooks';
 const leer=f=>readFileSync(f,'utf8');
 const mapa=leer('web/sate/mapa.js'), nucleo=leer('web/sate/nucleo.js'), componentes=leer('web/sate/componentes.js');
 const cascaron=leer('web/sate/cascaron.html'), fuenteInicio=leer('web/sate/inicio.js'), css=leer('web/sate/componentes.css');
-assert.match(cascaron,/\.box\.done\{opacity:1;color:var\(--ipn-texto\);background:color-mix\(in srgb,var\(--ipn-ok\) 12%,var\(--ipn-superficie\)\)/,'las materias acreditadas conservan texto legible y un fondo verde tenue');
+assert.match(cascaron,/\.box\.done\{opacity:\.45;color:var\(--ipn-tenue\);background:var\(--ipn-superficie\)/,'acreditadas deslavadas y neutras, sin verde (dueño 2026-10-23)');
 assert.match(fuenteInicio,/envoltura\.appendChild\(selectorPlan\);barra\.insertBefore\(envoltura,botonMapa\.nextSibling\)/,'la barra flotante reutiliza el selector del mapa');
 assert.match(fuenteInicio,/destino\.after\(selectorPlan\)/,'al salir del mapa el selector vuelve a su posición original');
 assert.match(css,/\.sate-barra__plan #plan-periodos button\{min-width:0;min-height:44px/,'los controles del selector mantienen un objetivo táctil suficiente');

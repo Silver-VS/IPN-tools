@@ -291,7 +291,7 @@ assert.match(css,/\.trayectoria-datos\{[^}]*grid-column:1;grid-row:2 \/ span 4;a
 assert.match(css,/\.trayectoria-datos p\{margin:0;line-height:1\.6\}/);
 assert.match(css,/@media\(max-width:639px\)\{\.trayectoria-datos\{grid-row:3\}\}/);
 const acreditada=shell.match(/\.box\.done\{([^}]+)\}/)[1];
-assert.match(acreditada,/opacity:1/);assert.match(acreditada,/color:var\(--ipn-texto\)/);assert.match(acreditada,/background:color-mix\(in srgb,var\(--ipn-ok\) 12%,var\(--ipn-superficie\)\)/);
+assert.match(acreditada,/opacity:\.45/);assert.doesNotMatch(acreditada,/--ipn-ok/,'acreditadas sin verde (dueño 2026-10-23)');
 assert.doesNotMatch(acreditada,/line-through/,'Contrato de contraste: texto sin tachado ni opacidad reducida');
 const luminancia=hex=>{const v=hex.match(/\w\w/g).map(c=>parseInt(c,16)/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4);return .2126*v[0]+.7152*v[1]+.0722*v[2]};
 const superficies=[...shell.matchAll(/--ipn-superficie:(#[a-f0-9]{6})/g)].map(m=>m[1]), textos=[...shell.matchAll(/--ipn-texto:(#[a-f0-9]{6})/g)].map(m=>m[1]);
