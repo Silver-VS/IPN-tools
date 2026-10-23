@@ -66,6 +66,14 @@
 .tramite-campo textarea{min-height:8rem;resize:vertical}
 .tramite-encabezado{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--ipn-esp-2)}
 .tramite-encabezado h2{margin:0;min-width:0;line-height:1.25}
+.tramite-encabezado .tramite-regreso{margin-left:auto}
+.tramite-miniatura{box-sizing:border-box;display:block;width:min(100%,15rem);max-height:8rem;overflow:hidden;margin-top:var(--ipn-esp-2);padding:var(--ipn-esp-2);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido);color:var(--ipn-texto);font-size:var(--ipn-tamano-xs);line-height:1.35}
+.tramite-miniatura-marca{display:block;color:var(--ipn-acento);font-weight:600}
+.tramite-miniatura strong{display:block;margin-block:var(--ipn-esp-1);font-size:var(--ipn-tamano-s)}
+.tramite-miniatura-datos{display:grid;grid-template-columns:minmax(0,1fr);margin:0}
+.tramite-miniatura-datos dt{color:var(--ipn-tenue)}
+.tramite-miniatura-datos dd{margin:0 0 var(--ipn-esp-1);overflow-wrap:anywhere;font-weight:600}
+.tramite-fila-boton .tramite-miniatura{grid-column:1/-1;width:min(100%,12rem);max-height:6rem;margin-top:0}
 .tramite-pie{display:flex;justify-content:flex-start;margin-top:var(--ipn-esp-5);padding-top:var(--ipn-esp-3);border-top:1px solid var(--ipn-borde-control)}
 .tramite-falta{margin-block:var(--ipn-esp-2);color:var(--ipn-tenue)}
 .dictamen-tipo{margin-block:var(--ipn-esp-3)}
