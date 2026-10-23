@@ -419,7 +419,7 @@
 
   /* ---------- Programas de estudio: #/<unidad>/guia/programas[/<carrera>/<clave>[/<seccion>]] ---------- */
   const P = { token: 0, clave: null };
-  const G = { carrera: null, modo: 'trayectoria', vista: null, token: 0, zoom: null, escala: 1 };
+  const G = { carrera: null, modo: 'trayectoria', vista: null, token: 0, zoom: { metro: null, matriz: null }, escala: 1 };
   const claseNivel = v => 'gd-n' + Math.min(Math.max(+v || 1, 1), 9);
   const reducido = () => !!(raiz.matchMedia && raiz.matchMedia('(prefers-reduced-motion:reduce)').matches);
 
@@ -578,7 +578,7 @@
     selCarrera.value = G.carrera;
     const tray = h('div', { 'class': 'gd-tray' }), lin = h('div', { 'class': 'gd-lin' }), metro = h('div', { 'class': 'gd-metro' }), mapa = h('div', { 'class': 'gd-mapa' }), esp = h('div', { 'class': 'gd-esp' });
     const seg = SateUI.segmentado({ etiqueta: t('sate.guia.explorar_modo'), opciones: [{ id: 'trayectoria', texto: t('sate.guia.modo_trayectoria'), corto: t('sate.guia.modo_trayectoria_corto') }, { id: 'lineas', texto: t('sate.guia.modo_lineas'), corto: t('sate.guia.modo_lineas_corto') }], valor: G.modo, alCambiar: m => { G.modo = m; pintar(); } });
-    const vista = SateUI.segmentado({ etiqueta: t('sate.guia.vista_etiqueta'), opciones: [{ id: 'metro', texto: t('sate.guia.vista_metro') }, { id: 'matriz', texto: t('sate.guia.vista_matriz') }], valor: G.vista, alCambiar: v => { G.vista = v; G.zoom = null; guardarVista(v); pintar(); } });
+    const vista = SateUI.segmentado({ etiqueta: t('sate.guia.vista_etiqueta'), opciones: [{ id: 'metro', texto: t('sate.guia.vista_metro') }, { id: 'matriz', texto: t('sate.guia.vista_matriz') }], valor: G.vista, alCambiar: v => { G.vista = v; guardarVista(v); pintar(); } });
     const zoom = h('div', { 'class': 'seg gd-zoom', role: 'group', 'aria-label': t('sate.guia.vista_zoom') }, [
       h('button', { type: 'button', 'data-gd-zoom': '-1', 'aria-label': t('sate.guia.vista_alejar'), texto: '−' }),
       h('button', { type: 'button', 'data-gd-zoom': '0', texto: t('sate.guia.vista_ajustar') }),
@@ -586,13 +586,18 @@
     const escala = () => {
       const lienzo = metro.hidden ? mapa.querySelector('.gd-mapa-lienzo') : metro.querySelector('.gd-metro-lienzo');
       if (!lienzo) return;
-      const caja = metro.hidden ? mapa : metro, ancho = caja.clientWidth || 1000, w = lienzo.scrollWidth || ancho, alto = lienzo.scrollHeight || 520;
-      lienzo.style.zoom = String(G.zoom ?? Math.max(.2, Math.min(1, ancho / w, 520 / alto)));
+      const caja = metro.hidden ? mapa : metro, id = metro.hidden ? 'matriz' : 'metro';
+      const ancho = caja.clientWidth || 1000;
+      lienzo.style.zoom = '1';
+      const w = lienzo.scrollWidth || ancho;
+      const ajustar = Math.min(1.5, ancho / w);
+      lienzo.style.zoom = String(G.zoom[id] ?? Math.max(1, ajustar));
       G.escala = Number(lienzo.style.zoom) || 1;
     };
     zoom.addEventListener('click', e => {
       const b = e.target.closest('[data-gd-zoom]'); if (!b) return;
-      G.zoom = b.dataset.gdZoom === '0' ? null : Math.max(.2, Math.min(3, (G.zoom ?? G.escala) * (b.dataset.gdZoom === '1' ? 1.2 : 1 / 1.2)));
+      const id = metro.hidden ? 'matriz' : 'metro';
+      G.zoom[id] = b.dataset.gdZoom === '0' ? null : Math.max(1, Math.min(1.5, (G.zoom[id] ?? G.escala) * (b.dataset.gdZoom === '1' ? 1.12 : 1 / 1.12)));
       escala();
     });
     // Una materia es siempre un botón: clic, Enter o espacio abren su ficha en la ventana emergente.
