@@ -99,7 +99,8 @@ class EncabezadoTest(unittest.TestCase):
 
     def test_css_solo_tokens_ipn_y_contenedor_comun(self):
         css = (ROOT / 'web/sate/encabezado.css').read_text(encoding='utf-8')
-        self.assertTrue(all(v.startswith('--ipn-') for v in re.findall(r'var\((--[\w-]+)', css)))
+        self.assertTrue(all(v.startswith('--ipn-') or v == '--sate-barra-alto'
+                            for v in re.findall(r'var\((--[\w-]+)', css)))
         cascaron = (ROOT / 'web/sate/cascaron.html').read_text(encoding='utf-8')
         self.assertIn('.wrap{max-width:var(--ipn-contenido-ancho)', cascaron)
         self.assertIn('padding-inline:var(--ipn-contenido-margen)', cascaron)

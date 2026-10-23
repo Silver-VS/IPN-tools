@@ -36,10 +36,15 @@
     const boton=original.cloneNode(true);boton.removeAttribute('id');boton.addEventListener('click',()=>original.click());acciones.append(boton);
   }
   bar.append(marca,copia,acciones);h.after(bar);
-  const sync=()=>{bar.hidden=!(mq.matches&&nav.getBoundingClientRect().bottom<0)};
+  // La altura puede cambiar por fuentes, zoom o etiquetas; los sticky comparten el borde visible.
+  const sync=()=>{
+    bar.hidden=!(mq.matches&&nav.getBoundingClientRect().bottom<0);
+    document.documentElement.style.setProperty('--sate-barra-alto',(bar.hidden?0:Math.ceil(bar.getBoundingClientRect().bottom))+'px');
+  };
   let pendiente=false;
   const actualizar=()=>{if(pendiente)return;pendiente=true;requestAnimationFrame(()=>{pendiente=false;sync()})};
   addEventListener('scroll',actualizar,{passive:true});addEventListener('resize',actualizar);mq.addEventListener('change',sync);
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(actualizar).observe(bar);
   bar.addEventListener('click',e=>{
     const a=e.target.closest('a[href]');if(!a)return;
     bar.querySelectorAll('a[aria-current=page]').forEach(x=>x.removeAttribute('aria-current'));a.setAttribute('aria-current','page');

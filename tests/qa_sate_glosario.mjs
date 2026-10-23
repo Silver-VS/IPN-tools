@@ -19,7 +19,7 @@ assert.doesNotMatch(terminoCSS, /vertical-align/);
 assert.match(regla('.sate-globo'), /position:fixed;/);
 assert.match(regla('.sate-globo'), /max-width:min\(320px,40ch,calc\(100vw - 16px\)\)/);
 const tactil = css.split('@media(hover:none){')[1].split('\n}')[0];
-const objetivos = [...tactil.matchAll(/([^{}]+)\{([^{}]*min-(?:height|width):44px!important[^{}]*)\}/g)];
+const objetivos = [...tactil.matchAll(/([^{}]+)\{([^{}]*min-(?:height|width):(?:44px|var\(--ipn-control-alto\))!important[^{}]*)\}/g)];
 assert.equal(objetivos.length, 3);
 for (const [, selector] of objetivos) assert.ok(selector.trim().endsWith(':not(.sate-termino)'), selector);
 assert.match(regla('.sate-termino::before'), /position:absolute;/);

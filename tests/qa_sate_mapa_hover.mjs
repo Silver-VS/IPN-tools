@@ -9,7 +9,7 @@ const cascaron=leer('web/sate/cascaron.html'), fuenteInicio=leer('web/sate/inici
 assert.match(cascaron,/\.box\.done\{opacity:\.45;color:var\(--ipn-tenue\);background:var\(--ipn-superficie\)/,'acreditadas deslavadas y neutras, sin verde (dueño 2026-10-23)');
 assert.match(fuenteInicio,/envoltura\.appendChild\(selectorPlan\);barra\.insertBefore\(envoltura,botonMapa\.nextSibling\)/,'la barra flotante reutiliza el selector del mapa');
 assert.match(fuenteInicio,/destino\.after\(selectorPlan\)/,'al salir del mapa el selector vuelve a su posición original');
-assert.match(css,/\.sate-barra__plan #plan-periodos button\{min-width:0;min-height:44px/,'los controles del selector mantienen un objetivo táctil suficiente');
+assert.match(css,/\.sate-barra__plan #plan-periodos button\{min-width:0;min-height:var\(--ipn-control-alto\)/,'los controles del selector mantienen un objetivo táctil suficiente');
 assert.match(mapa,/const H=Y\(bands\.length\?bands\[bands\.length-1\]\[3\]:L\.h\)/,'el SVG termina al final de la última banda curricular');
 
 // --- DOM mínimo con classList y atributos ---

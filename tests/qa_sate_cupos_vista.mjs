@@ -131,7 +131,7 @@ c.CUPOS.fila=filaAnterior;c.CUPOS.insignia=insigniaAnterior;
 let destino;const opener={};const loc={href:'https://sate.test/sate/cupos.html?unidad=unidad-ficticia&modo=saes&code=ficticio',search:'?unidad=unidad-ficticia&modo=saes&code=ficticio',hash:'#estado',replace:u=>destino=new URL(u)};
 vm.runInNewContext([...leer('web/sate/cupos.html').matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1],{URL,URLSearchParams,location:loc,opener});
 assert.equal(destino.pathname,'/sate/index.html');assert.equal(destino.searchParams.get('vista'),'cupos');assert.equal(destino.searchParams.get('modo'),'saes');assert.equal(destino.searchParams.get('code'),'ficticio');assert.equal(destino.hash,'#estado');
-const css=leer('web/sate/cascaron.html');assert.match(css,/html\[data-vista=cupos\] \.sate-navegacion/);assert.match(css,/#cupos-vista button.*min-height:44px/);
+const css=leer('web/sate/cascaron.html');assert.match(css,/html\[data-vista=cupos\] \.sate-navegacion/);assert.match(css,/#cupos-vista button.*min-height:var\(--ipn-control-alto\)/);
 assert.match(leer('web/sate/componentes.css'),/\.sate-chip--reemplazo\{[^}]*white-space:normal[^}]*margin-bottom:var\(--ipn-esp-2\)/);
 // VEN1: barra de configuración arriba (sin «Avisos y más»), medidor por fila y tarjetas de fila en teléfono.
 for(const regla of [/\.cupos-config\{/,/\.cupos-interruptor-pista\{/,/\.cupos-pista\{[^}]*height:8px/,/\.cupos-m-lleno \.cupos-pista i\{/,/\.cupos-tabla tr\{display:grid/,/\.cupos-config select:disabled/])assert.match(css,regla);
