@@ -810,9 +810,10 @@
         return s ? enlaceExterno('', s.url + (ref.pagina ? '#page=' + ref.pagina : ''), s.texto) : null;
       };
       return h('article', { 'class': 'guia-ficha' }, [h('small', { texto: t('sate.guia.acudir_' + (a.ambito || 'unidad')) }), a.pendiente ? h('strong', { texto: tx('confirmar') }) : null, h('h3', { texto: a.nombre }),
-        h('dl', {}, [campo(a.objetivo ? tx('objetivo_sintesis') : tx('atiende'), [h('p', {}, enLinea(a.objetivo?.texto || a.para || tx('sin_descripcion'), d)), a.objetivo ? cita(a.objetivo.fuente) : null,
+        h('dl', {}, [campo(a.orientacion ? tx('orientacion_propia') : tx('atiende'), [h('p', {}, enLinea(a.orientacion?.texto || a.para || tx('sin_descripcion'), d)),
           ...(a.necesidades || []).map(n => h('p', { texto: t(n.texto) + (n.pendiente ? ' · ' + tx('confirmar') : '') }))]),
-          a.funciones?.length ? campo(t('sate.guia.funciones_manual'), [h('ul', { 'class': 'guia-funciones' }, a.funciones.map(x => h('li', {}, [h('p', {}, enLinea(x.texto, d)), cita(x.fuente)])))]) : null,
+          a.objetivo ? campo(tx(a.objetivo.alcance === 'unidad' ? 'objetivo_unidad' : 'objetivo_oficial'), [h('blockquote', { 'class': 'pc-lector pc-oficial', texto: a.objetivo.texto }), cita(a.objetivo.fuente)]) : null,
+          a.funciones?.length ? campo(t('sate.guia.funciones_manual'), [h('ul', { 'class': 'guia-funciones pc-lector pc-oficial' }, a.funciones.map(x => h('li', {}, [h('p', { texto: x.texto }), cita(x.fuente)])))]) : null,
           campo(tx('depende'), [instancias.get(padre)?.nombre || a.dependenciaTexto || tx('confirmar'), a.fuenteDependencia ? cita(a.fuenteDependencia) : null]),
           a.procedimientos ? campo(tx('procedimientos'), [h('ul', { 'class': 'guia-procedimientos' }, a.procedimientos.map(x => h('li', {}, [h('strong', { texto: x.nombre }), h('p', { texto: x.participacion }), cita(x.fuente)]))), h('p', { texto: a.procedimientosNota })]) : null,
           campo(tx('contacto'), enLinea(a.contacto || tx('confirmar'), d)),
