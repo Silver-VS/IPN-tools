@@ -40,7 +40,6 @@
       const aviso=el('aside',null,'tramite-aviso');aviso.appendChild(el('h4',tx('aviso_titulo')));
       const lista=el('ul');for(const n of [1,2,3])lista.appendChild(SateTramites.citas(el('li',tx('aviso_'+tipo+'_'+n)),'sate.baja.aviso_'+tipo+'_'+n));
       aviso.appendChild(lista);caja.appendChild(aviso);
-      if(tipo==='temporal'&&raiz.SATE_DATA?.bajas?.reglamento){const a=el('a',tx('fundamento'));a.href=raiz.SATE_DATA.bajas.reglamento;a.target='_blank';a.rel='noopener';aviso.appendChild(a)}
     }};
   }
   function opciones(caja,ctx,id,leyenda,lista){

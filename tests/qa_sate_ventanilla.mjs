@@ -291,9 +291,10 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
 {
   const dd3=dic.definir(),pasoTipo=dd3.pasos[0].campos.find(f=>f.id==='tipo');
   const cajaTipo=new Nodo('div');pasoTipo.pintar(cajaTipo,{datos:{tipo:'interno'},cambiar(){}});
-  const enlaces=cajaTipo.todos().filter(n=>n.tagName==='a');
-  assert.equal(enlaces.length,c.SATE_DATA.dictamen.motivos.interno.length+c.SATE_DATA.dictamen.motivos.externo.length,'Cada situación enlaza su fundamento');
-  assert.ok(enlaces.every(a=>/^https:\/\/www\.ipn\.mx\/assets\/files\/normatividad\/docs\/reglamentos\/.+\.pdf$/.test(a.href)&&a.target==='_blank'&&a.rel==='noopener'));
+  const enlaces=cajaTipo.todos().filter(n=>n.attrs['aria-haspopup']==='dialog');
+  assert.equal(enlaces.length,9,'Un control por artículo, incluido el caso con tres artículos');
+  assert.ok(!cajaTipo.todos().some(n=>n.textContent==='Fundamento'));
+  assert.equal(cajaTipo.todos().filter(n=>n.tagName==='a').length,0,'El PDF se consulta desde el popup');
   for(const m of [...c.SATE_DATA.dictamen.motivos.interno,...c.SATE_DATA.dictamen.motivos.externo]){
     assert.ok(c.SATE_DATA.dictamen.textos['dictamen.motivo_'+m.id],m.id);assert.ok(c.SATE_DATA.dictamen.textos['dictamen.fund_'+m.id],m.id);
   }
@@ -541,6 +542,6 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   const ejemplo=box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Baja temporal. '));
   assert.ok(ejemplo.todos().some(n=>n.textContent==='Ejemplo'));
   assert.ok(ejemplo.todos().some(n=>n.textContent==='2099000000'),'Hoja con datos ficticios escritos');
-  assert.match(cssV,/aspect-ratio:612\/792/,'Marco carta');
-  assert.match(cssV,/transform:scale\(\.25\)/,'La hoja completa se reduce con transform');
+  assert.match(cssV,/min-height:calc\(400cqw \* 792 \/ 612\)/,'Hoja carta que puede crecer');
+  assert.match(cssV,/zoom:\.25/,'La reducción conserva el alto del flujo');
 }
