@@ -74,8 +74,16 @@ assert.equal(dialogo.tarjeta.style.left,'12px');
 assert.equal(vistas.at(-1),'mapa');
 assert.equal(dialogo.acciones.children.length,3);
 cajaObjetivo={top:180,left:28,right:324,bottom:360,height:180};eventos.get('resize')();
-assert.equal(dialogo.tarjeta.style.top,'372px');assert.equal(dialogo.tarjeta.style.left,'28px');
+assert.equal(dialogo.tarjeta.style.top,'48px');assert.equal(dialogo.tarjeta.style.left,'28px');
+for(const ancho of [1440,768,528,375]){
+  entorno.innerWidth=ancho;cajaObjetivo={top:Math.max(120,entorno.innerHeight-220),left:Math.min(24,ancho-320),right:Math.min(320,ancho-16),bottom:entorno.innerHeight-40,height:180};
+  eventos.get('resize')();
+  const x=parseFloat(dialogo.tarjeta.style.left),y=parseFloat(dialogo.tarjeta.style.top),w=dialogo.tarjeta.offsetWidth,h=dialogo.tarjeta.offsetHeight;
+  assert.ok(x>=8&&x+w<=ancho-8&&y>=8&&y+h<=entorno.innerHeight-8,`Tarjeta dentro de pantalla a ${ancho}px`);
+  assert.ok(x+w<=cajaObjetivo.left||x>=cajaObjetivo.right||y+h<=cajaObjetivo.top||y>=cajaObjetivo.bottom,`Tarjeta no tapa el resaltado a ${ancho}px`);
+}
 const css=leer('web/sate/componentes.css');
+assert.match(css,/\.sate-recorrido\{[^}]*font-family:var\(--ipn-fuente-texto\)[^}]*font-size:var\(--ipn-tamano-m\)/,'El diálogo define tipografía fuera de body');
 assert.match(css,/\.sate-recorrido__acciones\{position:fixed;[^}]*right:var\(--ipn-esp-3\);[^}]*bottom:max\(var\(--ipn-esp-3\),env\(safe-area-inset-bottom\)\)/);
 assert.doesNotMatch(css,/\.sate-recorrido__tarjeta\[data-control=barra\]/);
 dialogo.escape();assert.ok(cerrada);assert.equal(eventos.size,0);

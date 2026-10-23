@@ -28,8 +28,10 @@ const vacio=pintar([]);assert.equal(vacio.lo,420);assert.equal(vacio.end,870);
 for(const [a,b] of [[420,510],[480,600],[960,1050],[1080,1170],[0,30],[1410,1440]]){
   const r=pintar([grupo(a,b)]);
   assert.equal(r.span,vacio.span,'Una selección corta conserva el alto inicial');
-  if(a>=225&&b<=1215){assert.ok(a-r.lo>=90&&r.end-b>=90);assert.ok(Math.abs((a+b-r.lo-r.end)/2)<=15,'Centro alineado a media hora');}
+  if(a>=420&&b<=1230){assert.ok(r.lo>=420,'El rango no empieza antes de la jornada');assert.ok(r.end<=1320||r.end>=b,'El rango termina a las 22:00 salvo clase posterior');}
+  if(a>420&&b<1320)assert.ok(a-r.lo>=Math.min(90,a-420)&&r.end-b>=Math.min(90,1320-b),'Conserva margen disponible sin salir de la jornada');
 }
+const siete=pintar([grupo(420,510)]);assert.equal(siete.lo,420);assert.equal(siete.end,870,'El alto mínimo se desplaza dentro de la jornada');
 const tarde=pintar([grupo(960,1050)]);assert.ok(tarde.lo>420,'No muestra la mañana vacía');
 const animadas=animaciones.length;pintar([grupo(960,1050)]);assert.equal(animaciones.length,animadas,'No anima cada actualización de cupos');
 c.matchMedia=()=>({matches:false});pintar([grupo(420,510)]);assert.equal(animaciones.length,animadas,'Respeta movimiento reducido');
@@ -97,6 +99,7 @@ assert.match(html,/id="f-cupo"/,'El filtro de cupo aparece en Más filtros');
 assert.match(html,/id="f-cupo-ayuda"/,'El filtro explica si faltan datos y cuándo se consultaron');
 assert.match(leer('web/sate/horarios.js'),/S\.soloCupo&&!plan\(\)\.sel\.includes\(keyOf\(c\)\)/,'El generador conserva los grupos elegidos al filtrar cupos');
 assert.match(leer('web/sate/temarios.js'),/SATE\.temarios = \{[^}]*\babrir,/,'Horarios reutiliza el vistazo compartido del temario');
+assert.match(leer('web/sate/horarios.js'),/montar\(\)\{[^}]*SATE\.cargarTemarios\?\.\(\)\?\.then\(\(\)=>\{if\(SATE\.actual==='horarios'\)renderHor\(\)\}\)/,'Horarios carga temarios en segundo plano y repinta al terminar');
 assert.match(html,/\.temario-mini\{[^}]*min-width:44px[^}]*min-height:44px/,'El botón del temario tiene objetivo táctil');
 assert.equal([...html.matchAll(/class="btn sate-cupos-consultar"[^>]*data-cupos-ayuda/g)].length,2);
 assert.equal([...html.matchAll(/<span data-cupos-etiqueta>/g)].length,2);

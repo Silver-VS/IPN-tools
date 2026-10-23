@@ -19,10 +19,23 @@
     const salir=()=>{cerrado=true;activo=false;removeEventListener('resize',colocar);removeEventListener('scroll',colocar,true);ui?.elemento.remove();if(origen?.isConnected)origen.focus()};
     function colocar(){
       if(!elemento||!ui||!ui.elemento.open)return;
-      const r=elemento.getBoundingClientRect(),ancho=ui.tarjeta.offsetWidth,alto=ui.tarjeta.offsetHeight,gap=12,margen=8;
-      const x=Math.max(margen,Math.min(r.left,innerWidth-ancho-margen));
-      const debajo=r.bottom+gap+alto<=innerHeight-margen;
-      const y=Math.max(margen,Math.min(debajo?r.bottom+gap:r.top-alto-gap,innerHeight-alto-margen));
+      let r=elemento.getBoundingClientRect();const ancho=ui.tarjeta.offsetWidth,alto=ui.tarjeta.offsetHeight,gap=12,margen=8;
+      const opciones=caja=>[
+        {x:caja.left,y:caja.top-alto-gap,lugar:'arriba',espacio:caja.top-margen},
+        {x:caja.left,y:caja.bottom+gap,lugar:'abajo',espacio:innerHeight-margen-caja.bottom},
+        {x:caja.left-ancho-gap,y:caja.top,lugar:'izquierda',espacio:caja.left-margen},
+        {x:caja.right+gap,y:caja.top,lugar:'derecha',espacio:innerWidth-margen-caja.right}
+      ];
+      let candidatos=opciones(r);
+      const cabe=c=>c.espacio>=((c.lugar==='arriba'||c.lugar==='abajo')?alto:ancho)&&c.x>=margen&&c.y>=margen&&c.x+ancho<=innerWidth-margen&&c.y+alto<=innerHeight-margen;
+      let destino=candidatos.find(cabe);
+      if(!destino){
+        elemento.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+        r=elemento.getBoundingClientRect();candidatos=opciones(r);
+        destino=candidatos.find(cabe)||candidatos.reduce((a,b)=>b.espacio>a.espacio?b:a);
+      }
+      const x=Math.max(margen,Math.min(destino.x,innerWidth-ancho-margen));
+      const y=Math.max(margen,Math.min(destino.y,innerHeight-alto-margen));
       Object.assign(ui.tarjeta.style,{top:y+'px',left:x+'px',right:'auto',bottom:'auto'});
       Object.assign(ui.marco.style,{top:Math.max(0,r.top)+'px',left:Math.max(0,r.left)+'px',width:Math.max(0,Math.min(r.right,innerWidth)-Math.max(0,r.left))+'px',height:Math.max(0,Math.min(r.bottom,innerHeight)-Math.max(0,r.top))+'px'});
     }

@@ -546,9 +546,11 @@ function cuadriculaHorario(all,op){
   const horas=all.flatMap(c=>slots(c)), minimo=5*BLOCK;
   const first=horas.length?Math.min(...horas.map(b=>b[1])):START;
   const last=horas.length?Math.max(...horas.map(b=>b[2])):START+minimo;
-  // El mínimo conserva el alto del estado vacío; el margen y el centro siguen a lo elegido, incluso de noche.
-  const span=horas.length?Math.min(1440,Math.max(minimo,Math.ceil((last-first+2*BLOCK)/BLOCK)*BLOCK)):minimo;
-  const lo=horas.length?Math.max(0,Math.min(1440-span,Math.floor((first+last-span)/2/SLOT)*SLOT)):START;
+  // El alto mínimo se ajusta al tramo permitido por la jornada y las clases más tempranas o tardías.
+  const inicio=Math.min(START,first),fin=Math.max(22*60,last);
+  const span=horas.length?Math.min(fin-inicio,Math.max(minimo,Math.ceil((last-first+2*BLOCK)/BLOCK)*BLOCK)):minimo;
+  let lo=horas.length?Math.floor((first+last-span)/2/SLOT)*SLOT:START;
+  if(horas.length){lo=Math.max(inicio,Math.min(fin-span,lo));if(lo+span<last)lo=last-span;if(lo>first-BLOCK)lo=first-BLOCK;lo=Math.max(inicio,Math.min(fin-span,lo))}
   const end=lo+span, h=span/SLOT*SLOTPX;
   const cal=$('#cal');cal.style.setProperty('--days',days);cal.style.setProperty('--slot',SLOTPX+'px');
   let html='<div class="dh"></div>'+DAYS.slice(0,days).map(d=>`<div class="dh">${d}</div>`).join('');
