@@ -1,6 +1,41 @@
 /* Guía politécnica: portada de apartados, preguntas frecuentes, reglamentos y a quién acudir.
    Solo tokens --ipn-*; los componentes que se reutilizan (migas, tarjeta de navegación, buscador, pregunta desplegable)
    viven en web/sate/componentes.css. */
+.guia-etapas{display:flex;flex-wrap:wrap;list-style:none;margin:0;padding:0;min-width:0}
+.guia-etapas li{flex:1 1 44px;min-width:44px;position:relative}
+.guia-etapas li+li::before{content:"";position:absolute;top:22px;left:-50%;right:50%;height:2px;background:var(--ipn-linea)}
+.guia-etapas button{position:relative;display:flex;flex-direction:column;align-items:center;gap:var(--ipn-esp-2);width:100%;min-width:44px;min-height:44px;padding:0;border:0;background:none;color:var(--ipn-tenue);font:inherit;cursor:pointer}
+.guia-etapa-num{box-sizing:border-box;display:grid;place-items:center;width:44px;height:44px;border:2px solid var(--ipn-linea);border-radius:50%;background:var(--ipn-fondo)}
+.guia-etapas [aria-current] .guia-etapa-num{background:var(--ipn-acento);border-color:var(--ipn-acento);color:var(--ipn-sobre-acento)}
+.guia-etapa-nombre{font-size:var(--ipn-tamano-s);text-align:center;overflow-wrap:anywhere}
+.guia-panel,.guia-directorio{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:var(--ipn-esp-6);align-items:start;min-width:0}
+.guia-panel section,.guia-panel article,.guia-directorio>*{min-width:0}
+.guia-preguntas-etapa,.guia-directorio-lista{list-style:none;margin:var(--ipn-esp-4) 0 0;padding:0;display:grid;gap:var(--ipn-esp-2)}
+.guia-elegir{display:block;width:100%;min-height:44px;border:0;border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);background:transparent;color:var(--ipn-texto);font:inherit;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.guia-elegir:hover,.guia-elegir[aria-expanded=true],.guia-elegir[aria-current]{background:var(--ipn-acento-suave);color:var(--ipn-acento)}
+.guia-detalle{display:grid;gap:var(--ipn-esp-4);overflow-wrap:anywhere}
+.guia-controles{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+.guia-controles button{min-height:44px;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-2) var(--ipn-esp-3);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;cursor:pointer}
+.guia-controles [aria-pressed=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento)}
+.guia-barra{display:flex;align-items:center;flex-wrap:wrap;gap:var(--ipn-esp-4)}
+.guia-barra>.sate-buscador{flex:1;min-width:min(100%,18rem)}
+.guia .sate-buscador__borrar{width:44px;height:44px}
+.guia-ficha{display:grid;gap:var(--ipn-esp-3);overflow-wrap:anywhere}
+.guia-ficha dl{margin:0;display:grid;gap:var(--ipn-esp-4)}
+.guia-ficha dl>div{padding-top:var(--ipn-esp-3);border-top:1px solid var(--ipn-linea)}
+.guia-ficha dt{font-weight:600;color:var(--ipn-tenue)}
+.guia-ficha dd{margin:var(--ipn-esp-2) 0 0}
+.guia-ficha a{display:inline-flex;align-items:center;min-height:44px;overflow-wrap:anywhere}
+.guia-directorio-lista>li{padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea)}
+.guia-directorio-lista small{color:var(--ipn-tenue)}
+.guia-arbol ul{list-style:none;margin:0;padding-left:var(--ipn-esp-3);border-left:1px solid var(--ipn-linea)}
+.guia-arbol section>ul{padding-left:0;border:0}
+.guia-arbol summary{min-height:44px;cursor:pointer;overflow-wrap:anywhere;padding:var(--ipn-esp-2);box-sizing:border-box}
+.guia-nodo{border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);margin-block:var(--ipn-esp-2)}
+.guia-nodo--colegiado{border-style:dashed}
+.guia-etapas button:focus-visible,.guia-elegir:focus-visible,.guia-controles button:focus-visible,.guia-arbol summary:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+@media(max-width:899px){.guia-panel,.guia-directorio{grid-template-columns:minmax(0,1fr)}.guia-etapa-nombre{display:none}.guia-preguntas-etapa .guia-detalle{padding:var(--ipn-esp-3)}.guia-ficha-panel{display:none}}
+@media(max-width:359px){.guia-etapas{flex-wrap:wrap;gap:var(--ipn-esp-2)}.guia-etapas li{flex:0 0 44px}.guia-etapas li+li::before{display:none}}
 .guia-cab{display:grid;gap:var(--ipn-esp-4);min-width:0}
 .guia-cab h2{margin:0;font-size:var(--ipn-tamano-xl);line-height:1.25;overflow-wrap:anywhere}
 .guia-cab .tmr-intro{margin:0}

@@ -39,7 +39,8 @@
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 33
-   }
+   },
+   "depende": "ctce"
   },
   {
    "id": "subdireccion_academica",
@@ -48,7 +49,16 @@
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 42
-   }
+   },
+   "necesidades": [
+    {
+     "texto": "sate.guia.r10.necesidad_queja",
+     "palabras": [
+      "queja de un profesor contra docente maestro"
+     ],
+     "pendiente": true
+    }
+   ]
   },
   {
    "id": "sseis",
@@ -57,7 +67,23 @@
    "fuente": {
     "doc": "mo_upiita",
     "pagina": 87
-   }
+   },
+   "necesidades": [
+    {
+     "texto": "sate.guia.r10.necesidad_baja",
+     "palabras": [
+      "baja temporal pausar suspender semestre"
+     ],
+     "pendiente": true
+    },
+    {
+     "texto": "sate.guia.r10.necesidad_honor",
+     "palabras": [
+      "comisión de honor"
+     ],
+     "pendiente": true
+    }
+   ]
   },
   {
    "id": "extension_apoyos",
@@ -105,7 +131,8 @@
     "Prepara la solicitud en la Ventanilla digital y entrégala firmada en [[g:gestion_escolar|Gestión Escolar]]."
    ],
    "reemplaza": true,
-   "ventanilla": "dictamen"
+   "ventanilla": "dictamen",
+   "etapa": "4"
   },
   {
    "id": "formato-dictamen",
@@ -115,7 +142,8 @@
     "Imprímelo, fírmalo y entrégalo en [[g:gestion_escolar|Gestión Escolar]] antes de la fecha límite."
    ],
    "reemplaza": true,
-   "ventanilla": "dictamen"
+   "ventanilla": "dictamen",
+   "etapa": "4"
   },
   {
    "id": "baja-temporal",
@@ -129,7 +157,8 @@
    "formato": {
     "texto": "Formato oficial de baja temporal",
     "ref": "bajas.temporal"
-   }
+   },
+   "etapa": "5"
   },
   {
    "id": "baja-definitiva",
@@ -143,7 +172,8 @@
    "formato": {
     "texto": "Formato oficial de baja definitiva",
     "ref": "bajas.definitiva"
-   }
+   },
+   "etapa": "5"
   },
   {
    "id": "correo-institucional-upiita",
@@ -171,7 +201,8 @@
     "email",
     "ipn.mx",
     "contraseña del correo"
-   ]
+   ],
+   "etapa": "1"
   },
   {
    "id": "trabajo-terminal-upiita",
@@ -199,7 +230,8 @@
     "metodología de la investigación",
     "protocolo",
     "titulación"
-   ]
+   ],
+   "etapa": "7"
   },
   {
    "id": "idiomas-celex-upiita",
@@ -227,7 +259,9 @@
     "lenguas extranjeras",
     "cursos extracurriculares",
     "francés"
-   ]
+   ],
+   "etapa": "1"
   }
- ]
+ ],
+ "organigrama": "organigrama-upiita.json"
 }

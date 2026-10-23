@@ -2,7 +2,7 @@
 # Textos de SATE (Sistema de Apoyo a la Trayectoria Escolar) en español de México, tuteo.
 # Reglas: claves a-z0-9_ con puntos; variables {nombre}; plurales {n, plural, one {# x} other {# xs}}.
 # Al cambiar un texto: sube `version` y valida con `python tools/contenido.py`.
-version = "2026.10.27"
+version = "2026.10.28"
 
 [sate.creditos]
 rotulo = "créditos"
@@ -1815,3 +1815,30 @@ mi_horario = "Consulta los grupos que elegiste para tu horario."
 tramites = "Consulta los trámites y prepara sus formatos."
 calendario = "Consulta las fechas del calendario escolar."
 guia = "Elige un apartado para consultar sus temas."
+
+# Guía por etapas y directorio
+[sate.guia.r10]
+"etapa_1" = "Inscribirte y cursar"
+"etapa_2" = "Evaluaciones"
+"etapa_3" = "Si repruebas"
+"etapa_4" = "Dictamen y plazos"
+"etapa_5" = "Pausar o salir"
+"etapa_6" = "Cambiar el rumbo"
+"etapa_7" = "Terminar"
+"directorio" = "Directorio"
+"jerarquia" = "Jerarquía"
+"necesidad" = "¿Qué necesitas?"
+"todo" = "Todo"
+"atiende" = "Qué atiende"
+"depende" = "Depende de"
+"contacto" = "Contacto"
+"confirmar" = "Por confirmar"
+"relacionadas" = "Preguntas relacionadas"
+"estructura" = "Estructura de la unidad"
+"sin_descripcion" = "Funciones por confirmar"
+"fuente_estructura" = "Manual de Organización: estructura ratificada en octubre de 2021"
+"necesidad_queja" = "Quejas sobre docencia"
+"necesidad_baja" = "Baja temporal"
+"necesidad_honor" = "Comisión de Honor"
+"denuncias" = "Canales de denuncia"
+"denuncias_pendiente" = "La instancia responsable y los canales de denuncia institucional o anónima están por confirmar."

@@ -1162,6 +1162,8 @@ def escribir_guia(datos):
         return
     leer = lambda ruta: json.loads(ruta.read_text(encoding='utf-8')) if ruta.exists() else {}
     guia = fusionar_guia(leer(compartida), leer(fuente))
+    if isinstance(guia.get('organigrama'), str):
+        guia['organigrama'] = leer(ROOT / 'data/guia' / guia['organigrama'])
     bajas = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
     for p in guia['preguntas']:
         formato = p.get('formato')

@@ -36,13 +36,12 @@ vm.runInContext(leer('web/sate/rutas.js'), c);
 vm.runInContext(leer('web/sate/guia.js'), c);
 const caja = document.createElement('div'); caja.setAttribute('id','sate-guia'); document.body.appendChild(caja);
 await pestana.mostrar({partes:['situacion','consulta']});
-// El contenido de respuestas se crea al abrir su details.
-const det = caja.querySelector('details'); det.open = true; det.dispatchEvent(new Evento('toggle'));
+// La respuesta enlazada se abre dentro de la lista en teléfono.
+assert.ok(caja.querySelector('.guia-detalle'));
 datos.preguntas[0].ventanilla = 'dictamen';
 async function comprobarVentanilla(tramites, visible) {
   config.unidades.ficticia.tramites = tramites;
   await pestana.mostrar({partes:['situacion','consulta']});
-  const pregunta = caja.querySelector('details'); pregunta.open = true; pregunta.dispatchEvent(new Evento('toggle'));
   assert.equal(!!caja.querySelector('a[href="#/ficticia/tramites/dictamen"]'), visible);
 }
 await comprobarVentanilla([], false);
@@ -85,14 +84,11 @@ assert.ok(caja.querySelector('.rgl-art--ancho'), 'transitorios en el índice');
 await pestana.mostrar({partes:['acudir']});
 assert.ok(caja.textContent.includes('sate.guia.acudir_ipn'));
 assert.ok(caja.textContent.includes('sate.guia.fuente_pagina'));
-const instancia = caja.querySelector('#acudir-central'), funciones = instancia.querySelector('details');
-assert.equal(instancia.querySelector('p').textContent, 'Consulta art. 1.');
-assert.equal(funciones.querySelector('summary').textContent.trim(), 'sate.guia.funciones_manual');
-assert.equal(!!funciones.open, false);
-assert.equal(funciones.querySelector('p').textContent, ' Conserva crédito y el texto normativo.');
-assert.ok(funciones.querySelector('a[href="https://example.org/demo.pdf"]'));
+const instancia = caja.querySelector('.guia-ficha');
+assert.ok(instancia.textContent.includes('Consulta art. 1. Conserva crédito y el texto normativo.'));
+assert.ok(instancia.querySelector('a[href="https://example.org/demo.pdf"]'));
 assert.ok(instancia.querySelector('.guia-enlace'));
-assert.ok(funciones.querySelector('.sate-termino'));
+assert.ok(instancia.querySelector('.sate-termino'));
 await pestana.mostrar({partes:['reglamentos']});
 assert.ok(caja.querySelector('a[href="#/ficticia/guia/reglamentos/demo"]'));
 assert.ok(caja.textContent.includes('sate.guia.numero_articulos 1'));
