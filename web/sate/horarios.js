@@ -895,7 +895,7 @@ function loadInscrito(){
   // periodo de la oferta con más coincidencias (grupo + clave)
   const per=['proximo','actual'].filter(hasOffer).sort((a,b)=>H.filter(h=>find(b,h[0],h[1])).length-H.filter(h=>find(a,h[0],h[1])).length)[0]||S.per;
   if(per!==S.per){S.per=per;store.set('per',per)}
-  const pl=plan();pl.sel=[];pl.own=pl.own.filter(o=>!o.saes);let sinOferta=0;
+  const pl=plan();pl.inscrita=true;pl.sel=[];pl.own=pl.own.filter(o=>!o.saes);let sinOferta=0;
   H.forEach(([g,k,n,pf,ses])=>{const c=find(per,g,k);if(c){pl.sel.push(keyOf(c));return}
     // sin coincidencia en la oferta capturada: se agrega con las horas del SAES
     sinOferta++;const by={};ses.forEach(([d,a,b])=>{(by[a+'-'+b]=by[a+'-'+b]||{a,b,d:[]}).d.push(d)});
@@ -904,6 +904,8 @@ function loadInscrito(){
   $('#exp-msg').textContent=txH('inscrito_cargado',{version:ws().plan,periodo:txH(per==='proximo'?'periodo_proximo':'periodo_actual')})+
     (sinOferta?' '+txH('inscrito_sin_oferta',{n:sinOferta}):'');
 }
+// El periodo actual ya está inscrito; en otros periodos solo la versión cargada desde SAES.
+window.SateHorarioInscrito=()=>S.per==='actual'||!!plan().inscrita;
 function renderPlans(){
   $('#b-saeshor').hidden=!(isPersonal()&&ALUMNO.horario_inscrito?.length);
   const ids=planIds();
@@ -953,7 +955,10 @@ function renderCal(){
     if(ci.ret)$('#load .load-note').appendChild(SateUI.ayuda('sate.horarios.carga_ayuda',{ret:fmtCr(ci.ret),nuevos:fmtCr(ci.nuevos),libre:fmtCr(ci.libre),tope:fmtCr(ci.tope)}));
   }else $('#load').innerHTML='';
   $('#sel').hidden=!both.length;
-  $('#sel').innerHTML=sel.map(c=>`<div class="sel-item${window.SateCuposVista?.riesgo(c)?' cupos-riesgo':''}"><div class="sel-row"><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${esc(c[3])}</span><span class="sel-materia"><span class="sel-nombre">${esc(pretty(name(c)))}</span><small class="sel-prof" title="${esc(profs(c))}">${esc(profs(c))}</small></span><span class="sel-meta"><span class="cr">${esc(textoCreditos(c[8],c[7]))}</span>${typeof CUPOS!=='undefined'?CUPOS.insignia(c):''}${ayudaCreditos(c[8])}<button class="x" data-toggle="${esc(keyOf(c))}" aria-label="${esc(txH('quitar',{nombre:name(c)}))}">×</button></span></div>${window.SateCuposVista?.avisoCarga(c)||''}${window.SateCuposVista?.sugerencias(c)||''}</div>`).join('')+
+  const inscrito=window.SateHorarioInscrito?.()||false;
+  const cabeceraCupos=$('.planner .cupos-cabecera');if(cabeceraCupos)cabeceraCupos.hidden=inscrito;
+  const alertaCupos=$('#cupos-alerta');if(alertaCupos)alertaCupos.hidden=inscrito||!window.SateCuposVista?.riesgo||!sel.some(c=>window.SateCuposVista.riesgo(c));
+  $('#sel').innerHTML=sel.map(c=>`<div class="sel-item${!inscrito&&window.SateCuposVista?.riesgo(c)?' cupos-riesgo':''}"><div class="sel-row"><span class="sw" style="--h:${hue(c)}"></span><span class="grp">${esc(c[3])}</span><span class="sel-materia"><span class="sel-nombre">${esc(pretty(name(c)))}</span><small class="sel-prof" title="${esc(profs(c))}">${esc(profs(c))}</small></span><span class="sel-meta"><span class="cr">${esc(textoCreditos(c[8],c[7]))}</span>${!inscrito&&typeof CUPOS!=='undefined'?CUPOS.insignia(c):''}${ayudaCreditos(c[8])}<button class="x" data-toggle="${esc(keyOf(c))}" aria-label="${esc(txH('quitar',{nombre:name(c)}))}">×</button></span></div>${!inscrito?window.SateCuposVista?.avisoCarga(c)||'':''}${!inscrito?window.SateCuposVista?.sugerencias(c)||'':''}</div>`).join('')+
     own.map(o=>{const r=plan().own[o.i];return `<div class="sel-item"><div class="sel-row"><span class="sw own"></span><span class="grp">${esc(txH('extra'))}</span><span class="sel-materia"><span class="sel-nombre">${esc(o.n)}</span><small class="sel-prof">${r.d.map(d=>DAYS[d]).join(' ')} ${hm(r.a)}–${hm(r.b)}</small></span><span class="sel-meta"><button class="x" data-unown="${o.i}" aria-label="${esc(txH('quitar',{nombre:o.n}))}">×</button></span></div></div>`}).join('');
   montarAyudasCreditos();
   window.SateCuposVista?.pintar();

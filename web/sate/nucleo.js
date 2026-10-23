@@ -1194,7 +1194,7 @@ document.addEventListener('click',e=>{
   else if(d.newplan){const id=nextPlan();ws().plans[id]={sel:[],own:[]};ws().plan=id;S.hover=null;refresh()}
   else if(d.delplan){const id=d.delplan;if(t.dataset.confirm!=='1'){t.dataset.confirm='1';t.textContent='¿Eliminar?';t.classList.add('warn');setTimeout(()=>{if(t.isConnected){t.dataset.confirm='';t.textContent='×';t.classList.remove('warn')}},3000);return}
     delete ws().plans[id];ws().plan=planIds()[0];S.hover=null;refresh()}
-  else if('dup' in d){const id=nextPlan();ws().plans[id]=JSON.parse(JSON.stringify(plan()));ws().plan=id;refresh()}
+  else if('dup' in d){const id=nextPlan();ws().plans[id]=JSON.parse(JSON.stringify(plan()));delete ws().plans[id].inscrita;ws().plan=id;refresh()}
   else if(d.unown){eliminarPropia(+d.unown)}
   else if(d.oday){const i=+d.oday;S.ownDays=S.ownDays.includes(i)?S.ownDays.filter(x=>x!==i):[...S.ownDays,i];renderOwnForm()}
   else if(d.gt){S.gt=d.gt;renderHFilters()}
