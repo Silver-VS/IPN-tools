@@ -34,7 +34,7 @@ for (const ancho of [1300, 1024, 768, 375]) for (const tema of ['claro', 'oscuro
   }
   const caja=document.createElement('div'); caja.setAttribute('id','sate-guia'); document.body.appendChild(caja);
   await pestana.mostrar({partes:[]});
-  assert.ok(caja.querySelector('a[href="#/upiita/guia/actividades"]'), `${ancho}/${tema}: portada`);
+  assert.ok(caja.querySelector('a[href="#/upiita/guia/ruta/aprovecha"]'), `${ancho}/${tema}: actividades dentro de su ruta`);
   await pestana.mostrar({partes:['actividades']});
   const categorias=[...new Set(datos.actividades.elementos.map(a=>a.categoria))];
   assert.equal(caja.querySelectorAll('.guia-actividad-categoria').length,categorias.length,`${ancho}/${tema}: categorías`);

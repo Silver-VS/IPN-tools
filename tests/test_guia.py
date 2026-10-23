@@ -240,6 +240,7 @@ class TestCompilacion(unittest.TestCase):
         for u, guia in GUIAS.items():
             esperado = deepcopy(guia)
             esperado.pop('_fuente', None)
+            esperado['orientacion'] = json.loads((RAIZ / 'data/guia/rutas.json').read_text(encoding='utf-8'))
             capacidad = json.loads((RAIZ / 'data/sate.json').read_text(encoding='utf-8'))['unidades'][u].get('actividadesDatos')
             if capacidad:
                 esperado['actividades'] = json.loads((RAIZ / 'data/guia' / capacidad).read_text(encoding='utf-8'))

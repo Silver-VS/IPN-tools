@@ -1162,6 +1162,11 @@ def escribir_guia(datos):
         return
     leer = lambda ruta: json.loads(ruta.read_text(encoding='utf-8')) if ruta.exists() else {}
     guia = fusionar_guia(leer(compartida), leer(fuente))
+    guia['orientacion'] = leer(ROOT / 'data/guia/rutas.json')
+    asignadas = [p for r in guia['orientacion']['rutas'] for p in r['preguntas']]
+    for p in guia['preguntas']:
+        if asignadas.count(p['id']) != 1:
+            raise ValueError('Pregunta sin ruta única: ' + p['id'])
     capacidad = leer(ROOT / 'data/sate.json').get('unidades', {}).get(UNIDAD, {}).get('actividadesDatos')
     if capacidad:
         guia['actividades'] = json.loads((ROOT / 'data/guia' / capacidad).read_text(encoding='utf-8'))
