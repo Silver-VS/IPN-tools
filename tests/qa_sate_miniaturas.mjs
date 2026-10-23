@@ -24,6 +24,9 @@ for(const id of ['baja_temporal','baja_definitiva','electivas','dictamen'])for(c
 }
 for(const archivo of ['dictamen','bajas','tramites'])assert.doesNotMatch(leer('web/sate/'+archivo+'.js'),/tx\('fundamento'\)/,'Sin control Fundamento');
 const css=leer('web/sate/componentes.css');
+assert.match(src,/mini\.onclick=ampliarFormato/,'La miniatura usa la hoja común ampliada');
+assert.match(src,/ver=boton\(tx\('ver_formato'\),ampliarFormato\)/,'Vista previa usa la misma ampliación');
+assert.match(src,/function ampliarFormato\(\)\{\s*const hoja=miniatura\(def,m\.datos,false\)/);
 for(const clase of ['campo','firma','tabla']){
   const regla=css.match(new RegExp('\\.tramite-miniatura-'+clase+'\\{([^}]+)\\}'))[1];
   assert.doesNotMatch(regla,/position:absolute/,'Contenido en flujo: '+clase);

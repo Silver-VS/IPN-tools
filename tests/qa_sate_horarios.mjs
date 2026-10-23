@@ -134,7 +134,7 @@ for(const ancho of [1300,1024,768,375])for(const tema of ['claro','oscuro']){
   Elemento.prototype.close=function(){this.open=false};
   document.contains=n=>document.documentElement.contains(n);
   document.documentElement.clientWidth=ancho;document.documentElement.dataset.tema=tema;
-  document.body.innerHTML='<section id="v-hor"><button id="b-propuestas"></button><details id="gen"><div id="genres"></div></details><details id="ownform"></details><details id="mi-semana"></details></section>';
+  document.body.innerHTML='<section id="v-hor"><button id="b-propuestas"></button><details id="gen"><div class="genrow"><button id="b-gen"></button></div><p id="gen-status"></p><div id="genres"></div></details><details id="ownform"></details><details id="mi-semana"></details></section>';
   const espacio={plan:'A',plans:{A:{sel:[op.keyOf(grupo(420,510))],own:[]}}};
   const filas=[grupo(420,510),grupo(600,690),grupo(900,990)];
   filas.forEach((c,i)=>c[3]='G'+i);espacio.plans.A.sel=[op.keyOf(filas[0])];
@@ -147,6 +147,9 @@ for(const ancho of [1300,1024,768,375])for(const tema of ['claro','oscuro']){
   vm.runInContext(horarios.slice(horarios.indexOf('let ventanaPropuestas='),horarios.indexOf('/* ---------- generador de horarios ---------- */')),contexto);
   vm.runInContext('montarPropuestas();abrirPropuestas()',contexto);
   const dlg=document.querySelector('.sate-modal');assert.equal(dlg.open,true);
+  assert.ok(document.querySelector('.sate-segmentado'),'Control segmentado común');
+  assert.ok(document.querySelector('#d-opciones #b-gen'),'Generar queda dentro de las opciones plegables');
+  assert.ok(document.querySelector('.hor-propuestas-opciones #genres'),'Lista junto a las opciones, con semana independiente');
   const original=JSON.stringify(espacio);
   document.querySelector('[data-paso="1"]').click();
   assert.match(document.querySelector('#d-propuesta-n').textContent,/d_propuesta_numero/);

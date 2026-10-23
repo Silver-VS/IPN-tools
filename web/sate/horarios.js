@@ -23,7 +23,10 @@ function montarFiltrosD(){
   filtros.insertBefore($('#g-window'),$('#f-more'));
   const panel=document.createElement('dialog');panel.className='filtros-d-panel';panel.setAttribute('aria-label',txH('mas_filtros'));
   const cerrar=document.createElement('button');cerrar.type='button';cerrar.className='btn';cerrar.textContent=txH('d_cerrar');
-  panel.append(cerrar,mas);$('#v-hor').appendChild(panel);
+  const cab=document.createElement('header');cab.className='tramite-encabezado';
+  const titulo=document.createElement('h2');titulo.textContent=txH('d_filtros');
+  cerrar.textContent='×';cerrar.setAttribute('aria-label',txH('d_cerrar'));
+  cab.append(titulo,cerrar);panel.append(cab,mas);$('#v-hor').appendChild(panel);
   const resumen=document.createElement('p');resumen.id='d-panel-resumen';resumen.setAttribute('role','status');
   panel.insertBefore(resumen,mas);
   const grupo=(clave,elementos)=>{
@@ -46,7 +49,8 @@ function montarFiltrosD(){
   cerrar.addEventListener('click',()=>{panel.close();$('#f-more-title').focus()});
   panel.addEventListener('cancel',()=>$('#f-more-title').focus());
   const limpiar=document.createElement('button');limpiar.type='button';limpiar.className='link';limpiar.textContent=txH('d_limpiar');
-  panel.insertBefore(limpiar,mas);
+  const activos=document.createElement('div');activos.className='active';
+  panel.insertBefore(activos,mas);activos.append(resumen,limpiar);
   limpiar.addEventListener('click',()=>{
     Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],onlyWant:false,hideDone:false,soloCupo:false,fit:false,gap:null,gavoid:[]});
     store.set('excl',[]);
@@ -65,6 +69,7 @@ function montarFiltrosD(){
     $('#f-q').value=S.q;renderHFilters();renderGTime();renderOffer();
   };
   $('#d-activos').addEventListener('click',quitar);
+  resumen.addEventListener('click',quitar);
   const oferta=$('#offer');oferta.addEventListener('click',quitar);
   if(typeof renderGTime==='function')renderGTime();
 }
@@ -131,6 +136,7 @@ function renderFiltrosD(){
   $('#d-reglas').innerHTML+=generador.map(r=>`<li>${esc(r)}</li>`).join('');
   const claves=[...(S.onlyWant?['onlyWant']:[]),...(S.tur!=='*'?['tur']:[]),...(S.niv!=='*'?['niv']:[]),...(S.q.trim()?['q']:[]),...S.chips.map((_,i)=>'chip:'+i),...(S.soloCupo?['soloCupo']:[]),...(S.fit?['fit']:[]),...(S.hideDone&&isPersonal()?['hideDone']:[]),...(GT.a?['a']:[]),...(GT.b?['b']:[]),...S.gavoid.map((_,i)=>'prof:'+i),...Object.entries(ws().marks).filter(([,m])=>m.s==='no').map(([k])=>'no:'+k),...(S.gap?['gap']:[])];
   $('#d-activos').innerHTML=reglas.map((r,i)=>`<span class="chip">${esc(r)}<button type="button" data-d-quitar="${esc(claves[i])}" aria-label="${esc(txH('quitar_filtro',{nombre:r}))}">×</button></span>`).join('');
+  $('#d-panel-resumen').innerHTML=$('#d-activos').innerHTML||esc(txH('d_sin_filtros'));
 }
 if(typeof CUPOS!=='undefined')CUPOS.montar();
 $('#offer').addEventListener('click',e=>{
@@ -340,7 +346,7 @@ function montarPropuestas(){
 }
 function abrirPropuestas(){
   const cuerpo=document.createElement('div');cuerpo.className='hor-propuestas';
-  cuerpo.innerHTML=`<div class="seg" role="tablist"><button type="button" role="tab" id="d-tab-generar" aria-controls="gen" aria-selected="true">${esc(txH('d_generar'))}</button><button type="button" role="tab" id="d-tab-actividades" aria-controls="ownform" aria-selected="false">${esc(txH('d_actividades'))}</button></div>`;
+  cuerpo.innerHTML=`<div class="sate-segmentado" role="tablist"><button type="button" role="tab" id="d-tab-generar" aria-controls="gen" aria-selected="true">${esc(txH('d_generar'))}</button><button type="button" role="tab" id="d-tab-actividades" aria-controls="ownform" aria-selected="false">${esc(txH('d_actividades'))}</button></div>`;
   // El cuerpo debe estar conectado antes de mover controles consultados por id.
   ventanaPropuestas=SateUI.modal(txH('d_propuestas'),cuerpo,{amplio:true,alCerrar:()=>{
     cancelarGeneracion();$('#d-propuestas-deposito').append($('#gen'),$('#ownform'),$('#mi-semana'));ventanaPropuestas.elemento.classList.remove('hor-propuestas-modal');ventanaPropuestas=null;renderCal();
@@ -352,7 +358,13 @@ function abrirPropuestas(){
     const rejilla=document.createElement('div');rejilla.className='hor-propuestas-rejilla';
     const previa=document.createElement('section');previa.className='hor-propuesta-previa';
     previa.innerHTML=`<div class="actions"><button type="button" class="btn" data-paso="-1" aria-label="${esc(txH('d_anterior'))}">←</button><strong id="d-propuesta-n" role="status"></strong><button type="button" class="btn" data-paso="1" aria-label="${esc(txH('d_siguiente'))}">→</button><button type="button" class="btn" id="d-comparar" aria-pressed="false">${esc(txH('d_comparar'))}</button></div><p id="d-diferencias" role="status"></p><div class="calwrap"><div class="cal" id="d-preview"></div></div><div class="actions"><button type="button" class="btn primary" id="d-usar">${esc(txH('d_usar'))}</button><button type="button" class="btn" id="d-usar-nueva">${esc(txH('d_nueva'))}</button></div>`;
-    rejilla.append($('#genres'),previa);$('#gen').appendChild(rejilla);
+    const lateral=document.createElement('aside');lateral.className='hor-propuestas-opciones';
+    const opciones=document.createElement('details');opciones.id='d-opciones';opciones.open=true;
+    const resumen=document.createElement('summary');resumen.id='d-opciones-resumen';resumen.textContent=txH('d_editar_opciones');opciones.appendChild(resumen);
+    const generar=$('#b-gen'),estado=$('#gen-status'),lista=$('#genres');
+    for(const n of [...$('#gen').children])if(!n.matches('summary,#genres,#gen-status'))opciones.appendChild(n);
+    opciones.appendChild(generar);lateral.append(opciones,estado,lista);
+    rejilla.append(lateral,previa);$('#gen').appendChild(rejilla);
   }
   const tab=actividad=>{
     $('#gen').hidden=actividad;$('#ownform').hidden=!actividad;$('#mi-semana').hidden=!actividad||!SEMANA_ACTIVA;
@@ -822,22 +834,27 @@ function* generateBank(subj,N,{marks,pscore,oq,run}){
 }
 function renderGen(){
   const g=S.gen;
+  if($('#d-opciones')&&g?.top?.length){
+    $('#d-opciones').open=false;
+    $('#d-opciones-resumen').textContent=txH('d_opciones_resumen',{n:g.top[0].cs.length,dias:GT.days?txH('cantidad_dias',{n:GT.days}):txH('d_dias_sin_limite')});
+  }
   if(typeof ventanaPropuestas!=='undefined'&&ventanaPropuestas)renderPropuesta();
   $('#b-gen-clear').hidden=!g?.top?.length;
   if(!g){$('#genres').innerHTML='';return}
   if(g.msg){$('#genres').innerHTML=`<p class="empty">${esc(g.msg)}</p>`;return}
   const dmsg=g.bank?.auto?`<p class="gdays-msg">${txH('generador_auto',{n:g.bank.M,meta:fmtCr(g.bank.meta),tope:g.bank.tope!=null?txH('generador_tope',{n:fmtCr(g.bank.tope)}):''})}</p>${g.bank.relajado?`<p class="gdays-msg warn">${esc(txH('generador_relajado'))}</p>`:''}${g.top.length&&g.bank.best<g.bank.meta-4.5?`<p class="gdays-msg warn">${txH('generador_carga_menor',{n:fmtCr(g.bank.best)})}</p>`:''}`:g.bank?`<p class="gdays-msg">${txH('generador_numero',{n:g.bank.N,total:g.bank.M,tope:g.bank.tope!=null?txH('generador_carga_tope',{n:fmtCr(g.bank.tope)}):''})}</p>`:g.minDays!=null?`<p class="gdays-msg${g.maxD&&g.minDays>g.maxD?' warn':''}">${txH('generador_dias',{n:g.minDays})}${g.maxD&&g.minDays>g.maxD?' '+esc(txH('generador_dias_imposible',{n:g.maxD})):g.maxD?' '+esc(txH('generador_dias_posible',{n:g.maxD})):''}</p>`:'';
   const oex=g.optExceso?Object.entries(g.optExceso).map(([v,x])=>x.libre<=0?txH('optativas_cubiertas',{n:x.total,nivel:v}):txH('optativas_libres',{n:x.libre,nivel:v,elegidas:x.n})):[];
-  const oexMsg=oex.length?`<p class="gdays-msg warn">${esc(txH('optativas_aviso',{detalle:oex.join('; ')}))}</p>`:'';
   const none=g.subj.filter(s=>!s.opts.length).map(s=>s.k), mustNone=g.subj.filter(s=>s.must&&!s.opts.length).map(s=>s.k);
   const must=g.subj.filter(s=>s.must&&s.opts.length).map(s=>s.k);
   const omsg=(mustNone.length?`<p class="gdays-msg warn">${txH('obligatoria_sin_grupos',{nombre:mustNone.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'')+
     (must.length?`<p class="gdays-msg">${txH('obligatoria_incluida',{nombre:must.map(k=>esc(pretty(cur()[k][0]))).join(', ')})}</p>`:'');
-  if(!g.top.length){$('#genres').innerHTML=dmsg+omsg+oexMsg+`<p class="empty">${esc(txH(g.trunc?'generador_limite':'generador_sin_resultados'))}</p>`;return}
-  $('#genres').innerHTML=dmsg+omsg+oexMsg+
+  const avisos=dmsg||omsg||oex.length?`<details class="sate-aviso"><summary>${esc(txH(oex.length?'d_optativas_aviso':'d_generacion_aviso'))}</summary>${dmsg}${omsg}${oex.length?`<p>${esc(txH('optativas_aviso',{detalle:oex.join('; ')}))}</p>`:''}</details>`:'';
+  if(!g.top.length){$('#genres').innerHTML=avisos+`<p class="empty">${esc(txH(g.trunc?'generador_limite':'generador_sin_resultados'))}</p>`;return}
+  $('#genres').innerHTML=avisos+
     (none.length?`<small class="warn">${esc(txH('sin_grupos',{nombre:none.map(k=>cur()[k]?.[0]||k).join(', ')}))}</small>`:'')+
     g.top.map((r,i)=>{const cr=r.cs.reduce((s,c)=>s+c[7],0);
-      return `<div class="gen"><div><b>${esc(txH('opcion',{n:i+1}))}</b> · ${esc(txH('cantidad_materias',{n:r.cs.length}))} · ${fmtCr(cr)} créditos · ${esc(txH('cantidad_dias',{n:r.days.length}))}: ${r.days.map(d=>DAYS[d]).join(' ')}${r.q?' · '+esc(txH('jornada_comida',{n:(r.q.span/60).toFixed(1).replace('.0','')})):''}${r.miss.length?` · <span class="warn">${esc(txH('sin_materias',{n:r.miss.length,nombre:r.miss.map(k=>pretty(cur()[k]?.[0]||k)).join(', ')}))}</span>`:''}<div class="ls">${r.cs.map(c=>`<span class="grp">${c[3]}</span> ${esc(pretty(name(c)))}`).join(' · ')}</div></div>
+      const huecos=r.days.some(d=>{const bloques=r.cs.flatMap(c=>c[6].filter(b=>b[0]===d)).sort((a,b)=>a[1]-b[1]);return bloques.some((b,j)=>j>0&&b[1]>Math.max(...bloques.slice(0,j).map(x=>x[2])))});
+      return `<div class="gen"><div><button type="button" class="link" data-propuesta="${i}">${esc(txH('d_opcion_fila',{n:i+1,cr:fmtCr(cr),dias:r.days.length,huecos:huecos?txH('d_con_huecos'):txH('d_sin_huecos')}))}</button><details><summary>${esc(txH('cantidad_materias',{n:r.cs.length}))}</summary><ul>${r.cs.map(c=>`<li><span class="grp">${esc(c[3])}</span> ${esc(pretty(name(c)))}</li>`).join('')}</ul>${r.miss.length?`<p class="warn">${esc(txH('sin_materias',{n:r.miss.length,nombre:r.miss.map(k=>pretty(cur()[k]?.[0]||k)).join(', ')}))}</p>`:''}</details></div>
         <div class="acts"><button class="btn" data-useg="${i}" data-to="${ws().plan}">${esc(txH('usar',{version:ws().plan}))}</button><button class="btn" data-useg="${i}" data-to="+">${esc(txH('usar_nuevo'))}</button><button class="btn" data-propuesta="${i}">${esc(txH('ver'))}</button></div></div>`}).join('')+
     (g.trunc?`<small>${esc(txH(g.bank?'busqueda_prioridad':'busqueda_limitada'))}</small>`:'');
 }

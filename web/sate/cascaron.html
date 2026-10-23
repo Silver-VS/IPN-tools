@@ -554,13 +554,13 @@ details.box2>summary{cursor:pointer;font-weight:600;font-size:var(--ipn-tamano-s
 .hor-propuestas{min-width:0}
 .hor-propuestas>[role=tablist]{display:flex;flex-wrap:wrap}
 .hor-propuestas [role=tab]{flex:1;white-space:normal}
-.hor-propuestas [role=tab][aria-selected=true]{background:var(--ipn-acento);color:var(--ipn-sobre-acento)}
+
 .hor-propuestas .seg{flex-wrap:wrap;max-width:100%}
 .hor-propuestas [hidden]{display:none!important}
 .hor-propuestas>#gen,.hor-propuestas>#ownform{border:0;padding:0;margin-top:var(--ipn-esp-5)}
 .hor-propuestas>#gen>summary,.hor-propuestas>#ownform>summary{display:none}
 .hor-propuestas-rejilla{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--ipn-esp-5);align-items:start}
-.hor-propuestas .genres{min-width:0;max-height:60dvh;overflow:auto}
+.hor-propuestas .genres{min-width:0;max-height:none;overflow:visible}
 .hor-propuestas .gen{flex-direction:column;align-items:start}
 .hor-propuestas .gen:has([data-propuesta][aria-pressed=true]){border-color:var(--ipn-acento);background:var(--ipn-acento-suave)}
 .hor-propuestas .gen .acts [data-useg]{display:none}
@@ -576,7 +576,7 @@ details.box2>summary{cursor:pointer;font-weight:600;font-size:var(--ipn-tamano-s
 .filtros-d-panel select{max-width:100%}
 .d-cupo{display:grid;gap:var(--ipn-esp-1)}
 #v-hor .filtros-d-impacto{height:auto;overflow:visible;position:static}
-@media(max-width:639px){.hor-propuestas-rejilla{grid-template-columns:minmax(0,1fr)}.hor-propuestas .genres{display:flex;flex-direction:row;overflow-x:auto}.hor-propuestas .gen{min-width:70%}}
+@media(max-width:767px){.hor-propuestas-rejilla{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:1024px){.planner{position:static;max-height:none;overflow:visible;padding-right:0;order:-1}}
 .horario-flotante{display:none}
 .horario-compacto{width:calc(100% - 24px);max-width:680px;max-height:85dvh;box-sizing:border-box;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);overflow:auto}
