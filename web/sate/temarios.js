@@ -29,7 +29,7 @@
     }
     if (horas.totales_semestre != null) dato('horas_semestre', num(horas.totales_semestre));
     dato('vigencia', reg.vigencia);
-    dato('academia', String(reg.academia || '').replace(/^\s*del?\s+(la\s+)?/i, ''));
+    dato('academia', reg.academia);
     const secciones = [];
     const texto = (id, valor) => { if (!vacio(valor)) secciones.push({ id, titulo: st(id), tipo: 'texto', contenido: String(valor).trim() }); };
     texto('objetivo', reg.objetivo);
@@ -50,7 +50,8 @@
     return {
       titulo: reg.nombre,
       subtitulo: t('temarios.documento.subtitulo', { clave: claveNorm(reg.clave), carrera: ctx.carrera || '' }),
-      metadatos: meta, secciones, avisos,
+      metadatos: meta, secciones: secciones.map(s => ({ ...s, oficial: reg.pdf || reg.archivo || ('programa:' + reg.clave) })), avisos,
+      oficial: reg.pdf || reg.archivo || ('programa:' + reg.clave),
       fuente: { texto: t('temarios.documento.fuente', { plan: anio(ctx.plan || reg.plan) }) }
     };
   }
@@ -103,11 +104,7 @@
       /^https?:\/\/[^\s/]+(?:\/[^\s]*)?$/i.test(r.url) && (r.unidades === undefined || Array.isArray(r.unidades) && r.unidades.every(n => Number.isInteger(n) && n > 0))));
   }
   function tituloTema(s, siglas = raiz.SATE_CONFIG?.siglasTemarios || []) {
-    const n = String(s || '').trim().replace(/[.\s]+$/, '');
-    if (n !== n.toLocaleUpperCase('es')) return n;
-    const conocidas = new Set(siglas);
-    const oracion = n.toLocaleLowerCase('es').replace(/\p{L}+/gu, p => conocidas.has(p.toUpperCase()) ? p.toUpperCase() : p);
-    return oracion.charAt(0).toUpperCase() + oracion.slice(1);
+    return String(s || '');
   }
   // Requisitos directos (r) y materias que desbloquea una materia del índice, ordenados por nivel y nombre.
   function relaciones(materias, clave) {
@@ -134,7 +131,7 @@
 
   /* ===================== B. Integración con SATE ===================== */
   const t = (c, v) => SATE.texto(c, v);
-  const E = { indice: null, pIndice: null, carreras: {}, pCarreras: {}, recursos: {}, panel: null, token: 0, origen: null, origenClave: null };
+  const E = { indice: null, pIndice: null, carreras: {}, pCarreras: {}, recursos: {}, nombres: new Map(), panel: null, token: 0, origen: null, origenClave: null };
   const BASE = (document.currentScript && document.currentScript.src || '').replace(/[^\/]*$/, '');
   const unidad = () => raiz.SATE_UNIDAD;
   const ir = (carrera, clave, seccion) => enlace(unidad(), carrera, clave, seccion);
@@ -148,6 +145,8 @@
       if (k === 'texto') n.textContent = v; else n.setAttribute(k, v === true ? '' : v);
     }
     for (const x of hijos || []) if (x) n.appendChild(typeof x === 'string' ? document.createTextNode(x) : x);
+    const origen = typeof atributos?.texto === 'string' && E.nombres.get(atributos.texto);
+    if (origen) SateUI.oficial(n, origen);
     return n;
   }
   function cargarCss() {
@@ -166,7 +165,7 @@
     return r.json();
   });
   function preparar() {
-    return E.pIndice ||= traer('indice').then(d => { E.indice = d; return d; }).catch(e => { E.pIndice = null; throw e; });
+    return E.pIndice ||= traer('indice').then(d => { E.indice = d; for (const [clave, m] of Object.entries(d.materias)) E.nombres.set(m.n, 'plan:' + m.c + '/' + clave); return d; }).catch(e => { E.pIndice = null; throw e; });
   }
   function carreraDatos(id) {
     return E.pCarreras[id] ||= traer(id).then(d => {
@@ -222,6 +221,8 @@
   function construirFicha(r, recursos, op) {
     op = op || {};
     const m = r.registro, alIr = op.alIr, vistazo = op.modo === 'vistazo', dialogo = !!op.dialogo;   // dialogo: el título lo pone la ventana
+    const origen = m.pdf || m.archivo || ('programa:' + m.clave);
+    const oficial = n => SateUI.oficial(n, origen);
     const dato = (valor, etiqueta) => h('div', {}, [h('strong', { texto: valor }), h('small', { texto: t('sate.guia.' + etiqueta) })]);
     const horas = m.horas || {}, cr = m.creditos || {};
     const rel = relaciones(E.indice.materias, m.clave);
@@ -234,7 +235,7 @@
     const notas = [m.descripcion && m.descripcion_revisada === false ? t('sate.guia.descripcion_pendiente') : null, t('sate.guia.nota')].filter(Boolean);
     const cifras = h('div', { 'class': 'tmr-cifras' }, [cr.tepic != null || cr.satca != null ? dato(num(cr.tepic ?? cr.satca), 'creditos') : null, horas.teoria_semana != null || horas.practica_semana != null ? dato(num((horas.teoria_semana || 0) + (horas.practica_semana || 0)), 'horas') : null, m.tipo ? dato(t('temarios.tipo.' + m.tipo), 'tipo') : null]);
     const enc = h('header', { 'class': 'tmr-ficha-enc' }, [
-      dialogo ? null : h('h2', { texto: m.nombre, tabindex: '-1' }),
+      dialogo ? null : oficial(h('h2', { texto: m.nombre, tabindex: '-1' })),
       h('p', { 'class': 'tmr-meta', texto: [m.clave, E.indice.carreras[r.carreraId]?.nombre, m.nivel != null ? t('temarios.lista.nivel', { n: m.nivel }) : null].filter(Boolean).join(' · ') }),
       m.descripcion ? h('p', { 'class': 'tmr-descripcion', texto: m.descripcion }) : null,
       h('div', { 'class': 'tmr-acciones' }, vistazo ? [completa, pdf] : [pdf, cambiar])]);
@@ -244,13 +245,13 @@
     if (vistazo) {
       cuerpo = [enc, cifras, relaciones_, h('footer', { 'class': 'tmr-bloque' }, notas.map(n => h('p', { 'class': 'tmr-nota', texto: n })))];
     } else {
-      const texto = (id, titulo, valor) => { const ps = parrafos(valor); return ps.length ? h('section', { 'class': 'tmr-bloque', id: 'ficha-' + id }, [h('h3', { texto: titulo }), ...ps.map(x => h('p', { texto: x }))]) : null; };
+      const texto = (id, titulo, valor) => { const ps = parrafos(valor); return ps.length ? h('section', { 'class': 'tmr-bloque', id: 'ficha-' + id }, [h('h3', { texto: titulo }), ...ps.map(x => oficial(h('p', { texto: x })))]) : null; };
       const unidades = (m.contenidos || []).length ? h('section', { 'class': 'tmr-bloque', id: 'ficha-contenidos' }, [h('h3', { texto: t('sate.guia.veras') }),
-        h('ol', { 'class': 'tmr-pasos' }, m.contenidos.map((u, i) => h('li', {}, [h('span', { 'class': 'tmr-paso', texto: String(i + 1) }), h('div', {}, [h('h4', { texto: tituloTema(u.titulo) }), ...(u.subtemas || []).map(x => h('p', { texto: tituloTema(x) }))])])))]) : null;
+        oficial(h('ol', { 'class': 'tmr-pasos' }, m.contenidos.map((u, i) => h('li', {}, [h('span', { 'class': 'tmr-paso', texto: String(i + 1) }), h('div', {}, [h('h4', { texto: tituloTema(u.titulo) }), ...(u.subtemas || []).map(x => h('p', { texto: tituloTema(x) }))])]))))]) : null;
       const rec = recursos.length ? h('section', { 'class': 'tmr-bloque', id: 'ficha-recursos' }, [h('h3', { texto: t('sate.guia.recursos') }), ...recursos.map(x => enlaceExterno('tmr-recurso', x.url, [h('small', { texto: [x.fuente, x.idioma, x.tipo].join(' · ') }), h('span', { texto: x.titulo + ' ↗' })]))]) : null;
       const biblio = h('section', { 'class': 'tmr-bloque', id: 'ficha-bibliografia' }, [
         (m.bibliografia || []).length ? h('h3', { texto: t('sate.guia.bibliografia') }) : h('h3', { texto: t('temarios.ficha.bibliotecas_titulo') }),
-        (m.bibliografia || []).length ? h('ul', { 'class': 'tmr-biblio' }, m.bibliografia.map(b => SateBibliotecas.referencia(String(b.texto || '').trim()))) : null,
+        (m.bibliografia || []).length ? h('ul', { 'class': 'tmr-biblio' }, m.bibliografia.map(b => { const n = SateBibliotecas.referencia(String(b.texto || '').trim()); oficial(n.querySelector('span')); return n; })) : null,
         raiz.SateBibliotecas && raiz.SateBibliotecas.panel ? raiz.SateBibliotecas.panel({ termino: m.nombre, titulo: t('temarios.ficha.bibliotecas_titulo') }) : null]);
       const objetivo = texto('objetivo', t('temarios.seccion.objetivo'), m.objetivo);
       const secciones = [['contenidos', t('sate.guia.veras'), unidades],
@@ -267,10 +268,10 @@
       ]);
       const acreditacion = h('section', { 'class': 'tmr-lateral-bloque', id: 'ficha-evaluacion' }, [
         h('h3', { texto: t('temarios.ficha.acreditacion') }),
-        ...parrafos(m.evaluacion).map(x => h('p', { texto: x })),
+        ...parrafos(m.evaluacion).map(x => oficial(h('p', { texto: x }))),
         h('p', { 'class': 'tmr-nota', texto: t('temarios.ficha.ponderacion') })
       ]);
-      const oficial = h('section', { 'class': 'tmr-bloque', id: 'ficha-pdf' }, [h('h3', { texto: t('sate.guia.pdf') }), pdf]);
+      const enlacePdf = h('section', { 'class': 'tmr-bloque', id: 'ficha-pdf' }, [h('h3', { texto: t('sate.guia.pdf') }), pdf]);
       const bloques = [objetivo, ...secciones.filter(x => x[0] !== 'bibliografia').map(x => x[2]), acreditacion, biblio].filter(Boolean);
       const nav = h('nav', { 'class': 'rgl-arbol tmr-indice', 'aria-label': t('temarios.ficha.indice') });
       const detalle = h('details', { 'class': 'rgl-indice', open: !raiz.matchMedia?.('(max-width:768.98px)').matches }, [h('summary', { 'class': 'rgl-resumen', texto: t('temarios.ficha.indice') }), h('div', { 'class': 'rgl-indice__cuerpo' }, [nav])]);
@@ -308,7 +309,7 @@
       };
       raiz.addEventListener('resize', ajustar);
       if (raiz.requestAnimationFrame) raiz.requestAnimationFrame(ajustar);
-      cuerpo = [enc, SateUI.lector(detalle, lienzo, h('aside', { 'class': 'rgl-riel tmr-lateral-datos' }, [trayectoria, cifras, oficial, cambiar]))];
+      cuerpo = [enc, SateUI.lector(detalle, lienzo, h('aside', { 'class': 'rgl-riel tmr-lateral-datos' }, [trayectoria, cifras, enlacePdf, cambiar]))];
     }
     const ficha = h('div', { 'class': 'tmr-ficha' + (vistazo ? ' tmr-ficha--vistazo' : '') }, cuerpo.filter(Boolean));
     if (ficha.style && ficha.style.setProperty) ficha.style.setProperty('--tmr-area', m.area?.color || 'var(--ipn-acento)');

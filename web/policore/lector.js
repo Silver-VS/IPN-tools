@@ -104,6 +104,8 @@
     } else {
       parrafos(c).forEach(function (p) { caja.appendChild(p); });
     }
+    // La sección mezcla rótulos propios con transcripciones: marcar solo estas últimas.
+    if (s.oficial) for (const n of caja.querySelectorAll('.pc-oficial')) n.setAttribute('data-oficial', s.oficial);
     return caja;
   }
   function seccionesDe(doc) {
@@ -128,6 +130,7 @@
     /* encabezado */
     var enc = el('header', { 'class': 'pc-enc' });
     var titulo = el('h' + nivel, { 'class': 'pc-titulo', id: uid + '-titulo', tabindex: '-1', texto: doc.titulo || '' });
+    if (doc.oficial) titulo.setAttribute('data-oficial', doc.oficial);
     enc.appendChild(titulo);
     if (doc.subtitulo) enc.appendChild(el('p', { 'class': 'pc-sub', texto: doc.subtitulo }));
     var meta = (doc.metadatos || []).filter(function (m) { return m && m.valor != null && String(m.valor) !== ''; });
@@ -277,6 +280,8 @@
           rangos.forEach(function (rg) {
             if (rg[0] > pos) frag.appendChild(document.createTextNode(s.slice(pos, rg[0])));
             var m = el('mark', { 'class': 'pc-resalte', texto: s.slice(rg[0], rg[1]) });
+            var origen = nodo.parentNode.closest && nodo.parentNode.closest('[data-oficial]');
+            if (origen) m.setAttribute('data-oficial', origen.getAttribute('data-oficial'));
             frag.appendChild(m); marcas.push(m); pos = rg[1];
             if (sec) { var k = sec.getAttribute('data-pc-seccion'); conteo[k] = (conteo[k] || 0) + 1; }
           });

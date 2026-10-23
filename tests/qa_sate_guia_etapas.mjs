@@ -89,6 +89,13 @@ for (const nombre of nombres) {
   assert.ok(ficha.textContent.includes('sate.guia.r10.orientacion_propia'),nombre+' etiqueta propia');
   assert.equal(ficha.querySelectorAll('.guia-funciones.pc-oficial li').length,a.funciones.length,nombre+' texto oficial diferenciado');
   if(a.objetivo) assert.ok(ficha.textContent.includes(a.objetivo.texto),nombre+' objetivo literal');
+  for (const lector of ficha.querySelectorAll('.pc-lector.pc-oficial')) {
+    assert.ok(lector.getAttribute('data-oficial'), nombre+' lector con procedencia');
+    for (const n of lector.querySelectorAll('*')) assert.equal(n.getAttribute('data-oficial'), lector.getAttribute('data-oficial'));
+  }
+  const orientacion = ficha.querySelector('dl dd p');
+  assert.equal(orientacion.getAttribute('data-oficial'), null, nombre+' orientación propia sin marca');
+  for (const n of ficha.querySelectorAll('.guia-procedimientos strong')) assert.equal(n.getAttribute('data-oficial'), 'mp_upiita');
 }
 for (const a of datos.acudir.filter(a=>a.ambito==='ipn')) assert.ok(caja.querySelector('.guia-arbol [data-instancia="'+a.id+'"]'),a.id);
 caja.querySelector('.guia-arbol [data-instancia="gestion_escolar"]').click();

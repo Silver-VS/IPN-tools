@@ -158,6 +158,11 @@ assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'));
 await pestana.mostrar({partes:['reglamentos','rge','art-1']});
 assert.notEqual(caja.querySelector('.rgl-riel').hidden,true,'la rejilla se conserva al cambiar a un artículo sin citas (sin saltos)');
 assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'),'sin cambio de columnas');
+for (const lector of caja.querySelectorAll('.rgl-cuerpo')) {
+  assert.equal(lector.getAttribute('data-oficial'), 'rge');
+  for (const n of lector.querySelectorAll('*')) assert.equal(n.getAttribute('data-oficial'), 'rge', 'R14: cada elemento documental conserva el origen');
+}
+assert.equal(caja.querySelector('.rgl-riel').getAttribute('data-oficial'), null, 'orientación fuera del texto literal');
 pestana.ocultar();
 assert.equal(eventos.has('scroll'),false,'se retira el seguimiento al salir');
 assert.equal(eventos.has('resize'),false,'se retira el ajuste al salir');

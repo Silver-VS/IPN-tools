@@ -46,6 +46,13 @@ def cargar(ruta):
         if clave in mapa:
             errores.append(f"{ruta.name}: clave duplicada {clave}")
         mapa[clave] = valor
+    # Las denominaciones documentales conservan sus claves públicas, pero viven en datos.
+    if ruta.resolve() == (TEXTOS / 'es.toml').resolve():
+        oficiales = json.loads((ROOT / 'data/denominaciones_oficiales.json').read_text(encoding='utf-8'))
+        for clave, valor in oficiales.items():
+            if clave in mapa:
+                errores.append(f'{ruta.name}: texto oficial duplicado en TOML: {clave}')
+            mapa[clave] = valor
     return version, mapa, errores
 
 
