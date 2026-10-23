@@ -1644,7 +1644,7 @@ corto = "Guía"
 
 [sate.guia]
 actividades = "Por ser alumno"
-actividades_descripcion = "Estudia idiomas, practica deporte y consulta las actividades culturales y los servicios del IPN."
+actividades_descripcion = "Lo que puedes usar, cursar o visitar como alumno del IPN."
 actividades_detalle = "Idiomas, deporte, cultura y servicios"
 actividades_filtrar = "Filtrar por categoría"
 actividades_todas = "Todas"
