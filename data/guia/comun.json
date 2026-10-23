@@ -529,7 +529,8 @@
      "76",
      "77"
     ]
-   }
+   },
+   "depende": "consejo-general"
   },
   {
    "id": "des_procesos",
@@ -538,7 +539,8 @@
    "fuente": {
     "doc": "mo_des",
     "pagina": 35
-   }
+   },
+   "depende": "direccion-superior"
   },
   {
    "id": "dae",
@@ -627,7 +629,8 @@
     "resolución",
     "me dieron de baja",
     "no me deja reinscribir"
-   ]
+   ],
+   "etapa": "4"
   },
   {
    "id": "quien-dictamina",
@@ -664,7 +667,8 @@
     "tiempo de respuesta",
     "quién decide"
    ],
-   "ventanilla": "dictamen"
+   "ventanilla": "dictamen",
+   "etapa": "4"
   },
   {
    "id": "despues-de-ets",
@@ -707,7 +711,8 @@
     "kárdex",
     "ya pasé la materia",
     "extra"
-   ]
+   ],
+   "etapa": "2"
   },
   {
    "id": "oportunidades-reprobar",
@@ -744,7 +749,8 @@
     "modalidad",
     "baja",
     "extra"
-   ]
+   ],
+   "etapa": "3"
   },
   {
    "id": "tiempo-maximo",
@@ -780,7 +786,8 @@
     "semestres",
     "cuánto puedo tardar"
    ],
-   "ventanilla": "dictamen"
+   "ventanilla": "dictamen",
+   "etapa": "4"
   },
   {
    "id": "no-me-reinscribi",
@@ -815,7 +822,8 @@
     "me pasé de fecha",
     "dejé de ir"
    ],
-   "ventanilla": "baja_temporal"
+   "ventanilla": "baja_temporal",
+   "etapa": "5"
   },
   {
    "id": "carga-creditos",
@@ -851,7 +859,8 @@
     "irregular",
     "reinscripción",
     "cuántas materias puedo llevar"
-   ]
+   ],
+   "etapa": "1"
   },
   {
    "id": "plan-desfasado",
@@ -889,7 +898,8 @@
     "plan viejo",
     "plan nuevo",
     "rediseño"
-   ]
+   ],
+   "etapa": "6"
   },
   {
    "id": "que-es-irregular",
@@ -931,7 +941,8 @@
     "reprobadas",
     "situación escolar",
     "atrasado"
-   ]
+   ],
+   "etapa": "3"
   },
   {
    "id": "veces-cursar-materia",
@@ -973,7 +984,8 @@
     "segunda vez",
     "última oportunidad",
     "reprobar dos veces"
-   ]
+   ],
+   "etapa": "3"
   },
   {
    "id": "reglas-reinscripcion",
@@ -1007,7 +1019,8 @@
     "reinscribirme",
     "ordinaria",
     "inscripción"
-   ]
+   ],
+   "etapa": "1"
   },
   {
    "id": "carga-minima-media-maxima",
@@ -1041,7 +1054,8 @@
     "máxima",
     "cuántas materias",
     "carga académica"
-   ]
+   ],
+   "etapa": "1"
   },
   {
    "id": "derechos-obligaciones",
@@ -1074,7 +1088,8 @@
     "reglamento interno",
     "petición",
     "credencial"
-   ]
+   ],
+   "etapa": "1"
   },
   {
    "id": "faltas-sanciones",
@@ -1112,7 +1127,8 @@
     "comisión de honor",
     "copiar",
     "expulsión"
-   ]
+   ],
+   "etapa": "1"
   },
   {
    "id": "cuando-causo-baja",
@@ -1144,7 +1160,8 @@
     "perder la calidad de alumno",
     "expulsión",
     "permanencia"
-   ]
+   ],
+   "etapa": "5"
   },
   {
    "id": "como-se-acredita",
@@ -1184,7 +1201,8 @@
     "ordinario",
     "mejorar calificación",
     "6"
-   ]
+   ],
+   "etapa": "2"
   },
   {
    "id": "formato-dictamen",
@@ -1218,7 +1236,8 @@
     "anexos",
     "presentar",
     "entregar"
-   ]
+   ],
+   "etapa": "4"
   },
   {
    "id": "baja-materia",
@@ -1250,7 +1269,8 @@
     "carga mínima",
     "tres semanas",
     "quitar materia"
-   ]
+   ],
+   "etapa": "5"
   },
   {
    "id": "baja-temporal",
@@ -1284,7 +1304,8 @@
     "dos periodos",
     "congelar semestre",
     "darme de baja"
-   ]
+   ],
+   "etapa": "5"
   },
   {
    "id": "baja-definitiva",
@@ -1315,7 +1336,8 @@
     "renuncia",
     "baja del programa",
     "abandonar la carrera"
-   ]
+   ],
+   "etapa": "5"
   },
   {
    "id": "que-son-ets",
@@ -1350,7 +1372,8 @@
     "acreditar",
     "calendario",
     "extra"
-   ]
+   ],
+   "etapa": "2"
   },
   {
    "id": "saberes-previos",
@@ -1381,7 +1404,8 @@
     "acreditar sin cursar",
     "examen de saberes",
     "validar materia"
-   ]
+   ],
+   "etapa": "2"
   },
   {
    "id": "justificar-examen",
@@ -1413,7 +1437,8 @@
     "afirmativa ficta",
     "falta",
     "no pude presentar"
-   ]
+   ],
+   "etapa": "2"
   },
   {
    "id": "revision-calificacion",
@@ -1446,7 +1471,8 @@
     "injusta",
     "me reprobó",
     "revisar examen"
-   ]
+   ],
+   "etapa": "2"
   },
   {
    "id": "inconformidad-recurso",
@@ -1483,7 +1509,8 @@
     "impugnar",
     "no estoy de acuerdo",
     "queja"
-   ]
+   ],
+   "etapa": "4"
   },
   {
    "id": "cambio-carrera",
@@ -1522,7 +1549,8 @@
     "DAE",
     "otro programa",
     "me equivoqué de carrera"
-   ]
+   ],
+   "etapa": "6"
   },
   {
    "id": "carrera-simultanea",
@@ -1554,7 +1582,8 @@
     "carrera simultánea",
     "promedio 8",
     "dos carreras"
-   ]
+   ],
+   "etapa": "6"
   },
   {
    "id": "servicio-social",
@@ -1592,7 +1621,8 @@
     "70 por ciento",
     "liberación",
     "constancia de servicio"
-   ]
+   ],
+   "etapa": "7"
   },
   {
    "id": "titulacion",
@@ -1632,7 +1662,64 @@
     "CENEVAL",
     "seminario",
     "examen profesional"
-   ]
+   ],
+   "etapa": "7"
+  }
+ ],
+ "etapas": [
+  {
+   "id": "1",
+   "titulo": "sate.guia.r10.etapa_1"
+  },
+  {
+   "id": "2",
+   "titulo": "sate.guia.r10.etapa_2"
+  },
+  {
+   "id": "3",
+   "titulo": "sate.guia.r10.etapa_3"
+  },
+  {
+   "id": "4",
+   "titulo": "sate.guia.r10.etapa_4"
+  },
+  {
+   "id": "5",
+   "titulo": "sate.guia.r10.etapa_5"
+  },
+  {
+   "id": "6",
+   "titulo": "sate.guia.r10.etapa_6"
+  },
+  {
+   "id": "7",
+   "titulo": "sate.guia.r10.etapa_7"
+  }
+ ],
+ "estructuraCentral": [
+  {
+   "id": "denuncias",
+   "nombreClave": "sate.guia.r10.denuncias",
+   "paraClave": "sate.guia.r10.denuncias_pendiente",
+   "ambito": "ipn",
+   "pendiente": true,
+   "palabras": ["denuncia institucional anónima acoso violencia hostigamiento"]
+  },
+  {
+   "id": "consejo-general",
+   "nombre": "Consejo General Consultivo",
+   "ambito": "ipn",
+   "fuente": {
+    "doc": "ri"
+   }
+  },
+  {
+   "id": "direccion-superior",
+   "nombre": "Dirección de Educación Superior",
+   "ambito": "ipn",
+   "fuente": {
+    "doc": "mo_des"
+   }
   }
  ]
 }

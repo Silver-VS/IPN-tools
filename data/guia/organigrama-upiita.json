@@ -1,0 +1,63 @@
+{
+ "unidad": "UPIITA",
+ "documento": "mo_upiita",
+ "fuente": "Manual de Organización de la UPIITA: organigrama de julio de 2010, estructura ratificada en octubre de 2021 (imagen enviada por el dueño, 2026-10-22)",
+ "nota": "Sin nombres de titulares. Los órganos colegiados aparecen con línea punteada en el organigrama oficial.",
+ "raiz": {
+  "nombre": "Dirección",
+  "colegiados": [
+   "Consejo Técnico Consultivo Escolar",
+   "Comité Interno de Proyectos",
+   "Decanato"
+  ],
+  "apoyo": [
+   "Coordinación de Enlace y Gestión Técnica",
+   "Unidad de Informática"
+  ],
+  "areas": [
+   {
+    "nombre": "Subdirección Académica",
+    "dependencias": [
+     "Departamento de Ciencias Básicas",
+     "Departamento de Ingeniería",
+     "Departamento de Tecnologías Avanzadas",
+     "Departamento de Formación Integral e Institucional",
+     "Departamento de Innovación Educativa",
+     "Departamento de Evaluación y Seguimiento Académico",
+     "Unidad de Tecnología Educativa y Campus Virtual"
+    ]
+   },
+   {
+    "nombre": "Sección de Estudios de Posgrado e Investigación",
+    "colegiados": [
+     "Colegio de Profesores"
+    ],
+    "dependencias": [
+     "Departamento de Investigación",
+     "Departamento de Posgrado"
+    ]
+   },
+   {
+    "nombre": "Subdirección de Servicios Educativos e Integración Social",
+    "siglas": "SSEIS",
+    "dependencias": [
+     "Departamento de Gestión Escolar",
+     "Departamento de Servicios Estudiantiles",
+     "Departamento de Extensión y Apoyos Educativos",
+     "Unidad Politécnica de Integración Social"
+    ]
+   },
+   {
+    "nombre": "Subdirección Administrativa",
+    "dependencias": [
+     "Departamento de Capital Humano",
+     "Departamento de Recursos Financieros",
+     "Departamento de Recursos Materiales y Servicios"
+    ]
+   }
+  ]
+ },
+ "ids": {
+  "Consejo Técnico Consultivo Escolar": "ctce"
+ }
+}

@@ -150,7 +150,10 @@ class TestDatosGuia(unittest.TestCase):
         # [?] de G-GUIA1: el micrositio de la COSIE de la UPIITA no abre desde fuera de la red del IPN.
         crudo = json.dumps(GUIA, ensure_ascii=False)
         self.assertNotIn('upiita.ipn.mx/coordinaciones/cosie.html', crudo)
-        self.assertNotIn('Decanato', crudo)
+        # El organigrama aportado documenta el Decanato sin identificar titulares.
+        organigrama = json.loads((RAIZ / 'data/guia' / GUIA['organigrama']).read_text(encoding='utf-8'))
+        self.assertIn('Decanato', organigrama['raiz']['colegiados'])
+        self.assertIn('octubre de 2021', organigrama['fuente'])
 
 
 class TestBibliotecas(unittest.TestCase):
@@ -199,6 +202,8 @@ class TestCompilacion(unittest.TestCase):
         for u, guia in GUIAS.items():
             esperado = deepcopy(guia)
             esperado.pop('_fuente', None)
+            if isinstance(esperado.get('organigrama'), str):
+                esperado['organigrama'] = json.loads((RAIZ / 'data/guia' / esperado['organigrama']).read_text(encoding='utf-8'))
             for p in esperado['preguntas']:
                 f = p.get('formato')
                 if f and f.get('ref'):
