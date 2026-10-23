@@ -26,9 +26,11 @@ const caja=document.createElement('div'); caja.setAttribute('id','sate-guia'); d
 const abrir=async(...partes)=>{await pestana.mostrar({partes});assert.equal(caja.querySelector('[role="alert"]'),null);};
 const clickTexto=(sel,clave)=>{const b=[...caja.querySelectorAll(sel)].find(b=>b.textContent.trim()===clave); assert.ok(b,clave); b.click();};
 assert.equal(datos.etapas.length,7);
+assert.deepEqual(datos.etapas.map((_,i)=>i+1),[1,2,3,4,5,6,7],'La secuencia de etapas no salta números');
 for (const p of datos.preguntas) assert.ok(datos.etapas.some(e=>e.id===p.etapa),p.id+' tiene etapa');
 for (const apartado of ['situacion','tramites']) {
   await abrir(apartado);
+  assert.deepEqual([...caja.querySelectorAll('.guia-etapas .guia-etapa-num')].map(n=>n.textContent),datos.etapas.map((_,i)=>String(i+1)),'La pista conserva etapas sin preguntas');
   for (const e of datos.etapas.filter(e=>datos.preguntas.some(p=>p.apartado===apartado&&p.etapa===e.id))) {
     const etapa = [...caja.querySelectorAll('.guia-etapas button')].find(b=>b.getAttribute('title')?.trim()===e.titulo);
     assert.ok(etapa, JSON.stringify([...caja.querySelectorAll('.guia-etapas button')].map(b=>b.getAttribute('title'))));
@@ -41,11 +43,17 @@ for (ancho of [1440,1100,1024,768,375,320]) {
   await abrir('situacion','que-es-dictamen');
   const respuesta=caja.querySelector('#respuesta-que-es-dictamen');
   assert.ok(respuesta.querySelector('.sate-termino'),'glosario');
-  assert.ok(respuesta.querySelector('.guia-enlace'),'citas');
+  assert.ok(respuesta.querySelector('.sate-enlace-reglamento'),'citas');
+  assert.equal(respuesta.querySelector('.sate-enlace-reglamento').tagName,'BUTTON');
   assert.equal(respuesta.parentNode.tagName==='LI',ancho<900,'respuesta bajo su pregunta en teléfono');
   const buscador=caja.querySelector('#guia-qa'); buscador.value='ETS'; buscador.dispatchEvent(new Evento('input'));
   assert.deepEqual([...caja.querySelectorAll('[data-pregunta]')].map(b=>b.getAttribute('data-pregunta')),Array.from(c.SateGuia.buscarPreguntas(datos.preguntas,'ETS','situacion'),p=>p.id));
 }
+const componentesCss=leer('web/sate/componentes.css'), guiaCss=leer('web/sate/guia.css');
+assert.match(componentesCss,/\.sate-enlace-reglamento\{[^}]*display:inline;[^}]*color:inherit;[^}]*text-decoration-style:dotted;[^}]*text-decoration-color:var\(--ipn-acento\)/s,'Estilo común de cita reglamentaria');
+assert.doesNotMatch(componentesCss,/\.sate-enlace-reglamento\{[^}]*padding(?:-block|-top|-bottom)?\s*:\s*(?!0(?:\s|;))/s,'Cita sin padding que altera el renglón');
+assert.match(componentesCss,/\.sate-ayuda__btn\.sate-termino\{[^}]*display:inline;[^}]*padding:0;[^}]*text-decoration-color:var\(--ipn-tenue\)/s,'Término en línea con puntos tenues');
+assert.doesNotMatch(guiaCss,/\.guia-enlace\{[^}]*display:inline-block|\.guia-enlace\{[^}]*padding-block|\.guia-enlace\{[^}]*min-height/s,'No quedan citas en línea que alteren la caja');
 ancho=1440;
 await abrir('acudir','gestion_escolar');
 assert.ok(caja.querySelector('.guia-ficha .sate-termino'));

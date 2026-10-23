@@ -573,7 +573,12 @@ button.sate-chip{cursor:pointer}
 .sate-ayuda__btn:hover{color:var(--ipn-acento)}
 .sate-ayuda--termino{display:inline;position:static;vertical-align:baseline}
 .sate-ayuda__btn.sate-termino{display:inline;position:relative;width:auto;height:auto;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:max(1px,.08em);text-decoration-color:var(--ipn-tenue);text-underline-offset:.08em;cursor:help}
+/* En reposo, el glosario usa puntos tenues y las citas reglamentarias puntos de acento. */
 .sate-ayuda__btn.sate-termino:hover,.sate-ayuda__btn.sate-termino:focus-visible{color:var(--ipn-acento);text-decoration-color:var(--ipn-acento);background:none}
+.sate-enlace-reglamento{display:inline;position:relative;margin:0;padding:0;border:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-color:var(--ipn-acento);text-decoration-thickness:1px;text-underline-offset:.2em;cursor:pointer}
+.sate-cita-reglamento{display:inline;white-space:nowrap}
+.sate-enlace-reglamento:hover,.sate-enlace-reglamento:focus-visible{color:inherit;text-decoration-style:solid;text-decoration-color:var(--ipn-acento)}
+.sate-enlace-reglamento:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .sate-ayuda__btn.sate-termino:focus-visible{outline:1px solid var(--ipn-acento);outline-offset:2px}
 .sate-globo{position:fixed;z-index:60;box-sizing:border-box;max-width:min(320px,40ch,calc(100vw - 16px));max-height:calc(100dvh - 16px);overflow:auto;overflow-wrap:anywhere;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);font-weight:400;line-height:1.5;text-align:left}
 .sate-globo[hidden]{display:none}
@@ -1145,4 +1150,5 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 
 
 @media(max-width:767px){.sate-termino::before{content:"";position:absolute;inset:50% auto auto 50%;width:max(100%,var(--ipn-objetivo-tactil));height:max(100%,var(--ipn-objetivo-tactil));transform:translate(-50%,-50%)}}
+@media(max-width:767px){.sate-enlace-reglamento::after{content:"";position:absolute;inset:50% auto auto 50%;width:max(100%,var(--ipn-objetivo-tactil));height:max(100%,var(--ipn-objetivo-tactil));transform:translate(-50%,-50%)}}
 @media(max-width:767px){:is(button,[role=button],.btn,.sate-btn):not(.sate-termino){min-width:var(--ipn-objetivo-tactil)}}
