@@ -93,6 +93,11 @@ assert.match(css,/minmax\(var\(--ipn-horario-columna-min/,'Los traslapes conserv
 assert.match(css,/\.sate-cupos-consultar\.btn\{[^}]*min-height:44px/);
 assert.match(css,/:focus-visible/);
 const html=leer('web/sate/cascaron.html');
+assert.match(html,/id="f-cupo"/,'El filtro de cupo aparece en Más filtros');
+assert.match(html,/id="f-cupo-ayuda"/,'El filtro explica si faltan datos y cuándo se consultaron');
+assert.match(leer('web/sate/horarios.js'),/S\.soloCupo&&!plan\(\)\.sel\.includes\(keyOf\(c\)\)/,'El generador conserva los grupos elegidos al filtrar cupos');
+assert.match(leer('web/sate/temarios.js'),/SATE\.temarios = \{[^}]*\babrir,/,'Horarios reutiliza el vistazo compartido del temario');
+assert.match(html,/\.temario-mini\{[^}]*min-width:44px[^}]*min-height:44px/,'El botón del temario tiene objetivo táctil');
 assert.equal([...html.matchAll(/class="btn sate-cupos-consultar"[^>]*data-cupos-ayuda/g)].length,2);
 assert.equal([...html.matchAll(/<span data-cupos-etiqueta>/g)].length,2);
 assert.match(leer('web/sate/cupos.js'),/querySelector\?\.\('\[data-cupos-etiqueta\]'\)/,'Actualizar el texto conserva el ícono');

@@ -27,7 +27,7 @@ const CUPOS=(()=>{
     seleccion();
   }
   function aceptar(d){if(!C.validar(d)||d.unidad!==UNIDAD)return;const nueva=C.reciente(datos,d);if(nueva===datos)return;datos=C.limpiar(nueva);IPNT.set(HU+'cupos',JSON.stringify(datos));
-    if($('#cupos-ayuda')){pintar();if(S.gen){S.gen=generate();renderGen()}renderOffer();renderCal()}}
+    if($('#cupos-ayuda')){pintar();if(typeof renderHFilters==='function')renderHFilters();if(S.gen){S.gen=generate();renderGen()}renderOffer();renderCal()}}
   function leer(){try{aceptar(JSON.parse((window.IPNT?.almacen||localStorage).getItem(HU+'cupos')))}catch(e){console.warn('SATE Cupos: no se pudo leer la consulta local',e)}}
   async function nube(){if(typeof DEMO!=='undefined'&&DEMO)return;try{aceptar(await IPNT.cupos(UNIDAD))}catch(e){console.warn('SATE Cupos: lectura OneDrive fallida',{unidad:UNIDAD,error:e.message})}}
   window.addEventListener('storage',e=>{if(e.key===HU+'cupos')leer()});
@@ -50,5 +50,5 @@ const CUPOS=(()=>{
   }
   leer();
   setInterval(()=>{if(!document.hidden&&$('#cupos-ayuda')){const antes=omitir;pintar();if(antes!==omitir&&S.gen){S.gen=generate();renderGen()}renderOffer();renderCal()}},60000);
-  return {pocos:C.pocos,insignia,excluir,pintar,montar,fila,recibir:aceptar,omitirLlenos(){omitir=true},get datos(){return datos}};
+  return {pocos:C.pocos,insignia,excluir,pintar,montar,fila,recibir:aceptar,fecha:d=>C.fecha(d),get disponible(){return compatible()},omitirLlenos(){omitir=true},get datos(){return datos}};
 })();
