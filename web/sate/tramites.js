@@ -46,7 +46,7 @@
     const marca=el('span',ejemplo?tx('ejemplo'):tx('miniatura_lleno'),'tramite-miniatura-marca');nodo.appendChild(marca);
     const hoja=el('div',null,'tramite-miniatura-hoja');nodo.appendChild(hoja);
     const unidad=SATE_CONFIG.unidades[SATE_UNIDAD];
-    const cab=el('header',null,'tramite-miniatura-cab');cab.appendChild(el('b','IPN'));cab.appendChild(el('span',tx('miniatura_instituto')));cab.appendChild(el('b',unidad.siglas||SATE_UNIDAD.toUpperCase()));hoja.appendChild(cab);
+    const cab=el('header',null,'tramite-miniatura-cab');cab.appendChild(el('b','IPN'));const instituto=el('span',tx('miniatura_instituto'));instituto.setAttribute('data-oficial','lo');cab.appendChild(instituto);cab.appendChild(el('b',unidad.siglas||SATE_UNIDAD.toUpperCase()));hoja.appendChild(cab);
     const formato=['baja_temporal','baja_definitiva','dictamen','electivas'].includes(def.id);
     hoja.appendChild(el('h4',formato?tx('miniatura_titulo_'+(def.id==='dictamen'?(datos.tipo==='externo'?'dictamen_externo':'dictamen'):def.id)):def.titulo));
     const identidad=ejemplo?{}:leer('datos')?.datos||{};

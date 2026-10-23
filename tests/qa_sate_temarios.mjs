@@ -89,7 +89,7 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(doc.avisos.length, 1);
   assert.equal(doc.fuente.texto, 'Programa sintético de la unidad de aprendizaje, plan 2009.');
   const b103 = T.documento(bionica.find(r => r.clave === 'B103'), {t: texto, carrera: 'X', plan: '09'});
-  assert.equal(b103.metadatos.find(m => m.etiqueta === 'Academia').valor, 'Ciencias Básicas', 'sin el «de» inicial del OCR');
+  assert.equal(b103.metadatos.find(m => m.etiqueta === 'Academia').valor, 'de Ciencias Básicas', 'R14: la academia conserva el texto documental');
   assert.equal(b103.metadatos.find(m => m.etiqueta === 'Créditos TEPIC').valor, '7.5');
   assert.equal(b103.metadatos.find(m => m.etiqueta === 'Horas por semana').valor, '3 de teoría · 1.5 de práctica');
   // Créditos y horas completos, aviso de coincidencia aproximada y tipo de bibliografía legible.
@@ -127,12 +127,8 @@ function el(document, tag, attrs = {}, hijos = []) {
   for(const url of ['javascript:alert(1)','data:text/html,test','file:///test','//example.org']) assert.equal(T.recursosValidos({B101:[{...recurso,url}]}), false);
   assert.equal(T.recursosValidos({B101:[{...recurso,licencia:null}]}), false);
   assert.equal(T.recursosValidos({B101:[{...recurso,unidades:[0]}]}), false);
-  assert.equal(T.tituloTema('ÁLGEBRA LINEAL.'),'Álgebra lineal');
-  assert.equal(T.tituloTema('Replicación del ADN.'), 'Replicación del ADN');
-  assert.equal(T.tituloTema('REPLICACIÓN DEL ADN.', config.siglasTemarios), 'Replicación del ADN');
-  assert.equal(T.tituloTema('PCR, ARN Y ADN.', config.siglasTemarios), 'PCR, ARN y ADN');
-  assert.equal(T.tituloTema('Uso de SQL y TCP/IP.'), 'Uso de SQL y TCP/IP');
-  assert.equal(T.tituloTema('ESTUDIO DEL SOL.' , config.siglasTemarios), 'Estudio del sol');
+  for (const titulo of ['ÁLGEBRA LINEAL.', 'Replicación del ADN.', 'REPLICACIÓN DEL ADN.', 'PCR, ARN Y ADN.', 'Uso de SQL y TCP/IP.', 'ESTUDIO DEL SOL.'])
+    assert.equal(T.tituloTema(titulo, config.siglasTemarios), titulo, 'R14: título literal');
   const piloto = JSON.parse(leer('data/recursos/upiita/bionica.json'));
   assert.ok(T.recursosValidos(piloto));
   igual(JSON.parse(leer('web/dist/sate/datos/upiita/recursos/bionica.json')), piloto);
@@ -630,6 +626,10 @@ est.click(); await dormir(30);
   assert.ok(ficha.querySelector('.rgl-riel .tmr-pdf'), 'PDF oficial en el panel derecho');
   assert.doesNotMatch(leer('web/sate/temarios.css'), /\.tmr-indice a\{[^}]*border-radius:999px/, 'índice sin pastillas');
   assert.equal(ficha.querySelector('#ficha-objetivo p').textContent, reg103.objetivo.split(/\n+/)[0].trim());
+  for (const n of ficha.querySelectorAll('#ficha-objetivo p, #ficha-contenidos ol, #ficha-contenidos ol *, #ficha-evaluacion p:not(.tmr-nota), .tmr-biblio span'))
+    assert.ok(n.getAttribute('data-oficial'), 'R14: contenido del programa marcado: '+n.tagName);
+  assert.equal(ficha.querySelector('#ficha-objetivo h3').getAttribute('data-oficial'), null, 'rótulo propio sin marca');
+  if (ficha.querySelector('.tmr-descripcion')) assert.equal(ficha.querySelector('.tmr-descripcion').getAttribute('data-oficial'), null, 'descripción propia sin marca');
   assert.ok(ficha.querySelector('#ficha-bibliografia .tmr-biblio li'), 'la bibliografía del programa');
   // Buscar en bibliotecas, prellenado con el nombre de la materia
   const panelBib = ficha.querySelector('.sate-biblio');

@@ -1,0 +1,740 @@
+{
+  "version": 1,
+  "criterio": "Solo los campos enumerados son transcripción oficial. Los demás son texto propio, configuración o datos no textuales. * selecciona un nivel; fuente y localizadores se heredan del registro y se resuelven en las huellas.",
+  "archivos": {
+    "data/calendario.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Calendario de actividades 2027/1 e Inscripción a ETS del semestre 26/2, Departamento de Gestión Escolar de la UPIITA (25 de septiembre de 2026)",
+        "localizador": "fecha del aviso citado en fuente/fuenteOriginal; página no registrada"
+      },
+      "campos": [
+        "/upiita/actividades/*/desde",
+        "/upiita/actividades/*/hasta",
+        "/upiita/eventos/*/desde",
+        "/upiita/eventos/*/hasta"
+      ]
+    },
+    "data/calendario_ipn.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Calendario académico IPN",
+        "url": "https://www.comunidad.escom.ipn.mx/ibuitron/docs/calendario_academico/IPN-Calendario-Escolarizada-20262027.pdf",
+        "pagina": 1
+      },
+      "campos": [
+        "/eventos/*/titulo",
+        "/eventos/*/desde",
+        "/eventos/*/hasta",
+        "/periodos/*/inicio_clases",
+        "/periodos/*/fin_clases"
+      ]
+    },
+    "data/guia/comun.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "documentos del archivo y data/guia/comun.json",
+        "localizador": "fuente.doc, fuente.pagina o fuente.articulo de cada instancia/función/procedimiento; títulos: clave del documento"
+      },
+      "campos": [
+        "/documentos/*/titulo",
+        "/acudir/*/nombre",
+        "/acudir/*/objetivo/texto",
+        "/acudir/*/funciones/*/texto",
+        "/acudir/*/procedimientos/*/nombre"
+      ]
+    },
+    "data/guia/escom.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "documentos del archivo y data/guia/comun.json",
+        "localizador": "fuente.doc, fuente.pagina o fuente.articulo de cada instancia/función/procedimiento; títulos: clave del documento"
+      },
+      "campos": [
+        "/documentos/*/titulo",
+        "/acudir/*/nombre",
+        "/acudir/*/objetivo/texto",
+        "/acudir/*/funciones/*/texto",
+        "/acudir/*/procedimientos/*/nombre"
+      ]
+    },
+    "data/guia/organigrama-upiita.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "mo_upiita",
+        "pagina": 27
+      },
+      "campos": [
+        "/raiz/nombre",
+        "/raiz/colegiados/*",
+        "/raiz/apoyo/*",
+        "/raiz/areas/*/nombre",
+        "/raiz/areas/*/colegiados/*",
+        "/raiz/areas/*/dependencias/*"
+      ]
+    },
+    "data/guia/upibi.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "documentos del archivo y data/guia/comun.json",
+        "localizador": "fuente.doc, fuente.pagina o fuente.articulo de cada instancia/función/procedimiento; títulos: clave del documento"
+      },
+      "campos": [
+        "/documentos/*/titulo",
+        "/acudir/*/nombre",
+        "/acudir/*/objetivo/texto",
+        "/acudir/*/funciones/*/texto",
+        "/acudir/*/procedimientos/*/nombre"
+      ]
+    },
+    "data/guia/upiita.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "documentos del archivo y data/guia/comun.json",
+        "localizador": "fuente.doc, fuente.pagina o fuente.articulo de cada instancia/función/procedimiento; títulos: clave del documento"
+      },
+      "campos": [
+        "/documentos/*/titulo",
+        "/acudir/*/nombre",
+        "/acudir/*/objetivo/texto",
+        "/acudir/*/funciones/*/texto",
+        "/acudir/*/procedimientos/*/nombre"
+      ]
+    },
+    "data/horarios_upiita.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "saes.upiita.ipn.mx/Academica/horarios.aspx",
+        "localizador": "oferta SAES, periodo/grupo/clave del registro; sin paginación"
+      },
+      "campos": [
+        "/carreras/*",
+        "/actual/*/Asignatura",
+        "/proximo/*/Asignatura"
+      ]
+    },
+    "data/mapa_curricular_saes.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "saes.upiita.ipn.mx/Academica/mapa_curricular.aspx",
+        "localizador": "SAES, carrera/plan/nivel/clave en la misma fila; sin paginación"
+      },
+      "campos": [
+        "/rows/*/4"
+      ]
+    },
+    "data/reglamentos/becas.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "becas",
+        "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Reglamentos/RGB-g-extra-1805.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/cambio_carrera.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "cambio_carrera",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/lineamientos/gac-1419ext.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/cgc.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "cgc",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-consejo-general-consultivo-01-nov-2006.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/equivalencias.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "equivalencias",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/lineamientos/gac-969ext-bis.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/etica.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "etica",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/ce-ipn.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/honor.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "honor",
+        "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Lineamientos-Reglas/g-extra-1865.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/indice.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Índice de reglamentos",
+        "localizador": "id de cada registro; data/reglamentos/<id>.json"
+      },
+      "campos": [
+        "/*/titulo"
+      ]
+    },
+    "data/reglamentos/lo.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "lo",
+        "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/normativa/Leyes/1_LO_IPN.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/rge.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "rge",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/rge-13-06-2011.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/ri.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "ri",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-interno.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/ro.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "ro",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-organico-ipn-2020.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/servicio_social.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "servicio_social",
+        "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Normatividad/carpeta4/GAC_EXT_932B_reglamento_serv_social.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/subcomite_becas.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "subcomite_becas",
+        "url": "https://www.aplicaciones.abogadogeneral.ipn.mx/PDFS/Lineamientos-Reglas/g-extra-1864.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/reglamentos/titulacion.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "titulacion",
+        "url": "https://www.ipn.mx/assets/files/normatividad/docs/reglamentos/reglamento-de-titulacion-profesional-del-ipn.pdf",
+        "localizador": "articulo: n; ubicación: ubicacion; texto sin articulado: documento completo"
+      },
+      "campos": [
+        "/titulo",
+        "/estructura/*/titulo",
+        "/estructura/*/hijos/*/titulo",
+        "/articulos/*/ubicacion/*",
+        "/articulos/*/texto",
+        "/articulos/*/fracciones/*/texto",
+        "/transitorios/*/texto",
+        "/texto"
+      ]
+    },
+    "data/salones_26-2.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "C:/Users/silve/AppData/Local/Temp/claude/D--Documents-Development-UPIITA-DEV/16f170e0-95de-46a3-bb12-9309434f0c18/scratchpad/salones.pdf",
+        "localizador": "pagina del registro, grupo y horario de la clase"
+      },
+      "campos": [
+        "/clases/*/materia"
+      ]
+    },
+    "data/salones_27-1.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "https://www.upiita.ipn.mx/adjuntos/Horarios/27-1/HORARIOS%202027-1v3.pdf",
+        "localizador": "pagina del registro, grupo y horario de la clase"
+      },
+      "campos": [
+        "/clases/*/materia"
+      ]
+    },
+    "data/temarios/upiita/bionica.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Programa sintético, plan 09",
+        "localizador": "materias: clave y archivo/pdf del registro; páginas no registradas en la extracción original"
+      },
+      "campos": [
+        "/materias/*/nombre",
+        "/materias/*/objetivo",
+        "/materias/*/orientacion",
+        "/materias/*/evaluacion",
+        "/materias/*/academia",
+        "/materias/*/vigencia",
+        "/materias/*/contenidos/*/titulo",
+        "/materias/*/contenidos/*/subtemas/*",
+        "/materias/*/bibliografia/*/texto"
+      ]
+    },
+    "data/temarios/upiita/mecatronica.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Programa sintético, plan 09",
+        "localizador": "materias: clave y archivo/pdf del registro; páginas no registradas en la extracción original"
+      },
+      "campos": [
+        "/materias/*/nombre",
+        "/materias/*/objetivo",
+        "/materias/*/orientacion",
+        "/materias/*/evaluacion",
+        "/materias/*/academia",
+        "/materias/*/vigencia",
+        "/materias/*/contenidos/*/titulo",
+        "/materias/*/contenidos/*/subtemas/*",
+        "/materias/*/bibliografia/*/texto"
+      ]
+    },
+    "data/temarios/upiita/telematica.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Programa sintético, plan 09",
+        "localizador": "materias: clave y archivo/pdf del registro; páginas no registradas en la extracción original"
+      },
+      "campos": [
+        "/materias/*/nombre",
+        "/materias/*/objetivo",
+        "/materias/*/orientacion",
+        "/materias/*/evaluacion",
+        "/materias/*/academia",
+        "/materias/*/vigencia",
+        "/materias/*/contenidos/*/titulo",
+        "/materias/*/contenidos/*/subtemas/*",
+        "/materias/*/bibliografia/*/texto"
+      ]
+    },
+    "data/trayectoria_B.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Ingenieria Bionica trayectoria 0624.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/trayectoria_M.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Ingenieria Mecatronica trayectoria v1706.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/trayectoria_T.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Ingeniería telematica Trayectoria Tp.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/escom/horarios_saes.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "saes.escom.ipn.mx/Academica/horarios.aspx",
+        "localizador": "oferta SAES, periodo/grupo/clave del registro; sin paginación"
+      },
+      "campos": [
+        "/carreras/*",
+        "/actual/*/Asignatura",
+        "/proximo/*/Asignatura"
+      ]
+    },
+    "data/unidades/escom/mapa_curricular_saes.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "saes.escom.ipn.mx/Academica/mapa_curricular.aspx",
+        "localizador": "SAES, carrera/plan/nivel/clave en la misma fila; sin paginación"
+      },
+      "campos": [
+        "/rows/*/4"
+      ]
+    },
+    "data/unidades/escom/trayectoria_A.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "mapaCurricularLCD2020H.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/escom/trayectoria_B.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "mapaCurricularIIA2020.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/escom/trayectoria_C.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "mapaCurricularISC2020.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/horarios_saes.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "saes.upibi.ipn.mx/Academica/horarios.aspx",
+        "localizador": "oferta SAES, periodo/grupo/clave del registro; sin paginación"
+      },
+      "campos": [
+        "/carreras/*",
+        "/actual/*/Asignatura",
+        "/proximo/*/Asignatura"
+      ]
+    },
+    "data/unidades/upibi/mapa_curricular_saes.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "saes.upibi.ipn.mx/Academica/mapa_curricular.aspx",
+        "localizador": "SAES, carrera/plan/nivel/clave en la misma fila; sin paginación"
+      },
+      "campos": [
+        "/rows/*/4"
+      ]
+    },
+    "data/unidades/upibi/mapas_pdf/alimentos-2006.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "alimentos-2006.pdf",
+        "localizador": "clave del registro en el mapa curricular"
+      },
+      "campos": [
+        "/titulo",
+        "/materias/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/mapas_pdf/ambiental-2006.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "ambiental-2006.pdf",
+        "localizador": "clave del registro en el mapa curricular"
+      },
+      "campos": [
+        "/titulo",
+        "/materias/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/mapas_pdf/biomedica-2006.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "biomedica-2006.pdf",
+        "localizador": "clave del registro en el mapa curricular"
+      },
+      "campos": [
+        "/titulo",
+        "/materias/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/mapas_pdf/biotecnologia-2006.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "biotecnologia-2006.pdf",
+        "localizador": "clave del registro en el mapa curricular"
+      },
+      "campos": [
+        "/titulo",
+        "/materias/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/mapas_pdf/biotecnologia-2024.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "biotecnologia-2024.pdf",
+        "localizador": "clave del registro en el mapa curricular"
+      },
+      "campos": [
+        "/titulo",
+        "/materias/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/mapas_pdf/farmaceutica-2006.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "farmaceutica-2006.pdf",
+        "localizador": "clave del registro en el mapa curricular"
+      },
+      "campos": [
+        "/titulo",
+        "/materias/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/trayectoria_A.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "ambiental-2006.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/trayectoria_B.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "biotecnologia-2024.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/trayectoria_B_06.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "biotecnologia-2006.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/trayectoria_F.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "farmaceutica-2006.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/trayectoria_L.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "alimentos-2006.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades/upibi/trayectoria_M.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "biomedica-2006.pdf",
+        "localizador": "recuadro del mapa curricular; coordenadas del registro"
+      },
+      "campos": [
+        "/boxes/*/texto",
+        "/boxes/*/text",
+        "/boxes/*/nombre"
+      ]
+    },
+    "data/unidades_identidad.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Nombres oficiales de las unidades académicas del IPN (completados por el orquestador, 2026-10-09).",
+        "localizador": "directorio institucional, unidad identificada por su clave"
+      },
+      "campos": [
+        "/unidades/*/nombre",
+        "/unidades/*/nombreCompleto"
+      ]
+    },
+    "data/denominaciones_oficiales.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Calendario académico IPN 2026-2027; nombre institucional: Ley Orgánica del IPN, artículo 1",
+        "pagina": 1
+      },
+      "campos": [
+        "/*"
+      ]
+    },
+    "data/reglamentos/ocr/cambio_carrera.txt": {
+      "oficial": true,
+      "fuente": {
+        "documento": "cambio_carrera",
+        "localizador": "Transcripción OCR completa; páginas separadas por salto de página; SHA del PDF en primera línea"
+      },
+      "campos": [
+        "/texto"
+      ]
+    },
+    "data/reglamentos/ocr/equivalencias.txt": {
+      "oficial": true,
+      "fuente": {
+        "documento": "equivalencias",
+        "localizador": "Transcripción OCR completa; páginas separadas por salto de página; SHA del PDF en primera línea"
+      },
+      "campos": [
+        "/texto"
+      ]
+    }
+  }
+}

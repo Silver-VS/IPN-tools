@@ -1,0 +1,16 @@
+{
+  "sate.calendario.categoria_inscripcion": "Inscripción y reinscripción",
+  "sate.calendario.categoria_ordinaria": "Registro de evaluación ordinaria",
+  "sate.calendario.categoria_extraordinaria": "Registro de evaluación extraordinaria",
+  "sate.calendario.categoria_inscripcion_ets": "Inscripción a ETS",
+  "sate.calendario.categoria_ets": "Evaluación a título de suficiencia",
+  "sate.calendario.categoria_vacaciones": "Vacaciones",
+  "sate.calendario.categoria_saberes": "Fecha límite de saberes previamente adquiridos",
+  "sate.calendario.categoria_descanso": "Descanso obligatorio",
+  "sate.calendario.categoria_sindical": "Descanso por acuerdo sindical",
+  "sate.calendario.categoria_politecnico": "Celebración del Día del Politécnico",
+  "sate.calendario.categoria_nivelacion": "Nivelación académica autogestiva",
+  "sate.calendario.categoria_planeacion": "Planeación didáctica, académica y directiva",
+  "sate.calendario.categoria_induccion_nms": "Inducción para nuevo ingreso NMS",
+  "sate.ventanilla.miniatura_instituto": "Instituto Politécnico Nacional"
+}

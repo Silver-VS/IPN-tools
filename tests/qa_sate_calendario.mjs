@@ -428,6 +428,8 @@ for(const unidad of ['upiita','escom','upibi']){
    cambiar(p);cambiarVista(v);while(!document.getElementById('cal-anterior').disabled)document.getElementById('cal-anterior').onclick();
    do{sinClaves();assert.equal(nodos('calendario-ficha').every(n=>!/^(Ahora|Sigue)\s*:/.test(n.children[2].textContent)),true);recorridos++;if(document.getElementById('cal-proximo').disabled)break;document.getElementById('cal-proximo').onclick()}while(true);
    if(v==='carriles')for(const f of nodos('calendario-linea-fila'))assert.ok(f.children[1].all().some(n=>n.className==='calendario-ev'));
+   const oficiales=box.all().filter(n=>base.eventos.some(e=>e.titulo===n.text));
+   for(const n of oficiales)assert.equal(n.getAttribute('data-oficial'),base.url,'R14: denominación del calendario con origen: '+[n.tagName,n.className,n.text].join(' | '));
   }
  }
 }

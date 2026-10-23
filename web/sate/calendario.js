@@ -1,7 +1,7 @@
 /* Fechas civiles y una selección compartida entre el semicírculo, la línea de tiempo, el mes, la agenda y el detalle. */
 (function(){
   const api=SATE.calendario,tx=(k,v)=>SATE.texto('sate.calendario.'+k,v);
-  const el=(tag,texto,clase)=>{const n=document.createElement(tag);if(texto!=null)n.textContent=texto;if(clase)n.className=clase;return n};
+  const el=(tag,texto,clase)=>{const n=document.createElement(tag);if(texto!=null)n.textContent=texto;if(clase)n.className=clase;const base=SATE_CONFIG.calendarioBase;if(texto&&base?.eventos?.some(e=>e.titulo===texto))n.setAttribute('data-oficial',base.url||base.fuente);return n};
   const svg=(tag,attrs={})=>{const n=document.createElementNS('http://www.w3.org/2000/svg',tag);Object.entries(attrs).forEach(([k,v])=>n.setAttribute(k,v));return n};
   const date=s=>new Date(s+'T00:00:00'),numero=s=>Date.parse(s+'T00:00:00Z')/86400000;
   const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
@@ -111,7 +111,7 @@
       if(r.dentro&&m===api.hoy().slice(0,7))continue;const medio=(a+b)/2,p=punto(medio,308),co=Math.cos(ang(medio)),t=svg('text',{x:p[0],y:p[1],'text-anchor':co<-.35?'end':co>.35?'start':'middle',class:'calendario-svg-mes','data-mes':m});t.textContent=d.toLocaleDateString('es-MX',{month:'short'});dibujo.appendChild(t);
     }
     grupos.forEach(g=>g.miembros.forEach(e=>{const on=seleccionado(e),a=numero(e.desde)-numero(desde),b=Math.min(total,Math.max(numero(e.hasta)-numero(desde)+1,a+1.4)),m=meta(e);
-      const n=svg('g',{class:'calendario-arco','data-desde':e.desde,'data-hasta':e.hasta,'data-pasado':e.hasta<api.hoy(),'data-puntual':!!m.puntual});n.id=idDe('cal-arco-',e);conectar(n,g.miembros,g.nombre);const title=svg('title');title.textContent=e.titulo;n.appendChild(title);
+      const n=svg('g',{class:'calendario-arco','data-desde':e.desde,'data-hasta':e.hasta,'data-pasado':e.hasta<api.hoy(),'data-puntual':!!m.puntual});n.id=idDe('cal-arco-',e);conectar(n,g.miembros,g.nombre);const title=svg('title');title.textContent=e.titulo;if(SATE_CONFIG.calendarioBase?.eventos?.some(x=>x.titulo===e.titulo))title.setAttribute('data-oficial',SATE_CONFIG.calendarioBase.url||SATE_CONFIG.calendarioBase.fuente);n.appendChild(title);
       if(m.puntual){const p=punto(a+.5,284);n.appendChild(svg('circle',{cx:p[0],cy:p[1],r:on?14:11,class:'calendario-punto-fondo'}));const t=svg('text',{x:p[0],y:Number(p[1])+5,'text-anchor':'middle',class:'calendario-svg-simbolo'});t.textContent=simbolos[e.simbolo]||'•';n.appendChild(t)}
       else{const r0=m.anillo==='interior'?188:228,r1=m.anillo==='interior'?220:266;n.appendChild(svg('path',{d:banda(a,b,r0-(on?3:0),r1+(on?3:0)),class:'calendario-trazo',fill:['suspension','descanso','feriado'].includes(e.categoria)?'url(#cal-rayado-'+(e.categoria==='suspension'?'suspension':'descanso')+')':'var(--cal-color)'}))}dibujo.appendChild(n);
     }));
