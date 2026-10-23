@@ -324,7 +324,7 @@ assert.match(css,/\.tramite-campo input:not\(\[type=checkbox\]\),\.tramite-campo
 const excepcionesMapa=new Map([
   ['.box.slot .slot-sig','.85em'], // escala del mapa: continúa la línea dentro de la caja.
   ['.box.want::after','.95em'], // escala del mapa: marca en coordenadas de la caja.
-  ['.box .plan-marca','.95em'], // escala del mapa: periodo sobre la unidad de aprendizaje.
+  ['.box .plan-marca','.72em'], // escala del mapa: marca chica en la esquina de la caja (dueño, 2026-10-23).
 ]);
 // No hay botones con 1em/100% en estas fuentes. Agregar aquí su selector exacto si se requiere herencia.
 const botonesHeredados=new Set();
