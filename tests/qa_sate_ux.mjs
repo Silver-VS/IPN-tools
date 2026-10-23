@@ -29,7 +29,7 @@ for(const ancho of [375,414,768,1024,1440])for(const open of [false,true]){
 
 assert.match(css,/@media\(hover:none\)\{\s*:is\(button,[^}]+\{min-height:var\(--ipn-control-alto\)!important\}/);
 assert.match(css,/:is\(\.x,[^}]+\{min-width:44px!important;min-height:var\(--ipn-control-alto\)!important\}/);
-assert.match(css,/\.marks button\{min-height:36px\}/);
+assert.match(css,/\.marks button\{min-height:var\(--ipn-control-alto\)\}/);
 assert.match(css,/\.sate-recorte-calendario\{[^}]*min-height:var\(--ipn-control-alto\)/);
 assert.match(css,/\.sate-aviso:has\(\.sate-aviso__x\)\{padding-right:calc\(44px \+ var\(--ipn-esp-3\)\)\}/);
 assert.match(css,/#v-tray \.plan-bandeja\{bottom:calc\(var\(--ipn-barra-alto\)/);

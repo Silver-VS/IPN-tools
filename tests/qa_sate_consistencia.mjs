@@ -7,10 +7,18 @@ export function auditar(css, archivo) {
   const filas=[], errores=[];
   css=css.replace(/\/\*[\s\S]*?\*\//g,'');
   const sticky=new Set([...css.matchAll(/([^{}]+)\{([^{}]*position:\s*sticky[^{}]*)\}/g)].flatMap(m=>m[1].trim().split(',').map(s=>s.trim())));
+  const botones=new Set([...css.matchAll(/([^{}]+)\{([^{}]*cursor:\s*pointer[^{}]*)\}/g)].flatMap(m=>m[1].split(',').map(s=>s.trim().match(/(?:^|[ >+~])([.#][\w-]+)(?:\[[^\]]+\])?$/)?.[1]).filter(Boolean)));
   for(const bloque of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
     const selector=bloque[1].trim(), cuerpo=bloque[2];
     const propiedades=Object.fromEntries([...cuerpo.matchAll(/([\w-]+)\s*:\s*([^;]+)(?:;|$)/g)].map(m=>[m[1],m[2].trim()]));
     const radio=propiedades['border-radius'];
+    const boton=!/::|\binput\b/.test(selector) && (selector.split(',').some(s=>/(?:^|[ >+~])(?:button|\.[\w-]*btn[\w-]*|\.add|\.x|\.link)(?:[.:#\[][^ ]*)?$/.test(s.trim()) || [...botones].some(b=>s.trim()===b || (s.trim().startsWith(b) && /^[\[.:#][^ ]*$/.test(s.trim().slice(b.length))))) || propiedades.cursor==='pointer');
+    if(boton && !selector.includes('.sate-termino')) {
+      for(const propiedad of ['height','min-height','max-height']) {
+        const valor=propiedades[propiedad]?.replace(/\s*!important$/,'');
+        if(valor && !/^(?:auto|var\(--ipn-(?:control-alto|control-compacto|objetivo-tactil)\))$/.test(valor)) errores.push(`${archivo}: ${selector}: altura de botón ${propiedad} ${valor}`);
+      }
+    }
     for(const [propiedad,valor] of Object.entries(propiedades).filter(([p])=>/^border-(?:(?:top|bottom)-(?:left|right)-)?radius$/.test(p))) {
       if(!/^(?:0|var\(--ipn-radio(?:-pastilla|-circulo)?\))(?: (?:0|var\(--ipn-radio\)))*$/.test(valor)) errores.push(`${archivo}: ${selector}: ${propiedad} ${valor}`);
       if(valor==='var(--ipn-radio-pastilla)' && !/^(?:\.(?:tramite-estado|calendario-pildora|sate-chip|sel-area|chip|wchip|tag-rel|simchip|dpill|k-chip|eqv-f|an-tag))$/.test(selector)) errores.push(`${archivo}: ${selector}: pastilla fuera de filtros/estado`);
@@ -23,6 +31,10 @@ export function auditar(css, archivo) {
 }
 // Comprueba que el guardia detecta regresiones y permite el sistema y stickies horizontales.
 assert.equal(auditar('.x{border-radius:8px}', 'prueba').errores.length,1);
+for(const alto of ['28px','38px','40px','44px','var(--ipn-esp-6)']) assert.equal(auditar(`button{min-height:${alto}}`,'prueba').errores.length,1);
+assert.equal(auditar('.accion{cursor:pointer;height:28px}','prueba').errores.length,1);
+assert.equal(auditar('.accion{cursor:pointer}.accion:hover{height:28px}','prueba').errores.length,1);
+assert.equal(auditar('button{min-height:var(--ipn-control-compacto)}','prueba').errores.length,0);
 assert.equal(auditar('.x{position:sticky;top:0}', 'prueba').errores.length,1);
 assert.equal(auditar('.x{position:sticky;top:var(--ipn-esp-4)}', 'prueba').errores.length,1);
 assert.equal(auditar('.x{position:sticky}.x{top:0}', 'prueba').errores.length,1);
@@ -49,6 +61,10 @@ assert.equal(auditar('.x{border-radius:var(--ipn-radio);position:sticky;top:calc
   bottom=10;eventos.scroll();assert.equal(valores['--sate-barra-alto'],'0px');
 }
 const archivos=[...readdirSync('web/sate').filter(f=>f.endsWith('.css')).map(f=>'web/sate/'+f),'web/sate/cascaron.html'];
+const componentes=readFileSync('web/sate/componentes.css','utf8');
+assert.match(componentes,/:root\{--ipn-control-compacto:32px\}/);
+assert.match(componentes,/:is\(td,\.marks,\.maptools\) :is\(button,\.add\)\{min-height:var\(--ipn-control-compacto\)/);
+assert.match(componentes,/@media\(max-width:767px\)\{:is\(td,\.marks,\.maptools\) :is\(button,\.add\)\{min-height:var\(--ipn-objetivo-tactil\);min-width:var\(--ipn-objetivo-tactil\)/);
 assert.match(readFileSync('web/sate/encabezado.css','utf8'),/--ipn-control-alto:var\(--ipn-objetivo-tactil,44px\)/,'la altura común conserva el objetivo táctil');
 const resultados=archivos.map(f=>auditar(f.endsWith('.html')?readFileSync(f,'utf8').match(/<style>([\s\S]*?)<\/style>/)[1]:readFileSync(f,'utf8'),f));
 const filas=resultados.flatMap(r=>r.filas), errores=resultados.flatMap(r=>r.errores);

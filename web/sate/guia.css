@@ -194,7 +194,7 @@
 .rgl-sugerencias{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
 .rgl-temas{display:grid;grid-template-columns:1fr 1fr;gap:var(--ipn-esp-5);align-items:start}
 .rgl-temas__opciones{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-2)}
-.rgl-temas__opciones button{min-height:5rem;padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;text-align:left;overflow-wrap:anywhere;cursor:pointer}
+.rgl-temas__opciones button{min-height:var(--ipn-control-alto);padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;text-align:left;overflow-wrap:anywhere;cursor:pointer}
 .rgl-temas__opciones button[aria-pressed=true]{background:var(--ipn-acento-suave);border-color:var(--ipn-acento);color:var(--ipn-acento)}
 .rgl-temas__articulos{padding:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);min-width:0;max-height:32rem;overflow:auto}
 .rgl-temas__lista{padding:0;margin:0;list-style:none}

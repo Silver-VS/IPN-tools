@@ -252,7 +252,16 @@ assert.match(nodos('calendario-linea-tarjeta')[0].textContent,/Línea de tiempo 
 const filas=nodos('calendario-linea-fila');
 assert.deepEqual(filas.map(n=>n.getAttribute('data-fila')),['tramites','evaluaciones','ets','becas','tt','sin_clases','dias_clave']);
 assert.deepEqual(filas.map(n=>n.children[0].textContent),['Trámites','Evaluaciones','ETS','Becas','Trabajo terminal','Sin clases','Días clave']);
-for(const f of filas){const pista=f.children[1];assert.ok(pista.all().some(n=>n.className==='calendario-ev'),'Fila sin eventos: '+f.getAttribute('data-fila'));assert.ok(parseInt(pista.style.height)>=34)}
+// Evalúa las expresiones emitidas con la escala común, sin motor de layout.
+const medida=s=>vm.runInNewContext(s.replaceAll('calc','').replace(/var\(--ipn-(control-alto|esp-1|esp-2)\)/g,(_,k)=>({'control-alto':44,'esp-1':4,'esp-2':8})[k]));
+for(const f of filas){
+  const pista=f.children[1],eventos=pista.all().filter(n=>n.className==='calendario-ev');
+  assert.ok(eventos.length,'Fila sin eventos: '+f.getAttribute('data-fila'));
+  const alto=medida(pista.style.height),pisos=[...new Set(eventos.map(n=>medida(n.style.top)))].sort((a,b)=>a-b);
+  assert.ok(alto>=44);
+  for(const top of pisos)assert.ok(top+44<=alto,'El botón queda dentro de la pista');
+  for(let i=1;i<pisos.length;i++)assert.ok(pisos[i]-pisos[i-1]>=44,'Los objetivos de carriles vecinos no se solapan');
+}
 const evs=nodos('calendario-ev');assert.equal(evs.length,api.eventos().filter(e=>e.periodo==='27/1').length);
 for(const n of evs){assert.equal(n.tagName,'button');assert.ok(n.getAttribute('aria-label').includes(','));assert.ok(['true','false'].includes(n.getAttribute('aria-pressed')));assert.match(n.getAttribute('data-desde'),/^\d{4}-/)}
 assert.ok(evs.some(n=>n.getAttribute('data-puntual')==='true'),'Puntos para días únicos');
@@ -310,8 +319,8 @@ c.SATE_CONFIG=config;c.SATE_UNIDAD='upiita';const p99={periodo:'99/9'};c.DATA.ca
 api.hoy=()=> '2026-10-10';mostrar();cambiar('99/9');
 assert.deepEqual(nodos('calendario-linea-fila').map(n=>n.getAttribute('data-fila')),['tramites']);
 assert.equal(nodos('calendario-linea-pista')[0].getAttribute('data-carriles'),'2','Solapamientos en dos carriles; el evento distante reutiliza el primero');
-assert.equal(nodos('calendario-linea-pista')[0].style.height,'60px');
-c.DATA.calendario.eventos=[e('gestion','2026-10-01',p99)];mostrar();assert.equal(nodos('calendario-linea-pista')[0].style.height,'34px');
+assert.equal(medida(nodos('calendario-linea-pista')[0].style.height),112);
+c.DATA.calendario.eventos=[e('gestion','2026-10-01',p99)];mostrar();assert.equal(medida(nodos('calendario-linea-pista')[0].style.height),60);
 almacen.set('hu.cal.vista','"desconocida"');mostrar();assert.equal(nodos('calendario-semicirculo').length,1,'Valor inválido vuelve a la vista predeterminada');
 c.DATA.calendario=data.upiita;
 

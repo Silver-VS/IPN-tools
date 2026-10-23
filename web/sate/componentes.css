@@ -1,4 +1,10 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
+:root{--ipn-control-compacto:32px}
+/* La altura es mínima: las acciones con texto en varias líneas pueden crecer. */
+:where(button,[role=button],.btn,.sate-btn){box-sizing:border-box;min-height:var(--ipn-control-alto)}
+/* Solo tablas y barras densas; en teléfono se usa el objetivo táctil normal. */
+:is(td,.marks,.maptools) :is(button,.add){min-height:var(--ipn-control-compacto);height:auto;padding-block:var(--ipn-esp-1)}
+@media(max-width:767px){:is(td,.marks,.maptools) :is(button,.add){min-height:var(--ipn-objetivo-tactil);min-width:var(--ipn-objetivo-tactil)}}
 .sate-recorrido{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-m);overflow:hidden;box-sizing:border-box}
 .sate-recorrido::backdrop{background:transparent}
 .sate-recorrido__marco{position:fixed;box-sizing:border-box;border:3px solid var(--ipn-acento);border-radius:var(--ipn-radio);pointer-events:none}
@@ -10,7 +16,7 @@
 .sate-recorrido__opcion{display:grid;align-content:start;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-3);border-top:1px solid var(--ipn-borde-control)}
 .sate-recorrido__opcion h3{margin:0;font-size:var(--ipn-tamano-m)}
 .sate-recorrido__opcion p{margin:0;color:var(--ipn-tenue)}
-.sate-recorrido__opcion button{justify-self:start;min-height:var(--ipn-esp-6)}
+.sate-recorrido__opcion button{justify-self:start;min-height:var(--ipn-control-alto)}
 .sate-recorrido__opcion button:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .sate-recorrido__tarjeta h2{font-size:var(--ipn-tamano-xl);margin:0;line-height:1.25}
 .sate-recorrido__tarjeta p{margin-block:var(--ipn-esp-2)}
@@ -90,7 +96,7 @@
 .dictamen-situaciones{margin:var(--ipn-esp-2) 0 0;padding-left:var(--ipn-esp-5);overflow-wrap:anywhere}
 .dictamen-situaciones li{margin-block:var(--ipn-esp-2)}
 .dictamen-situaciones small{display:block;color:var(--ipn-tenue)}
-.dictamen-situaciones a{display:inline-flex;align-items:center;min-height:2.25rem;padding:0 var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);text-decoration:none}
+.dictamen-situaciones a{display:inline-flex;align-items:center;min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);text-decoration:none}
 .dictamen-situaciones a:hover{border-color:var(--ipn-acento);color:var(--ipn-acento)}
 .dictamen-anexos{min-width:0;margin-block:var(--ipn-esp-4)}
 .dictamen-anexos ol{list-style:none;margin:var(--ipn-esp-2) 0;padding:0}
@@ -115,7 +121,7 @@
 .tramite-fila-boton:hover{background:var(--ipn-hundido)}
 .tramite-fila-boton:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 /* Ventanilla A (dueño, 2026-10-17): cada trámite es un objeto con borde fino; gana a .sate-btn (píldora). */
-.sate-btn.tramite-fila-boton{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:var(--ipn-esp-1);min-height:0;height:auto;padding:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);text-align:left;white-space:normal;line-height:1.4}
+.sate-btn.tramite-fila-boton{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;row-gap:var(--ipn-esp-1);min-height:var(--ipn-control-alto);height:auto;padding:var(--ipn-esp-4);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);text-align:left;white-space:normal;line-height:1.4}
 .sate-btn.tramite-fila-boton:hover{border-color:var(--ipn-tenue);background:var(--ipn-superficie)}
 .tramite-fila-boton .tramite-fila-titulo{grid-column:1;font-size:var(--ipn-tamano-m);font-weight:600;color:var(--ipn-texto)}
 .tramite-fila-boton .tramite-fila-para{grid-column:1;font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
@@ -286,9 +292,9 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-linea-fila+.calendario-linea-fila{border-top:1px dashed var(--cal-linea)}
 .calendario-linea-fila>b{display:flex;align-items:center;gap:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs);font-weight:600;color:var(--cal-tenue)}
 .calendario-linea-pista{position:relative;min-width:0;min-height:34px}
-.calendario-ev{position:absolute;height:20px;min-width:6px;padding:0;border:0;border-radius:var(--ipn-radio);background:var(--cal-color);cursor:pointer}
+.calendario-ev{position:absolute;height:var(--ipn-control-alto);min-width:6px;padding:0;border:0;border-radius:var(--ipn-radio);background:var(--cal-color);cursor:pointer}
 .calendario-ev::before{content:"";position:absolute;inset:-6px -3px}
-.calendario-ev[data-puntual=true]{width:12px;height:12px;min-width:0;border-radius:var(--ipn-radio);transform:translateX(-6px)}
+.calendario-ev[data-puntual=true]{width:12px;height:var(--ipn-control-alto);min-width:0;border-radius:var(--ipn-radio);transform:translateX(-6px)}
 .calendario-ev[data-rayado=true]{background:repeating-linear-gradient(135deg,var(--cal-color) 0 3px,transparent 3px 6px);outline:1px solid var(--cal-color)}
 .calendario-ev[data-pasado=true]:not([data-seleccionado=true]){opacity:.35}
 .calendario-ev[data-seleccionado=true]{outline:2px solid var(--cal-texto);outline-offset:2px;opacity:1}
@@ -301,7 +307,7 @@ body.sate-flotante #sate-tabs{display:none}
 /* Agenda «Lo que viene» */
 .calendario-agenda-lista{display:flex;flex-direction:column;gap:var(--ipn-esp-5)}
 .calendario-agenda-mes h4{margin:0 0 var(--ipn-esp-2);font-size:var(--ipn-tamano-m);text-transform:uppercase;letter-spacing:.06em;color:var(--cal-tenue);line-height:1.25;font-weight:600}
-.calendario-item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:var(--ipn-esp-3);align-items:center;width:100%;min-height:48px;padding:var(--ipn-esp-2) var(--ipn-esp-3);border:1px solid transparent;border-radius:var(--ipn-radio);background:none;color:var(--cal-texto);font:inherit;text-align:left;cursor:pointer}
+.calendario-item{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:var(--ipn-esp-3);align-items:center;width:100%;min-height:var(--ipn-control-alto);padding:var(--ipn-esp-2) var(--ipn-esp-3);border:1px solid transparent;border-radius:var(--ipn-radio);background:none;color:var(--cal-texto);font:inherit;text-align:left;cursor:pointer}
 .calendario-item:hover{background:var(--cal-hundido)}
 .calendario-item[aria-pressed=true]{border-color:var(--cal-texto);background:var(--cal-hundido)}
 .calendario-fecha{display:flex;flex-direction:column;align-items:center;line-height:1.1;padding-left:var(--ipn-esp-2);border-left:3px solid var(--cal-color)}
@@ -340,16 +346,16 @@ body.sate-flotante #sate-tabs{display:none}
 .calendario-centro-etiqueta{color:var(--cal-tenue)}
 .calendario-centro strong{font-size:var(--ipn-tamano-xl);line-height:1.15}
 .calendario-centro-largo{display:flex;flex-direction:column;gap:var(--ipn-esp-1)}
-.calendario-centro .sate-btn{padding:0 var(--ipn-esp-1);min-height:32px;font:inherit;color:var(--cal-acento);background:none;border:0}
+.calendario-centro .sate-btn{padding:0 var(--ipn-esp-1);min-height:var(--ipn-control-alto);font:inherit;color:var(--cal-acento);background:none;border:0}
 .calendario-nav{display:flex;align-items:center;gap:var(--ipn-esp-2);margin-bottom:var(--ipn-esp-2)}
 .calendario-nav h3{flex:1;margin:0;font-size:var(--ipn-tamano-l);text-align:center;text-transform:capitalize;line-height:1.25}
-.calendario-nav .sate-btn{min-width:40px;min-height:40px;padding:0;background:var(--cal-fondo);color:var(--cal-texto)}
+.calendario-nav .sate-btn{min-width:40px;min-height:var(--ipn-control-alto);padding:0;background:var(--cal-fondo);color:var(--cal-texto)}
 .calendario-nav .sate-btn:disabled{opacity:.5}
 .calendario-mes{width:100%;min-width:0;overflow:hidden;background:var(--cal-fondo)}
 .calendario-dias-semana,.calendario-fechas{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
 .calendario-dias-semana{text-align:center;color:var(--cal-tenue);padding:var(--ipn-esp-1) 0;font-size:var(--ipn-tamano-xs)}
 .calendario-celda{min-width:0;padding:var(--ipn-esp-1)}
-.calendario-dia{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ipn-esp-1);width:100%;min-width:0;min-height:40px;border:0;border-radius:var(--ipn-radio);background:var(--cal-fondo);color:var(--cal-texto);font:inherit;font-size:var(--ipn-tamano-xs);padding:var(--ipn-esp-1);cursor:pointer;font-variant-numeric:tabular-nums}
+.calendario-dia{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ipn-esp-1);width:100%;min-width:0;min-height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio);background:var(--cal-fondo);color:var(--cal-texto);font:inherit;font-size:var(--ipn-tamano-xs);padding:var(--ipn-esp-1);cursor:pointer;font-variant-numeric:tabular-nums}
 .calendario-dia:hover{background:var(--cal-hundido)}
 .calendario-fuera{opacity:.5}
 .calendario-numero{display:grid;place-items:center;min-width:1.5rem;min-height:1.5rem;background:transparent;border-radius:var(--ipn-radio)}
@@ -421,7 +427,7 @@ body.sate-flotante #sate-tabs{display:none}
 /* chips: el color indica el estado; la marca (✓ ! ✕ i) lo repite sin depender del color */
 .sate-chips{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2);padding:var(--ipn-esp-1)}   /* se acomodan en varias líneas, sin barra lateral */
 .sate-chips__item{flex:none;display:inline-flex}
-.sate-chip{display:inline-flex;align-items:center;gap:var(--ipn-esp-2);min-height:2.25rem;padding:0 var(--ipn-esp-3);border:1px solid var(--chip-c);border-radius:var(--ipn-radio-pastilla);background:var(--chip-s);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);white-space:nowrap}
+.sate-chip{display:inline-flex;align-items:center;gap:var(--ipn-esp-2);min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-3);border:1px solid var(--chip-c);border-radius:var(--ipn-radio-pastilla);background:var(--chip-s);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);white-space:nowrap}
 .sate-chip[data-estado=ok]{--chip-c:var(--ipn-ok);--chip-s:var(--ipn-ok-suave)}
 .sate-chip[data-estado=aviso]{--chip-c:var(--ipn-aviso);--chip-s:var(--ipn-aviso-suave)}
 .sate-chip[data-estado=error]{--chip-c:var(--ipn-error);--chip-s:var(--ipn-error-suave)}
@@ -443,7 +449,7 @@ button.sate-chip{cursor:pointer}
 .sate-aviso p{margin:0}
 .sate-aviso__titulo{font-weight:600;color:var(--av-c)}
 .sate-aviso__cuerpo{margin-top:var(--ipn-esp-1)!important;overflow-wrap:anywhere}
-.sate-aviso__x{position:absolute;top:var(--ipn-esp-1);right:var(--ipn-esp-1);width:2rem;height:2rem;border:0;background:none;cursor:pointer;border-radius:var(--ipn-radio)}
+.sate-aviso__x{position:absolute;top:var(--ipn-esp-1);right:var(--ipn-esp-1);width:2rem;height:var(--ipn-control-alto);border:0;background:none;cursor:pointer;border-radius:var(--ipn-radio)}
 .sate-enlace{display:inline-block;margin-top:var(--ipn-esp-2);padding:0;border:0;background:none;color:var(--ipn-acento);text-decoration:underline;cursor:pointer;font-size:var(--ipn-tamano-s)}
 
 /* botones */
@@ -463,7 +469,7 @@ button.sate-chip{cursor:pointer}
 .sate-modal--pequeno{width:min(24rem,calc(100vw - var(--ipn-esp-5)))}
 .sate-modal__cab{display:flex;align-items:center;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
 .sate-modal__titulo{flex:1;margin:0;font-size:var(--ipn-tamano-l);font-weight:600;line-height:1.25}
-.sate-modal__x{flex:none;width:2.5rem;height:2.5rem;border:0;border-radius:var(--ipn-radio);background:none;cursor:pointer}
+.sate-modal__x{flex:none;width:2.5rem;height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio);background:none;cursor:pointer}
 .sate-modal__cuerpo{flex:1;min-height:0;overflow:auto;padding:var(--ipn-esp-4);font-size:var(--ipn-tamano-s);line-height:1.5}
 .sate-modal__cuerpo p{margin:0 0 var(--ipn-esp-3)}
 .sate-modal__cuerpo a{color:var(--ipn-acento)}
@@ -512,7 +518,7 @@ button.sate-chip{cursor:pointer}
 .sate-buscador input{box-sizing:border-box;width:100%;min-width:0;min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-7) 0 var(--ipn-esp-7);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
 .sate-buscador input::-webkit-search-cancel-button{display:none}
 .sate-buscador input:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
-.sate-buscador__borrar{position:absolute;right:var(--ipn-esp-1);display:grid;place-items:center;width:2.5rem;height:2.5rem;border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font:inherit;font-size:var(--ipn-tamano-l);line-height:1;cursor:pointer}
+.sate-buscador__borrar{position:absolute;right:var(--ipn-esp-1);display:grid;place-items:center;width:2.5rem;height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font:inherit;font-size:var(--ipn-tamano-l);line-height:1;cursor:pointer}
 .sate-buscador__borrar[hidden]{display:none}
 .sate-buscador__borrar:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
 
@@ -528,7 +534,7 @@ button.sate-chip{cursor:pointer}
 .sate-preguntas{display:grid;gap:var(--ipn-esp-3);margin:0;padding:0;list-style:none}
 .sate-pregunta{border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);scroll-margin-top:calc(var(--sate-barra-alto) + var(--ipn-esp-5))}
 .sate-pregunta[open]{border-color:var(--ipn-acento)}
-.sate-pregunta>summary{display:flex;align-items:center;justify-content:space-between;gap:var(--ipn-esp-4);min-height:3.25rem;padding:var(--ipn-esp-3) var(--ipn-esp-5);cursor:pointer;font-weight:600;list-style:none;overflow-wrap:anywhere}
+.sate-pregunta>summary{display:flex;align-items:center;justify-content:space-between;gap:var(--ipn-esp-4);min-height:var(--ipn-control-alto);padding:var(--ipn-esp-3) var(--ipn-esp-5);cursor:pointer;font-weight:600;list-style:none;overflow-wrap:anywhere}
 .sate-pregunta>summary::-webkit-details-marker{display:none}
 .sate-pregunta>summary::after{content:"";flex:none;width:.6rem;height:.6rem;margin-top:calc(-1 * var(--ipn-esp-1));border-right:2px solid var(--ipn-tenue);border-bottom:2px solid var(--ipn-tenue);transform:rotate(45deg)}
 .sate-pregunta[open]>summary::after{margin-top:var(--ipn-esp-1);transform:rotate(-135deg)}
@@ -555,7 +561,7 @@ button.sate-chip{cursor:pointer}
 
 /* ayuda */
 .sate-ayuda{display:inline-block;position:relative;vertical-align:middle}
-.sate-ayuda__btn{display:inline-grid;place-items:center;min-width:1.75rem;min-height:1.75rem;border:0;background:none;color:var(--ipn-tenue);cursor:pointer;border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-m);padding:0}
+.sate-ayuda__btn{display:inline-grid;place-items:center;min-width:1.75rem;min-height:var(--ipn-control-alto);border:0;background:none;color:var(--ipn-tenue);cursor:pointer;border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-m);padding:0}
 .sate-ayuda__btn:hover{color:var(--ipn-acento)}
 .sate-ayuda--termino{display:inline;position:static;vertical-align:baseline}
 .sate-ayuda__btn.sate-termino{display:inline;position:relative;width:auto;height:auto;min-width:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;color:inherit;font:inherit;line-height:inherit;text-decoration-line:underline;text-decoration-style:dotted;text-decoration-thickness:max(1px,.08em);text-decoration-color:var(--ipn-tenue);text-underline-offset:.08em;cursor:help}
@@ -586,12 +592,12 @@ button.sate-chip{cursor:pointer}
 .sate-pestana[aria-selected=true]::after,.sate-barra__btn[aria-current=page]::after{content:'';position:absolute;bottom:.3rem;left:calc(50% - .18rem);width:.36rem;height:.36rem;border-radius:var(--ipn-radio);background:var(--sate-realce)}
 .sate-pestana:focus-visible,.sate-barra__btn:focus-visible,.trayectoria-minimapa button:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .sate-pestanas--seg{display:inline-flex;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-1);background:var(--ipn-hundido)}
-.sate-pestanas--seg .sate-pestana{min-height:2.25rem;border:0;border-radius:var(--ipn-radio)}
+.sate-pestanas--seg .sate-pestana{min-height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio)}
 .sate-pestanas--seg .sate-pestana[aria-selected=true]{background:var(--ipn-superficie);box-shadow:0 0 0 1px var(--ipn-linea)}
 
 /* barra inferior: teléfono y contenedores donde tampoco caben los textos cortos */
 .sate-barra{display:none;position:fixed;left:var(--ipn-esp-2);right:var(--ipn-esp-2);bottom:var(--ipn-esp-2);z-index:40;box-sizing:border-box;min-height:calc(64px + env(safe-area-inset-bottom,0px));gap:var(--ipn-esp-1);padding:var(--ipn-esp-2);padding-bottom:calc(var(--ipn-esp-2) + env(safe-area-inset-bottom,0px));border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido);box-shadow:inset 0 1px 3px var(--ipn-linea);font-family:var(--ipn-fuente-texto)}
-.sate-barra__btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ipn-esp-1);flex:1;min-width:0;min-height:48px;border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);cursor:pointer;padding:var(--ipn-esp-1) var(--ipn-esp-1) var(--ipn-esp-3);transition:background var(--ipn-duracion-rapida)}
+.sate-barra__btn{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--ipn-esp-1);flex:1;min-width:0;min-height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio);background:none;color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs);cursor:pointer;padding:var(--ipn-esp-1) var(--ipn-esp-1) var(--ipn-esp-3);transition:background var(--ipn-duracion-rapida)}
 .sate-barra__plan{display:flex;flex:none;align-items:center}
 .sate-barra__plan #plan-periodos{gap:var(--ipn-esp-1)}
 .sate-barra__plan #plan-periodos button{min-width:0;min-height:var(--ipn-control-alto);padding-inline:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs)}
@@ -749,7 +755,7 @@ body.sate-flotante .sate-barra{display:flex}
 .tramite-datos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,14rem),1fr));gap:0 var(--ipn-esp-3)}
 .tramite-datos>h3,.tramite-datos>.tramite-acciones{grid-column:1 / -1}
 .tramite-campo input:not([type=checkbox]),.tramite-campo select{min-height:2.25rem;padding:var(--ipn-esp-2) var(--ipn-esp-2)}
-#sate-tramites .sate-btn,.tramite-datos .sate-btn{min-height:2.25rem;padding-inline:var(--ipn-esp-3);font:inherit}
+#sate-tramites .sate-btn,.tramite-datos .sate-btn{min-height:var(--ipn-control-alto);padding-inline:var(--ipn-esp-3);font:inherit}
 .saes-dlg .tramite-datos{font-size:var(--ipn-tamano-m)}
 .saes-dlg .tramite-acciones{position:static}
 .chosen-requisitos{margin-top:var(--ipn-esp-3);font-size:var(--ipn-tamano-s)}
@@ -782,14 +788,14 @@ body.sate-flotante .sate-barra{display:flex}
 
 /* UX1: grupos separados y dimensiones compartidas con los contratos de diseño. */
 .info:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
-.marks button{min-height:36px}
+.marks button{min-height:var(--ipn-control-alto)}
 .maptools{row-gap:var(--ipn-esp-3);margin-block:var(--ipn-esp-3)}
 .maptools .seg{max-width:100%;flex-wrap:wrap}
 #legend{flex-wrap:wrap;white-space:normal;gap:var(--ipn-esp-2) var(--ipn-esp-4)}
 #map-simbologia{display:none}
 #map-primera-visita{margin-block:var(--ipn-esp-4)}
 .sate-aviso:has(.sate-aviso__x){padding-right:calc(44px + var(--ipn-esp-3))}
-.sate-aviso__x{width:44px;height:44px}
+.sate-aviso__x{width:44px;height:var(--ipn-control-alto)}
 .sate-recorte-calendario{min-height:var(--ipn-control-alto)}
 .sate-navegacion{margin-block:var(--ipn-esp-3)}
 .gtime,.genrow{gap:var(--ipn-esp-4);margin-block:var(--ipn-esp-3)}
@@ -891,7 +897,7 @@ body.sate-flotante .sate-barra{display:flex}
 @media(hover:none){.calendario-linea-pista,.calendario-linea-meses,.calendario-linea-hoy-capa{display:none}.calendario-linea-lista{display:grid;gap:var(--ipn-esp-2)}.calendario-linea-lista button{white-space:normal;text-align:left;margin-block:var(--ipn-esp-1)}}
 /* Más comparte cierre, foco y teclado con el modal común. */
 .sate-mas-lista{display:grid;gap:var(--ipn-esp-4)}
-.sate-mas-lista button{display:flex;align-items:center;gap:var(--ipn-esp-3);min-height:3rem}
+.sate-mas-lista button{display:flex;align-items:center;gap:var(--ipn-esp-3);min-height:var(--ipn-control-alto)}
 .sate-mas-lista .sate-pestana__texto--corto{display:none}
 .sate-modal.sate-modal--mas{inset:auto 0 0;margin:0 auto;width:min(100%,36rem);height:auto;max-height:80dvh;border-radius:var(--ipn-radio) var(--ipn-radio) 0 0}
 .sate-mas-lista button[aria-current=page]{background:var(--ipn-acento-suave);border-color:var(--ipn-acento);font-weight:600}
@@ -1114,3 +1120,7 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 @media(max-width:639px){.filtros-d~.hlayout{padding-bottom:calc(var(--ipn-control-alto) + var(--ipn-esp-7))}}
 @media(max-width:639px){.filtros-d-panel{inset:auto 0 0;width:100%;height:80dvh}.filtros-d .search{min-width:0}.filtros-d-impacto{position:relative}.filtros-d .pill{white-space:normal}}
 @media(max-width:639px){.filtros-d-impacto{position:sticky;top:calc(var(--sate-barra-alto) + env(safe-area-inset-top,0px));z-index:5}}
+
+.calendario-linea-fila,.calendario-linea-pista{min-height:var(--ipn-control-alto)}
+@media(max-width:767px){.sate-termino::before{content:"";position:absolute;inset:50% auto auto 50%;width:max(100%,var(--ipn-objetivo-tactil));height:max(100%,var(--ipn-objetivo-tactil));transform:translate(-50%,-50%)}}
+@media(max-width:767px){:is(button,[role=button],.btn,.sate-btn):not(.sate-termino){min-width:var(--ipn-objetivo-tactil)}}

@@ -146,13 +146,14 @@
       // Los eventos que se traslapan se apilan en carriles dentro de la misma fila.
       const items=evs.map(e=>{const puntual=!!meta(e).puntual,a=pos(e.desde)+(puntual?50/total:0),ancho=puntual?0:(numero(e.hasta)-numero(e.desde)+1)/total*100;return {e,puntual,a,ancho,fin:puntual?a+1.6:Math.max(a+ancho,a+.9)+.3}}),ocupados=[];
       items.forEach(it=>{let l=ocupados.findIndex(f=>f<=it.a);if(l<0)l=ocupados.length;ocupados[l]=it.fin;it.lane=l});
-      const carriles=Math.max(1,ocupados.length);pista.setAttribute('data-carriles',carriles);pista.style.height=carriles===1?'34px':(carriles*26+8)+'px';
+      // Cada carril reserva el objetivo completo para no superponer botones al crecer.
+      const carriles=Math.max(1,ocupados.length);pista.setAttribute('data-carriles',carriles);pista.style.height=`calc(${carriles} * (var(--ipn-control-alto) + var(--ipn-esp-2)) + var(--ipn-esp-2))`;
       items.forEach(it=>{
-        const {e,puntual}=it,top=carriles===1?7:4+it.lane*26,b=boton(null,()=>{},idDe('cal-ev-',e));b.className='calendario-ev';conectar(b,[e],e.titulo);
+        const {e,puntual}=it,top=`calc(var(--ipn-esp-1) + ${it.lane} * (var(--ipn-control-alto) + var(--ipn-esp-2)))`,b=boton(null,()=>{},idDe('cal-ev-',e));b.className='calendario-ev';conectar(b,[e],e.titulo);
         b.setAttribute('data-puntual',puntual);b.setAttribute('data-pasado',pasado(e));b.setAttribute('data-rayado',['suspension','descanso','feriado','sindical'].includes(e.categoria));b.setAttribute('data-desde',e.desde);b.setAttribute('data-hasta',e.hasta);b.setAttribute('data-grupo',grupoDe(e)?.clave||'');b.title=e.titulo+' · '+corto(e);
-        b.style.left=it.a+'%';b.style.top=top+(puntual?4:0)+'px';if(!puntual)b.style.width=it.ancho+'%';pista.appendChild(b);
+        b.style.left=it.a+'%';b.style.top=top;if(!puntual)b.style.width=it.ancho+'%';pista.appendChild(b);
         const siguiente=items.filter(o=>o.lane===it.lane&&o.a>it.a)[0],espacio=(siguiente?siguiente.a:100)-it.fin;
-        if(espacio>=14){const n=el('span',e.titulo.replace(/ \(registro\)$/,''),'calendario-linea-nombre');n.style.left='calc('+it.fin+'% + 4px)';n.style.top=(top+2)+'px';n.style.width='calc('+(espacio-1)+'% - 8px)';n.setAttribute('aria-hidden','true');pista.appendChild(n)}
+        if(espacio>=14){const n=el('span',e.titulo.replace(/ \(registro\)$/,''),'calendario-linea-nombre');n.style.left='calc('+it.fin+'% + 4px)';n.style.top=top;n.style.width='calc('+(espacio-1)+'% - 8px)';n.setAttribute('aria-hidden','true');pista.appendChild(n)}
       });
       fila.appendChild(pista);
       const lista=el('div',null,'calendario-linea-lista');
