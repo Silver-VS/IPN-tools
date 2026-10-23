@@ -66,6 +66,13 @@
     return raizArbol;
   }
   const totalArticulos = nodo => nodo.articulos.length + nodo.hijos.reduce((s, h) => s + totalArticulos(h), 0);
+  // El mapa usa artículos existentes, no la resta de extremos (puede haber artículos Bis).
+  function mapaReglamento(reg) {
+    return (reg.estructura || []).map(nodo => ({
+      titulo: nodo.titulo, aplicacion: nodo.aplicacion || 'organizacion',
+      articulos: (reg.articulos || []).filter(a => (a.ubicacion || [])[0] === nodo.titulo).map(a => a.n)
+    })).filter(nodo => nodo.articulos.length);
+  }
   // Artículos de definiciones («se entenderá por: Término: definición. Otro: …»): un párrafo por término.
   // Regla conservadora: solo tras «por:», con términos que empiezan en mayúscula y no pasan de 80 caracteres sin signos.
   function dividirDefiniciones(texto) {
@@ -116,7 +123,7 @@
     const preguntas = (d && citasPorArticulo(d).get(doc + ':' + n)) || [], disponibles = tramitesUnidad || [];
     return { preguntas, tramites: [...new Set(preguntas.map(p => p.ventanilla).filter(v => v && disponibles.includes(v)))] };
   }
-  raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo };
+  raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -350,7 +357,7 @@
     if (raiz.navigator?.clipboard?.writeText) return raiz.navigator.clipboard.writeText(url);
     return Promise.reject(new Error('Sin portapapeles'));
   }
-  // Lector de tres paneles: índice del reglamento | texto de un artículo | trámites y preguntas que lo citan.
+  // Lector de tres paneles: índice | articulado continuo | trámites y preguntas del artículo actual.
   function montarReglamento(raizGuia, d, reg, doc, ancla) {
     const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos'), href: rutaGuia('reglamentos') }, { texto: reg.titulo }], reg.titulo, reg.gaceta);
     const articulos = reg.sin_texto ? [] : reg.articulos || [], transitorios = reg.sin_texto ? [] : reg.transitorios || [];
@@ -379,7 +386,8 @@
       const propios = [...ancestros, det];
       for (const hijo of nodo.hijos) cuerpo.appendChild(nodoArbol(hijo, propios));
       if (nodo.articulos.length) cuerpo.appendChild(h('ul', { 'class': 'rgl-arts' }, nodo.articulos.map(n => chip(n, propios))));
-      det.append(h('summary', {}, [h('span', { texto: nodo.titulo }), h('small', { texto: String(totalArticulos(nodo)) })]), cuerpo);
+      const primeroDe = x => x.articulos[0] || primeroDe(x.hijos[0]);
+      det.append(h('summary', {}, [enlaceAncla('rgl-indice-titulo', anclaArticulo(primeroDe(nodo)), nodo.titulo), h('small', { texto: String(totalArticulos(nodo)) })]), cuerpo);
       return det;
     }
     const arbolNav = h('div', { 'class': 'rgl-arbol' }, arbol.hijos.map(x => nodoArbol(x, [])));
@@ -406,10 +414,27 @@
     const texto = h('article', { 'class': 'rgl-texto', 'aria-label': reg.titulo });
     const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
     const rejilla = h('div', { 'class': 'rgl' }, [indice, texto, riel]);
+    const estrecho = () => pantallaChica() || (rejilla.clientWidth > 0 && rejilla.clientWidth <= 672);
     if (fuenteDoc || avisoOcr) cab.nodo.appendChild(h('div', { 'class': 'rgl-datos' }, [fuenteDoc, avisoOcr]));
-    raizGuia.append(cab.nodo, rejilla);
+    const mapa = mapaReglamento(reg);
+    const cifras = h('dl', { 'class': 'rgl-cifras' }, [
+      ['articulos', articulos.length], ['titulos', mapa.filter(x => /^TÍTULO/i.test(x.titulo)).length],
+      ['directos', mapa.filter(x => x.aplicacion === 'directo').reduce((s, x) => s + x.articulos.length, 0)]
+    ].map(([clave, n]) => h('div', {}, [h('dt', { texto: t('sate.guia.rgl_' + clave) }), h('dd', { texto: String(n) })])));
+    const barra = h('div', { 'class': 'rgl-mapa__barra' }, mapa.map(x => {
+      const a = enlaceAncla('rgl-mapa__tramo rgl-aplica--' + x.aplicacion, anclaArticulo(x.articulos[0]), [h('span', { texto: x.titulo })],
+        { title: x.titulo + ' · ' + t('sate.guia.numero_articulos', { n: x.articulos.length }), 'aria-label': x.titulo + ' · ' + t('sate.guia.rgl_' + x.aplicacion) });
+      a.style.flex = x.articulos.length + ' 0 0';
+      return a;
+    }));
+    const mapaVista = h('section', { 'class': 'rgl-mapa' }, [h('h3', { texto: t('sate.guia.rgl_mapa') }),
+      h('ul', { 'class': 'rgl-leyenda' }, ['directo', 'parcial', 'organizacion'].map(x => h('li', { 'class': 'rgl-aplica--' + x, texto: t('sate.guia.rgl_' + x) }))), barra,
+      h('div', { 'class': 'rgl-mapa__titulos' }, mapa.map(x => enlaceAncla('', anclaArticulo(x.articulos[0]), x.titulo)))]);
+    raizGuia.append(cab.nodo, cifras);
+    if (mapa.length) raizGuia.appendChild(mapaVista);
+    raizGuia.appendChild(rejilla);
 
-    let actual = null, mensaje = null, temporizador = 0, enlaceActual = '';
+    let actual = null, enlaceActual = '';
     function fila(clase, marca, anclaDe, etiqueta, contenido) {
       return h('li', { 'class': clase, 'data-ancla': anclaDe }, [enlaceAncla('rgl-marca', anclaDe, marca, { 'aria-label': etiqueta }), h('div', {}, contenido)]);
     }
@@ -422,56 +447,77 @@
         f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), [h('p', { texto: x.texto })]))) : null]))));
       return h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial' }, nodos);
     }
-    const rotuloArticulo = a => ({ ancla: anclaArticulo(a.n), rotulo: t('sate.guia.articulo_rotulo', { n: a.n }) });
-    function paginas(antes, despues) {
-      const enlace = (x, clase, ref) => x ? enlaceAncla('rgl-pagina ' + clase, x.ancla, [h('small', { texto: ref }), h('span', { texto: x.rotulo })]) : h('span');
-      return h('nav', { 'class': 'rgl-paginas', 'aria-label': t('sate.guia.rgl_indice') }, [enlace(antes, 'rgl-pagina--antes', t('sate.guia.rgl_anterior')), enlace(despues, 'rgl-pagina--despues', t('sate.guia.rgl_siguiente'))]);
-    }
-    function copiar() {
-      const avisar = clave => { if (mensaje) { mensaje.textContent = t(clave); raiz.clearTimeout(temporizador); temporizador = raiz.setTimeout(() => { mensaje.textContent = ''; }, 2500); } };
-      Promise.resolve().then(() => copiarEnlace(enlaceActual)).then(() => avisar('sate.guia.rgl_copiado'), () => avisar('sate.guia.rgl_copiar_error'));
-    }
-    function cabeceraTexto(rotulo, ubicacion) {
-      const boton = h('button', { type: 'button', 'class': 'btn rgl-copiar', texto: t('sate.guia.rgl_copiar') });
-      boton.addEventListener('click', copiar);
-      mensaje = h('span', { 'class': 'rgl-copiado', role: 'status', 'aria-live': 'polite' });
-      return h('header', { 'class': 'rgl-cab' }, [h('div', {}, [ubicacion ? h('p', { 'class': 'rgl-ubicacion', texto: ubicacion }) : null, h('h3', { tabindex: '-1', texto: rotulo })]), h('div', { 'class': 'rgl-acciones' }, [boton, mensaje])]);
-    }
     function pintarRiel(a) {
       const rel = a ? relacionesArticulo(d, doc, a.n, tramites) : { preguntas: [], tramites: [] };
       const bloques = [];
       if (rel.tramites.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_tramites') }), h('ul', {}, rel.tramites.map(id => h('li', {}, [h('a', { href: '#/' + unidad() + '/tramites/' + id, texto: t('sate.tramite.' + id + '.titulo') })])))]));
       if (rel.preguntas.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_preguntas') }), h('ul', {}, rel.preguntas.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]));
       riel.replaceChildren(...bloques);
-      riel.hidden = !bloques.length;
-      rejilla.classList.toggle('rgl--sin-riel', !bloques.length);
+      // Mantener las columnas evita que el texto cambie de ancho al recorrer artículos sin relaciones.
+      riel.hidden = false;
     }
     function marcarIndice(clave) {
       for (const [n, a] of enlaces) { if (n === clave) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
       if (enlaceTransitorios) { if (clave === 'transitorios') enlaceTransitorios.setAttribute('aria-current', 'true'); else enlaceTransitorios.removeAttribute('aria-current'); }
       for (const g of grupos.get(clave) || []) g.open = true;
+      for (const g of arbolNav.querySelectorAll('.rgl-grupo')) {
+        const titulo = g.querySelector('.rgl-indice-titulo');
+        if ((grupos.get(clave) || []).includes(g)) titulo.setAttribute('aria-current', 'true');
+        else titulo.removeAttribute('aria-current');
+      }
       // Con el índice abierto, el artículo actual queda a la vista dentro de su propio desplazamiento.
       const activo = clave === 'transitorios' ? enlaceTransitorios : enlaces.get(clave), r = cuerpoIndice.getBoundingClientRect();
       if (activo && indice.open && r.height) { const a = activo.getBoundingClientRect(); if (a.top < r.top || a.bottom > r.bottom) cuerpoIndice.scrollTop += a.top - r.top - r.height / 3; }
     }
-    // Pinta un artículo (o los transitorios).
+    // El lienzo conserva todo el documento; al navegar solo cambian el índice y las relaciones.
     function pintar(clave) {
       if (clave === 'transitorios') {
         const rotulo = t('sate.guia.transitorios');
-        texto.replaceChildren(cabeceraTexto(rotulo, ''),
-          h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial' }, [h('ol', { 'class': 'rgl-fracciones' }, transitorios.map(x => h('li', { 'class': 'rgl-fr' }, [h('span', { 'class': 'rgl-marca', texto: x.n + '.' }), h('div', {}, [h('p', { texto: x.texto })])])))]),
-          paginas(articulos.length ? rotuloArticulo(articulos[articulos.length - 1]) : null, null));
         pintarRiel(null);
         resumen.textContent = rotulo;
       } else {
         const i = posicion.get(clave), a = articulos[i];
-        texto.replaceChildren(cabeceraTexto(t('sate.guia.articulo_rotulo', { n: a.n }), (a.ubicacion || []).join(' · ')), cuerpoArticulo(a),
-          paginas(i > 0 ? rotuloArticulo(articulos[i - 1]) : null, i < articulos.length - 1 ? rotuloArticulo(articulos[i + 1]) : transitorios.length ? { ancla: 'transitorios', rotulo: t('sate.guia.transitorios') } : null));
         pintarRiel(a);
         resumen.textContent = t('sate.guia.rgl_art_corto', { n: a.n });
       }
       marcarIndice(clave);
       actual = clave;
+      for (const tramo of barra.children) {
+        const grupo = mapa.find(x => x.articulos.includes(clave));
+        if (grupo && tramo.getAttribute('data-ancla') === anclaArticulo(grupo.articulos[0])) tramo.setAttribute('aria-current', 'true');
+        else tramo.removeAttribute('aria-current');
+      }
+    }
+    const secciones = new Map();
+    let ubicacionAnterior = [], contenedores = [texto];
+    for (const a of articulos) {
+      const ubicacion = a.ubicacion || [];
+      let comun = 0;
+      while (comun < ubicacion.length && ubicacion[comun] === ubicacionAnterior[comun]) comun++;
+      contenedores = contenedores.slice(0, comun + 1);
+      for (let nivel = comun; nivel < ubicacion.length; nivel++) {
+        const grupo = h('section', { 'class': 'rgl-seccion rgl-nivel-' + nivel }, [h('h' + Math.min(6, nivel + 3), { 'class': 'rgl-encabezado', texto: ubicacion[nivel] })]);
+        contenedores[contenedores.length - 1].appendChild(grupo);
+        contenedores.push(grupo);
+      }
+      const anc = anclaArticulo(a.n);
+      const copiarArticulo = h('button', { type: 'button', 'class': 'btn rgl-copiar', texto: t('sate.guia.rgl_copiar') });
+      const estado = h('span', { role: 'status', 'class': 'rgl-copiado' });
+      copiarArticulo.addEventListener('click', () => copiarEnlace(rutaReglamento(doc, anc)).then(
+        () => { estado.textContent = t('sate.guia.rgl_copiado'); },
+        () => { estado.textContent = t('sate.guia.rgl_copiar_error'); }));
+      const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-' + anc, 'data-articulo': a.n }, [
+        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, estado]), cuerpoArticulo(a)]);
+      contenedores[contenedores.length - 1].appendChild(seccion);
+      secciones.set(a.n, seccion);
+      ubicacionAnterior = ubicacion;
+    }
+    if (transitorios.length) {
+      const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-transitorios', 'data-articulo': 'transitorios' }, [
+        h('h3', { texto: t('sate.guia.transitorios') }), h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial' },
+          transitorios.map(x => h('p', { texto: x.n + '. ' + x.texto })))]);
+      texto.appendChild(seccion);
+      secciones.set('transitorios', seccion);
     }
     // Muestra el artículo o la fracción de un ancla; sin ancla válida, el primer artículo. Devuelve el nodo de la fracción, si hay.
     function ir(anclaDestino, empujar) {
@@ -486,26 +532,69 @@
       enlaceActual = rutaReglamento(doc, fr ? final : clave === 'transitorios' ? clave : anclaArticulo(clave));
       if (empujar) {
         try { history[cambio ? 'pushState' : 'replaceState'](null, '', enlaceActual); } catch (e) { /* sin historial */ }
-        if (indice.open && pantallaChica()) indice.open = false;
-        if (fr) SateUI.revelar(fr);
-        else if (cambio) { const r = texto.getBoundingClientRect(); if (r.top < 0 && texto.scrollIntoView) texto.scrollIntoView({ block: 'start' }); }
+        if (indice.open && estrecho()) indice.open = false;
+        (fr || secciones.get(clave))?.scrollIntoView({ block: 'start' });
       }
       return fr;
     }
-    rejilla.addEventListener('click', e => {
+    raizGuia.addEventListener('click', e => {
       const a = e.target.closest && e.target.closest('a[data-ancla]');
       if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
       e.preventDefault();
       ir(a.getAttribute('data-ancla'), true);
     });
     const consulta = raiz.matchMedia ? raiz.matchMedia('(max-width:768.98px)') : null;
-    const ajustar = () => { indice.open = !(consulta && consulta.matches); };
+    let eraEstrecho = null;
+    const ajustar = () => {
+      const chico = estrecho();
+      if (chico !== eraEstrecho) indice.open = !chico;
+      eraEstrecho = chico;
+      const rielEnIndice = (rejilla.clientWidth > 0 && rejilla.clientWidth <= 832) ||
+        !!raiz.matchMedia?.('(max-width:1024.98px)').matches;
+      if (rielEnIndice && riel.parentNode !== cuerpoIndice) cuerpoIndice.insertBefore(riel, arbolNav);
+      else if (!rielEnIndice && riel.parentNode !== rejilla) rejilla.appendChild(riel);
+      // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
+      function colocar(contenedor, tope) {
+        for (const grupo of contenedor.children) {
+          if (!grupo.classList.contains('rgl-seccion')) continue;
+          const cabecera = grupo.firstChild;
+          cabecera.style.top = tope + 'px';
+          colocar(grupo, tope + (cabecera.offsetHeight || 48));
+        }
+      }
+      colocar(texto, chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
+      for (const seccion of secciones.values()) {
+        let tope = chico ? indice.querySelector('summary').offsetHeight || 48 : 0;
+        for (let padre = seccion.parentNode; padre && padre !== texto; padre = padre.parentNode) {
+          if (padre.classList.contains('rgl-seccion')) tope += padre.firstChild.offsetHeight || 48;
+        }
+        seccion.style.scrollMarginTop = (tope + 16) + 'px';
+      }
+    };
     if (consulta?.addEventListener) consulta.addEventListener('change', ajustar);
     ajustar();
-    limpiarLector = () => { if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); raiz.clearTimeout(temporizador); };
+    const observador = raiz.ResizeObserver ? new raiz.ResizeObserver(ajustar) : null;
+    observador?.observe(rejilla);
+    raiz.addEventListener('resize', ajustar);
+    let cuadro = 0;
+    const seguir = () => {
+      if (cuadro) return;
+      cuadro = raiz.requestAnimationFrame(() => {
+        cuadro = 0;
+        let visible = null;
+        for (const [n, seccion] of secciones) {
+          if (seccion.getBoundingClientRect().top > (parseFloat(seccion.style.scrollMarginTop) || 180)) break;
+          visible = n;
+        }
+        if (visible && visible !== actual) pintar(visible);
+      });
+    };
+    raiz.addEventListener('scroll', seguir, { passive: true });
+    limpiarLector = () => { if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.cancelAnimationFrame(cuadro); };
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
-    if (fr) SateUI.revelar(fr);
-    return { titulo: cab.titulo, enDocumento: !!fr };
+    const destino = ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null;
+    if (destino) SateUI.revelar(destino);
+    return { titulo: cab.titulo, enDocumento: !!destino };
   }
   async function apartadoReglamentos(raizGuia, d, doc, ancla, vigente) {
     if (doc) {
@@ -515,11 +604,62 @@
     }
     const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos') }], tituloApartado('reglamentos'), t('sate.guia.reglamentos_intro'));
     const indice = await cargarReglamento('indice');
-    const docs = Object.entries(d.documentos).filter(([, x]) => x.reglamento).map(([id, x]) => ({ id, ...x }));
-    const lista = h('ul', { 'class': 'sate-tarjetas-nav' }, docs.map(x => h('li', {}, [
-      SateUI.tarjetaNav({ href: rutaGuia('reglamentos', x.id), titulo: x.titulo, detalle: [t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id)?.articulos ?? 0 }), x.gaceta, x.resumen].filter(Boolean).join('. ') })])));
+    const docs = Object.entries(d.documentos).filter(([id, x]) => x.reglamento && indice.some(i => i.id === id)).map(([id, x]) => ({ id, ...x }));
+    const registros = await Promise.all(docs.map(x => cargarReglamento(x.id)));
+    if (!vigente()) return {};
+    const lista = h('ul', { 'class': 'rgl-biblioteca' }, docs.map(x => h('li', {}, [
+      h('a', { href: rutaGuia('reglamentos', x.id), 'class': 'rgl-libro' }, [
+        h('strong', { 'class': 'rgl-siglas', texto: x.siglas || x.titulo.split(/\s+/).filter(p => /^[A-ZÁÉÍÓÚÑ]/.test(p) && !/^(IPN|Instituto|Politécnico|Nacional)$/.test(p)).map(p => p[0]).join('') }),
+        h('h4', { texto: x.titulo }), h('small', { texto: x.gaceta }),
+        h('span', { texto: t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id)?.articulos ?? 0 }) })])])));
+    const resultados = h('ul', { 'class': 'guia-resultados', hidden: true, 'aria-live': 'polite' });
+    const pintarResultados = q => {
+      const encontrados = registros.flatMap(reg => buscarArticulos(reg, q, 4).map(a => ({ reg, a }))).slice(0, 12);
+      resultados.hidden = !terminos(q).length;
+      resultados.replaceChildren(...encontrados.map(({ reg, a }) => h('li', {}, [h('a', {
+        'class': 'guia-resultado', href: rutaReglamento(reg.id, anclaArticulo(a.n))
+      }, [h('strong', { texto: reg.titulo + ' · ' + t('sate.guia.rgl_art_corto', { n: a.n }) }), h('small', { texto: a.texto.slice(0, 140) })])])));
+      if (!encontrados.length) resultados.appendChild(h('li', { 'class': 'guia-vacio', texto: t('sate.guia.rgl_resultados', { n: 0 }) }));
+    };
+    const buscar = SateUI.buscador({ etiqueta: t('sate.guia.rgl_buscar_todos'), marcador: t('sate.guia.rgl_buscar_marcador'), alCambiar: pintarResultados });
+    const sugerencias = h('div', { 'class': 'rgl-sugerencias' }, ['baja', 'recursar', 'plazo'].map(clave => {
+      const boton = h('button', { type: 'button', 'class': 'btn', texto: t('sate.guia.rgl_sugerencia_' + clave) });
+      boton.addEventListener('click', () => {
+        const q = t('sate.guia.rgl_sugerencia_' + clave);
+        buscar.raiz.querySelector('input').value = q;
+        pintarResultados(q);
+      });
+      return boton;
+    }));
+    const temasLista = h('div', { 'class': 'rgl-temas__opciones' });
+    const temaArticulos = h('div', { 'class': 'rgl-temas__articulos', 'aria-live': 'polite' });
+    const temas = [ ['trayectoria', /regular|plazo|trayectoria/], ['oportunidades', /recurs|acredita|ets/], ['carga', /carga|creditos/],
+      ['bajas', /baja/], ['dictamen', /dictamen/], ['inconformidad', /inconform|reconsidera|apelacion/] ];
+    function elegirTema(clave, patron) {
+      for (const boton of temasLista.children) boton.setAttribute('aria-pressed', String(boton.dataset.tema === clave));
+      const preguntas = (d.preguntas || []).filter(p => patron.test(norm([p.pregunta, ...(p.palabras || [])].join(' '))));
+      const citas = new Map();
+      for (const p of preguntas) for (const f of p.fuentes || []) for (const n of f.arts || []) {
+        const reg = registros.find(x => x.id === f.doc), a = reg?.articulos.find(x => x.n === n);
+        if (a && !citas.has(f.doc + ':' + n)) citas.set(f.doc + ':' + n, { reg, a, pregunta: p.pregunta });
+      }
+      temaArticulos.replaceChildren(h('h4', { texto: t('sate.guia.rgl_tema_' + clave) }), h('ul', { 'class': 'rgl-temas__lista' }, [...citas.values()].map(({ reg, a, pregunta }) => h('li', {}, [
+        h('a', { href: rutaReglamento(reg.id, anclaArticulo(a.n)), 'class': 'guia-resultado' }, [h('strong', { texto: pregunta }),
+          h('small', { texto: reg.titulo + ' · ' + t('sate.guia.rgl_art_corto', { n: a.n }) }), h('span', { texto: a.texto.slice(0, 160) })])]))));
+      if (!citas.size) temaArticulos.appendChild(h('p', { texto: t('sate.guia.rgl_resultados', { n: 0 }) }));
+    }
+    for (const [clave, patron] of temas) {
+      const boton = h('button', { type: 'button', 'data-tema': clave, texto: t('sate.guia.rgl_tema_' + clave), 'aria-pressed': 'false' });
+      boton.addEventListener('click', () => elegirTema(clave, patron));
+      temasLista.appendChild(boton);
+    }
+    elegirTema(...temas[3]);
     const portal = d.documentos.normatividad;
-    raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado' }, [h('a', { href: rutaGuia('glosario'), texto: t('sate.guia.glosario') }), lista, portal ? enlaceExterno('guia-portal sate-enlace', portal.url, t('sate.guia.normatividad_portal')) : null]));
+    raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado rgl-explorador' }, [buscar.raiz, sugerencias, resultados,
+      h('section', {}, [h('h3', { texto: t('sate.guia.rgl_biblioteca') }), lista]),
+      h('section', { 'class': 'rgl-temas' }, [h('div', {}, [h('h3', { texto: t('sate.guia.rgl_temas') }), temasLista]), temaArticulos]),
+      h('a', { href: rutaGuia('glosario'), texto: t('sate.guia.glosario') }),
+      portal ? enlaceExterno('guia-portal sate-enlace', portal.url, t('sate.guia.normatividad_portal')) : null]));
     return { titulo: cab.titulo };
   }
   function apartadoGlosario(raizGuia, d) {

@@ -2,6 +2,7 @@
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync, readdirSync} from 'node:fs';
+import {crearEntorno} from './dom_minimo.mjs';
 const leer = f => readFileSync(f, 'utf8');
 const c = vm.createContext({});
 vm.runInContext(leer('web/sate/guia.js'), c);
@@ -55,5 +56,74 @@ assert.ok(!/\.rgl[^{]*\{[^}]*(serif|Noto Serif)/.test(css), 'sin serif en el lec
 assert.match(leer('web/sate/componentes.css'), /\.sate-modal__cuerpo\{[^}]*min-height:0;[^}]*overflow:auto/,'el cuerpo del modal puede encogerse y desplazarse');
 assert.match(leer('web/sate/componentes.css'), /\.sate-modal\{[^}]*width:min\(36rem,calc\(100vw - var\(--ipn-esp-5\)\)\);max-height:calc\(100dvh - var\(--ipn-esp-6\)\)/,'el modal cabe en el ancho y alto del viewport');
 assert.match(css, /\.rgl-fracciones[^\{]*\{[^}]*list-style:none/,'la fracción conserva solo su numeración literal');
-assert.match(leer('web/sate/guia.js'), /'class': 'rgl-fr' \}, \[h\('span', \{ 'class': 'rgl-marca', texto: f\.fr \+ '\.'/,'cada fracción muestra su número romano literal una sola vez');
+assert.match(leer('web/sate/guia.js'), /fila\('rgl-fr', f\.fr \+ '\.'/,'cada fracción muestra su número romano literal una sola vez');
+const mapa = G.mapaReglamento(ri);
+assert.equal(mapa.length, 12);
+assert.equal(mapa.reduce((s, n) => s + n.articulos.length, 0), 295, 'mapa proporcional al articulado completo');
+assert.equal(mapa.filter(n => n.aplicacion === 'directo').reduce((s, n) => s + n.articulos.length, 0), 45);
+assert.equal(mapa[1].aplicacion, 'parcial');
+assert.equal(mapa[5].aplicacion, 'parcial');
+for (const n of mapa) assert.ok(['directo','parcial','organizacion'].includes(n.aplicacion));
+assert.equal(G.mapaReglamento({estructura:[{titulo:'TÍTULO DE PRUEBA',aplicacion:'directo'}],articulos:[
+  {n:'1',ubicacion:['TÍTULO DE PRUEBA']},{n:'1 Bis',ubicacion:['TÍTULO DE PRUEBA']}
+]})[0].articulos.length, 2, 'el mapa no supone números consecutivos');
 console.log('OK reglamentos: árbol, fracciones, incisos, definiciones, anclas, búsqueda, relaciones y fuente');
+
+// Integración del explorador y del lienzo en el DOM del repositorio, sin abrir un navegador.
+const {document, Elemento, Evento} = crearEntorno();
+Elemento.prototype.append = function (...nodos) { for (const n of nodos) if (n) this.appendChild(n); };
+document.createElementNS = (_, tag) => document.createElement(tag);
+const config = JSON.parse(leer('data/sate.json'));
+config.unidades.ficticia = {guiaDatos:true, siglas:'Unidad ficticia', tramites:['dictamen']};
+const guia = JSON.parse(leer('data/guia/comun.json'));
+const eventos = new Map(), cuadros = [];
+let pestana, movil = false;
+const avisos = [];
+const contexto = vm.createContext({document, setTimeout, clearTimeout,
+  console:{...console,warn:(...p)=>avisos.push(p)},
+  addEventListener:(tipo, fn)=>eventos.set(tipo,fn), removeEventListener:tipo=>eventos.delete(tipo),
+  requestAnimationFrame:fn=>{cuadros.push(fn);return cuadros.length;}, cancelAnimationFrame(){},
+  matchMedia:()=>({matches:movil}), scrollTo(){},
+  location:{href:'https://example.org/',hash:'#/ficticia/guia/reglamentos'}, history:{pushState(){},replaceState(){}},
+  SATE_UNIDAD:'ficticia', SATE_CONFIG:config,
+  SATE:{texto:(k,v={})=>k==='sate.guia.rgl_sugerencia_baja' ? 'baja temporal' : k + ' ' + Object.values(v).join(' · '), pestana:(_,p)=>pestana=p,error:e=>{throw e;}},
+  fetch:async url=>({ok:true,json:async()=>url.includes('/reglamentos/') ? reg(url.split('/').pop().replace('.json','')) : guia})
+});
+vm.runInContext(leer('web/sate/componentes.js'), contexto);
+vm.runInContext(leer('web/sate/guia.js'), contexto);
+const caja = document.createElement('div'); caja.setAttribute('id','sate-guia'); document.body.appendChild(caja);
+await pestana.mostrar({partes:['reglamentos']});
+assert.equal(avisos.length,0, JSON.stringify(avisos));
+assert.equal(caja.querySelectorAll('.rgl-libro').length,reg('indice').length);
+assert.equal(caja.querySelectorAll('.rgl-temas__opciones button').length,6);
+assert.ok(caja.querySelectorAll('.rgl-temas__articulos a').length>0,'temas con citas reales');
+caja.querySelector('.rgl-sugerencias button').click();
+assert.equal(caja.querySelector('.guia-resultados').hidden,false);
+assert.ok(caja.querySelectorAll('.guia-resultados a').length>0,'sugerencias buscan artículos');
+await pestana.mostrar({partes:['reglamentos','ri']});
+assert.equal(avisos.length,0, JSON.stringify(avisos));
+assert.equal(caja.querySelectorAll('.rgl-articulo').length,ri.articulos.length+1,'todos los artículos y transitorios en el lienzo');
+assert.equal(caja.querySelectorAll('.rgl-mapa__tramo').length,12);
+const rutas = new Set(ri.articulos.flatMap(a=>a.ubicacion.map((_,i)=>a.ubicacion.slice(0,i+1).join(' / '))));
+assert.equal(caja.querySelectorAll('.rgl-encabezado').length,rutas.size,'encabezados de todos los títulos, capítulos y secciones');
+const tramo = caja.querySelectorAll('.rgl-mapa__tramo')[2];
+tramo.click();
+assert.equal(caja.querySelector('.rgl-art[aria-current]').getAttribute('data-ancla'),'art-77');
+assert.equal(document.scrolled.getAttribute('data-articulo'),'77','mapa salta al inicio del título');
+const articulosDOM = caja.querySelectorAll('.rgl-articulo');
+for (const nodo of articulosDOM) nodo.getBoundingClientRect=()=>({top:1000});
+articulosDOM[0].getBoundingClientRect=()=>({top:-300});
+articulosDOM[1].getBoundingClientRect=()=>({top:0});
+eventos.get('scroll')(); cuadros.shift()();
+assert.equal(caja.querySelector('.rgl-art[aria-current]').getAttribute('data-ancla'),'art-2','scroll-spy actualiza el índice');
+assert.equal(caja.querySelectorAll('.rgl-articulo').length,296,'navegar no reemplaza el articulado');
+movil=true;
+await pestana.mostrar({partes:['reglamentos','ri','art-106.III']});
+assert.equal(caja.querySelector('.rgl-indice').open,false,'índice plegado en teléfono');
+assert.equal(caja.querySelectorAll('.rgl-activa').length,1,'ancla a una fracción');
+assert.equal(caja.querySelector('.rgl-activa').getAttribute('data-ancla'),'art-106.III');
+pestana.ocultar();
+assert.equal(eventos.has('scroll'),false,'se retira el seguimiento al salir');
+assert.equal(eventos.has('resize'),false,'se retira el ajuste al salir');
+assert.equal(avisos.length,0, JSON.stringify(avisos));
+console.log('OK explorador y lienzo: biblioteca, temas, sugerencias, 295 artículos, transitorios, mapa, saltos, scroll-spy y teléfono.');
