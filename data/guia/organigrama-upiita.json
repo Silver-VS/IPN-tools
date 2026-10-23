@@ -1,8 +1,8 @@
 {
  "unidad": "UPIITA",
  "documento": "mo_upiita",
- "fuente": "Manual de Organización de la UPIITA: organigrama de julio de 2010, estructura ratificada en octubre de 2021 (imagen enviada por el dueño, 2026-10-22)",
- "nota": "Sin nombres de titulares. Los órganos colegiados aparecen con línea punteada en el organigrama oficial.",
+ "fuente": "Manual de Organización de la UPIITA, diciembre de 2023, pp. 27–28 del PDF: organigrama y estructura orgánica; estructura ratificada en octubre de 2021.",
+ "nota": "Sin nombres de titulares. Los órganos colegiados se muestran como relaciones colegiadas, no como subordinación administrativa. Las funciones y procedimientos se consultan en las fichas de las mismas áreas.",
  "raiz": {
   "nombre": "Dirección",
   "colegiados": [
@@ -58,6 +58,33 @@
   ]
  },
  "ids": {
-  "Consejo Técnico Consultivo Escolar": "ctce"
- }
+  "Dirección": "direccion",
+  "Consejo Técnico Consultivo Escolar": "ctce",
+  "Comité Interno de Proyectos": "comite_proyectos",
+  "Decanato": "decanato",
+  "Coordinación de Enlace y Gestión Técnica": "enlace_gestion",
+  "Unidad de Informática": "unidad_informatica",
+  "Subdirección Académica": "subdireccion_academica",
+  "Departamento de Ciencias Básicas": "ciencias_basicas",
+  "Departamento de Ingeniería": "ingenieria",
+  "Departamento de Tecnologías Avanzadas": "tecnologias_avanzadas",
+  "Departamento de Formación Integral e Institucional": "formacion_integral",
+  "Departamento de Innovación Educativa": "innovacion_educativa",
+  "Departamento de Evaluación y Seguimiento Académico": "evaluacion_seguimiento",
+  "Unidad de Tecnología Educativa y Campus Virtual": "tecnologia_educativa",
+  "Sección de Estudios de Posgrado e Investigación": "sepi",
+  "Colegio de Profesores": "colegio_profesores",
+  "Departamento de Investigación": "investigacion",
+  "Departamento de Posgrado": "posgrado",
+  "Subdirección de Servicios Educativos e Integración Social": "sseis",
+  "Departamento de Gestión Escolar": "gestion_escolar",
+  "Departamento de Servicios Estudiantiles": "servicios_estudiantiles",
+  "Departamento de Extensión y Apoyos Educativos": "extension_apoyos",
+  "Unidad Politécnica de Integración Social": "upis",
+  "Subdirección Administrativa": "subdireccion_administrativa",
+  "Departamento de Capital Humano": "capital_humano",
+  "Departamento de Recursos Financieros": "recursos_financieros",
+  "Departamento de Recursos Materiales y Servicios": "recursos_materiales"
+ },
+ "pagina": 27
 }

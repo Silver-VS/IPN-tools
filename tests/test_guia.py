@@ -23,6 +23,43 @@ KEBAB = re.compile(r'^[a-z0-9]+(?:-[a-z0-9]+)*$')
 
 
 class TestDatosGuia(unittest.TestCase):
+    def test_manual_upiita_cubre_cada_area_con_paginas(self):
+        org = json.loads((RAIZ / 'data/guia/organigrama-upiita.json').read_text(encoding='utf-8'))
+        raiz = org['raiz']
+        nombres = [raiz['nombre'], *raiz['colegiados'], *raiz['apoyo']]
+        padres = {n: org['ids'][raiz['nombre']] for n in nombres[1:]}
+        for rama in raiz['areas']:
+            nombres.append(rama['nombre'])
+            padres[rama['nombre']] = org['ids'][raiz['nombre']]
+            for n in rama['dependencias'] + rama.get('colegiados', []):
+                nombres.append(n)
+                padres[n] = org['ids'][rama['nombre']]
+        self.assertEqual(len(nombres), 27)
+        for nombre in nombres:
+            with self.subTest(area=nombre):
+                areas = [a for a in GUIA['acudir'] if a['nombre'] == nombre]
+                self.assertEqual(len(areas), 1, 'Toda área necesita ficha propia')
+                a = areas[0]
+                self.assertEqual(a['id'], org['ids'][nombre])
+                self.assertTrue(3 <= len(a['funciones']) <= 6)
+                self.assertNotIn('por confirmar', a['para'].lower())
+                self.assertTrue(a['objetivo']['sintesis'])
+                for f in [a['objetivo'], *a['funciones']]:
+                    self.assertTrue(f['texto'].strip())
+                    self.assertEqual(f['fuente']['doc'], 'mo_upiita')
+                    self.assertTrue(30 <= f['fuente']['pagina'] <= 115)
+                if nombre in padres:
+                    self.assertEqual(a['depende'], padres[nombre])
+                self.assertEqual(a['fuenteDependencia'], {'doc': 'mo_upiita', 'pagina': 28})
+                self.assertEqual(len({p['clave'] for p in a['procedimientos']}), len(a['procedimientos']))
+                for p in a['procedimientos']:
+                    self.assertRegex(p['clave'], r'^UPIITA-P[OA]-\d{2}$')
+                    self.assertTrue(p['nombre'].strip() and p['participacion'].strip())
+                    self.assertEqual(p['fuente']['doc'], 'mp_upiita')
+                    self.assertTrue(18 <= p['fuente']['pagina'] <= 211)
+                if not a['procedimientos']:
+                    self.assertIn('Por confirmar', a['procedimientosNota'])
+
     def test_contratos_en_todas_las_unidades(self):
         for u, guia in GUIAS.items():
             with self.subTest(unidad=u):
