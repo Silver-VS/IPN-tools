@@ -1073,3 +1073,14 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 /* El cascarón comparte estilos con tablas heredadas; explicitar el desplazamiento evita top:0 ajenos. */
 .kx-tabla thead th{position:sticky;top:var(--sate-barra-alto);z-index:2;background:var(--ipn-hundido)}
 .guia .pc-lector{--pc-desfase:calc(var(--sate-barra-alto) + var(--ipn-esp-4));--pc-barra-arriba:var(--sate-barra-alto)}
+.sate-rejilla-recursos{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr));gap:1px;background:var(--ipn-linea);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);overflow:hidden}
+.sate-recurso{display:flex;flex-direction:column;min-width:0;gap:var(--ipn-esp-2);padding:var(--ipn-esp-5);background:var(--ipn-superficie);overflow-wrap:anywhere;font-size:var(--ipn-tamano-s);line-height:1.5}
+.sate-recurso h3{margin:0;font-size:var(--ipn-tamano-m);font-weight:700}
+.sate-recurso p,.sate-recurso dl,.sate-recurso dd{margin:0}
+.sate-recurso dt{margin-top:var(--ipn-esp-3);font-weight:600}
+.sate-recurso small{color:var(--ipn-tenue);font-size:var(--ipn-tamano-xs)}
+.sate-recurso__enlace{display:flex;align-items:center;align-self:start;min-height:var(--ipn-control-alto);margin-top:auto;color:var(--ipn-acento);border-radius:var(--ipn-radio)}
+.sate-recurso__enlace:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.sate-filtro-recursos .sate-chip{--chip-c:var(--ipn-linea);--chip-s:var(--ipn-superficie);min-height:var(--ipn-control-alto)}
+.sate-filtro-recursos .sate-chip[aria-pressed=true]{--chip-c:var(--ipn-acento);--chip-s:var(--ipn-hundido);color:var(--ipn-acento);font-weight:600}
+.sate-filtro-recursos .sate-chip:hover{--chip-s:var(--ipn-hundido)}
