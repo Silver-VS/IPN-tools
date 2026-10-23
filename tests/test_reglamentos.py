@@ -16,6 +16,24 @@ CONTEOS = {'rge': (77, 7), 'ri': (295, 6), 'ro': (103, 4), 'lo': (34, 4),
 
 
 class Extraccion(unittest.TestCase):
+    def test_regenerar_conserva_aplicacion_editorial(self):
+        r.CACHE.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=r.CACHE) as carpeta:
+            destino = Path(carpeta)
+            (destino / 'prueba.pdf').write_bytes(b'%PDF-ficticio')
+            (destino / 'prueba.json').write_text(json.dumps({'estructura': [
+                {'titulo': 'TÍTULO TERCERO DE LOS ALUMNOS', 'aplicacion': 'directo'}
+            ]}), encoding='utf-8')
+            textos = ['TÍTULO TERCERO\nDE LOS ALUMNOS\nArtículo 1. ' + 'Texto ficticio. ' * 30]
+            fuente = {'titulo': 'Prueba', 'url': 'https://example.org/prueba.pdf', 'gaceta': 'Prueba ficticia'}
+            with patch.object(r, 'CACHE', destino), patch.object(r, 'DESTINO', destino), \
+                    patch.object(r, 'fuentes', return_value={'prueba': fuente}), \
+                    patch.object(r, 'paginas', return_value=textos), patch('sys.argv', ['reglamentos.py']), \
+                    self.assertLogs(r.LOG, level='INFO'):
+                r.main()
+            resultado = json.loads((destino / 'prueba.json').read_text(encoding='utf-8'))
+            self.assertEqual(resultado['estructura'][0]['aplicacion'], 'directo')
+
     def test_jerarquia_bis_fracciones_inciso_y_transitorio(self):
         a, t, e = r.extraer(['TÍTULO PRIMERO\nDisposiciones generales\n'
                             'CAPÍTULO IV\nConsulta\nSección Primera\nRequisitos\n'

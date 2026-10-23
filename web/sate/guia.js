@@ -66,10 +66,23 @@
     return raizArbol;
   }
   const totalArticulos = nodo => nodo.articulos.length + nodo.hijos.reduce((s, h) => s + totalArticulos(h), 0);
+  function etiquetaTitulo(titulo) {
+    const texto = titulo.replace(/^(?:t[íi]tulo|cap[íi]tulo|secci[óo]n)\s+(?:(?:d[ée]cim[oa]\s+)?(?:primer[oa]|segund[oa]|tercer[oa]|cuart[oa]|quint[oa]|sext[oa]|s[ée]ptim[oa]|octav[oa]|noven[oa]|d[ée]cim[oa]|[úu]nic[oa])|[IVXLCDM]+|\d+)[.:]?\s*/i, '').trim();
+    const normal = texto.toLocaleLowerCase('es').replace(/\bipn\b/g, 'IPN');
+    return normal ? normal[0].toLocaleUpperCase('es') + normal.slice(1) : titulo;
+  }
+  // Respaldo para extracciones antiguas sin clasificación; se compara sin acentos ni mayúsculas.
+  function aplicacionTitulo(nodo) {
+    if (nodo.aplicacion && nodo.aplicacion !== 'organizacion') return nodo.aplicacion;
+    const titulo = norm(etiquetaTitulo(nodo.titulo));
+    if (/alumnos|alumnado|estudiantes|aspirantes|becarias|prestadores|ingreso|trayectoria|movilidad|egreso|certificacion|equivalencia|revalidacion|reconsideracion|requisitos|acreditacion|incumplimiento|revocacion|procedimiento disciplinario|examen profesional|expedicion del titulo/.test(titulo)) return 'directo';
+    if (/funcion educativa|organos consultivos|modalidades|programas academicos/.test(titulo)) return 'parcial';
+    return nodo.aplicacion || 'organizacion';
+  }
   // El mapa usa artículos existentes, no la resta de extremos (puede haber artículos Bis).
   function mapaReglamento(reg) {
     return (reg.estructura || []).map(nodo => ({
-      titulo: nodo.titulo, aplicacion: nodo.aplicacion || 'organizacion',
+      titulo: nodo.titulo, etiqueta: etiquetaTitulo(nodo.titulo), aplicacion: aplicacionTitulo(nodo),
       articulos: (reg.articulos || []).filter(a => (a.ubicacion || [])[0] === nodo.titulo).map(a => a.n)
     })).filter(nodo => nodo.articulos.length);
   }
@@ -365,7 +378,7 @@
     const avisoOcr = reg.ocr && !reg.sin_texto ? h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }) : null;
     if (!articulos.length && !transitorios.length) {
       // Sin articulado (código, lineamientos escaneados): el texto corrido, sin índice.
-      const lineas = !reg.sin_texto && reg.texto ? String(reg.texto).split(/\n+/).filter(Boolean) : [];
+      const lineas = !d.documentos[doc]?.soloPdf && !reg.sin_texto && reg.texto ? String(reg.texto).split(/\n+/).filter(Boolean) : [];
       raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado' }, [avisoOcr, lineas.length
         ? h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-ancla': 'texto' }, lineas.map(x => h('p', { texto: x })))
         : h('p', { role: 'status', texto: t('sate.guia.sin_articulo') }), fuenteDoc]));
@@ -422,14 +435,14 @@
       ['directos', mapa.filter(x => x.aplicacion === 'directo').reduce((s, x) => s + x.articulos.length, 0)]
     ].map(([clave, n]) => h('div', {}, [h('dt', { texto: t('sate.guia.rgl_' + clave) }), h('dd', { texto: String(n) })])));
     const barra = h('div', { 'class': 'rgl-mapa__barra' }, mapa.map(x => {
-      const a = enlaceAncla('rgl-mapa__tramo rgl-aplica--' + x.aplicacion, anclaArticulo(x.articulos[0]), [h('span', { texto: x.titulo })],
+      const a = enlaceAncla('rgl-mapa__tramo rgl-aplica--' + x.aplicacion, anclaArticulo(x.articulos[0]), [h('span', { 'class': 'rgl-mapa__color' }), h('span', { 'class': 'rgl-mapa__etiqueta', texto: x.etiqueta }), h('span', { 'class': 'rgl-mapa__completo', texto: x.titulo })],
         { title: x.titulo + ' · ' + t('sate.guia.numero_articulos', { n: x.articulos.length }), 'aria-label': x.titulo + ' · ' + t('sate.guia.rgl_' + x.aplicacion) });
       a.style.flex = x.articulos.length + ' 0 0';
+      if (x.articulos.length / articulos.length < 0.04) a.classList.add('rgl-mapa__tramo--angosto');
       return a;
     }));
     const mapaVista = h('section', { 'class': 'rgl-mapa' }, [h('h3', { texto: t('sate.guia.rgl_mapa') }),
-      h('ul', { 'class': 'rgl-leyenda' }, ['directo', 'parcial', 'organizacion'].map(x => h('li', { 'class': 'rgl-aplica--' + x, texto: t('sate.guia.rgl_' + x) }))), barra,
-      h('div', { 'class': 'rgl-mapa__titulos' }, mapa.map(x => enlaceAncla('', anclaArticulo(x.articulos[0]), x.titulo)))]);
+      h('ul', { 'class': 'rgl-leyenda' }, ['directo', 'parcial', 'organizacion'].map(x => h('li', { 'class': 'rgl-aplica--' + x, texto: t('sate.guia.rgl_' + x) }))), barra]);
     raizGuia.append(cab.nodo, cifras);
     if (mapa.length) raizGuia.appendChild(mapaVista);
     raizGuia.appendChild(rejilla);
@@ -452,9 +465,9 @@
       const bloques = [];
       if (rel.tramites.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_tramites') }), h('ul', {}, rel.tramites.map(id => h('li', {}, [h('a', { href: '#/' + unidad() + '/tramites/' + id, texto: t('sate.tramite.' + id + '.titulo') })])))]));
       if (rel.preguntas.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_preguntas') }), h('ul', {}, rel.preguntas.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]));
-      riel.replaceChildren(...bloques);
-      // Mantener las columnas evita que el texto cambie de ancho al recorrer artículos sin relaciones.
-      riel.hidden = false;
+      riel.replaceChildren(...(bloques.length ? [h('h3', { texto: t('sate.guia.rgl_contexto') }), ...bloques] : []));
+      riel.hidden = !bloques.length;
+      rejilla.classList.toggle('rgl--sin-riel', !bloques.length);
     }
     function marcarIndice(clave) {
       for (const [n, a] of enlaces) { if (n === clave) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
@@ -608,10 +621,10 @@
     const registros = await Promise.all(docs.map(x => cargarReglamento(x.id)));
     if (!vigente()) return {};
     const lista = h('ul', { 'class': 'rgl-biblioteca' }, docs.map(x => h('li', {}, [
-      h('a', { href: rutaGuia('reglamentos', x.id), 'class': 'rgl-libro' }, [
+      h('a', { href: x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? x.url : rutaGuia('reglamentos', x.id), 'class': 'rgl-libro' }, [
         h('strong', { 'class': 'rgl-siglas', texto: x.siglas || x.titulo.split(/\s+/).filter(p => /^[A-ZÁÉÍÓÚÑ]/.test(p) && !/^(IPN|Instituto|Politécnico|Nacional)$/.test(p)).map(p => p[0]).join('') }),
         h('h4', { texto: x.titulo }), h('small', { texto: x.gaceta }),
-        h('span', { texto: t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id)?.articulos ?? 0 }) })])])));
+        h('span', { texto: indice.find(i => i.id === x.id)?.articulos ? t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id).articulos }) : t(x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? 'sate.guia.rgl_solo_pdf' : 'sate.guia.rgl_texto_completo') })])])));
     const resultados = h('ul', { 'class': 'guia-resultados', hidden: true, 'aria-live': 'polite' });
     const pintarResultados = q => {
       const encontrados = registros.flatMap(reg => buscarArticulos(reg, q, 4).map(a => ({ reg, a }))).slice(0, 12);

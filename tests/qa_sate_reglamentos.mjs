@@ -1,7 +1,7 @@
 // Lector de reglamentos (opción B): estructura, anclas, relaciones y fuente. Sin navegador.
 import vm from 'node:vm';
 import assert from 'node:assert/strict';
-import {readFileSync, readdirSync} from 'node:fs';
+import {readFileSync, readdirSync, existsSync} from 'node:fs';
 import {crearEntorno} from './dom_minimo.mjs';
 const leer = f => readFileSync(f, 'utf8');
 const c = vm.createContext({});
@@ -18,8 +18,21 @@ assert.equal(G.leerAncla('transitorios'), null);
 // todos los reglamentos: cada fracción se encuentra en el texto y ningún artículo se pierde
 for (const f of readdirSync('data/reglamentos').filter(n => n.endsWith('.json') && n !== 'indice.json')) {
   const r = reg(f.replace('.json', '')), arbol = G.arbolReglamento(r);
+  const compilado = 'web/dist/sate/datos/reglamentos/' + f;
+  if (existsSync(compilado)) {
+    const datos = JSON.parse(leer(compilado));
+    assert.deepEqual(datos.estructura, r.estructura, f + ': clasificación y estructura llegan al compilado');
+    assert.deepEqual(Array.from(G.mapaReglamento(datos), n => n.aplicacion), Array.from(G.mapaReglamento(r), n => n.aplicacion));
+  }
   const cuenta = n => n.articulos.length + n.hijos.reduce((s, h) => s + cuenta(h), 0);
   assert.equal(cuenta(arbol), r.articulos.length, f + ': árbol completo');
+  // Una regeneración o un compilado antiguo puede perder las anotaciones editoriales.
+  const sinClasificacion = {...r, estructura:r.estructura.map(({aplicacion, ...n}) => n)};
+  for (const datos of [r, sinClasificacion]) {
+    const mapa = G.mapaReglamento(datos);
+    if (datos.estructura.some(n => /\b(alumnos|alumnado|estudiantes)\b/.test(G.norm(n.titulo))))
+      assert.ok(mapa.some(n => n.aplicacion === 'directo'), f + ': título del alumnado sin artículos directos');
+  }
   for (const a of r.articulos) {
     const p = G.partesArticulo(a);
     if (a.fracciones?.length) assert.equal(p.fracciones.length, a.fracciones.length, f + ' art. ' + a.n + ': fracciones');
@@ -63,6 +76,13 @@ assert.equal(mapa.reduce((s, n) => s + n.articulos.length, 0), 295, 'mapa propor
 assert.equal(mapa.filter(n => n.aplicacion === 'directo').reduce((s, n) => s + n.articulos.length, 0), 45);
 assert.equal(mapa[1].aplicacion, 'parcial');
 assert.equal(mapa[5].aplicacion, 'parcial');
+assert.equal(mapa[2].etiqueta, 'De los alumnos');
+for (const titulo of ['TÍTULO TERCERO DE LOS ALUMNOS', 'Título Tercero De los alumnos', 'TITULO III DE LOS ALUMNOS']) {
+  assert.equal(G.mapaReglamento({estructura:[{titulo}], articulos:[{n:'1',ubicacion:[titulo]}]})[0].aplicacion, 'directo');
+}
+const mapaRge = G.mapaReglamento(reg('rge'));
+assert.equal(mapaRge[5].aplicacion, 'directo', 'trayectoria escolar del RGE');
+assert.equal(mapaRge[8].aplicacion, 'directo', 'reconsideración del RGE');
 for (const n of mapa) assert.ok(['directo','parcial','organizacion'].includes(n.aplicacion));
 assert.equal(G.mapaReglamento({estructura:[{titulo:'TÍTULO DE PRUEBA',aplicacion:'directo'}],articulos:[
   {n:'1',ubicacion:['TÍTULO DE PRUEBA']},{n:'1 Bis',ubicacion:['TÍTULO DE PRUEBA']}
@@ -95,6 +115,10 @@ const caja = document.createElement('div'); caja.setAttribute('id','sate-guia');
 await pestana.mostrar({partes:['reglamentos']});
 assert.equal(avisos.length,0, JSON.stringify(avisos));
 assert.equal(caja.querySelectorAll('.rgl-libro').length,reg('indice').length);
+const cgc = Array.from(caja.querySelectorAll('.rgl-libro')).find(n => n.getAttribute('href') === reg('cgc').url);
+assert.ok(cgc, 'CGC enlaza al PDF oficial porque no tiene articulado fiable');
+assert.ok(cgc.textContent.includes('sate.guia.rgl_solo_pdf'), 'sin conteo engañoso de cero artículos');
+assert.ok(Array.from(caja.querySelectorAll('.rgl-libro')).find(n => n.getAttribute('href') === '#/ficticia/guia/reglamentos/etica').textContent.includes('sate.guia.rgl_texto_completo'), 'se conserva el lector del código sin articulado');
 assert.equal(caja.querySelectorAll('.rgl-temas__opciones button').length,6);
 assert.ok(caja.querySelectorAll('.rgl-temas__articulos a').length>0,'temas con citas reales');
 caja.querySelector('.rgl-sugerencias button').click();
@@ -104,6 +128,9 @@ await pestana.mostrar({partes:['reglamentos','ri']});
 assert.equal(avisos.length,0, JSON.stringify(avisos));
 assert.equal(caja.querySelectorAll('.rgl-articulo').length,ri.articulos.length+1,'todos los artículos y transitorios en el lienzo');
 assert.equal(caja.querySelectorAll('.rgl-mapa__tramo').length,12);
+assert.equal(caja.querySelectorAll('.rgl-mapa__etiqueta')[2].textContent, 'De los alumnos');
+assert.equal(caja.querySelectorAll('.rgl-mapa__titulos').length,0,'cada etiqueta pertenece a su segmento');
+assert.equal(caja.querySelector('.rgl-riel').hidden,true,'sin columna vacía cuando no hay citas');
 const rutas = new Set(ri.articulos.flatMap(a=>a.ubicacion.map((_,i)=>a.ubicacion.slice(0,i+1).join(' / '))));
 assert.equal(caja.querySelectorAll('.rgl-encabezado').length,rutas.size,'encabezados de todos los títulos, capítulos y secciones');
 const tramo = caja.querySelectorAll('.rgl-mapa__tramo')[2];
@@ -122,6 +149,13 @@ await pestana.mostrar({partes:['reglamentos','ri','art-106.III']});
 assert.equal(caja.querySelector('.rgl-indice').open,false,'índice plegado en teléfono');
 assert.equal(caja.querySelectorAll('.rgl-activa').length,1,'ancla a una fracción');
 assert.equal(caja.querySelector('.rgl-activa').getAttribute('data-ancla'),'art-106.III');
+movil=false;
+await pestana.mostrar({partes:['reglamentos','rge','art-55']});
+assert.equal(caja.querySelector('.rgl-riel').hidden,false,'panel con preguntas reales para baja temporal');
+assert.ok(caja.querySelectorAll('.rgl-riel a').length>0);
+assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'));
+await pestana.mostrar({partes:['reglamentos','rge','art-1']});
+assert.equal(caja.querySelector('.rgl-riel').hidden,true,'el texto recupera espacio al cambiar a un artículo sin citas');
 pestana.ocultar();
 assert.equal(eventos.has('scroll'),false,'se retira el seguimiento al salir');
 assert.equal(eventos.has('resize'),false,'se retira el ajuste al salir');

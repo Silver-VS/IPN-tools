@@ -284,6 +284,15 @@ def main():
                 textos, con_ocr = ocr, True
                 LOG.info('%s: se usa la transcripción OCR (%s páginas)', id_, len(textos))
         articulos, transitorios, estructura = extraer(textos)
+        # La extracción del PDF no contiene las anotaciones editoriales del mapa.
+        # Conservarlas por título evita perderlas al actualizar la fuente oficial.
+        anterior = DESTINO / f'{id_}.json'
+        if anterior.exists():
+            previos = {n['titulo']: n.get('aplicacion') for n in
+                       json.loads(anterior.read_text(encoding='utf-8')).get('estructura', [])}
+            for nodo in estructura:
+                if previos.get(nodo['titulo']):
+                    nodo['aplicacion'] = previos[nodo['titulo']]
         documento = {k: fuente[k] for k in ('titulo', 'url', 'gaceta')}
         documento.update(id=id_, sha256=hashlib.sha256(ruta.read_bytes()).hexdigest(),
                          extraido_el=date.today().isoformat(), estructura=estructura,
