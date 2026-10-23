@@ -1,4 +1,79 @@
 function renderMap(){return conSim(usaSim('mapa'),()=>conPlan(renderMap0))}
+// La preferencia pertenece a la carrera y al periodo, igual que la selección del plan.
+function mapaModoClave(){return 'mapModo.'+S.car+'.'+planClave(0)}
+function mapaTieneCurso(){return isPersonal()&&conSim(false,()=>conPlan(()=>tr().enCurso.length>0,0))}
+function mapaModoInicial(hay,guardado,elegidas){return !hay?'plan':guardado?.modo==='curso'?'curso':guardado?.modo==='plan'?'plan':elegidas?'plan':'curso'}
+function mapaEnCurso(){return mapaModoInicial(mapaTieneCurso(),store.get(mapaModoClave(),null),conPlan(()=>tr().want.length,0))==='curso'}
+function mapaPeriodoCurso(){const p=perIdx(ALUMNO?.periodo_actual);return p!=null?perName(p):planInicio()!=null?perName(planInicio()-1):SATE.texto('sate.planeacion.este_semestre')}
+function mapaActualizarModo(){
+  const hay=mapaTieneCurso(), curso=mapaEnCurso(), tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v);
+  document.querySelectorAll('#plan-periodos,.plan-periodos-barra').forEach(seg=>{
+    let b=seg.querySelector('[data-mapa-curso]');
+    if(!b){b=document.createElement('button');b.type='button';b.dataset.mapaCurso='';seg.prepend(b)}
+    b.hidden=!hay;b.textContent=tx('periodo_en_curso',{periodo:mapaPeriodoCurso()});b.setAttribute('aria-pressed',String(curso));
+    if(hay)seg.hidden=false;
+  });
+  document.querySelectorAll('[data-plan-paso]').forEach(b=>{if(hay&&b.dataset.planPaso==='0')b.hidden=false;if(curso)b.setAttribute('aria-pressed','false')});
+  document.querySelectorAll('.plan-bandeja .actions').forEach(el=>{el.classList.toggle('mapa-solo-consulta',curso);el.inert=curso;el.setAttribute('aria-hidden',String(curso))});
+  $('#plan-supuesto').classList.toggle('mapa-solo-consulta',curso);
+  $('#mapnote').querySelectorAll('[data-mapa-ayuda]').forEach(el=>el.remove());
+  for(const clave of ['modo_planear_ayuda','modo_curso_ayuda']){
+    const li=document.createElement('li');li.dataset.mapaAyuda='';li.textContent=tx(clave);$('#mapnote').appendChild(li);
+  }
+}
+function mapaConsultar(k){
+  S.mapHover=k;S.mapFocus=true;S.reqHover=null;resaltarMapa();
+  console.debug('SATE: consulta en mapa',{carrera:S.car,clave:k,periodo:mapaPeriodoCurso()});
+}
+function mapaHorarioConsulta(k){
+  const filas=(ALUMNO?.horario_inscrito||[]).filter(h=>h[1]===k);
+  return filas.map(([grupo,clave,nombre,profesor,sesiones])=>{
+    const g=[...(DATA.periodos.actual||[]),...(DATA.periodos.proximo||[])].find(g=>g[0]===S.car&&g[3]===grupo&&g[8]===clave);
+    const horario=(sesiones||[]).map(([dia,a,b])=>`${DAYN[dia]} ${hm(a)}–${hm(b)}`).join(' · ');
+    const salones=[...new Set((g?.[10]||[]).filter(Boolean))].join(', ');
+    return `<p>${esc([grupo,profesor,horario,salones].filter(Boolean).join(' · '))}</p>`;
+  }).join('');
+}
+function montarModoMapa(){
+  // Adaptadores del inspector y la bandeja: el núcleo sigue sirviendo a las demás pestañas.
+  const lado=renderSide0, inspector=renderInsp;
+  renderSide0=function(){const r=lado();mapaActualizarModo();return r};
+  renderInsp=function(){
+    if(!mapaEnCurso()){inspector();return}
+    // La consulta describe la inscripción real, aunque haya una simulación o un segundo periodo activo.
+    conSim(false,()=>conPlan(inspector,0));
+    $('#insp').querySelector('.insp-act')?.remove();
+    if(S.mapHover&&cur()[S.mapHover])$('#insp .insp-b')?.insertAdjacentHTML('afterbegin',mapaHorarioConsulta(S.mapHover));
+  };
+  const guardado=store.get(mapaModoClave(),null);
+  if(guardado?.modo==='plan'&&planPasos().includes(guardado.paso))S.planPaso=guardado.paso;
+  // Captura antes de los manejadores históricos: una consulta nunca llega a toggleBox.
+  document.addEventListener('click',e=>{
+    if(e.target.closest?.('#map-ayuda')){
+      e.preventDefault();e.stopImmediatePropagation();
+      const cuerpo=document.createElement('div'), leyenda=document.createElement('div'), notas=document.createElement('ul');
+      leyenda.className='legend';leyenda.innerHTML=leyendaMapa(true);notas.innerHTML=$('#mapnote').innerHTML;
+      cuerpo.append(leyenda,notas);SateUI.modal(SATE.texto('sate.planeacion.leer_mapa'),cuerpo);return;
+    }
+    const curso=e.target.closest?.('[data-mapa-curso]'), paso=e.target.closest?.('[data-plan-paso]');
+    if(curso||paso){
+      e.preventDefault();e.stopImmediatePropagation();
+      const anterior=S.planPaso;
+      if(paso)S.planPaso=PLAN_DOS_PERIODOS?+paso.dataset.planPaso:0;
+      store.set(mapaModoClave(),{modo:curso?'curso':'plan',paso:S.planPaso});
+      S.mapHover=null;S.mapFocus=false;S.reqHover=null;
+      if(paso&&anterior!==S.planPaso)renderTray();else{renderSide();resaltarMapa()}
+      return;
+    }
+    if(!mapaEnCurso())return;
+    const b=e.target.closest?.('[data-box],[data-lwant],[data-fwant],[data-unwant],[data-fmover]');
+    if(b&&b.closest('#v-tray')){e.preventDefault();e.stopImmediatePropagation();mapaConsultar(b.dataset.box||b.dataset.lwant||b.dataset.fwant||b.dataset.unwant||b.dataset.fmover)}
+  },true);
+  document.addEventListener('keydown',e=>{
+    const b=e.target.closest?.('[data-box]');
+    if(b&&mapaEnCurso()&&(e.key==='Enter'||e.key===' ')){e.preventDefault();e.stopImmediatePropagation();mapaConsultar(b.dataset.box)}
+  },true);
+}
 function renderSinUbicar(){
   const el=$('#optativas-sin-linea'), off=offeredClaves(), c=cur();
   const claves=(MAP().optativasSinLinea||[]).filter(k=>c[k]?.[3]==='P'&&off.has(k));
@@ -205,7 +280,7 @@ function renderAyudaPrimeraVisita(){
   if(!box.hidden)box.appendChild(SateUI.aviso({estado:'info',titulo:SATE.texto('sate.planeacion.primera_visita'),descartable:true,
     alDescartar(){store.set('mapAyudaDescartada',true);box.hidden=true}}));
 }
-SATE.pestana('mapa',{montar(){SATE.cargarTemarios?.()},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta();SATE.temarios?.cerrar?.()}});
+SATE.pestana('mapa',{montar(){montarModoMapa();SATE.cargarTemarios?.()},mostrar(){renderAyudaPrimeraVisita();renderTray()},ocultar(){tipOculta();SATE.temarios?.cerrar?.()}});
 
 /* ---------- resaltado al pasar el cursor, sin redibujar ----------
    Alterna clases en las cajas y flechas ya dibujadas (mismas reglas que el dibujo: resalteCaja y resalteArista). */
