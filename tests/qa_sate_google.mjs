@@ -12,7 +12,7 @@ const ui=py("print(cuenta.inject('<!--__CUENTA_BTN__-->'))");
 // 1. El diálogo no ofrece Google y no quedan avisos de «fase de prueba».
 assert.equal(cfg.googleSoloMigracion,true);assert.equal('googlePrueba' in cfg,false);assert.equal('contacto' in cfg,false);
 assert.doesNotMatch(ui,/Continuar con Google|ipnt-glogin|ipnt-h-go|fase de prueba|ipnt-contacto|%%/);
-assert.match(ui,/ipnt-mig-link/);assert.match(ui,/Pásalos a Microsoft/);assert.match(ui,/Traer mis datos de Google/);assert.match(ui,/Continuar con Microsoft/);
+assert.match(ui,/ipnt-mig-link/);assert.match(ui,/Pásalos a Microsoft/);assert.match(ui,/Importar datos de Google/);assert.match(ui,/Continuar con Microsoft/);
 // 2. La interfaz de Google no contiene ninguna escritura.
 const go=js.slice(js.indexOf('// Google Drive SOLO PARA MIGRAR'),js.indexOf('const PROV='));
 assert.doesNotMatch(go,/POST|PUT|PATCH|DELETE|upload|subir/);
@@ -96,5 +96,5 @@ assert.equal(sinGoogle.api.proveedor,'ms');assert.ok(sinGoogle.llamadas.every(l=
 // 6. Perfil inexistente en Drive: aviso y nada cambia.
 const vacio=entorno(cfg);vacio.c.fetch=async u=>u.includes('/files?')?{ok:true,status:200,json:async()=>({files:[]})}:{ok:true,status:200,json:async()=>({name:'A',email:'a@ejemplo.invalid'})};
 await vacio.nodo('ipnt-mig-1').handlers.click();await espera();
-assert.equal(vacio.session.getItem('ipnt.mig'),null);assert.match(vacio.nodo('ipnt-mig-msg').textContent,/No encontramos/);
+assert.equal(vacio.session.getItem('ipnt.mig'),null);assert.match(vacio.nodo('ipnt-mig-msg').textContent,/No se encontró/);
 console.log('qa_sate_google: ok');

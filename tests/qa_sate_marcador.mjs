@@ -44,7 +44,7 @@ assert.deepEqual(await c.IPNTSateLeer(),perfil);assert.equal(lecturas,2);
 assert.deepEqual(funciones().map(n=>n.attrs['data-funcion']),['copiar','abrir','cupos']);
 assert.doesNotMatch(box().innerHTML,/<table|Promedio|Créditos|ipnt-sate-menu/);
 await funciones()[0].onclick();assert.equal(copiado,JSON.stringify(perfil));assert.deepEqual(JSON.parse(copiado),perfil);
-assert.match(el('mensaje').textContent,/Datos copiados.*Traer datos SAES.*pega/);
+assert.match(el('mensaje').textContent,/Datos copiados.*Traer datos del SAES.*pégalos/);
 funciones()[1].onclick();assert.equal(abiertas[0][0],'https://sate.invalid/');
 funciones()[2].onclick();assert.equal(body.hijos.length,1);assert.equal(montajes,1);assert.equal(el('inicio').hidden,true);assert.equal(el('cupos').hidden,false);
 el('modos').querySelectorAll('button')[1].onclick();assert.equal(modo,'ventana');assert.equal(preferencias.get('ipnt.cupos.modo'),'ventana');

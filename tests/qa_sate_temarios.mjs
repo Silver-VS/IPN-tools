@@ -652,7 +652,7 @@ est.click(); await dormir(30);
   document.querySelector('dialog').dispatchEvent(new Evento('cancel'));
   await m.mostrar({partes: ['bionica', 'B999']});
   assert.equal(caja2.querySelector('h2').textContent, 'Programa no encontrado');
-  assert.match(caja2.textContent, /No encontramos ese programa/);
+  assert.match(caja2.textContent, /No se encontró ese programa/);
   await m.mostrar({partes: ['telematica', 'B103']});
   assert.equal(caja2.querySelector('h2').textContent, 'Programa no encontrado');
   await m.mostrar({partes: []});
@@ -665,7 +665,7 @@ est.click(); await dormir(30);
   vm.runInContext(leer('web/policore/lector.js'), sin.c); vm.runInContext(leer('web/sate/temarios.js'), sin.c);
   const cajaSin = sin.document.body.appendChild(el(sin.document, 'section', {id: 'sate-temarios'}));
   await sinModulos.temarios.mostrar({partes: []});
-  assert.equal(cajaSin.textContent, 'Aún no hay programas de estudio de esta unidad');
+  assert.equal(cajaSin.textContent, 'Aún no hay programas de estudio de esta unidad académica.');
   assert.equal(sin.estado.fetches.length,0,'una unidad sin programas no solicita datos inexistentes');
 }
 

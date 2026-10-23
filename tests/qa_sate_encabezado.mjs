@@ -24,7 +24,7 @@ assert.doesNotMatch(html, /sate-recorrido-invitacion|sate\.recorrido\.boton/);
 const acciones = encabezado.slice(encabezado.indexOf('class="header-actions"'), encabezado.indexOf('class="enc-btn sate-opinar"'));
 // De derecha a izquierda: tema, sesión, SAES (en el HTML, de izquierda a derecha).
 assert.ok(acciones.indexOf('id="saes-open"') < acciones.indexOf('id="ipnt-open"') && acciones.indexOf('id="ipnt-open"') < acciones.indexOf('id="theme-btn"'), 'orden: SAES, sesión, tema');
-assert.match(acciones, /id="saes-open"[^>]*data-saes-open[\s\S]*id="sate-saes-indicador"[^>]*role="img"[^>]*aria-label="Sin datos del SAES: consulta el mapa o arma tu horario"[\s\S]*Traer datos SAES/);
+assert.match(acciones, /id="saes-open"[^>]*data-saes-open[\s\S]*id="sate-saes-indicador"[^>]*role="img"[^>]*aria-label="Sin datos del SAES: consulta el mapa o arma tu horario"[\s\S]*Traer datos del SAES/);
 assert.match(encabezado, /class="enc-btn sate-opinar" type="button" data-encuesta hidden/, 'DIS5: Opinar conserva el gancho dentro de las acciones');
 assert.ok(encabezado.indexOf('sate-logo-ipn') < encabezado.indexOf('class="brand"') && encabezado.indexOf('class="brand"') < encabezado.indexOf('class="sate-lado"'));
 assert.ok(encabezado.indexOf('class="sate-contexto"') < encabezado.indexOf('id="sate-leyenda"'), 'La fase de prueba pertenece al contexto');
@@ -142,7 +142,7 @@ const c=vm.createContext({SATE:{texto},document:{getElementById:id=>id==='saes-o
 vm.runInContext(saes+'\nglobalThis.estado=SAES.status;',c);
 for (const datos of [null,{leido:'2026-10-07T12:00:00Z'},{leido:'2026-10-08T15:00:00Z'},null,{demo:true,leido:'2026-10-07T12:00:00Z'}]) {
   const usando=!!datos&&!datos.demo;
-  c.estado(datos);assert.equal(clases.on,usando);assert.equal(span.textContent,usando?'Actualizar datos SAES':'Traer datos SAES');
+  c.estado(datos);assert.equal(clases.on,usando);assert.equal(span.textContent,usando?'Actualizar datos del SAES':'Traer datos del SAES');
   assert.equal(btn['aria-label'],span.textContent,'La acción en icono conserva su nombre accesible');
   assert.equal(corto.textContent,usando?'Actualizar':'Traer datos');
   const esperado=usando?texto('sate.cupos.alumno_actualizado',{hora:new Date(datos.leido).toLocaleTimeString('es-MX',{hour:'2-digit',minute:'2-digit',hour12:false})}):texto('sate.encabezado.sin_datos');
@@ -183,12 +183,13 @@ assert.match(css,/\.sate-controles select\{field-sizing:content;min-width:0;max-
   assert.match(fuente,/TOP_CARRERAS!==carrerasClave[\s\S]*?innerHTML=cars\.map[\s\S]*?TOP_CARRERAS=carrerasClave;ajustarCarrera\(\)/);
 }
 const catalogo=leer('contenido/textos/es.toml');
-for(const clave of ['lead_temporal','aviso_temporal_1','periodos_ayuda']){
+for(const clave of ['lead_temporal','aviso_temporal_1']){
   const linea=catalogo.split('\n').find(l=>l.startsWith(clave+' ='));
   assert.match(linea,/dos periodos semestrales completos/);
   assert.match(linea,/no tienen que ser seguidos/);
   assert.doesNotMatch(linea,/un año|consecutivos/);
 }
+assert.match(catalogo.split('\n').find(l=>l.startsWith('periodos_ayuda =')),/Elige uno o dos periodos\..*consulta tu saldo con Gestión Escolar/);
 const baja=JSON.parse(leer('web/dist/sate/datos/upiita/guia.json'));
 assert.ok(JSON.stringify(baja).includes('dos periodos semestrales completos en toda tu trayectoria; no tienen que ser seguidos'));
 assert.match(acciones,/class="sate-texto-corto">Traer datos/,'H: etiqueta móvil inicial en catálogo');

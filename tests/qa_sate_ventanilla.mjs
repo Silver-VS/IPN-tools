@@ -188,7 +188,7 @@ assert.equal(dialogo.acciones[0].texto,'Empezar');dialogo.acciones[0].onclick();
 dialogo=null;
 c.SATE.repintar=()=>modulo.mostrar({tramite:'dictamen'});
 modulo.mostrar({tramite:'dictamen'});
-const volverVentanilla=box.todos().find(n=>n.tagName==='button'&&n.textContent==='Volver a la Ventanilla');
+const volverVentanilla=box.todos().find(n=>n.tagName==='button'&&n.textContent==='Volver a Ventanilla digital');
 assert.ok(volverVentanilla,'El proceso conserva un botón de regreso arriba');volverVentanilla.click();assert.equal(ir,'tramites');
 assert.ok(box.querySelector('form'),'Dictamen pide el contacto dentro del paso');
 assert.ok(box.todos().some(n=>n.name==='celular'));assert.ok(box.todos().some(n=>n.name==='telefono'));
@@ -376,7 +376,7 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
 
   // Regreso a Ventanilla arriba, junto al título del proceso.
   const a2=t.asistente(box,dd3);
-  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Volver a la Ventanilla');
+  const regresos=box.todos().filter(n=>n.tagName==='button'&&n.textContent==='Volver a Ventanilla digital');
   assert.equal(regresos.length,1);
   assert.equal(box.todos().find(n=>n.className.includes('tramite-guia'))?.href,'#/upiita/guia/situacion/que-es-dictamen','El dictamen enlaza a su respuesta de la Guía');
   assert.ok(regresos.every(n=>n.className.includes('sate-volver')),'«Volver» es un botón del sistema');
