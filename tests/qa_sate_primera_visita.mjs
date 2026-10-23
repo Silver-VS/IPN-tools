@@ -11,7 +11,7 @@ assert.equal((vacio.match(/<button/g)||[]).length,2);
 assert.match(vacio,/class="btn primary"[^>]*id="desempeno-lector"/);
 assert.match(vacio,/id="desempeno-explorar"/);
 assert.doesNotMatch(vacio,/onclick=/);
-assert.equal(texto('sate.planeacion.oferta_vacia'),'Aún no eliges materias en el Mapa curricular. Elígelas allá o consulta toda la oferta.');
+assert.equal(texto('sate.planeacion.oferta_vacia'),'Aún no eliges materias en el Mapa curricular.');
 assert.match(texto('sate.trayectoria.sin_datos'),/SAES.*Sin ellos puedes explorar el mapa y armar tu horario/);
 const nodos=new Map();
 const nodo=id=>{if(!nodos.has(id))nodos.set(id,{eventos:{},addEventListener(k,f){this.eventos[k]=f}});return nodos.get(id)};
