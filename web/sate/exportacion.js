@@ -16,7 +16,7 @@ function wrapText(ctx,text,max){const w=String(text).split(/\s+/),out=[];let ln=
 const perLabel=()=>{if(isPersonal()){const t=perMeta(),n=semNow(),out=[];if(t!=null)out.push('Periodo '+perName(t));if(n)out.push(n+'.º periodo escolar');if(out.length)return out.join(' · ')}
   return S.per==='proximo'?'Próximo periodo':'Periodo actual'};
 /* dibuja en coordenadas lógicas (W ancho) y escala k; part: 'week' | 'list' | 'all' */
-async function drawSchedule(part,k=3){
+async function drawSchedule(part,k=3,vector=null){
   await document.fonts?.ready;
   // paleta clara u oscura (opción «Tema de la imagen y el PDF»)
   const DK=EXP.dark, D=scheduleData(),W=1400,PAD=48,F='"Noto Sans",system-ui,sans-serif',ACC=SATE_CONFIG.unidades[UNIDAD]?.realce?.[DK?'oscuro':'claro']||getComputedStyle(document.documentElement).getPropertyValue('--sate-acento-base').trim(),INK=DK?'#ece6e9':'#231f20',MUT=DK?'#a9a0a5':'#5c575a',LINE=DK?'#3a3237':'#e3dade',
@@ -28,7 +28,7 @@ async function drawSchedule(part,k=3){
   const lo=allSlots.length?Math.min(...allSlots.map(b=>b[1])):START, hi=allSlots.length?Math.max(...allSlots.map(b=>b[2])):START+BLOCK;
   const HEAD=110, gridTop=HEAD+44, LEFT=PAD+56, colW=(W-LEFT-PAD)/days;
   // Nada se corta: el alto de la hora y de cada renglón de la lista se mide con el texto completo.
-  const mg=document.createElement('canvas').getContext('2d');
+  const mg=vector||document.createElement('canvas').getContext('2d');
   const envolver=(fuente,t,w)=>{mg.font=`${fuente} ${F}`;return wrapText(mg,t,w)};
   const blocks=[...D.sel.flatMap(c=>c[6].map(([d,a,b],i)=>({c,d,a,b,r:(c[10]||[])[i]||''}))),...D.own.flatMap(o=>o.d.map(d=>({o,d,a:o.a,b:o.b})))];
   const textoBloque=B=>{const w=colW-6-16;
@@ -45,7 +45,7 @@ async function drawSchedule(part,k=3){
      envolver('400 14px',pattern(c).join('; ')+((s=>s?` · ${txH('salon')} ${s}`:'')([...new Set((c[10]||[]).filter(Boolean).map(shortRoom))].join(', '))),400)];
   const ROWH=part==='week'?46:Math.max(46,...rowsList.map(c=>28+(Math.max(...columnasLista(c).map(x=>x.length))-1)*18+18)), listTop=part==='list'?HEAD:gridTop+gridH+48;
   const H=part==='week'?gridTop+gridH+70:listTop+40+rowsList.length*ROWH+70;
-  const cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;const g=cv.getContext('2d');g.scale(k,k);
+  const cv=vector?{width:W,height:H}:document.createElement('canvas');cv.width=W*k;cv.height=H*k;const g=vector||cv.getContext('2d');g.scale(k,k);
   g.fillStyle=BG;g.fillRect(0,0,W,H);
   g.fillStyle=ACC;g.fillRect(0,0,W,8);
   const carN=DATA.carreras[S.car]||'', perN=perLabel();
@@ -117,7 +117,7 @@ function weekGrid(){
     if(prev&&sg.it?.own&&prev.it?.own&&prev.it.t===sg.it.t)prev.span++;else out.push(sg)});
   return {rows,days,cells:out,D};
 }
-async function drawTable(part,k=3){
+async function drawTable(part,k=3,vector=null){
   await document.fonts?.ready;
   // proporciones del formato en tabla: lienzo angosto (letra grande en carta), líneas delgadas dentro y gruesas en
   // el contorno, debajo del título, debajo de los días y a la derecha de la columna de horas
@@ -126,7 +126,7 @@ async function drawTable(part,k=3){
   // HR: renglones de título y encabezado, delgados como en el formato del equipo
   const THIN=1.4, THICK=3.4, HOURW=118, colW=(W-2*PAD-HOURW)/days, HR=24, TOP=PAD+58, C=[['Grupo',70],['Materia',262],['Profesor',314],['Créd',58],['Salón',216]], LH=17;
   // Nada se corta: cada renglón mide lo que necesita su recuadro más largo (texto envuelto a su ancho real).
-  const mg=document.createElement('canvas').getContext('2d');mg.font=`400 14px ${F}`;
+  const mg=vector||document.createElement('canvas').getContext('2d');mg.font=`400 14px ${F}`;
   const lineas=(t,w)=>String(t).split('\n').reduce((n,seg)=>n+wrapText(mg,seg,w-10).length,0);
   const ROWH=Math.max(46,...cells.filter(c=>c.it).map(c=>Math.ceil((lineas(c.it.t,colW*c.span)*LH+12)/(c.r1-c.r0))));
   const filaLista=c=>[c[3],pretty(name(c)),proper(profs(c)),fmtCr(c[7]),c[10]?[...new Set(c[10].filter(Boolean).map(shortRoom))].join(', '):''];
@@ -134,7 +134,7 @@ async function drawTable(part,k=3){
   const tableH=part==='list'?0:2*HR+rows.length*ROWH;
   const listTop=part==='list'?TOP:TOP+tableH+34;
   const H=part==='week'?TOP+tableH+46:listTop+2*HR+D.sel.length*LROW+70;
-  const cv=document.createElement('canvas');cv.width=W*k;cv.height=H*k;const g=cv.getContext('2d');g.scale(k,k);
+  const cv=vector?{width:W,height:H}:document.createElement('canvas');cv.width=W*k;cv.height=H*k;const g=vector||cv.getContext('2d');g.scale(k,k);
   g.fillStyle=BG;g.fillRect(0,0,W,H);
   const carN=DATA.carreras[S.car]||'';
   g.fillStyle=INK;g.font=`700 19px ${F}`;g.fillText(`Horario ${ws().plan} · ${pretty(carN)}`,PAD,PAD+8);
@@ -175,7 +175,7 @@ async function drawTable(part,k=3){
   return cv;
 }
 const EXP={get perPage(){return store.get('expPer',2)},get dark(){return store.get('expDark',false)},get style(){return store.get('expStyle','color')},get own(){return store.get('expOwn','#dbe7f5')},get show(){return Object.assign({g:false,p:false},store.get('expShow',{}))}};
-const drawFor=(part,k)=>EXP.style==='min'?drawTable(part,k):drawSchedule(part,k);
+const drawFor=(part,k,vector=null)=>EXP.style==='min'?drawTable(part,k,vector):drawSchedule(part,k,vector);
 
 /* ---------- Excel (.xlsx, también se abre en Google Sheets): mismo formato que la tabla minimalista ---------- */
 async function loadExcelJS(){if(window.ExcelJS)return window.ExcelJS;await new Promise((ok,ko)=>{const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';s.integrity='sha512-dlPw+ytv/6JyepmelABrgeYgHI0O+frEwgfnPdXDTOIZz+eDgfW07QXG02/O8COfivBdGNINy+Vex+lYmJ5rxw==';s.crossOrigin='anonymous';s.onload=ok;s.onerror=()=>ko(new Error('No se pudo cargar el generador de Excel.'));document.head.appendChild(s)});return window.ExcelJS}
@@ -228,18 +228,36 @@ async function exportPng(){
   const cv=await drawFor('all',3);return saveFile(`horario-${ws().plan}-${UNIDAD}.png`,await toBlob(cv));
 }
 async function loadPdfLib(){if(!window.PDFLib)await SATE.script('../assets/vendor/pdf-lib.min.js');return window.PDFLib}
-// agrega una hoja carta al PDF con el horario dibujado (horizontal en colorido, vertical en minimalista)
-async function pdfPage(doc,rgb){
-  const cv=await drawFor('all',3), png=await doc.embedPng(new Uint8Array(await (await toBlob(cv)).arrayBuffer()));
-  const [PW,PH]=EXP.style==='min'?[612,792]:[792,612];
-  const pg=doc.addPage([PW,PH]), m=24, sc=Math.min((PW-2*m)/png.width,(PH-2*m)/png.height);
-  if(EXP.dark)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:EXP.style==='min'?rgb(.078,.071,.078):rgb(.09,.078,.102)});   // hoja oscura completa
-  pg.drawImage(png,{x:(PW-png.width*sc)/2,y:PH-m-png.height*sc,width:png.width*sc,height:png.height*sc});
+// El texto pasa por una sola conversión para conservar lo más posible en WinAnsi.
+const pdfText=t=>String(t).replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[–—―]/g,'-').replace(/…/g,'...').replace(/[^\u0000-\u00ff]/g,'?');
+const pdfColor=(ctx,s)=>{ctx.fillStyle=s;const m=String(ctx.fillStyle).match(/\d+(?:\.\d+)?/g)||[0,0,0];return m.slice(0,3).map(Number).map(n=>n/255)};
+function vectorContext(page,PDFLib,W,H,scale,ox=0,oy=0){
+  const {rgb}=PDFLib, point=PDFLib._point||((x,y)=>({x,y})), probe=document.createElement('canvas').getContext('2d');let sx=1,sy=1,fill='#000',stroke='#000',font='400 12px Arial',align='left',alpha=1,path=[],stack=[];
+  const xy=(x,y)=>({x:ox+x*scale*sx,y:oy+(H-y*sy)*scale});
+  const opts=(color)=>{const [r,g,b]=pdfColor(probe,color);return rgb(r,g,b)};
+  const drawText=(t,x,y)=>{const z=/(\d+(?:\.\d+)?)px/.exec(font),size=Number(z?.[1]||12)*scale, bold=/bold|700|600/.test(font), f=bold?vectorContext.bold:vectorContext.reg;
+    let text=pdfText(t),p=xy(x,y),w=f.widthOfTextAtSize(text,size);if(align==='center')p.x-=w/2;else if(align==='right')p.x-=w;
+    page.drawText(text,{x:p.x,y:p.y,size,font:f,color:opts(fill),opacity:alpha});};
+  let width=1;
+  const api={scale:(x,y=x)=>{sx*=x;sy*=y},fillRect:(x,y,w,h)=>{const p=xy(x,y+h);page.drawRectangle({x:p.x,y:p.y,width:w*sx*scale,height:h*sy*scale,color:opts(fill),opacity:alpha})},strokeRect:(x,y,w,h)=>{const p=xy(x,y+h);page.drawRectangle({x:p.x,y:p.y,width:w*sx*scale,height:h*sy*scale,borderColor:opts(stroke),borderWidth:width*scale})},fillText:drawText,measureText:t=>{const z=/(\d+(?:\.\d+)?)px/.exec(font),f=/bold|700|600/.test(font)?vectorContext.bold:vectorContext.reg;return {width:f.widthOfTextAtSize(pdfText(t),Number(z?.[1]||12))}},beginPath:()=>{path=[]},moveTo:(x,y)=>path.push(['m',x,y]),lineTo:(x,y)=>path.push(['l',x,y]),roundRect:(x,y,w,h,r)=>{api.rect(x,y,w,h)},rect:(x,y,w,h)=>{path.push(['m',x,y],['l',x+w,y],['l',x+w,y+h],['l',x,y+h],['l',x,y])},clip:()=>{},save:()=>stack.push({fill,stroke,font,align,alpha,width}),restore:()=>{const v=stack.pop();if(v)({fill,stroke,font,align,alpha,width}=v)},stroke:()=>{for(let i=1;i<path.length;i++){const a=xy(path[i-1][1],path[i-1][2]),b=xy(path[i][1],path[i][2]);if(!Number.isFinite(a.x)||!Number.isFinite(a.y)||!Number.isFinite(b.x)||!Number.isFinite(b.y))continue;page.drawLine({start:point(a.x,a.y),end:point(b.x,b.y),color:opts(stroke),thickness:width*scale,opacity:alpha})}},set fillStyle(v){fill=v},get fillStyle(){return fill},set strokeStyle(v){stroke=v},get strokeStyle(){return stroke},set font(v){font=v},get font(){return font},set textAlign(v){align=v},get textAlign(){return align},set lineWidth(v){width=v},set globalAlpha(v){alpha=v},get globalAlpha(){return alpha}};
+  return api;
 }
+async function drawPdfPage(doc,PDFLib,part='all',page=null,pageSize=null,placement=null){
+  const measured=await drawFor(part,1), [PW,PH]=pageSize|| (EXP.style==='min'?[612,792]:[792,612]), m=24,
+    sc=placement?.scale||Math.min((PW-2*m)/measured.width,(PH-2*m)/measured.height),
+    x=placement?.x??(PW-measured.width*sc)/2, bottom=placement?.bottom??(PH-measured.height*sc)/2;
+  const pg=page||doc.addPage();if(!page)pg.setSize(PW,PH);
+  if(EXP.dark&&!page)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:PDFLib.rgb(.08,.07,.08)});
+  vectorContext.reg=await doc.embedFont(PDFLib.StandardFonts.Helvetica);vectorContext.bold=await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+  const g=vectorContext(pg,PDFLib,measured.width,measured.height,sc,x,bottom);
+  await drawFor(part,1,g);
+  return pg;
+}
+async function pdfPage(doc,PDFLib){return drawPdfPage(doc,PDFLib)}
 async function exportPdf(){
   if(!selected().length&&!ownVis().length)return txH('exportacion_vacia');
-  const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create();
-  await pdfPage(doc,rgb);   // una sola hoja con el horario y la lista
+  const PDFLib=await loadPdfLib(), {PDFDocument}=PDFLib, doc=await PDFDocument.create();
+  await pdfPage(doc,PDFLib);
   doc.setTitle(`Horario ${ws().plan} ${DATA.siglas||UNIDAD.toUpperCase()}`);
   return saveFile(`horario-${ws().plan}-${UNIDAD}.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
 }
@@ -248,17 +266,18 @@ const plansConContenido=()=>planIds().filter(id=>{const p=ws().plans[id];return 
 async function exportPdfAll(){
   const ids=plansConContenido();
   if(!ids.length)return txH('exportacion_todos_vacia');
-  const {PDFDocument,rgb}=await loadPdfLib(), doc=await PDFDocument.create(), prev=ws().plan;
+  const PDFLib=await loadPdfLib(), {PDFDocument}=PDFLib, doc=await PDFDocument.create(), prev=ws().plan;
   // dos por hoja: carta horizontal con dos columnas (como «2 páginas por hoja» al imprimir); uno por hoja: tamaño completo
   const two=EXP.perPage===2, [PW,PH]=two||EXP.style!=='min'?[792,612]:[612,792], m=24, GAP=20, colW=two?(PW-2*m-GAP)/2:PW-2*m;
   let pg=null, col=0;
-  const nueva=()=>{pg=doc.addPage([PW,PH]);if(EXP.dark)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:EXP.style==='min'?rgb(.078,.071,.078):rgb(.09,.078,.102)});col=0};
+  const nueva=()=>{pg=doc.addPage();pg.setSize(PW,PH);if(EXP.dark)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:PDFLib.rgb(.078,.071,.078)});col=0};
   try{for(const id of ids){ws().plan=id;
-    const cv=await drawFor('all',3), png=await doc.embedPng(new Uint8Array(await (await toBlob(cv)).arrayBuffer()));
-    const sc=Math.min(colW/png.width,(PH-2*m)/png.height), w=png.width*sc, h=png.height*sc;
+    const cv=await drawFor('all',1);
+    const sc=Math.min(colW/cv.width,(PH-2*m)/cv.height), w=cv.width*sc, h=cv.height*sc;
     if(!pg||col>=(two?2:1))nueva();
     const x0=m+col*(colW+GAP);
-    pg.drawImage(png,{x:x0+(colW-w)/2,y:PH-m-h,width:w,height:h});col++}}finally{ws().plan=prev}
+    const x=x0+(colW-w)/2, bottom=PH-m-h;
+    await drawPdfPage(doc,PDFLib,'all',pg,[PW,PH],{x,bottom,scale:sc,width:cv.width,height:cv.height});col++}}finally{ws().plan=prev}
   doc.setTitle(txH('exportacion_titulo',{unidad:DATA.siglas||UNIDAD.toUpperCase()}));
   const r=await saveFile(`horarios-${UNIDAD}.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
   const n=doc.getPageCount();

@@ -137,7 +137,7 @@ assert.match(leer('web/sate/componentes.css'),/\.sate-chip--reemplazo\{[^}]*whit
 for(const regla of [/\.cupos-config\{/,/\.cupos-interruptor-pista\{/,/\.cupos-pista\{[^}]*height:8px/,/\.cupos-m-lleno \.cupos-pista i\{/,/\.cupos-tabla tr\{display:grid/,/\.cupos-config select:disabled/])assert.match(css,regla);
 assert.doesNotMatch(leer('web/sate/cupos-vista.js'),/summary>\$\{esc\(tx\('avisos_mas'\)\)\}/,'Avisos ya no es un bloque desplegable');
 assert.match(leer('web/sate/cupos-vista.js'),/id="cupos-config"[\s\S]*id="cupos-avisos-controles"[\s\S]*id="cupos-ultima"[\s\S]*id="cupos-auto-estado"/);
-assert.match(leer('web/dist/sate.js'),/sate\/index\.html\?vista=cupos/);
+assert.match(leer('web/dist/sate.js'),/sate\/index\.html\?sateUnidad=' \+ UNIDAD/);
 // El núcleo completo adopta los cambios de la ventana receptora sin escribirlos otra vez.
 const eventos={};let renders=0;
 const sincronizado={actual:{plan:'A',plans:{A:{sel:[],own:[]}}}},nuevo={plan:'A',plans:{A:{sel:['alternativa'],own:[]}}};
