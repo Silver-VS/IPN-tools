@@ -717,7 +717,7 @@ function renderSide0(){
   if(S.reqHover){S.reqHover=null;S.mapHover=null;S.mapFocus=false;resaltarMapa()}
   const c=cur(), want=tr().want.filter(k=>c[k]), credWant=want.reduce((s,k)=>s+c[k][1],0), off=offeredClaves();
   const tx=(k,v)=>SATE.texto('sate.planeacion.'+k,v);
-  $('#plan-panel').setAttribute('aria-label',tx('titulo'));$('#map-ayuda').textContent='ⓘ '+tx('leer_mapa');$('#plan-periodos').setAttribute('aria-label',tx('periodos'));
+  $('#plan-panel').setAttribute('aria-label',tx('titulo'));$('#map-ayuda').textContent='ⓘ '+tx('leer_mapa');$('#plan-periodos').setAttribute('aria-label',tx('periodos'));document.querySelectorAll('.plan-periodos-barra').forEach(e=>{e.setAttribute('aria-label',tx('periodos'));e.hidden=!PLAN_DOS_PERIODOS});
   if(!PLAN_DOS_PERIODOS)S.planPaso=0;
   $('#plan-opciones').hidden=!PLAN_DOS_PERIODOS;
   document.querySelectorAll('[data-plan-paso]').forEach(b=>{b.hidden=!PLAN_DOS_PERIODOS;const paso=+b.dataset.planPaso;b.textContent=planEtiqueta(paso);b.setAttribute('aria-pressed',String(paso===S.planPaso))});

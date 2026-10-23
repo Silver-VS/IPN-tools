@@ -761,6 +761,8 @@ footer{margin-top:var(--ipn-esp-6);padding-top:var(--ipn-esp-4);border-top:1px s
 .plan-grupos.un-periodo{grid-template-columns:1fr}
 .plan-bandeja{position:sticky;bottom:0;z-index:30;padding:var(--ipn-esp-3);background:var(--ipn-superficie);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);box-shadow:0 -3px 12px #0001}
 .plan-bandeja .plan-resumen span{white-space:normal}
+/* Selector «Planear» también en la bandeja flotante del mapa (los mismos data-plan-paso: misma lógica y estado) */
+.plan-bandeja .plan-periodos-barra{flex:0 0 auto;align-self:center}
 body.sate-flotante:has(.sate-barra) .plan-bandeja{bottom:calc(var(--ipn-barra-alto) + env(safe-area-inset-bottom,0px))}
 @media(max-width:639px){#legend{display:none}.maptools{gap:var(--ipn-esp-1)}.maptools .seg button{padding:var(--ipn-esp-2) var(--ipn-esp-1);font-size:var(--ipn-tamano-s)}#map-ayuda{font-size:var(--ipn-tamano-xs)}.plan-bandeja{bottom:calc(var(--ipn-barra-alto) + env(safe-area-inset-bottom,0px))}.plan-bandeja .actions{gap:var(--ipn-esp-1)}.plan-bandeja .btn{padding:var(--ipn-esp-2);font-size:var(--ipn-tamano-xs)}}
 /* La vista reducida monta los mismos componentes sobre el cascarón. */
@@ -919,6 +921,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       </div>
     </div>
       <div class="plan-head plan-bandeja"><p class="plan-resumen" id="plan-resumen" role="status" aria-live="polite"></p>
+        <div class="seg plan-periodos-barra" role="group"><button type="button" data-plan-paso="0"></button><button type="button" data-plan-paso="1"></button></div>
         <div class="actions"><details class="plan-menu" id="plan-menu"><summary></summary><div class="plan-menu-cuerpo"><button class="btn" type="button" id="plan-simular"></button><button class="btn" type="button" id="b-none"></button></div></details><button class="btn primary" type="button" id="b-go"></button><button class="btn" type="button" id="plan-deshacer" hidden></button></div>
         <span class="sate-sr" id="plan-anuncio" role="status" aria-live="polite" aria-atomic="true"></span>
       </div>
