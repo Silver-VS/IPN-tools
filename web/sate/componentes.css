@@ -77,10 +77,10 @@
 .tramite-cita{font:inherit;color:var(--ipn-acento);background:transparent;border:0;text-decoration:underline;text-underline-offset:var(--ipn-esp-1);padding:var(--ipn-esp-1);cursor:pointer;white-space:nowrap}
 #sate-tramites .tramite-cita{white-space:nowrap;overflow-wrap:normal}
 .tramite-cita:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
-.tramite-miniatura{position:relative;box-sizing:border-box;display:block;width:min(100%,12rem);margin-top:var(--ipn-esp-2);border:1px solid var(--ipn-linea);background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-xs);line-height:1.5;container-type:inline-size}
+.tramite-miniatura{position:relative;box-sizing:border-box;display:block;width:min(100%,12rem);margin-top:var(--ipn-esp-2);border:1px solid var(--ipn-linea);background:var(--ipn-superficie);color:var(--ipn-texto);font-size:var(--ipn-tamano-xs);line-height:1.5;aspect-ratio:612/792;overflow:hidden}
 .tramite-fila-boton .tramite-miniatura{grid-column:1/-1;margin-top:0}
 /* Zoom conserva el alto del flujo, incluso con valores largos o una tabla completa. */
-.tramite-miniatura-hoja{position:relative;isolation:isolate;box-sizing:border-box;display:grid;align-content:start;gap:var(--ipn-esp-5);width:400%;min-height:calc(400cqw * 792 / 612);padding:var(--ipn-esp-7);zoom:.25;font-size:var(--ipn-tamano-xs)}
+.tramite-miniatura-hoja{position:relative;isolation:isolate;box-sizing:border-box;display:grid;align-content:start;gap:var(--ipn-esp-5);width:400%;height:400%;padding:var(--ipn-esp-7);transform:scale(.25);transform-origin:0 0;font-size:var(--ipn-tamano-xs)}
 .tramite-miniatura-hoja>*{min-width:0;overflow-wrap:anywhere}
 .tramite-miniatura-cab{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--ipn-esp-3);align-items:center;border-bottom:1px solid var(--ipn-linea);padding-bottom:var(--ipn-esp-4)}
 .tramite-miniatura-cab>span{text-align:center}

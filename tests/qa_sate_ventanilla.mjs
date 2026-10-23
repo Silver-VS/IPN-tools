@@ -542,6 +542,6 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   const ejemplo=box.todos().find(n=>n.tagName==='button'&&n.attrs['aria-label']?.startsWith('Baja temporal. '));
   assert.ok(ejemplo.todos().some(n=>n.textContent==='Ejemplo'));
   assert.ok(ejemplo.todos().some(n=>n.textContent==='2099000000'),'Hoja con datos ficticios escritos');
-  assert.match(cssV,/min-height:calc\(400cqw \* 792 \/ 612\)/,'Hoja carta que puede crecer');
-  assert.match(cssV,/zoom:\.25/,'La reducción conserva el alto del flujo');
+  assert.match(cssV,/\.tramite-miniatura\{[^}]*aspect-ratio:612\/792[^}]*overflow:hidden/,'Miniatura en proporción carta, sin desbordarse');
+  assert.match(cssV,/\.tramite-miniatura-hoja\{[^}]*transform:scale\(\.25\)/,'La hoja se reduce con transform (zoom ya no reduce los anchos en %)');
 }
