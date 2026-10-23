@@ -742,7 +742,7 @@ function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="bu
    escala final. La respuesta es proporcional y amplificada (exponente GAIN): un pellizco amplio acerca mucho más que
    uno pequeño. Usa el mismo ZOOM que los botones +/−; desplazar con un dedo sigue siendo nativo. */
 
-SATE.pestana('horarios',{montar(){montarSemana();drawCals();renderGTime();SATE.cargarTemarios?.()?.then(()=>{if(SATE.actual==='horarios')renderHor()})},mostrar(){renderHor()},ocultar(){cancelarGeneracion();if($('#horario-compacto').open)$('#horario-compacto').close();S.hover=null}});
+SATE.pestana('horarios',{montar(){montarSemana();drawCals();renderGTime();SATE.cargarTemarios?.()?.then(()=>{if(SATE.actual?.pestana==='horarios')renderHor()})},mostrar(){renderHor()},ocultar(){cancelarGeneracion();if($('#horario-compacto').open)$('#horario-compacto').close();S.hover=null}});
 
 $('#b-export').addEventListener('click', async () => {
   try { await SATE.script('exportacion.js'); abrirExportacion(); }
