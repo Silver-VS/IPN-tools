@@ -295,6 +295,7 @@
     if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios','guia'].includes(actual.pestana)) { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos();
     const m = window.SateMedicion;
+    document.title = texto(actual.tramite ? 'sate.tramite.' + actual.tramite + '.titulo' : 'sate.pestana.' + (actual.padre || actual.pestana) + '.titulo') + ' — SATE';
     const pendiente = m ? m.render(actual.pestana, () => modulos[actual.pestana].mostrar(actual)) : modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);

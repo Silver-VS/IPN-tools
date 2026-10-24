@@ -75,6 +75,7 @@
     dlg.classList.toggle('sate-modal--pequeno', !!op.pequeno);
     dlg.classList.toggle('sate-modal--amplio', !!op.amplio);
     dlg.classList.toggle('sate-modal--lectura', !!op.lectura);
+    dlg.classList.toggle('sate-modal--flotante', !!op.flotante);
     var cuerpo = dlg.querySelector('.sate-modal__cuerpo');
     cuerpo.textContent = '';
     var c = typeof contenido === 'function' ? contenido() : contenido;
@@ -102,7 +103,7 @@
     document.documentElement.classList.remove('sate-sin-scroll');
     var o = origen, f = alCerrar;
     origen = null; alCerrar = null;
-    if (o && o.focus && document.contains(o)) o.focus();
+    if (o && o.focus && document.contains(o)) o.focus({preventScroll:true});
     if (f) f();
   }
 

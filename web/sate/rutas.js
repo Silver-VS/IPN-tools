@@ -70,7 +70,7 @@
       horarios:[datos('oferta'),...(cfg.cupos ? ['cupos.js','cupos-vista.js'] : []),'horarios.js'],
       calendario:['calendario.js'], tramites:[datos('tramites'),'tramites.js',...tramites],
       guia:['bibliotecas.js','guia.js','guia.css','temarios.css','../policore/lector.css',...(cfg.guiaDatos ? [datos('guia')] : [])],
-      temarios:['bibliotecas.js','temarios.js','guia.css','temarios.css',datos('temarios/indice')]})[id] || [];
+      temarios:['bibliotecas.js','guia.js','temarios.js','guia.css','temarios.css',datos('temarios/indice')]})[id] || [];
   }
   function precargador(cfg, unidad, json) {
     const pedidos = new Set();

@@ -63,7 +63,7 @@
   }
   function buscarEnRegistro(reg, terms) {
     if (!terms.length) return [];
-    const campos = { nombre: norm(claveNorm(reg.clave) + ' ' + (reg.nombre || '')), objetivo: norm(reg.objetivo), contenidos: norm(textoContenidos(reg)) };
+    const campos = { nombre: norm(claveNorm(reg.clave) + ' ' + (reg.nombre || '')), objetivo: norm(reg.objetivo), contenidos: norm(textoContenidos(reg)), bibliografia:norm((reg.bibliografia || []).map(b => b.texto).join(' ')) };
     const todo = Object.values(campos).join(' \n ');
     if (!terms.every(w => todo.includes(w))) return null;
     return Object.keys(campos).filter(k => terms.some(w => campos[k].includes(w)));
@@ -738,6 +738,9 @@
   }
   function portadaProgramas(caja) {
     const cab = cabeceraPagina(migasBase().slice(0, 1).concat([{ texto: t('sate.guia.programas') }]), t('sate.guia.programas'), t('temarios.explorador.intro'));
+    document.title = t('sate.guia.programas') + ' — ' + t('sate.pestana.guia.titulo');
+    const carrera = SATE.actual?.partes?.[0];
+    if (SATE.guia?.buscador) cab.nodo.appendChild(SATE.guia.buscador({fuente:'programas', carrera, nombre:E.indice.carreras[carrera]?.nombre || t('sate.guia.programas')}));
     caja.replaceChildren(h('div', { 'class': 'tmr guia' }, [cab.nodo, bloqueConsultar(), explorador()]));
     P.clave = null;
     cab.titulo.focus({ preventScroll: true });
@@ -754,6 +757,7 @@
     const [carr, clave, seccion] = (r && r.partes) || [];
     if (!carr || !clave) { portadaProgramas(caja); return; }
     const k = claveNorm(clave), id = carr + '/' + k;
+    document.title = (E.indice.materias[k]?.n || clave) + ' · ' + (E.indice.carreras[carr]?.nombre || carr) + ' — ' + t('sate.pestana.guia.titulo');
     // Misma ficha ya abierta (p. ej. un clic en el índice): solo se desplaza a la sección.
     if (P.clave === id && caja.querySelector('.tmr-ficha')) { if (seccion) irASeccion(seccion); return; }
     caja.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }));
@@ -770,6 +774,7 @@
     }
     const ficha = construirFicha(reg, recursos[k] || [], { modo: 'completa', alCambiar: () => abrirSelector({ carrera: reg.carreraId, actual: k }) });
     const cab = h('div', { 'class': 'guia-cab' }, [SateUI.migas([...migasBase(), { texto: reg.registro.nombre }])]);
+    if (SATE.guia?.buscador) cab.appendChild(SATE.guia.buscador({fuente:'programas',carrera:carr,materia:k,nombre:reg.registro.nombre}));
     caja.replaceChildren(h('div', { 'class': 'tmr guia' }, [cab, h('div', { 'class': 'tmr-pagina' }, [ficha])]));
     P.clave = id;
     if (seccion) irASeccion(seccion);

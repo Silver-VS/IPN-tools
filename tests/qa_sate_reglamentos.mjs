@@ -144,6 +144,8 @@ articulosDOM[0].getBoundingClientRect=()=>({top:-300});
 articulosDOM[1].getBoundingClientRect=()=>({top:0});
 eventos.get('scroll')(); cuadros.shift()();
 assert.equal(caja.querySelector('.rgl-art[aria-current]').getAttribute('data-ancla'),'art-2','scroll-spy actualiza el índice');
+assert.match(document.title,/^Art\. 2 · RI/,'título actualizado al desplazarse');
+assert.match(caja.querySelector('.rgl-contexto__actual').textContent,/2/);
 assert.equal(caja.querySelectorAll('.rgl-articulo').length,296,'navegar no reemplaza el articulado');
 movil=true;
 await pestana.mostrar({partes:['reglamentos','ri','art-106.III']});
@@ -152,6 +154,8 @@ assert.equal(caja.querySelectorAll('.rgl-activa').length,1,'ancla a una fracció
 assert.equal(caja.querySelector('.rgl-activa').getAttribute('data-ancla'),'art-106.III');
 movil=false;
 await pestana.mostrar({partes:['reglamentos','rge','art-55']});
+assert.match(document.title,/^Art\. 55 · RGE/,'título concreto por ruta');
+assert.ok(caja.querySelector('.rgl-contexto').textContent.includes('Reglamento General de Estudios'));
 assert.equal(caja.querySelector('.rgl-riel').hidden,false,'panel con preguntas reales para baja temporal');
 assert.ok(caja.querySelectorAll('.rgl-riel a').length>0);
 assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'));
@@ -163,6 +167,10 @@ for (const lector of caja.querySelectorAll('.rgl-cuerpo')) {
   for (const n of lector.querySelectorAll('*')) assert.equal(n.getAttribute('data-oficial'), 'rge', 'R14: cada elemento documental conserva el origen');
 }
 assert.equal(caja.querySelector('.rgl-riel').getAttribute('data-oficial'), null, 'orientación fuera del texto literal');
+contexto.location.hash='#/ficticia/guia/reglamentos/honor/art-21.I?frpos=14';
+await pestana.mostrar({partes:['reglamentos','honor','art-21.I']});
+assert.equal(document.scrolled.getAttribute('data-fraccion-pos'),'14','numeración repetida conserva el destino exacto');
+assert.equal(document.scrolled.querySelector('p').textContent,reg('honor').articulos.find(a=>a.n==='21').fracciones[13].texto);
 pestana.ocultar();
 assert.equal(eventos.has('scroll'),false,'se retira el seguimiento al salir');
 assert.equal(eventos.has('resize'),false,'se retira el ajuste al salir');
