@@ -22,13 +22,20 @@ for(const u of Object.keys(config)) {
   c.SateRutas=c.window.SateRutas;
   vm.runInContext(inicio.slice(inicio.indexOf('  let regresoPuente'),inicio.indexOf('  function error(e)')),c);
   vm.runInContext(`pintarPlataformas({pestana:'mapa'});pintarPlataformas({pestana:'guia'});`,c);
-  assert.equal(document.querySelectorAll('#sate-plataformas').length,1);
-  assert.equal(document.querySelector('#sate-plataforma-guia').getAttribute('aria-current'),'page');
-  assert.equal(siglas.textContent,'sate.pestana.guia.titulo');
-  assert.equal(document.querySelector('#sate-plataformas').parentNode,marca,'segmentos junto a la marca');
+  const boton=document.getElementById('b-plataforma');
+  assert.equal(document.querySelectorAll('#b-plataforma').length,1);
+  assert.equal(boton.className,'sate-unidad-btn sate-siglas');
+  assert.equal(boton.getAttribute('aria-haspopup'),'dialog');
+  assert.equal(boton.textContent,'sate.pestana.guia.titulo');
+  let opciones;
+  c.selectorMarca=(_,lista)=>opciones=lista;
+  boton.onclick();
+  assert.equal(opciones.length,2);
+  assert.equal(opciones[1].actual,true);
+  assert.equal(opciones[0].href,'#/'+u+'/mapa');
   vm.runInContext("pintarPlataformas({pestana:'mapa'})",c);
-  assert.equal(document.querySelector('#sate-plataforma-sate').getAttribute('aria-current'),'page');
-  assert.equal(document.querySelector('#sate-plataforma-guia').getAttribute('aria-current'),null);
+  boton.onclick();assert.equal(opciones[0].actual,true);
+  assert.equal(opciones[1].href,'#/'+u+'/guia');
   const origen={hash:'#/'+u+'/mapa',nombre:'Mapa curricular',y:437};
   c.origen=origen;c.destino='#/'+u+'/guia';
   vm.runInContext('guardarPuente(origen,destino);restaurarPuente({hash:destino,pestana:"guia"})',c);
@@ -48,31 +55,42 @@ for(const u of Object.keys(config)) {
   vm.runInContext('restaurarPuente({hash:destino})',c);
 }
 const css=leer('web/sate/componentes.css');
-assert.match(css,/sate-plataformas\{[^}]*flex-wrap:nowrap/);
-assert.match(css,/sate-plataformas a\{[^}]*text-decoration:none/);
 assert.match(css,/a:visited\{color:var\(--ipn-acento\)\}/,'los enlaces visitados conservan el color de acción');
 assert.match(css,/\.sate-regreso\{[^}]*margin:0 0 var\(--ipn-esp-3\)/);
 assert.match(css,/\.sate-regreso-cerrar\{[^}]*min-width:var\(--ipn-objetivo-tactil\)[^}]*min-height:var\(--ipn-objetivo-tactil\)/);
-assert.match(css,/sate-plataformas \[aria-current=page\]\{[^}]*border-color:[^}]*--ipn-aviso/);
 assert.match(css,/html\[data-vista=guia-vinculada\] #sate-nombre\{display:none\}/);
 const cssEnc=leer('web/sate/encabezado.css');
 assert.match(cssEnc,/@media\(min-width:1024px\)[\s\S]*?grid-template-areas:"marca contexto acciones"/,
   'desde 1024 px el puente mantiene marca, carrera y acciones en la misma fila');
 assert.match(cssEnc,/@media\(min-width:1024px\) and \(max-width:1199px\)/,
   'el escalón corto se limita a 1024–1199 px');
-assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda\{[^}]*color:transparent/);
-assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda (?:\.sate-ayuda__btn)?::before\{content:"•"/,
+assert.match(cssEnc,/\.sate-encabezado:has\(#b-plataforma\) #sate-leyenda\{[^}]*color:transparent/);
+assert.match(cssEnc,/\.sate-encabezado:has\(#b-plataforma\) #sate-leyenda (?:\.sate-ayuda__btn)?::before\{content:"•"/,
   'la fase de prueba se reduce a un punto con el title como ayuda');
-assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) \.header-actions \.saes-open \.sate-texto-corto\{display:inline\}/,
+assert.match(cssEnc,/\.sate-encabezado:has\(#b-plataforma\) \.header-actions \.saes-open \.sate-texto-corto\{display:inline\}/,
   'el escalón corto muestra Actualizar y conserva el aria-label del botón');
 assert.match(cssEnc,/@media\(max-width:767px\)/);
-assert.match(css,/@media\(max-width:767px\)[\s\S]*?\.sate-plataformas a\{padding-inline:/,
-  'el selector de plataforma sigue presente en el encabezado compacto');
-// Sin navegador no se calcula geometría; estas reglas fijan el escalón completo y el corto para 1440/1280/1024,
-// el compacto para 768 y el flotante/compacto con plataformas visibles para 600/375.
-for(const ancho of [1440,1280])assert.ok(ancho>=1200,'escalón completo '+ancho);
-for(const ancho of [1024,768])assert.ok(ancho>=768,'escalón corto/compacto '+ancho);
-for(const ancho of [600,375])assert.ok(ancho<=767,'escalón flotante/compacto '+ancho);
+assert.match(inicio,/function selectorMarca\(titulo, opciones\)/);
+assert.match(inicio,/selectorMarca\(texto\('sate.encabezado.unidad'\)/);
+assert.match(inicio,/boton.onclick=\(\)=>selectorMarca/);
+assert.doesNotMatch(inicio,/sate-plataformas/);
+// Ambos selectores construyen sus opciones y delegan el foco/Escape al mismo diálogo.
+{
+  const {document}=crearEntorno();let caja,cerrados=0;
+  const c=vm.createContext({document,texto:k=>k,location:{},SateUI:{modal:(_,n)=>{caja=n;return {cerrar:()=>cerrados++}}}});
+  vm.runInContext(inicio.slice(inicio.indexOf('  function selectorMarca('),inicio.indexOf('  async function mostrarEntrada(')),c);
+  vm.runInContext('elegirUnidad()',c);
+  assert.equal(caja.className,'sate-selector-marca');
+  caja.children[0].onclick();assert.equal(c.location.href,'index.html?sateEntrada=1');
+  vm.runInContext("selectorMarca('Plataformas',[{texto:'SATE',href:'#/unidad/mapa',actual:true},{texto:'Guía politécnica',href:'#/unidad/guia'}])",c);
+  assert.equal(caja.className,'sate-selector-marca');
+  assert.equal(caja.children[0].getAttribute('aria-current'),'page');
+  assert.equal(caja.children[1].getAttribute('aria-current'),null);
+  caja.children[1].onclick();assert.equal(cerrados,2);
+}
+// Sin navegador se comprueban las reglas, no se afirma haber medido geometría.
+assert.match(css,/\.sate-marca:has\(#b-plataforma\) #sate-titulo\{font-size:var\(--ipn-tamano-s\)\}/);
+assert.doesNotMatch(css,/\.sate-marca:has\(#b-plataforma\)[^{]*\.sate-siglas[^}]*display:none/);
 assert.match(inicio,/filter\(id=>id!=='guia'\)/);
 assert.match(inicio,/SATE\.articulo\(m\[1\]/);
 assert.doesNotMatch(inicio,/config\[unidad\] = .*generica:true/);
@@ -102,4 +120,4 @@ vm.runInContext(nucleo.slice(nucleo.indexOf('function inspParts(k)'),nucleo.inde
 const ficha=inspector.inspParts('DEMO');
 assert.match(ficha.l2,/horarios\?materia=DEMO/);assert.match(ficha.l2,/sate.puentes.grupos:1/);
 assert.match(ficha.l2,/sate.puentes.todo/);assert.doesNotMatch(ficha.l2,/tag-rel|guia\/programas/);
-console.log('R16: interruptor, regreso y desplazamiento, almacenamiento bloqueado, enlaces y perfil OK');
+console.log('R16: selector compartido, regreso y desplazamiento, almacenamiento bloqueado, enlaces y perfil OK');

@@ -128,20 +128,20 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
 :root{--sate-barra-alto:0px;--ipn-radio-pastilla:999px;--ipn-radio-circulo:50%;--ipn-control-alto:var(--ipn-objetivo-tactil,44px);--ipn-filtros-alto:6rem}
 /* El puente conserva una sola franja superior desde 1024 px; la Guía no usa la fila de pestañas. */
 @media(min-width:1024px){
-  header.sate-encabezado:has(.sate-plataformas){grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"marca contexto acciones" "nav nav nav" "avisos avisos avisos";column-gap:var(--ipn-esp-4)}
-  .sate-encabezado:has(.sate-plataformas) .sate-contexto{flex-wrap:nowrap;justify-content:flex-start;gap:var(--ipn-esp-2)}
-  .sate-encabezado:has(.sate-plataformas) .sate-contexto .sate-controles{flex:1 1 auto;min-width:0}
-  .sate-encabezado:has(.sate-plataformas) .sate-contexto select{width:100%;max-width:22rem}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda{flex:none}
-  .sate-encabezado:has(.sate-plataformas) .sate-unidad-nombre{max-width:9ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  header.sate-encabezado:has(#b-plataforma){grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"marca contexto acciones" "nav nav nav" "avisos avisos avisos";column-gap:var(--ipn-esp-4)}
+  .sate-encabezado:has(#b-plataforma) .sate-contexto{flex-wrap:nowrap;justify-content:flex-start;gap:var(--ipn-esp-2)}
+  .sate-encabezado:has(#b-plataforma) .sate-contexto .sate-controles{flex:1 1 auto;min-width:0}
+  .sate-encabezado:has(#b-plataforma) .sate-contexto select{width:100%;max-width:22rem}
+  .sate-encabezado:has(#b-plataforma) #sate-leyenda{flex:none}
+  .sate-encabezado:has(#b-plataforma) .sate-unidad-nombre{max-width:9ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
 /* Escalón corto: 1024–1199 prioriza carrera y acciones reconocibles frente a los logotipos. */
 @media(min-width:1024px) and (max-width:1199px){
-  .sate-encabezado:has(.sate-plataformas) :is(.sate-logo-slot,.sate-logo-ipn){display:none}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda{width:var(--ipn-esp-4);overflow:hidden;color:transparent;white-space:nowrap}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda .sate-ayuda__btn{position:relative;width:var(--ipn-esp-4);overflow:hidden;color:transparent}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda .sate-ayuda__btn::before{content:"•";position:absolute;inset:0;display:grid;place-items:center;color:var(--ipn-tenue)}
-  .sate-encabezado:has(.sate-plataformas) .header-actions .saes-open .sate-texto-largo{display:none!important}
-  .sate-encabezado:has(.sate-plataformas) .header-actions .saes-open .sate-texto-corto{display:inline}
-  .sate-encabezado:has(.sate-plataformas) .header-actions .sate-opinar span{display:none}
+  .sate-encabezado:has(#b-plataforma) :is(.sate-logo-slot,.sate-logo-ipn){display:none}
+  .sate-encabezado:has(#b-plataforma) #sate-leyenda{width:var(--ipn-esp-4);overflow:hidden;color:transparent;white-space:nowrap}
+  .sate-encabezado:has(#b-plataforma) #sate-leyenda .sate-ayuda__btn{position:relative;width:var(--ipn-esp-4);overflow:hidden;color:transparent}
+  .sate-encabezado:has(#b-plataforma) #sate-leyenda .sate-ayuda__btn::before{content:"•";position:absolute;inset:0;display:grid;place-items:center;color:var(--ipn-tenue)}
+  .sate-encabezado:has(#b-plataforma) .header-actions .saes-open .sate-texto-largo{display:none!important}
+  .sate-encabezado:has(#b-plataforma) .header-actions .saes-open .sate-texto-corto{display:inline}
+  .sate-encabezado:has(#b-plataforma) .header-actions .sate-opinar span{display:none}
 }

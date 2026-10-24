@@ -202,7 +202,7 @@ assert.match(css,/body\.sate-flotante \.sate-barra\{display:flex\}/);
 assert.match(css,/\.sate-barra__btn \.sate-pestana__texto\{white-space:nowrap;overflow-wrap:normal\}/);
 // Ejecutar el adaptador real con geometría controlada, sin navegador ni red.
 {
-const adaptador = inicio.slice(inicio.indexOf('  function adaptarPestanas()'),inicio.indexOf('  function elegirUnidad()'));
+const adaptador = inicio.slice(inicio.indexOf('  function adaptarPestanas()'),inicio.indexOf('  function selectorMarca('));
 let ancho = 1000, completo = 600, corto = 400, medicion, frame, frames = 0, observador, mutacion, fuentes;
 const boton = {dataset:{id:'mapa'},focus(){doc.activeElement=this}};
 const inferior = {dataset:{id:'mapa'},focus(){doc.activeElement=this}};

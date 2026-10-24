@@ -85,22 +85,20 @@
   function pintarPlataformas(r) {
     if(!document.querySelector('.sate-marca'))return;
     const guia = r.padre === 'guia' || r.pestana === 'guia';
-    let nav = document.getElementById('sate-plataformas');
-    if(!nav) {
-      nav=document.createElement('nav');nav.setAttribute('id','sate-plataformas');nav.className='sate-plataformas';
-      nav.setAttribute('aria-label',texto('sate.puentes.plataformas'));
-      for(const id of ['guia','sate']) {
-        const a=document.createElement('a');a.setAttribute('id','sate-plataforma-'+id);
-        a.textContent=texto(id==='guia'?'sate.puentes.guia':'sate.siglas');nav.appendChild(a);
-      }
-      document.querySelector('.sate-marca').appendChild(nav);
+    let boton = document.getElementById('b-plataforma');
+    if(!boton) {
+      const siglas=document.querySelector('.sate-siglas');
+      boton=document.createElement('button');boton.setAttribute('id','b-plataforma');
+      boton.type='button';boton.className='sate-unidad-btn sate-siglas';
+      boton.setAttribute('aria-haspopup','dialog');
+      siglas.parentNode.replaceChild(boton,siglas);
     }
-    for(const id of ['guia','sate']) {
-      const a=document.getElementById('sate-plataforma-'+id);
-      a.href='#/'+u+'/'+(id==='guia'?'guia':'mapa');
-      if((id==='guia')===guia)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
-    }
-    document.querySelector('.sate-siglas').textContent=texto(guia?'sate.pestana.guia.titulo':'sate.siglas');
+    boton.textContent=texto(guia?'sate.pestana.guia.titulo':'sate.siglas');
+    boton.setAttribute('aria-label',boton.textContent+'. '+texto('sate.puentes.plataformas'));
+    boton.onclick=()=>selectorMarca(texto('sate.puentes.plataformas'),['sate','guia'].map(id=>({
+      texto:texto(id==='guia'?'sate.pestana.guia.titulo':'sate.puentes.sate'),
+      href:'#/'+u+'/'+(id==='guia'?'guia':'mapa'),actual:(id==='guia')===guia
+    })));
     document.documentElement.setAttribute('data-vista',guia?'guia-vinculada':'');
   }
   function restaurarPuente(r) {
@@ -259,13 +257,22 @@
     halo.appendChild(img);
     return halo;
   }
-  function elegirUnidad() {
+  function selectorMarca(titulo, opciones) {
     const caja = document.createElement('div');
-    const boton = document.createElement('button'); boton.type='button'; boton.className='btn'; boton.textContent=texto('sate.entrada.cambiar');
+    caja.className='sate-selector-marca';
+    for(const opcion of opciones) {
+      const boton=document.createElement(opcion.href?'a':'button');
+      boton.className='btn';boton.textContent=opcion.texto;
+      if(opcion.href)boton.setAttribute('href',opcion.href);else boton.type='button';
+      if(opcion.actual)boton.setAttribute('aria-current','page');
+      boton.onclick=()=>{dialogo?.cerrar();opcion.accion?.()};
+      caja.appendChild(boton);
+    }
+    const dialogo=SateUI.modal(titulo,caja);
+  }
+  function elegirUnidad() {
     // La entrada explícita conserva el perfil y la preferencia hasta elegir otra unidad.
-    boton.onclick=()=>{location.href='index.html?sateEntrada=1'};
-    caja.appendChild(boton);
-    SateUI.modal(texto('sate.encabezado.unidad'), caja);
+    selectorMarca(texto('sate.encabezado.unidad'),[{texto:texto('sate.entrada.cambiar'),accion:()=>{location.href='index.html?sateEntrada=1'}}]);
   }
   async function mostrarEntrada() {
     // La cuenta y el Lector deben estar listos antes de habilitar la selección y el pegado.
@@ -349,7 +356,7 @@
     document.getElementById('sate-guia').hidden = r.pestana !== 'guia';
     const panel = document.getElementById(r.pestana === 'guia' ? 'sate-guia' : r.pestana === 'horarios' ? 'v-hor' : r.pestana === 'tramites' ? 'sate-tramites' : r.pestana === 'temarios' ? 'sate-temarios' : r.pestana === 'trayectoria' ? 'sate-trayectoria' : r.pestana === 'calendario' ? 'sate-calendario' : 'v-tray');
     panel.setAttribute('role','tabpanel');
-    panel.setAttribute('aria-labelledby',(tabs.querySelector('[data-id="'+marca+'"]') || document.getElementById('sate-plataforma-guia')).id);
+    panel.setAttribute('aria-labelledby',(tabs.querySelector('[data-id="'+marca+'"]') || document.getElementById('b-plataforma')).id);
     api.store.set('ruta', r.hash);
     document.getElementById('sate-carga').hidden = true;
     await repintar();
