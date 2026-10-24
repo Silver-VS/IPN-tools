@@ -536,6 +536,25 @@
       return document.createTextNode(p.texto);
     });
   }
+  function cuerpoArticulo(a, doc, fila, literal = false) {
+    if(literal) return h('div', {'class':'pc-lector pc-oficial', 'data-oficial':doc}, [h('p', {'class':'guia-articulo-literal', texto:a.texto})]);
+    if (!E.partes.has(a)) E.partes.set(a, partesArticulo(a));
+    const p = E.partes.get(a), nodos = [];
+    if (p.intro) nodos.push(h('p', { texto: p.intro }));
+    if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones' }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
+    if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
+      h('p', { texto: f.texto }),
+      f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), [h('p', { texto: x.texto })]))) : null]))));
+    const cuerpo = h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc }, nodos);
+    cuerpo.querySelectorAll('.rgl-fr').forEach((n,i) => {
+      n.setAttribute('data-fraccion-pos',i+1);
+      if (p.fracciones.filter(f=>f.fr===p.fracciones[i].fr).length > 1) {
+        const enlace = n.querySelector('a');
+        enlace.setAttribute('href',enlace.getAttribute('href')+'?frpos='+(i+1));
+      }
+    });
+    return envolverReferencias(cuerpo, doc, a);
+  }
   SATE.articulo = async function (doc, n, fr) {
     // La lectura literal también funciona desde otra vista si no se pudo cargar la Guía.
     const d = await datos().catch(e => {
@@ -550,7 +569,7 @@
     const a = !reg?.sin_texto && reg?.articulos?.find(x => String(x.n) === String(n));
     const cuerpo = h('div', { 'class': 'guia-articulo' }, a ? [
       h('p', { texto: (a.ubicacion || []).join(' · ') }),
-      h('div', { 'class': 'pc-lector pc-oficial', 'data-oficial': doc }, [h('p', { 'class': 'guia-articulo-literal', texto: a.texto })])
+      cuerpoArticulo(a,doc,null,true)
     ] : [h('p', { role: 'status', texto: t(error ? 'sate.guia.error_articulo' : 'sate.guia.sin_articulo') })]);
     if (a) {
       const literal = cuerpo.querySelector('.guia-articulo-literal');
@@ -663,12 +682,14 @@
     raizGuia.classList.add('guia-nueva');
     raizGuia.appendChild(buscador.cab);raizGuia.appendChild(buscador.resultados);raizGuia.appendChild(contenido);
     if(s){
-      const proxima=SATE.calendario?.recorte('guia')?.[0];
+      const proxima=SATE.calendario?.proximos?.(Infinity)?.find(e=>!e.personal) || SATE.calendario?.recorte('guia')?.[0];
+      const ets=s.adeudos.length?SATE.calendario?.proximos?.(1,['ets','inscripcion_ets'])?.[0]:null;
       contenido.appendChild(h('section',{'class':'guia-hoy','aria-label':tx('hoy')},[
         h('strong',{texto:tx('hoy')}),h('span',{'class':'guia-estado '+(s.adeudos.length?'guia-estado--aviso':'guia-estado--ok'),texto:s.adeudos.length?tx('irregular_hoy',{n:s.adeudos.length}):tx('regular')}),
         h('span',{'class':'guia-estado '+(s.nDes?'guia-estado--error':'guia-estado--ok'),texto:s.nDes?tx('desfase',{n:s.nDes}):tx('sin_desfase')}),
-        proxima?h('span',{},[h('span',{'data-oficial':'calendario',texto:proxima.titulo}),document.createTextNode(' · '),h('time',{'data-oficial':'calendario',datetime:proxima.desde,texto:fechaRevision(proxima.desde)})]):null,
-        h('a',{href:rutaGuia('ruta',elegida),texto:tx('ver_toca')})]));
+        proxima?h('a',{href:'#/'+unidad()+'/calendario'},[h('strong',{texto:t('sate.puentes.fecha')+' · '}),h('span',{'data-oficial':'calendario',texto:proxima.titulo}),document.createTextNode(' · '),h('time',{'data-oficial':'calendario',datetime:proxima.desde,texto:fechaRevision(proxima.desde)})]):null,
+        h('a',{href:rutaGuia('ruta',elegida),texto:t('sate.puentes.ruta')+' · '+tx(elegida)}),
+        ets?h('a',{href:'#/'+unidad()+'/calendario'},[h('strong',{texto:t('sate.puentes.ets')+' · '}),h('span',{'data-oficial':'calendario',texto:ets.titulo}),h('time',{'data-oficial':'calendario',datetime:ets.desde,texto:' · '+fechaRevision(ets.desde)})]):null]));
     }
     const rutas=d.orientacion.rutas;
     contenido.appendChild(h('section',{'class':'guia-rutas-seccion'},[h('h3',{texto:tx('empieza')}),h('div',{'class':'guia-rutas'},rutas.map(r=>{
@@ -1058,24 +1079,6 @@
     function fila(clase, marca, anclaDe, etiqueta, contenido) {
       return h('li', { 'class': clase, 'data-ancla': anclaDe }, [enlaceAncla('rgl-marca', anclaDe, marca, { 'aria-label': etiqueta }), h('div', {}, contenido)]);
     }
-    function cuerpoArticulo(a) {
-      if (!E.partes.has(a)) E.partes.set(a, partesArticulo(a));
-      const p = E.partes.get(a), nodos = [];
-      if (p.intro) nodos.push(h('p', { texto: p.intro }));
-      if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones' }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
-      if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
-        h('p', { texto: f.texto }),
-        f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), [h('p', { texto: x.texto })]))) : null]))));
-      const cuerpo = h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc }, nodos);
-      cuerpo.querySelectorAll('.rgl-fr').forEach((n,i) => {
-        n.setAttribute('data-fraccion-pos',i+1);
-        if (p.fracciones.filter(f=>f.fr===p.fracciones[i].fr).length > 1) {
-          const enlace = n.querySelector('a');
-          enlace.setAttribute('href',enlace.getAttribute('href')+'?frpos='+(i+1));
-        }
-      });
-      return envolverReferencias(cuerpo, doc, a);
-    }
     function pintarRiel(a) {
       const rel = a ? relacionesArticulo(d, doc, a.n, tramites) : { preguntas: [], tramites: [] };
       const bloques = [];
@@ -1154,7 +1157,7 @@
         h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, botonGuardarInv(doc,a.n), estado])]);
       // Reservar altura evita que los títulos posteriores colapsen mientras llega su texto.
       seccion.style.minHeight = Math.max(110, Math.ceil((a.texto || '').length / 80) * 24 + 64) + 'px';
-      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a)); seccion.style.minHeight = ''; if(investigacionCompartida || leerInvestigaciones().proyectos.length)pintarAnotaciones(); });
+      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a,doc,fila)); seccion.style.minHeight = ''; if(investigacionCompartida || leerInvestigaciones().proyectos.length)pintarAnotaciones(); });
       if (Math.abs(posicion.get(a.n) - centro) <= 3) completar(a.n);
       contenedores[contenedores.length - 1].appendChild(seccion);
       secciones.set(a.n, seccion);

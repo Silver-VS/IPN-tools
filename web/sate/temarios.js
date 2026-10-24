@@ -201,7 +201,12 @@
   }
 
   function nombreDe(k) { const e = E.indice?.materias?.[claveNorm(k)]; return e ? e.n : k; }
-  const enlaceHtml = k => (tiene(k) ? '<p class="insp-temario"><a href="' + esc(ir(E.indice.materias[claveNorm(k)].c, claveNorm(k))) + '">' + esc(t('temarios.mapa.ver')) + '</a></p>' : '');
+  const enlaceHtml = k => {
+    const programa=tiene(k)?'<a href="'+esc(ir(E.indice.materias[claveNorm(k)].c,claveNorm(k)))+'">'+esc(t('sate.puentes.programa'))+'</a>':'';
+    const grupos=typeof classes==='function'?classes().filter(c=>c[0]===S.car && claveNorm(c[8])===claveNorm(k)):[];
+    const oferta=grupos.length?'<a href="#/'+unidad()+'/horarios?materia='+encodeURIComponent(k)+'">'+esc(t('sate.puentes.grupos',{n:new Set(grupos.map(c=>c[3])).size}))+'</a>':'';
+    return '<p class="insp-temario sate-puentes-materia">'+programa+oferta+'<a href="#/'+unidad()+'/guia">'+esc(t('sate.puentes.todo'))+'</a></p>';
+  };
   const migasBase = () => [{ texto: t('sate.pestana.guia.titulo'), href: '#/' + unidad() + '/guia' }, { texto: t('sate.guia.programas'), href: ir() }];
 
   /* ---------- vista única de una unidad de aprendizaje ----------
@@ -355,10 +360,25 @@
     try {
       const r = await registro(k);
       if (token !== E.token) return;
-      const recursos = await cargarRecursos(r.carreraId);
-      if (token !== E.token) return;
-      p.style.setProperty('--tmr-area', r.registro.area?.color || 'var(--ipn-acento)');
-      E.cuerpo.replaceChildren(construirFicha(r, recursos[k] || [], { modo: 'vistazo', alIr: () => cerrar({ foco: false }) }));
+      if(!SATE.actual || SATE.actual.pestana==='guia' || SATE.actual.padre==='guia') {
+        const recursos=await cargarRecursos(r.carreraId);
+        if(token!==E.token)return;
+        p.style.setProperty('--tmr-area',r.registro.area?.color || 'var(--ipn-acento)');
+        E.cuerpo.replaceChildren(construirFicha(r,recursos[k]||[],{modo:'vistazo',alIr:()=>cerrar({foco:false})}));
+        return;
+      }
+      const ficha=h('div',{'class':'sate-puentes-materia'},[
+        SateUI.oficial(h('strong',{texto:r.registro.nombre}),'temarios'),
+        h('a',{href:ir(r.carreraId,r.registro.clave),texto:t('sate.puentes.programa')}),
+        h('a',{href:ir(r.carreraId,r.registro.clave),texto:t('sate.puentes.todo')})]);
+      // La oferta corresponde al periodo y carrera seleccionados; no se deducen relaciones normativas.
+      const grupos=typeof classes==='function'?classes().filter(c=>c[0]===S.car && claveNorm(c[8])===k):[];
+      if(grupos.length){
+        const a=h('a',{href:'#/'+unidad()+'/horarios?materia='+encodeURIComponent(k),texto:t('sate.puentes.grupos',{n:new Set(grupos.map(c=>c[3])).size})});
+        ficha.insertBefore(a,ficha.lastChild);
+      }
+      ficha.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>cerrar({foco:false})));
+      E.cuerpo.replaceChildren(ficha);
       p.setAttribute('aria-label', t('temarios.panel.etiqueta', { materia: r.registro.nombre }));
     } catch (e) {
       if (token !== E.token) return;

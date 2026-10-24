@@ -68,6 +68,13 @@ for(const unidad of ['upiita','escom','upibi']){
   s=perfil;await abrir();assert.ok(caja.querySelector('.guia-hoy'));assert.equal(caja.querySelector('[data-ruta="irregular"]').getAttribute('aria-current'),'true');
   assert.equal(caja.querySelectorAll('.guia-estado').length,2);
   assert.match(caja.querySelector('.guia-hoy').textContent,/ETS ficticio/);
+  c.SATE.calendario.proximos=(_,categorias)=>categorias?[{titulo:'ETS de prueba',desde:'2026-11-03'}]:[{titulo:'Fecha oficial de prueba',desde:'2026-11-02'}];
+  await abrir();
+  assert.match(caja.querySelector('.guia-hoy').textContent,/Para ti.*Fecha oficial de prueba.*Tu ruta.*Tu próximo ETS.*ETS de prueba/);
+  assert.equal(caja.querySelectorAll('.guia-hoy time').length,2);
+  s={...perfil,adeudos:[],nDes:0};await abrir();
+  assert.doesNotMatch(caja.querySelector('.guia-hoy').textContent,/Tu próximo ETS/,'sin adeudos no propone ETS');
+  s=perfil;await abrir();
   assert.ok(caja.querySelector('.guia-busqueda-campo svg'));
   assert.match(caja.querySelector('[data-ruta="aprovecha"]').textContent,/actividades deportivas.*atención a la salud/);
   assert.doesNotMatch(caja.querySelector('[data-ruta="aprovecha"]').textContent,/\d+ formatos?/);

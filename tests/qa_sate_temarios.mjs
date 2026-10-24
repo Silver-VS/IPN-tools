@@ -517,6 +517,21 @@ est.click(); await dormir(30);
   assert.match(html, /\.maptools>\.seg\{flex-shrink:0;max-width:100%\}/);
   // El panel conserva su API, independiente de los clics del mapa.
   const antes = JSON.stringify(tr);
+  const estadoPrevio=c.S;
+  for(const pestana of ['mapa','horarios']) {
+    c.SATE.actual={pestana};c.S={car:'B'};
+    c.classes=()=>[['B',null,null,'1BM1',null,null,null,null,'B101'],['B',null,null,'1BM1',null,null,null,null,'B101'],['B',null,null,'1BM2',null,null,null,null,'B101'],['X',null,null,'1XM1',null,null,null,null,'B101']];
+    await T.abrir('B101',caja1);
+    const breve=T.estado.panel.querySelector('.sate-puentes-materia');assert.ok(breve);
+    assert.equal(breve.querySelectorAll('a').length,3);
+    const oferta=breve.querySelectorAll('a').find(a=>a.getAttribute('href').includes('/horarios?'));
+    assert.equal(oferta.textContent,'2 grupos · Ver en Horarios ›');
+    assert.equal(oferta.getAttribute('href'),'#/upiita/horarios?materia=B101');
+    assert.equal(breve.querySelector('.tmr-descripcion'),null,'sin apilar secciones del programa');
+    assert.equal(breve.querySelector('[data-reglamento]'),null,'no inventa relaciones normativas');
+    T.cerrar();
+  }
+  delete c.SATE.actual;delete c.classes;c.S=estadoPrevio;
   await T.abrir('B101', caja1);
   assert.equal(JSON.stringify(tr), antes);
   const panel = T.estado.panel;
@@ -586,9 +601,11 @@ est.click(); await dormir(30);
   assert.equal(document.documentElement.classList.contains('sate-sin-scroll'), false);
   estado.lateral = true;
   // Enlace desde la ficha de la materia (inspector)
-  assert.match(T.enlaceHtml('B101'), /href="#\/upiita\/guia\/programas\/bionica\/B101"[^>]*>Ver programa</);
-  assert.equal(T.enlaceHtml('B102'), '');
-  assert.equal(T.enlaceHtml('XXX'), '');
+  assert.match(T.enlaceHtml('B101'), /href="#\/upiita\/guia\/programas\/bionica\/B101"[^>]*>Ver programa ›</);
+  for(const clave of ['B102','XXX']) {
+    assert.match(T.enlaceHtml(clave), /Ver todo en la Guía/);
+    assert.doesNotMatch(T.enlaceHtml(clave), /guia\/programas\//,'sin programa no inventa un destino');
+  }
 
   /* ----- Vista única de la unidad de aprendizaje ----- */
   const reg103 = bionica.find(r => r.clave === 'B103');

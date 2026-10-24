@@ -639,10 +639,9 @@ function inspParts(k){
       s0.includes('lock')?`<b>Aún no puedes cursarla:</b> te falta ${miss.map(nm).join(', ')}.`:
       `<b>Puedes cursarla.</b>${lv.ok?'':` Seriación recomendada por nivel: ${lv.miss.join(', ')}.`}`}
   if(isElec(k))return {l1,l2:(st?`<p class="insp-st">${st}</p>`:'')+`<p>${SATE.texto(CAPACIDADES.electivas?.texto||'sate.electivas.acreditacion_consulta',{enlace:'#/'+UNIDAD+'/tramites/'+CAPACIDADES.electivas?.tramite})}</p>`};
-  const l2=(st?`<p class="insp-st">${st}</p>`:'')+
-    `<p><span class="tag-rel pre">Antes</span><b>Requisitos:</b> ${pre.length?pre.map(nm).join(', '):'ninguno registrado'}${all.size>pre.length?` <span class="muted">(${all.size} materias en toda su cadena)</span>`:''}</p>`+
-    `<p><span class="tag-rel post">Después</span><b>Es requisito de:</b> ${post.length?post.map(nm).join(', '):'ninguna materia'}</p>`+
-    (off?'':'<p class="muted"><i>Sin grupos en el periodo consultado.</i></p>')+(SATE.temarios?.enlaceHtml?.(k)||'');
+  const grupos=new Set(classes().filter(c=>c[0]===S.car&&c[8]===k).map(c=>c[3])).size;
+  const puentes=SATE.temarios?.enlaceHtml?.(k)||`<p class="sate-puentes-materia">${grupos?`<a href="#/${UNIDAD}/horarios?materia=${encodeURIComponent(k)}">${esc(SATE.texto('sate.puentes.grupos',{n:grupos}))}</a>`:''}<a href="#/${UNIDAD}/guia">${esc(SATE.texto('sate.puentes.todo'))}</a></p>`;
+  const l2=(st?`<p class="insp-st">${st}</p>`:'')+puentes;
   return {l1,l2};
 }
 /* Materias del horario inscrito que no son de este plan (movilidad/flexibilidad académica, cambio de carrera u otra carrera de la

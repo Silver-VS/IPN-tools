@@ -142,7 +142,19 @@ if(typeof CUPOS!=='undefined')CUPOS.montar();
 $('#offer').addEventListener('click',e=>{
   if(e.target.closest('[data-oferta-mapa]'))SATE.ir('mapa');
   if(e.target.closest('[data-oferta-toda]')){S.onlyWant=false;store.set('onlyWant',false);renderHFilters();renderOffer()}
-  const temario=e.target.closest('[data-temario]');if(temario)SATE.temarios?.abrir(temario.dataset.temario,temario);
+  const temario=e.target.closest('[data-temario]');
+  if(temario){
+    const k=temario.dataset.temario;
+    if(SATE.temarios?.tiene(k))SATE.temarios.abrir(k,temario);
+    else {
+      const grupos=classes().filter(c=>c[0]===S.car&&c[8]===k),cuerpo=document.createElement('div');
+      cuerpo.className='sate-puentes-materia';
+      for(const [href,texto] of [['#/'+UNIDAD+'/horarios?materia='+encodeURIComponent(k),SATE.texto('sate.puentes.grupos',{n:new Set(grupos.map(c=>c[3])).size})],['#/'+UNIDAD+'/guia',SATE.texto('sate.puentes.todo')]]){
+        const a=document.createElement('a');a.href=href;a.textContent=texto;a.onclick=()=>SateUI.cerrarModal();cuerpo.appendChild(a);
+      }
+      SateUI.modal(grupos.length?name(grupos[0]):k,cuerpo,{pequeno:true});
+    }
+  }
 });
 $('#f-hide').addEventListener('change',e=>{S.hide=e.target.checked;store.set('hide',S.hide);renderOffer()});
 $('#f-done').addEventListener('change',e=>{S.hideDone=e.target.checked;store.set('hideDone',S.hideDone);renderOffer()});
@@ -315,7 +327,7 @@ function roomsTxt(c){if(!c[10]||!c[10].some(Boolean))return '';const by=new Map(
 /* Líneas de especialización de una optativa (por clave o por nombre, ya que una optativa puede tener varias claves) */
 function lineasDe(k){const c=cur(), n=c[k]?.[0]?.toUpperCase();if(!n)return[];
   return (MAP().lineas||[]).filter(l=>l.claves.some(x=>x===k||c[x]?.[0]?.toUpperCase()===n)).map(l=>l.linea!==l.area?l.linea:l.area)}
-function botonTemario(c){return SATE.temarios?.tiene(c[8])?`<button type="button" class="temario-mini" data-temario="${esc(c[8])}" aria-label="${esc(SATE.texto('sate.horarios.temario_abrir',{nombre:name(c)}))}" title="${esc(SATE.texto('sate.horarios.temario_abrir',{nombre:name(c)}))}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zM4 5.5v14A2.5 2.5 0 0 1 6.5 17H20M8 7h8M8 10h8"/></svg></button>`:''}
+function botonTemario(c){return `<button type="button" class="temario-mini" data-temario="${esc(c[8])}" aria-label="${esc(SATE.texto('sate.puentes.materia',{nombre:name(c)}))}" title="${esc(SATE.texto('sate.puentes.materia',{nombre:name(c)}))}"><svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 0 4 22zM4 5.5v14A2.5 2.5 0 0 1 6.5 17H20M8 7h8M8 10h8"/></svg></button>`}
 function optRow(c,sel,inGroup){
   const k=keyOf(c), on=plan().sel.includes(k), mk=ws().marks[k]||{};
   const clash=[...sel,...ownAsClasses()].filter(s=>(s.own||keyOf(s)!==k)&&overlaps(s,c));
@@ -987,7 +999,7 @@ function renderOwnForm(){$('#own-d').innerHTML=DAYS.map((d,i)=>`<button type="bu
    escala final. La respuesta es proporcional y amplificada (exponente GAIN): un pellizco amplio acerca mucho más que
    uno pequeño. Usa el mismo ZOOM que los botones +/−; desplazar con un dedo sigue siendo nativo. */
 
-SATE.pestana('horarios',{montar(){montarSemana();montarPropuestas();drawCals();renderGTime();SATE.cargarTemarios?.()?.then(()=>{if(SATE.actual?.pestana==='horarios')renderHor()})},mostrar(){renderHor()},ocultar(){cancelarGeneracion();if($('#horario-compacto').open)$('#horario-compacto').close();S.hover=null}});
+SATE.pestana('horarios',{montar(){montarSemana();montarPropuestas();drawCals();renderGTime();SATE.cargarTemarios?.()?.then(()=>{if(SATE.actual?.pestana==='horarios')renderHor()})},mostrar(){const materia=new URLSearchParams(location.hash.split('?')[1]||'').get('materia');if(materia)S.q=materia;renderHor()},ocultar(){cancelarGeneracion();if($('#horario-compacto').open)$('#horario-compacto').close();S.hover=null}});
 
 $('#b-export').addEventListener('click', async () => {
   try { await SATE.script('exportacion.js'); abrirExportacion(); }
