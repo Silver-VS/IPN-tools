@@ -4,6 +4,8 @@ import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {crearEntorno} from './dom_minimo.mjs';
 const leer=p=>readFileSync(p,'utf8'), json=p=>JSON.parse(leer(p));
+const entradaGuia=leer('web/dist/guia/index.html');
+assert.match(entradaGuia,/sateGuia=1#\/upiita\/guia/,'la entrada estable abre la Guía autónoma de la unidad compilada');
 const config=json('data/sate.json'), orientacion=json('data/guia/rutas.json');
 const textos=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]).textos;
 const texto=(k,v={})=>(textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??k);
@@ -60,6 +62,9 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(caja.querySelectorAll('[data-ruta]').length,4);
   assert.equal(caja.querySelector('.sate-tarjetas-nav'),null,'sin rejilla vieja');
   assert.equal(caja.querySelector('.guia-hoy'),null,'sin perfil no hay franja');
+  assert.equal(caja.querySelectorAll('.guia-aplica').length,0,'sin perfil no aparecen marcas de situación personal');
+  assert.equal(caja.querySelectorAll('.guia-estado').length,0,'sin perfil no aparecen alertas personales');
+  assert.equal(c.document.title,'Guía politécnica — '+(config.unidades[unidad].siglas||unidad.toUpperCase()),'la portada nombra la unidad');
   s=perfil;await abrir();assert.ok(caja.querySelector('.guia-hoy'));assert.equal(caja.querySelector('[data-ruta="irregular"]').getAttribute('aria-current'),'true');
   assert.equal(caja.querySelectorAll('.guia-estado').length,2);
   assert.match(caja.querySelector('.guia-hoy').textContent,/ETS ficticio/);

@@ -757,7 +757,7 @@
     const [carr, clave, seccion] = (r && r.partes) || [];
     if (!carr || !clave) { portadaProgramas(caja); return; }
     const k = claveNorm(clave), id = carr + '/' + k;
-    document.title = (E.indice.materias[k]?.n || clave) + ' · ' + (E.indice.carreras[carr]?.nombre || carr) + ' — ' + t('sate.pestana.guia.titulo');
+    document.title = (E.indice.materias[k]?.n || clave) + ' · programa — ' + t('sate.pestana.guia.titulo');
     // Misma ficha ya abierta (p. ej. un clic en el índice): solo se desplaza a la sección.
     if (P.clave === id && caja.querySelector('.tmr-ficha')) { if (seccion) irASeccion(seccion); return; }
     caja.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }));

@@ -118,13 +118,10 @@ def extraer(registros):
                         regla = 'artículo relativo adyacente en el mismo documento'
                     resueltas.append({**entrada, 'destino': destino, 'n': str(objetivo['n']), 'fr': fr, 'regla': regla})
             # Las alusiones sin número no tienen un destino de artículo demostrable.
-            for m in re.finditer(r'\b(?:este Reglamento|p[aá]rrafo (?:anterior|siguiente)|art[ií]culos\s+\d+[^.;]*)', texto, re.I):
+            for m in re.finditer(r'\b(?:p[aá]rrafo (?:anterior|siguiente)|art[ií]culos\s+\d+[^.;]*)', texto, re.I):
                 if not any(x['doc'] == doc and x['articulo'] == str(a['n']) and x['inicio'] <= m.start() < x['fin'] for x in resueltas):
                     registro = {'doc': doc, 'articulo': str(a['n']), 'inicio': m.start(), 'fin': m.end(), 'texto': m.group()}
-                    if norm(m.group()) == norm('este Reglamento'):
-                        resueltas.append({**registro, 'destino': doc, 'n': str(a['n']), 'fr': '', 'regla': 'documento autorreferido; ancla al artículo que contiene la alusión'})
-                    else:
-                        ambiguas.append({**registro, 'motivo': 'Alusión sin destino único de artículo o párrafo'})
+                    ambiguas.append({**registro, 'motivo': 'Alusión sin destino único de artículo o párrafo'})
             for destino, nombres_alias in alias_data.get('alias', {}).items():
                 if destino in registros and registros[destino].get('articulos'):
                     continue
@@ -257,7 +254,7 @@ if __name__ == '__main__':
     escribir(ROOT / 'data/referencias/reglamentos.json', refs['resueltas'])
     escribir(ROOT / 'data/referencias/externas.json', refs['externas'])
     escribir(ROOT / 'docs/referencias-ambiguas.json', refs['ambiguas'])
-    nuevas = [r for r in refs['resueltas'] if r['regla'].startswith('documento autorreferido')]
+    nuevas = []
     ambiguas_iniciales = 87
     dudosas_iniciales = ambiguas_iniciales - len(nuevas) - len(refs['externas'])
     lineas = ['# Referencias cruzadas revisadas', '', f"(a) Enlazables entre las 87 ambiguas: {len(nuevas)}", f"(b) Externas: {len(refs['externas'])}", f"(c) Dudosas: {dudosas_iniciales}", '', '## Destinos enlazables', '']

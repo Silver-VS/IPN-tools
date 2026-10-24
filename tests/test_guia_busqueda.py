@@ -75,3 +75,10 @@ def test_nombre_ambiguo_sin_alias_no_se_enlaza():
         'dos': {'titulo': 'Reglamento Dos', 'articulos': [{'n': '2', 'texto': 'A'}]}}
     r = mod.extraer(registros)
     assert not r['resueltas'] and not r['externas'] and r['ambiguas']
+
+
+def test_este_reglamento_no_crea_un_autoenlace():
+    registros = {'demo': {'titulo': 'Reglamento de prueba', 'articulos': [
+        {'n': '1', 'texto': 'Este Reglamento establece la regla.'}]}}
+    r = mod.extraer(registros)
+    assert not any(x['texto'] == 'Este Reglamento' for x in r['resueltas'])

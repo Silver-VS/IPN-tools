@@ -1222,6 +1222,17 @@ def escribir_sate(data):
     from encabezado import encabezado_sate
     dist = ROOT / "web/dist"
     destino = dist / "sate"
+    guia_dist = dist / "guia"
+    guia_dist.mkdir(parents=True, exist_ok=True)
+    guia_url = '../sate/index.html?sateGuia=1#/' + UNIDAD + '/guia'
+    guia_titulo = _html.escape(UCONF['siglas'])
+    (guia_dist / 'index.html').write_text(
+        '<!doctype html><html lang="es"><meta charset="utf-8">'
+        '<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\' \'unsafe-inline\'; object-src \'none\'; base-uri \'self\'; form-action \'none\'">'
+        '<title>Guía politécnica — ' + guia_titulo + '</title>'
+        '<script>location.replace(' + json.dumps(guia_url, ensure_ascii=False) + ')</script>'
+        '<a href="' + _html.escape(guia_url, quote=True) + '">Abrir la Guía politécnica</a></html>',
+        encoding='utf-8')
     datos = escribir_datos(data)
     (dist / ("horarios-" + UNIDAD + ".html")).write_text(redireccion(UNIDAD), encoding="utf-8")
     (dist / "horarios.html").write_text(redireccion(None), encoding="utf-8")

@@ -658,6 +658,7 @@
   }
   function portadaNueva(raizGuia,d) {
     const s=situacion(), elegida=rutaPersonal(s), contenido=h('div',{'class':'guia-inicio'});
+    document.title=t('sate.pestana.guia.titulo')+' — '+(SATE_CONFIG.unidades[unidad()]?.siglas || unidad().toUpperCase());
     const buscador=buscadorSoluciones(d,s,contenido);
     raizGuia.classList.add('guia-nueva');
     raizGuia.appendChild(buscador.cab);raizGuia.appendChild(buscador.resultados);raizGuia.appendChild(contenido);
@@ -673,7 +674,7 @@
     contenido.appendChild(h('section',{'class':'guia-rutas-seccion'},[h('h3',{texto:tx('empieza')}),h('div',{'class':'guia-rutas'},rutas.map(r=>{
       const ps=preguntasRuta(d,r), formatos=new Set([...r.tramites.filter(id=>cfg().tramites?.includes(id)),...ps.filter(p=>p.formato).map(p=>p.ventanilla||p.formato.ref||p.formato.url||p.id)]), n=ps.filter(p=>aplicaPregunta(p,s,d.orientacion)).length;
       return h('a',{href:rutaGuia('ruta',r.id),'class':'guia-ruta-tarjeta','data-ruta':r.id,'aria-current':elegida===r.id?'true':null},[
-        h('div',{'class':'guia-ruta-titulo'},[iconoRuta(r.id),h('h4',{texto:tx(r.id)}),elegida===r.id?h('small',{'class':'guia-aplica',texto:tx('tu_situacion')}):null]),
+        h('div',{'class':'guia-ruta-titulo'},[iconoRuta(r.id),h('h4',{texto:tx(r.id)}),s&&elegida===r.id?h('small',{'class':'guia-aplica',texto:tx('tu_situacion')}):null]),
         h('p',{texto:tx(r.id+'_detalle')}),h('ul',{},[...r.consultas.map(id=>ps.find(p=>p.id===id)).filter(Boolean).slice(0,3).map(p=>h('li',{texto:p.pregunta})),...(r.muestrasActividades||[]).map(c=>h('li',{texto:tx('muestra_'+c)}))]),
         h('small',{texto:tx('conteo',{n:ps.length})+(formatos.size?' · '+tx(formatos.size===1?'un_formato':'n_formatos',{n:formatos.size}):'')+(n?' · '+tx('aplican',{n}):'')+(r.actividades && d.actividades?' · '+t('sate.guia.actividades_resultados',{n:d.actividades.elementos.length}):'')})]);
     }))]));

@@ -27,6 +27,10 @@
   }
   const inicial = entrada ? null : SateRutas.ruta(location.hash, solicitada, config);
   const unidad = inicial?.unidad || solicitada;
+  if (parametros.get('sateGuia') === '1' && unidad && config[unidad]) {
+    config[unidad] = {...config[unidad], generica:true};
+    document.documentElement.dataset.vista = 'guia';
+  }
   window.SATE_UNIDAD = config[unidad] ? unidad : null;
   const u = window.SATE_UNIDAD, cfg = config[u];
   let unidadRealce = u;
@@ -295,7 +299,8 @@
     if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios','guia'].includes(actual.pestana)) { ir('horarios'); return; }
     api.renderTop(); api.renderAviso(); SATE.presente.avisos();
     const m = window.SateMedicion;
-    document.title = texto(actual.tramite ? 'sate.tramite.' + actual.tramite + '.titulo' : 'sate.pestana.' + (actual.padre || actual.pestana) + '.titulo') + ' — SATE';
+    const guiaSola = /(?:^|[?&])sateGuia=1(?:&|$)/.test(location.search);
+    document.title = texto(actual.tramite ? 'sate.tramite.' + actual.tramite + '.titulo' : 'sate.pestana.' + (actual.padre || actual.pestana) + '.titulo') + (guiaSola ? ' — ' + texto('sate.pestana.guia.titulo') : ' — SATE');
     const pendiente = m ? m.render(actual.pestana, () => modulos[actual.pestana].mostrar(actual)) : modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
