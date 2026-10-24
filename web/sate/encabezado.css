@@ -126,3 +126,10 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
 .sate-barra-flotante .sate-pestana{padding-block:var(--ipn-esp-1)}
 .sate-barra-flotante :is(button,a){min-height:var(--ipn-control-alto)}
 :root{--sate-barra-alto:0px;--ipn-radio-pastilla:999px;--ipn-radio-circulo:50%;--ipn-control-alto:var(--ipn-objetivo-tactil,44px);--ipn-filtros-alto:6rem}
+/* El contexto cede una fila antes de que marca y acciones compitan por su ancho. */
+@media(min-width:768px) and (max-width:1439px){
+  header.sate-encabezado:has(.sate-plataformas){grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"marca acciones" "contexto contexto" "nav nav" "avisos avisos";row-gap:var(--ipn-esp-3)}
+  .sate-encabezado:has(.sate-plataformas) .sate-contexto{justify-content:flex-start}
+}
+@media(min-width:1440px){header.sate-encabezado:has(.sate-plataformas){grid-template-columns:auto minmax(0,1fr) auto}}
+@media(max-width:1024px){.sate-encabezado:has(.sate-plataformas) :is(.sate-logo-slot,.sate-logo-ipn){display:none}}

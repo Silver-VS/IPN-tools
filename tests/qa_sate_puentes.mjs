@@ -11,6 +11,7 @@ for(const u of Object.keys(config)) {
   const cab=document.createElement('header');cab.className='sate-encabezado';
   const marca=document.createElement('div');marca.className='sate-marca';
   const siglas=document.createElement('span');siglas.className='sate-siglas';marca.appendChild(siglas);cab.appendChild(marca);document.body.appendChild(cab);
+  const brand=document.createElement('div');brand.className='brand';marca.appendChild(brand);
   const almacen=new Map();let posicion;
   const c=vm.createContext({document,u,config,console,Number,JSON,
     texto:(k,v={})=>k==='sate.puentes.regresar'?'‹ Regresar a '+v.origen:k,
@@ -23,6 +24,10 @@ for(const u of Object.keys(config)) {
   assert.equal(document.querySelectorAll('#sate-plataformas').length,1);
   assert.equal(document.querySelector('#sate-plataforma-guia').getAttribute('aria-current'),'page');
   assert.equal(siglas.textContent,'sate.pestana.guia.titulo');
+  assert.equal(document.querySelector('#sate-plataformas').parentNode,marca,'segmentos junto a la marca');
+  vm.runInContext("pintarPlataformas({pestana:'mapa'})",c);
+  assert.equal(document.querySelector('#sate-plataforma-sate').getAttribute('aria-current'),'page');
+  assert.equal(document.querySelector('#sate-plataforma-guia').getAttribute('aria-current'),null);
   const origen={hash:'#/'+u+'/mapa',nombre:'Mapa curricular',y:437};
   c.origen=origen;c.destino='#/'+u+'/guia';
   vm.runInContext('guardarPuente(origen,destino);restaurarPuente({hash:destino})',c);
@@ -32,6 +37,12 @@ for(const u of Object.keys(config)) {
   c.sessionStorage.getItem=()=>{throw Error('almacen bloqueado')};
   vm.runInContext('restaurarPuente({hash:destino})',c);
 }
+const css=leer('web/sate/componentes.css');
+assert.match(css,/sate-plataformas\{[^}]*flex-wrap:nowrap/);
+assert.match(css,/sate-plataformas a\{[^}]*text-decoration:none/);
+assert.match(css,/sate-plataformas \[aria-current=page\]\{[^}]*border-color:[^}]*--ipn-aviso/);
+assert.match(css,/html\[data-vista=guia-vinculada\] #sate-nombre\{display:none\}/);
+assert.match(leer('web/sate/encabezado.css'),/@media\(min-width:768px\) and \(max-width:1439px\)/);
 assert.match(inicio,/filter\(id=>id!=='guia'\)/);
 assert.match(inicio,/SATE\.articulo\(m\[1\]/);
 assert.doesNotMatch(inicio,/config\[unidad\] = .*generica:true/);

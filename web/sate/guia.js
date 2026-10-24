@@ -680,16 +680,14 @@
     document.title=t('sate.pestana.guia.titulo')+' — '+(SATE_CONFIG.unidades[unidad()]?.siglas || unidad().toUpperCase());
     const buscador=buscadorSoluciones(d,s,contenido);
     raizGuia.classList.add('guia-nueva');
-    raizGuia.appendChild(buscador.cab);raizGuia.appendChild(buscador.resultados);raizGuia.appendChild(contenido);
+    raizGuia.appendChild(buscador.cab);raizGuia.appendChild(contenido);
     if(s){
       const proxima=SATE.calendario?.proximos?.(Infinity)?.find(e=>!e.personal) || SATE.calendario?.recorte('guia')?.[0];
       const ets=s.adeudos.length?SATE.calendario?.proximos?.(1,['ets','inscripcion_ets'])?.[0]:null;
       contenido.appendChild(h('section',{'class':'guia-hoy','aria-label':tx('hoy')},[
-        h('strong',{texto:tx('hoy')}),h('span',{'class':'guia-estado '+(s.adeudos.length?'guia-estado--aviso':'guia-estado--ok'),texto:s.adeudos.length?tx('irregular_hoy',{n:s.adeudos.length}):tx('regular')}),
-        h('span',{'class':'guia-estado '+(s.nDes?'guia-estado--error':'guia-estado--ok'),texto:s.nDes?tx('desfase',{n:s.nDes}):tx('sin_desfase')}),
-        proxima?h('a',{href:'#/'+unidad()+'/calendario'},[h('strong',{texto:t('sate.puentes.fecha')+' · '}),h('span',{'data-oficial':'calendario',texto:proxima.titulo}),document.createTextNode(' · '),h('time',{'data-oficial':'calendario',datetime:proxima.desde,texto:fechaRevision(proxima.desde)})]):null,
-        h('a',{href:rutaGuia('ruta',elegida),texto:t('sate.puentes.ruta')+' · '+tx(elegida)}),
-        ets?h('a',{href:'#/'+unidad()+'/calendario'},[h('strong',{texto:t('sate.puentes.ets')+' · '}),h('span',{'data-oficial':'calendario',texto:ets.titulo}),h('time',{'data-oficial':'calendario',datetime:ets.desde,texto:' · '+fechaRevision(ets.desde)})]):null]));
+        h('a',{href:rutaGuia('ruta',elegida),texto:t('sate.puentes.ruta')+' ›'}),
+        ets?h('a',{href:'#/'+unidad()+'/calendario',title:ets.titulo},[h('strong',{texto:t('sate.puentes.ets')+' · '}),h('time',{'data-oficial':'calendario',datetime:ets.desde,texto:fechaRevision(ets.desde)}),document.createTextNode(' ›')]):null,
+        proxima?h('a',{href:'#/'+unidad()+'/calendario',title:proxima.titulo},[h('strong',{texto:t('sate.puentes.fecha')+' · '}),h('time',{'data-oficial':'calendario',datetime:proxima.desde,texto:fechaRevision(proxima.desde)}),document.createTextNode(' ›')]):null]));
     }
     const rutas=d.orientacion.rutas;
     contenido.appendChild(h('section',{'class':'guia-rutas-seccion'},[h('h3',{texto:tx('empieza')}),h('div',{'class':'guia-rutas'},rutas.map(r=>{

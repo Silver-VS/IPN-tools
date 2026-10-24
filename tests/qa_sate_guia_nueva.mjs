@@ -44,7 +44,7 @@ for(const unidad of ['upiita','escom','upibi']){
  for(const id of config.unidades[unidad].tramites)assert.equal(orientacion.rutas.filter(r=>r.tramites.includes(id)).length,1,id);
  for(const a of datos.actividades?.elementos||[])assert.equal(orientacion.rutas.filter(r=>r.actividades?.includes(a.categoria)).length,1,a.nombre);
  for(const [q,id] of [['reprobe el recurse','veces-cursar-materia'],['baja temporal','baja-temporal'],['ingles titulacion','titulacion']])assert.equal(G.buscarSoluciones(datos,q)[0]?.id,id);
- for(const ancho of [1300,1024,768,375])for(const tema of ['claro','oscuro']){
+ for(const ancho of [1440,1280,1024,768,375])for(const tema of ['claro','oscuro']){
   const {document,Evento}=crearEntorno();document.createElementNS=(_,tag)=>document.createElement(tag);
   document.documentElement.setAttribute('data-tema',tema);
   const perfil={adeudos:['DEMO','UNO'],fis:[{k:'DEMO',veces:2,estado:'desfasada'},{k:'UNO',veces:1,estado:'desfasada'}],nDes:2,rd:{n:2,ok:false,des:[{k:'DEMO',veces:2,estado:'desfasada'},{k:'UNO',veces:1,estado:'desfasada'}]},D:{obt:5,total:10}};
@@ -66,11 +66,14 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.equal(caja.querySelectorAll('.guia-estado').length,0,'sin perfil no aparecen alertas personales');
   assert.equal(c.document.title,'Guía politécnica — '+(config.unidades[unidad].siglas||unidad.toUpperCase()),'la portada nombra la unidad');
   s=perfil;await abrir();assert.ok(caja.querySelector('.guia-hoy'));assert.equal(caja.querySelector('[data-ruta="irregular"]').getAttribute('aria-current'),'true');
-  assert.equal(caja.querySelectorAll('.guia-estado').length,2);
-  assert.match(caja.querySelector('.guia-hoy').textContent,/ETS ficticio/);
+  assert.equal(caja.querySelectorAll('.guia-hoy .guia-estado').length,0);
+  assert.doesNotMatch(caja.querySelector('.guia-hoy').textContent,/adeudos|desfase|Irregular/);
   c.SATE.calendario.proximos=(_,categorias)=>categorias?[{titulo:'ETS de prueba',desde:'2026-11-03'}]:[{titulo:'Fecha oficial de prueba',desde:'2026-11-02'}];
   await abrir();
-  assert.match(caja.querySelector('.guia-hoy').textContent,/Para ti.*Fecha oficial de prueba.*Tu ruta.*Tu próximo ETS.*ETS de prueba/);
+  assert.match(caja.querySelector('.guia-hoy').textContent,/Tu ruta ›.*Tu próximo ETS.*Tu próxima fecha del calendario/);
+  assert.equal(caja.querySelectorAll('.guia-hoy a').length,3);
+  assert.doesNotMatch(source,/appendChild\(buscador.resultados\)/,'el contenedor vacío no reserva otra separación');
+  assert.match(css,/guia-hoy a\{[^}]*margin:0[^}]*text-decoration:none/);
   assert.equal(caja.querySelectorAll('.guia-hoy time').length,2);
   s={...perfil,adeudos:[],nDes:0};await abrir();
   assert.doesNotMatch(caja.querySelector('.guia-hoy').textContent,/Tu próximo ETS/,'sin adeudos no propone ETS');
@@ -108,4 +111,4 @@ for(const unidad of ['upiita','escom','upibi']){
   s=null;c.location.hash='#/'+unidad+'/guia?q=reprobe%20el%20recurse';await abrir();await new Promise(r=>setTimeout(r,190));assert.ok(caja.querySelector('.guia-busqueda-grupos h3'));
  }
 }
-console.log('OK R15: rutas sin huérfanos en tres unidades, decisiones conservadoras, búsqueda, teclado, enlaces profundos, DOM 1300/1024/768/375 claro/oscuro y reglas CSS. Sin medición visual de geometría.');
+console.log('OK R15/R16: rutas, búsqueda, teclado, enlaces y franja compacta en tres unidades; DOM 1440/1280/1024/768/375 claro/oscuro y reglas CSS. Sin medición visual de geometría.');

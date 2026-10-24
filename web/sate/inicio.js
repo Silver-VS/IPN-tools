@@ -91,9 +91,9 @@
       nav.setAttribute('aria-label',texto('sate.puentes.plataformas'));
       for(const id of ['guia','sate']) {
         const a=document.createElement('a');a.setAttribute('id','sate-plataforma-'+id);
-        a.textContent=texto(id==='guia'?'sate.pestana.guia.titulo':'sate.siglas');nav.appendChild(a);
+        a.textContent=texto(id==='guia'?'sate.puentes.guia':'sate.siglas');nav.appendChild(a);
       }
-      (document.querySelector('.sate-marca .brand') || document.querySelector('.sate-marca')).appendChild(nav);
+      document.querySelector('.sate-marca').appendChild(nav);
     }
     for(const id of ['guia','sate']) {
       const a=document.getElementById('sate-plataforma-'+id);

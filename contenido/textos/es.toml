@@ -2115,6 +2115,7 @@ procedimientos = "Participación en procedimientos"
 [sate.puentes]
 materia = "Consultar {nombre}"
 plataformas = "Plataformas"
+guia = "Guía"
 regresar = "‹ Regresar a {origen}"
 programa = "Ver programa ›"
 grupos = "{n} grupos · Ver en Horarios ›"
