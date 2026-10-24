@@ -46,7 +46,10 @@ def compactar(entradas):
 
 def extraer(registros):
     """Resuelve solo destinos presentes y únicos; no adivina artículos inexistentes."""
-    resueltas, ambiguas = [], []
+    resueltas, ambiguas, externas = [], [], []
+    alias_path = ROOT / 'data/referencias/alias_reglamentos.json'
+    alias_data = leer(alias_path) if alias_path.exists() else {'alias': {}}
+    alias = {norm(nombre): destino for destino, nombres_alias in alias_data.get('alias', {}).items() for nombre in nombres_alias}
     nombres = {norm(r['titulo']).removesuffix(' del ipn'): k for k, r in registros.items()}
     patron = re.compile(r'(?:fracci[oó]n\s+([IVXLCDM]+)\s+del\s+)?art[ií]culo\s+(\d+(?:\s+Bis)?|anterior|siguiente)(?:\s*,?\s*fracci[oó]n\s+([IVXLCDM]+))?(?:\s+(?:del?|de la)\s+((?:Reglamento|Ley|C[oó]digo|Lineamientos)[^.;:\n]*))?', re.I)
     for doc, reg in registros.items():
@@ -57,6 +60,11 @@ def extraer(registros):
                 destino, motivo = doc, None
                 fin = m.end()
                 if nombre and not norm(nombre).startswith('reglamento se'):
+                    alias_destinos = {d for nombre_alias, d in alias.items() if norm(nombre).startswith(nombre_alias) and (len(norm(nombre)) == len(nombre_alias) or norm(nombre)[len(nombre_alias)] in ' ,')}
+                    if len(alias_destinos) == 1:
+                        destino = next(iter(alias_destinos))
+                        if destino not in registros or not registros[destino].get('articulos'):
+                            continue
                     candidatos = [k for titulo, k in nombres.items() if norm(nombre).startswith(titulo) and (len(norm(nombre)) == len(titulo) or norm(nombre)[len(titulo)] in ' ,')]
                     if len(candidatos) == 1:
                         destino = candidatos[0]
@@ -105,12 +113,32 @@ def extraer(registros):
                 if motivo:
                     ambiguas.append({**entrada, 'motivo': motivo})
                 else:
-                    resueltas.append({**entrada, 'destino': destino, 'n': str(objetivo['n']), 'fr': fr})
+                    regla = 'alias explícito de documento' if nombre else 'número literal en el documento'
+                    if n.lower() in ('anterior', 'siguiente'):
+                        regla = 'artículo relativo adyacente en el mismo documento'
+                    resueltas.append({**entrada, 'destino': destino, 'n': str(objetivo['n']), 'fr': fr, 'regla': regla})
             # Las alusiones sin número no tienen un destino de artículo demostrable.
             for m in re.finditer(r'\b(?:este Reglamento|p[aá]rrafo (?:anterior|siguiente)|art[ií]culos\s+\d+[^.;]*)', texto, re.I):
                 if not any(x['doc'] == doc and x['articulo'] == str(a['n']) and x['inicio'] <= m.start() < x['fin'] for x in resueltas):
-                    ambiguas.append({'doc': doc, 'articulo': str(a['n']), 'inicio': m.start(), 'fin': m.end(), 'texto': m.group(), 'motivo': 'Alusión sin destino único de artículo o párrafo'})
-    return {'resueltas': resueltas, 'ambiguas': ambiguas}
+                    registro = {'doc': doc, 'articulo': str(a['n']), 'inicio': m.start(), 'fin': m.end(), 'texto': m.group()}
+                    if norm(m.group()) == norm('este Reglamento'):
+                        resueltas.append({**registro, 'destino': doc, 'n': str(a['n']), 'fr': '', 'regla': 'documento autorreferido; ancla al artículo que contiene la alusión'})
+                    else:
+                        ambiguas.append({**registro, 'motivo': 'Alusión sin destino único de artículo o párrafo'})
+            for destino, nombres_alias in alias_data.get('alias', {}).items():
+                if destino in registros and registros[destino].get('articulos'):
+                    continue
+                for nombre_alias in nombres_alias:
+                    for m in re.finditer(re.escape(nombre_alias), texto, re.I):
+                        externas.append({'doc': doc, 'articulo': str(a['n']), 'inicio': m.start(), 'fin': m.end(), 'texto': m.group(), 'documento': registros[destino]['titulo'] if destino in registros else nombre_alias})
+    unicas = {}
+    for e in externas:
+        k = (e['doc'], e['articulo'], e['inicio'])
+        if k not in unicas or e['fin'] > unicas[k]['fin']:
+            unicas[k] = e
+    externas = list(unicas.values())
+    ambiguas = [x for x in ambiguas if not any(r['doc'] == x['doc'] and r['articulo'] == x['articulo'] and r['inicio'] == x['inicio'] for r in resueltas) and not any(e['doc'] == x['doc'] and e['articulo'] == x['articulo'] and x['inicio'] <= e['inicio'] < x['fin'] for e in externas)]
+    return {'resueltas': resueltas, 'externas': externas, 'ambiguas': ambiguas}
 
 
 def referencias():
@@ -220,11 +248,20 @@ def generar(datos, unidad):
             anterior.unlink()
     # Se publica el artefacto revisable, no una extracción distinta al informe guardado.
     escribir(datos.parent / 'referencias.json', leer(ROOT / 'data/referencias/reglamentos.json'))
+    escribir(datos / 'referencias-externas.json', leer(ROOT / 'data/referencias/externas.json'))
     return manifiesto
 
 
 if __name__ == '__main__':
     refs = referencias()
     escribir(ROOT / 'data/referencias/reglamentos.json', refs['resueltas'])
+    escribir(ROOT / 'data/referencias/externas.json', refs['externas'])
     escribir(ROOT / 'docs/referencias-ambiguas.json', refs['ambiguas'])
-    print('Referencias:', len(refs['resueltas']), 'resueltas;', len(refs['ambiguas']), 'ambiguas')
+    nuevas = [r for r in refs['resueltas'] if r['regla'].startswith('documento autorreferido')]
+    ambiguas_iniciales = 87
+    dudosas_iniciales = ambiguas_iniciales - len(nuevas) - len(refs['externas'])
+    lineas = ['# Referencias cruzadas revisadas', '', f"(a) Enlazables entre las 87 ambiguas: {len(nuevas)}", f"(b) Externas: {len(refs['externas'])}", f"(c) Dudosas: {dudosas_iniciales}", '', '## Destinos enlazables', '']
+    for r in nuevas:
+        lineas.append(f"- `{r['doc']}` art. {r['articulo']}: «{r['texto']}» → `{r['destino']}` art. {r['n']}" + (f" fr. {r['fr']}" if r['fr'] else '') + f". Regla: {r['regla']}.")
+    escribir(ROOT / 'docs/referencias-resueltas.md', '\n'.join(lineas) + '\n')
+    print('Referencias:', len(refs['resueltas']), 'resueltas;', len(refs['externas']), 'externas;', len(refs['ambiguas']), 'ambiguas')
