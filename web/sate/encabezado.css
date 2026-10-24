@@ -60,7 +60,7 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
 .sate-encabezado #sate-avisos-globales:not(:empty){margin-top:var(--ipn-esp-3)}
 @media(min-width:768px){html{scroll-padding-top:calc(var(--sate-barra-alto) + var(--ipn-esp-4))}.sate-barra-flotante{box-sizing:border-box;position:fixed;z-index:20;inset:0 0 auto;display:flex;align-items:center;gap:var(--ipn-esp-6);min-height:var(--ipn-control-alto);padding:0 max(var(--ipn-contenido-margen),calc((100vw - var(--ipn-contenido-ancho))/2));background:var(--ipn-superficie);color:var(--ipn-texto);box-shadow:0 2px 10px color-mix(in srgb,var(--ipn-texto) 12%,transparent);font-family:var(--ipn-fuente-texto);transform:translateY(0);opacity:1;transition:transform .16s ease,opacity .16s ease}.sate-barra-flotante[hidden]{display:flex!important;visibility:hidden;transform:translateY(-100%);opacity:0;pointer-events:none}.sate-barra-marca{flex:none;color:var(--ipn-marca);font-weight:700;font-size:var(--ipn-tamano-s)}.sate-barra-flotante nav{min-width:0;flex:1}.sate-barra-flotante .sate-enlaces{gap:var(--ipn-esp-6)}.sate-barra-flotante .sate-pestana{min-height:var(--ipn-objetivo-tactil)}.sate-barra-acciones{display:flex;flex:none;gap:var(--ipn-esp-1)}.sate-barra-acciones button{box-sizing:border-box;display:grid;place-items:center;width:var(--ipn-objetivo-tactil);height:var(--ipn-objetivo-tactil);padding:0;border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-texto);cursor:pointer}.sate-barra-acciones button:hover{background:var(--ipn-acento-suave)}.sate-barra-flotante :is(a,button):focus-visible{outline:var(--ipn-linea-foco) solid var(--ipn-acento);outline-offset:var(--ipn-linea-foco)}}
 @media(prefers-reduced-motion:reduce){.sate-barra-flotante{transition:none}}
-@media(min-width:768px) and (max-width:1199px){
+@media(min-width:768px) and (max-width:1023px){
   /* Compacto: la leyenda larga cede su espacio al nombre de la carrera, que no se corta. */
   header.sate-encabezado{grid-template-columns:auto minmax(0,1fr) auto}
   .sate-marca #sate-nombre{display:none}
@@ -126,10 +126,21 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
 .sate-barra-flotante .sate-pestana{padding-block:var(--ipn-esp-1)}
 .sate-barra-flotante :is(button,a){min-height:var(--ipn-control-alto)}
 :root{--sate-barra-alto:0px;--ipn-radio-pastilla:999px;--ipn-radio-circulo:50%;--ipn-control-alto:var(--ipn-objetivo-tactil,44px);--ipn-filtros-alto:6rem}
-/* El contexto cede una fila antes de que marca y acciones compitan por su ancho. */
-@media(min-width:768px) and (max-width:1439px){
-  header.sate-encabezado:has(.sate-plataformas){grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"marca acciones" "contexto contexto" "nav nav" "avisos avisos";row-gap:var(--ipn-esp-3)}
-  .sate-encabezado:has(.sate-plataformas) .sate-contexto{justify-content:flex-start}
+/* El puente conserva una sola franja superior desde 1024 px; la Guía no usa la fila de pestañas. */
+@media(min-width:1024px){
+  header.sate-encabezado:has(.sate-plataformas){grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"marca contexto acciones" "nav nav nav" "avisos avisos avisos";column-gap:var(--ipn-esp-4)}
+  .sate-encabezado:has(.sate-plataformas) .sate-contexto{flex-wrap:nowrap;justify-content:flex-start;gap:var(--ipn-esp-2)}
+  .sate-encabezado:has(.sate-plataformas) .sate-contexto .sate-controles{flex:1 1 auto;min-width:0}
+  .sate-encabezado:has(.sate-plataformas) .sate-contexto select{width:100%;max-width:22rem}
+  .sate-encabezado:has(.sate-plataformas) #sate-leyenda{flex:none}
+  .sate-encabezado:has(.sate-plataformas) .sate-unidad-nombre{max-width:9ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
-@media(min-width:1440px){header.sate-encabezado:has(.sate-plataformas){grid-template-columns:auto minmax(0,1fr) auto}}
-@media(max-width:1024px){.sate-encabezado:has(.sate-plataformas) :is(.sate-logo-slot,.sate-logo-ipn){display:none}}
+/* Escalón corto: 1024–1199 prioriza carrera y acciones reconocibles frente a los logotipos. */
+@media(min-width:1024px) and (max-width:1199px){
+  .sate-encabezado:has(.sate-plataformas) :is(.sate-logo-slot,.sate-logo-ipn){display:none}
+  .sate-encabezado:has(.sate-plataformas) #sate-leyenda{width:var(--ipn-esp-4);overflow:hidden;color:transparent;white-space:nowrap}
+  .sate-encabezado:has(.sate-plataformas) #sate-leyenda::before{content:"•";color:var(--ipn-tenue)}
+  .sate-encabezado:has(.sate-plataformas) .header-actions .saes-open .sate-texto-largo{display:none!important}
+  .sate-encabezado:has(.sate-plataformas) .header-actions .saes-open .sate-texto-corto{display:inline}
+  .sate-encabezado:has(.sate-plataformas) .header-actions .sate-opinar span{display:none}
+}

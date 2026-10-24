@@ -157,7 +157,7 @@ const cssEnc=leer('web/sate/encabezado.css');
 assert.equal(leer('web/dist/sate/encabezado.css'),cssEnc);
 assert.match(html,/<link rel="stylesheet" href="encabezado.css">/);
 assert.match(cssEnc,/grid-template-areas:"marca contexto acciones" "nav nav nav" "avisos avisos avisos"/);
-assert.match(cssEnc,/@media\(min-width:768px\) and \(max-width:1199px\)/);
+assert.match(cssEnc,/@media\(min-width:768px\) and \(max-width:1023px\)/);
 assert.match(cssEnc,/@media\(max-width:767px\)/);
 assert.match(cssEnc,/\.sate-marca\{[^}]*display:flex;align-items:center/);
 assert.match(cssEnc,/margin:var\(--ipn-esp-6\) 0 0/,'Aire entre la franja superior y las pestañas');

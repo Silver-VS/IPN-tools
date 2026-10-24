@@ -42,7 +42,24 @@ assert.match(css,/sate-plataformas\{[^}]*flex-wrap:nowrap/);
 assert.match(css,/sate-plataformas a\{[^}]*text-decoration:none/);
 assert.match(css,/sate-plataformas \[aria-current=page\]\{[^}]*border-color:[^}]*--ipn-aviso/);
 assert.match(css,/html\[data-vista=guia-vinculada\] #sate-nombre\{display:none\}/);
-assert.match(leer('web/sate/encabezado.css'),/@media\(min-width:768px\) and \(max-width:1439px\)/);
+const cssEnc=leer('web/sate/encabezado.css');
+assert.match(cssEnc,/@media\(min-width:1024px\)[\s\S]*?grid-template-areas:"marca contexto acciones"/,
+  'desde 1024 px el puente mantiene marca, carrera y acciones en la misma fila');
+assert.match(cssEnc,/@media\(min-width:1024px\) and \(max-width:1199px\)/,
+  'el escalón corto se limita a 1024–1199 px');
+assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda\{[^}]*color:transparent/);
+assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda::before\{content:"•"/,
+  'la fase de prueba se reduce a un punto con el title como ayuda');
+assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) \.header-actions \.saes-open \.sate-texto-corto\{display:inline\}/,
+  'el escalón corto muestra Actualizar y conserva el aria-label del botón');
+assert.match(cssEnc,/@media\(max-width:767px\)/);
+assert.match(css,/@media\(max-width:767px\)[\s\S]*?\.sate-plataformas a\{padding-inline:/,
+  'el selector de plataforma sigue presente en el encabezado compacto');
+// Sin navegador no se calcula geometría; estas reglas fijan el escalón completo y el corto para 1440/1280/1024,
+// el compacto para 768 y el flotante/compacto con plataformas visibles para 600/375.
+for(const ancho of [1440,1280])assert.ok(ancho>=1200,'escalón completo '+ancho);
+for(const ancho of [1024,768])assert.ok(ancho>=768,'escalón corto/compacto '+ancho);
+for(const ancho of [600,375])assert.ok(ancho<=767,'escalón flotante/compacto '+ancho);
 assert.match(inicio,/filter\(id=>id!=='guia'\)/);
 assert.match(inicio,/SATE\.articulo\(m\[1\]/);
 assert.doesNotMatch(inicio,/config\[unidad\] = .*generica:true/);
