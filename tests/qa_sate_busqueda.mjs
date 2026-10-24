@@ -8,7 +8,7 @@ const pure=vm.createContext({}); vm.runInContext(leer('web/sate/guia.js'),pure);
 const G=pure.SateGuia;
 const html=leer('web/dist/sate/index.html');
 const config=JSON.parse(html.match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
-const texto=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??k);
+const texto=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+),\s*plural,\s*((?:[^{}]*\{[^{}]*\})+)\s*\}/g,(_,clave,cuerpo)=>{const n=Number(v[clave]),opciones=Object.fromEntries([...cuerpo.matchAll(/(=?\w+)\s*\{([^{}]*)\}/g)].map(([,op,tx])=>[op,tx]));return (opciones['='+n]??opciones[n===1?'one':'other']).replace(/#/g,String(n));}).replace(/\{(\w+)\}/g,(_,k)=>v[k]??k);
 const esperar=()=>new Promise(r=>setTimeout(r,190));
 for(const unidad of Object.keys(config.unidades)){
  const base='web/dist/sate/datos/'+unidad+'/busqueda/', manifiesto=json(base+'indice.json');
@@ -22,10 +22,15 @@ for(const unidad of Object.keys(config.unidades)){
  }
  for(const f of ['preguntas','reglamentos','acudir','formatos','calendario'])assert.ok(entradas.some(e=>e.fuente===f),unidad+': '+f);
  const opciones={orientacion:manifiesto.orientacion};
+ assert.equal(G.textoVisibleIndice('Puedes [[g:baja_temporal|baja temporal]] ([[a:rge:55|art. 55]])'), 'Puedes baja temporal (art. 55)', 'limpia marcas internas antes de buscar/resaltar fragmentos');
+ assert.equal(G.fragmento('Puedes [[g:baja_temporal|baja temporal]] ([[a:rge:55|art. 55]])','baja temporal'), 'Puedes baja temporal (art. 55)', 'el fragmento nunca expone claves internas');
+ assert.equal(texto('sate.guia.busqueda.coincidencias_reglamento',{n:1}), '1 coincidencia');
+ assert.equal(texto('sate.guia.busqueda.coincidencias_reglamento',{n:2}), '2 coincidencias');
  assert.ok(G.buscarIndice(entradas,'baja temporal',opciones).some(e=>e.ruta.includes('/baja-temporal')));
  assert.ok(G.buscarIndice(entradas,'interrumpir sus efectos',opciones).some(e=>e.ruta.includes('/honor/art-44')));
  const acotados=G.buscarIndice(entradas,'baja temporal',{...opciones,fuente:'reglamentos',doc:'rge'});
  assert.ok(acotados.length);assert.ok(acotados.every(e=>e.doc==='rge'));
+ if(unidad==='upiita') assert.equal(G.agruparReglamentos(G.buscarIndice(entradas,'baja temporal',{...opciones,fuente:'reglamentos'}))[0].doc,'rge','el RGE encabeza la búsqueda de baja temporal');
  if(Object.keys(manifiesto.carreras).length){
   assert.ok(G.buscarIndice(entradas,'control',opciones).some(e=>e.fuente==='programas'));
   assert.ok(G.buscarIndice(entradas,'Gauss-Jordan',opciones).some(e=>e.ruta.includes('/B103/objetivo')));

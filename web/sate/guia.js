@@ -189,7 +189,15 @@
   }
   raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
   const nombreMateria = nombre => { const s=String(nombre).toLocaleLowerCase('es'); return s.charAt(0).toLocaleUpperCase('es')+s.slice(1); };
-  const textosIndice = new WeakMap();
+  const textoVisibleIndice = texto => String(texto || '').replace(/\[\[(?:a|g):[\w-]+(?::[\w -]+)?\|([^\]]+)\]\]/g, '$1');
+  function puntuarIndice(e, ts, q, orientacion, intencion) {
+    if (intencion && e.fuente === 'preguntas' && e.ruta.endsWith('/'+intencion.pregunta)) return 10000;
+    const titulo = norm(e.titulo), migas = norm((e.migas || []).join(' ')), frase = norm(q).trim();
+    const encabezado = titulo + ' ' + migas;
+    const texto = palabrasConsulta([e.titulo, e.texto, ...(e.migas || [])].join(' '), orientacion || {}).join(' ');
+    if (!ts.every(w => texto.includes(w))) return 0;
+    return (frase && encabezado.includes(frase) ? 10000 : frase && norm(textoVisibleIndice(e.texto)).includes(frase) ? 1000 : 0) + ts.filter(w => titulo.includes(w)).length * 10 + ts.filter(w => migas.includes(w)).length * 3 + ts.length;
+  }
   function buscarIndice(entradas, q, opciones = {}) {
     const ts = palabrasConsulta(q, opciones.orientacion || {});
     if (!ts.length) return [];
@@ -198,17 +206,11 @@
       (!opciones.doc || e.doc === opciones.doc) && (!opciones.carrera || !e.carrera || e.carrera === opciones.carrera) &&
       (!opciones.materia || e.materia === opciones.materia) &&
       (!opciones.apartado || e.ruta.includes('/guia/' + opciones.apartado + '/')))
-      .map(e => {
-        let guardado = textosIndice.get(e);
-        if (!guardado || guardado.orientacion !== opciones.orientacion) {
-          guardado = {orientacion:opciones.orientacion, texto:palabrasConsulta([e.titulo, e.texto, ...e.migas].join(' '), opciones.orientacion || {}).join(' ')};
-          textosIndice.set(e,guardado);
-        }
-        const texto = guardado.texto;
-        return {e, peso: intencion && e.fuente === 'preguntas' && e.ruta.endsWith('/'+intencion.pregunta) ? 100 : ts.every(w => texto.includes(w)) ? 1 + ts.filter(w => norm(e.titulo).includes(w)).length : 0};
-      }).filter(x => x.peso).sort((a,b) => b.peso-a.peso).map(x => x.e);
+      .map(e => ({e, peso: puntuarIndice(e, ts, q, opciones.orientacion, intencion)}))
+      .filter(x => x.peso).sort((a,b) => b.peso-a.peso).map(x => Object.assign(x.e, {_pesoBusqueda:x.peso}));
   }
   function fragmento(texto, q) {
+    texto = textoVisibleIndice(texto);
     const posiciones = terminos(q).map(w => norm(texto).indexOf(w)).filter(i => i >= 0);
     const inicio = Math.max(0, (posiciones.length ? Math.min(...posiciones) : 0) - 65);
     return (inicio ? '…' : '') + texto.slice(inicio, inicio + 220) + (texto.length > inicio + 220 ? '…' : '');
@@ -218,7 +220,7 @@
     const valor = v => Array.isArray(v) ? Array.from(d.cadenas[v[0]]).slice(v[1],v[2]).join('') : d.cadenas[v];
     return d.filas.map(f => ({...Object.fromEntries(campos.map((k,i) => [k,valor(f[i])])), migas:f[8].map(i => d.cadenas[i])}));
   }
-  Object.assign(raiz.SateGuia, {buscarIndice, fragmento, expandirIndice, resaltar, partesResaltado, agruparReglamentos, nivelesReglamento});
+  Object.assign(raiz.SateGuia, {buscarIndice, fragmento, textoVisibleIndice, expandirIndice, resaltar, partesResaltado, agruparReglamentos, nivelesReglamento});
   const motivoInicial = s => s?.fis?.some(f=>f.veces>=2)?'recursamiento':s?.nDes?'antiguas':s?.adeudos?.length?'ordinario':'';
   Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
 
@@ -320,7 +322,7 @@
     const grupos = new Map();
     for (const e of resultados) { if (!grupos.has(e.doc)) grupos.set(e.doc, []); grupos.get(e.doc).push(e); }
     return [...grupos].map(([doc, entradas]) => ({doc, entradas, titulo:entradas[0].titulo}))
-      .sort((a,b) => resultados.indexOf(a.entradas[0]) - resultados.indexOf(b.entradas[0]));
+      .sort((a,b) => Math.max(...b.entradas.map(e=>e._pesoBusqueda||0)) - Math.max(...a.entradas.map(e=>e._pesoBusqueda||0)) || b.entradas.length-a.entradas.length);
   }
   function nivelesReglamento(reg) {
     const ubicaciones = (reg?.articulos || []).flatMap(a => a.ubicacion || []);
@@ -383,10 +385,10 @@
           for (const e of resultados) if (e.carrera) {
             const k = norm(e.titulo), cs = nombres.get(k) || new Set(); cs.add(e.carrera); nombres.set(k, cs);
           }
-          const fila = e => h('li', {}, [
-            h('a', {href:e.ruta}, resaltar(e.titulo,q)),
+          const fila = (e, agrupada = false) => h('li', {}, [
+            ...(agrupada && e.doc ? [] : [h('a', {href:e.ruta}, resaltar(e.titulo,q))]),
             ...(e.carrera ? [h('strong', {'class':'guia-carrera', texto:e.carreraNombre}), ...(nombres.get(norm(e.titulo))?.size > 1 ? [h('small', {texto:bt('homonima')})] : [])] : []),
-            h('small', {texto:e.migas.join(' › ')}),
+            h('small', {texto:(agrupada && e.doc ? e.migas.filter((m,i) => !(i === 0 && norm(m) === norm(e.titulo))) : e.migas).join(' › ')}),
             h('p', {'data-oficial':e.oficial}, resaltar(fragmento(e.texto,q),q))
           ]);
           const conjuntos = new Map();
@@ -404,7 +406,7 @@
             const docs = agruparReglamentos(resultados);
             grupo.appendChild(h('div', {'class':'guia-reglamentos-resultados'}, docs.map(g => h('section', {'class':'guia-reglamento-resultado'}, [
               h('header', {}, [h('strong', {'class':'guia-sello', texto:selloReglamento(g.titulo,g.doc)}), h('h4', {texto:g.titulo,'data-oficial':g.doc}), h('small',{texto:bt('coincidencias_reglamento',{n:g.entradas.length})})]),
-              h('ul', {}, g.entradas.slice(0,2).map(fila)),
+              h('ul', {}, g.entradas.slice(0,2).map(e => fila(e,true))),
               h('a', {href:rutaReglamento(g.doc)+'?q='+encodeURIComponent(q), texto:bt('ver_reglamento_acotado',{n:g.entradas.length})})
             ]))));
             lista.appendChild(grupo);
