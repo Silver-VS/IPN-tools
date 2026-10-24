@@ -31,7 +31,7 @@
     return (d.preguntas || []).map(p => {
       const texto = palabrasConsulta(textoDe(p), o).join(' '), titulo = palabrasConsulta(p.pregunta, o).join(' ');
       const aciertos = ts.filter(w => texto.includes(w));
-      return {p, peso: (intencion?.pregunta === p.id ? 100 : 0) + aciertos.length * 3 + ts.filter(w => titulo.includes(w)).length};
+      return {p, peso: (intencion?.pregunta === p.id ? 100 : aciertos.length < Math.ceil(ts.length * .75) ? 0 : aciertos.length * 3 + ts.filter(w => titulo.includes(w)).length)};
     }).filter(x => x.peso > 0).sort((a,b) => b.peso-a.peso).map(x => x.p);
   }
   function aplicaPregunta(p, s, o) {
@@ -49,7 +49,7 @@
   // No inferimos un dictamen desde respuestas manuales ni anulamos la excepción transitoria del núcleo.
   function resolverRuta(s, estado) {
     if (estado.motivo === 'pausa') return 'baja-temporal';
-    if (estado.dictamen !== 'no') return null;
+    if (estado.dictamen === 'si') return null;
     if (s?.rd?.ok) return 'oportunidades-reprobar';
     if (s?.rd?.n && !s.rd.ok) return 'formato-dictamen';
     if (estado.motivo === 'ordinario') return 'oportunidades-reprobar';
@@ -172,7 +172,9 @@
     return { preguntas, tramites: [...new Set(preguntas.map(p => p.ventanilla).filter(v => v && disponibles.includes(v)))] };
   }
   raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
-  Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta});
+  const nombreMateria = nombre => { const s=String(nombre).toLocaleLowerCase('es'); return s.charAt(0).toLocaleUpperCase('es')+s.slice(1); };
+  const motivoInicial = s => s?.fis?.some(f=>f.veces>=2)?'recursamiento':s?.nDes?'antiguas':s?.adeudos?.length?'ordinario':'';
+  Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
 
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
@@ -302,13 +304,23 @@
   /* ---------- portada ---------- */
   const tx = (k, v) => t('sate.guia.nueva.' + k, v);
   const situacion = () => typeof situacionDatos === 'function' ? situacionDatos() : null;
+  const nombreDe = f => nombreMateria(typeof cur==='function'?cur()[f.k]?.[0]||f.k:f.k);
+  const vecesDe = f => tx(f.veces===1?'una_vez':'veces',{clave:nombreDe(f),n:f.veces??tx('sin_dato')});
+  function motivoMateria(f) {
+    return f.veces>=2 ? vecesDe(f) : f.estado==='desfasada' ? tx('materia_desfasada',{materia:nombreDe(f)}) : tx('materia_adeudada',{materia:nombreDe(f)});
+  }
+  function aplicaDetalle(p,s,d) {
+    const regla=d.orientacion.aplicabilidad[p.id];
+    const fis=regla==='dictamen'?(s.rd?.des||[]):s.fis||[];
+    return fis.filter(f=>regla==='recursamiento'?f.veces>=2:regla==='desfase'?f.estado==='desfasada':true).map(motivoMateria).join(' · ');
+  }
   const preguntasRuta = (d, r) => d.preguntas.filter(p => r.preguntas.includes(p.id));
   const enlacePregunta = p => h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta });
   function iconoRuta(id) {
     const caminos = {nuevo:'M3 8l9-5 9 5-9 5-9-5 M7 11v5c3 3 7 3 10 0v-5', irregular:'M4 20h16 M5 16l5-6 4 3 5-8 M15 5h4v4', aprovecha:'M12 3l3 6 6 1-4 5 1 6-6-3-6 3 1-6-4-5 6-1z', salida:'M5 22V3h13l-3 5 3 5H5'};
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     for (const [k,v] of Object.entries({viewBox:'0 0 24 24',width:'24',height:'24',fill:'none',stroke:'currentColor','stroke-width':'1.7','stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'})) svg.setAttribute(k,v);
-    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', caminos[id]); svg.appendChild(p);
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', id==='buscar'?'M21 21l-5-5 M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0':caminos[id]); svg.appendChild(p);
     return svg;
   }
   function tarjetaSolucion(d, p, s, rotulo) {
@@ -324,7 +336,7 @@
     if(cfg().vistas?.some(v=>v.id==='temarios') && s?.adeudos?.length)acciones.appendChild(SateUI.tarjetaNav({href:rutaGuia('programas'),titulo:tx('temarios'),compacta:true}));
     const formato=p.formato && (p.formato.url||d.documentos[p.formato.doc]?.url);
     return h('article', {'class':'guia-solucion'}, [h('small', {'class':'guia-rotulo',texto:tx(rotulo)}), h('h3', {texto:p.pregunta}),
-      aplicaPregunta(p,s,d.orientacion) ? h('p', {'class':'guia-aplica',texto:tx('te_aplica')}) : null,
+      aplicaPregunta(p,s,d.orientacion) && aplicaDetalle(p,s,d) ? h('p', {'class':'guia-aplica',texto:aplicaDetalle(p,s,d)}) : null,
       h('p',{'class':'guia-respuesta'},enLinea(p.respuesta,d)),
       (p.pasos||[]).length?h('section',{},[h('h4',{texto:t('sate.guia.que_hacer')}),h('ol',{'class':'guia-pasos'},p.pasos.map(paso=>h('li',{},[h('span',{},enLinea(paso,d))])))]):null,
       formato?enlaceExterno('guia-formato',formato,p.formato.texto||t('sate.guia.formato_titulo')):null,
@@ -366,7 +378,7 @@
     const chips=h('div',{'class':'guia-chips'});
     const sugerencias=s?.adeudos?.length?['reprobe el recurse','ets','baja temporal','servicio social','ingles titulacion']:['baja temporal','servicio social','ingles titulacion','becas','ets'];
     for(const q of sugerencias){const b=h('button',{type:'button',texto:tx('chip_'+q.replaceAll(' ','_'))});b.addEventListener('click',()=>{input.value=q;pintar();input.focus();});chips.appendChild(b);}
-    const cab=h('section',{'class':'guia-hero'},[h('h2',{texto:tx('resolver'),tabindex:'-1'}),h('div',{'class':'guia-busqueda-campo'},[input,borrar]),chips]);
+    const cab=h('section',{'class':'guia-hero'},[h('h2',{texto:tx('resolver'),tabindex:'-1'}),h('div',{'class':'guia-busqueda-campo'},[iconoRuta('buscar'),input,borrar]),chips]);
     let inicial='';try{inicial=decodeURIComponent((raiz.location.hash.split('?')[1]||'').split('&').find(p=>p.startsWith('q='))?.slice(2).replace(/\+/g,' ')||'');}catch(e){console.warn('SATE: búsqueda de Guía inválida',{ruta:raiz.location.hash,mensaje:e.message});}
     input.value=inicial;pintar(false);
     return {cab,resultados};
@@ -377,11 +389,11 @@
     raizGuia.classList.add('guia-nueva');
     raizGuia.appendChild(buscador.cab);raizGuia.appendChild(buscador.resultados);raizGuia.appendChild(contenido);
     if(s){
-      const proxima=SATE.calendario?.proximos(1)?.[0];
+      const proxima=SATE.calendario?.recorte('guia')?.[0];
       contenido.appendChild(h('section',{'class':'guia-hoy','aria-label':tx('hoy')},[
-        h('strong',{texto:tx('hoy')}),h('span',{texto:s.adeudos.length?tx('irregular_hoy',{n:s.adeudos.length}):tx('regular')}),
-        s.nDes?h('span',{texto:tx('desfase',{n:s.nDes})}):null,
-        proxima?h('span',{},[document.createTextNode(proxima.titulo+' · '),h('time',{'data-oficial':'calendario',datetime:proxima.desde,texto:fechaRevision(proxima.desde)})]):null,
+        h('strong',{texto:tx('hoy')}),h('span',{'class':'guia-estado '+(s.adeudos.length?'guia-estado--aviso':'guia-estado--ok'),texto:s.adeudos.length?tx('irregular_hoy',{n:s.adeudos.length}):tx('regular')}),
+        h('span',{'class':'guia-estado '+(s.nDes?'guia-estado--error':'guia-estado--ok'),texto:s.nDes?tx('desfase',{n:s.nDes}):tx('sin_desfase')}),
+        proxima?h('span',{},[h('span',{'data-oficial':'calendario',texto:proxima.titulo}),document.createTextNode(' · '),h('time',{'data-oficial':'calendario',datetime:proxima.desde,texto:fechaRevision(proxima.desde)})]):null,
         h('a',{href:rutaGuia('ruta',elegida),texto:tx('ver_toca')})]));
     }
     const rutas=d.orientacion.rutas;
@@ -389,8 +401,8 @@
       const ps=preguntasRuta(d,r), formatos=new Set([...r.tramites.filter(id=>cfg().tramites?.includes(id)),...ps.filter(p=>p.formato).map(p=>p.ventanilla||p.formato.ref||p.formato.url||p.id)]), n=ps.filter(p=>aplicaPregunta(p,s,d.orientacion)).length;
       return h('a',{href:rutaGuia('ruta',r.id),'class':'guia-ruta-tarjeta','data-ruta':r.id,'aria-current':elegida===r.id?'true':null},[
         h('div',{'class':'guia-ruta-titulo'},[iconoRuta(r.id),h('h4',{texto:tx(r.id)}),elegida===r.id?h('small',{'class':'guia-aplica',texto:tx('tu_situacion')}):null]),
-        h('p',{texto:tx(r.id+'_detalle')}),h('ul',{},r.consultas.map(id=>ps.find(p=>p.id===id)).filter(Boolean).slice(0,3).map(p=>h('li',{texto:p.pregunta}))),
-        h('small',{texto:tx('conteo',{n:ps.length,f:formatos.size})+(n?' · '+tx('aplican',{n}):'')+(r.actividades && d.actividades?' · '+t('sate.guia.actividades_resultados',{n:d.actividades.elementos.length}):'')})]);
+        h('p',{texto:tx(r.id+'_detalle')}),h('ul',{},[...r.consultas.map(id=>ps.find(p=>p.id===id)).filter(Boolean).slice(0,3).map(p=>h('li',{texto:p.pregunta})),...(r.muestrasActividades||[]).map(c=>h('li',{texto:tx('muestra_'+c)}))]),
+        h('small',{texto:tx('conteo',{n:ps.length})+(formatos.size?' · '+tx(formatos.size===1?'un_formato':'n_formatos',{n:formatos.size}):'')+(n?' · '+tx('aplican',{n}):'')+(r.actividades && d.actividades?' · '+t('sate.guia.actividades_resultados',{n:d.actividades.elementos.length}):'')})]);
     }))]));
     contenido.appendChild(h('section',{'class':'guia-consulta'},[h('h3',{texto:tx('consulta')}),h('div',{},['reglamentos','acudir','programas','tramites'].filter(id=>apartados().some(a=>a.id===id)).map(id=>h('a',{href:rutaGuia(id)},[h('strong',{texto:id==='tramites'?tx('formatos'):tituloApartado(id)}),h('small',{texto:t(infoApartado(id).descripcion)})])))]));
     return buscador.cab.querySelector('h2');
@@ -403,20 +415,32 @@
     const s=situacion(), ps=preguntasRuta(d,r), cab=cabecera([...migasBase(),{texto:tx(r.id)}],tx(r.id),tx(r.id+'_detalle'));
     raizGuia.appendChild(cab.nodo);
     const preguntas=h('div',{'class':'guia-opciones'}), panel=h('section',{'class':'guia-toca','aria-live':'polite','aria-label':tx('lo_toca')}), mas=h('section',{'class':'guia-mas'});
-    const fis=s?.fis||[], estado={motivo:s?.nDes?'antiguas':fis.some(f=>f.veces>=2)?'recursamiento':s?.adeudos?.length?'ordinario':'',materia:fis[0]?.k||'',dictamen:'desconocido',tema:ps[0]?.id||''};
+    const fis=s?.fis||[], estado={motivo:motivoInicial(s),materia:(fis.find(f=>f.veces>=2)||fis.find(f=>f.estado==='desfasada')||fis[0])?.k||'',dictamen:'desconocido',tema:ps[0]?.id||''};
     const dibujar=()=>{
       const accion=id==='irregular'?resolverRuta(s,estado):estado.tema;
-      const p=ps.find(p=>p.id===accion), seleccion=fis.find(f=>f.k===estado.materia);
+      const p=ps.find(p=>p.id===accion);
       panel.replaceChildren(h('strong',{'class':'guia-rotulo',texto:tx('lo_toca')}));
       if(p){
         if(estado.consulta==='areas') panel.appendChild(h('ul',{},(p.acudir||[]).map(id=>d.acudir.find(a=>a.id===id)).filter(Boolean).map(a=>h('li',{},[h('a',{href:rutaGuia('acudir',a.id),texto:a.nombre})]))));
         else if(estado.consulta==='reglamento') panel.appendChild(h('ul',{},(p.fuentes||[]).map(f=>fuente(d,f,t)).filter(Boolean).map(f=>h('li',{},[h('a',{href:rutaReglamento(f.doc),texto:f.texto}),...f.arts.map(n=>botonArticulo(f.doc,n,t('sate.guia.articulo_rotulo',{n})))]))));
-        else panel.appendChild(tarjetaSolucion(d,p,s,'orientacion'));
+        else if(accion==='formato-dictamen') {
+          panel.appendChild(h('h3',{texto:tx('pedir_dictamen')}));
+          for(const f of s.rd.des||fis.filter(f=>f.estado==='desfasada')) panel.appendChild(h('p',{'class':'guia-motivo',texto:motivoMateria(f)}));
+          const area=d.acudir.find(a=>a.id==='gestion_escolar'), filas=h('dl',{'class':'guia-toca-datos'});
+          const fila=(etiqueta,nodo)=>filas.appendChild(h('div',{},[h('dt',{texto:etiqueta}),h('dd',{},[nodo])]));
+          const fecha=typeof calItems==='function'?calItems()?.items.find(a=>a.para==='dictamen'&&!a.pasada):null;
+          fila(tx('fecha_limite'),fecha?h('span',{},[h('span',{'data-oficial':'calendario',texto:fecha.titulo||fecha.texto}),h('time',{'data-oficial':'calendario',datetime:fecha.hasta||fecha.desde,texto:fechaRevision(fecha.hasta||fecha.desde)})]):h('span',{texto:tx('fecha_confirmar')}));
+          fila(tx('formato'),cfg().tramites?.includes('dictamen')?h('a',{href:'#/'+unidad()+'/tramites/dictamen',texto:t('sate.tramite.dictamen.titulo')}):h('span',{texto:t('sate.tramite.dictamen.titulo')}));
+          fila(tx('entrega'),area?h('a',{href:rutaGuia('acudir',area.id),texto:area.nombre,'data-oficial':area.fuente?.doc}):h('span',{texto:tx('entrega_confirmar')}));
+          panel.appendChild(filas);
+          if(cfg().tramites?.includes('dictamen'))panel.appendChild(h('a',{'class':'guia-toca-principal',href:'#/'+unidad()+'/tramites/dictamen',texto:tx('llenar_dictamen')}));
+          panel.appendChild(enlacePregunta(p));
+          if(cfg().vistas?.some(v=>v.id==='temarios'))panel.appendChild(h('a',{href:rutaGuia('programas'),texto:tx('temarios')}));
+        } else panel.appendChild(tarjetaSolucion(d,p,s,'orientacion'));
         const calendario=typeof calItems==='function'?calItems():null;
         const fecha=p.ventanilla==='dictamen'?calendario?.items.find(a=>a.para==='dictamen'&&!a.pasada):null;
-        if(fecha)panel.appendChild(h('p',{},[h('strong',{texto:tx('fecha_limite')+' '}),document.createTextNode(fecha.titulo+' · '),h('time',{'data-oficial':'calendario',datetime:fecha.hasta||fecha.desde,texto:fechaRevision(fecha.hasta||fecha.desde)})]));
+        if(fecha && accion!=='formato-dictamen')panel.appendChild(h('p',{},[h('strong',{texto:tx('fecha_limite')+' '}),document.createTextNode(fecha.titulo+' · '),h('time',{'data-oficial':'calendario',datetime:fecha.hasta||fecha.desde,texto:fechaRevision(fecha.hasta||fecha.desde)})]));
       } else {panel.appendChild(h('p',{texto:tx('sin_regla')}));panel.appendChild(h('ul',{},ps.filter(p=>['que-es-dictamen','veces-cursar-materia','oportunidades-reprobar','baja-temporal'].includes(p.id)).map(p=>h('li',{},[enlacePregunta(p)]))));}
-      if(seleccion)panel.appendChild(h('p',{texto:tx('veces',{clave:seleccion.k,n:seleccion.veces??tx('sin_dato')})}));
     };
     function opciones(clave,titulo,items){
       const controles=h('div',{'class':'guia-chips'}), campo=h('fieldset',{},[h('legend',{texto:titulo}),controles]);
@@ -425,7 +449,7 @@
     }
     if(id==='irregular'){
       opciones('motivo',tx('que_paso'),['ordinario','recursamiento','antiguas','pausa'].map(k=>[k,tx(k)]));
-      if(fis.length)opciones('materia',tx('que_materia'),fis.map(f=>[f.k,tx('veces',{clave:typeof cur==='function'?cur()[f.k]?.[0]||f.k:f.k,n:f.veces??tx('sin_dato')})]));
+      if(fis.length)opciones('materia',tx('que_materia'),fis.map(f=>[f.k,vecesDe(f)]));
       else preguntas.appendChild(h('p',{texto:tx('sin_kardex')}));
       opciones('dictamen',tx('dictamen_vigente'),['si','no','desconocido'].map(k=>[k,tx(k)]));
     } else {

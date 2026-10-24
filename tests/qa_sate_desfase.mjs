@@ -30,6 +30,14 @@ run(nucleo.slice(nucleo.indexOf('const perIdx='),nucleo.indexOf('/* Desfase OFIC
 run(nucleo.slice(nucleo.indexOf('const saveT='),nucleo.indexOf('function pattern(')));
 run(nucleo.slice(nucleo.indexOf('function refresh('),nucleo.indexOf('/* ---------- eventos ---------- */')));
 run(horarios.slice(horarios.indexOf('let generacion=null;'),horarios.indexOf('\nfunction renderOffer()')));
+// GN2: el perfil ficticio 4 llega a la acción de Guía mediante la regla real del núcleo.
+const guiaPura=vm.createContext({});vm.runInContext(leer('web/sate/guia.js'),guiaPura);
+run(nucleo.slice(nucleo.indexOf('function failInfo('),nucleo.indexOf('/* Una sola proyección')));
+run(nucleo.split('\n').find(l=>l.startsWith('const cargaDe=')));
+const reglaPerfil4=run('conPlan(()=>conSim(false,()=>reglaDesfase()),0)');
+assert.ok(reglaPerfil4?.n>0 && !reglaPerfil4.ok,'el perfil 4 necesita dictamen');
+assert.equal(guiaPura.SateGuia.resolverRuta({rd:reglaPerfil4},{motivo:'antiguas',dictamen:'desconocido'}),'formato-dictamen');
+assert.deepEqual(Array.from(Object.values(reglaPerfil4.por)).sort(),['agotada','dictamen'],'motivos conservados: dos intentos y desfase antiguo');
 // Sin elección no se fija ningún periodo, tampoco para los adeudos ya desfasados.
 assert.deepEqual(Array.from(run('tr().oblig')),[]);
 for(const k of ['B203','B204'])assert.equal(run(`planAsignado('${k}')`),null);
