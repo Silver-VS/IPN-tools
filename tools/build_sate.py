@@ -1208,6 +1208,8 @@ def escribir_datos(data):
     escribir_temarios(data, datos)
     escribir_recursos(datos)
     escribir_guia(datos)
+    from guia_busqueda import generar
+    generar(datos, UNIDAD)
     import shutil
     shutil.copytree(ROOT / 'data/reglamentos', ROOT / 'web/dist/sate/datos/reglamentos', dirs_exist_ok=True)
     return datos

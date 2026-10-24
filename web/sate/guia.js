@@ -80,7 +80,8 @@
   }
   /* ---- Lector de reglamentos: estructura, anclas y relaciones, a partir de data/reglamentos/<id>.json ---- */
   // Ancla citable: art-7 (artículo), art-7.III (fracción), art-7.III.b (inciso). El número puede llevar espacios (1 Bis).
-  const anclaArticulo = (n, fr, inciso) => 'art-' + n + (fr ? '.' + fr + (inciso ? '.' + inciso : '') : '');
+  const anclaArticulo = (n, fr, inciso) => n === 'texto' ? 'texto' : 'art-' + n + (fr ? '.' + fr + (inciso ? '.' + inciso : '') : '');
+  const selloReglamento = (titulo, doc) => String(titulo || '').split(/\s+/).filter(p => /^[A-ZÁÉÍÓÚÑ]/.test(p) && !/^(IPN|Instituto|Politécnico|Nacional)$/.test(p)).map(p => p[0]).join('') || doc.toUpperCase();
   function leerAncla(ancla) {
     const m = /^art-([\w -]+?)(?:\.(\w+)(?:\.(\w+))?)?$/.exec(String(ancla || ''));
     return m ? { n: m[1], fr: m[2] || null, inciso: m[3] || null } : null;
@@ -148,7 +149,8 @@
     const ts = terminos(q), num = norm(q).trim();
     if (!ts.length) return [];
     const r = [];
-    for (const a of (reg && reg.articulos) || []) {
+    const articulado = reg?.articulos?.length ? reg.articulos : reg?.texto && !reg.sin_texto ? [{n:'texto',texto:reg.texto}] : [];
+    for (const a of articulado) {
       const n = norm(a.n), exacto = n === num;
       if (exacto || (/^\d/.test(num) && n.startsWith(num)) || (!/^\d+$/.test(num) && ts.every(w => norm(a.texto + ' ' + (a.ubicacion || []).join(' ')).includes(w)))) r.push({ a, peso: exacto ? 0 : 1 });
     }
@@ -173,6 +175,36 @@
   }
   raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
   const nombreMateria = nombre => { const s=String(nombre).toLocaleLowerCase('es'); return s.charAt(0).toLocaleUpperCase('es')+s.slice(1); };
+  const textosIndice = new WeakMap();
+  function buscarIndice(entradas, q, opciones = {}) {
+    const ts = palabrasConsulta(q, opciones.orientacion || {});
+    if (!ts.length) return [];
+    const intencion = (opciones.orientacion?.intenciones || []).find(i => i.terminos.every(w => ts.includes(w)));
+    return entradas.filter(e => (!opciones.fuente || e.fuente === opciones.fuente) &&
+      (!opciones.doc || e.doc === opciones.doc) && (!opciones.carrera || !e.carrera || e.carrera === opciones.carrera) &&
+      (!opciones.materia || e.materia === opciones.materia) &&
+      (!opciones.apartado || e.ruta.includes('/guia/' + opciones.apartado + '/')))
+      .map(e => {
+        let guardado = textosIndice.get(e);
+        if (!guardado || guardado.orientacion !== opciones.orientacion) {
+          guardado = {orientacion:opciones.orientacion, texto:palabrasConsulta([e.titulo, e.texto, ...e.migas].join(' '), opciones.orientacion || {}).join(' ')};
+          textosIndice.set(e,guardado);
+        }
+        const texto = guardado.texto;
+        return {e, peso: intencion && e.fuente === 'preguntas' && e.ruta.endsWith('/'+intencion.pregunta) ? 100 : ts.every(w => texto.includes(w)) ? 1 + ts.filter(w => norm(e.titulo).includes(w)).length : 0};
+      }).filter(x => x.peso).sort((a,b) => b.peso-a.peso).map(x => x.e);
+  }
+  function fragmento(texto, q) {
+    const posiciones = terminos(q).map(w => norm(texto).indexOf(w)).filter(i => i >= 0);
+    const inicio = Math.max(0, (posiciones.length ? Math.min(...posiciones) : 0) - 65);
+    return (inicio ? '…' : '') + texto.slice(inicio, inicio + 220) + (texto.length > inicio + 220 ? '…' : '');
+  }
+  function expandirIndice(d) {
+    const campos = ['titulo','texto','ruta','doc','carrera','carreraNombre','materia','oficial'];
+    const valor = v => Array.isArray(v) ? Array.from(d.cadenas[v[0]]).slice(v[1],v[2]).join('') : d.cadenas[v];
+    return d.filas.map(f => ({...Object.fromEntries(campos.map((k,i) => [k,valor(f[i])])), migas:f[8].map(i => d.cadenas[i])}));
+  }
+  Object.assign(raiz.SateGuia, {buscarIndice, fragmento, expandirIndice});
   const motivoInicial = s => s?.fis?.some(f=>f.veces>=2)?'recursamiento':s?.nDes?'antiguas':s?.adeudos?.length?'ordinario':'';
   Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
 
@@ -184,6 +216,127 @@
   const unidad = () => raiz.SATE_UNIDAD;
   const cfg = () => SATE_CONFIG.unidades[unidad()] || {};
   const E = { datos: new Map(), reglamentos: new Map(), partes: new WeakMap(), nombres: new Map() };
+  const indicesBusqueda = new Map();
+  function cargarBusqueda(archivo) {
+    const ruta = 'datos/' + unidad() + '/busqueda/' + archivo;
+    if (!indicesBusqueda.has(ruta)) indicesBusqueda.set(ruta, SATE.json(ruta).then(d => archivo === 'indice.json' ? d : expandirIndice(d)).catch(e => {
+      indicesBusqueda.delete(ruta); throw e;
+    }));
+    return indicesBusqueda.get(ruta);
+  }
+  const bt = (clave, v) => t('sate.guia.busqueda.' + clave, v);
+  function parametroGuia(clave) {
+    try { return decodeURIComponent((raiz.location.hash.split('?')[1] || '').split('&').find(p => p.startsWith(clave + '='))?.slice(clave.length + 1).replace(/\+/g,' ') || ''); }
+    catch(e) { console.warn('SATE: parámetro de Guía inválido', {clave, mensaje:e.message}); return ''; }
+  }
+  function resaltar(texto, q) {
+    const nodos = [], ts = terminos(q), normal = norm(texto);
+    let pos = 0;
+    while (pos < texto.length) {
+      const siguientes = ts.map(w => ({i:normal.indexOf(w, pos), n:w.length})).filter(x => x.i >= 0).sort((a,b) => a.i-b.i);
+      const x = siguientes[0];
+      if (!x) { nodos.push(document.createTextNode(texto.slice(pos))); break; }
+      nodos.push(document.createTextNode(texto.slice(pos, x.i)), h('mark', {texto:texto.slice(x.i, x.i+x.n)}));
+      pos = x.i+x.n;
+    }
+    return nodos;
+  }
+  function buscadorIndice(op = {}) {
+    let version = 0, temporizador, carrera = op.carrera || '', manifiesto;
+    const panel = h('div', {'class':'guia-busqueda-unica'});
+    const etiqueta = op.nombre ? bt('en', {nombre:op.nombre}) : bt('global');
+    const entrada = h('input', {type:'search', id:op.nombre ? null : 'guia-q', 'aria-label':etiqueta, placeholder:bt('marcador')});
+    const lista = h('div', {'class':'guia-busqueda-grupos', 'aria-live':'polite'});
+    const filtros = h('div', {'class':'guia-chips'});
+    const todos = h('a', {href:rutaGuia(), texto:bt('toda')});
+    todos.addEventListener('click', () => { todos.setAttribute('href',rutaGuia() + '?q=' + encodeURIComponent(entrada.value)); });
+    panel.append(h('label', {}, [h('span', {texto:etiqueta}), h('div', {'class':'guia-busqueda-campo'}, [iconoRuta('buscar'), entrada])]), ...(op.nombre ? [todos] : []), filtros, lista);
+    async function pintar() {
+      if (panel.isConnected === false) return;
+      const mi = ++version, q = entrada.value.trim(), u = unidad();
+      if (!op.nombre && raiz.history?.replaceState) raiz.history.replaceState(null,'',rutaGuia() + (q ? '?q='+encodeURIComponent(q) : ''));
+      if (op.destino) op.destino.hidden = !!q;
+      lista.replaceChildren();
+      if (!terminos(q).length) return;
+      lista.appendChild(h('p', {role:'status', texto:bt('cargando')}));
+      try {
+        manifiesto = await cargarBusqueda('indice.json');
+        if (mi !== version || u !== unidad()) return;
+        if (!op.carrera && !filtros.children.length && (!op.fuente || op.fuente === 'programas')) {
+          const letra = typeof ALUMNO !== 'undefined' && ALUMNO && typeof carreraPerfil === 'function' ? carreraPerfil(ALUMNO) : null;
+          const perfil = Object.keys(manifiesto.carreras).find(k => manifiesto.letras?.[k] === letra), cs = Object.entries(manifiesto.carreras);
+          if (!op.carrera && perfil) carrera=perfil;
+          const selector = h('select', {'aria-label':bt('carrera')}, [...(perfil ? [h('option', {value:perfil, texto:bt('tu_carrera',{nombre:manifiesto.carreras[perfil]})})] : []), h('option', {value:'', texto:bt('todas')}), ...cs.filter(([id])=>id!==perfil).map(([id,n]) => h('option', {value:id, texto:n}))]);
+          selector.value = carrera;
+          selector.addEventListener('change', () => { carrera = selector.value; pintar(); });
+          filtros.appendChild(h('label', {}, [bt('carrera'), selector]));
+        }
+        const fuentes = Object.keys(manifiesto.fuentes).filter(f => !op.fuente || f === op.fuente);
+        const bloques = await Promise.all(fuentes.map(async fuente => {
+          const partes = manifiesto.fuentes[fuente].partes.filter(p => !(fuente === 'reglamentos' && op.doc && p.clave !== op.doc) && !(fuente === 'programas' && carrera && p.clave !== carrera));
+          const entradas = (await Promise.all(partes.map(p => cargarBusqueda(p.archivo)))).flat();
+          for (const e of entradas) e.fuente=fuente;
+          const resultados = buscarIndice(entradas, q, {...op, carrera, orientacion:manifiesto.orientacion});
+          return {fuente, resultados};
+        }));
+        if (mi !== version || u !== unidad()) return;
+        lista.replaceChildren();
+        let total = 0;
+        for (const {fuente, resultados} of bloques) {
+          if (!resultados.length) continue;
+          total += resultados.length;
+          const grupo = h('section', {}, [h('h3', {texto:bt(fuente) + ' · ' + resultados.length})]);
+          const nombres = new Map();
+          for (const e of resultados) if (e.carrera) {
+            const k = norm(e.titulo), cs = nombres.get(k) || new Set(); cs.add(e.carrera); nombres.set(k, cs);
+          }
+          const fila = e => h('li', {}, [
+            h('a', {href:e.ruta}, resaltar(e.titulo,q)),
+            ...(e.carrera ? [h('strong', {'class':'guia-carrera', texto:e.carreraNombre}), ...(nombres.get(norm(e.titulo))?.size > 1 ? [h('small', {texto:bt('homonima')})] : [])] : []),
+            h('small', {texto:e.migas.join(' › ')}),
+            h('p', {'data-oficial':e.oficial}, resaltar(fragmento(e.texto,q),q))
+          ]);
+          const conjuntos = new Map();
+          for (const e of resultados) {
+            const clave = fuente === 'programas' ? norm(e.titulo) : e.ruta;
+            if (!conjuntos.has(clave)) conjuntos.set(clave, []);
+            conjuntos.get(clave).push(e);
+          }
+          const filas = [...conjuntos.values()].map(es => es.length === 1 ? fila(es[0]) : h('li', {'class':'guia-resultados-agrupados'}, [
+            h('strong', {texto:es[0].titulo}),
+            ...(new Set(es.map(e=>e.carrera)).size > 1 ? [h('small',{texto:bt('homonima')})] : []),
+            h('ul', {}, es.map(fila))
+          ]));
+          grupo.appendChild(h('ul', {}, filas.slice(0, 6)));
+          if (filas.length > 6) grupo.appendChild(h('details', {}, [h('summary', {texto:bt('ver', {n:filas.length})}), h('ul', {}, filas.slice(6))]));
+          if (fuente === 'reglamentos' && !op.doc) {
+            for (const doc of new Set(resultados.map(e => e.doc))) {
+              const rs = resultados.filter(e => e.doc === doc);
+              grupo.appendChild(h('a', {href:rutaReglamento(doc) + '?q=' + encodeURIComponent(q), texto:bt('ver_reglamento', {n:rs.length, nombre:rs[0].titulo})}));
+            }
+          }
+          lista.appendChild(grupo);
+        }
+        if (!total) lista.appendChild(h('p', {role:'status', texto:t('sate.guia.sin_resultados_preguntas')}));
+      } catch(e) {
+        if (mi !== version) return;
+        console.warn('SATE: índice de Guía no disponible', {unidad:u, consulta:q, fuente:op.fuente, mensaje:e.message});
+        const reintentar = h('button', {type:'button', texto:t('sate.guia.reintentar')});
+        reintentar.addEventListener('click', pintar);
+        lista.replaceChildren(h('p', {role:'alert', texto:t('sate.guia.error_datos')}), reintentar);
+      }
+    }
+    entrada.addEventListener('input', () => { ++version; clearTimeout(temporizador); temporizador = setTimeout(pintar, 140); });
+    entrada.addEventListener('keydown', e => {
+      const enlaces = lista.querySelectorAll('a[href]');
+      if (e.key === 'Escape') { entrada.value=''; pintar(); entrada.focus(); e.preventDefault(); }
+      else if (e.key === 'ArrowDown' && enlaces.length) { enlaces[0].focus(); e.preventDefault(); }
+      else if (e.key === 'Enter' && enlaces.length) { raiz.location.hash=enlaces[0].getAttribute('href'); e.preventDefault(); }
+    });
+    const q = parametroGuia('q');
+    if (q) { entrada.value=q; setTimeout(pintar,0); }
+    return panel;
+  }
   function h(etiqueta, atributos, hijos) {
     const n = document.createElement(etiqueta);
     for (const k in atributos || {}) {
@@ -238,6 +391,36 @@
     b.addEventListener('click', () => SATE.articulo(doc, n));
     return b;
   }
+  function cargarReferencias() {
+    if (!E.referencias) E.referencias = (SATE.json ? SATE.json('datos/referencias.json') : fetch('datos/referencias.json').then(r => {
+      if (!r.ok) throw new Error('Referencias: HTTP ' + r.status);
+      return r.json();
+    })).catch(e => {
+      E.referencias = null;
+      console.warn('SATE: referencias no disponibles', {mensaje:e.message});
+      return [];
+    });
+    return E.referencias.then(rs => { E.enlaces = Array.isArray(rs) ? rs : []; return E.enlaces; });
+  }
+  function envolverReferencias(nodo, doc, a) {
+    const refs = (E.enlaces || []).filter(r => r.doc === doc && r.articulo === String(a.n));
+    for (const p of nodo.querySelectorAll('p,dt,dd')) {
+      const texto = p.textContent, partes = []; let inicio = 0;
+      const origen = a.texto.indexOf(texto);
+      const ocurrencias = refs.map(r => ({r, i:Array.from(a.texto).slice(0,r.inicio).join('').length-origen}))
+        .filter(x => origen >= 0 && x.i >= 0 && texto.slice(x.i,x.i+x.r.texto.length) === x.r.texto).sort((a,b) => a.i-b.i);
+      for (const {r,i} of ocurrencias) {
+        if (i < inicio) continue;
+        partes.push(document.createTextNode(texto.slice(inicio,i)));
+        const b = h('button', {type:'button', 'class':'sate-enlace-reglamento', texto:texto.slice(i,i+r.texto.length)});
+        SateUI.oficial(b,doc);
+        b.addEventListener('click', () => SATE.articulo(r.destino,r.n,r.fr));
+        partes.push(b); inicio = i+r.texto.length;
+      }
+      if (partes.length) p.replaceChildren(...partes, document.createTextNode(texto.slice(inicio)));
+    }
+    return nodo;
+  }
   function enLinea(texto, d) {
     const partes = marcas(String(texto || '').replace(/\{unidad\}/g, () => cfg().siglas || unidad()));
     return partes.map((p, i) => {
@@ -254,14 +437,14 @@
       return document.createTextNode(p.texto);
     });
   }
-  SATE.articulo = async function (doc, n) {
+  SATE.articulo = async function (doc, n, fr) {
     // La lectura literal también funciona desde otra vista si no se pudo cargar la Guía.
     const d = await datos().catch(e => {
       console.warn('SATE: metadatos del artículo no disponibles', { doc, n, mensaje: e.message });
       return {};
     }), meta = d.documentos?.[doc] || {};
     let reg, error;
-    try { reg = await cargarReglamento(doc); } catch (e) {
+    try { [reg] = await Promise.all([cargarReglamento(doc), cargarReferencias()]); } catch (e) {
       error = e;
       console.warn('SATE: artículo no disponible', { doc, n, mensaje: e.message });
     }
@@ -270,13 +453,21 @@
       h('p', { texto: (a.ubicacion || []).join(' · ') }),
       h('div', { 'class': 'pc-lector pc-oficial', 'data-oficial': doc }, [h('p', { 'class': 'guia-articulo-literal', texto: a.texto })])
     ] : [h('p', { role: 'status', texto: t(error ? 'sate.guia.error_articulo' : 'sate.guia.sin_articulo') })]);
+    if (a) {
+      const literal = cuerpo.querySelector('.guia-articulo-literal');
+      const f = a.fracciones?.find(f => f.fr === fr), i = f ? a.texto.indexOf(f.texto) : -1;
+      if (i >= 0) literal.replaceChildren(h('span', {'class':'guia-cita-atenuada', texto:a.texto.slice(0,i)}), h('mark', {texto:a.texto.slice(i,i+f.texto.length)}), h('span', {'class':'guia-cita-atenuada', texto:a.texto.slice(i+f.texto.length)}));
+      else envolverReferencias(cuerpo,doc,a);
+      SateUI.oficial(literal,doc);
+    }
     if (a && reg.ocr) cuerpo.appendChild(h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }));
-    const leer = h('a', { href: rutaReglamento(doc, 'art-' + n), texto: t('sate.guia.leer_reglamento') });
+    cuerpo.insertBefore(h('strong', {'class':'guia-sello', texto:selloReglamento(reg?.titulo,doc)}), cuerpo.firstChild);
+    const leer = h('a', { href: rutaReglamento(doc, anclaArticulo(n,fr)), texto:bt('abrir_reglamento') });
     leer.addEventListener('click', () => SateUI.cerrarModal());
     cuerpo.appendChild(leer);
     const url = reg?.url || meta.url;
     if (url) cuerpo.appendChild(enlaceExterno('', url, t('sate.guia.pdf_oficial')));
-    return SateUI.modal(t('sate.guia.articulo_titulo', { n, reglamento: reg?.titulo || meta.titulo || doc }), cuerpo, {lectura:true});
+    return SateUI.modal(t('sate.guia.articulo_titulo', { n, reglamento: reg?.titulo || meta.titulo || doc }), cuerpo, {lectura:true, flotante:true});
   };
   const apartados = () => apartadosDisponibles(SATE_CONFIG.guia, cfg());
   const infoApartado = id => (SATE_CONFIG.guia || []).find(a => a.id === id);
@@ -286,6 +477,7 @@
   const fechaRevision = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('es-MX', { dateStyle: 'long' }); } catch (e) { return d; } };
 
   function cabecera(migas, titulo, intro) {
+    document.title = titulo + ' — ' + t('sate.pestana.guia.titulo');
     const hh = h('h2', { texto: titulo, tabindex: '-1' });
     return { nodo: h('header', { 'class': 'guia-cab' }, [SateUI.migas(migas), hh, intro ? h('p', { 'class': 'tmr-intro', texto: intro }) : null]), titulo: hh };
   }
@@ -352,36 +544,7 @@
     return h('aside',{'class':'guia-grupos'},grupos.map(([id,links])=>h('section',{},[h('h3',{texto:tx(id)}),h('ul',{},links.length?links.map(a=>h('li',{},[a])):[h('li',{texto:tx('sin_coincidencias')})])])));
   }
   function buscadorSoluciones(d, s, destino) {
-    let indice=-1;
-    const resultados=h('div',{'class':'guia-busqueda-panel',hidden:true,'aria-live':'polite'});
-    const input=h('input',{type:'search',id:'guia-q',placeholder:tx('marcador'),'aria-label':t('sate.guia.buscar_guia_etiqueta'),'aria-controls':'guia-soluciones'});
-    resultados.setAttribute('id','guia-soluciones');
-    const borrar=h('button',{type:'button',texto:tx('limpiar'),'class':'guia-limpiar'});
-    function pintar(guardar=true) {
-      const q=input.value.trim(), hay=!!terminos(q).length;
-      indice=-1; resultados.hidden=!hay; destino.hidden=hay; borrar.hidden=!hay;
-      if(guardar && raiz.history?.replaceState) raiz.history.replaceState(null,'',rutaGuia()+(q?'?q='+encodeURIComponent(q):''));
-      const ps=buscarSoluciones(d,q);
-      resultados.replaceChildren(...(hay?[ps.length?tarjetaSolucion(d,ps[0],s,'respuesta_directa'):h('p',{role:'status',texto:t('sate.guia.sin_resultados_preguntas')}),gruposBusqueda(d,q,ps)]:[]));
-    }
-    input.addEventListener('input',()=>pintar());
-    borrar.addEventListener('click',()=>{input.value='';pintar();input.focus();});
-    function teclado(e) {
-      if(e.key==='Escape'){input.value='';pintar();input.focus();e.preventDefault();return;}
-      if(!['ArrowDown','ArrowUp','Enter'].includes(e.key))return;
-      const links=[...resultados.querySelectorAll('.guia-grupos a')]; if(!links.length)return;
-      if(e.key==='Enter'){raiz.location.hash=links[Math.max(0,indice)].getAttribute('href');}
-      else {indice=(indice+(e.key==='ArrowDown'?1:-1)+links.length)%links.length;links[indice].focus();}
-      e.preventDefault();
-    }
-    input.addEventListener('keydown',teclado); resultados.addEventListener('keydown',teclado);
-    const chips=h('div',{'class':'guia-chips'});
-    const sugerencias=s?.adeudos?.length?['reprobe el recurse','ets','baja temporal','servicio social','ingles titulacion']:['baja temporal','servicio social','ingles titulacion','becas','ets'];
-    for(const q of sugerencias){const b=h('button',{type:'button',texto:tx('chip_'+q.replaceAll(' ','_'))});b.addEventListener('click',()=>{input.value=q;pintar();input.focus();});chips.appendChild(b);}
-    const cab=h('section',{'class':'guia-hero'},[h('h2',{texto:tx('resolver'),tabindex:'-1'}),h('div',{'class':'guia-busqueda-campo'},[iconoRuta('buscar'),input,borrar]),chips]);
-    let inicial='';try{inicial=decodeURIComponent((raiz.location.hash.split('?')[1]||'').split('&').find(p=>p.startsWith('q='))?.slice(2).replace(/\+/g,' ')||'');}catch(e){console.warn('SATE: búsqueda de Guía inválida',{ruta:raiz.location.hash,mensaje:e.message});}
-    input.value=inicial;pintar(false);
-    return {cab,resultados};
+    return {cab:buscadorIndice({destino}), resultados:h('div')};
   }
   function portadaNueva(raizGuia,d) {
     const s=situacion(), elegida=rutaPersonal(s), contenido=h('div',{'class':'guia-inicio'});
@@ -577,6 +740,7 @@
         });
         const li = h('li', {}, [b]);
         if (activo) {
+          document.title = p.pregunta + ' — ' + t('sate.pestana.guia.titulo');
           const contenido = h('article', { id: 'respuesta-' + p.id, 'class': 'guia-detalle' }, [h('h3', { texto: p.pregunta }), respuesta(d, p)]);
           (ancho ? detalle : li).appendChild(contenido);
         } else li.appendChild(h('div', { id: 'respuesta-' + p.id, hidden: true }));
@@ -611,9 +775,13 @@
     const fuenteDoc = reg.url ? h('p', { 'class': 'rgl-fuente' }, [enlaceExterno('', reg.url, t('sate.guia.pdf_oficial'))]) : null;
     const avisoOcr = reg.ocr && !reg.sin_texto ? h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }) : null;
     if (!articulos.length && !transitorios.length) {
+      const contextoPlano = h('nav', {'class':'rgl-contexto','aria-label':reg.titulo}, [
+        h('strong', {texto:reg.titulo}),
+        h('details', {}, [h('summary',{texto:t('sate.guia.rgl_buscar_etiqueta')}),buscadorIndice({fuente:'reglamentos',doc,nombre:reg.titulo})]),
+        h('a',{href:rutaGuia('reglamentos'),texto:bt('cambiar')})]);
       // Sin articulado (código, lineamientos escaneados): el texto corrido, sin índice.
-      const lineas = !d.documentos[doc]?.soloPdf && !reg.sin_texto && reg.texto ? String(reg.texto).split(/\n+/).filter(Boolean) : [];
-      raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado' }, [avisoOcr, lineas.length
+      const lineas = !reg.sin_texto && reg.texto ? String(reg.texto).split(/\n+/).filter(Boolean) : [];
+      raizGuia.append(cab.nodo, contextoPlano, h('div', { 'class': 'guia-apartado' }, [avisoOcr, lineas.length
         ? h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc, 'data-ancla': 'texto' }, lineas.map(x => h('p', { texto: x })))
         : h('p', { role: 'status', texto: t('sate.guia.sin_articulo') }), fuenteDoc]));
       return { titulo: cab.titulo };
@@ -642,21 +810,14 @@
     const enlaceTransitorios = transitorios.length ? enlaceAncla('rgl-art rgl-art--ancho', 'transitorios', t('sate.guia.transitorios')) : null;
     if (enlaceTransitorios) arbolNav.appendChild(h('ul', { 'class': 'rgl-arts' }, [h('li', {}, [enlaceTransitorios])]));
 
-    const resultados = h('ul', { 'class': 'rgl-resultados', hidden: true });
-    const aviso = h('p', { 'class': 'sate-sr', role: 'status', 'aria-live': 'polite' });
-    let primero = null;
-    const buscar = SateUI.buscador({ etiqueta: t('sate.guia.rgl_buscar_etiqueta'), marcador: t('sate.guia.rgl_buscar_marcador'), id: 'rgl-q',
-      alCambiar: q => {
-        const hay = terminos(q).length > 0, r = hay ? buscarArticulos(reg, q, 40) : [];
-        primero = r[0] ? anclaArticulo(r[0].n) : null;
-        arbolNav.hidden = hay;
-        resultados.hidden = !hay;
-        resultados.replaceChildren(...r.map(a => h('li', {}, [enlaceAncla('rgl-resultado', anclaArticulo(a.n), [h('strong', { texto: t('sate.guia.rgl_art_corto', { n: a.n }) }), h('span', { texto: a.texto.slice(0, 90) })])])));
-        aviso.textContent = hay ? t('sate.guia.rgl_resultados', { n: r.length }) : '';
-      },
-      alEnviar: () => { if (primero) ir(primero, true); } });
+    const cuerpoIndice = h('div', { 'class': 'rgl-indice__cuerpo' }, [arbolNav]);
     const resumen = h('span', { 'class': 'rgl-resumen__actual' });
-    const cuerpoIndice = h('div', { 'class': 'rgl-indice__cuerpo' }, [h('div', { 'class': 'rgl-buscar' }, [buscar.raiz]), aviso, resultados, arbolNav]);
+    const contextoActual = h('span', {'class':'rgl-contexto__actual'});
+    const contexto = h('nav', {'class':'rgl-contexto', 'aria-label':reg.titulo}, [
+      h('div', {}, [h('strong', {texto:selloReglamento(reg.titulo,doc) + ' · ' + reg.titulo}), contextoActual]),
+      h('details', {}, [h('summary', {texto:t('sate.guia.rgl_buscar_etiqueta')}), buscadorIndice({fuente:'reglamentos',doc,nombre:reg.titulo})]),
+      h('a', {href:rutaGuia('reglamentos'), texto:bt('cambiar')})
+    ]);
     const indice = h('details', { 'class': 'rgl-indice', open: true }, [h('summary', { 'class': 'rgl-resumen' }, [h('span', { texto: t('sate.guia.rgl_indice') }), resumen]), cuerpoIndice]);
     const texto = h('article', { 'class': 'rgl-texto', 'aria-label': reg.titulo });
     const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
@@ -677,7 +838,7 @@
     }));
     const mapaVista = h('section', { 'class': 'rgl-mapa' }, [h('h3', { texto: t('sate.guia.rgl_mapa') }),
       h('ul', { 'class': 'rgl-leyenda' }, ['directo', 'parcial', 'organizacion'].map(x => h('li', { 'class': 'rgl-aplica--' + x, texto: t('sate.guia.rgl_' + x) }))), barra]);
-    raizGuia.append(cab.nodo, cifras);
+    raizGuia.append(cab.nodo, contexto, cifras);
     if (mapa.length) raizGuia.appendChild(mapaVista);
     raizGuia.appendChild(rejilla);
 
@@ -693,7 +854,15 @@
       if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
         h('p', { texto: f.texto }),
         f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), [h('p', { texto: x.texto })]))) : null]))));
-      return h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc }, nodos);
+      const cuerpo = h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc }, nodos);
+      cuerpo.querySelectorAll('.rgl-fr').forEach((n,i) => {
+        n.setAttribute('data-fraccion-pos',i+1);
+        if (p.fracciones.filter(f=>f.fr===p.fracciones[i].fr).length > 1) {
+          const enlace = n.querySelector('a');
+          enlace.setAttribute('href',enlace.getAttribute('href')+'?frpos='+(i+1));
+        }
+      });
+      return envolverReferencias(cuerpo, doc, a);
     }
     function pintarRiel(a) {
       const rel = a ? relacionesArticulo(d, doc, a.n, tramites) : { preguntas: [], tramites: [] };
@@ -729,6 +898,9 @@
       }
       marcarIndice(clave);
       actual = clave;
+      const a = articulos[posicion.get(clave)];
+      contextoActual.textContent = [...(a?.ubicacion || []), a ? t('sate.guia.articulo_rotulo', {n:a.n}) : t('sate.guia.transitorios')].join(' › ');
+      document.title = (a ? 'Art. ' + a.n : t('sate.guia.transitorios')) + ' · ' + selloReglamento(reg.titulo,doc) + ' — ' + t('sate.pestana.guia.titulo');
       for (const tramo of barra.children) {
         const grupo = mapa.find(x => x.articulos.includes(clave));
         if (grupo && tramo.getAttribute('data-ancla') === anclaArticulo(grupo.articulos[0])) tramo.setAttribute('aria-current', 'true');
@@ -807,6 +979,7 @@
     raizGuia.addEventListener('click', e => {
       const a = e.target.closest && e.target.closest('a[data-ancla]');
       if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
+      if (a.getAttribute('href')?.includes('?frpos=')) return;
       e.preventDefault();
       ir(a.getAttribute('data-ancla'), true);
     });
@@ -821,7 +994,9 @@
       if (rielEnIndice && riel.parentNode !== cuerpoIndice) cuerpoIndice.insertBefore(riel, arbolNav);
       else if (!rielEnIndice && riel.parentNode !== rejilla) rejilla.appendChild(riel);
       // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
-      const base = chico ? indice.querySelector('summary').offsetHeight || 48 : 0;
+      const altoContexto = contexto.offsetHeight || 0;
+      raizGuia.style.setProperty('--ipn-lector-contexto-alto', altoContexto + 'px');
+      const base = altoContexto + (chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
       const alturas = new Map(Array.from(texto.querySelectorAll('.rgl-encabezado'), n => [n, n.offsetHeight || 48]));
       const cambios = [];
       for (const [cab, alto] of alturas) {
@@ -844,6 +1019,7 @@
     ajustar();
     const observador = raiz.ResizeObserver ? new raiz.ResizeObserver(ajustar) : null;
     observador?.observe(rejilla);
+    observador?.observe(contexto);
     raiz.addEventListener('resize', ajustar);
     let cuadro = 0;
     const seguir = () => {
@@ -885,15 +1061,25 @@
     raiz.addEventListener('beforeprint', completarTodo);
     tarea = enReposo(continuar);
     limpiarLector = () => { detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchstart', soltarAncla); raiz.removeEventListener('pointerdown', soltarAncla); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
+    const qInicial = parametroGuia('q');
+    const frpos = parametroGuia('frpos');
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
-    const destino = ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null;
+    if (qInicial) {
+      contexto.querySelector('details').open=true;
+    }
+    const preciso = /^\d+$/.test(frpos) && secciones.get(actual)?.querySelector('[data-fraccion-pos="'+frpos+'"]');
+    if (preciso) {
+      fr?.classList.remove('rgl-activa'); preciso.classList.add('rgl-activa');
+      history.replaceState(null,'',rutaReglamento(doc,ancla)+'?frpos='+frpos);
+    }
+    const destino = preciso || (ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null);
     // Salto inmediato: un desplazamiento suave largo lo interrumpe el dibujo por partes y no llega al artículo.
     if (destino) { destino.scrollIntoView({ block: 'start' }); SateUI.revelar(destino); }
     return { titulo: cab.titulo, enDocumento: !!destino };
   }
   async function apartadoReglamentos(raizGuia, d, doc, ancla, vigente) {
     if (doc) {
-      const reg = await cargarReglamento(doc);
+      const [reg] = await Promise.all([cargarReglamento(doc), cargarReferencias()]);
       if (!vigente()) return {};
       return raiz.SateMedicion ? raiz.SateMedicion.render('reglamento ' + doc, () => montarReglamento(raizGuia, d, reg, doc, ancla)) : montarReglamento(raizGuia, d, reg, doc, ancla);
     }
@@ -913,7 +1099,7 @@
       resultados.hidden = !terminos(q).length;
       resultados.replaceChildren(...encontrados.map(({ reg, a }) => h('li', {}, [h('a', {
         'class': 'guia-resultado', href: rutaReglamento(reg.id, anclaArticulo(a.n))
-      }, [h('strong', { texto: reg.titulo + ' · ' + t('sate.guia.rgl_art_corto', { n: a.n }) }), h('small', { texto: a.texto.slice(0, 140) })])])));
+      }, [h('strong', { texto: reg.titulo + ' · ' + (a.n === 'texto' ? t('sate.guia.rgl_texto_completo') : t('sate.guia.rgl_art_corto', { n: a.n })) }), h('small', { texto: fragmento(a.texto,q) })])])));
       if (!encontrados.length) resultados.appendChild(h('li', { 'class': 'guia-vacio', texto: t('sate.guia.rgl_resultados', { n: 0 }) }));
     };
     const buscar = SateUI.buscador({ etiqueta: t('sate.guia.rgl_buscar_todos'), marcador: t('sate.guia.rgl_buscar_marcador'), alCambiar: pintarResultados });
@@ -957,20 +1143,21 @@
       portal ? enlaceExterno('guia-portal sate-enlace', portal.url, t('sate.guia.normatividad_portal')) : null]));
     return { titulo: cab.titulo };
   }
-  function apartadoGlosario(raizGuia, d) {
+  function apartadoGlosario(raizGuia, d, id) {
     const cab = cabecera([...migasBase(), { texto: t('sate.guia.glosario') }], t('sate.guia.glosario'));
     const lista = h('dl', { 'class': 'guia-glosario' });
     const entradas = Object.values(d.glosario || {}).sort((a, b) => a.termino.localeCompare(b.termino, 'es'));
     function pintar(q) {
       lista.replaceChildren(...entradas.filter(g => norm(g.termino + ' ' + g.definicion).includes(norm(q))).map(g => {
         const f = fuente(d, g.fuente, t);
-        return h('div', {}, [h('dt', { texto: g.termino }), h('dd', {}, [h('p', { texto: g.definicion }), f ? enlaceExterno('', f.url, f.texto) : null, ...(f?.arts || []).map(n => botonArticulo(f.doc, n, t('sate.guia.articulo_rotulo', { n })))])]);
+        const clave = Object.keys(d.glosario).find(k => d.glosario[k] === g);
+        return h('div', {'data-glosario':clave}, [h('dt', { texto: g.termino }), h('dd', {}, [h('p', { texto: g.definicion }), f ? enlaceExterno('', f.url, f.texto) : null, ...(f?.arts || []).map(n => botonArticulo(f.doc, n, t('sate.guia.articulo_rotulo', { n })))])]);
       }));
     }
     const buscar = SateUI.buscador({ etiqueta: t('sate.guia.buscar_glosario'), marcador: t('sate.guia.buscar_glosario'), alCambiar: pintar });
     pintar('');
     raizGuia.append(cab.nodo, buscar.raiz, lista);
-    return { titulo: cab.titulo };
+    return { titulo: cab.titulo, destino:id ? lista.querySelector('[data-glosario="'+id+'"]') : null };
   }
   function apartadoAcudir(raizGuia, d, abrirId) {
     const tx = k => t('sate.guia.r10.' + k);
@@ -1015,6 +1202,7 @@
     const buscar = SateUI.buscador({ etiqueta: tx('necesidad'), marcador: tx('necesidad'), id: 'guia-necesidad', alCambiar: pintar });
     function seleccionar(a) {
       elegido = a.id;
+      document.title = a.nombre + ' — ' + t('sate.pestana.guia.titulo');
       history.replaceState(null, '', rutaGuia('acudir', a.id));
       if (raiz.matchMedia('(max-width:899px)').matches) SateUI.modal(a.nombre, ficha(a));
       else pintar();
@@ -1031,7 +1219,7 @@
         h('dl', {}, [campo(a.orientacion ? tx('orientacion_propia') : tx('atiende'), [h('p', {}, enLinea(a.orientacion?.texto || a.para || tx('sin_descripcion'), d)),
           ...(a.necesidades || []).map(n => h('p', { texto: t(n.texto) + (n.pendiente ? ' · ' + tx('confirmar') : '') }))]),
           a.objetivo ? campo(tx(a.objetivo.alcance === 'unidad' ? 'objetivo_unidad' : 'objetivo_oficial'), [h('blockquote', { 'class': 'pc-lector pc-oficial', 'data-oficial': a.objetivo.fuente.doc, texto: a.objetivo.texto }), cita(a.objetivo.fuente)]) : null,
-          a.funciones?.length ? campo(t('sate.guia.funciones_manual'), [h('ul', { 'class': 'guia-funciones pc-lector pc-oficial', 'data-oficial': a.funciones[0].fuente.doc }, a.funciones.map(x => h('li', { 'data-oficial': x.fuente.doc }, [h('p', { texto: x.texto }), cita(x.fuente)])))]) : null,
+          a.funciones?.length ? campo(t('sate.guia.funciones_manual'), [h('ul', { 'class': 'guia-funciones pc-lector pc-oficial', 'data-oficial': a.funciones[0].fuente.doc }, a.funciones.map((x,i) => h('li', { 'data-funcion':i+1, 'data-oficial': x.fuente.doc }, [h('p', { texto: x.texto }), cita(x.fuente)])))]) : null,
           campo(tx('depende'), [instancias.get(padre)?.nombre || a.dependenciaTexto || tx('confirmar'), a.fuenteDependencia ? cita(a.fuenteDependencia) : null]),
           // Sin procedimientos asignados en el manual no se muestra el bloque (la nota queda en los datos).
           a.procedimientos?.length ? campo(tx('procedimientos'), [h('ul', { 'class': 'guia-procedimientos' }, a.procedimientos.map(x => h('li', {}, [h('strong', { 'data-oficial': x.fuente.doc, texto: x.nombre }), h('p', { texto: x.participacion }), cita(x.fuente)]))), h('p', { texto: a.procedimientosNota })]) : null,
@@ -1118,7 +1306,7 @@
     }
     const fila = a => {
       const detalle = h('details', { 'class': 'guia-actividad-detalle' }, [h('summary', { texto: t('sate.guia.actividades_detalle') }), h('div', {}, [h('p', { texto: a.ofrece }), ...['requisitos', 'inscripcion', 'donde'].filter(k => a[k]).flatMap(k => [h('h4', { texto: t('sate.guia.actividades_' + k) }), h('p', { texto: a[k] })]), enlaceExterno('sate-recurso__enlace', a.url, t('sate.guia.actividades_sitio')), h('small', { texto: t('sate.guia.actividades_consulta', { fecha: fechaRevision(a.consulta) }) })])]);
-      return h('li', { 'class': 'guia-actividad' }, [h('div', {}, [h('strong', { texto: a.nombre }), h('small', { texto: resumirLugar(a) }), enlaceExterno('guia-actividad-enlace', a.url, t('sate.guia.actividades_sitio'))]), detalle]);
+      return h('li', { 'class': 'guia-actividad', 'data-actividad':contenido.elementos.indexOf(a)+1 }, [h('div', {}, [h('strong', { texto: a.nombre }), h('small', { texto: resumirLugar(a) }), enlaceExterno('guia-actividad-enlace', a.url, t('sate.guia.actividades_sitio'))]), detalle]);
     };
     function pintar() {
       const encontrados = coincidencias();
@@ -1141,7 +1329,13 @@
     raizGuia.appendChild(h('section', { 'class': 'guia-apartado guia-actividades' }, [filtro.raiz, integrada?controles:null, estado, zona]));
     categoria = categorias.includes(id) ? id : '';
     pintar();
-    return { titulo: cab.titulo };
+    const actividad = parametroGuia('actividad');
+    const destino = actividad && zona.querySelector('[data-actividad="' + actividad + '"]');
+    if (destino) {
+      const detalle = destino.querySelector('details'); if (detalle) detalle.open=true;
+      document.title = contenido.elementos[Number(actividad)-1].nombre + ' — ' + t('sate.pestana.guia.titulo');
+    }
+    return { titulo: cab.titulo, destino };
   }
 
   /* ---------- pestaña ---------- */
@@ -1149,6 +1343,7 @@
   async function mostrar(r) {
     const caja = document.getElementById('sate-guia'), mi = ++token;
     const [apartado, id, ancla] = (r && r.partes) || [];
+    document.title = t('sate.pestana.guia.titulo') + ' — SATE';
     apagarLector();
     const raizGuia = h('div', { 'class': 'tmr guia' });
     caja.replaceChildren(raizGuia);
@@ -1160,8 +1355,20 @@
         const d = await datos();
         const a = infoApartado(apartado);
         if (mi !== token) return;
-        const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d) : a.datos === 'actividades' ? apartadoActividades(raizGuia, d, id) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);
+        const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d, id) : a.datos === 'actividades' ? apartadoActividades(raizGuia, d, id) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);
+        if (apartado === 'acudir' && id) document.title=(d.acudir.find(a=>a.id===id)?.nombre || tituloApartado(apartado))+' — '+t('sate.pestana.guia.titulo');
         foco = x.titulo;
+        if (mi === token && !(apartado === 'reglamentos' && id)) {
+          const nombre = foco?.textContent || tituloApartado(apartado);
+          const todos = h('a', {href:rutaGuia(), texto:bt('toda')});
+          todos.addEventListener('click', () => { todos.setAttribute('href',rutaGuia()+'?q='+encodeURIComponent(raizGuia.querySelector('input[type="search"]')?.value || '')); });
+          raizGuia.querySelector('.guia-cab')?.appendChild(h('p', {'class':'guia-busqueda-ambito'}, [bt('en',{nombre}), ' · ', todos]));
+        }
+        if (mi === token && apartado === 'acudir' && id) {
+          const f = parametroGuia('funcion');
+          const nodo = f && raizGuia.querySelector('[data-funcion="' + f + '"]');
+          if (nodo) { SateUI.revelar(nodo); return; }
+        }
         if (mi === token && x.enDocumento) return;
         if (mi === token && x.destino) { SateUI.revelar(x.destino); return; }
       }
@@ -1176,6 +1383,6 @@
       raizGuia.replaceChildren(h('p', { 'class': 'tmr-vacio', role: 'alert', texto: t('sate.guia.error_datos') }), otra);
     }
   }
-  SATE.guia = { datos, enlace: (...p) => rutaGuia(...p) };
+  SATE.guia = { datos, buscador:buscadorIndice, enlace: (...p) => rutaGuia(...p) };
   SATE.pestana('guia', { montar() {}, mostrar(r) { return mostrar(r).catch(e => SATE.error(e)); }, ocultar() { token++; apagarLector(); } });
 })(typeof window !== 'undefined' ? window : globalThis);

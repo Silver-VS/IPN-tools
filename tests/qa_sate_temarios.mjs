@@ -682,6 +682,7 @@ est.click(); await dormir(30);
   document.body.appendChild(el(document, 'section', {id: 'sate-temarios'}));
   await c.SATE.temarios.preparar();
   await modulos.temarios.mostrar({partes: ['bionica', 'B103']});
+  assert.equal(document.title,c.SATE.temarios.estado.indice.materias.B103.n+' · '+c.SATE.temarios.estado.indice.carreras.bionica.nombre+' — '+texto('sate.pestana.guia.titulo'));
   const tarjetas = document.querySelectorAll('.tmr-recurso');
   assert.equal(tarjetas.length, 3);
   assert.ok(tarjetas.some(a => a.getAttribute('href').endsWith('_(Kuttler)')));

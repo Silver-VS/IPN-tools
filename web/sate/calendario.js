@@ -16,6 +16,7 @@
   let arribaVisible=true,copiaActiva=false,observador=null,tarjetaMes=null,tarjetaCopia=null,ladoNodo=null;
   let periodo=null,mes=null,foco=null,ampliar=false,verPasados=false,elegidos=new Set(),tituloElegido='',hoja=false,retorno=null;
   let eventos=[],ordenados=[],grupos=[],desde,hasta,limites,box,panel,marcas=[],dias=[],periodosDisponibles=[];
+  let ultimoEnlace = '';
   const seleccionado=e=>elegidos.has(identidad(e)),categoria=e=>tx('categoria_'+e.categoria);
   const meta=e=>SATE_CONFIG.calendarioBase?.vista?.categorias?.[e.categoria]||{};
   // El valor guardado «carriles» corresponde a la vista Detallado; se conserva para no perder la preferencia del alumno.
@@ -202,7 +203,16 @@
     const opciones=[...new Set([...Object.keys(base?.periodos||{}),...Object.keys(local?.periodos||{}),...todos.map(e=>e.periodo)])].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));periodosDisponibles=opciones;
     const limite=p=>local?.periodos?.[p]||base?.periodos?.[p]||{desde:todos.filter(e=>e.periodo===p).map(e=>e.desde).sort()[0],hasta:todos.filter(e=>e.periodo===p).map(e=>e.hasta).sort().at(-1)};
     if(!opciones.includes(periodo)){periodo=opciones.find(p=>limite(p).desde<=api.hoy()&&limite(p).hasta>=api.hoy())||opciones.find(p=>limite(p).desde>api.hoy())||opciones.at(-1);mes=null;elegidos.clear()}
-    const solicitado=api.procesoPendiente;if(solicitado){periodo=solicitado.periodo;mes=solicitado.desde.slice(0,7);elegidos=new Set([identidad(solicitado)]);tituloElegido=solicitado.titulo;hoja=movil();api.procesoPendiente=null}
+    let solicitado=api.procesoPendiente;
+    const enlace = typeof location === 'undefined' ? '' : location.hash;
+    if (enlace !== ultimoEnlace) {
+      ultimoEnlace = enlace;
+      const parametros = new URLSearchParams(enlace.split('?')[1] || '');
+      const fecha = parametros.get('fecha'), titulo = parametros.get('evento');
+      const encontrado = todos.find(e => e.desde === fecha && (!titulo || e.titulo === titulo));
+      if (encontrado) solicitado = encontrado;
+    }
+    if(solicitado){periodo=solicitado.periodo;mes=solicitado.desde.slice(0,7);foco=solicitado.desde;elegidos=new Set([identidad(solicitado)]);tituloElegido=solicitado.titulo;hoja=movil();api.procesoPendiente=null}
     eventos=todos.filter(e=>e.periodo===periodo);ordenados=[...eventos].sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta));grupos=agrupar(eventos);limites=limite(periodo);if(!limites.desde)limites={desde:api.hoy(),hasta:api.hoy()};
     // Incluir trámites previos y posteriores sin alterar las semanas del periodo.
     const extremos=[limites.desde,limites.hasta,...eventos.flatMap(e=>[e.desde,e.hasta])].sort();desde=extremos[0];hasta=extremos.at(-1);box.setAttribute('data-estado',!eventos.length?'vacio':api.hoy()<limites.desde?'antes':api.hoy()>limites.hasta?'despues':'durante');box.setAttribute('data-vista',vista());

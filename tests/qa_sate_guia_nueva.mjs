@@ -49,7 +49,7 @@ for(const unidad of ['upiita','escom','upibi']){
    location:{hash:'#/'+unidad+'/guia',pathname:'/',search:''},history:{replaceState(_,__,hash){c.location.hash=hash;}},scrollTo(){},addEventListener(){},removeEventListener(){},matchMedia:()=>({matches:ancho<900}),
    SATE_UNIDAD:unidad,SATE_CONFIG:config,situacionDatos:()=>s,cur:()=>({DEMO:['ONDAS ELECTROMAGNÉTICAS'],UNO:['CÁLCULO']}),
    calItems:()=>({items:[{para:'dictamen',pasada:true,titulo:'Dictamen anterior',hasta:'2026-10-01'},{para:'dictamen',pasada:false,titulo:'Dictamen ficticio',hasta:'2026-11-02'}]}),
-   SATE:{texto,json:async()=>datos,pestana:(_,p)=>pestana=p,error:e=>{throw e;},calendario:{recorte:tipo=>{assert.equal(tipo,'guia');return [{titulo:'ETS ficticio',desde:'2026-11-01'}];}}}});
+   SATE:{texto,json:async ruta=>ruta.includes('/busqueda/')?json('web/dist/sate/'+ruta):datos,pestana:(_,p)=>pestana=p,error:e=>{throw e;},calendario:{recorte:tipo=>{assert.equal(tipo,'guia');return [{titulo:'ETS ficticio',desde:'2026-11-01'}];}}}});
   config.unidades[unidad].guiaDatos=true;
   vm.runInContext(leer('web/sate/componentes.js'),c);vm.runInContext(source,c);vm.runInContext(leer('web/sate/rutas.js'),c);
   const caja=document.createElement('div');caja.setAttribute('id','sate-guia');document.body.appendChild(caja);
@@ -66,9 +66,8 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.doesNotMatch(caja.querySelector('[data-ruta="aprovecha"]').textContent,/\d+ formatos?/);
   for(const tarjeta of caja.querySelectorAll('[data-ruta]'))assert.doesNotMatch(tarjeta.textContent,/0 formatos|1 formatos/);
   for(const q of ['reprobe el recurse','baja temporal','ingles titulacion']){
-   const input=caja.querySelector('#guia-q');input.value=q;input.dispatchEvent(new Evento('input'));
-   assert.ok(caja.querySelector('.guia-solucion h3'));assert.equal(caja.querySelectorAll('.guia-grupos h3').length,4);
-   if(q==='reprobe el recurse')assert.match(caja.querySelector('.guia-solucion .guia-aplica').textContent,/Ondas electromagnéticas · 2 veces cursada/);
+   const input=caja.querySelector('#guia-q');input.value=q;input.dispatchEvent(new Evento('input'));await new Promise(r=>setTimeout(r,190));
+   assert.ok(caja.querySelector('.guia-busqueda-grupos h3'));assert.ok(caja.querySelectorAll('.guia-busqueda-grupos a').length);
    assert.ok(c.location.hash.endsWith('?q='+encodeURIComponent(q)));
    input.dispatchEvent(new Evento('keydown',{key:'ArrowDown'}));assert.equal(document.activeElement.tagName,'A');
    const href=document.activeElement.getAttribute('href');input.dispatchEvent(new Evento('keydown',{key:'Enter'}));assert.equal(c.location.hash,href,'Enter abre el resultado seleccionado');
@@ -92,7 +91,7 @@ for(const unidad of ['upiita','escom','upibi']){
    }
    assert.equal(caja.querySelectorAll('.guia-mas li').length,datos.preguntas.filter(p=>r.preguntas.includes(p.id)).length,'todas las respuestas aparecen también debajo de la ruta');
   }
-  s=null;c.location.hash='#/'+unidad+'/guia?q=reprobe%20el%20recurse';await abrir();assert.ok(caja.querySelector('.guia-solucion'));
+  s=null;c.location.hash='#/'+unidad+'/guia?q=reprobe%20el%20recurse';await abrir();await new Promise(r=>setTimeout(r,190));assert.ok(caja.querySelector('.guia-busqueda-grupos h3'));
  }
 }
 console.log('OK R15: rutas sin huérfanos en tres unidades, decisiones conservadoras, búsqueda, teclado, enlaces profundos, DOM 1300/1024/768/375 claro/oscuro y reglas CSS. Sin medición visual de geometría.');

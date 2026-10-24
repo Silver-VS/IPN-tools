@@ -59,6 +59,7 @@ export function crearEntorno() {
       return n;
     }
     appendChild(n) { return this._insertar(n, null); }
+    append(...ns) { for (const n of ns) this.appendChild(typeof n === 'string' ? doc.createTextNode(n) : n); }
     insertBefore(n, ref) { return this._insertar(n, ref); }
     removeChild(n) { const i = this.childNodes.indexOf(n); if (i >= 0) { this.childNodes.splice(i, 1); n.parentNode = null; } return n; }
     replaceChild(nuevo, viejo) { this._insertar(nuevo, viejo); this.removeChild(viejo); return viejo; }
