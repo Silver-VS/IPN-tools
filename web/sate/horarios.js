@@ -152,6 +152,7 @@ $('#offer').addEventListener('click',e=>{
       for(const [href,texto] of [['#/'+UNIDAD+'/horarios?materia='+encodeURIComponent(k),SATE.texto('sate.puentes.grupos',{n:new Set(grupos.map(c=>c[3])).size})],['#/'+UNIDAD+'/guia',SATE.texto('sate.puentes.todo')]]){
         const a=document.createElement('a');a.href=href;a.textContent=texto;a.onclick=()=>SateUI.cerrarModal();cuerpo.appendChild(a);
       }
+      if(SATE.relacionesMateria)cuerpo.insertAdjacentHTML('beforeend',SATE.relacionesHtml(SATE.relacionesMateria(k)));
       SateUI.modal(grupos.length?name(grupos[0]):k,cuerpo,{pequeno:true});
     }
   }

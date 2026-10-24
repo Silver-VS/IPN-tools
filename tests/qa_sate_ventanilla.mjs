@@ -9,6 +9,7 @@ class Nodo{
   appendChild(n){this.children.push(n);return n}replaceChildren(){this.children=[]}
   setAttribute(k,v){this.attrs[k]=String(v)}getAttribute(k){return this.attrs[k]??null}
   removeAttribute(k){delete this.attrs[k];if(k==='src')delete this.src}
+  insertAdjacentHTML(posicion,html){assert.equal(posicion,'beforeend');this.vinculosHtml=(this.vinculosHtml||'')+html}
   querySelector(s){return this.todos().find(n=>s.startsWith('#')?n.id===s.slice(1):s.startsWith('[')?(()=>{const m=s.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);return m&&(m[2]==null?n.attrs[m[1]]!=null:n.attrs[m[1]]===m[2])})():n.tagName===s)||null}
   todos(){return this.children.flatMap(n=>[n,...n.todos()])}focus(){foco=this}click(){this.onclick?.()}
 }
@@ -544,4 +545,20 @@ console.log('Dictamen V2: sugerencia, catálogo, periodos, límite 8, privacidad
   assert.ok(ejemplo.todos().some(n=>n.textContent==='2099000000'),'Hoja con datos ficticios escritos');
   assert.match(cssV,/\.tramite-miniatura\{[^}]*aspect-ratio:612\/792[^}]*overflow:hidden/,'Miniatura en proporción carta, sin desbordarse');
   assert.match(cssV,/\.tramite-miniatura-hoja\{[^}]*transform:scale\(\.25\)/,'La hoja se reduce con transform (zoom ya no reduce los anchos en %)');
+  // VIN: lista y resumen consumen las relaciones compiladas y el renderizador común.
+  Object.assign(c.SATE_DATA,JSON.parse(readFileSync('web/dist/sate/datos/upiita/nucleo.json','utf8')));
+  c.UNIDAD='upiita';c.esc=s=>String(s).replace(/[&<>"]/g,x=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[x]));
+  const core=readFileSync('web/sate/nucleo.js','utf8');
+  vm.runInContext(core.slice(core.indexOf('function relacionesHtml('),core.indexOf('SATE.relacionesMateria='))+'SATE.relacionesHtml=relacionesHtml;',c);
+  t.mostrarLista(box);
+  const relacionadas=box.todos().filter(n=>n.className==='tramite-fila'&&n.vinculosHtml);
+  assert.equal(relacionadas.length,config.unidades.upiita.tramites.length);
+  for(const fila of relacionadas){
+    assert.match(fila.vinculosHtml,/data-vinculo-doc=/);
+    assert.match(fila.vinculosHtml,/Se entrega en/);
+    assert.match(fila.vinculosHtml,/guia\/acudir\//);
+    assert.match(fila.vinculosHtml,/data-oficial=/);
+    fila.children[0].click();
+    assert.match(dialogo.contenido.vinculosHtml,/data-vinculo-art=/);
+  }
 }

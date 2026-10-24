@@ -1208,6 +1208,13 @@ def escribir_datos(data):
     escribir_temarios(data, datos)
     escribir_recursos(datos)
     escribir_guia(datos)
+    from relaciones_sate import generar as generar_relaciones
+    leer = lambda ruta: json.loads(ruta.read_text(encoding='utf-8'))
+    relaciones = generar_relaciones(leer(datos / 'guia.json'), leer(ROOT / 'data/sate.json'), UNIDAD)
+    (datos / 'relaciones.json').write_text(json.dumps(relaciones, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    nucleo = leer(datos / 'nucleo.json')
+    nucleo['relaciones'] = relaciones
+    (datos / 'nucleo.json').write_text(json.dumps(nucleo, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
     from guia_busqueda import generar
     generar(datos, UNIDAD)
     import shutil

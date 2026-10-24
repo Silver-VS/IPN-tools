@@ -1189,6 +1189,9 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 .sate-plataformas a:focus-visible,.sate-regresar:focus-visible{outline:solid var(--ipn-acento);outline-offset:var(--ipn-esp-1)}
 .sate-puentes-materia{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-3);align-items:center;font-size:var(--ipn-tamano-s)}
 .sate-puentes-materia a{padding-block:var(--ipn-esp-3)}
+.sate-vinculos-fila{flex-basis:100%;margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);font-size:var(--ipn-tamano-s);overflow-wrap:anywhere}
+.sate-vinculos-fila a,.sate-vinculos-fila button{min-height:var(--ipn-control-alto);display:inline-flex;align-items:center}
+.tramite-fila>.sate-vinculos-fila{padding:var(--ipn-esp-3)}
 html[data-vista=guia-vinculada] .sate-navegacion,html[data-vista=guia-vinculada] .sate-barra{display:none}
 html[data-vista=guia-vinculada] #sate-nombre{display:none}
 @media(max-width:767px){

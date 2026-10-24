@@ -7,9 +7,9 @@ const nucleo=leer('web/sate/nucleo.js'), horarios=leer('web/sate/horarios.js');
 const perfil=JSON.parse(leer('data/perfiles-prueba/desfase-dictamen-bionica.json'));
 const datos=JSON.parse(leer('web/dist/sate/datos/upiita/nucleo.json'));
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
-const almacen=new Map(), nodos=new Map(), logs=[];
+const almacen=new Map(), nodos=new Map(), logs=[],eventos=[];
 const storage={getItem:k=>almacen.get(k)??null,setItem:(k,v)=>almacen.set(k,v)};
-const document={addEventListener(){},querySelector(k){if(!nodos.has(k))nodos.set(k,{hidden:false,innerHTML:'',textContent:'',addEventListener(){},checked:false});return nodos.get(k)}};
+const document={addEventListener(tipo,fn){eventos.push({tipo,fn})},querySelector(k){if(!nodos.has(k))nodos.set(k,{hidden:false,innerHTML:'',textContent:'',addEventListener(){},checked:false});return nodos.get(k)}};
 const c=vm.createContext({console:{debug:(...args)=>logs.push(args)},document,performance,structuredClone,
   SATE_DATA:{...datos,periodos:{actual:[],proximo:[]}},SATE_CONFIG:config,
   SAES:{load:()=>structuredClone(perfil)},IPNT:{set:(k,v)=>storage.setItem(k,v)},
@@ -38,6 +38,23 @@ const reglaPerfil4=run('conPlan(()=>conSim(false,()=>reglaDesfase()),0)');
 assert.ok(reglaPerfil4?.n>0 && !reglaPerfil4.ok,'el perfil 4 necesita dictamen');
 assert.equal(guiaPura.SateGuia.resolverRuta({rd:reglaPerfil4},{motivo:'antiguas',dictamen:'desconocido'}),'formato-dictamen');
 assert.deepEqual(Array.from(Object.values(reglaPerfil4.por)).sort(),['agotada','dictamen'],'motivos conservados: dos intentos y desfase antiguo');
+// VIN: ficha del perfil real, aunque la simulación suponga aprobados sus adeudos.
+run(nucleo.slice(nucleo.indexOf('function relacionesMateria('),nucleo.indexOf('function failInfo(')));
+let articuloAbierto;
+c.SATE.articulo=(doc,n)=>{articuloAbierto=[doc,n]};
+eventos.at(-1).fn({target:{closest:()=>({dataset:{vinculoDoc:'ri',vinculoArt:'98'}})}});
+assert.deepEqual(articuloAbierto,['ri','98'],'el chip abre la vista flotante existente');
+const vinculo4=run("relacionesMateria('B203')");
+assert.ok(vinculo4.articulos.some(a=>a.doc==='ri'&&a.articulo==='98'));
+assert.equal(vinculo4.tramite.id,'dictamen');
+assert.match(run("relacionesHtml(relacionesMateria('B203'))"),/data-vinculo-doc="ri".*data-vinculo-art="98"/);
+assert.match(run("relacionesHtml(relacionesMateria('B203'))"),/guia\/acudir\/gestion_escolar/);
+assert.equal(run('relacionesHtml(relacionesMateria(ALUMNO.acreditadas[0][0]))'),'');
+assert.equal((run("relacionesHtml(relacionesMateria('B203'))").match(/<p /g)||[]).length,2,'máximo dos renglones lógicos');
+run('SIM.on=true;SIM.rec.B203={forma:"ets"}');
+assert.ok(run("relacionesMateria('B203').articulos.length")>0);
+run('SIM.on=false;delete SIM.rec.B203;for(const k in T)delete T[k]');
+assert.equal(run('(()=>{const previo=ALUMNO;ALUMNO=null;try{return relacionesHtml(relacionesMateria("B203"))}finally{ALUMNO=previo}})()'),'');
 // Sin elección no se fija ningún periodo, tampoco para los adeudos ya desfasados.
 assert.deepEqual(Array.from(run('tr().oblig')),[]);
 for(const k of ['B203','B204'])assert.equal(run(`planAsignado('${k}')`),null);

@@ -347,6 +347,40 @@ document.addEventListener('click',e=>{const v=e.target.closest('[data-calver-ver
 document.addEventListener('click',e=>{const b=e.target.closest('[data-calc],[data-calver]');if(!b)return;
   if(b.dataset.calver){store.set('calVer',b.dataset.calver);CALSEL=null}else CALSEL=+b.dataset.calc;
   const sc=[...document.querySelectorAll('.cal-strip')].map(x=>x.scrollLeft);drawCals();document.querySelectorAll('.cal-strip').forEach((x,i)=>x.scrollLeft=sc[i]||0)});
+// La ficha describe el perfil leído, incluso si Mapa muestra una simulación.
+function relacionesMateria(k){
+  if(!isPersonal()||!cur()[k])return {articulos:[],tramite:null};
+  return conPlan(()=>conSim(false,()=>{
+    const t=tr();if(t.done.includes(k))return {articulos:[],tramite:null};
+    const f=failInfo(k),desfasada=t.desfS.includes(k)||f?.estado==='desfasada';
+    const situaciones=new Set();
+    if(t.adeudos.includes(k))situaciones.add('adeudos');
+    if(f?.veces>=2)situaciones.add('recursamiento');
+    if(t.curso.includes(k)&&f)situaciones.add('recursando');
+    if(desfasada)situaciones.add('desfasada');
+    const rd=reglaDesfase(),requiere=!!f&&!f.curso&&(rd?['dictamen','agotada'].includes(rd.por[k]):desfasada||f.veces>=2);
+    if(requiere)situaciones.add('dictamen');
+    const r=DATA.relaciones||{},ps=new Set((r.situaciones||[]).filter(x=>situaciones.has(x.situacion)).map(x=>x.pregunta));
+    const articulos=[...new Map((r.articulos||[]).filter(x=>ps.has(x.pregunta)).map(x=>[x.doc+':'+x.articulo,x])).values()];
+    return {articulos,tramite:requiere?(r.tramites||[]).find(x=>x.id==='dictamen')||null:null};
+  }),0);
+}
+function relacionesHtml(r,soloTramite=false){
+  const tx=(k,v)=>SATE.texto('sate.puentes.'+k,v),u=encodeURIComponent(UNIDAD);
+  const arts=r.articulos||[],trm=r.tramite;
+  let html=arts.length?`<p class="sate-vinculos-fila">${esc(tx('aplica'))} ${arts.map(a=>`<button type="button" class="sate-btn tramite-citas" data-vinculo-doc="${esc(a.doc)}" data-vinculo-art="${esc(a.articulo)}">${esc(tx('articulo',{doc:a.doc.toUpperCase(),n:a.articulo}))}</button>`).join(' ')}</p>`:'';
+  if(trm&&(!soloTramite||trm.area)){
+    const area=trm.area;
+    html+=`<p class="sate-vinculos-fila">${soloTramite?'':esc(tx('tramite'))+' '+esc(SATE.texto('sate.tramite.'+trm.id+'.titulo'))+' · <a href="#/'+u+'/tramites/'+encodeURIComponent(trm.id)+'">'+esc(tx('llenar'))+'</a>'}${area?`${soloTramite?'':' · '}${esc(tx('entrega'))} <a href="#/${u}/guia/acudir/${encodeURIComponent(area.id)}"><span data-oficial="${esc(area.fuente.doc)}">${esc(area.nombre)}</span> ›</a>`:''}</p>`;
+  }
+  return html;
+}
+SATE.relacionesMateria=relacionesMateria;
+SATE.relacionesHtml=relacionesHtml;
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-vinculo-doc]');if(!b)return;
+  SATE.articulo(b.dataset.vinculoDoc,b.dataset.vinculoArt);
+});
 function failInfo(k){
   const t=tr(); if(!(k in t.failP)) return null;
   const idx=t.failP[k], meta=perMeta(), limite=idx==null?null:idx+2;
@@ -641,7 +675,7 @@ function inspParts(k){
   if(isElec(k))return {l1,l2:(st?`<p class="insp-st">${st}</p>`:'')+`<p>${SATE.texto(CAPACIDADES.electivas?.texto||'sate.electivas.acreditacion_consulta',{enlace:'#/'+UNIDAD+'/tramites/'+CAPACIDADES.electivas?.tramite})}</p>`};
   const grupos=new Set(classes().filter(c=>c[0]===S.car&&c[8]===k).map(c=>c[3])).size;
   const puentes=SATE.temarios?.enlaceHtml?.(k)||`<p class="sate-puentes-materia">${grupos?`<a href="#/${UNIDAD}/horarios?materia=${encodeURIComponent(k)}">${esc(SATE.texto('sate.puentes.grupos',{n:grupos}))}</a>`:''}<a href="#/${UNIDAD}/guia">${esc(SATE.texto('sate.puentes.todo'))}</a></p>`;
-  const l2=(st?`<p class="insp-st">${st}</p>`:'')+puentes;
+  const l2=(st?`<p class="insp-st">${st}</p>`:'')+puentes+(SATE.relacionesMateria?SATE.relacionesHtml(SATE.relacionesMateria(k)):'');
   return {l1,l2};
 }
 /* Materias del horario inscrito que no son de este plan (movilidad/flexibilidad académica, cambio de carrera u otra carrera de la

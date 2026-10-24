@@ -370,13 +370,14 @@
       const ficha=h('div',{'class':'sate-puentes-materia'},[
         SateUI.oficial(h('strong',{texto:r.registro.nombre}),'temarios'),
         h('a',{href:ir(r.carreraId,r.registro.clave),texto:t('sate.puentes.programa')}),
-        h('a',{href:ir(r.carreraId,r.registro.clave),texto:t('sate.puentes.todo')})]);
+        h('a',{href:'#/'+unidad()+'/guia',texto:t('sate.puentes.todo')})]);
       // La oferta corresponde al periodo y carrera seleccionados; no se deducen relaciones normativas.
       const grupos=typeof classes==='function'?classes().filter(c=>c[0]===S.car && claveNorm(c[8])===k):[];
       if(grupos.length){
         const a=h('a',{href:'#/'+unidad()+'/horarios?materia='+encodeURIComponent(k),texto:t('sate.puentes.grupos',{n:new Set(grupos.map(c=>c[3])).size})});
         ficha.insertBefore(a,ficha.lastChild);
       }
+      if(SATE.relacionesMateria)ficha.insertAdjacentHTML('beforeend',SATE.relacionesHtml(SATE.relacionesMateria(k)));
       ficha.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>cerrar({foco:false})));
       E.cuerpo.replaceChildren(ficha);
       p.setAttribute('aria-label', t('temarios.panel.etiqueta', { materia: r.registro.nombre }));

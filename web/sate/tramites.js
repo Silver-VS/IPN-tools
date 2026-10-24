@@ -170,6 +170,7 @@
       box.replaceChildren();
       const ultimo=m.paso===def.pasos.length,nombres=[...def.pasos.map(p=>p.titulo),def.revisarTitulo||tx('revisar')];
       const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));if(def.volver)cabeza.appendChild(regreso('tramite-volver'));cabeza.appendChild(boton(tx('descartar'),()=>{if(descartar(def)){m.listo=false;for(const c of m.campos)if(c.sensible)m.datos[c.id]='';revocar();SATE.ir('tramites')}}));box.appendChild(cabeza);
+      vinculos(box,def.id);
       const lead=typeof def.lead==='string'?def.lead:'';if(lead)box.appendChild(el('p',lead,'tramite-lead'));
       const guia=enlaceGuia(def.id);if(guia){const g=SateUI.tarjetaNav({href:guia,titulo:tx('guia_titulo'),detalle:tx('guia_detalle'),compacta:true});g.className+=' tramite-guia';box.appendChild(g)}
       // Los pasos ya hechos se pueden volver a abrir; el activo y los pendientes no son botones.
@@ -305,6 +306,10 @@
     return '';
   }
   const definiciones=new Map();let activo;
+  function vinculos(nodo,id){
+    const tramite=window.SATE_DATA?.relaciones?.tramites?.find(t=>t.id===id);
+    if(tramite&&SATE.relacionesHtml)nodo.insertAdjacentHTML('beforeend',SATE.relacionesHtml({articulos:tramite.articulos,tramite},true));
+  }
   function mostrarLista(box){
     box.replaceChildren(el('h2',tx('elige_resolver')));
     const cfg=SATE_CONFIG.unidades[SATE_UNIDAD];
@@ -332,7 +337,7 @@
         if(e.motivo)accion.appendChild(el('span',e.motivo,'tramite-fila-meta'));
         if(aplica?.aplica)accion.appendChild(el('span',tx('te_aplica')+' · '+aplica.motivo,'tramite-fila-meta tramite-aplica'));
         accion.setAttribute('aria-label',SATE.texto('sate.tramite.'+id+'.titulo')+'. '+tx(id+'_para'));
-        fila.appendChild(accion);lista.appendChild(fila);
+        fila.appendChild(accion);vinculos(fila,id);lista.appendChild(fila);
       }
     }
     box.appendChild(lista);
@@ -340,6 +345,7 @@
   function abrirResumen(id,def){
     const contenido=el('div',null,'tramite-resumen');
     contenido.appendChild(el('p',tx(id+'_para'),'tramite-resumen__para'));
+    vinculos(contenido,id);
     const pasos=el('ol',null,'tramite-resumen__pasos');
     [...def.pasos.map(p=>p.titulo),def.revisarTitulo||tx('revisar')].forEach(t=>pasos.appendChild(el('li',t)));
     contenido.appendChild(pasos);
