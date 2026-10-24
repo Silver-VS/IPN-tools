@@ -104,6 +104,11 @@
     }
     return raizArbol;
   }
+  // El salto explícito prevalece sobre el scroll programático y la hidratación.
+  function articuloEnGeometria(filas, borde, fijado) {
+    if (fijado != null) return fijado;
+    return filas.find(f => f.top >= borde)?.n || filas.at(-1)?.n || null;
+  }
   const totalArticulos = nodo => nodo.articulos.length + nodo.hijos.reduce((s, h) => s + totalArticulos(h), 0);
   const numerosNodo = nodo => nodo.orden.flatMap(x => x.hijo ? numerosNodo(x.hijo) : [x.n]);
   function destinoArticulo(reg, consulta) {
@@ -187,7 +192,7 @@
     const preguntas = (d && citasPorArticulo(d).get(doc + ':' + n)) || [], disponibles = tramitesUnidad || [];
     return { preguntas, tramites: [...new Set(preguntas.map(p => p.ventanilla).filter(v => v && disponibles.includes(v)))] };
   }
-  raiz.SateGuia = { norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
+  raiz.SateGuia = { articuloEnGeometria, norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
   const nombreMateria = nombre => { const s=String(nombre).toLocaleLowerCase('es'); return s.charAt(0).toLocaleUpperCase('es')+s.slice(1); };
   const textoVisibleIndice = texto => String(texto || '').replace(/\[\[(?:a|g):[\w-]+(?::[\w -]+)?\|([^\]]+)\]\]/g, '$1');
   function puntuarIndice(e, ts, q, orientacion, intencion) {
@@ -914,7 +919,7 @@
   function estadoMarcadoresInv() {
     const v=leerInvestigaciones(),p=investigacionCompartida||v.proyectos[v.activa];
     for(const b of document.querySelectorAll('[data-guardar-doc]')){const guardado=p?.marcadores.some(m=>m.doc===b.getAttribute('data-guardar-doc')&&m.n===b.getAttribute('data-guardar-n')&&m.fr===b.getAttribute('data-guardar-fr'));
-      b.hidden=!!investigacionCompartida;b.setAttribute('aria-pressed',String(!!guardado));b.textContent=ti(guardado?'guardado':'guardar');}
+      b.hidden=!!investigacionCompartida;b.setAttribute('aria-pressed',String(!!guardado));b.textContent=ti(guardado?'guardado':'guardar');b.setAttribute('aria-label',b.textContent);b.setAttribute('title',b.textContent);}
   }
   function guardarArticuloInv(doc,n,fr='') {
     const v=leerInvestigaciones();
@@ -984,9 +989,11 @@
     const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
     const rejilla = SateUI.lector(indice, texto, riel);
     const investigacion = h('details',{'class':'rgl-investigacion',open:!pantallaChica()},[h('summary',{texto:ti('panel')})]);
-    const invCuerpo=h('div',{'class':'rgl-investigacion__cuerpo'}), invContexto=h('span',{'class':'rgl-investigacion__contexto'});
+    const invCuerpo=h('div',{'class':'rgl-investigacion__cuerpo'}), invContexto=h('button',{type:'button','class':'rgl-investigacion__contexto','aria-expanded':String(investigacion.open)});
+    invContexto.addEventListener('click',()=>{investigacion.open=!investigacion.open;invContexto.setAttribute('aria-expanded',String(investigacion.open));});
+    investigacion.addEventListener('toggle',()=>invContexto.setAttribute('aria-expanded',String(investigacion.open)));
     investigacion.appendChild(invCuerpo); contexto.appendChild(invContexto);
-    let filtroInv='', busquedaInv='';
+    let filtroInv='', busquedaInv='', resultadoImportacion='';
     async function pintarInvestigacion() {
       estadoMarcadoresInv();
       const v=leerInvestigaciones(), p=investigacionCompartida || v.proyectos[v.activa], solo=!!investigacionCompartida;
@@ -995,8 +1002,10 @@
       const error=e=>{console.warn('SATE investigación',{mensaje:e.message}); invCuerpo.appendChild(h('p',{role:'alert',texto:ti('error')}));};
       const accion=(k,fn)=>invCuerpo.appendChild(botonInv(k,()=>Promise.resolve().then(fn).catch(error)));
       accion('nueva',()=>{const nombre=raiz.prompt(ti('nombre')); if(!nombre?.trim())return; v.proyectos.push(validarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]})); v.activa=v.proyectos.length-1; investigacionCompartida=null; guardarInvestigaciones(v); pintarInvestigacion();});
-      const archivo=h('input',{type:'file',accept:'.json,application/json','aria-label':ti('importar')});
-      archivo.addEventListener('change',async()=>{try{const f=archivo.files[0]; if(!f || f.size>2000000)throw new Error('Tamaño inválido'); investigacionCompartida=validarInvestigacion(JSON.parse(await f.text())); pintarInvestigacion();}catch(e){error(e);}}); invCuerpo.appendChild(archivo);
+      const archivo=h('input',{type:'file',id:'rgl-importar',hidden:true,accept:'.json,application/json','aria-label':ti('importar')});
+      const importar=botonInv('importar',()=>archivo.click());
+      invCuerpo.append(h('label',{'class':'sate-sr',for:'rgl-importar',texto:ti('importar')}),importar,h('p',{role:'status',texto:resultadoImportacion}));
+      archivo.addEventListener('change',async()=>{try{const f=archivo.files[0]; if(!f || f.size>2000000)throw new Error('Tamaño inválido'); investigacionCompartida=validarInvestigacion(JSON.parse(await f.text())); resultadoImportacion=ti('importada'); pintarInvestigacion();}catch(e){error(e);}}); invCuerpo.appendChild(archivo);
       if(!p){pintarAnotaciones();return;}
       invCuerpo.appendChild(h('h4',{texto:p.nombre}));
       if(solo)invCuerpo.appendChild(h('p',{texto:ti('solo_lectura')}));
@@ -1146,13 +1155,17 @@
         contenedores.push(grupo);
       }
       const anc = anclaArticulo(a.n);
-      const copiarArticulo = h('button', { type: 'button', 'class': 'btn rgl-copiar', texto: t('sate.guia.rgl_copiar') });
+      const copiarArticulo = h('button', { type: 'button', 'class': 'btn rgl-copiar rgl-icono', 'aria-label':t('sate.guia.rgl_copiar'), title:t('sate.guia.rgl_copiar'), texto: t('sate.guia.rgl_copiar') });
       const estado = h('span', { role: 'status', 'class': 'rgl-copiado' });
       copiarArticulo.addEventListener('click', () => copiarEnlace(rutaReglamento(doc, anc)).then(
         () => { estado.textContent = t('sate.guia.rgl_copiado'); },
         () => { estado.textContent = t('sate.guia.rgl_copiar_error'); }));
+      const guardar = botonGuardarInv(doc,a.n);
+      guardar.classList.add('rgl-icono');
+      guardar.setAttribute('aria-label',ti('guardar')); guardar.setAttribute('title',ti('guardar'));
+      const acciones = h('details',{'class':'rgl-art-acciones',open:!pantallaChica()},[h('summary',{'aria-label':ti('acciones'),title:ti('acciones'),texto:'⋯'}),h('div',{},[copiarArticulo,guardar])]);
       const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-' + anc, 'data-articulo': a.n }, [
-        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, botonGuardarInv(doc,a.n), estado])]);
+        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), acciones, estado])]);
       // Reservar altura evita que los títulos posteriores colapsen mientras llega su texto.
       seccion.style.minHeight = Math.max(110, Math.ceil((a.texto || '').length / 80) * 24 + 64) + 'px';
       pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a,doc,fila)); seccion.style.minHeight = ''; if(investigacionCompartida || leerInvestigaciones().proyectos.length)pintarAnotaciones(); });
@@ -1228,7 +1241,10 @@
     let eraEstrecho = null;
     const ajustar = () => {
       const chico = estrecho();
-      if (chico !== eraEstrecho) indice.open = !chico;
+      if (chico !== eraEstrecho) {
+        indice.open = !chico;
+        for (const acciones of texto.querySelectorAll('.rgl-art-acciones')) acciones.open = !chico;
+      }
       eraEstrecho = chico;
       const rielEnIndice = !pantallaChica() && ((rejilla.clientWidth > 0 && rejilla.clientWidth <= 832) ||
         !!raiz.matchMedia?.('(max-width:1024.98px)').matches);
@@ -1268,15 +1284,25 @@
       if (cuadro) return;
       cuadro = raiz.requestAnimationFrame(() => {
         cuadro = 0;
-        const visible = SateUI.lectorVisible(secciones);
+        let borde = contexto.getBoundingClientRect().bottom || 0;
+        if (estrecho()) {
+          const r = indice.querySelector('summary').getBoundingClientRect();
+          if (r.top <= borde && r.bottom > borde) borde = r.bottom;
+        }
+        for (const barra of texto.querySelectorAll('.rgl-encabezado')) {
+          const r = barra.getBoundingClientRect(), estilo = raiz.getComputedStyle?.(barra);
+          if (estilo?.position === 'sticky' && r.top <= borde && r.bottom > borde) borde = r.bottom;
+        }
+        const visible = articuloEnGeometria(Array.from(secciones, ([n, seccion]) => ({n, top:(seccion.querySelector('header') || seccion).getBoundingClientRect().top})), borde, anclaFijada?.getAttribute('data-articulo'));
         if (visible) { vecindad(visible); if (visible !== actual) pintar(visible); }
       });
     };
     raiz.addEventListener('scroll', seguir, { passive: true });
-    const soltarAncla = () => { anclaFijada = null; };
+    const soltarAncla = () => { anclaFijada = null; seguir(); };
     raiz.addEventListener('wheel', soltarAncla, { passive: true });
-    raiz.addEventListener('touchstart', soltarAncla, { passive: true });
-    raiz.addEventListener('pointerdown', soltarAncla, { passive: true });
+    raiz.addEventListener('touchmove', soltarAncla, { passive: true });
+    const soltarBarra = e => { if (e.target === document.documentElement) soltarAncla(); };
+    raiz.addEventListener('pointerdown', soltarBarra, { passive: true });
     const soltarAnclaTeclado = e => { if (['ArrowDown','ArrowUp','PageDown','PageUp','Home','End',' '].includes(e.key)) soltarAncla(); };
     raiz.addEventListener('keydown', soltarAnclaTeclado);
     let detenido = false, tarea;
@@ -1302,7 +1328,7 @@
     for (const n of secciones.values()) interseccion?.observe(n);
     raiz.addEventListener('beforeprint', completarTodo);
     tarea = enReposo(continuar);
-    limpiarLector = () => { raiz.removeEventListener('sate-investigacion',actualizarInv); if(raiz.CSS?.highlights)for(const etiqueta of etiquetasInv)raiz.CSS.highlights.delete('sate-inv-'+etiqueta); detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchstart', soltarAncla); raiz.removeEventListener('pointerdown', soltarAncla); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
+    limpiarLector = () => { raiz.removeEventListener('sate-investigacion',actualizarInv); if(raiz.CSS?.highlights)for(const etiqueta of etiquetasInv)raiz.CSS.highlights.delete('sate-inv-'+etiqueta); detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchmove', soltarAncla); raiz.removeEventListener('pointerdown', soltarBarra); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
     const qInicial = parametroGuia('q');
     const frpos = parametroGuia('frpos');
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
