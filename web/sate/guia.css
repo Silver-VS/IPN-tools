@@ -343,3 +343,17 @@
 
 @media(max-width:1024.98px){.tmr.guia > .sate-tarjetas-nav{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:639.98px){.tmr.guia > .sate-tarjetas-nav{grid-template-columns:minmax(0,1fr)}}
+/* Investigación: controles propios fuera del contenido documental. */
+.rgl-investigacion{min-width:0;overflow-wrap:anywhere;margin-top:var(--ipn-esp-5)}
+.rgl-investigacion>summary{min-height:var(--ipn-control-alto);cursor:pointer;font-weight:600}
+.rgl-investigacion__cuerpo{display:flex;flex-direction:column;gap:var(--ipn-esp-3);padding-block:var(--ipn-esp-3)}
+.rgl-investigacion input,.rgl-investigacion select,.rgl-investigacion button,.rgl-indice__cuerpo>input,.rgl-seleccion button,.rgl-seleccion select{box-sizing:border-box;min-height:var(--ipn-control-alto);max-width:100%;min-width:0;font:inherit;color:var(--ipn-texto);background:var(--ipn-superficie);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-2)}
+.rgl-investigacion__item{display:flex;flex-direction:column;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea)}
+.rgl-notas{font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);padding:var(--ipn-esp-3);background:var(--ipn-hundido);overflow-wrap:anywhere}
+.rgl-seleccion:not([hidden]){display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+.rgl-investigacion :focus-visible,.rgl-seleccion :focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+::highlight(sate-inv-favor){background-color:var(--ipn-ok-suave);color:var(--ipn-texto)}
+::highlight(sate-inv-contra){background-color:var(--ipn-error-suave);color:var(--ipn-texto)}
+::highlight(sate-inv-requisito){background-color:var(--ipn-acento-suave);color:var(--ipn-texto)}
+::highlight(sate-inv-plazo){background-color:var(--ipn-aviso-suave);color:var(--ipn-texto)}
+@media(max-width:768.98px){.rgl-investigacion{position:fixed;inset:auto 0 0;z-index:20;max-height:50dvh;overflow:auto;background:var(--ipn-superficie);padding:var(--ipn-esp-4);border-top:1px solid var(--ipn-linea)}.rgl:has(.rgl-investigacion){padding-bottom:var(--ipn-esp-8)}.rgl:has(.rgl-investigacion[open]){padding-bottom:50dvh}.rgl-contexto{flex-wrap:wrap}}
