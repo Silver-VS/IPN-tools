@@ -247,18 +247,20 @@
     let version = 0, temporizador, carrera = op.carrera || '', manifiesto;
     const panel = h('div', {'class':'guia-busqueda-unica'});
     const etiqueta = op.nombre ? bt('en', {nombre:op.nombre}) : bt('global');
-    const entrada = h('input', {type:'search', id:op.nombre ? null : 'guia-q', 'aria-label':etiqueta, placeholder:bt('marcador')});
+    const entrada = h('input', {type:'search', id:op.nombre ? null : 'guia-q', 'aria-label':etiqueta, placeholder:op.marcador||bt('marcador')});
     const lista = h('div', {'class':'guia-busqueda-grupos', 'aria-live':'polite'});
     const filtros = h('div', {'class':'guia-chips'});
     const todos = h('a', {href:rutaGuia(), texto:bt('toda')});
     todos.addEventListener('click', () => { todos.setAttribute('href',rutaGuia() + '?q=' + encodeURIComponent(entrada.value)); });
-    panel.append(h('label', {}, [h('span', {texto:etiqueta}), h('div', {'class':'guia-busqueda-campo'}, [iconoRuta('buscar'), entrada])]), ...(op.nombre ? [todos] : []), filtros, lista);
+    panel.append(h('label', {}, [h('span', {texto:etiqueta}), h('div', {'class':'guia-busqueda-campo'}, [iconoRuta('buscar'), entrada])]), ...(op.nombre ? [todos] : []), filtros, ...(op.antes ? [op.antes] : []), lista);
+    op.alEntrada?.(entrada);
     async function pintar() {
       if (panel.isConnected === false) return;
       const mi = ++version, q = entrada.value.trim(), u = unidad();
       if (!op.nombre && raiz.history?.replaceState) raiz.history.replaceState(null,'',rutaGuia() + (q ? '?q='+encodeURIComponent(q) : ''));
       if (op.destino) op.destino.hidden = !!q;
       lista.replaceChildren();
+      op.alPintar?.(q);
       if (!terminos(q).length) return;
       lista.appendChild(h('p', {role:'status', texto:bt('cargando')}));
       try {
@@ -545,8 +547,17 @@
       ['areas',d.acudir.filter(a=>coincide(a.nombre+' '+a.para)||preguntas.slice(0,3).some(p=>p.acudir?.includes(a.id))).slice(0,4).map(a=>h('a',{href:rutaGuia('acudir',a.id),texto:a.nombre}))]];
     return h('aside',{'class':'guia-grupos'},grupos.map(([id,links])=>h('section',{},[h('h3',{texto:tx(id)}),h('ul',{},links.length?links.map(a=>h('li',{},[a])):[h('li',{texto:tx('sin_coincidencias')})])])));
   }
+  // Portada aprobada (maqueta R15): título, buscador global con ejemplos en voz de alumno, chips y respuesta directa arriba de los grupos.
   function buscadorSoluciones(d, s, destino) {
-    return {cab:buscadorIndice({destino}), resultados:h('div')};
+    const directa=h('div',{'class':'guia-respuesta-directa'});
+    const pintarDirecta=q=>{const ps=terminos(q).length?buscarSoluciones(d,q):[];directa.replaceChildren(...(ps.length?[tarjetaSolucion(d,ps[0],s,'respuesta_directa')]:[]));};
+    let entrada=null;
+    const chips=h('div',{'class':'guia-chips guia-sugerencias'});
+    const sugerencias=s?.adeudos?.length?['reprobe el recurse','ets','baja temporal','servicio social','ingles titulacion']:['baja temporal','servicio social','ingles titulacion','becas','ets'];
+    for(const q of sugerencias){const b=h('button',{type:'button',texto:tx('chip_'+q.replaceAll(' ','_'))});b.addEventListener('click',()=>{if(!entrada)return;entrada.value=q;entrada.dispatchEvent(new Event('input'));entrada.focus();});chips.appendChild(b);}
+    const panel=buscadorIndice({destino,alPintar:pintarDirecta,antes:h('div',{'class':'guia-hero-extra'},[chips,directa]),marcador:tx('marcador'),alEntrada:e=>{entrada=e;}});
+    const cab=h('section',{'class':'guia-hero'},[h('h2',{texto:tx('resolver'),tabindex:'-1'}),panel]);
+    return {cab, resultados:h('div')};
   }
   function portadaNueva(raizGuia,d) {
     const s=situacion(), elegida=rutaPersonal(s), contenido=h('div',{'class':'guia-inicio'});
