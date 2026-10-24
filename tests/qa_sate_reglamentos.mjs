@@ -99,7 +99,10 @@ const guia = JSON.parse(leer('data/guia/comun.json'));
 const eventos = new Map(), cuadros = [];
 let pestana, movil = false;
 const avisos = [];
+const almacen=new Map();
 const contexto = vm.createContext({document, setTimeout, clearTimeout,
+  localStorage:{getItem:k=>almacen.get(k)||null}, IPNT:{set:(k,v)=>almacen.set(k,v)}, prompt:()=> 'Proyecto ficticio', confirm:()=>true, Event:Evento,
+  dispatchEvent:e=>eventos.get(e.type)?.(e),
   console:{...console,warn:(...p)=>avisos.push(p)},
   addEventListener:(tipo, fn)=>eventos.set(tipo,fn), removeEventListener:tipo=>eventos.delete(tipo),
   requestAnimationFrame:fn=>{cuadros.push(fn);return cuadros.length;}, cancelAnimationFrame(){},
@@ -126,6 +129,11 @@ assert.equal(caja.querySelector('.guia-resultados').hidden,false);
 assert.ok(caja.querySelectorAll('.guia-resultados a').length>0,'sugerencias buscan artículos');
 await pestana.mostrar({partes:['reglamentos','ri']});
 assert.equal(avisos.length,0, JSON.stringify(avisos));
+const guardar=caja.querySelector('.rgl-articulo header').querySelectorAll('button')[1];
+guardar.click();
+assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos[0].marcadores[0].n,'1','guardar usa IPNT por unidad');
+guardar.click();
+assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos[0].marcadores.length,0,'segundo clic borra marcador');
 assert.equal(caja.querySelectorAll('.rgl-articulo').length,ri.articulos.length+1,'todos los artículos y transitorios en el lienzo');
 assert.equal(caja.querySelectorAll('.rgl-mapa__tramo').length,12);
 assert.equal(caja.querySelectorAll('.rgl-mapa__etiqueta')[2].textContent, 'De los alumnos');

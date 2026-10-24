@@ -90,20 +90,32 @@
   }
   // Árbol de títulos y capítulos según la ubicación de cada artículo; cada nodo guarda los números de artículo que contiene.
   function arbolReglamento(reg) {
-    const raizArbol = { titulo: null, hijos: [], articulos: [] }, vistos = new Map();
+    const raizArbol = { titulo: null, hijos: [], articulos: [], orden: [] }, vistos = new Map();
     for (const a of (reg && reg.articulos) || []) {
       let nodo = raizArbol, clave = '';
       for (const u of a.ubicacion || []) {
         clave += '\u0001' + u;
         let hijo = vistos.get(clave);
-        if (!hijo) { hijo = { titulo: u, hijos: [], articulos: [] }; nodo.hijos.push(hijo); vistos.set(clave, hijo); }
+        if (!hijo) { hijo = { titulo: u, hijos: [], articulos: [], orden: [] }; nodo.hijos.push(hijo); nodo.orden.push({hijo}); vistos.set(clave, hijo); }
         nodo = hijo;
       }
       nodo.articulos.push(a.n);
+      nodo.orden.push({n:a.n});
     }
     return raizArbol;
   }
   const totalArticulos = nodo => nodo.articulos.length + nodo.hijos.reduce((s, h) => s + totalArticulos(h), 0);
+  const numerosNodo = nodo => nodo.orden.flatMap(x => x.hijo ? numerosNodo(x.hijo) : [x.n]);
+  function destinoArticulo(reg, consulta) {
+    const q = norm(consulta).trim().replace(/^art(?:iculo|\.)?\s*/, '');
+    const tr = /^transitorio\s+(\d+|\w+)$/.exec(q);
+    if (tr) {
+      const a = (reg.transitorios || []).find((x,i) => norm(x.n) === tr[1] || String(i+1) === tr[1]);
+      return a ? 'transitorio-' + a.n : null;
+    }
+    const a = (reg.articulos || []).find(x => norm(x.n).replace(/\s+/g,' ') === q.replace(/\s+/g,' '));
+    return a ? anclaArticulo(a.n) : null;
+  }
   function etiquetaTitulo(titulo) {
     const texto = titulo.replace(/^(?:t[íi]tulo|cap[íi]tulo|secci[óo]n)\s+(?:(?:d[ée]cim[oa]\s+)?(?:primer[oa]|segund[oa]|tercer[oa]|cuart[oa]|quint[oa]|sext[oa]|s[ée]ptim[oa]|octav[oa]|noven[oa]|d[ée]cim[oa]|[úu]nic[oa])|[IVXLCDM]+|\d+)[.:]?\s*/i, '').trim();
     const normal = texto.toLocaleLowerCase('es').replace(/\bipn\b/g, 'IPN');
@@ -210,6 +222,51 @@
   const motivoInicial = s => s?.fis?.some(f=>f.veces>=2)?'recursamiento':s?.nDes?'antiguas':s?.adeudos?.length?'ordinario':'';
   Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
 
+  const etiquetasInv = ['favor','contra','requisito','plazo'];
+  // Recalcula contra los nodos actuales: partir un párrafo o envolver una referencia no desplaza la anotación.
+  function segmentosAnotacion(textos,a) {
+    if(textos.join('').slice(a.inicio,a.fin)!==a.literal)return null;
+    let offset=0, inicio=null, fin=null;
+    textos.forEach((texto,i)=>{const limite=offset+texto.length;if(a.inicio>=offset&&a.inicio<limite)inicio=[i,a.inicio-offset];if(a.fin>offset&&a.fin<=limite)fin=[i,a.fin-offset];offset=limite;});
+    return inicio&&fin?{inicio,fin}:null;
+  }
+  // El intercambio no contiene perfil, unidad ni información del SAES. Se reconstruye una lista blanca.
+  function validarInvestigacion(d) {
+    const plano = (s,max) => typeof s === 'string' && s.length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f<>]/.test(s);
+    if (!d || d.formato !== 'sate-investigacion' || d.version !== 1 || !plano(d.nombre,120) || !d.nombre.trim() || !['solicitud','queja','propuesta','estudio'].includes(d.proposito) || !plano(d.autor,120) || !Array.isArray(d.etiquetas) || d.etiquetas.length>20 || !d.etiquetas.every(x=>plano(x,40)) || !Array.isArray(d.marcadores) || d.marcadores.length>300) throw new Error('Investigación inválida');
+    const marcadores = d.marcadores.map(m => {
+      if(!m || !/^[a-z0-9_-]{1,80}$/.test(m.doc) || !plano(m.n,80) || !m.n.trim() || !plano(m.fr,20) || !Array.isArray(m.anotaciones) || m.anotaciones.length>100) throw new Error('Marcador inválido');
+      return {doc:m.doc,n:m.n,fr:m.fr,anotaciones:m.anotaciones.map(a=>{
+        if(!a || !Number.isSafeInteger(a.inicio) || !Number.isSafeInteger(a.fin) || a.inicio<0 || a.fin<=a.inicio || a.fin>200000 || !plano(a.literal,20000) || a.literal.length!==a.fin-a.inicio || !plano(a.nota,4000) || !etiquetasInv.includes(a.etiqueta)) throw new Error('Anotación inválida');
+        return {inicio:a.inicio,fin:a.fin,literal:a.literal,nota:a.nota,etiqueta:a.etiqueta};
+      })};
+    });
+    return {formato:d.formato,version:1,nombre:d.nombre,proposito:d.proposito,autor:d.autor,etiquetas:d.etiquetas.slice(),marcadores};
+  }
+  function alternarMarcador(p,doc,n,fr='') {
+    const i=p.marcadores.findIndex(m=>m.doc===doc && m.n===String(n) && m.fr===fr);
+    if(i<0) p.marcadores.push({doc,n:String(n),fr,anotaciones:[]}); else p.marcadores.splice(i,1);
+  }
+  function fundamentoInv(p, documentos) {
+    const grupos = new Map();
+    for(const m of p.marcadores) {if(!grupos.has(m.doc)) grupos.set(m.doc,new Set()); grupos.get(m.doc).add(m.n);}
+    return Array.from(grupos).sort(([a],[b])=>a.localeCompare(b)).map(([doc,ns])=>({titulo:documentos[doc]?.titulo || doc,numeros:Array.from(ns).sort((a,b)=>a.localeCompare(b,'es',{numeric:true}))}));
+  }
+  async function codificarInv(p) {
+    const bytes = new TextEncoder().encode(JSON.stringify(validarInvestigacion(p)));
+    const comprimido = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
+    return btoa(Array.from(comprimido,x=>String.fromCharCode(x)).join('')).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  async function decodificarInv(s) {
+    if(!/^[\w-]+$/.test(s) || s.length>2000000) throw new Error('Enlace inválido');
+    const bytes = Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),x=>x.charCodeAt(0));
+    const lector = new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate')).getReader();
+    let tam=0, partes=[];
+    for(;;) {const {done,value}=await lector.read(); if(done) break; tam+=value.length; if(tam>2000000) {await lector.cancel(); throw new Error('Investigación demasiado grande');} partes.push(value);}
+    return validarInvestigacion(JSON.parse(await new Blob(partes).text()));
+  }
+  Object.assign(raiz.SateGuia,{numerosNodo,destinoArticulo,validarInvestigacion,alternarMarcador,fundamentoInv,codificarInv,decodificarInv,segmentosAnotacion});
+
   if (typeof raiz.SATE === 'undefined' || typeof raiz.SATE_CONFIG === 'undefined' || typeof document === 'undefined') return;
 
   /* ===================== B. Integración con SATE ===================== */
@@ -248,6 +305,7 @@
     const panel = h('div', {'class':'guia-busqueda-unica'});
     const etiqueta = op.nombre ? bt('en', {nombre:op.nombre}) : bt('global');
     const entrada = h('input', {type:'search', id:op.nombre ? null : 'guia-q', 'aria-label':etiqueta, placeholder:op.marcador||bt('marcador')});
+    entrada.addEventListener('keydown',async e=>{if(e.key==='Enter' && op.doc){const destino=destinoArticulo(await cargarReglamento(op.doc),entrada.value);if(destino){e.preventDefault();raiz.location.hash=rutaReglamento(op.doc,destino);}}});
     const lista = h('div', {'class':'guia-busqueda-grupos', 'aria-live':'polite'});
     const filtros = h('div', {'class':'guia-chips'});
     const todos = h('a', {href:rutaGuia(), texto:bt('toda')});
@@ -264,6 +322,10 @@
       if (!terminos(q).length) return;
       lista.appendChild(h('p', {role:'status', texto:bt('cargando')}));
       try {
+        if(op.doc && /^(?:art(?:iculo|\.)?\s*\d|transitorio\s)/i.test(norm(q))) {
+          const destino=destinoArticulo(await cargarReglamento(op.doc),q);
+          if(destino && mi===version){lista.replaceChildren(h('a',{href:rutaReglamento(op.doc,destino),texto:q}));return;}
+        }
         manifiesto = await cargarBusqueda('indice.json');
         if (mi !== version || u !== unidad()) return;
         if (!op.carrera && !filtros.children.length && (!op.fuente || op.fuente === 'programas')) {
@@ -469,6 +531,7 @@
     const leer = h('a', { href: rutaReglamento(doc, anclaArticulo(n,fr)), texto:bt('abrir_reglamento') });
     leer.addEventListener('click', () => SateUI.cerrarModal());
     cuerpo.appendChild(leer);
+    if(a)cuerpo.appendChild(botonGuardarInv(doc,n,fr||''));
     const url = reg?.url || meta.url;
     if (url) cuerpo.appendChild(enlaceExterno('', url, t('sate.guia.pdf_oficial')));
     return SateUI.modal(t('sate.guia.articulo_titulo', { n, reglamento: reg?.titulo || meta.titulo || doc }), cuerpo, {lectura:true, flotante:true});
@@ -478,6 +541,7 @@
   const tituloApartado = id => t(infoApartado(id).titulo);
   const rutaGuia = (...p) => enlace(unidad(), ...p);
   const rutaReglamento = (doc, ancla) => rutaGuia('reglamentos', doc) + (ancla ? '/' + encodeURIComponent(ancla) : '');
+  const sufijoInvestigacion = () => parametroGuia('inv') ? '?inv='+parametroGuia('inv') : parametroGuia('arts') ? '?arts='+encodeURIComponent(parametroGuia('arts')) : '';
   const fechaRevision = d => { try { return new Date(d + 'T12:00:00').toLocaleDateString('es-MX', { dateStyle: 'long' }); } catch (e) { return d; } };
 
   function cabecera(migas, titulo, intro) {
@@ -781,6 +845,34 @@
     if (raiz.navigator?.clipboard?.writeText) return raiz.navigator.clipboard.writeText(url);
     return Promise.reject(new Error('Sin portapapeles'));
   }
+  let investigacionCompartida = null;
+  const claveInv = () => 'hu.' + unidad() + '.investigaciones';
+  function leerInvestigaciones() {
+    if(!raiz.localStorage)return {activa:0,proyectos:[]};
+    try {const v=JSON.parse(raiz.localStorage.getItem(claveInv()) || '{"activa":0,"proyectos":[]}'); return {activa:v.activa,proyectos:v.proyectos.map(validarInvestigacion)};} catch(e) {console.warn('SATE investigaciones: almacenamiento inválido',e.message); return {activa:0,proyectos:[]};}
+  }
+  function guardarInvestigaciones(v) {raiz.IPNT.set(claveInv(),JSON.stringify(v));}
+  const ti = (k,v) => t('sate.guia.inv_'+k,v);
+  function botonInv(k,fn) {const b=h('button',{type:'button','class':'btn',texto:ti(k)}); b.addEventListener('click',fn); return b;}
+  function botonGuardarInv(doc,n,fr='') {
+    const b=botonInv('guardar',()=>{if(!investigacionCompartida){guardarArticuloInv(doc,n,fr);estadoMarcadoresInv();}});
+    b.setAttribute('data-guardar-doc',doc);b.setAttribute('data-guardar-n',n);b.setAttribute('data-guardar-fr',fr);return b;
+  }
+  function estadoMarcadoresInv() {
+    const v=leerInvestigaciones(),p=investigacionCompartida||v.proyectos[v.activa];
+    for(const b of document.querySelectorAll('[data-guardar-doc]')){const guardado=p?.marcadores.some(m=>m.doc===b.getAttribute('data-guardar-doc')&&m.n===b.getAttribute('data-guardar-n')&&m.fr===b.getAttribute('data-guardar-fr'));
+      b.hidden=!!investigacionCompartida;b.setAttribute('aria-pressed',String(!!guardado));b.textContent=ti(guardado?'guardado':'guardar');}
+  }
+  function guardarArticuloInv(doc,n,fr='') {
+    const v=leerInvestigaciones();
+    if(!v.proyectos.length) {const nombre=raiz.prompt(ti('nombre')); if(!nombre?.trim()) return; v.proyectos.push(validarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]})); v.activa=0;}
+    alternarMarcador(v.proyectos[v.activa],doc,n,fr); guardarInvestigaciones(v);
+    raiz.dispatchEvent(new Event('sate-investigacion'));
+  }
+  function descargarInv(nombre,texto,tipo) {
+    const url=URL.createObjectURL(new Blob([texto],{type:tipo})), a=h('a',{href:url,download:nombre});
+    document.body.appendChild(a); a.click(); a.remove(); raiz.setTimeout(()=>URL.revokeObjectURL(url),4000);
+  }
   // Lector de tres paneles: índice | articulado continuo | trámites y preguntas del artículo actual.
   function montarReglamento(raizGuia, d, reg, doc, ancla) {
     const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos'), href: rutaGuia('reglamentos') }, { texto: reg.titulo }], reg.titulo, reg.gaceta);
@@ -812,18 +904,21 @@
     function nodoArbol(nodo, ancestros) {
       const det = h('details', { 'class': 'rgl-grupo' }), cuerpo = h('div', { 'class': 'rgl-grupo__cuerpo' });
       const propios = [...ancestros, det];
-      for (const hijo of nodo.hijos) cuerpo.appendChild(nodoArbol(hijo, propios));
-      if (nodo.articulos.length) cuerpo.appendChild(h('ul', { 'class': 'rgl-arts' }, nodo.articulos.map(n => chip(n, propios))));
-      const primeroDe = x => x.articulos[0] || primeroDe(x.hijos[0]);
-      det.append(h('summary', {}, [enlaceAncla('rgl-indice-titulo', anclaArticulo(primeroDe(nodo)), nodo.titulo), h('small', { texto: String(totalArticulos(nodo)) })]), cuerpo);
+      for (const x of nodo.orden) cuerpo.appendChild(x.hijo ? nodoArbol(x.hijo, propios) : h('ul', {'class':'rgl-arts'}, [chip(x.n, propios)]));
+      const ns = numerosNodo(nodo);
+      det.append(h('summary', {}, [enlaceAncla('rgl-indice-titulo', anclaArticulo(ns[0]), nodo.titulo, {'data-oficial':doc}), h('small', { texto: t(ns.length === 1 ? 'sate.guia.inv_intervalo_uno' : 'sate.guia.inv_intervalo', {desde:ns[0],hasta:ns[ns.length-1]}) })]), cuerpo);
       return det;
     }
-    const arbolNav = h('div', { 'class': 'rgl-arbol' }, arbol.hijos.map(x => nodoArbol(x, [])));
-    if (arbol.articulos.length) arbolNav.appendChild(h('ul', { 'class': 'rgl-arts' }, arbol.articulos.map(n => chip(n, []))));
+    const arbolNav = h('div', { 'class': 'rgl-arbol' }, arbol.orden.map(x => x.hijo ? nodoArbol(x.hijo, []) : h('ul', {'class':'rgl-arts'}, [chip(x.n,[])])));
     const enlaceTransitorios = transitorios.length ? enlaceAncla('rgl-art rgl-art--ancho', 'transitorios', t('sate.guia.transitorios')) : null;
     if (enlaceTransitorios) arbolNav.appendChild(h('ul', { 'class': 'rgl-arts' }, [h('li', {}, [enlaceTransitorios])]));
+    for (const x of transitorios) arbolNav.appendChild(enlaceAncla('rgl-art', 'transitorio-' + x.n, x.n, {'data-oficial':doc}));
 
-    const cuerpoIndice = h('div', { 'class': 'rgl-indice__cuerpo' }, [arbolNav]);
+    const salto = h('input', {type:'search', placeholder:t('sate.guia.inv_ir'), 'aria-label':t('sate.guia.inv_ir')});
+    const saltar = () => { const destino = destinoArticulo(reg,salto.value); if(destino) ir(destino,true); };
+    salto.addEventListener('change',saltar);
+    salto.addEventListener('keydown',e => {if(e.key === 'Enter') {e.preventDefault(); saltar();}});
+    const cuerpoIndice = h('div', { 'class': 'rgl-indice__cuerpo' }, [salto, arbolNav]);
     const resumen = h('span', { 'class': 'rgl-resumen__actual' });
     const contextoActual = h('span', {'class':'rgl-contexto__actual'});
     const contexto = h('nav', {'class':'rgl-contexto', 'aria-label':reg.titulo}, [
@@ -835,6 +930,76 @@
     const texto = h('article', { 'class': 'rgl-texto', 'aria-label': reg.titulo });
     const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
     const rejilla = SateUI.lector(indice, texto, riel);
+    const investigacion = h('details',{'class':'rgl-investigacion',open:!pantallaChica()},[h('summary',{texto:ti('panel')})]);
+    const invCuerpo=h('div',{'class':'rgl-investigacion__cuerpo'}), invContexto=h('span',{'class':'rgl-investigacion__contexto'});
+    investigacion.appendChild(invCuerpo); contexto.appendChild(invContexto);
+    let filtroInv='', busquedaInv='';
+    async function pintarInvestigacion() {
+      estadoMarcadoresInv();
+      const v=leerInvestigaciones(), p=investigacionCompartida || v.proyectos[v.activa], solo=!!investigacionCompartida;
+      invCuerpo.replaceChildren();
+      invContexto.textContent=p ? ti('contexto',{nombre:p.nombre,n:new Set(p.marcadores.map(m=>m.doc+':'+m.n)).size}) : ti('panel');
+      const error=e=>{console.warn('SATE investigación',{mensaje:e.message}); invCuerpo.appendChild(h('p',{role:'alert',texto:ti('error')}));};
+      const accion=(k,fn)=>invCuerpo.appendChild(botonInv(k,()=>Promise.resolve().then(fn).catch(error)));
+      accion('nueva',()=>{const nombre=raiz.prompt(ti('nombre')); if(!nombre?.trim())return; v.proyectos.push(validarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]})); v.activa=v.proyectos.length-1; investigacionCompartida=null; guardarInvestigaciones(v); pintarInvestigacion();});
+      const archivo=h('input',{type:'file',accept:'.json,application/json','aria-label':ti('importar')});
+      archivo.addEventListener('change',async()=>{try{const f=archivo.files[0]; if(!f || f.size>2000000)throw new Error('Tamaño inválido'); investigacionCompartida=validarInvestigacion(JSON.parse(await f.text())); pintarInvestigacion();}catch(e){error(e);}}); invCuerpo.appendChild(archivo);
+      if(!p){pintarAnotaciones();return;}
+      invCuerpo.appendChild(h('h4',{texto:p.nombre}));
+      if(solo)invCuerpo.appendChild(h('p',{texto:ti('solo_lectura')}));
+      if(p.autor)invCuerpo.appendChild(h('p',{texto:p.autor}));
+      invCuerpo.appendChild(h('p',{texto:ti(p.proposito)+' · '+p.etiquetas.join(', ')}));
+      if(solo) accion('copia',()=>{v.proyectos.push(validarInvestigacion(p));v.activa=v.proyectos.length-1;guardarInvestigaciones(v);investigacionCompartida=null;pintarInvestigacion();});
+      else {
+        const selector=h('select',{'aria-label':ti('proyecto')},v.proyectos.map((x,i)=>h('option',{value:i,selected:i===v.activa,texto:x.nombre})));
+        selector.addEventListener('change',()=>{v.activa=Number(selector.value);guardarInvestigaciones(v);pintarInvestigacion();});invCuerpo.appendChild(selector);
+        accion('renombrar',()=>{const n=raiz.prompt(ti('nombre'),p.nombre);if(n?.trim()){p.nombre=n;guardarInvestigaciones({...v,proyectos:v.proyectos.map(validarInvestigacion)});pintarInvestigacion();}});
+        accion('borrar',()=>{if(raiz.confirm(ti('confirmar'))){v.proyectos.splice(v.activa,1);v.activa=0;guardarInvestigaciones(v);pintarInvestigacion();}});
+        const proposito=h('select',{'aria-label':ti('proposito')},['solicitud','queja','propuesta','estudio'].map(x=>h('option',{value:x,selected:x===p.proposito,texto:ti(x)})));
+        proposito.addEventListener('change',()=>{p.proposito=proposito.value;guardarInvestigaciones(v);});invCuerpo.appendChild(proposito);
+        for(const campo of ['autor','etiquetas']) {const input=h('input',{'aria-label':ti(campo),placeholder:ti(campo),value:campo==='etiquetas'?p.etiquetas.join(', '):p.autor,maxlength:120});input.addEventListener('change',()=>{p[campo]=campo==='etiquetas'?input.value.split(',').map(x=>x.trim()).filter(Boolean):input.value;try{validarInvestigacion(p);guardarInvestigaciones(v);}catch(e){error(e);}});invCuerpo.appendChild(input);}
+      }
+      const filtro=h('select',{'aria-label':ti('filtro')},['',...etiquetasInv].map(x=>h('option',{value:x,selected:x===filtroInv,texto:ti(x||'todas')})));
+      filtro.addEventListener('change',()=>{filtroInv=filtro.value;pintarInvestigacion();});
+      const buscar=h('input',{type:'search',value:busquedaInv,placeholder:ti('buscar_notas'),'aria-label':ti('buscar_notas')});buscar.addEventListener('change',()=>{busquedaInv=buscar.value;pintarInvestigacion();});invCuerpo.append(filtro,buscar);
+      for(const m of p.marcadores) {
+        const anotaciones=m.anotaciones.filter(a=>(!filtroInv||a.etiqueta===filtroInv)&&(!busquedaInv||norm(a.nota).includes(norm(busquedaInv))));
+        if((filtroInv||busquedaInv)&&!anotaciones.length)continue;
+        invCuerpo.appendChild(h('div',{'class':'rgl-investigacion__item'},[h('a',{href:rutaReglamento(m.doc,anclaArticulo(m.n,m.fr))+sufijoInvestigacion(),texto:m.doc.toUpperCase()+' · '+ti('articulo',{n:m.n})}),h('small',{texto:ti('conteo',{n:anotaciones.length})}),...anotaciones.map(a=>h('p',{texto:ti(a.etiqueta)+' · '+(a.nota||a.literal)})),solo?null:botonInv('quitar',()=>{alternarMarcador(p,m.doc,m.n,m.fr);guardarInvestigaciones(v);estadoMarcadoresInv();pintarInvestigacion();})]));
+      }
+      const documentos={...d.documentos,[doc]:reg};
+      for(const m of p.marcadores)documentos[m.doc]=await cargarReglamento(m.doc);
+      const grupos=fundamentoInv(p,documentos), fundamento=ti('fundamento',{articulos:grupos.map(g=>ti('grupo',{numeros:g.numeros.join(', '),documento:g.titulo})).join(' y ')});
+      invCuerpo.append(h('h4',{texto:ti('fundamento_titulo')}),h('p',{texto:fundamento}));
+      accion('copiar_fundamento',()=>raiz.navigator.clipboard.writeText(fundamento));
+      const citas=async()=>{const rs=[];for(const m of p.marcadores){const r=await cargarReglamento(m.doc),a=r.articulos.find(x=>x.n===m.n);if(a)rs.push({titulo:r.titulo,n:m.n,texto:m.fr?a.fracciones?.find(f=>f.fr===m.fr)?.texto||a.texto:a.texto,anotaciones:m.anotaciones});}return rs;};
+      accion('json',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json'));
+      accion('pdf',async()=>{
+        if(!raiz.PDFLib)await SATE.script('../assets/vendor/pdf-lib.min.js');
+        const lib=raiz.PDFLib, pdf=await lib.PDFDocument.create(), fuente=await pdf.embedFont(lib.StandardFonts.Helvetica);
+        let pagina=pdf.addPage(), y=790;
+        const escribir=s=>{let linea='';for(const palabra of s.split(/\s+/)){const siguiente=linea?linea+' '+palabra:palabra;if(fuente.widthOfTextAtSize(siguiente,11)>490&&linea){if(y<55){pagina=pdf.addPage();y=790;}pagina.drawText(linea,{x:50,y,size:11,font:fuente});y-=16;linea=palabra;}else linea=siguiente;}if(linea){if(y<55){pagina=pdf.addPage();y=790;}pagina.drawText(linea,{x:50,y,size:11,font:fuente});y-=24;}};
+        escribir(p.nombre);escribir(fundamento);for(const x of await citas()){escribir(x.titulo+', art. '+x.n);escribir(x.texto);for(const a of x.anotaciones){escribir(a.literal);escribir(ti(a.etiqueta)+': '+a.nota);}}
+        descargarInv('investigacion.pdf',await pdf.save(),'application/pdf');
+      });
+      accion('markdown',async()=>descargarInv('investigacion.md','# '+p.nombre+'\n\n'+fundamento+'\n\n'+(await citas()).map(x=>'## '+x.titulo+', art. '+x.n+'\n\n'+x.texto+'\n\n'+x.anotaciones.map(a=>'> '+a.literal+'\n\n'+ti(a.etiqueta)+': '+a.nota).join('\n\n')).join('\n\n'),'text/markdown'));
+      accion('latex',async()=>{const esc=s=>s.replace(/[\\{}$&#%_~^]/g,c=>'\\char'+c.charCodeAt(0)+'{}');descargarInv('investigacion.tex','\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\begin{document}\n'+esc(p.nombre)+'\n\n'+esc(fundamento)+'\n\n'+(await citas()).map(x=>esc(x.titulo+', art. '+x.n)+'\n\n'+esc(x.texto)+'\n\n'+x.anotaciones.map(a=>esc(a.literal+' '+ti(a.etiqueta)+': '+a.nota)).join('\n\n')).join('\n\n')+'\n\\end{document}','application/x-tex');});
+      accion('compartir',async()=>{const s=await codificarInv(p);if(s.length>7000){invCuerpo.appendChild(h('p',{role:'status',texto:ti('largo')}));return;}await raiz.navigator.clipboard.writeText(raiz.location.href.split('#')[0]+rutaReglamento(doc)+'?inv='+s);});
+      accion('enlace',()=>raiz.navigator.clipboard.writeText(raiz.location.href.split('#')[0]+rutaReglamento(doc)+'?arts='+encodeURIComponent(p.marcadores.map(m=>m.doc+':'+m.n+(m.fr?':'+m.fr:'')).join(','))));
+      pintarAnotaciones();
+    }
+    function pintarAnotaciones() {
+      const p=investigacionCompartida || leerInvestigaciones().proyectos[leerInvestigaciones().activa];
+      for(const n of texto.querySelectorAll('.rgl-notas'))n.remove();
+      const rangos=Object.fromEntries(etiquetasInv.map(x=>[x,[]]));
+      for(const m of p?.marcadores||[])if(m.doc===doc){const seccion=secciones.get(m.n), cuerpo=seccion?.querySelector('.rgl-cuerpo');if(!cuerpo)continue;
+        const nodos=[],walker=document.createTreeWalker?.(cuerpo,4);if(!walker)continue;while(walker.nextNode())nodos.push(walker.currentNode);
+        for(const a of m.anotaciones){const posiciones=segmentosAnotacion(nodos.map(n=>n.textContent),a);if(!posiciones)continue;const r=document.createRange();r.setStart(nodos[posiciones.inicio[0]],posiciones.inicio[1]);r.setEnd(nodos[posiciones.fin[0]],posiciones.fin[1]);rangos[a.etiqueta].push(r);seccion.appendChild(h('p',{'class':'rgl-notas',texto:ti(a.etiqueta)+' · '+a.nota}));}
+      }
+      if(raiz.CSS?.highlights && raiz.Highlight)etiquetasInv.forEach(x=>raiz.CSS.highlights.set('sate-inv-'+x,new raiz.Highlight(...rangos[x])));
+    }
+    const actualizarInv=()=>{estadoMarcadoresInv();pintarInvestigacion().catch(e=>console.warn('SATE investigación',e.message));};
+    raiz.addEventListener('sate-investigacion',actualizarInv);
     const estrecho = () => pantallaChica() || (rejilla.clientWidth > 0 && rejilla.clientWidth <= 672);
     if (fuenteDoc || avisoOcr) cab.nodo.appendChild(h('div', { 'class': 'rgl-datos' }, [fuenteDoc, avisoOcr]));
     const mapa = mapaReglamento(reg);
@@ -844,7 +1009,7 @@
     ].map(([clave, n]) => h('div', {}, [h('dt', { texto: t('sate.guia.rgl_' + clave) }), h('dd', { texto: String(n) })])));
     const barra = h('div', { 'class': 'rgl-mapa__barra' }, mapa.map(x => {
       const a = enlaceAncla('rgl-mapa__tramo rgl-aplica--' + x.aplicacion, anclaArticulo(x.articulos[0]), [h('span', { 'class': 'rgl-mapa__color' }), h('span', { 'class': 'rgl-mapa__etiqueta', texto: x.etiqueta }), h('span', { 'class': 'rgl-mapa__completo', texto: x.titulo })],
-        { title: x.titulo + ' · ' + t('sate.guia.numero_articulos', { n: x.articulos.length }), 'aria-label': x.titulo + ' · ' + t('sate.guia.rgl_' + x.aplicacion) });
+        { title: x.titulo + ' · ' + ti(x.articulos.length===1?'intervalo_uno':'intervalo',{desde:x.articulos[0],hasta:x.articulos[x.articulos.length-1]}), 'aria-label': x.titulo + ' · ' + t('sate.guia.rgl_' + x.aplicacion) });
       a.style.flex = x.articulos.length + ' 0 0';
       if (x.articulos.length / articulos.length < 0.04) a.classList.add('rgl-mapa__tramo--angosto');
       return a;
@@ -884,6 +1049,7 @@
       if (rel.preguntas.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_preguntas') }), h('ul', {}, rel.preguntas.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]));
       // El riel no se oculta: si cambiara la rejilla al desplazarse, el índice y el texto saltarían.
       riel.replaceChildren(h('h3', { texto: t('sate.guia.rgl_contexto') }), ...(bloques.length ? bloques : [h('p', { 'class': 'rgl-riel-vacio', texto: t('sate.guia.rgl_sin_citas') })]));
+      riel.appendChild(investigacion);
     }
     function marcarIndice(clave) {
       for (const [n, a] of enlaces) { if (n === clave) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
@@ -951,10 +1117,10 @@
         () => { estado.textContent = t('sate.guia.rgl_copiado'); },
         () => { estado.textContent = t('sate.guia.rgl_copiar_error'); }));
       const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-' + anc, 'data-articulo': a.n }, [
-        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, estado])]);
+        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), copiarArticulo, botonGuardarInv(doc,a.n), estado])]);
       // Reservar altura evita que los títulos posteriores colapsen mientras llega su texto.
       seccion.style.minHeight = Math.max(110, Math.ceil((a.texto || '').length / 80) * 24 + 64) + 'px';
-      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a)); seccion.style.minHeight = ''; });
+      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a)); seccion.style.minHeight = ''; if(investigacionCompartida || leerInvestigaciones().proyectos.length)pintarAnotaciones(); });
       if (Math.abs(posicion.get(a.n) - centro) <= 3) completar(a.n);
       contenedores[contenedores.length - 1].appendChild(seccion);
       secciones.set(a.n, seccion);
@@ -963,29 +1129,56 @@
     if (transitorios.length) {
       const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-transitorios', 'data-articulo': 'transitorios' }, [
         h('h3', { texto: t('sate.guia.transitorios') }), h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc },
-          transitorios.map(x => h('p', { texto: x.n + '. ' + x.texto })))]);
+          transitorios.map(x => h('p', { 'data-transitorio':x.n, texto: x.n + '. ' + x.texto })))]);
       texto.appendChild(seccion);
       secciones.set('transitorios', seccion);
     }
+    const seleccionBarra=h('div',{'class':'rgl-seleccion',hidden:true,role:'toolbar','aria-label':ti('seleccion')});
+    const etiquetaSeleccion=h('select',{'aria-label':ti('etiqueta')},etiquetasInv.map(x=>h('option',{value:x,texto:ti(x)})));
+    let seleccionActual=null;
+    function capturarSeleccion() {
+      const s=raiz.getSelection?.();if(!s?.rangeCount||s.isCollapsed)return;
+      const r=s.getRangeAt(0), inicio=r.startContainer.parentElement?.closest('.rgl-cuerpo'), fin=r.endContainer.parentElement?.closest('.rgl-cuerpo');
+      if(!inicio || inicio!==fin || !texto.contains(inicio))return;
+      const previo=document.createRange();previo.selectNodeContents(inicio);previo.setEnd(r.startContainer,r.startOffset);
+      const literal=r.toString(), n=inicio.closest('[data-articulo]').getAttribute('data-articulo'), fr=r.startContainer.parentElement?.closest('.rgl-fr')?.getAttribute('data-ancla')?.split('.')[1]||'';
+      seleccionActual={n,fr,inicio:previo.toString().length,fin:previo.toString().length+literal.length,literal};seleccionBarra.hidden=false;
+    }
+    function anotar(nota) {
+      if(!seleccionActual || investigacionCompartida)return;
+      const v=leerInvestigaciones(),p=v.proyectos[v.activa];if(!p){guardarArticuloInv(doc,seleccionActual.n);if(leerInvestigaciones().proyectos.length)anotar(nota);return;}
+      let m=p.marcadores.find(x=>x.doc===doc&&x.n===seleccionActual.n&&x.fr===seleccionActual.fr);
+      if(!m){m={doc,n:seleccionActual.n,fr:seleccionActual.fr,anotaciones:[]};p.marcadores.push(m);}
+      m.anotaciones.push({inicio:seleccionActual.inicio,fin:seleccionActual.fin,literal:seleccionActual.literal,nota:nota||'',etiqueta:etiquetaSeleccion.value||'favor'});
+      validarInvestigacion(p);guardarInvestigaciones(v);seleccionBarra.hidden=true;actualizarInv();
+    }
+    seleccionBarra.append(etiquetaSeleccion,botonInv('subrayar',()=>anotar('')),botonInv('nota',()=>{const nota=raiz.prompt(ti('nota'));if(nota!==null)anotar(nota);}),botonInv('cita',()=>{if(seleccionActual)raiz.navigator.clipboard.writeText(seleccionActual.literal+' ('+reg.titulo+', art. '+seleccionActual.n+(seleccionActual.fr?', fracc. '+seleccionActual.fr:'')+').');}));
+    contexto.appendChild(seleccionBarra);texto.addEventListener('mouseup',capturarSeleccion);texto.addEventListener('keyup',capturarSeleccion);texto.addEventListener('touchend',capturarSeleccion);
+    actualizarInv();
+    const compartido=parametroGuia('inv');
+    if(compartido)decodificarInv(compartido).then(p=>{investigacionCompartida=p;actualizarInv();}).catch(e=>{console.warn('SATE investigación compartida',e.message);invCuerpo.appendChild(h('p',{role:'alert',texto:ti('error')}));});
+    const artsCompartidos=parametroGuia('arts');
+    if(artsCompartidos && !compartido){try{investigacionCompartida=validarInvestigacion({formato:'sate-investigacion',version:1,nombre:ti('compartida'),proposito:'estudio',autor:'',etiquetas:[],marcadores:artsCompartidos.split(',').map(x=>{const [doc,n,fr='']=x.split(':');return {doc,n,fr,anotaciones:[]};})});actualizarInv();}catch(e){console.warn('SATE marcadores compartidos',e.message);}}
     // Muestra el artículo o la fracción de un ancla; sin ancla válida, el primer artículo. Devuelve el nodo de la fracción, si hay.
     let anclaFijada = null;
     function ir(anclaDestino, empujar) {
       const p = leerAncla(anclaDestino);
-      const clave = anclaDestino === 'transitorios' && transitorios.length ? 'transitorios' : p && posicion.has(p.n) ? p.n : articulos.length ? articulos[0].n : 'transitorios';
+      const tr = anclaDestino?.startsWith('transitorio-') ? Array.from(texto.querySelectorAll('[data-transitorio]')).find(x=>x.getAttribute('data-transitorio')===anclaDestino.slice(12)) : null;
+      const clave = (anclaDestino === 'transitorios' || tr) && transitorios.length ? 'transitorios' : p && posicion.has(p.n) ? p.n : articulos.length ? articulos[0].n : 'transitorios';
       const cambio = clave !== actual;
       vecindad(clave);
       if (cambio) pintar(clave);
-      const final = p && clave === p.n && p.fr ? anclaArticulo(p.n, p.fr, p.inciso) : clave === 'transitorios' ? 'transitorios' : anclaArticulo(clave);
+      const final = p && clave === p.n && p.fr ? anclaArticulo(p.n, p.fr, p.inciso) : tr ? anclaDestino : clave === 'transitorios' ? 'transitorios' : anclaArticulo(clave);
       const fr = final.includes('.') ? Array.from(texto.querySelectorAll('li[data-ancla]')).find(x => x.getAttribute('data-ancla') === final) : null;
       for (const x of texto.querySelectorAll('.rgl-activa')) x.classList.remove('rgl-activa');
-      if (fr) fr.classList.add('rgl-activa');
+      (tr || fr || secciones.get(clave))?.classList.add('rgl-activa');
       // La hidratación incremental conserva el destino de ruta aunque el lector visible cambie.
       anclaFijada = secciones.get(clave) || null;
-      enlaceActual = rutaReglamento(doc, fr ? final : clave === 'transitorios' ? clave : anclaArticulo(clave));
+      enlaceActual = rutaReglamento(doc, final) + sufijoInvestigacion();
       if (empujar) {
         try { history[cambio ? 'pushState' : 'replaceState'](null, '', enlaceActual); } catch (e) { /* sin historial */ }
         if (indice.open && estrecho()) indice.open = false;
-        (fr || secciones.get(clave))?.scrollIntoView({ block: 'start' });
+        (tr || fr || secciones.get(clave))?.scrollIntoView({ block: 'start' });
       }
       return fr;
     }
@@ -1002,8 +1195,8 @@
       const chico = estrecho();
       if (chico !== eraEstrecho) indice.open = !chico;
       eraEstrecho = chico;
-      const rielEnIndice = (rejilla.clientWidth > 0 && rejilla.clientWidth <= 832) ||
-        !!raiz.matchMedia?.('(max-width:1024.98px)').matches;
+      const rielEnIndice = !pantallaChica() && ((rejilla.clientWidth > 0 && rejilla.clientWidth <= 832) ||
+        !!raiz.matchMedia?.('(max-width:1024.98px)').matches);
       if (rielEnIndice && riel.parentNode !== cuerpoIndice) cuerpoIndice.insertBefore(riel, arbolNav);
       else if (!rielEnIndice && riel.parentNode !== rejilla) rejilla.appendChild(riel);
       // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
@@ -1073,7 +1266,7 @@
     for (const n of secciones.values()) interseccion?.observe(n);
     raiz.addEventListener('beforeprint', completarTodo);
     tarea = enReposo(continuar);
-    limpiarLector = () => { detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchstart', soltarAncla); raiz.removeEventListener('pointerdown', soltarAncla); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
+    limpiarLector = () => { raiz.removeEventListener('sate-investigacion',actualizarInv); if(raiz.CSS?.highlights)for(const etiqueta of etiquetasInv)raiz.CSS.highlights.delete('sate-inv-'+etiqueta); detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchstart', soltarAncla); raiz.removeEventListener('pointerdown', soltarAncla); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
     const qInicial = parametroGuia('q');
     const frpos = parametroGuia('frpos');
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
