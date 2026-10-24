@@ -1182,6 +1182,7 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 @media(max-width:768.98px){.guia-busqueda-grupos{grid-template-columns:minmax(0,1fr)}.rgl-contexto>div{flex-basis:100%}.rgl-contexto{gap:var(--ipn-esp-2)}.sate-modal--flotante{inset-inline:var(--ipn-esp-3);max-width:calc(100vw - var(--ipn-esp-6))}}
 a:visited{color:var(--ipn-acento)}
 .sate-selector-marca{display:grid;gap:var(--ipn-esp-2)}
+.sate-selector-marca a.btn,.sate-selector-marca a.btn:visited{justify-content:center;text-decoration:none;color:var(--ipn-texto)}
 .sate-selector-marca [aria-current=page]{font-weight:700;background:var(--ipn-acento-suave)}
 .sate-selector-marca [aria-current=page]::before{content:"✓";margin-inline-end:var(--ipn-esp-2)}
 .sate-encabezado .sate-marca #sate-titulo{white-space:nowrap;flex-wrap:nowrap}
