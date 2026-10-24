@@ -285,8 +285,9 @@ SATE.calendario={
   },
   proximos(n=5,categorias=this.categorias){const hoy=this.hoy();return this.eventos().filter(a=>a.hasta>=hoy&&categorias.includes(a.categoria)).sort((a,b)=>a.desde.localeCompare(b.desde)||a.hasta.localeCompare(b.hasta)).slice(0,Math.max(0,n))},
   recorte(pestana){
-    if(SATE_CONFIG.unidades[SATE_UNIDAD].generica||!SATE_CONFIG.unidades[SATE_UNIDAD].pestanas.includes('calendario')||!['horarios','mapa','trayectoria'].includes(pestana))return [];
+    if(SATE_CONFIG.unidades[SATE_UNIDAD].generica||!SATE_CONFIG.unidades[SATE_UNIDAD].pestanas.includes('calendario')||!['horarios','mapa','trayectoria','guia'].includes(pestana))return [];
     const todos=this.proximos(Infinity,pestana==='trayectoria'?this.categorias:['gestion','academico','inscripcion','inicio','ets','inscripcion_ets']);
+    if(pestana==='guia')return todos.filter(e=>e.desde>this.hoy() && (e.personal||['inscripcion','ets','inscripcion_ets'].includes(e.categoria)||/dictamen|reinscripci[oó]n/i.test(e.titulo))).slice(0,2);
     const adeudos=pestana==='mapa'&&isPersonal()&&conSim(false,()=>tr().fail.length>0);
     return todos.filter(e=>pestana==='trayectoria'||(pestana==='horarios'?(e.personal||/citas publicadas|inscripci[oó]n/i.test(e.titulo)&&!['ets','inscripcion_ets'].includes(e.categoria)&&!/ETS/i.test(e.titulo)):(/^Inicio del periodo/i.test(e.titulo)||adeudos&&(['ets','inscripcion_ets'].includes(e.categoria)||/ETS/i.test(e.titulo))))).slice(0,2);
   },

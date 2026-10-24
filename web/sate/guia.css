@@ -51,7 +51,24 @@
 .guia-opciones{display:grid;gap:var(--ipn-esp-5);min-width:0}
 .guia-opciones fieldset{margin:0;padding:var(--ipn-esp-5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);min-width:0}
 .guia-opciones legend{font-weight:600;padding:var(--ipn-esp-2)}
-.guia-toca{display:grid;gap:var(--ipn-esp-4);min-width:0}
+.guia-toca{display:grid;gap:var(--ipn-esp-4);min-width:0;padding:var(--ipn-esp-5);border:1px solid var(--ipn-acento);border-radius:var(--ipn-radio);background:var(--ipn-superficie);overflow-wrap:anywhere}
+.guia-toca>h3{font-size:var(--ipn-tamano-xl)}
+.guia-toca>p{margin:0}
+.guia-toca-datos{margin:0;min-width:0}
+.guia-toca-datos>div{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:var(--ipn-esp-3);padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea)}
+.guia-toca-datos dt{color:var(--ipn-tenue)}
+.guia-toca-datos dd{margin:0;min-width:0}
+.guia-toca-datos time{display:block}
+.guia-toca>a,.guia-toca li>a{display:flex;align-items:center;text-decoration:none;border-bottom:1px solid var(--ipn-linea);padding-block:var(--ipn-esp-2)}
+.guia-toca>ul{list-style:none;margin:0;padding:0}
+.guia-toca>a.guia-toca-principal{justify-content:center;padding:var(--ipn-esp-3);background:var(--ipn-acento);color:var(--ipn-sobre-acento);border-radius:var(--ipn-radio);font-weight:600;text-align:center}
+.guia-nueva [tabindex="-1"]:focus{outline:none;box-shadow:none}
+.guia-busqueda-campo>svg{flex:none;margin-inline-end:var(--ipn-esp-3);color:var(--ipn-tenue)}
+.guia-estado{display:inline-flex;align-items:center;gap:var(--ipn-esp-2)}
+.guia-estado::before{content:"";flex:none;width:var(--ipn-esp-2);height:var(--ipn-esp-2);border-radius:var(--ipn-radio-circulo)}
+.guia-estado--aviso::before{background:var(--ipn-aviso)}
+.guia-estado--error::before{background:var(--ipn-error)}
+.guia-estado--ok::before{background:var(--ipn-ok)}
 .guia-mas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--ipn-esp-5)}
 .guia-mas>h3{grid-column:1/-1}
 @media(max-width:1024px){.guia-ruta-tarjeta{padding:var(--ipn-esp-5)}.guia-solucion{padding:var(--ipn-esp-5)}.guia-ruta-titulo h4{font-size:var(--ipn-tamano-m)}}

@@ -368,6 +368,15 @@ c.matchMedia=()=>({matches:false});c.SATE_CONFIG=config;c.DATA.calendario=data.u
 c.addEventListener=()=>{};vm.runInContext('window=globalThis',c);vm.runInContext(leer('web/dist/sate/componentes.js'),c);c.SateUI.usarTextos(SATE.texto);
 let destino;SATE.ir=id=>destino=id;
 assert.equal(api.recorte('calendario').length,0);assert.equal(api.recorte('horarios')[0].titulo,'Citas publicadas');
+const eventosOriginal=api.eventos;
+api.hoy=()=> '2026-10-23';
+api.eventos=()=>[
+ {titulo:'Entrega de constancias de registro de protocolo',categoria:'gestion',desde:'2026-10-19',hasta:'2026-10-29'},
+ {titulo:'ETS ficticio',categoria:'ets',desde:'2026-10-24',hasta:'2026-10-24'},
+ {titulo:'Solicitud de dictamen',categoria:'gestion',desde:'2026-10-25',hasta:'2026-10-26'},
+ {titulo:'Reinscripción ficticia',categoria:'inscripcion',desde:'2026-10-26',hasta:'2026-10-26'}];
+assert.deepEqual(Array.from(api.recorte('guia'),e=>e.titulo),['ETS ficticio','Solicitud de dictamen'],'la Guía usa próximos procesos futuros y pertinentes');
+api.eventos=eventosOriginal;api.hoy=()=> '2026-10-07';
 for(const id of ['horarios','mapa','trayectoria']){api.pintarRecorte(id);api.pintarRecorte(id);const p=paneles[id==='horarios'?'v-hor':id==='mapa'?'v-tray':'sate-trayectoria'];assert.equal(p.all().filter(n=>n.className==='sate-recorte-calendario').length,1)}
 paneles['v-hor'].firstChild.listeners.click();mostrar();assert.equal(destino,'calendario');assert.match(nodos('calendario-detalle')[0].textContent,/Citas publicadas/);
 c.isPersonal=()=>true;c.ALUMNO={cita:{inicio:'08/10/2026 10:00:00',fin:'08/10/2026 10:30:00'}};c.perDeFecha=()=>0;
