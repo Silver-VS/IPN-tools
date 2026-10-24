@@ -48,7 +48,7 @@ assert.match(cssEnc,/@media\(min-width:1024px\)[\s\S]*?grid-template-areas:"marc
 assert.match(cssEnc,/@media\(min-width:1024px\) and \(max-width:1199px\)/,
   'el escalón corto se limita a 1024–1199 px');
 assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda\{[^}]*color:transparent/);
-assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda::before\{content:"•"/,
+assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) #sate-leyenda (?:\.sate-ayuda__btn)?::before\{content:"•"/,
   'la fase de prueba se reduce a un punto con el title como ayuda');
 assert.match(cssEnc,/\.sate-encabezado:has\(\.sate-plataformas\) \.header-actions \.saes-open \.sate-texto-corto\{display:inline\}/,
   'el escalón corto muestra Actualizar y conserva el aria-label del botón');

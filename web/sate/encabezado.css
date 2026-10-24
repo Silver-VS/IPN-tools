@@ -138,9 +138,9 @@ header.sate-encabezado{position:relative;display:grid;grid-template-columns:minm
 /* Escalón corto: 1024–1199 prioriza carrera y acciones reconocibles frente a los logotipos. */
 @media(min-width:1024px) and (max-width:1199px){
   .sate-encabezado:has(.sate-plataformas) :is(.sate-logo-slot,.sate-logo-ipn){display:none}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda{overflow:hidden;white-space:nowrap}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda .sate-ayuda__btn{font-size:0;min-width:var(--ipn-esp-4)}
-  .sate-encabezado:has(.sate-plataformas) #sate-leyenda .sate-ayuda__btn::before{content:"•";color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+  .sate-encabezado:has(.sate-plataformas) #sate-leyenda{width:var(--ipn-esp-4);overflow:hidden;color:transparent;white-space:nowrap}
+  .sate-encabezado:has(.sate-plataformas) #sate-leyenda .sate-ayuda__btn{position:relative;width:var(--ipn-esp-4);overflow:hidden;color:transparent}
+  .sate-encabezado:has(.sate-plataformas) #sate-leyenda .sate-ayuda__btn::before{content:"•";position:absolute;inset:0;display:grid;place-items:center;color:var(--ipn-tenue)}
   .sate-encabezado:has(.sate-plataformas) .header-actions .saes-open .sate-texto-largo{display:none!important}
   .sate-encabezado:has(.sate-plataformas) .header-actions .saes-open .sate-texto-corto{display:inline}
   .sate-encabezado:has(.sate-plataformas) .header-actions .sate-opinar span{display:none}
