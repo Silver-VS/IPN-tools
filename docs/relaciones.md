@@ -17,6 +17,16 @@ la red ni modifica textos documentales. Cada arista lleva `fuente`.
 | Bajas → área de entrega | Los pasos de `baja-temporal` y `baja-definitiva` dicen expresamente presentar o entregar la solicitud en Gestión Escolar. La lista `acudir` por sí sola no prueba entrega. |
 | Electivas → artículos y entrega | La capacidad `electivas.tramite` identifica el trámite; el preámbulo de `data/gestion_escolar/instructivo.txt`, página 3, enumera los artículos del RI y RGE. Se extraen sus números, sin copiar ni corregir la transcripción. El instructivo desarrolla el nombre del DIE y dice «El alumno entrega la constancia en el DIE.» (tabla IX); el nombre y destino se toman de su ficha existente `innovacion_educativa`. |
 
+## 1.1 ESCOM y UPIBI
+
+No se generan relaciones trámite→artículo/área para ESCOM ni UPIBI. En
+`data/sate.json`, ambas unidades declaran `tramites: []`, no declaran
+`guiaTramites` y no activan un trámite de electivas. Las citas de `citasVentanilla`
+son fundamentos de trámites concretos habilitados para UPIITA; que el Reglamento
+General de Estudios rija en todo el IPN no demuestra que esos trámites estén
+disponibles en las otras unidades ni identifica su receptor local. Se requieren
+trámites y rutas de Guía confirmados para crear esas aristas.
+
 ## 2. Situación real de cada materia
 
 `relacionesMateria` ejecuta las reglas existentes con `conSim(false)` y el periodo

@@ -1181,8 +1181,15 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 .rgl-contexto:has(details[open]){max-height:calc(100dvh - var(--sate-barra-alto,0px) - var(--ipn-esp-7));overflow:auto}
 @media(max-width:768.98px){.guia-busqueda-grupos{grid-template-columns:minmax(0,1fr)}.rgl-contexto>div{flex-basis:100%}.rgl-contexto{gap:var(--ipn-esp-2)}.sate-modal--flotante{inset-inline:var(--ipn-esp-3);max-width:calc(100vw - var(--ipn-esp-6))}}
 .sate-plataformas{display:inline-flex;flex:none;flex-wrap:nowrap;gap:var(--ipn-esp-1);align-items:center;padding:var(--ipn-esp-1);border:var(--ipn-linea-fina) solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
+a:visited{color:var(--ipn-acento)}
 .sate-encabezado .sate-marca #sate-titulo{white-space:nowrap;flex-wrap:nowrap}
 .sate-plataformas a,.sate-regresar{display:inline-flex;align-items:center;min-height:var(--ipn-objetivo-tactil);box-sizing:border-box;padding:var(--ipn-esp-2);border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-s)}
+.sate-regreso{display:flex;align-items:center;gap:var(--ipn-esp-1);margin:0 0 var(--ipn-esp-3)}
+.sate-regresar{color:var(--ipn-acento);text-decoration:none}
+.sate-regresar:visited{color:var(--ipn-acento)}
+.sate-regreso-cerrar{display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:var(--ipn-objetivo-tactil);min-height:var(--ipn-objetivo-tactil);padding:var(--ipn-esp-2);border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-tenue);font:inherit;cursor:pointer}
+.sate-regreso-cerrar:hover{background:var(--ipn-superficie-2);color:var(--ipn-acento)}
+.sate-regreso-cerrar:focus-visible{outline:solid var(--ipn-acento);outline-offset:var(--ipn-esp-1)}
 .sate-plataformas a{white-space:nowrap;text-decoration:none;border:var(--ipn-linea-fina) solid transparent;color:var(--ipn-texto)}
 .sate-plataformas a:hover{background:var(--ipn-superficie-2)}
 .sate-plataformas [aria-current=page]{background:var(--ipn-aviso-suave);border-color:color-mix(in srgb,var(--ipn-aviso) 55%,var(--ipn-linea));color:var(--ipn-texto);font-weight:700}

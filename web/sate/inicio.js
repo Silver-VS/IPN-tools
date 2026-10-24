@@ -104,18 +104,27 @@
     document.documentElement.setAttribute('data-vista',guia?'guia-vinculada':'');
   }
   function restaurarPuente(r) {
-    document.getElementById('sate-regresar')?.remove?.();
+    const previo=document.getElementById('sate-regresar');
+    if(previo?.parentNode?.classList?.contains('sate-regreso'))previo.parentNode.parentNode?.removeChild(previo.parentNode);
+    else previo?.remove?.();
     if(regresoPuente?.hash===r.hash) {
       const y=regresoPuente.y;regresoPuente=null;
       requestAnimationFrame(()=>window.scrollTo(0,y));return;
     }
     let p;
     try { p=JSON.parse(sessionStorage.getItem('ipnt.puente')); } catch { return; }
-    if(!p || p.destino!==r.hash || !SateRutas.ruta(p.origen?.hash||'',u,config) || !Number.isFinite(p.origen.y))return;
+    if(!p)return;
+    if(p.destino!==r.hash){try{sessionStorage.removeItem('ipnt.puente')}catch{}return;}
+    if(!SateRutas.ruta(p.origen?.hash||'',u,config) || !Number.isFinite(p.origen.y))return;
     const a=document.createElement('a');a.setAttribute('id','sate-regresar');a.className='sate-regresar';a.setAttribute('href',p.origen.hash);
-    a.textContent=texto('sate.puentes.regresar',{origen:p.origen.nombre});
+    a.append(document.createTextNode('‹ '),document.createTextNode(texto('sate.puentes.regresar',{origen:p.origen.nombre}).replace(/^‹\s*/,'')));
     a.onclick=()=>{regresoPuente=p.origen;try{sessionStorage.removeItem('ipnt.puente')}catch{}};
-    const cab=document.querySelector('.sate-encabezado');cab.parentNode.insertBefore(a,cab.nextSibling);
+    const control=document.createElement('div');control.className='sate-regreso';control.appendChild(a);
+    const cerrar=document.createElement('button');cerrar.type='button';cerrar.className='sate-regreso-cerrar';cerrar.textContent='×';
+    cerrar.setAttribute('aria-label',texto('componentes.cerrar'));
+    cerrar.onclick=()=>{try{sessionStorage.removeItem('ipnt.puente')}catch{}control.parentNode?.removeChild(control)};control.appendChild(cerrar);
+    const contenido=r.pestana==='guia'?document.getElementById('sate-guia'):document.getElementById('v-tray');
+    contenido?.parentNode?.insertBefore(control,contenido);
   }
   function error(e) {
     console.error('SATE: carga fallida', {unidad:u, ruta:location.hash, mensaje:e.message, pila:e.stack});
