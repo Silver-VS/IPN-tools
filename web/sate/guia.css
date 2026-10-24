@@ -62,7 +62,7 @@
 .guia-toca>a,.guia-toca li>a{display:flex;align-items:center;text-decoration:none;border-bottom:1px solid var(--ipn-linea);padding-block:var(--ipn-esp-2)}
 .guia-toca>ul{list-style:none;margin:0;padding:0}
 .guia-toca>a.guia-toca-principal{justify-content:center;padding:var(--ipn-esp-3);background:var(--ipn-acento);color:var(--ipn-sobre-acento);border-radius:var(--ipn-radio);font-weight:600;text-align:center}
-.guia-nueva [tabindex="-1"]:focus{outline:none;box-shadow:none}
+.guia-nueva [tabindex="-1"]:focus,.rgl-cab h3:focus,.pc-titulo:focus,.pc-sec-tit:focus{outline:none;box-shadow:none}
 .guia-busqueda-campo>svg{flex:none;margin-inline-end:var(--ipn-esp-3);color:var(--ipn-tenue)}
 .guia-estado{display:inline-flex;align-items:center;gap:var(--ipn-esp-2)}
 .guia-estado::before{content:"";flex:none;width:var(--ipn-esp-2);height:var(--ipn-esp-2);border-radius:var(--ipn-radio-circulo)}
@@ -216,6 +216,13 @@
 .rgl-art--ancho{grid-column:1/-1}
 .rgl-art:focus-visible,.rgl-resultado:focus-visible,.rgl-pagina:focus-visible,.rgl-marca:focus-visible,.rgl-riel a:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .rgl-resultados{margin:0;padding:0;list-style:none;display:grid}
+.guia-reglamentos-resultados{display:grid;gap:var(--ipn-esp-5)}
+.guia-reglamento-resultado{display:grid;gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-linea)}
+.guia-reglamento-resultado header{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;gap:var(--ipn-esp-1) var(--ipn-esp-3)}
+.guia-reglamento-resultado header h4{margin:0;font-size:var(--ipn-tamano-m);font-weight:600}
+.guia-reglamento-resultado header small{grid-column:2;color:var(--ipn-tenue)}
+.guia-reglamento-resultado>ul{margin:0;padding:0;list-style:none}
+.guia-reglamento-resultado>a{justify-self:start;min-height:var(--ipn-control-alto);display:flex;align-items:center}
 .rgl-resultado{display:grid;gap:var(--ipn-esp-1);min-height:var(--ipn-control-alto);padding:var(--ipn-esp-2);border-radius:var(--ipn-radio);color:var(--ipn-texto);text-decoration:none;font-size:var(--ipn-tamano-s)}
 .rgl-resultado:hover{background:var(--ipn-hundido)}
 .rgl-resultado span{color:var(--ipn-tenue);overflow-wrap:anywhere}

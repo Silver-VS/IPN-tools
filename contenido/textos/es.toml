@@ -342,6 +342,8 @@ homonima = "Mismo nombre, otro programa"
 tu_carrera = "Tu carrera · {nombre}"
 ver = "Ver los {n} resultados ›"
 ver_reglamento = "Ver los {n} de {nombre} ›"
+coincidencias_reglamento = "{n} coincidencias"
+ver_reglamento_acotado = "Ver los {n} de este reglamento ›"
 abrir_reglamento = "Abrir en el reglamento ›"
 cambiar = "Cambiar de reglamento"
 

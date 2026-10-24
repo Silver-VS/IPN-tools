@@ -218,7 +218,7 @@
     const valor = v => Array.isArray(v) ? Array.from(d.cadenas[v[0]]).slice(v[1],v[2]).join('') : d.cadenas[v];
     return d.filas.map(f => ({...Object.fromEntries(campos.map((k,i) => [k,valor(f[i])])), migas:f[8].map(i => d.cadenas[i])}));
   }
-  Object.assign(raiz.SateGuia, {buscarIndice, fragmento, expandirIndice});
+  Object.assign(raiz.SateGuia, {buscarIndice, fragmento, expandirIndice, resaltar, partesResaltado, agruparReglamentos, nivelesReglamento});
   const motivoInicial = s => s?.fis?.some(f=>f.veces>=2)?'recursamiento':s?.nDes?'antiguas':s?.adeudos?.length?'ordinario':'';
   Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
 
@@ -288,17 +288,44 @@
     try { return decodeURIComponent((raiz.location.hash.split('?')[1] || '').split('&').find(p => p.startsWith(clave + '='))?.slice(clave.length + 1).replace(/\+/g,' ') || ''); }
     catch(e) { console.warn('SATE: parámetro de Guía inválido', {clave, mensaje:e.message}); return ''; }
   }
-  function resaltar(texto, q) {
-    const nodos = [], ts = terminos(q), normal = norm(texto);
-    let pos = 0;
-    while (pos < texto.length) {
+  function partesResaltado(texto, q) {
+    const rangos = [], ts = terminos(q), posiciones = [];
+    let normal = '', original = 0, pos = 0;
+    for (const c of texto) {
+      const n = norm(c); normal += n;
+      for (let i = 0; i < n.length; i++) posiciones.push(original);
+      original += c.length;
+    }
+    while (pos < normal.length) {
       const siguientes = ts.map(w => ({i:normal.indexOf(w, pos), n:w.length})).filter(x => x.i >= 0).sort((a,b) => a.i-b.i);
       const x = siguientes[0];
-      if (!x) { nodos.push(document.createTextNode(texto.slice(pos))); break; }
-      nodos.push(document.createTextNode(texto.slice(pos, x.i)), h('mark', {texto:texto.slice(x.i, x.i+x.n)}));
+      if (!x) break;
+      const inicioOriginal = posiciones[x.i], finOriginal = posiciones[x.i+x.n] ?? texto.length;
+      rangos.push([inicioOriginal,finOriginal]);
       pos = x.i+x.n;
     }
+    return rangos;
+  }
+  function resaltar(texto, q) {
+    const nodos = [], rangos = partesResaltado(texto,q);
+    let pos = 0;
+    for (const [inicio,fin] of rangos) {
+      if (inicio > pos) nodos.push(document.createTextNode(texto.slice(pos,inicio)));
+      nodos.push(h('mark', {texto:texto.slice(inicio,fin)})); pos=fin;
+    }
+    if (pos < texto.length) nodos.push(document.createTextNode(texto.slice(pos)));
     return nodos;
+  }
+  function agruparReglamentos(resultados) {
+    const grupos = new Map();
+    for (const e of resultados) { if (!grupos.has(e.doc)) grupos.set(e.doc, []); grupos.get(e.doc).push(e); }
+    return [...grupos].map(([doc, entradas]) => ({doc, entradas, titulo:entradas[0].titulo}))
+      .sort((a,b) => resultados.indexOf(a.entradas[0]) - resultados.indexOf(b.entradas[0]));
+  }
+  function nivelesReglamento(reg) {
+    const ubicaciones = (reg?.articulos || []).flatMap(a => a.ubicacion || []);
+    const patrones = [/^t[íi]tulo\b/i, /^cap[íi]tulo\b/i, /^secci[óo]n\b/i];
+    return ['titulos','capitulos','secciones'].map((nivel,i) => ({nivel,cantidad:new Set(ubicaciones.filter(x => patrones[i].test(x)).map(x => x.trim())).size})).filter(x => x.cantidad);
   }
   function buscadorIndice(op = {}) {
     let version = 0, temporizador, carrera = op.carrera || '', manifiesto;
@@ -373,14 +400,18 @@
             ...(new Set(es.map(e=>e.carrera)).size > 1 ? [h('small',{texto:bt('homonima')})] : []),
             h('ul', {}, es.map(fila))
           ]));
+          if (fuente === 'reglamentos') {
+            const docs = agruparReglamentos(resultados);
+            grupo.appendChild(h('div', {'class':'guia-reglamentos-resultados'}, docs.map(g => h('section', {'class':'guia-reglamento-resultado'}, [
+              h('header', {}, [h('strong', {'class':'guia-sello', texto:selloReglamento(g.titulo,g.doc)}), h('h4', {texto:g.titulo,'data-oficial':g.doc}), h('small',{texto:bt('coincidencias_reglamento',{n:g.entradas.length})})]),
+              h('ul', {}, g.entradas.slice(0,2).map(fila)),
+              h('a', {href:rutaReglamento(g.doc)+'?q='+encodeURIComponent(q), texto:bt('ver_reglamento_acotado',{n:g.entradas.length})})
+            ]))));
+            lista.appendChild(grupo);
+            continue;
+          }
           grupo.appendChild(h('ul', {}, filas.slice(0, 6)));
           if (filas.length > 6) grupo.appendChild(h('details', {}, [h('summary', {texto:bt('ver', {n:filas.length})}), h('ul', {}, filas.slice(6))]));
-          if (fuente === 'reglamentos' && !op.doc) {
-            for (const doc of new Set(resultados.map(e => e.doc))) {
-              const rs = resultados.filter(e => e.doc === doc);
-              grupo.appendChild(h('a', {href:rutaReglamento(doc) + '?q=' + encodeURIComponent(q), texto:bt('ver_reglamento', {n:rs.length, nombre:rs[0].titulo})}));
-            }
-          }
           lista.appendChild(grupo);
         }
         if (!total) lista.appendChild(h('p', {role:'status', texto:t('sate.guia.sin_resultados_preguntas')}));
@@ -1004,7 +1035,7 @@
     if (fuenteDoc || avisoOcr) cab.nodo.appendChild(h('div', { 'class': 'rgl-datos' }, [fuenteDoc, avisoOcr]));
     const mapa = mapaReglamento(reg);
     const cifras = h('dl', { 'class': 'rgl-cifras' }, [
-      ['articulos', articulos.length], ['titulos', mapa.filter(x => /^TÍTULO/i.test(x.titulo)).length],
+      ['articulos', articulos.length], ...nivelesReglamento(reg).map(x => [x.nivel,x.cantidad]),
       ['directos', mapa.filter(x => x.aplicacion === 'directo').reduce((s, x) => s + x.articulos.length, 0)]
     ].map(([clave, n]) => h('div', {}, [h('dt', { texto: t('sate.guia.rgl_' + clave) }), h('dd', { texto: String(n) })])));
     const barra = h('div', { 'class': 'rgl-mapa__barra' }, mapa.map(x => {
@@ -1202,7 +1233,8 @@
       // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
       const altoContexto = contexto.offsetHeight || 0;
       raizGuia.style.setProperty('--ipn-lector-contexto-alto', altoContexto + 'px');
-      const base = altoContexto + (chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
+      const altoBarraFija = parseFloat(raiz.getComputedStyle?.(raizGuia).getPropertyValue('--sate-barra-alto')) || 0;
+      const base = altoBarraFija + altoContexto + (chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
       const alturas = new Map(Array.from(texto.querySelectorAll('.rgl-encabezado'), n => [n, n.offsetHeight || 48]));
       const cambios = [];
       for (const [cab, alto] of alturas) {

@@ -9,6 +9,20 @@ vm.runInContext(leer('web/sate/guia.js'), c);
 const G = c.SateGuia;
 const reg = id => JSON.parse(leer('data/reglamentos/' + id + '.json'));
 
+const textoResaltado = 'Control neurodifuso y control neurodifuso: situación.';
+const rangosResaltados = G.partesResaltado(textoResaltado, 'control neurodifuso situación');
+assert.equal(rangosResaltados.map(([a,b]) => textoResaltado.slice(a,b)).join('|'), 'Control|neurodifuso|control|neurodifuso|situación', 'resalta coincidencias repetidas con acentos');
+let cursorResaltado = 0;
+const textoReconstruido = rangosResaltados.map(([a,b]) => { const parte = textoResaltado.slice(cursorResaltado,b); cursorResaltado=b; return parte; }).join('') + textoResaltado.slice(cursorResaltado);
+assert.equal(textoReconstruido, textoResaltado, 'conserva exactamente los espacios y el texto entre marcas');
+const gruposBusqueda = G.agruparReglamentos([
+  {doc:'rge',titulo:'Reglamento General de Estudios',id:1}, {doc:'ri',titulo:'Reglamento Interno',id:2},
+  {doc:'rge',titulo:'Reglamento General de Estudios',id:3}, {doc:'rge',titulo:'Reglamento General de Estudios',id:4}
+]);
+assert.deepEqual(Array.from(gruposBusqueda, x => [x.doc,x.entradas.length]), [['rge',3],['ri',1]], 'agrupa por documento y conserva relevancia');
+assert.deepEqual(Array.from(gruposBusqueda[0].entradas.slice(0,2), x => x.id), [1,3], 'los dos primeros son los más relevantes');
+assert.deepEqual(Array.from(G.nivelesReglamento(reg('rge')), x => [x.nivel,x.cantidad]), [['capitulos',9]], 'omite niveles que no existen');
+
 // anclas
 assert.equal(G.anclaArticulo('4', 'III', 'b'), 'art-4.III.b');
 assert.deepEqual({...G.leerAncla('art-1 Bis.II')}, {n: '1 Bis', fr: 'II', inciso: null});
@@ -164,9 +178,15 @@ movil=false;
 await pestana.mostrar({partes:['reglamentos','rge','art-55']});
 assert.match(document.title,/^Art\. 55 · RGE/,'título concreto por ruta');
 assert.ok(caja.querySelector('.rgl-contexto').textContent.includes('Reglamento General de Estudios'));
+const cifrasRge = caja.querySelector('.rgl-cifras').textContent;
+assert.ok(cifrasRge.includes('sate.guia.rgl_capitulos 9'), 'el resumen presenta los capítulos del RGE');
+assert.ok(!cifrasRge.includes('sate.guia.rgl_titulos'), 'el resumen oculta títulos cuando el documento no tiene');
 assert.equal(caja.querySelector('.rgl-riel').hidden,false,'panel con preguntas reales para baja temporal');
 assert.ok(caja.querySelectorAll('.rgl-riel a').length>0);
 assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'));
+await pestana.mostrar({partes:['reglamentos','rge','art-48']});
+assert.match(caja.querySelector('.rgl-contexto__actual').textContent.split('›').at(-1).trim(), /48$/, 'al saltar al artículo 48 el contexto coincide con la ruta');
+assert.match(document.title,/^Art\. 48 · RGE/,'al saltar al artículo 48 también se actualiza el título');
 await pestana.mostrar({partes:['reglamentos','rge','art-1']});
 assert.notEqual(caja.querySelector('.rgl-riel').hidden,true,'la rejilla se conserva al cambiar a un artículo sin citas (sin saltos)');
 assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'),'sin cambio de columnas');
