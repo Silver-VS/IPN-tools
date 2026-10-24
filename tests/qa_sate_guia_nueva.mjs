@@ -14,6 +14,8 @@ assert.equal(G.resolverRuta({rd:{n:1,ok:true}},{motivo:'antiguas',dictamen:'no'}
 assert.equal(G.resolverRuta({rd:{n:1,ok:false}},{motivo:'antiguas',dictamen:'no'}),'formato-dictamen');
 assert.equal(G.resolverRuta({rd:{n:1,ok:false}},{motivo:'antiguas',dictamen:'si'}),null,'dictamen vigente requiere revisión');
 assert.equal(G.resolverRuta({rd:{n:1,ok:false}},{motivo:'antiguas',dictamen:'desconocido'}),'formato-dictamen','usa la regla calculada aunque no se responda el formulario');
+assert.equal(G.resolverRuta({rd:null,fis:[{k:'B203',veces:1,estado:'desfasada'},{k:'B204',veces:2,estado:'desfasada'}]},{motivo:'recursamiento',dictamen:'desconocido'}),'formato-dictamen','sin regla general de desfase, las materias desfasadas o dos veces cursadas piden dictamen (perfil ficticio 4)');
+assert.equal(G.resolverRuta({rd:null,fis:[{k:'B203',veces:1,estado:'reprobada'}]},{motivo:'recursamiento',dictamen:'desconocido'}),null,'una reprobada sin desfase no inventa dictamen');
 assert.equal(G.nombreMateria('ONDAS ELECTROMAGNÉTICAS'),'Ondas electromagnéticas');
 assert.equal(G.motivoInicial({nDes:2,fis:[{veces:2}]}),'recursamiento');
 assert.equal(G.motivoInicial({nDes:1,fis:[{veces:1}]}),'antiguas');

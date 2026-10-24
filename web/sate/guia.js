@@ -52,6 +52,8 @@
     if (estado.dictamen === 'si') return null;
     if (s?.rd?.ok) return 'oportunidades-reprobar';
     if (s?.rd?.n && !s.rd.ok) return 'formato-dictamen';
+    // Sin regla general de desfase para el periodo, el estado por materia (desfasada o dos veces cursada) ya exige dictamen.
+    if (!s?.rd && (s?.fis||[]).some(f=>f.estado==='desfasada'||f.veces>=2)) return 'formato-dictamen';
     if (estado.motivo === 'ordinario') return 'oportunidades-reprobar';
     return null;
   }
@@ -425,7 +427,7 @@
         else if(estado.consulta==='reglamento') panel.appendChild(h('ul',{},(p.fuentes||[]).map(f=>fuente(d,f,t)).filter(Boolean).map(f=>h('li',{},[h('a',{href:rutaReglamento(f.doc),texto:f.texto}),...f.arts.map(n=>botonArticulo(f.doc,n,t('sate.guia.articulo_rotulo',{n})))]))));
         else if(accion==='formato-dictamen') {
           panel.appendChild(h('h3',{texto:tx('pedir_dictamen')}));
-          for(const f of s.rd.des||fis.filter(f=>f.estado==='desfasada')) panel.appendChild(h('p',{'class':'guia-motivo',texto:motivoMateria(f)}));
+          for(const f of s.rd?.des||fis.filter(f=>f.estado==='desfasada'||f.veces>=2)) panel.appendChild(h('p',{'class':'guia-motivo',texto:motivoMateria(f)}));
           const area=d.acudir.find(a=>a.id==='gestion_escolar'), filas=h('dl',{'class':'guia-toca-datos'});
           const fila=(etiqueta,nodo)=>filas.appendChild(h('div',{},[h('dt',{texto:etiqueta}),h('dd',{},[nodo])]));
           const fecha=typeof calItems==='function'?calItems()?.items.find(a=>a.para==='dictamen'&&!a.pasada):null;
