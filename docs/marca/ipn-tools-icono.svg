@@ -1,12 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="80 14 200 200" width="512" height="512">
-  <title>IPN-tools</title>
-  <!-- Burrito-horario: cuadrícula de horario con una ruta escalonada hacia la meta (dorado) y orejas de burro -->
-  <g transform="rotate(-14 150 58)"><ellipse cx="150" cy="58" rx="15" ry="36" fill="#6C1D45"/><ellipse cx="150" cy="62" rx="7" ry="24" fill="#B5577F"/></g>
-  <g transform="rotate(14 210 58)"><ellipse cx="210" cy="58" rx="15" ry="36" fill="#6C1D45"/><ellipse cx="210" cy="62" rx="7" ry="24" fill="#B5577F"/></g>
-  <rect x="110" y="70" width="140" height="140" rx="32" fill="#6C1D45"/>
-  <g fill="#FFFFFF">
-    <rect x="129" y="89" width="28" height="28" rx="6" opacity="0.22"/><rect x="166" y="89" width="28" height="28" rx="6" opacity="0.22"/><rect x="203" y="89" width="28" height="28" rx="6" fill="#E8B04B"/>
-    <rect x="129" y="126" width="28" height="28" rx="6" opacity="0.22"/><rect x="166" y="126" width="28" height="28" rx="6"/><rect x="203" y="126" width="28" height="28" rx="6"/>
-    <rect x="129" y="163" width="28" height="28" rx="6"/><rect x="166" y="163" width="28" height="28" rx="6"/><rect x="203" y="163" width="28" height="28" rx="6" opacity="0.22"/>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="80 14 200 200"><title>IPN-tools</title><g transform="rotate(-14 150 58)"><ellipse cx="150" cy="58" fill="#6C1D45" rx="15" ry="36"/><ellipse cx="150" cy="62" fill="#B5577F" rx="7" ry="24"/></g><g transform="rotate(14 210 58)"><ellipse cx="210" cy="58" fill="#6C1D45" rx="15" ry="36"/><ellipse cx="210" cy="62" fill="#B5577F" rx="7" ry="24"/></g><rect width="140" height="140" x="110" y="70" fill="#6C1D45" rx="32"/><g fill="#FFF"><rect width="28" height="28" x="129" y="89" opacity=".22" rx="6"/><rect width="28" height="28" x="166" y="89" opacity=".22" rx="6"/><rect width="28" height="28" x="203" y="89" fill="#E8B04B" rx="6"/><rect width="28" height="28" x="129" y="126" opacity=".22" rx="6"/><rect width="28" height="28" x="166" y="126" rx="6"/><rect width="28" height="28" x="203" y="126" rx="6"/><rect width="28" height="28" x="129" y="163" rx="6"/><rect width="28" height="28" x="166" y="163" rx="6"/><rect width="28" height="28" x="203" y="163" opacity=".22" rx="6"/></g></svg>
