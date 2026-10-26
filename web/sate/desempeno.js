@@ -14,6 +14,12 @@ let ST_RENDER=0;
 const trayectoriaAbierta=(id,inicial=false)=>store.get('trayectoria.seccion.'+id,id==='kardex'||!MQ_PHONE.matches&&inicial);
 const KX_FILTRO={};
 const kardexFiltro=()=>({periodo:'*',estado:'*',...store.get('trayectoria.kardex.'+S.car,{}),...KX_FILTRO[S.car]});
+const kardexPeriodoActual=periodos=>{
+  const idx=perIdx(ALUMNO.periodo_actual||DATA.calendario?.periodo);
+  return periodos.find(p=>idx!=null&&perIdx(p)===idx)||periodos.at(-1)||'*';
+};
+function kardexEstilos(){if($('#kx-estilos'))return;const s=document.createElement('style');s.id='kx-estilos';s.textContent=`.kx-periodos-marco{position:relative;min-width:0}.kx-periodos-marco:before,.kx-periodos-marco:after{content:"";position:absolute;z-index:1;inset-block:var(--ipn-esp-3);width:var(--ipn-esp-4);pointer-events:none;opacity:0;transition:opacity .15s}.kx-periodos-marco:before{inset-inline-start:0;background:linear-gradient(90deg,var(--ipn-superficie),transparent)}.kx-periodos-marco:after{inset-inline-end:0;background:linear-gradient(270deg,var(--ipn-superficie),transparent)}.kx-periodos-marco[data-antes="true"]:before,.kx-periodos-marco[data-despues="true"]:after{opacity:1}.kx-periodos{scroll-snap-type:x mandatory;scroll-padding-inline:50%;overscroll-behavior-inline:contain}.kx-periodo{scroll-snap-align:center}.kx-periodo[aria-pressed="true"]{border-color:var(--ipn-acento);box-shadow:inset 0 0 0 1px var(--ipn-acento)}.kx-periodos-nav{display:flex;justify-content:flex-end;gap:var(--ipn-esp-2)}.kx-periodos-nav button{min-width:var(--ipn-control-alto);min-height:var(--ipn-control-alto)}@media(max-width:600px){.kx-periodo{flex-basis:min(80%,calc(var(--ipn-esp-8)*4))}.kx-periodos{scroll-padding-inline:10%}}`;document.head.appendChild(s)}
+function actualizarBordesKardex(){const el=$('#kx-periodos'),marco=el?.parentElement;if(!el||!marco)return;marco.dataset.antes=String(el.scrollLeft>1);marco.dataset.despues=String(el.scrollLeft+el.clientWidth<el.scrollWidth-1)}
 const filasKardex=()=>{
   const c=cur(), A=ALUMNO;
   return [...(A.acreditadas||[]).filter(r=>r&&notaValida(r[1])!=null).map(r=>({...r,acreditada:true})),
@@ -22,13 +28,17 @@ const filasKardex=()=>{
     .sort((a,b)=>(perIdx(b.periodo)??-1)-(perIdx(a.periodo)??-1)||a.clave.localeCompare(b.clave,'es'));
 };
 function renderKardexLista(){
-  const rows=filasKardex(), filtro=kardexFiltro(), periodos=[...new Set(rows.map(r=>r.periodo).filter(Boolean))].sort((a,b)=>(perIdx(a)??-1)-(perIdx(b)??-1));
+  const rows=filasKardex(), periodos=[...new Set(rows.map(r=>r.periodo).filter(Boolean))].sort((a,b)=>(perIdx(a)??-1)-(perIdx(b)??-1));let filtro=kardexFiltro();
+  const guardado=store.get('trayectoria.kardex.'+S.car,{});
+  if(filtro.periodo!=='*'&&!periodos.includes(filtro.periodo)||guardado.periodo==null&&!KX_FILTRO[S.car])filtro={...filtro,periodo:kardexPeriodoActual(periodos)};
+  KX_FILTRO[S.car]=filtro;
   const aprobadas=(ALUMNO.acreditadas||[]).map(r=>notaValida(r?.[1])).filter(v=>v!=null), media=aprobadas.length?aprobadas.reduce((a,b)=>a+b,0)/aprobadas.length:null;
   const tx=(k,v)=>esc(SATE.texto('sate.trayectoria.kardex_'+k,v)), veces=k=>Math.max(rows.filter(r=>r.clave===k).length,...(ALUMNO.reprobadas_periodo||[]).filter(r=>r[0]===k).map(r=>+r[2]||1));
   const visibles=rows.filter(r=>(filtro.periodo==='*'||r.periodo===filtro.periodo)&&(filtro.estado==='*'||filtro.estado==='acreditadas'&&r.acreditada||filtro.estado==='reprobadas'&&!r.acreditada||filtro.estado==='multi'&&(veces(r.clave)>=2||/^(EXT|ETS|REC)$/.test(r.codigo))||filtro.estado==='eqv'&&/^(EQV|REV|DIC)$/.test(r.codigo))).sort((a,b)=>Number(b.adeudo)-Number(a.adeudo));
   const chip=r=>`<span class="kx-nota kx-g${r.cal>=9?'9':r.cal>=8?'8':r.cal>=6?'6':'5'}" title="${esc(r.clave+' · '+r.nombre+' · '+(FORMAS[r.codigo]||r.codigo))}">${r.cal}${({EXT:'E',ETS:'T',REC:'R',EQV:'Q',REV:'Q',DIC:'Q'})[r.codigo]?`<sub>${({EXT:'E',ETS:'T',REC:'R',EQV:'Q',REV:'Q',DIC:'Q'})[r.codigo]}</sub>`:''}</span>`;
   const medias=periodos.map(p=>{const rs=rows.filter(r=>r.periodo===p);return rs.reduce((s,r)=>s+r.cal,0)/rs.length});
-  $('#kx-periodos').innerHTML=periodos.map((p,i)=>{const rs=rows.filter(r=>r.periodo===p), delta=i?medias[i]-medias[i-1]:0, cr=rs.every(r=>r.cr!=null)?fmtCr(rs.reduce((s,r)=>s+(r.acreditada?+r.cr:0),0)):'—';return `<button type="button" class="chip kx-periodo" data-kx-periodo="${esc(p)}" aria-pressed="${filtro.periodo===p}"><span class="kx-periodo-cab"><b>${esc(p)}</b><strong>${medias[i].toFixed(2)} <small class="${delta<0?'kx-baja':'kx-sube'}">${i?delta>0?'▲':delta<0?'▼':'=':''}</small></strong></span><span class="kx-fichas">${rs.map(chip).join('')}</span><span class="kx-periodo-pie">${tx('unidades',{n:rs.length})}<span>${cr} ${tx('cr')}</span></span></button>`}).join('');
+  kardexEstilos();const strip=$('#kx-periodos');strip.innerHTML=periodos.map((p,i)=>{const rs=rows.filter(r=>r.periodo===p), delta=i?medias[i]-medias[i-1]:0, cr=rs.every(r=>r.cr!=null)?fmtCr(rs.reduce((s,r)=>s+(r.acreditada?+r.cr:0),0)):'—';return `<button type="button" class="chip kx-periodo" data-kx-periodo="${esc(p)}" aria-pressed="${filtro.periodo===p}"><span class="kx-periodo-cab"><b>${esc(p)}</b><strong>${medias[i].toFixed(2)} <small class="${delta<0?'kx-baja':'kx-sube'}">${i?delta>0?'▲':delta<0?'▼':'=':''}</small></strong></span><span class="kx-fichas">${rs.map(chip).join('')}</span><span class="kx-periodo-pie">${tx('unidades',{n:rs.length})}<span>${cr} ${tx('cr')}</span></span></button>`}).join('');
+  const seleccionado=strip.querySelector('[aria-pressed="true"]');if(seleccionado)strip.scrollTo({left:Math.max(0,seleccionado.offsetLeft-(strip.clientWidth-seleccionado.offsetWidth)/2),behavior:'instant'});actualizarBordesKardex();
   $('#kx-filtros').innerHTML=[['*','todos'],['reprobadas','riesgo'],['multi','multi'],['eqv','eqv']].map(([v,k])=>`<button type="button" class="chip" data-kx-estado="${v}" aria-pressed="${filtro.estado===v}">${tx(k)}</button>`).join('');
   $('#kx-todos').setAttribute('aria-pressed',String(filtro.periodo==='*'));
   $('#kx-cuenta').textContent=SATE.texto('sate.trayectoria.kardex_cuenta',{n:visibles.length,m:rows.length});
@@ -181,7 +191,7 @@ async function renderStatsVista(){
     <header class="kx-cabecera"><h3>${esc(SATE.texto('sate.trayectoria.kardex_calificaciones'))}</h3><div class="kpis kx-promedios">${[['oficial','prom_oficial'],['acreditadas','prom_acreditadas'],['proyeccion','prom_proyeccion']].map(([id,key])=>`<div class="kpi"><span>${esc(SATE.texto('sate.trayectoria.kardex_'+key))}</span><div class="kpi-v"><b id="kx-prom-${id}"></b></div></div>`).join('')}</div></header>
     <section class="trayectoria-kardex-curso" aria-labelledby="kx-curso-titulo"><h3 id="kx-curso-titulo">${esc(SATE.texto('sate.trayectoria.kardex_curso'))}</h3>${kardexCurso()}</section>
     <details class="trayectoria-plegable" id="trayectoria-kardex"><summary>${esc(SATE.texto('sate.trayectoria.kardex'))}</summary><div class="kx-bloque">
-      <div id="kx-periodos" class="kx-periodos" role="group" aria-label="${esc(SATE.texto('sate.trayectoria.kardex_periodo'))}"></div>
+      <div class="kx-periodos-marco"><div class="kx-periodos-nav"><button type="button" class="chip" data-kx-mover="-1" aria-label="Periodo anterior">‹</button><button type="button" class="chip" data-kx-mover="1" aria-label="Periodo siguiente">›</button></div><div id="kx-periodos" class="kx-periodos" role="group" aria-label="${esc(SATE.texto('sate.trayectoria.kardex_periodo'))}" tabindex="0"></div></div>
       <p class="kx-leyenda">${esc(SATE.texto('sate.trayectoria.kardex_leyenda'))}</p>
       <div class="kx-controles"><div class="kx-chips"><button type="button" id="kx-todos" class="chip" data-kx-periodo="*">${esc(SATE.texto('sate.trayectoria.kardex_periodos_todos'))}</button><div id="kx-filtros" role="group" aria-label="${esc(SATE.texto('sate.trayectoria.kardex_estado'))}"></div></div><span id="kx-cuenta" role="status" aria-live="polite"></span></div>
       <table class="kx-tabla"><thead><tr>${['ua','periodo','nota','forma','veces','creditos'].map(k=>`<th scope="col">${esc(SATE.texto('sate.trayectoria.kardex_'+k))}</th>`).join('')}</tr></thead><tbody id="kx-lista"></tbody></table>
@@ -249,12 +259,15 @@ const cambiarMeta=e=>{
 };
 $('#kstats').addEventListener('input',cambiarMeta);
 $('#kstats').addEventListener('click',e=>{
+  const mover=e.target.closest('[data-kx-mover]');if(mover){const lista=$('#kx-periodos'),items=[...lista.querySelectorAll('.kx-periodo')],idx=items.findIndex(x=>x.getAttribute('aria-pressed')==='true'),next=items[Math.max(0,Math.min(items.length-1,idx+(+mover.dataset.kxMover)))];next?.click();return}
   const boton=e.target.closest('[data-kx-periodo],[data-kx-estado]');if(!boton)return;
   const campo=boton.dataset.kxPeriodo!=null?'periodo':'estado', valor=boton.dataset.kxPeriodo??boton.dataset.kxEstado;
   const cfg={...kardexFiltro(),[campo]:valor};KX_FILTRO[S.car]=cfg;store.set('trayectoria.kardex.'+S.car,cfg);renderKardexLista();
   // La tira se reconstruye al filtrar: conservar el foco en el botón elegido.
   document.querySelector(`[data-kx-${campo}="${CSS.escape(valor)}"]`)?.focus();
 });
+$('#kstats').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key)||!e.target.closest('#kx-periodos'))return;e.preventDefault();const items=[...$('#kx-periodos').querySelectorAll('.kx-periodo')],idx=items.indexOf(e.target.closest('.kx-periodo')),next=items[Math.max(0,Math.min(items.length-1,idx+(e.key==='ArrowRight'?1:-1)))];if(!next)return;next.click();$('#kx-periodos').querySelector(`[data-kx-periodo="${CSS.escape(next.dataset.kxPeriodo)}"]`)?.focus()});
+$('#kstats').addEventListener('scroll',e=>{if(e.target.id==='kx-periodos')actualizarBordesKardex()},true);
 $('#kstats').addEventListener('input',e=>{if(e.target.id!=='prom-meta')return;const v=+e.target.value;if(!(v>=6&&v<=10))return;
   store.set('promMeta.'+S.car,v);store.set('pmCal.'+S.car,{});const D=statsDatos(),M=promMeta(D,v);
   $('#pm-res').innerHTML=promMetaHtml(M)});
