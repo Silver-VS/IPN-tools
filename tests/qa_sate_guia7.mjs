@@ -103,15 +103,15 @@ assert.equal(caja.querySelector('dl').textContent, '');
 const actividadCfg = config.guia.find(a => a.datos === 'actividades');
 assert.equal(actividadCfg.titulo, 'sate.guia.actividades');
 await pestana.mostrar({partes:['actividades']});
-assert.equal(caja.querySelectorAll('.guia-actividad-categoria').length, 2, 'entrada muestra categorías');
-assert.equal(caja.querySelectorAll('.guia-actividad-detalle[open]').length, 0, 'ningún detalle inicia desplegado');
-assert.equal(caja.querySelectorAll('.guia-actividad').length, 0, 'entrada no muestra opciones individuales');
+assert.equal(caja.querySelectorAll('[role="tab"]').length, 2, 'entrada muestra pestañas de categorías');
+assert.equal(caja.querySelectorAll('details').length, 0, 'el catálogo no usa acordeones');
+assert.equal(caja.querySelectorAll('[data-actividad]').length, 1, 'entrada muestra opciones de la primera categoría');
 await pestana.mostrar({partes:['actividades','deporte']});
-assert.equal(caja.querySelectorAll('.guia-actividad').length, 1, 'la ruta profunda abre esa categoría');
+assert.equal(caja.querySelectorAll('[data-actividad]').length, 1, 'la ruta profunda abre esa categoría');
 assert.ok(caja.textContent.includes('Coordinación Deportiva'));
-const buscarActividades = caja.querySelector('input'); buscarActividades.value='Centro de Lenguas'; buscarActividades.dispatchEvent(new Evento('input'));
-assert.ok(caja.textContent.includes('Centro de Lenguas oficial'), 'el filtro busca en otra categoría');
-assert.equal(caja.querySelectorAll('.guia-actividad').length, 1);
+caja.querySelector('[data-id="idiomas"]').click();
+assert.ok(caja.textContent.includes('Centro de Lenguas oficial'), 'la pestaña cambia de categoría');
+assert.equal(caja.querySelectorAll('[data-actividad]').length, 1);
 for (const n of readdirSync('data/reglamentos').filter(n=>n.endsWith('.json'))) {
   assert.equal(leer('web/dist/sate/datos/reglamentos/'+n), leer('data/reglamentos/'+n), n+': copia publicada');
 }

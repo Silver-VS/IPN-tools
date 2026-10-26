@@ -899,6 +899,11 @@
     raizGuia.classList.add('guia-nueva');
     const s=situacion(), ps=preguntasRuta(d,r), cab=cabecera([...migasBase(),{texto:tx(r.id)}],tx(r.id),tx(r.id+'_detalle'));
     raizGuia.appendChild(cab.nodo);
+    if(r.actividades && d.actividades){
+      cab.nodo.insertBefore(h('p',{'class':'guia-catalogo-etapa',texto:t('sate.guia.actividades_etapa',{n:r.etapas.join(', ')})}),cab.titulo);
+      raizGuia.appendChild(catalogoActividades(d,{categorias:r.actividades,preguntas:ps}));
+      return cab.titulo;
+    }
     const preguntas=h('div',{'class':'guia-opciones'}), panel=h('section',{'class':'guia-toca','aria-live':'polite','aria-label':tx('lo_toca')}), mas=h('section',{'class':'guia-mas'});
     const fis=s?.fis||[], estado={motivo:motivoInicial(s),materia:(fis.find(f=>f.veces>=2)||fis.find(f=>f.estado==='desfasada')||fis[0])?.k||'',dictamen:'desconocido',tema:ps[0]?.id||''};
     const dibujar=()=>{
@@ -946,7 +951,6 @@
     for(const etapa of d.etapas.filter(e=>ps.some(p=>p.etapa===e.id))){const deEtapa=ps.filter(p=>p.etapa===etapa.id);mas.appendChild(h('section',{},[h('h4',{texto:t(etapa.titulo)}),h('ul',{},deEtapa.map(p=>h('li',{},[enlacePregunta(p)])))]));}
     for(const tramite of r.tramites.filter(x=>cfg().tramites?.includes(x)))mas.appendChild(h('a',{href:'#/'+unidad()+'/tramites/'+tramite,texto:t('sate.tramite.'+tramite+'.titulo')}));
     raizGuia.appendChild(mas);dibujar();
-    if(r.actividades && d.actividades)apartadoActividades(raizGuia,d,null,true);
     return cab.titulo;
   }
   function buscadorGlobal(d) {
@@ -1866,54 +1870,76 @@
     return { titulo: cab.titulo };
   }
 
-  function apartadoActividades(raizGuia, d, id, integrada=false) {
-    const cab = cabecera([...migasBase(), { texto: tituloApartado('actividades') }], tituloApartado('actividades'));
-    const contenido = d.actividades;
-    const filtro = SateUI.buscador({ etiqueta: t('sate.guia.actividades_filtrar'), marcador: t('sate.guia.actividades_filtrar'), id: 'guia-actividades', alCambiar: valor => { consulta = valor; pintar(); } });
-    const zona = h('div', { 'class': 'guia-actividades-vista' });
-    const estado = h('p', { 'class': 'sate-sr', role: 'status', 'aria-live': 'polite' });
-    let categoria = '', consulta = '', lugar = false, electivas = false;
-    const categorias = [...new Set(contenido.elementos.map(a => a.categoria))];
-    const nombres = new Map(contenido.elementos.map(a => [a.categoria, t('sate.guia.actividades_' + a.categoria)]));
-    const resumirLugar = a => /en l[ií]nea|a distancia|plataforma/i.test(a.donde) ? t('sate.guia.actividades_en_linea') : /upiita|unidad acad[eé]mica/i.test(a.donde) ? t('sate.guia.actividades_tu_unidad') : t('sate.guia.actividades_otra_sede');
-    const coincidencias = () => contenido.elementos.filter(a => (!lugar || resumirLugar(a)===t('sate.guia.actividades_tu_unidad')) && (!electivas || a.electivas===true) && (!consulta || norm([a.nombre, a.ofrece, a.donde, a.requisitos, a.inscripcion, nombres.get(a.categoria)].join(' ')).includes(norm(consulta))));
-    const controles=h('div',{'class':'guia-chips'});
-    if(integrada){
-      for(const cat of ['',...categorias]){const b=h('button',{type:'button','aria-pressed':cat===''?'true':'false',texto:cat?nombres.get(cat):tx('todas')});b.addEventListener('click',()=>{categoria=cat;for(const otro of controles.querySelectorAll('[data-filtro-categoria]'))otro.setAttribute('aria-pressed',otro===b?'true':'false');pintar();});b.setAttribute('data-filtro-categoria',cat);controles.appendChild(b);}
-      for(const [clave,texto] of [['lugar',tx('en_unidad')],...(contenido.elementos.some(a=>typeof a.electivas==='boolean')?[['electivas',tx('electivas')]]:[])]){const b=h('button',{type:'button','aria-pressed':'false',texto});b.addEventListener('click',()=>{if(clave==='lugar')lugar=!lugar;else electivas=!electivas;b.setAttribute('aria-pressed',(clave==='lugar'?lugar:electivas)?'true':'false');pintar();});controles.appendChild(b);}
+  // Las dos entradas comparten selección, ficha y ventana; la ruta solo acota los datos.
+  function catalogoActividades(d, opciones={}) {
+    const contenido=d.actividades, preguntas=opciones.preguntas || [];
+    const categorias=(opciones.categorias || contenido.categorias || [...new Set(contenido.elementos.map(a=>a.categoria))])
+      .filter(cat=>contenido.elementos.some(a=>a.categoria===cat));
+    const elementos=contenido.elementos.filter(a=>categorias.includes(a.categoria));
+    const numero=a=>String(contenido.elementos.indexOf(a)+1);
+    const actividad=elementos.find(a=>numero(a)===parametroGuia('actividad'));
+    let categoria=actividad?.categoria || (categorias.includes(opciones.categoria)?opciones.categoria:categorias[0]), elegido=actividad || elementos.find(a=>a.categoria===categoria);
+    const zona=h('section',{'class':'sate-catalogo'}), panel=h('div',{'class':'sate-catalogo__marco',id:'guia-catalogo-panel',role:'tabpanel'});
+    const nombres=cat=>t('sate.guia.actividades_'+cat);
+    // Se reutilizan los símbolos existentes solo donde representan la categoría.
+    const iconos={idiomas:'guia',cultura:'guia',servicios:'tramites'};
+    const icono=cat=>SateUI.iconoPestana(iconos[cat]);
+    const renglones=texto=>h('div',{'class':'sate-catalogo__renglones'},
+      // Conserva la puntuación y no parte correos, abreviaturas ni dominios.
+      (texto.match(/[^;]+;?\s*/g) || []).map(parte=>h('p',{texto:parte})));
+    function ficha(a) {
+      const relacionadas=preguntas.filter(p=>(p.palabras || []).some(palabra=>norm(palabra)===norm(a.categoria)) || norm(p.pregunta).includes(norm(a.categoria)));
+      const areas=[...new Set(relacionadas.flatMap(p=>p.acudir || []))].map(id=>d.acudir.find(a=>a.id===id)).filter(Boolean);
+      const relacionados=h('div',{'class':'sate-catalogo__relacionados'},areas.map(area=>h('a',{
+        href:rutaGuia('acudir',area.id),'class':'sate-catalogo__relacionado'},[
+        h('span',{'data-oficial':area.fuente?.doc,texto:area.nombre}),h('small',{texto:t('sate.guia.a_quien')})])));
+      return h('article',{'class':'sate-catalogo__ficha'},[
+        h('header',{},[h('small',{'class':'sate-catalogo__categoria'},[icono(a.categoria),nombres(a.categoria)]),h('h3',{texto:a.nombre}),h('p',{texto:a.ofrece})]),
+        h('dl',{},['donde','requisitos','inscripcion'].filter(k=>a[k]).map(k=>h('div',{},[
+          h('dt',{texto:t('sate.guia.actividades_'+k+(k==='donde'?'':'_titulo'))}),h('dd',{},[k==='donde'?h('p',{texto:a[k]}):renglones(a[k])])]))),
+        enlaceExterno('sate-btn sate-btn--primario',a.url,t('sate.guia.actividades_sitio')),
+        areas.length?h('section',{},[h('h4',{texto:t('sate.guia.actividades_relacionado')}),relacionados]):null,
+        h('footer',{},[enlaceExterno('',a.url,t('sate.guia.actividades_fuente',{sitio:a.url.split('/')[2]})),
+          h('small',{texto:t('sate.guia.actividades_consulta',{fecha:fechaRevision(a.consulta)})})])]);
     }
-    const fila = a => {
-      const detalle = h('details', { 'class': 'guia-actividad-detalle' }, [h('summary', { texto: t('sate.guia.actividades_detalle') }), h('div', {}, [h('p', { texto: a.ofrece }), ...['requisitos', 'inscripcion', 'donde'].filter(k => a[k]).flatMap(k => [h('h4', { texto: t('sate.guia.actividades_' + k) }), h('p', { texto: a[k] })]), enlaceExterno('sate-recurso__enlace', a.url, t('sate.guia.actividades_sitio')), h('small', { texto: t('sate.guia.actividades_consulta', { fecha: fechaRevision(a.consulta) }) })])]);
-      return h('li', { 'class': 'guia-actividad', 'data-actividad':contenido.elementos.indexOf(a)+1 }, [h('div', {}, [h('strong', { texto: a.nombre }), h('small', { texto: resumirLugar(a) }), enlaceExterno('guia-actividad-enlace', a.url, t('sate.guia.actividades_sitio'))]), detalle]);
-    };
+    function seleccionar(a,origen) {
+      elegido=a;
+      for(const b of panel.querySelectorAll('[data-actividad]'))b.setAttribute('aria-current',numero(a)===b.getAttribute('data-actividad')?'true':'false');
+      panel.querySelector('.sate-catalogo__detalle')?.replaceChildren(ficha(a));
+      console.debug('SATE: catálogo de actividades',{categoria:a.categoria,actividad:numero(a),ventana:raiz.matchMedia('(max-width:600px)').matches});
+      if(raiz.matchMedia('(max-width:600px)').matches)SateUI.modal(a.nombre,ficha(a),{flotante:true,origen,volver:t('sate.guia.actividades_volver')});
+    }
     function pintar() {
-      const encontrados = coincidencias();
-      estado.textContent = t('sate.guia.actividades_resultados', { n: encontrados.length });
-      if(integrada)zona.replaceChildren(h('ul',{'class':'guia-actividades-lista'},encontrados.filter(a=>!categoria||a.categoria===categoria).map(fila)));
-      else if (consulta) zona.replaceChildren(h('ul', { 'class': 'guia-actividades-lista' }, encontrados.map(fila)));
-      else if (categoria) {
-        const volver = h('a', { 'class': 'guia-actividades-volver', href: rutaGuia('actividades'), texto: '‹ ' + t('sate.guia.actividades_todas') });
-        zona.replaceChildren(volver, h('h2', { texto: nombres.get(categoria) }), h('ul', { 'class': 'guia-actividades-lista' }, encontrados.filter(a => a.categoria === categoria).map(fila)));
-      } else {
-        zona.replaceChildren(h('ul', { 'class': 'guia-actividades-categorias' }, categorias.map(id => {
-          const b = h('button', { type: 'button', 'class': 'guia-actividad-categoria', 'data-categoria': id }, [h('span', { 'class': 'guia-actividad-marca', 'aria-hidden': 'true' }), h('strong', { texto: nombres.get(id) }), h('small', { texto: t('sate.guia.actividades_resultados', { n: contenido.elementos.filter(a => a.categoria === id).length }) })]);
-          b.addEventListener('click', () => { categoria = id; pintar(); });
-          b.addEventListener('click', () => { raiz.location.hash = rutaGuia('actividades', id); });
-          return h('li', {}, [b]);
-        })));
+      const lista=h('ul',{'class':'sate-catalogo__lista'});
+      for(const p of preguntas){
+        const b=h('button',{type:'button','class':'sate-catalogo__opcion','data-pregunta':p.id},[
+          h('small',{texto:t('sate.guia.actividades_pregunta')}),h('span',{texto:p.pregunta})]);
+        b.addEventListener('click',()=>SateUI.modal(p.pregunta,respuesta(d,p),{lectura:true,flotante:true,origen:b,volver:t('sate.guia.actividades_volver')}));
+        lista.appendChild(h('li',{},[b]));
       }
+      for(const a of elementos.filter(a=>a.categoria===categoria)){
+        const b=h('button',{type:'button','class':'sate-catalogo__opcion','data-actividad':numero(a),'aria-current':a===elegido?'true':'false'},[
+          h('span',{'class':'sate-catalogo__nombre'},[icono(a.categoria),h('span',{texto:a.nombre})]),h('small',{texto:a.donde.replace(/;\s*/g,' · ')})]);
+        b.addEventListener('click',()=>seleccionar(a,b));lista.appendChild(h('li',{},[b]));
+      }
+      panel.replaceChildren(lista,h('div',{'class':'sate-catalogo__detalle','aria-live':'polite'},elegido?[ficha(elegido)]:[]));
     }
-    raizGuia.appendChild(cab.nodo);
-    raizGuia.appendChild(h('section', { 'class': 'guia-apartado guia-actividades' }, [filtro.raiz, integrada?controles:null, estado, zona]));
-    categoria = categorias.includes(id) ? id : '';
-    pintar();
-    const actividad = parametroGuia('actividad');
-    const destino = actividad && zona.querySelector('[data-actividad="' + actividad + '"]');
-    if (destino) {
-      const detalle = destino.querySelector('details'); if (detalle) detalle.open=true;
-      document.title = contenido.elementos[Number(actividad)-1].nombre + ' — ' + t('sate.pestana.guia.titulo');
-    }
-    return { titulo: cab.titulo, destino };
+    if(!categorias.length)return h('p',{texto:t('sate.guia.sin_datos')});
+    const pestanas=SateUI.pestanas({etiqueta:t('sate.guia.actividades_categorias'),activa:categoria,
+      items:categorias.map(cat=>({id:cat,icono:iconos[cat],texto:nombres(cat)+' '+elementos.filter(a=>a.categoria===cat).length})),
+      alCambiar:cat=>{categoria=cat;if(elegido?.categoria!==cat)elegido=elementos.find(a=>a.categoria===cat);panel.setAttribute('aria-label',nombres(cat));pintar();}});
+    for(const b of pestanas.querySelectorAll('[role="tab"]'))b.setAttribute('aria-controls',panel.id);
+    zona.append(h('div',{'class':'sate-catalogo__pestanas'},[pestanas]),panel);
+    if(actividad && raiz.matchMedia('(max-width:600px)').matches)seleccionar(actividad,panel.querySelector('[data-actividad="'+numero(actividad)+'"]'));
+    return zona;
+  }
+
+  function apartadoActividades(raizGuia, d, id) {
+    const cab=cabecera([...migasBase(),{texto:tituloApartado('actividades')}],tituloApartado('actividades'),t('sate.guia.actividades_descripcion'));
+    const rutas=(d.orientacion?.rutas || []).filter(r=>r.actividades);
+    const preguntas=d.preguntas.filter(p=>rutas.some(r=>r.preguntas.includes(p.id)));
+    raizGuia.append(cab.nodo,catalogoActividades(d,{categoria:id,preguntas}));
+    return {titulo:cab.titulo};
   }
 
   /* ---------- pestaña ---------- */

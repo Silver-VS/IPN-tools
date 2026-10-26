@@ -92,7 +92,15 @@ for(const unidad of ['upiita','escom','upibi']){
   }
   for(const r of orientacion.rutas){
    assert.ok(c.SateRutas.ruta('#/'+unidad+'/guia/ruta/'+r.id,unidad,config.unidades));
-   await abrir('ruta',r.id);assert.ok(caja.querySelector('.guia-ruta-panel'));assert.ok(caja.querySelector('.guia-mas'));
+   await abrir('ruta',r.id);
+   if(r.actividades && datos.actividades){
+    assert.ok(caja.querySelector('.sate-catalogo'));
+    assert.equal(caja.querySelector('.guia-ruta-panel'),null);
+    assert.equal(caja.querySelector('.guia-mas'),null);
+    assert.equal(caja.querySelectorAll('[data-pregunta]').length,datos.preguntas.filter(p=>r.preguntas.includes(p.id)).length);
+    continue;
+   }
+   assert.ok(caja.querySelector('.guia-ruta-panel'));assert.ok(caja.querySelector('.guia-mas'));
    if(r.id==='irregular'){
     assert.equal(caja.querySelector('.guia-toca h3').textContent,'Pide dictamen antes de reinscribirte');
     assert.doesNotMatch(caja.querySelector('.guia-toca').textContent,/Falta información/);
