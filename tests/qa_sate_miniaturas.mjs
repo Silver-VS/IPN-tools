@@ -26,7 +26,7 @@ for(const archivo of ['dictamen','bajas','tramites'])assert.doesNotMatch(leer('w
 const css=leer('web/sate/componentes.css');
 assert.match(src,/mini\.onclick=ampliarFormato/,'La miniatura usa la hoja común ampliada');
 assert.match(src,/ver=boton\(tx\('ver_formato'\),ampliarFormato\)/,'Vista previa usa la misma ampliación');
-assert.match(src,/function ampliarFormato\(\)\{\s*const hoja=miniatura\(def,m\.datos,false\)/);
+assert.match(src,/function ampliarFormato\(\)\{\s*const hoja=miniatura\(def,m\.datos,!!def\.generar\)/);
 for(const clase of ['campo','firma','tabla']){
   const regla=css.match(new RegExp('\\.tramite-miniatura-'+clase+'\\{([^}]+)\\}'))[1];
   assert.doesNotMatch(regla,/position:absolute/,'Contenido en flujo: '+clase);

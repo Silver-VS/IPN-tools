@@ -123,7 +123,11 @@
   }
   function asistente(box,def){
     const m=modelo(def);let url=null,version=0,destruido=false,temporizador;
-    function revocar(){if(url){URL.revokeObjectURL(url);url=null}}
+    function sincronizarVista(){
+      const mini=box.querySelector('.tramite-miniatura'),vista=box.querySelector('.tramite-preview');
+      if(mini)mini.hidden=!!url;if(vista)vista.hidden=!url;
+    }
+    function revocar(){if(url){URL.revokeObjectURL(url);url=null}sincronizarVista()}
     async function previsualizar(){
       const v=++version;
       if(estadoFalta()){revocar();box.querySelector('iframe')?.removeAttribute('src');return}
@@ -133,7 +137,7 @@
         if(destruido||v!==version)return;
         revocar();url=URL.createObjectURL(new Blob([bytes],{type:'application/pdf'}));
         const estado=box.querySelector('[data-pdf-estado]');if(estado)estado.textContent='';
-        const marco=box.querySelector('iframe');if(marco)marco.src=url;
+        const marco=box.querySelector('iframe');if(marco)marco.src=url+'#view=FitH';sincronizarVista();
         const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=false;
       }catch(e){if(destruido||v!==version)return;revocar();box.querySelector('iframe')?.removeAttribute('src');const ver=box.querySelector('[data-ver-formato]');if(ver)ver.disabled=true;console.error('Ventanilla: vista previa fallida',{tramite:def.id,paso:m.paso,error:e.name});const aviso=box.querySelector('[data-pdf-estado]');if(aviso)aviso.textContent=e.message||tx('pdf_error')}
     }
@@ -159,7 +163,8 @@
       finally{if(!destruido)b.disabled=!!def.faltante?.(m.datos,true)}
     }
     function ampliarFormato(){
-      const hoja=miniatura(def,m.datos,false);hoja.className+=' tramite-miniatura--ampliada';
+      const hoja=miniatura(def,m.datos,!!def.generar);hoja.className+=' tramite-miniatura--ampliada';
+      if(url){const formato=el('iframe');formato.className='tramite-formato-pdf';formato.title=tx('vista_previa');formato.src=url+'#view=FitH';SateUI.modal(tx('ver_formato'),formato,{amplio:true});return}
       SateUI.modal(tx('ver_formato'),hoja,{amplio:true});
     }
     let confirmado=false;
@@ -201,7 +206,8 @@
           for(const dato of filas){const fila=el('div');fila.appendChild(el('dt',dato.texto));fila.appendChild(el('dd',dato.valor));const b=boton(tx('cambiar'),()=>{if(dato.cambiar)dato.cambiar();else{m.cambiar(i);pintar()}});b.className+=' tramite-sin-impresion tramite-texto';b.setAttribute('aria-label',tx('cambiar_dato',{dato:dato.texto}));fila.appendChild(b);resumen.appendChild(fila)}
         }));bloque.appendChild(resumen);pantalla.appendChild(bloque);
         def.revisar?.(pantalla,m.datos,bloque);
-        const mini=miniatura(def,m.datos,false);pantalla.appendChild(mini);
+        // Hasta que exista el PDF, la orientación propia se identifica como ejemplo.
+        const mini=miniatura(def,m.datos,!!def.generar);pantalla.appendChild(mini);mini.hidden=!!url;
         if(def.generar){mini.tabIndex=0;mini.setAttribute('role','button');mini.onclick=ampliarFormato;mini.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();mini.onclick()}}}
         if(def.confirmacion){const l=el('label',null,'tramite-campo'),n=el('input');n.type='checkbox';n.onchange=()=>confirmado=n.checked;l.appendChild(n);l.appendChild(el('span',def.confirmacion));pantalla.appendChild(l)}
       }else for(const c of def.pasos[m.paso].campos||[]){
@@ -225,7 +231,7 @@
       }
       // La vista previa y «Ver formato» solo en el último paso: antes se podía sacar un PDF casi vacío.
       if(conVista){
-        const lateral=el('aside',null,'tramite-preview'),iframe=el('iframe');iframe.title=tx('vista_previa');if(url)iframe.src=url;lateral.appendChild(iframe);layout.appendChild(lateral);
+        const lateral=el('aside',null,'tramite-preview'),iframe=el('iframe');lateral.hidden=!url;iframe.title=tx('vista_previa');if(url)iframe.src=url+'#view=FitH';lateral.appendChild(iframe);layout.appendChild(lateral);
         const fila=el('div',null,'tramite-ver-fila'),ver=boton(tx('ver_formato'),ampliarFormato);ver.className+=' tramite-ver';ver.setAttribute('data-ver-formato','');ver.disabled=!url;
         fila.appendChild(ver);fila.appendChild(el('small',tx('ver_formato_ayuda')));pantalla.appendChild(fila);
         programar();

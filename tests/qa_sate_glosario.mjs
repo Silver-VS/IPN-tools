@@ -69,7 +69,7 @@ env.dispatchEvent(new Evento('mouseenter', {bubbles:false}));
 assert.ok(g.hidden, 'el hover espera 120 ms');
 avanzar(120);
 assert.equal(g.hidden, false);
-assert.equal(g.parentNode, document.body, 'fuera de ancestros locales');
+assert.equal(g.parentNode, document.documentElement, 'fuera del zoom del body, igual que el tooltip de SATE');
 assert.equal(b.getAttribute('aria-describedby'), g.id);
 assert.equal(g.textContent, 'Resolución ficticia <segura>.');
 assert.equal(g.style.left, '210px', 'alineado al inicio de la palabra');
@@ -95,7 +95,7 @@ const icono = c.SateUI.ayuda('ayuda.ficticia'); document.body.appendChild(icono)
 icono.querySelector('button').click();
 assert.ok(g.hidden);
 const ayudaIcono = document.getElementById(icono.querySelector('button').getAttribute('aria-describedby'));
-assert.equal(ayudaIcono.parentNode, document.body);
+assert.equal(ayudaIcono.parentNode, document.documentElement);
 eventos.scroll();
 movil = true; b.click();
 assert.ok(g.hidden);

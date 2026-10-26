@@ -1,5 +1,6 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
 :root{--ipn-control-compacto:32px}
+:root{--ipn-formato-ancho:900px;--ipn-papel:#fff;--ipn-tinta:#18181b;--ipn-tinta-tenue:#52525b;--ipn-papel-linea:#d9d9de;--ipn-indice-ancho:16rem;--ipn-tarjeta-titulo-min:12ch;--ipn-radio-interior:max(0px,calc(var(--ipn-radio) - var(--ipn-esp-1)))}
 /* La altura es mínima: las acciones con texto en varias líneas pueden crecer. */
 :where(button,[role=button],.btn,.sate-btn){box-sizing:border-box;min-height:var(--ipn-control-alto)}
 /* Solo tablas y barras densas; en teléfono se usa el objetivo táctil normal. */
@@ -63,7 +64,8 @@
 @media(min-width:1025px){.tramite-acciones{bottom:0}}
 .tramite-revision>div{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-borde-control)}
 .tramite-revision dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
-.tramite-preview{display:none;min-width:0}
+.tramite-preview{display:block;min-width:0}
+.tramite-preview[hidden]{display:none!important}
 .tramite-preview iframe{width:100%;height:75vh;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-hundido)}
 .dictamen-opciones{min-width:0;border:0;padding:0;margin-block:var(--ipn-esp-3)}
 .dictamen-opciones label{display:flex;align-items:flex-start;gap:var(--ipn-esp-2);padding:var(--ipn-esp-2);margin-block:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);cursor:pointer}
@@ -95,7 +97,11 @@
 .tramite-miniatura-tabla span{min-width:0;overflow-wrap:anywhere;padding:var(--ipn-esp-1);border-right:1px solid var(--ipn-linea);min-height:var(--ipn-esp-4);font-size:var(--ipn-tamano-xs)}
 .tramite-miniatura-marca{position:absolute;inset:50% auto auto 50%;z-index:-1;pointer-events:none;transform:translate(-50%,-50%) rotate(-30deg);opacity:.1;color:var(--ipn-acento);font-size:var(--ipn-tamano-xl);font-weight:600;white-space:nowrap}
 .tramite-miniatura[role=button]{cursor:pointer}
-.tramite-miniatura--ampliada{width:100%;margin:0}
+.tramite-miniatura--ampliada{width:100%;--ipn-superficie:var(--ipn-papel);--ipn-texto:var(--ipn-tinta);--ipn-tenue:var(--ipn-tinta-tenue);--ipn-linea:var(--ipn-papel-linea);max-width:var(--ipn-formato-ancho);margin-inline:auto;aspect-ratio:612/792;overflow:visible;color-scheme:light}
+.tramite-miniatura--ampliada .tramite-miniatura-hoja{width:100%;height:auto;min-height:100%;transform:none;padding:var(--ipn-esp-5);font-size:var(--ipn-tamano-m)}
+.tramite-miniatura--ampliada .tramite-miniatura-campo small,.tramite-miniatura--ampliada .tramite-miniatura-tabla span{font-size:var(--ipn-tamano-s)}
+.sate-modal:has(.tramite-miniatura--ampliada,.tramite-formato-pdf){width:min(var(--ipn-formato-ancho),calc(100vw - var(--ipn-esp-5)))}
+.tramite-formato-pdf{box-sizing:border-box;display:block;width:100%;height:75dvh;border:0;background:var(--ipn-papel);color-scheme:light}
 .tramite-miniatura:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
 .tramite-pie{display:flex;justify-content:flex-start;margin-top:var(--ipn-esp-5);padding-top:var(--ipn-esp-3);border-top:1px solid var(--ipn-borde-control)}
 .tramite-falta{margin-block:var(--ipn-esp-2);color:var(--ipn-tenue)}
@@ -531,7 +537,7 @@ button.sate-chip{cursor:pointer}
 .sate-buscador__borrar:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
 
 .sate-segmentado{box-sizing:border-box;display:inline-grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:var(--ipn-esp-1);max-width:100%;padding:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-hundido)}
-.sate-segmentado button{min-width:0;min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-4);border:0;border-radius:var(--ipn-radio);background:transparent;color:var(--ipn-tenue);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);cursor:pointer;overflow-wrap:anywhere}
+.sate-segmentado button{min-width:0;min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-4);border:0;border-radius:var(--ipn-radio-interior);background:transparent;color:var(--ipn-tenue);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s);cursor:pointer;overflow-wrap:anywhere}
 .sate-segmentado button[aria-pressed=true],.sate-segmentado button[aria-selected=true]{background:var(--ipn-acento-suave);color:var(--ipn-acento);box-shadow:inset 0 0 0 1.5px var(--ipn-acento);font-weight:600}   /* igual que .seg: un solo estilo de segmento activo en SATE */
 .sate-segmentado button{overflow-wrap:normal;word-break:normal;hyphens:none}
 .sate-segmentado__corto{display:none}
@@ -606,8 +612,8 @@ button.sate-chip{cursor:pointer}
 .sate-pestana[aria-selected=true]::after,.sate-barra__btn[aria-current=page]::after{content:'';position:absolute;bottom:.3rem;left:calc(50% - .18rem);width:.36rem;height:.36rem;border-radius:var(--ipn-radio);background:var(--sate-realce)}
 .sate-pestana:focus-visible,.sate-barra__btn:focus-visible,.trayectoria-minimapa button:focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .sate-pestanas--seg{display:inline-flex;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);padding:var(--ipn-esp-1);background:var(--ipn-hundido)}
-.sate-pestanas--seg .sate-pestana{min-height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio)}
-.sate-pestanas--seg .sate-pestana[aria-selected=true]{background:var(--ipn-superficie);box-shadow:0 0 0 1px var(--ipn-linea)}
+.sate-pestanas--seg .sate-pestana{min-height:var(--ipn-control-alto);border:0;border-radius:var(--ipn-radio-interior)}
+.sate-pestanas--seg .sate-pestana[aria-selected=true]{background:var(--ipn-superficie);box-shadow:inset 0 0 0 1px var(--ipn-linea)}
 
 /* barra inferior: teléfono y contenedores donde tampoco caben los textos cortos */
 .sate-barra{display:none;position:fixed;left:var(--ipn-esp-2);right:var(--ipn-esp-2);bottom:var(--ipn-esp-2);z-index:40;box-sizing:border-box;min-height:calc(64px + env(safe-area-inset-bottom,0px));gap:var(--ipn-esp-1);padding:var(--ipn-esp-2);padding-bottom:calc(var(--ipn-esp-2) + env(safe-area-inset-bottom,0px));border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-hundido);box-shadow:inset 0 1px 3px var(--ipn-linea);font-family:var(--ipn-fuente-texto)}
@@ -1096,11 +1102,13 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 /* Ventanilla: tarjetas de trámite como rectángulos contiguos en rejilla (líneas de 1 px compartidas) */
 .tramite-rejilla{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;margin-top:var(--ipn-esp-4);background:var(--ipn-linea);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);overflow:hidden}
 @media(max-width:639px){.tramite-rejilla{grid-template-columns:minmax(0,1fr)}}
-.tramite-rejilla .tramite-fila{border:0;display:flex}
+.tramite-rejilla .tramite-fila{border:0;display:flex;flex-direction:column}
 .tramite-rejilla .sate-btn.tramite-fila-boton{flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:var(--ipn-esp-1);border:0;border-radius:0;background:var(--ipn-superficie);padding:var(--ipn-esp-4)}
 .tramite-rejilla .sate-btn.tramite-fila-boton:hover{background:var(--ipn-hundido)}
 .tramite-rejilla .tramite-estado{order:-1;align-self:flex-start}
 .tramite-rejilla .tramite-miniatura{width:min(100%,9rem);margin-top:var(--ipn-esp-2)}
+.tramite-rejilla .tramite-fila-titulo{min-width:var(--ipn-tarjeta-titulo-min);align-self:stretch}
+.tramite-rejilla .tramite-fila-boton>*{max-width:100%;box-sizing:border-box}
 .tramite-fila-grupo{font-size:var(--ipn-tamano-xs);font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ipn-tenue)}
 /* Acciones de una línea: un tamaño táctil. Las tarjetas conservan su alto de contenido. */
 .btn,.sate-btn,.sate-volver,.sate-migas a,.stats-btn,.guia-acudir a,.dictamen-situaciones a,.tmr-acciones .btn,.sate-segmentado button,.seg button,.calendario-vistas .sate-btn,.calendario-ficha,.calendario-pasados{
@@ -1198,7 +1206,12 @@ a:visited{color:var(--ipn-acento)}
 .sate-puentes-materia a{padding-block:var(--ipn-esp-3)}
 .sate-vinculos-fila{flex-basis:100%;margin:0;display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);font-size:var(--ipn-tamano-s);overflow-wrap:anywhere}
 .sate-vinculos-fila a,.sate-vinculos-fila button{min-height:var(--ipn-control-alto);display:inline-flex;align-items:center}
-.tramite-fila>.sate-vinculos-fila{padding:var(--ipn-esp-3)}
+.tramite-fila>.sate-vinculos-fila{padding:var(--ipn-esp-3);flex-basis:auto;align-content:start}
+/* Las tres variantes comparten relleno y geometría: el resalte queda dentro del borde. */
+.seg,.sate-segmentado,.sate-pestanas--seg{box-sizing:border-box;padding:var(--ipn-esp-1);gap:var(--ipn-esp-1);border-radius:var(--ipn-radio);overflow:visible;align-items:stretch}
+.seg button,.seg.sm button,.sate-segmentado button,.sate-pestanas--seg .sate-pestana{box-sizing:border-box;min-height:var(--ipn-control-alto);height:auto;margin:0;border-radius:var(--ipn-radio-interior)}
+.seg button[aria-pressed=true],.sate-segmentado button[aria-pressed=true],.sate-segmentado button[aria-selected=true]{box-shadow:inset 0 0 0 1.5px var(--ipn-acento)}
+.tramite-miniatura[hidden]{display:none}
 html[data-vista=guia-vinculada] .sate-navegacion,html[data-vista=guia-vinculada] .sate-barra{display:none}
 html[data-vista=guia-vinculada] #sate-nombre{display:none}
 @media(max-width:767px){

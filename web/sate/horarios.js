@@ -360,6 +360,7 @@ function montarPropuestas(){
 function abrirPropuestas(){
   const cuerpo=document.createElement('div');cuerpo.className='hor-propuestas';
   cuerpo.innerHTML=`<div class="sate-segmentado" role="tablist"><button type="button" role="tab" id="d-tab-generar" aria-controls="gen" aria-selected="true">${esc(txH('d_generar'))}</button><button type="button" role="tab" id="d-tab-actividades" aria-controls="ownform" aria-selected="false">${esc(txH('d_actividades'))}</button></div>`;
+  const subtitulo=document.createElement('p');subtitulo.textContent=txH('d_propuestas_subtitulo');cuerpo.insertBefore(subtitulo,cuerpo.firstChild);
   // El cuerpo debe estar conectado antes de mover controles consultados por id.
   ventanaPropuestas=SateUI.modal(txH('d_propuestas'),cuerpo,{amplio:true,alCerrar:()=>{
     cancelarGeneracion();$('#d-propuestas-deposito').append($('#gen'),$('#ownform'),$('#mi-semana'));ventanaPropuestas.elemento.classList.remove('hor-propuestas-modal');ventanaPropuestas=null;renderCal();

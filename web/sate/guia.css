@@ -195,8 +195,8 @@
 .rgl-datos{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2) var(--ipn-esp-5)}
 .rgl-fuente{margin:0}
 .rgl-datos .guia-aviso-ocr{max-width:66ch}
-.rgl{display:grid;grid-template-columns:minmax(11rem,14rem) minmax(0,75ch) minmax(10rem,14rem);gap:var(--ipn-esp-5);align-items:start;min-width:0}
-.rgl--sin-riel{grid-template-columns:minmax(14rem,17rem) minmax(0,1fr)}
+.rgl{display:grid;grid-template-columns:var(--ipn-indice-ancho) minmax(0,75ch) minmax(10rem,14rem);gap:var(--ipn-esp-5);align-items:start;min-width:0}
+.rgl--sin-riel{grid-template-columns:var(--ipn-indice-ancho) minmax(0,1fr)}
 .rgl-indice{position:sticky;top:calc(var(--sate-barra-alto) + var(--ipn-esp-4));min-width:0;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie)}
 .rgl-resumen{display:none;align-items:center;justify-content:space-between;gap:var(--ipn-esp-3);min-height:var(--ipn-control-alto);padding:0 var(--ipn-esp-4);font-weight:600;cursor:pointer}
 .rgl-resumen::after{content:"";flex:none;width:.5rem;height:.5rem;margin-left:var(--ipn-esp-2);border:solid var(--ipn-tenue);border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-2px)}
@@ -208,7 +208,8 @@
 .rgl-arbol{display:grid;gap:var(--ipn-esp-1);min-width:0}
 .rgl-arbol[hidden],.rgl-resultados[hidden]{display:none}
 .rgl-grupo{min-width:0}
-.rgl-grupo>summary{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--ipn-esp-2);min-height:var(--ipn-control-alto);padding:var(--ipn-esp-2);border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-s);font-weight:600;line-height:1.3;cursor:pointer;overflow-wrap:anywhere}
+.rgl-grupo>summary{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--ipn-esp-2);min-height:var(--ipn-control-alto);padding:var(--ipn-esp-2);border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-s);font-weight:600;line-height:1.3;cursor:pointer;overflow-wrap:normal;word-break:normal}
+.rgl-indice-titulo{min-width:0;overflow-wrap:normal;word-break:normal}
 .rgl-grupo>summary:hover{background:var(--ipn-hundido)}
 .rgl-grupo>summary small{flex:none;color:var(--ipn-tenue);font-weight:400}
 .rgl-grupo__cuerpo{display:grid;gap:var(--ipn-esp-1);margin-left:var(--ipn-esp-2);padding-left:var(--ipn-esp-2);border-left:1px solid var(--ipn-linea)}
@@ -283,7 +284,7 @@
 .rgl-riel ul{margin:0;padding:0;list-style:none;display:grid;gap:var(--ipn-esp-1)}
 .rgl-riel a{display:flex;align-items:center;min-height:var(--ipn-control-alto);color:var(--ipn-acento);overflow-wrap:anywhere}
 @media(max-width:1024.98px){
-  .rgl,.rgl--sin-riel{grid-template-columns:minmax(14rem,17rem) minmax(0,1fr)}
+  .rgl,.rgl--sin-riel{grid-template-columns:var(--ipn-indice-ancho) minmax(0,1fr)}
   .rgl-indice{grid-row:1/3}
   .rgl-texto{grid-column:2;grid-row:2}
   .rgl-riel{position:static;grid-column:2;grid-row:1;padding-bottom:var(--ipn-esp-4);border-bottom:1px solid var(--ipn-linea)}
@@ -359,7 +360,7 @@
 @media(max-width:1024.98px){.rgl-biblioteca{grid-template-columns:repeat(2,minmax(0,1fr))}.rgl-temas{grid-template-columns:minmax(0,1fr)}.rgl{gap:var(--ipn-esp-4)}.rgl-riel{position:sticky;top:calc(var(--sate-barra-alto) + var(--ipn-esp-4));grid-column:2}}
 @media(max-width:768.98px){.rgl-riel{position:static;grid-column:auto}.rgl-indice{position:sticky;top:var(--sate-barra-alto);z-index:5}.rgl-encabezado{top:calc(var(--sate-barra-alto) + 3rem)}.rgl-nivel-1>.rgl-encabezado{top:calc(var(--sate-barra-alto) + 6rem)}.rgl-nivel-2>.rgl-encabezado{top:calc(var(--sate-barra-alto) + 9rem)}.rgl-articulo{scroll-margin-top:calc(var(--sate-barra-alto) + 15rem)}}
 @media(max-width:479.98px){.rgl-biblioteca{grid-template-columns:minmax(0,1fr)}.rgl-temas__opciones{grid-template-columns:repeat(2,minmax(0,1fr))}.rgl-libro{padding:var(--ipn-esp-4)}}
-@container(max-width:52rem){.rgl-biblioteca{grid-template-columns:repeat(2,minmax(0,1fr))}.rgl-temas{grid-template-columns:minmax(0,1fr)}.rgl,.rgl--sin-riel{grid-template-columns:minmax(11rem,14rem) minmax(0,1fr);gap:var(--ipn-esp-4)}.rgl-riel{grid-column:2;position:static}}
+@container(max-width:52rem){.rgl-biblioteca{grid-template-columns:repeat(2,minmax(0,1fr))}.rgl-temas{grid-template-columns:minmax(0,1fr)}.rgl,.rgl--sin-riel{grid-template-columns:var(--ipn-indice-ancho) minmax(0,1fr);gap:var(--ipn-esp-4)}.rgl-riel{grid-column:2;position:static}}
 @container(max-width:42rem){.rgl,.rgl--sin-riel{grid-template-columns:minmax(0,1fr)}.rgl-indice{position:sticky;top:var(--sate-barra-alto);z-index:5}.rgl-indice[open]>.rgl-indice__cuerpo{max-height:60vh}.rgl-resumen{display:flex}.rgl-riel{grid-column:auto;position:static}.rgl-biblioteca{grid-template-columns:minmax(0,1fr)}}
 /* Portada de la Guía: apartados como rectángulos contiguos de la misma altura (igual que la Ventanilla) */
 /* Seis accesos: 3×2, 2×3 o 1×6, siempre sin huecos (dueño: rectángulos contiguos que ocupen el espacio). */
