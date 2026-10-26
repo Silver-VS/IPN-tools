@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const leer=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const indice=leer('web/sate/guia.css'),componentes=leer('web/sate/componentes.css'),guia=leer('web/sate/guia.js');
+const toml=leer('contenido/textos/es.toml');
+assert.match(indice,/\.rgl-grupo>summary\{display:grid;grid-template-columns:minmax\(0,1fr\)/,'R17-5: títulos del índice a ancho completo');
+assert.match(indice,/\.rgl-indice\{[^}]*min-width:min\(100%,calc\(var\(--ipn-esp-8\)\*8\)\)/,'R17-5: ancho mínimo cómodo del índice');
+assert.match(componentes,/\.sate-modal__titulo:focus\{outline:none\}/,'R17-7: foco programático sin anillo');
+assert.match(componentes,/\.sate-ventana\[inert\]::after\{[^}]*background:var\(--ipn-velo-ventana\)/,'R17-7: velo de ventana inactiva');
+assert.match(guia,/guia-definicion-fracciones[\s\S]*?fracciones_completas/,'R17-8: fracciones desplegables en respuesta directa');
+assert.match(toml,/fracciones_completas\s*=\s*"Ver integración completa \(\{n\} fracciones\)"/,'R17-8: texto visible por clave');
+console.log('R17: índice, pila de ventanas y fracciones plegables verificados.');

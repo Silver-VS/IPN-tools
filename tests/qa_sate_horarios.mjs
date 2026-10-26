@@ -169,8 +169,8 @@ assert.match(leer('web/sate/horarios.js'),/S\.soloCupo&&!plan\(\)\.sel\.includes
 assert.match(leer('web/sate/temarios.js'),/SATE\.temarios = \{[^}]*\babrir,/,'Horarios reutiliza el vistazo compartido del temario');
 assert.match(leer('web/sate/horarios.js'),/montar\(\)\{[^}]*SATE\.cargarTemarios\?\.\(\)\?\.then\(\(\)=>\{if\(SATE\.actual\?\.pestana==='horarios'\)renderHor\(\)\}\)/,'Horarios carga temarios en segundo plano y repinta al terminar');
 assert.match(html,/\.temario-mini\{[^}]*min-width:44px[^}]*min-height:var\(--ipn-control-alto\)/,'El botón del temario tiene objetivo táctil');
-assert.equal([...html.matchAll(/class="btn sate-cupos-consultar"[^>]*data-cupos-ayuda/g)].length,2);
-assert.equal([...html.matchAll(/<span data-cupos-etiqueta>/g)].length,2);
+assert.equal([...html.matchAll(/class="btn sate-cupos-consultar"[^>]*data-cupos-ayuda/g)].length,1,'R17: cupos se consultan una vez desde Oferta');
+assert.equal([...html.matchAll(/<span data-cupos-etiqueta>/g)].length,1);
 assert.match(leer('web/sate/cupos.js'),/querySelector\?\.\('\[data-cupos-etiqueta\]'\)/,'Actualizar el texto conserva el ícono');
 const horariosInscritos=leer('web/sate/horarios.js');
 assert.match(horariosInscritos,/pl\.inscrita=true/,'Traer horario SAES marca esa versión como inscrita');

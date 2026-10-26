@@ -634,8 +634,8 @@
     if (a) {
       const literal = cuerpo.querySelector('.guia-articulo-literal');
       const f = a.fracciones?.find(f => f.fr === fr), i = f ? a.texto.indexOf(f.texto) : -1;
+      envolverReferencias(cuerpo,doc,a);
       if (i >= 0) literal.replaceChildren(h('span', {'class':'guia-cita-atenuada', texto:a.texto.slice(0,i)}), h('mark', {texto:a.texto.slice(i,i+f.texto.length)}), h('span', {'class':'guia-cita-atenuada', texto:a.texto.slice(i+f.texto.length)}));
-      else envolverReferencias(cuerpo,doc,a);
       SateUI.oficial(literal,doc);
     }
     if (a && reg.ocr) cuerpo.appendChild(h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }));
@@ -747,7 +747,12 @@
                 b.addEventListener('click',()=>SATE.articulo(f.doc,n,fr));
                 return h('div',{},[h('blockquote',{'data-oficial':f.doc,texto}),b]);
               };
-              return [cita(a.fracciones?.length ? p.intro : a.texto),...(a.fracciones || []).map(fr=>cita(fr.texto,fr.fr))];
+              if(!a.fracciones?.length)return [cita(a.texto)];
+              const completa=h('details',{'class':'guia-definicion-fracciones'},[
+                h('summary',{texto:tx('fracciones_completas',{n:a.fracciones.length})}),
+                h('div',{},a.fracciones.map(fr=>cita(fr.texto,fr.fr)))
+              ]);
+              return [cita(p.intro),completa];
             });
           }));
           const areas=(d.acudir || []).filter(a=>(g.acudir || [g.id]).includes(a.id));

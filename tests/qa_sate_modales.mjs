@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import vm from 'node:vm';
 import {readFileSync} from 'node:fs';
 import {crearEntorno} from './dom_minimo.mjs';
-const leer=p=>readFileSync(p,'utf8'), json=p=>JSON.parse(leer(p));
+const leer=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8'), json=p=>JSON.parse(leer(p));
 const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONFIG=([\s\S]*?);<\/script>/)[1]);
 for(const ancho of [1440,1024,768,600,375,320])for(const oscuro of [false,true]){
   const {document,Elemento,Evento}=crearEntorno(), tareas=[], eventos={};
@@ -43,8 +43,8 @@ for(const ancho of [1440,1024,768,600,375,320])for(const oscuro of [false,true])
   const tercera=top();assert.notEqual(tercera,articulo);assert.equal(articulo.inert,true);
   assert.equal(tercera.querySelector('.sate-modal__navegacion .sate-enlace').hidden,false);
   const literal=json('data/reglamentos/honor.json').articulos.find(a=>a.n==='34').texto;
-  assert.equal(tercera.querySelector('.guia-articulo-literal').textContent,literal);
-  assert.ok(tercera.querySelector('.guia-articulo-literal button'),'también hay citas enlazadas dentro del texto oficial');
+  assert.equal(tercera.querySelector('.pc-lector.pc-oficial').textContent,literal);
+  assert.ok(tercera.querySelector('.pc-lector.pc-oficial button'),'también hay citas enlazadas dentro del texto oficial');
   tercera.querySelector('.sate-modal__volver').click();vaciar();
   assert.equal(top()===articulo,true);assert.equal(document.activeElement===otra,true);
   articulo.querySelector('.sate-modal__volver').click();vaciar();

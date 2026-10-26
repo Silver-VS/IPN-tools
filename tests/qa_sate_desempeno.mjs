@@ -26,7 +26,7 @@ for(const unidad of ['upiita','escom','upibi']){
     const n=Number(v[k]),op={};c.replace(/(=?\w+)\s*\{([^{}]*)\}/g,(_,k,t)=>{op[k]=t});
     return (op['='+n]??op[new Intl.PluralRules('es-MX').select(n)]??op.other??'').replace(/#/g,String(n));
   }).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}');
-  function nodo(id='') {return {id,hidden:true,innerHTML:'',textContent:'',value:'',options:[],dataset:{},parentElement:{hidden:false,parentElement:{hidden:false}},clientWidth:375,offsetWidth:375,offsetHeight:800,
+  function nodo(id='') {return {id,hidden:true,innerHTML:'',textContent:'',value:'',options:[],dataset:id==='#kx-periodos'?undefined:{},parentElement:{hidden:false,parentElement:{hidden:false}},clientWidth:375,offsetWidth:375,offsetHeight:800,
     style:{setProperty(){}},classList:{add(){},remove(){},toggle(){},contains(){return false}},eventos:{},
     addEventListener(k,fn){(this.eventos[k]??=[]).push(fn)},setAttribute(){},removeAttribute(){},getAttribute(){return null},appendChild(){},insertAdjacentHTML(){},
     querySelector:s=>s==='svg'?null:nodo(),querySelectorAll:s=>s==='.charts'?[nodo(),nodo()]:[],closest:()=>null,contains:()=>false,
@@ -59,7 +59,7 @@ for(const unidad of ['upiita','escom','upibi']){
       assert.equal(solicitudes.length,0,pesta+' sin descargas de gráficas');
     }
   }
-  vm.runInContext(leer('web/dist/sate/desempeno.js'),c);
+  vm.runInContext(leer('web/sate/desempeno.js'),c);
   const mod=SATE.modulos.trayectoria;mod.montar();
   SATE.actual.pestana='trayectoria';vm.runInContext('ALUMNO=null;for(const k in T)delete T[k]',c);
   await mod.mostrar();assert.equal(solicitudes.length,0,'Sin perfil no requiere Plot');
@@ -127,10 +127,11 @@ for(const unidad of ['upiita','escom','upibi']){
   assert.match(orden,/<details class="trayectoria-areas-detalle"><summary>Ver detalle<\/summary>/,'REV1: datos de áreas plegados por omisión');
   assert.match(orden,/Escala 6–10 · línea: tu promedio sin reprobadas \([^)]*\) · acento: tus 2 mejores áreas/);
   assert.match(document.querySelector('#est-sim').innerHTML,/Simular fin de semestre/);
-  vm.runInContext("ALUMNO.kardex_reprobadas=[[Object.keys(cur())[0],5,'23/2','ORD']];ALUMNO.acreditadas=ALUMNO.acreditadas.filter(a=>a[0]!==Object.keys(cur())[0]);ALUMNO.en_curso=[Object.keys(cur())[1]]",c);
+  vm.runInContext("KX_FILTRO[S.car]={periodo:'*',estado:'*'};ALUMNO.kardex_reprobadas=[[Object.keys(cur())[0],5,'23/2','ORD']];ALUMNO.acreditadas=ALUMNO.acreditadas.filter(a=>a[0]!==Object.keys(cur())[0]);ALUMNO.en_curso=[Object.keys(cur())[1]]",c);
   pendiente=mod.mostrar();vaciarCuadros();await pendiente;
   assert.match(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'Perfil ficticio adeuda resalta junto a la materia');
-  const filtrar=dataset=>document.querySelector('#kstats').eventos.click.forEach(fn=>fn({target:{closest:()=>({dataset})}}));
+  const filtrar=dataset=>document.querySelector('#kstats').eventos.click.forEach(fn=>fn({target:{closest:selector=>
+    (dataset.kxEstado!=null&&selector.includes('data-kx-estado')||dataset.kxPeriodo!=null&&selector.includes('data-kx-periodo'))?{dataset}:null}}));
   filtrar({kxEstado:'reprobadas'});
   assert.equal(vm.runInContext('KX_FILTRO[S.car]?.estado',c),'reprobadas','El control actualiza el filtro');
   assert.match(document.querySelector('#kx-lista').innerHTML,/Adeudo/,'El filtro de reprobadas muestra adeudos');
@@ -142,7 +143,12 @@ for(const unidad of ['upiita','escom','upibi']){
     const anterior=vm.runInContext('ALUMNO',c);
     for(const nombre of ['desfase-dictamen-bionica','regular-mecatronica']){
       c.perfilKx=JSON.parse(leer('data/perfiles-prueba/'+nombre+'.json'));
-      vm.runInContext('ALUMNO=perfilKx;S.car=ALUMNO.carrera;KX_FILTRO[S.car]={periodo:"*",estado:"*"};renderKardexLista()',c);
+      vm.runInContext('ALUMNO=perfilKx;S.car=ALUMNO.carrera',c);
+      c.periodoKxPrevio=vm.runInContext('ALUMNO.periodo_actual',c);
+      vm.runInContext('ALUMNO.periodo_actual=filasKardex()[0].periodo;delete KX_FILTRO[S.car];store.set("trayectoria.kardex."+S.car,{});renderKardexLista()',c);
+      const periodoActual=vm.runInContext('ALUMNO.periodo_actual',c);
+      assert.match(document.querySelector('#kx-periodos').innerHTML,new RegExp(`data-kx-periodo="${periodoActual}" aria-pressed="true"`),'R17-KAR: selecciona el periodo actual aunque falten dataset y scrollTo');
+      vm.runInContext('ALUMNO.periodo_actual=periodoKxPrevio;KX_FILTRO[S.car]={periodo:"*",estado:"*"};renderKardexLista()',c);
       const n=vm.runInContext('filasKardex().length',c);
       assert.equal(document.querySelector('#kx-cuenta').textContent,`Mostrando ${n} de ${n}`);
       assert.match(document.querySelector('#kx-periodos').innerHTML,/kx-fichas/);
