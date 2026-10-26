@@ -281,6 +281,12 @@
 .rgl-fracciones,.rgl-incisos{padding:0;list-style:none;display:grid;gap:var(--ipn-esp-3)}
 .rgl-fr,.rgl-inc{display:grid;grid-template-columns:2.75rem minmax(0,1fr);align-items:start;padding:var(--ipn-esp-1) 0;border-radius:var(--ipn-radio)}
 .rgl-fr>div{display:grid;gap:var(--ipn-esp-3);min-width:0}
+.rgl-fr>div,.rgl-inc>div{display:grid;min-width:0;grid-template-columns:minmax(0,1fr) auto;column-gap:var(--ipn-esp-3);row-gap:var(--ipn-esp-3)}
+.rgl-fr>div>*,.rgl-inc>div>*{grid-column:1/-1}
+.rgl-fr>div>.guia-articulo-literal,.rgl-inc>div>.guia-articulo-literal{grid-column:1;grid-row:1}
+.rgl-fr>div>.inv-fraccion,.rgl-inc>div>.inv-fraccion{display:contents}
+.inv-fraccion>button{grid-column:2;grid-row:1;align-self:start}
+.inv-fraccion>:not(button){grid-column:1/-1}
 .rgl-incisos{margin-top:var(--ipn-esp-2)}
 .rgl-marca{position:relative;color:var(--ipn-acento);font-weight:600;text-decoration:none;font-family:var(--ipn-fuente-texto)}
 .rgl-marca::after{content:"";position:absolute;inset:-0.6rem 0}

@@ -1141,7 +1141,7 @@
   function nuevaInv(nombre) {return migrarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]});}
   async function guardarArticuloInv(doc,n,fr='',inciso='',frpos=0) {
     const v=leerInvestigaciones();
-    if(!v.proyectos.length){const nombre=raiz.prompt(ti('nombre'));if(!nombre?.trim())return;v.proyectos.push(nuevaInv(nombre));v.activa=0;}
+    if(!v.proyectos.length){v.proyectos.push(nuevaInv(ti('nombre_inicial')));v.activa=0;}
     const p=v.proyectos[v.activa],m={doc,n:String(n),fr,inciso,anotaciones:[],nota:'',tipo:'personal',huella:'',...(frpos?{frpos}:{})};
     const i=p.marcadores.findIndex(x=>claveCita(x)===claveCita(m));
     if(i>=0)p.marcadores.splice(i,1);
@@ -1175,7 +1175,7 @@
       v.proyectos.forEach((p,i)=>{const b=h('button',{type:'button','class':'btn',texto:p.nombre,'aria-pressed':String(i===v.activa)});b.addEventListener('click',()=>{v.activa=i;guardar();repintar();});lista.appendChild(b);});
       herramientas.appendChild(lista);
     }
-    herramientas.appendChild(botonInv('nueva',()=>{const nombre=raiz.prompt(ti('nombre'));if(!nombre?.trim())return;try{v.proyectos.push(nuevaInv(nombre));v.activa=v.proyectos.length-1;guardar();repintar();}catch(e){errorInv(e);}}));
+    herramientas.appendChild(botonInv('nueva',()=>{const nombre=ti('nombre_n',{n:v.proyectos.length+1});try{v.proyectos.push(nuevaInv(nombre));v.activa=v.proyectos.length-1;guardar();repintar();}catch(e){errorInv(e);}}));
     if(p){
       herramientas.append(botonInv('renombrar',()=>{const nombre=raiz.prompt(ti('nombre'),p.nombre);if(nombre?.trim()&&raiz.confirm(ti('confirmar_nombre'))){try{p.nombre=nombre;validarInvestigacion(p);guardar();repintar();}catch(e){errorInv(e);}}}),botonInv('borrar',()=>{if(raiz.confirm(ti('confirmar'))){v.proyectos.splice(v.activa,1);v.activa=0;guardar();repintar();}}));
     }
