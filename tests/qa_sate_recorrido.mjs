@@ -58,7 +58,7 @@ const entorno={console,document:documento,innerWidth:375,innerHeight:700,matchMe
   SateUI:{recorridoTarjeta(salir){
     dialogo={elemento:{open:false,dataset:{},showModal(){this.open=true},remove(){cerrada=true},querySelectorAll(){return []},addEventListener(){}},
       tarjeta:Object.assign(nodo(),{getBoundingClientRect:()=>({top:360,height:120})}),titulo:nodo(),texto:nodo(),acciones:Object.assign(nodo(),{getBoundingClientRect:()=>({top:620,bottom:700,height:80})}),marco:nodo(),escape:salir};return dialogo;
-  },modal(){}},scrollBy(){}};
+  },abrirVentana(d){d.showModal()},cerrarVentana(d){d.open=false},modal(){}},scrollBy(){}};
 entorno.window=entorno;
 vm.runInNewContext(leer('web/sate/recorrido.js'),entorno);
 await entorno.SateRecorrido.iniciar();

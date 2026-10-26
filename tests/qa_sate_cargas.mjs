@@ -63,6 +63,7 @@ for (const dosPeriodos of [false,true]) for (const unidad of ['upiita','escom','
   function nodo(id='') { return {id,hidden:true,value:'',dataset:{},innerHTML:'',textContent:'',options:[],children:[],style:{setProperty(){},getPropertyValue(){return ''}},
     classList:{add(){},remove(){},toggle(){},contains(){return false}},eventos:{},addEventListener(n,fn){this.eventos[n]=fn},setAttribute(){},removeAttribute(){},getAttribute(){return null},
     appendChild(){},append(){},prepend(){},remove(){},insertAdjacentHTML(){},querySelector:()=>nodo(),querySelectorAll:()=>[],closest:()=>null,contains:()=>false,focus(){document.activeElement=this},
+    insertBefore(n){this.appendChild(n)},
     offsetWidth:1280,offsetHeight:800,clientWidth:1280,scrollLeft:0,getBoundingClientRect:()=>({top:0,left:0,bottom:800,width:1280,height:800}),showModal(){this.hidden=false},close(){this.hidden=true}}; }
   const segmentos=[nodo('plan-0'),nodo('plan-1')];segmentos.forEach((b,i)=>{b.dataset.planPaso=String(i);b.atributos={};b.setAttribute=(k,v)=>b.atributos[k]=v});
   const eventosDocumento={};

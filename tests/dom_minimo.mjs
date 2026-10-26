@@ -45,6 +45,7 @@ export function crearEntorno() {
     constructor(type, o = {}) { Object.assign(this, { type, bubbles: true, defaultPrevented: false, _stop: false }, o); }
     preventDefault() { this.defaultPrevented = true; }
     stopPropagation() { this._stop = true; }
+    stopImmediatePropagation() { this._stop = true; this._inmediato = true; }
   }
   class Nodo {
     constructor() { this.parentNode = null; this.childNodes = []; this._ev = {}; }
@@ -83,7 +84,7 @@ export function crearEntorno() {
       e.target ||= this;
       for (let n = this; n && !e._stop; n = n.parentNode || (n === doc.documentElement ? doc : null)) {
         e.currentTarget = n;
-        for (const f of [...(n._ev?.[e.type] || [])]) f(e);
+        for (const f of [...(n._ev?.[e.type] || [])]) { f(e); if(e._inmediato)break; }
         if (!e.bubbles) break;
       }
       return !e.defaultPrevented;
@@ -141,6 +142,10 @@ export function crearEntorno() {
     click() { return this.dispatchEvent(new Evento('click', { target: this })); }
   }
   // Los atributos reflejan en propiedades que el código lee directamente.
+  for (const atributo of ['hidden','inert']) Object.defineProperty(Elemento.prototype, atributo, {
+    get(){return this._attrs.has(atributo)},
+    set(v){if(v)this._attrs.set(atributo,'');else this._attrs.delete(atributo)}
+  });
   const reflejo = Object.getOwnPropertyDescriptor(Elemento.prototype, 'setAttribute');
   Elemento.prototype.setAttribute = function (k, v) {
     reflejo.value.call(this, k, v);

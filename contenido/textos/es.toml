@@ -400,6 +400,8 @@ tramites = "Esta sección está en preparación. Consulta el aviso vigente y rea
 # Componentes comunes (web/sate/componentes.js).
 [componentes]
 cerrar = "Cerrar"
+cerrar_todo = "Cerrar todo"
+ventanas = "Ventanas abiertas"
 descartar = "Descartar"
 barra.etiqueta = "Secciones"
 ayuda.boton = "Ayuda"

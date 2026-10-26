@@ -45,8 +45,8 @@ function montarFiltrosD(){
   grupo('d_cuando',[horas,$('#f-fit').closest('label')]);
   grupo('d_quien',[$('#g-avoid').closest('.field')]);
   for(const [id,k] of [['#d-from','a'],['#d-to','b']])$(id).addEventListener('change',e=>{GT[k]=e.target.value;renderGTime();gtChanged()});
-  $('#f-more-title').addEventListener('click',e=>{e.preventDefault();panel.showModal();cerrar.focus()});
-  cerrar.addEventListener('click',()=>{panel.close();$('#f-more-title').focus()});
+  $('#f-more-title').addEventListener('click',e=>{e.preventDefault();SateUI.abrirVentana(panel);cerrar.focus()});
+  cerrar.addEventListener('click',()=>SateUI.cerrarVentana(panel));
   panel.addEventListener('cancel',()=>$('#f-more-title').focus());
   const limpiar=document.createElement('button');limpiar.type='button';limpiar.className='link';limpiar.textContent=txH('d_limpiar');
   const activos=document.createElement('div');activos.className='active';
@@ -214,10 +214,10 @@ $('#b-horario').addEventListener('click',()=>{
   const dlg=$('#horario-compacto');
   // Mover la vista real conserva la selección, los eventos y la vista previa sin duplicar ids.
   for(const s of ['.calwrap','#agenda'])$('#horario-compacto-cuerpo').appendChild($(s));
-  dlg.showModal();
+  SateUI.abrirVentana(dlg);
   renderCal();
 });
-$('#horario-compacto-cerrar').addEventListener('click',()=>$('#horario-compacto').close());
+$('#horario-compacto-cerrar').addEventListener('click',()=>SateUI.cerrarVentana($('#horario-compacto')));
 $('#horario-compacto').addEventListener('close',()=>{
   for(const s of ['.calwrap','#agenda'])$('.planner').insertBefore($(s),$('.planner .summary'));
   renderCal();

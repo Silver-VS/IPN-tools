@@ -16,7 +16,7 @@
   let arribaVisible=true,copiaActiva=false,observador=null,tarjetaMes=null,tarjetaCopia=null,ladoNodo=null;
   let periodo=null,mes=null,foco=null,ampliar=false,verPasados=false,elegidos=new Set(),tituloElegido='',hoja=false,retorno=null;
   let eventos=[],ordenados=[],grupos=[],desde,hasta,limites,box,panel,marcas=[],dias=[],periodosDisponibles=[];
-  let ultimoEnlace = '';
+  let ultimoEnlace = '', ventanaDetalle = null;
   const seleccionado=e=>elegidos.has(identidad(e)),categoria=e=>tx('categoria_'+e.categoria);
   const meta=e=>SATE_CONFIG.calendarioBase?.vista?.categorias?.[e.categoria]||{};
   // El valor guardado «carriles» corresponde a la vista Detallado; se conserva para no perder la preferencia del alumno.
@@ -41,7 +41,7 @@
     // En teléfono el foco pasa a la hoja; en escritorio vuelve al elemento elegido, que se redibujó.
     if(completos.length&&hoja)document.getElementById('cal-detalle-titulo')?.focus({preventScroll:true});else if(retorno)enfocar(retorno);
   }
-  function cerrar(){hoja=false;if(!movil())elegidos.clear();mostrar();enfocar(document.getElementById(retorno)?retorno:'cal-dia-'+api.hoy())}
+  function cerrar(){if(ventanaDetalle){ventanaDetalle.cerrar();return}hoja=false;if(!movil())elegidos.clear();mostrar();enfocar(document.getElementById(retorno)?retorno:'cal-dia-'+api.hoy())}
   function volver(){elegidos.clear();tituloElegido='';hoja=false;mes=api.hoy().slice(0,7);redibujar('cal-dia-'+api.hoy())}
   function conectar(n,es,titulo){n.setAttribute('data-categoria',es[0].categoria);n.setAttribute('aria-label',es.map(e=>tx('evento_aria',{titulo:e.titulo,fechas:rango(e)})).join('; '));n.onclick=()=>elegir(es,titulo,n);if(n.tagName.toLowerCase()==='g'){n.setAttribute('role','button');n.setAttribute('tabindex',0);n.onkeydown=k=>{if(k.key==='Enter'||k.key===' '){k.preventDefault();n.onclick()}}}marcas.push({n,es})}
   function resumen(sinEtiqueta=false){
@@ -190,12 +190,17 @@
   function detalle(){
     const elegidosEv=ordenados.filter(seleccionado),sugerido=ordenados.find(e=>!pasado(e)),es=elegidosEv.length?elegidosEv:(!movil()&&sugerido?[sugerido]:[]);
     panel.hidden=movil()&&(!hoja||!elegidosEv.length);panel.setAttribute('aria-labelledby','cal-detalle-titulo');if(panel.hidden)return;
-    if(movil()){panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');const fondo=boton(null,cerrar);fondo.className='calendario-hoja-fondo';fondo.tabIndex=-1;fondo.setAttribute('aria-label',tx('cerrar_detalle'));box.appendChild(fondo)}else panel.setAttribute('aria-live','polite');
+    if(!movil())panel.setAttribute('aria-live','polite');
     const h=el('h3',elegidosEv.length?tituloElegido:es.length?es[0].titulo:tx('detalle'));h.id='cal-detalle-titulo';h.tabIndex=-1;panel.appendChild(h);if(movil())panel.appendChild(boton(tx('cerrar_detalle'),cerrar,'cal-cerrar'));
     if(!es.length)panel.appendChild(el('p',tx('detalle_vacio'),'calendario-detalle-vacio'));
     es.forEach(e=>{const s=el('section',null,'calendario-detalle-evento');s.setAttribute('data-categoria',e.categoria);s.appendChild(el('small',categoria(e),'calendario-detalle-categoria'));if(es.length>1)s.appendChild(el('h4',e.titulo));s.appendChild(el('p',rango(e)));s.appendChild(el('strong',estado([e]),'calendario-cuenta'));s.appendChild(el('p',tx('audiencia',{audiencia:(e.audiencia||['alumnos']).map(a=>tx('audiencia_'+a)).join(', ')})));if(e.para)s.appendChild(el('p',tx('condicion_'+e.para)));if(e.nota||e.texto)s.appendChild(el('p',e.nota||e.texto));const fuente=el('details',null,'calendario-fuente');fuente.appendChild(el('summary',tx('fuente_titulo')));fuente.appendChild(el('p',tx('fuente',{fuente:e.fuente||''})));if(e.url){const a=el('a',tx('consultar_fuente'));a.href=e.url;fuente.appendChild(a)}if(e.fuenteOriginal)fuente.appendChild(el('small',e.fuenteOriginal));s.appendChild(fuente);panel.appendChild(s)});
     if(elegidosEv.length&&!movil())panel.appendChild(boton(tx('volver_hoy'),volver,'cal-volver-detalle'));
-    panel.onkeydown=k=>{if(k.key==='Escape'&&movil()){k.preventDefault();cerrar()}else if(movil()&&k.key==='Tab'){const ns=Array.from(panel.querySelectorAll('button, a[href], summary')),primero=ns[0],ultimo=ns.at(-1);if(k.shiftKey&&(document.activeElement===primero||document.activeElement===h)){k.preventDefault();ultimo?.focus()}else if(!k.shiftKey&&document.activeElement===ultimo){k.preventDefault();primero?.focus()}}};
+    if(movil()){
+      const contenido=el('div');
+      while(panel.firstChild)contenido.appendChild(panel.firstChild);
+      panel.hidden=true;
+      ventanaDetalle=SateUI.modal(h.textContent,contenido,{alCerrar:()=>{ventanaDetalle=null;cerrar()}});
+    }
   }
   function mostrar(){return globalThis.SateMedicion?globalThis.SateMedicion.render('calendario',mostrarVista):mostrarVista()}
   function mostrarVista(){

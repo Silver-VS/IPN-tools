@@ -323,48 +323,27 @@
 
   /* ---------- vistazo: modal del Mapa curricular ---------- */
   function construirPanel() {
-    if (E.panel) return E.panel;
-    const x = h('button', { type: 'button', 'class': 'tmr-panel-x', 'aria-label': t('temarios.panel.cerrar'), texto: '×' });
     const cuerpo = h('div', { 'class': 'tmr-panel-cuerpo' });
-    const p = h('section', { 'class': 'tmr-panel', role: 'dialog', 'aria-modal': 'true', tabindex: '-1', hidden: true },
-      [h('div', { 'class': 'tmr-panel-enc' }, [x]), cuerpo]);
-    const velo = h('div', { 'class': 'tmr-velo', hidden: true });
-    x.addEventListener('click', () => cerrar({ foco: true }));
-    velo.addEventListener('click', () => cerrar({ foco: true }));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && E.panel && !E.panel.hidden) cerrar({ foco: true }); });
-    p.addEventListener('keydown', e => {
-      if (e.key !== 'Tab') return;
-      const f = [...p.querySelectorAll('button,a[href]')], a = f[0], z = f[f.length - 1];
-      if (e.shiftKey && (document.activeElement === a || document.activeElement === p)) { e.preventDefault(); z.focus(); }
-      else if (!e.shiftKey && (document.activeElement === z || document.activeElement === p)) { e.preventDefault(); a.focus(); }
-    });
-    // Fuera del <body>: no hereda el zoom de interfaz (--ui-zoom), igual que el globo de ayuda.
-    document.documentElement.appendChild(velo); document.documentElement.appendChild(p);
-    E.panel = p; E.velo = velo; E.cuerpo = cuerpo;
-    return p;
-  }
-  function ajustarPanel() {
-    E.velo.hidden = E.panel.hidden;
-    document.body.inert = !E.panel.hidden;
-    document.documentElement.classList.toggle('sate-sin-scroll', !E.panel.hidden);
+    const ventana = SateUI.modal(t('temarios.panel.etiqueta', { materia: nombreDe(E.origenClave) }), cuerpo, {amplio:true,origen:E.origen});
+    E.panel = ventana.elemento; E.cuerpo = cuerpo;
+    return E.panel;
   }
   async function abrir(clave, origen) {
     const k = claveNorm(clave);
     if (!tiene(k)) return;
     E.origen = origen || E.origen; E.origenClave = k;
-    const token = ++E.token, p = construirPanel();
-    p.hidden = false; ajustarPanel();
+    const p = construirPanel();
+    const cuerpo = E.cuerpo;
     p.setAttribute('aria-label', t('temarios.panel.etiqueta', { materia: nombreDe(k) }));
-    E.cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }));
-    p.focus();
+    cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'status', texto: t('temarios.panel.cargando') }));
     try {
       const r = await registro(k);
-      if (token !== E.token) return;
+      if (!p.open) return;
       if(!SATE.actual || SATE.actual.pestana==='guia' || SATE.actual.padre==='guia') {
         const recursos=await cargarRecursos(r.carreraId);
-        if(token!==E.token)return;
+        if(!p.open)return;
         p.style.setProperty('--tmr-area',r.registro.area?.color || 'var(--ipn-acento)');
-        E.cuerpo.replaceChildren(construirFicha(r,recursos[k]||[],{modo:'vistazo',alIr:()=>cerrar({foco:false})}));
+        cuerpo.replaceChildren(construirFicha(r,recursos[k]||[],{modo:'vistazo',alIr:()=>SateUI.cerrarVentana(p)}));
         return;
       }
       const ficha=h('div',{'class':'sate-puentes-materia'},[
@@ -378,27 +357,20 @@
         ficha.insertBefore(a,ficha.lastChild);
       }
       if(SATE.relacionesMateria)ficha.insertAdjacentHTML('beforeend',SATE.relacionesHtml(SATE.relacionesMateria(k)));
-      ficha.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>cerrar({foco:false})));
-      E.cuerpo.replaceChildren(ficha);
+      ficha.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>SateUI.cerrarVentana(p)));
+      cuerpo.replaceChildren(ficha);
       p.setAttribute('aria-label', t('temarios.panel.etiqueta', { materia: r.registro.nombre }));
     } catch (e) {
-      if (token !== E.token) return;
+      if (!p.open) return;
       console.warn('SATE: ficha no disponible', {unidad:unidad(), clave:k, ruta:raiz.location.hash, mensaje:e.message, pila:e.stack});
       const otra = h('button', { type: 'button', 'class': 'btn', texto: t('temarios.panel.reintentar') });
       otra.addEventListener('click', () => abrir(k, E.origen));
-      E.cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra);
+      cuerpo.replaceChildren(h('p', { 'class': 'tmr-estado', role: 'alert', texto: t('temarios.panel.error') }), otra);
     }
   }
   function cerrar(op) {
     const p = E.panel;
-    if (!p || p.hidden) return;
-    E.token++;
-    p.hidden = true; ajustarPanel();
-    if (op && op.foco) {
-      let o = E.origen;
-      if (!o || !o.isConnected) o = document.querySelector('[data-box="' + (raiz.CSS && CSS.escape ? CSS.escape(E.origenClave) : E.origenClave) + '"]');
-      if (o && o.focus) o.focus();
-    }
+    if (p) SateUI.cerrarVentana(p);
   }
 
   /* ---------- selector de unidad de aprendizaje: ventana con la trayectoria visual ---------- */
@@ -433,7 +405,7 @@
     function boton(m, colores) {
       const b = h('button', { type: 'button', 'class': 'sel-materia', 'data-clave': m.clave, 'aria-current': op && op.actual === m.clave ? 'true' : null }, [h('span', { texto: m.n }), h('small', { texto: [m.clave, SEL.orden === 'az' && m.v != null ? t('temarios.lista.nivel', { n: m.v }) : null].filter(Boolean).join(' · ') })]);
       const c = colores.get(m.a); if (c) b.style.setProperty('--sel-area', c);
-      b.addEventListener('click', () => { SateUI.cerrarModal(); abrirFicha(m.clave); });
+      b.addEventListener('click', () => { abrirFicha(m.clave); });
       return h('li', {}, [b]);
     }
     function pintar() {

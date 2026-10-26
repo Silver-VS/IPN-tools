@@ -11,8 +11,9 @@ const config=JSON.parse(leer('web/dist/sate/index.html').match(/window.SATE_CONF
 // Umbrales sin diferencias entre CSS y JS; CSS no admite var() en @media.
 assert.match(shell,/--ipn-quiebre-movil:640px/);
 assert.match(shell,/--ipn-quiebre-escritorio:1024px/);
+// R17 conserva 600 px solo para las hojas modales; las vistas mantienen sus umbrales anteriores.
 for(const src of [shell,css,core,leer('web/sate/calendario.js'),leer('web/sate/inicio.js')])
-  assert.doesNotMatch(src,/\((?:max|min)-width:\s*(?:480|520|600|720|768|819|900|980|1100)px\)/);
+  assert.doesNotMatch(src,/\((?:max|min)-width:\s*(?:480|520|720|768|819|900|980|1100)px\)/);
 const vistas=core.match(/const mview=\(\)=>[^;]+;/)[0];
 for(const ancho of [375,414,639,640,768,1024,1440])for(const elegida of [null,'mapa','lista']){
   const c={S:{mview:elegida,cview:null},MQ_PHONE:{matches:ancho<640}};
