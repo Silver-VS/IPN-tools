@@ -229,6 +229,7 @@
   "ctce": {
    "termino": "Consejo Técnico Consultivo Escolar (CTCE)",
    "definicion": "El órgano de consulta de cada unidad académica. Lo preside la dirección de la unidad y participan, entre otras personas, representantes del personal docente y del alumnado. De él depende la Comisión de Situación Escolar de la unidad.",
+   "definicionFuentes": [{"doc":"ri","arts":["202","203"]},{"doc":"lo","arts":["27","28"]}],
    "fuente": {
     "doc": "ri",
     "arts": [
@@ -240,6 +241,8 @@
   "cgc": {
    "termino": "Consejo General Consultivo (CGC)",
    "definicion": "El órgano de consulta de todo el Instituto, no de una sola unidad académica. Tiene sus propias comisiones, como la de Situación Escolar, que atienden los asuntos que una unidad no puede resolver por sí sola.",
+   "acudir": ["consejo-general"],
+   "definicionFuentes": [{"doc":"ri","arts":["184","185"]},{"doc":"lo","arts":["25"]}],
    "fuente": {
     "doc": "ri",
     "arts": [
