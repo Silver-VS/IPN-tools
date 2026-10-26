@@ -45,10 +45,10 @@
       var arriba = i === ventanas.length - 1;
       v.elemento.inert = !arriba;
       if (arriba) v.elemento.setAttribute('aria-modal', 'true'); else v.elemento.removeAttribute('aria-modal');
-      v.volver.hidden = !i;
-      v.volver.textContent = i ? '‹ ' + ventanas[i - 1].titulo : '';
+      v.volver.hidden = !i && !v.regreso;
+      v.volver.textContent = i ? '‹ ' + ventanas[i - 1].titulo : v.regreso || '';
       v.todo.hidden = ventanas.length < 3;
-      v.navegacion.hidden = !i && !v.cierre;
+      v.navegacion.hidden = !i && !v.cierre && !v.regreso;
     });
     document.documentElement.classList.toggle('sate-sin-scroll', !!ventanas.length);
   }
@@ -114,6 +114,7 @@
     op = op || {};
     if (ventanas.some(function (v) { return v.elemento === d; })) return;
     var titulo = d.querySelector('h2'), v = {elemento:d, id:++secuencia, pasos:1, titulo:op.titulo || titulo?.textContent || d.getAttribute('aria-label'), origen:op.origen || document.activeElement, alCerrar:op.alCerrar, propia:op.propia};
+    v.regreso = op.volver;
     v.volver = el('button', {type:'button', class:'sate-btn sate-modal__volver'});
     v.todo = el('button', {type:'button', class:'sate-enlace', texto:traducir('componentes.cerrar_todo')});
     v.navegacion = el('nav', {class:'sate-modal__navegacion', 'aria-label':traducir('componentes.ventanas')}, [v.volver, v.todo]);
@@ -234,7 +235,7 @@
       });
       pie.appendChild(b);
     });
-    return abrirVentana(dlg, {titulo:titulo, origen:op.origen, alCerrar:op.alCerrar, propia:true});
+    return abrirVentana(dlg, {titulo:titulo, origen:op.origen, alCerrar:op.alCerrar, volver:op.volver, propia:true});
   }
   function cerrar() {
     cerrarVentana();
@@ -507,7 +508,7 @@
     return el('span', {class:'sate-pestana__icono', 'aria-hidden':'true', html:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" focusable="false">'+trazos[ident]+'</svg>'});
   }
   function contenidoPestana(b, it) {
-    var icono = iconoPestana(it.id);
+    var icono = iconoPestana(it.icono || it.id);
     if (icono) b.appendChild(icono);
     b.appendChild(el('span', {class:'sate-pestana__texto', texto:it.texto}));
     if (it.corto) {
@@ -793,7 +794,7 @@ function leyendaGrafica(items,esc){
 
   raiz.SateUI = { avisoMateria, definicion: (texto, titulo, definicion) => ayuda('', {}, {texto, titulo, definicion}), leyendaGrafica, indicadoresTrayectoria, fichasKardex, caminoTrayectoria, bandasMapa:rowBands, minimapaCurricular, cajaMateria, resalteCaja, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
     abrirVentana: abrirVentana, cerrarVentana: cerrarVentana, cerrarVentanas: cerrarTodo,
-    ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior,
+    ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, iconoPestana: iconoPestana, barraInferior: barraInferior,
     volver: volver, migas: migas, tarjetaNav: tarjetaNav, buscador: buscador, segmentado: segmentado, pregunta: pregunta, revelar: revelar };
   // Solo se aplica a una transcripción: nunca al contenedor que mezcla orientación y fuentes.
   raiz.SateUI.oficial = function (nodo, documento) {
