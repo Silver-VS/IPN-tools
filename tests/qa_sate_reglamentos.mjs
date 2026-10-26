@@ -81,7 +81,7 @@ const css = leer('web/sate/guia.css');
 assert.match(css, /\.rgl \.pc-lector\.pc-oficial[^{]*\{font-family:var\(--ipn-fuente-texto\)\}/);
 assert.ok(!/\.rgl[^{]*\{[^}]*(serif|Noto Serif)/.test(css), 'sin serif en el lector de reglamentos');
 assert.match(leer('web/sate/componentes.css'), /\.sate-modal__cuerpo\{[^}]*min-height:0;[^}]*overflow:auto/,'el cuerpo del modal puede encogerse y desplazarse');
-assert.match(leer('web/sate/componentes.css'), /\.sate-modal\{[^}]*width:min\(36rem,calc\(100vw - var\(--ipn-esp-5\)\)\);max-height:calc\(100dvh - var\(--ipn-esp-6\)\)/,'el modal cabe en el ancho y alto del viewport');
+assert.match(leer('web/sate/componentes.css'), /\.sate-modal\{[^}]*position:fixed;inset-block:var\(--ipn-esp-3\);[^}]*max-height:calc\(100dvh - 2 \* var\(--ipn-esp-3\)\)/,'el modal queda dentro del alto visible con márgenes');
 assert.match(css, /\.rgl-fracciones[^\{]*\{[^}]*list-style:none/,'la fracción conserva solo su numeración literal');
 assert.match(leer('web/sate/guia.js'), /fila\('rgl-fr', f\.fr \+ '\.'/,'cada fracción muestra su número romano literal una sola vez');
 const mapa = G.mapaReglamento(ri);

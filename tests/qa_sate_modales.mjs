@@ -91,4 +91,11 @@ for(const ancho of [1440,1024,768,600,375,320])for(const oscuro of [false,true])
   assert.equal(location.hash,'#/upiita/mapa');assert.equal(posicion,0);
 }
 assert.match(leer('web/sate/componentes.css'),/@media\(max-width:600px\)/);
+const estilos=leer('web/sate/componentes.css');
+assert.match(estilos,/\.sate-modal\{position:fixed;inset-block:var\(--ipn-esp-3\);[\s\S]*?max-height:calc\(100dvh - 2 \* var\(--ipn-esp-3\)\)/,'la ventana tiene límites visibles en escritorio');
+assert.match(estilos,/\.sate-modal__cab\{[^}]*flex:none/,'el encabezado conserva título y cierre');
+assert.match(estilos,/\.sate-modal__navegacion\{[^}]*flex:none/,'la navegación de la pila queda fija');
+assert.match(estilos,/\.sate-modal__cuerpo\{[^}]*overflow:auto;overscroll-behavior:contain/,'solo el cuerpo desplaza su contenido y contiene el gesto');
+assert.match(estilos,/\.sate-modal__pie\{[^}]*flex:none/,'el pie de acciones queda fijo');
+assert.doesNotMatch(estilos,/\.sate-modal\[open\]\{animation:sate-sube/,'la apertura no traslada el diálogo fuera del área visible');
 console.log('Modales: Dictamen → cita → cita, estado, scroll, foco, Esc/Tab/fondo, Atrás, límite 5 y diálogos persistentes; 6 anchos y 2 temas, DOM sin renderizado.');
