@@ -224,7 +224,7 @@
       if (definicion) g.textContent = definicion.definicion;
       else g.innerHTML = traducir(clave, vars);
       // Las coordenadas pertenecen al viewport, fuera de ancestros transformados o recortados.
-      (b.closest('dialog[open]') || document.body).appendChild(g);
+      (b.closest('dialog[open]') || document.documentElement).appendChild(g);
       g.hidden = false; b.setAttribute('aria-describedby', gid);
       colocar();
       globoAbierto = ocultar;

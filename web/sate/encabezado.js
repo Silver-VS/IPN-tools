@@ -36,10 +36,10 @@
     const boton=original.cloneNode(true);boton.removeAttribute('id');boton.addEventListener('click',()=>original.click());acciones.append(boton);
   }
   bar.append(marca,copia,acciones);h.after(bar);
-  // La altura puede cambiar por fuentes, zoom o etiquetas; los sticky comparten el borde visible.
+  // Reservar el mismo tope antes y después del umbral: mostrar la barra no empuja los sticky.
   const sync=()=>{
     bar.hidden=!(mq.matches&&nav.getBoundingClientRect().bottom<0);
-    document.documentElement.style.setProperty('--sate-barra-alto',(bar.hidden?0:Math.ceil(bar.getBoundingClientRect().bottom))+'px');
+    document.documentElement.style.setProperty('--sate-barra-alto',(mq.matches?Math.ceil(bar.getBoundingClientRect().height):0)+'px');
   };
   let pendiente=false;
   const actualizar=()=>{if(pendiente)return;pendiente=true;requestAnimationFrame(()=>{pendiente=false;sync()})};

@@ -22,7 +22,7 @@ export function auditar(css, archivo) {
       }
     }
     for(const [propiedad,valor] of Object.entries(propiedades).filter(([p])=>/^border-(?:(?:top|bottom)-(?:left|right)-)?radius$/.test(p))) {
-      if(!/^(?:0|var\(--ipn-radio(?:-pastilla|-circulo)?\))(?: (?:0|var\(--ipn-radio\)))*$/.test(valor)) errores.push(`${archivo}: ${selector}: ${propiedad} ${valor}`);
+      if(!/^(?:0|var\(--ipn-radio(?:-pastilla|-circulo|-interior)?\))(?: (?:0|var\(--ipn-radio\)))*$/.test(valor)) errores.push(`${archivo}: ${selector}: ${propiedad} ${valor}`);
       if(valor==='var(--ipn-radio-pastilla)' && !/^(?:\.(?:tramite-estado|calendario-pildora|sate-chip|sel-area|chip|wchip|tag-rel|simchip|dpill|k-chip|eqv-f|an-tag)|\.guia-chips button)$/.test(selector)) errores.push(`${archivo}: ${selector}: pastilla fuera de filtros/estado`);
       if(valor==='var(--ipn-radio-circulo)' && !/^(?:\.tmr-paso|\.guia-estado::before|\.guia-etapa-num|\.guia-pasos li::before|\.sate-tarjeta-nav__icono|\.sate-chip__marca|\.sate-estado-dato|\.calendario-(?:ficha-punto|signo)|\.gd-estacion-punto|\.sel-area::before|\.tramite-(?:estado|guardado)::before|\.box\.curso::after|\.legend i\.l-curso::after|\.tgl-ui::after|\.cupos-interruptor-pista::after|\.cal-l::before|\.info|\.mm-leg i)$/.test(selector)) errores.push(`${archivo}: ${selector}: círculo fuera de pasos/íconos`);
     }
@@ -48,19 +48,19 @@ assert.equal(auditar('.x{border-radius:var(--ipn-radio);position:sticky;top:calc
 {
   let bottom=10, alto=44, escritorio=true, resize;
   const eventos={}, valores={};
-  const nodo=()=>({hidden:false,setAttribute(){},removeAttribute(){},append(){},addEventListener(){},querySelectorAll:()=>[],getBoundingClientRect:()=>({bottom:alto})});
+  const nodo=()=>({hidden:false,setAttribute(){},removeAttribute(){},append(){},addEventListener(){},querySelectorAll:()=>[],getBoundingClientRect:()=>({bottom:alto,height:alto})});
   const tabs={...nodo(),cloneNode:nodo};
   const nav={...nodo(),getAttribute:()=>'',getBoundingClientRect:()=>({bottom})};
   const h={querySelector:s=>s==='.sate-enlaces'?tabs:s==='.sate-navegacion'?nav:null,after(){}};
   const mq={get matches(){return escritorio},addEventListener(k,fn){eventos.media=fn}};
   const document={querySelector:()=>h,getElementById:()=>null,createElement:nodo,documentElement:{style:{setProperty(k,v){valores[k]=v}}}};
   vm.runInNewContext(readFileSync('web/sate/encabezado.js','utf8'),{document,matchMedia:()=>mq,addEventListener(k,fn){eventos[k]=fn},requestAnimationFrame:fn=>fn(),ResizeObserver:class{constructor(fn){resize=fn}observe(){}}});
-  assert.equal(valores['--sate-barra-alto'],'0px');
+  assert.equal(valores['--sate-barra-alto'],'44px','reserva estable antes del umbral');
   bottom=-1;eventos.scroll();assert.equal(valores['--sate-barra-alto'],'44px');
   alto=68.2;resize();assert.equal(valores['--sate-barra-alto'],'69px');
   escritorio=false;eventos.media();assert.equal(valores['--sate-barra-alto'],'0px');
   escritorio=true;eventos.resize();assert.equal(valores['--sate-barra-alto'],'69px');
-  bottom=10;eventos.scroll();assert.equal(valores['--sate-barra-alto'],'0px');
+  bottom=10;eventos.scroll();assert.equal(valores['--sate-barra-alto'],'69px','volver arriba conserva el tope');
 }
 const archivos=[...readdirSync('web/sate').filter(f=>f.endsWith('.css')).map(f=>'web/sate/'+f),'web/sate/cascaron.html'];
 const componentes=readFileSync('web/sate/componentes.css','utf8');
