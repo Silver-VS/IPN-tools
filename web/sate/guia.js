@@ -1881,8 +1881,8 @@
     let categoria=actividad?.categoria || (categorias.includes(opciones.categoria)?opciones.categoria:categorias[0]), elegido=actividad || elementos.find(a=>a.categoria===categoria);
     const zona=h('section',{'class':'sate-catalogo'}), panel=h('div',{'class':'sate-catalogo__marco',id:'guia-catalogo-panel',role:'tabpanel'});
     const nombres=cat=>t('sate.guia.actividades_'+cat);
-    // Se reutilizan los símbolos existentes solo donde representan la categoría.
-    const iconos={idiomas:'guia',cultura:'guia',servicios:'tramites'};
+    // Sin íconos por categoría hasta tener uno propio para cada una: mezclados se ven desiguales.
+    const iconos={};
     const icono=cat=>SateUI.iconoPestana(iconos[cat]);
     const renglones=texto=>h('div',{'class':'sate-catalogo__renglones'},
       // Conserva la puntuación y no parte correos, abreviaturas ni dominios.
