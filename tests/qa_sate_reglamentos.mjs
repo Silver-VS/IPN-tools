@@ -25,6 +25,12 @@ assert.deepEqual(Array.from(G.nivelesReglamento(reg('rge')), x => [x.nivel,x.can
 
 // anclas
 assert.equal(G.anclaArticulo('4', 'III', 'b'), 'art-4.III.b');
+const textoNorma='Conforme a: I. Si ocurre. II. Si no: a) en el primer caso; b) en el segundo.';
+const bloquesNorma=G.bloquesNormativos(textoNorma);
+assert.equal(bloquesNorma.map(x=>x.marca+x.texto).join('').replace(/\s+/g,' ').trim(),textoNorma.replace(/\s+/g,' ').trim(),'los renglones conservan el texto oficial salvo espacios');
+assert.deepEqual(Array.from(bloquesNorma,x=>x.marca.trim()).filter(Boolean),['I.','II.','a)','b)'],'separa fracciones e incisos al inicio de oración');
+const textoParrafos='I. Primera fracción.\n\nII. Segunda fracción.';
+assert.equal(G.bloquesNormativos(textoParrafos).map(x=>x.marca+x.texto).join('').replace(/ /g,''),textoParrafos.replace(/ /g,''),'conserva los saltos de párrafo originales');
 assert.deepEqual({...G.leerAncla('art-1 Bis.II')}, {n: '1 Bis', fr: 'II', inciso: null});
 assert.deepEqual({...G.leerAncla('art-33.III.b')}, {n: '33', fr: 'III', inciso: 'b'});
 assert.equal(G.leerAncla('transitorios'), null);
@@ -48,6 +54,8 @@ for (const f of readdirSync('data/reglamentos').filter(n => n.endsWith('.json') 
       assert.ok(mapa.some(n => n.aplicacion === 'directo'), f + ': título del alumnado sin artículos directos');
   }
   for (const a of r.articulos) {
+    const renglones=G.bloquesNormativos(a.texto).map(x=>x.marca+x.texto).join('');
+    assert.equal(renglones.replace(/ /g,''),a.texto.replace(/ /g,''),f+' art. '+a.n+': renglones oficiales sin cambios');
     const p = G.partesArticulo(a);
     if (a.fracciones?.length) assert.equal(p.fracciones.length, a.fracciones.length, f + ' art. ' + a.n + ': fracciones');
   }
@@ -135,6 +143,7 @@ assert.equal(caja.querySelectorAll('.rgl-libro').length,reg('indice').length);
 const cgc = Array.from(caja.querySelectorAll('.rgl-libro')).find(n => n.getAttribute('href') === reg('cgc').url);
 assert.ok(cgc, 'CGC enlaza al PDF oficial porque no tiene articulado fiable');
 assert.ok(cgc.textContent.includes('sate.guia.rgl_solo_pdf'), 'sin conteo engañoso de cero artículos');
+assert.ok(cgc.textContent.includes('sate.guia.rgl_solo_pdf_nota'),'explica por qué el CGC conserva el enlace al PDF');
 assert.ok(Array.from(caja.querySelectorAll('.rgl-libro')).find(n => n.getAttribute('href') === '#/ficticia/guia/reglamentos/etica').textContent.includes('sate.guia.rgl_texto_completo'), 'se conserva el lector del código sin articulado');
 assert.equal(caja.querySelectorAll('.rgl-temas__opciones button').length,6);
 assert.ok(caja.querySelectorAll('.rgl-temas__articulos a').length>0,'temas con citas reales');
@@ -146,14 +155,18 @@ assert.equal(avisos.length,0, JSON.stringify(avisos));
 const guardar=caja.querySelector('.rgl-articulo header').querySelectorAll('button')[1];
 guardar.click();
 assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos[0].marcadores[0].n,'1','guardar usa IPNT por unidad');
+assert.equal(guardar.getAttribute('aria-pressed'),'true','guardar expone el estado activo');
 guardar.click();
 assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos[0].marcadores.length,0,'segundo clic borra marcador');
+assert.equal(guardar.getAttribute('aria-pressed'),'false','quitar vuelve al estado normal');
 assert.equal(caja.querySelectorAll('.rgl-articulo').length,ri.articulos.length+1,'todos los artículos y transitorios en el lienzo');
 assert.equal(caja.querySelectorAll('.rgl-mapa__tramo').length,12);
 assert.equal(caja.querySelectorAll('.rgl-mapa__etiqueta')[2].textContent, 'De los alumnos');
 assert.equal(caja.querySelectorAll('.rgl-mapa__titulos').length,0,'cada etiqueta pertenece a su segmento');
 assert.notEqual(caja.querySelector('.rgl-riel').hidden,true,'el riel no se oculta: la rejilla no salta al desplazarse');
 assert.ok(caja.querySelector('.rgl-riel-vacio'),'aviso discreto cuando el artículo no tiene citas');
+assert.equal(caja.querySelector('.rgl-riel').children[0],caja.querySelector('.rgl-investigacion'),'investigación inicia el marco lateral sticky');
+assert.match(caja.querySelector('.rgl-investigacion__contexto').textContent,/sate\.guia\.inv_boton\s+\(\d+\)/,'el botón fijo anuncia la cantidad guardada');
 const rutas = new Set(ri.articulos.flatMap(a=>a.ubicacion.map((_,i)=>a.ubicacion.slice(0,i+1).join(' / '))));
 assert.equal(caja.querySelectorAll('.rgl-encabezado').length,rutas.size,'encabezados de todos los títulos, capítulos y secciones');
 const tramo = caja.querySelectorAll('.rgl-mapa__tramo')[2];
@@ -179,6 +192,10 @@ movil=false;
 await pestana.mostrar({partes:['reglamentos','rge','art-55']});
 assert.match(document.title,/^Art\. 55 · RGE/,'título concreto por ruta');
 assert.ok(caja.querySelector('.rgl-contexto').textContent.includes('Reglamento General de Estudios'));
+const buscarContexto=caja.querySelector('.rgl-busqueda-contexto input');
+buscarContexto.value='baja temporal';buscarContexto._ev.input[0]();
+assert.equal(caja.querySelector('.rgl-busqueda-contexto__resultados').hidden,false,'los resultados se despliegan bajo el campo local');
+assert.ok(caja.querySelectorAll('.rgl-busqueda-contexto__resultados a').length>0);
 const cifrasRge = caja.querySelector('.rgl-cifras').textContent;
 assert.ok(cifrasRge.includes('sate.guia.rgl_capitulos 9'), 'el resumen presenta los capítulos del RGE');
 assert.ok(!cifrasRge.includes('sate.guia.rgl_titulos'), 'el resumen oculta títulos cuando el documento no tiene');
@@ -199,7 +216,11 @@ assert.ok(caja.querySelector('.rgl-art-acciones summary').getAttribute('aria-lab
 assert.ok(caja.querySelector('.rgl-copiar').getAttribute('title'));
 assert.equal(caja.querySelector('#rgl-importar').hidden,true,'selector nativo oculto');
 assert.equal(caja.querySelector('label[for="rgl-importar"]').textContent.includes('inv_importar'),true);
-assert.ok(css.includes('.rgl-contexto>a:visited'),'acciones sin color de enlace visitado');
+assert.ok(!css.includes(':visited'),'la portada no marca reglamentos visitados');
+assert.ok(css.includes('max-height:calc(100dvh - var(--sate-barra-alto) - 2 * var(--ipn-esp-4))'),'investigación limita su altura al espacio visible');
+assert.ok(/\.rgl-investigacion__contexto\{[^}]*position:fixed/.test(css),'investigación se abre desde un botón fijo en teléfono');
+assert.ok(css.includes('max-width:55vw'),'el campo contextual se expande al enfocarlo');
+assert.ok(css.includes("[data-guardar-doc][aria-pressed=true]::before{content:'★'}"),'estrella rellena cuando el artículo está guardado');
 assert.ok(css.includes('.rgl-art-acciones:not([open])>div{display:none}'),'menú móvil plegado');
 const archivoImportado=caja.querySelector('#rgl-importar');
 let selectorAbierto=false;
