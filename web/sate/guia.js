@@ -34,6 +34,23 @@
       return {p, peso: (intencion?.pregunta === p.id ? 100 : aciertos.length < Math.ceil(ts.length * .75) ? 0 : aciertos.length * 3 + ts.filter(w => titulo.includes(w)).length)};
     }).filter(x => x.peso > 0).sort((a,b) => b.peso-a.peso).map(x => x.p);
   }
+  function respuestaDirecta(d, q) {
+    const o = d.orientacion || {}, ts = [...new Set(palabrasConsulta(q,o).filter(w => !['es','son'].includes(w)))];
+    if (!ts.length) return {definiciones:[], pregunta:null};
+    const definiciones = Object.entries(d.glosario || {}).filter(([,g]) => {
+      const titulo = terminos(g.termino);
+      return ts.every(w => titulo.includes(w));
+    }).map(([id,g]) => ({id,...g}));
+    if (definiciones.length) return {definiciones, pregunta:null};
+    const intencion = (o.intenciones || []).find(i => i.terminos.every(w => ts.includes(w)) && ts.every(w => i.terminos.includes(w)));
+    const candidatos = (d.preguntas || []).map(p => {
+      const titulo = palabrasConsulta(p.pregunta,o), texto = palabrasConsulta(textoVisibleIndice(textoDe(p)),o);
+      const aciertos = ts.filter(w => texto.includes(w)).length, cabecera = ts.filter(w => titulo.includes(w)).length;
+      const peso = intencion && intencion.pregunta === p.id ? 100 : aciertos === ts.length && cabecera >= Math.ceil(ts.length * .75) ? aciertos * 3 + cabecera * 4 : 0;
+      return {p,peso};
+    }).filter(x => x.peso >= 7).sort((a,b) => b.peso-a.peso);
+    return {definiciones:[], pregunta:candidatos[0]?.p || null};
+  }
   function aplicaPregunta(p, s, o) {
     if (!s) return false;
     const regla = o?.aplicabilidad?.[p.id];
@@ -227,7 +244,7 @@
   }
   Object.assign(raiz.SateGuia, {buscarIndice, fragmento, textoVisibleIndice, expandirIndice, resaltar, partesResaltado, agruparReglamentos, nivelesReglamento});
   const motivoInicial = s => s?.fis?.some(f=>f.veces>=2)?'recursamiento':s?.nDes?'antiguas':s?.adeudos?.length?'ordinario':'';
-  Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
+  Object.assign(raiz.SateGuia, {palabrasConsulta, buscarSoluciones, respuestaDirecta, aplicaPregunta, rutaPersonal, resolverRuta, nombreMateria, motivoInicial});
 
   const etiquetasInv = ['favor','contra','requisito','plazo'];
   // Recalcula contra los nodos actuales: partir un párrafo o envolver una referencia no desplaza la anotación.
@@ -314,6 +331,7 @@
     return rangos;
   }
   function resaltar(texto, q) {
+    texto = textoVisibleIndice(texto);
     const nodos = [], rangos = partesResaltado(texto,q);
     let pos = 0;
     for (const [inicio,fin] of rangos) {
@@ -323,11 +341,19 @@
     if (pos < texto.length) nodos.push(document.createTextNode(texto.slice(pos)));
     return nodos;
   }
-  function agruparReglamentos(resultados) {
+  function agruparReglamentos(resultados, q = '', orientacion = {}) {
     const grupos = new Map();
+    const ts = palabrasConsulta(q,orientacion);
     for (const e of resultados) { if (!grupos.has(e.doc)) grupos.set(e.doc, []); grupos.get(e.doc).push(e); }
-    return [...grupos].map(([doc, entradas]) => ({doc, entradas, titulo:entradas[0].titulo}))
-      .sort((a,b) => Math.max(...b.entradas.map(e=>e._pesoBusqueda||0)) - Math.max(...a.entradas.map(e=>e._pesoBusqueda||0)) || b.entradas.length-a.entradas.length);
+    return [...grupos].map(([doc, entradas]) => {
+      const articulos = entradas.filter(e => /\/art-|\/texto(?:\?|$)/.test(e.ruta || '') && ts.every(w => palabrasConsulta(e.texto,orientacion).join(' ').includes(w)));
+      const porArticulo = new Map();
+      for(const e of articulos){const clave=e.ruta.split('?')[0].split('/art-')[1]?.split('.')[0] || 'texto';if(!porArticulo.has(clave))porArticulo.set(clave,e);}
+      return {doc, entradas:articulos.length ? [...porArticulo.values()] : entradas, titulo:entradas[0].titulo,
+        articulos:porArticulo.size};
+    }).sort((a,b) => Number(b.articulos > 0)-Number(a.articulos > 0) ||
+      (a.articulos && b.articulos ? Number(b.doc === 'rge')-Number(a.doc === 'rge') : 0) ||
+      b.articulos-a.articulos || Math.max(...b.entradas.map(e=>e._pesoBusqueda||0))-Math.max(...a.entradas.map(e=>e._pesoBusqueda||0)) || b.entradas.length-a.entradas.length);
   }
   function nivelesReglamento(reg) {
     const ubicaciones = (reg?.articulos || []).flatMap(a => a.ubicacion || []);
@@ -390,8 +416,8 @@
           for (const e of resultados) if (e.carrera) {
             const k = norm(e.titulo), cs = nombres.get(k) || new Set(); cs.add(e.carrera); nombres.set(k, cs);
           }
-          const fila = (e, agrupada = false) => h('li', {}, [
-            ...(agrupada && e.doc ? [] : [h('a', {href:e.ruta}, resaltar(e.titulo,q))]),
+          const fila = (e, agrupada = false) => h('li', {'class':'guia-resultado'}, [
+            h('a', {href:e.ruta}, resaltar(agrupada && e.doc ? e.migas.filter(m=>/^Art\. /.test(m)).join(' · ') + (/\/art-[^.]+\./.test(e.ruta) ? bt('fraccion',{fr:e.migas.at(-1)}) : '') || e.titulo : e.titulo,q)),
             ...(e.carrera ? [h('strong', {'class':'guia-carrera', texto:e.carreraNombre}), ...(nombres.get(norm(e.titulo))?.size > 1 ? [h('small', {texto:bt('homonima')})] : [])] : []),
             h('small', {texto:(agrupada && e.doc ? e.migas.filter((m,i) => !(i === 0 && norm(m) === norm(e.titulo))) : e.migas).join(' › ')}),
             h('p', {'data-oficial':e.oficial}, resaltar(fragmento(e.texto,q),q))
@@ -408,11 +434,12 @@
             h('ul', {}, es.map(fila))
           ]));
           if (fuente === 'reglamentos') {
-            const docs = agruparReglamentos(resultados);
+            const docs = agruparReglamentos(resultados,q,manifiesto.orientacion);
+            grupo.querySelector('h3').textContent=bt(fuente)+' · '+docs.length;
             grupo.appendChild(h('div', {'class':'guia-reglamentos-resultados'}, docs.map(g => h('section', {'class':'guia-reglamento-resultado'}, [
-              h('header', {}, [h('strong', {'class':'guia-sello', texto:selloReglamento(g.titulo,g.doc)}), h('h4', {texto:g.titulo,'data-oficial':g.doc}), h('small',{texto:bt('coincidencias_reglamento',{n:g.entradas.length})})]),
-              h('ul', {}, g.entradas.slice(0,2).map(e => fila(e,true))),
-              h('a', {href:rutaReglamento(g.doc)+'?q='+encodeURIComponent(q), texto:bt('ver_reglamento_acotado',{n:g.entradas.length})})
+              h('header', {}, [h('strong', {'class':'guia-sello', texto:selloReglamento(g.titulo,g.doc)}), h('h4', {texto:g.titulo,'data-oficial':g.doc}), h('small',{texto:g.articulos ? bt('articulos_reglamento',{n:g.articulos}) : bt('solo_titulo')})]),
+              ...(g.articulos ? [h('ul', {}, g.entradas.slice(0,2).map(e => fila(e,true)))] : []),
+              h('a', {href:rutaReglamento(g.doc)+'?q='+encodeURIComponent(q), texto:g.articulos ? bt('ver_reglamento_acotado',{n:g.articulos}) : bt('abrir_reglamento')})
             ]))));
             lista.appendChild(grupo);
             continue;
@@ -671,7 +698,37 @@
   // Portada aprobada (maqueta R15): título, buscador global con ejemplos en voz de alumno, chips y respuesta directa arriba de los grupos.
   function buscadorSoluciones(d, s, destino) {
     const directa=h('div',{'class':'guia-respuesta-directa'});
-    const pintarDirecta=q=>{const ps=terminos(q).length?buscarSoluciones(d,q):[];directa.replaceChildren(...(ps.length?[tarjetaSolucion(d,ps[0],s,'respuesta_directa')]:[]));};
+    let versionDirecta=0;
+    const pintarDirecta=async q=>{
+      const mi=++versionDirecta, u=unidad(), r=respuestaDirecta(d,q);
+      directa.replaceChildren();
+      if (!r.definiciones.length) {
+        if(r.pregunta)directa.appendChild(tarjetaSolucion(d,r.pregunta,s,'respuesta_directa'));
+        return;
+      }
+      try {
+        const secciones=await Promise.all(r.definiciones.map(async g=>{
+          const citas=await Promise.all((g.definicionFuentes || [g.fuente]).filter(Boolean).map(async f=>{
+            const reg=await cargarReglamento(f.doc);
+            return (f.arts || []).flatMap(n=>{
+              const a=reg.articulos?.find(a=>String(a.n)===String(n));
+              if(!a)return [];
+              const p=partesArticulo(a), rotulo=t('sate.guia.fuente_articulo',{documento:reg.titulo,articulo:n});
+              const cita=(texto,fr)=>{
+                const b=h('button',{type:'button','class':'sate-enlace-reglamento',texto:rotulo+(fr?bt('fraccion',{fr}):'')});
+                b.addEventListener('click',()=>SATE.articulo(f.doc,n,fr));
+                return h('div',{},[h('blockquote',{'data-oficial':f.doc,texto}),b]);
+              };
+              return [cita(a.fracciones?.length ? p.intro : a.texto),...(a.fracciones || []).map(fr=>cita(fr.texto,fr.fr))];
+            });
+          }));
+          const areas=(d.acudir || []).filter(a=>(g.acudir || [g.id]).includes(a.id));
+          return h('section',{},[h('h4',{texto:g.termino}),h('p',{texto:g.definicion}),...citas.flat(),
+            ...areas.map(a=>h('a',{href:rutaGuia('acudir',a.id)},[t('sate.guia.a_quien')+' · ',h('span',{'data-oficial':a.fuente?.doc,texto:a.nombre})]))]);
+        }));
+        if(mi===versionDirecta && u===unidad() && directa.isConnected!==false)directa.appendChild(h('article',{'class':'guia-definicion'},[h('small',{'class':'guia-rotulo',texto:tx('respuesta_directa')}),h('h3',{texto:bt('que_es')}),...secciones]));
+      } catch(e) { console.warn('SATE: definición directa no disponible',{unidad:u,consulta:q,mensaje:e.message}); }
+    };
     let entrada=null;
     const chips=h('div',{'class':'guia-chips guia-sugerencias'});
     const sugerencias=s?.adeudos?.length?['reprobe el recurse','ets','baja temporal','servicio social','ingles titulacion']:['baja temporal','servicio social','ingles titulacion','becas','ets'];
