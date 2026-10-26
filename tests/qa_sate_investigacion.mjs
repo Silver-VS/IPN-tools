@@ -45,7 +45,7 @@ const tokens=readFileSync('vendor/ipn-comun/dist/tokens.css','utf8')+readFileSyn
 const investigacionCss=css.slice(css.indexOf('/* Investigación:'));
 for(const [,token] of investigacionCss.matchAll(/var\((--ipn-[\w-]+)\)/g))assert.ok(tokens.includes(token+':'),token+' existe en ambos temas por herencia');
 for(const ancho of [1300,1024,768,375]){
- assert.ok(ancho>768.98?investigacionCss.includes('min-width:0'):investigacionCss.includes('max-height:50dvh'));
+ assert.ok(ancho>768.98?investigacionCss.includes('position:sticky')&&investigacionCss.includes('max-height:calc(100dvh - var(--sate-barra-alto)'):investigacionCss.includes('inset:auto 0 calc(')&&investigacionCss.includes('position:fixed'));
 }
 assert.match(investigacionCss,/focus-visible/);
 assert.match(investigacionCss,/::highlight\(sate-inv-plazo\)/);

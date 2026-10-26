@@ -35,7 +35,7 @@ for(const ancho of [1300,1024,768,375])for(const oscuro of [false,true]){
       assert.equal(modal.querySelector('h2').id,modal.getAttribute('aria-labelledby'));
       const reg=JSON.parse(leer('data/reglamentos/'+doc+'.json'));
       const a=reg.articulos.find(a=>String(a.n)===n);
-      if(a)assert.equal(modal.querySelector('.guia-articulo-literal').textContent,a.texto);
+      if(a)assert.equal(modal.querySelector('.guia-articulo .pc-lector').textContent.replace(/\s+/g,' ').trim(),a.texto.replace(/\s+/g,' ').trim());
       else assert.ok(modal.querySelector('[role="status"]'),'Documento sin texto: aviso explícito');
       const enlace=modal.querySelector('.guia-articulo a');
       assert.ok(enlace.getAttribute('href').endsWith('/art-'+n));

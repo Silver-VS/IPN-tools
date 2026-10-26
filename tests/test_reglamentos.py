@@ -182,6 +182,15 @@ class DatosOficiales(unittest.TestCase):
         self.assertTrue(por_id['etica']['sin_articulado'])
         self.assertGreater(len(self.datos['etica']['texto']), 10000)
 
+    def test_cgc_sigue_solo_pdf_sin_fuente_paginada_local(self):
+        cgc = self.datos['cgc']
+        self.assertEqual((cgc['articulos'], cgc['transitorios'], cgc['estructura']), ([], [], []))
+        self.assertTrue(cgc['sin_articulado'])
+        self.assertEqual(r.extraer([cgc['texto']]), ([], [], []), 'el texto plano guardado no permite reconstruir los artículos')
+        estado = (ROOT / 'docs/REGLAMENTO-CGC.md').read_text(encoding='utf-8')
+        self.assertIn('.cache/reglamentos/cgc.pdf', estado)
+        self.assertIn('data/reglamentos/ocr/cgc.txt', estado)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -180,6 +180,28 @@
     const d = frs.length ? null : dividirDefiniciones(texto);
     return d ? { intro: d.intro, definiciones: d.definiciones, fracciones: [] } : { intro: texto, definiciones: null, fracciones: [] };
   }
+  // Parte solo saltos de párrafo existentes y marcadores al inicio de oración; conserva todo el texto.
+  function bloquesNormativos(texto) {
+    const salida = [];
+    const parrafos=String(texto || '').split(/(\n\s*\n+)/);
+    for (let i=0;i<parrafos.length;i+=2) {
+      const parrafo=parrafos[i], separador=parrafos[i+1]||'';
+      const re = /(^\s*|(?<=[.!?;:])\s+)([IVXLCDM]+[.)]|[a-z]\))(\s+)/g;
+      let pos = 0, inicioTexto = 0, marca = '', m;
+      while ((m = re.exec(parrafo))) {
+        const inicio = m.index + m[1].length;
+        if (marca) salida.push({ marca, texto: parrafo.slice(inicioTexto, inicio) });
+        else if (inicio > pos) salida.push({ marca: '', texto: parrafo.slice(pos, inicio) });
+        marca = m[2] + m[3];
+        inicioTexto = re.lastIndex;
+        pos = re.lastIndex;
+      }
+      if (pos === 0) salida.push({ marca: '', texto: parrafo });
+      else salida.push({ marca, texto: parrafo.slice(inicioTexto) });
+      if(separador)salida[salida.length-1].texto+=separador;
+    }
+    return salida;
+  }
   // Artículos que contienen todas las palabras (o cuyo número empieza como lo escrito); primero el número exacto.
   function buscarArticulos(reg, q, maximo) {
     const ts = terminos(q), num = norm(q).trim();
@@ -209,7 +231,7 @@
     const preguntas = (d && citasPorArticulo(d).get(doc + ':' + n)) || [], disponibles = tramitesUnidad || [];
     return { preguntas, tramites: [...new Set(preguntas.map(p => p.ventanilla).filter(v => v && disponibles.includes(v)))] };
   }
-  raiz.SateGuia = { articuloEnGeometria, norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
+  raiz.SateGuia = { articuloEnGeometria, norm, terminos, buscarPreguntas, apartadosDisponibles, fuente, enlace, marcas, anclaArticulo, leerAncla, arbolReglamento, partesArticulo, bloquesNormativos, dividirDefiniciones, buscarArticulos, relacionesArticulo, mapaReglamento };
   const nombreMateria = nombre => { const s=String(nombre).toLocaleLowerCase('es'); return s.charAt(0).toLocaleUpperCase('es')+s.slice(1); };
   const textoVisibleIndice = texto => String(texto || '').replace(/\[\[(?:a|g):[\w-]+(?::[\w -]+)?\|([^\]]+)\]\]/g, '$1');
   function puntuarIndice(e, ts, q, orientacion, intencion) {
@@ -535,7 +557,7 @@
   }
   function envolverReferencias(nodo, doc, a) {
     const refs = (E.enlaces || []).filter(r => r.doc === doc && r.articulo === String(a.n));
-    for (const p of nodo.querySelectorAll('p,dt,dd')) {
+    for (const p of nodo.querySelectorAll('p,dt,dd,.rgl-renglon__texto')) {
       const texto = p.textContent, partes = []; let inicio = 0;
       const origen = a.texto.indexOf(texto);
       const ocurrencias = refs.map(r => ({r, i:Array.from(a.texto).slice(0,r.inicio).join('').length-origen}))
@@ -569,14 +591,20 @@
     });
   }
   function cuerpoArticulo(a, doc, fila, literal = false) {
-    if(literal) return h('div', {'class':'pc-lector pc-oficial', 'data-oficial':doc}, [h('p', {'class':'guia-articulo-literal', texto:a.texto})]);
+    const textoEnBloques = texto => bloquesNormativos(texto).map(x => x.marca
+      ? h('div', {'class':'rgl-renglon rgl-renglon--marcado '+(/[IVXLCDM]/.test(x.marca[0])?'rgl-renglon--fraccion':'rgl-renglon--inciso'), 'data-oficial':doc}, [
+        h('span', {'class':'rgl-renglon__marca', 'data-oficial':doc, texto:x.marca}),
+        h('span', {'class':'rgl-renglon__texto', 'data-oficial':doc, texto:x.texto})
+      ])
+      : h('p', {'class':'guia-articulo-literal', 'data-oficial':doc, texto:x.texto}));
+    if(literal) return h('div', {'class':'pc-lector pc-oficial', 'data-oficial':doc}, textoEnBloques(a.texto));
     if (!E.partes.has(a)) E.partes.set(a, partesArticulo(a));
     const p = E.partes.get(a), nodos = [];
-    if (p.intro) nodos.push(h('p', { texto: p.intro }));
+    if (p.intro) nodos.push(...textoEnBloques(p.intro));
     if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones' }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
     if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
-      h('p', { texto: f.texto }),
-      f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), [h('p', { texto: x.texto })]))) : null]))));
+      ...textoEnBloques(f.texto),
+      f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), textoEnBloques(x.texto)))) : null]))));
     const cuerpo = h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc }, nodos);
     cuerpo.querySelectorAll('.rgl-fr').forEach((n,i) => {
       n.setAttribute('data-fraccion-pos',i+1);
@@ -1036,17 +1064,28 @@
     const cuerpoIndice = h('div', { 'class': 'rgl-indice__cuerpo' }, [salto, arbolNav]);
     const resumen = h('span', { 'class': 'rgl-resumen__actual' });
     const contextoActual = h('span', {'class':'rgl-contexto__actual'});
+    const resultadosContexto = h('ul', {'class':'rgl-busqueda-contexto__resultados', hidden:true, 'aria-live':'polite'});
+    const entradaContexto = h('input', {type:'search', autocomplete:'off', 'aria-label':t('sate.guia.rgl_buscar_etiqueta'), placeholder:t('sate.guia.rgl_buscar_marcador'), 'aria-expanded':'false'});
+    const busquedaContexto = h('div', {'class':'rgl-busqueda-contexto'}, [entradaContexto,resultadosContexto]);
+    entradaContexto.addEventListener('input',()=>{
+      const q=entradaContexto.value.trim(), encontrados=buscarArticulos(reg,q,10);
+      resultadosContexto.replaceChildren(...encontrados.map(a=>h('li',{},[h('a',{href:rutaReglamento(doc,anclaArticulo(a.n)), 'data-ancla':anclaArticulo(a.n)},[
+        h('strong',{texto:t('sate.guia.rgl_art_corto',{n:a.n})}),h('span',{texto:fragmento(a.texto,q)})
+      ])])));
+      if(q && !encontrados.length)resultadosContexto.appendChild(h('li',{class:'guia-vacio',texto:t('sate.guia.rgl_resultados',{n:0})}));
+      resultadosContexto.hidden=!q;entradaContexto.setAttribute('aria-expanded',String(!!q));
+    });
     const contexto = h('nav', {'class':'rgl-contexto', 'aria-label':reg.titulo}, [
-      h('div', {}, [h('strong', {texto:selloReglamento(reg.titulo,doc) + ' · ' + reg.titulo}), contextoActual]),
-      h('details', {}, [h('summary', {texto:t('sate.guia.rgl_buscar_etiqueta')}), buscadorIndice({fuente:'reglamentos',doc,nombre:reg.titulo})]),
-      h('a', {href:rutaGuia('reglamentos'), texto:bt('cambiar')})
+      h('div', {'class':'rgl-contexto__titulo'}, [h('strong', {texto:selloReglamento(reg.titulo,doc) + ' · ' + reg.titulo}), contextoActual]),
+      busquedaContexto,
+      h('a', {'class':'rgl-contexto__cambiar',href:rutaGuia('reglamentos'), texto:bt('cambiar')})
     ]);
     const indice = h('details', { 'class': 'rgl-indice', open: true }, [h('summary', { 'class': 'rgl-resumen' }, [h('span', { texto: t('sate.guia.rgl_indice') }), resumen]), cuerpoIndice]);
     const texto = h('article', { 'class': 'rgl-texto', 'aria-label': reg.titulo });
     const riel = h('aside', { 'class': 'rgl-riel', 'aria-label': t('sate.guia.rgl_contexto') });
     const rejilla = SateUI.lector(indice, texto, riel);
-    const investigacion = h('details',{'class':'rgl-investigacion',open:!pantallaChica()},[h('summary',{texto:ti('panel')})]);
-    const invCuerpo=h('div',{'class':'rgl-investigacion__cuerpo'}), invContexto=h('button',{type:'button','class':'rgl-investigacion__contexto','aria-expanded':String(investigacion.open)});
+    const investigacion = h('details',{'class':'rgl-investigacion',id:'rgl-investigacion',open:!pantallaChica()},[h('summary',{texto:ti('panel')})]);
+    const invCuerpo=h('div',{'class':'rgl-investigacion__cuerpo'}), invContexto=h('button',{type:'button','class':'rgl-investigacion__contexto','aria-controls':'rgl-investigacion','aria-expanded':String(investigacion.open),texto:ti('boton')+' (0)'});
     invContexto.addEventListener('click',()=>{investigacion.open=!investigacion.open;invContexto.setAttribute('aria-expanded',String(investigacion.open));});
     investigacion.addEventListener('toggle',()=>invContexto.setAttribute('aria-expanded',String(investigacion.open)));
     investigacion.appendChild(invCuerpo); contexto.appendChild(invContexto);
@@ -1055,7 +1094,7 @@
       estadoMarcadoresInv();
       const v=leerInvestigaciones(), p=investigacionCompartida || v.proyectos[v.activa], solo=!!investigacionCompartida;
       invCuerpo.replaceChildren();
-      invContexto.textContent=p ? ti('contexto',{nombre:p.nombre,n:new Set(p.marcadores.map(m=>m.doc+':'+m.n)).size}) : ti('panel');
+      invContexto.textContent=ti('boton')+' ('+new Set(p?.marcadores.map(m=>m.doc+':'+m.n)||[]).size+')';
       const error=e=>{console.warn('SATE investigación',{mensaje:e.message}); invCuerpo.appendChild(h('p',{role:'alert',texto:ti('error')}));};
       const accion=(k,fn)=>invCuerpo.appendChild(botonInv(k,()=>Promise.resolve().then(fn).catch(error)));
       accion('nueva',()=>{const nombre=raiz.prompt(ti('nombre')); if(!nombre?.trim())return; v.proyectos.push(validarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]})); v.activa=v.proyectos.length-1; investigacionCompartida=null; guardarInvestigaciones(v); pintarInvestigacion();});
@@ -1149,8 +1188,7 @@
       if (rel.tramites.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_tramites') }), h('ul', {}, rel.tramites.map(id => h('li', {}, [h('a', { href: '#/' + unidad() + '/tramites/' + id, texto: t('sate.tramite.' + id + '.titulo') })])))]));
       if (rel.preguntas.length) bloques.push(h('section', {}, [h('h4', { texto: t('sate.guia.rgl_preguntas') }), h('ul', {}, rel.preguntas.map(p => h('li', {}, [h('a', { href: rutaGuia(p.apartado, p.id), texto: p.pregunta })])))]));
       // El riel no se oculta: si cambiara la rejilla al desplazarse, el índice y el texto saltarían.
-      riel.replaceChildren(h('h3', { texto: t('sate.guia.rgl_contexto') }), ...(bloques.length ? bloques : [h('p', { 'class': 'rgl-riel-vacio', texto: t('sate.guia.rgl_sin_citas') })]));
-      riel.appendChild(investigacion);
+      riel.replaceChildren(investigacion, h('h3', { texto: t('sate.guia.rgl_contexto') }), ...(bloques.length ? bloques : [h('p', { 'class': 'rgl-riel-vacio', texto: t('sate.guia.rgl_sin_citas') })]));
     }
     function marcarIndice(clave) {
       for (const [n, a] of enlaces) { if (n === clave) a.setAttribute('aria-current', 'true'); else a.removeAttribute('aria-current'); }
@@ -1417,7 +1455,8 @@
       h('a', { href: x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? x.url : rutaGuia('reglamentos', x.id), 'class': 'rgl-libro' }, [
         h('strong', { 'class': 'rgl-siglas', texto: x.siglas || x.titulo.split(/\s+/).filter(p => /^[A-ZÁÉÍÓÚÑ]/.test(p) && !/^(IPN|Instituto|Politécnico|Nacional)$/.test(p)).map(p => p[0]).join('') }),
         h('h4', { texto: x.titulo }), h('small', { texto: x.gaceta }),
-        h('span', { texto: indice.find(i => i.id === x.id)?.articulos ? t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id).articulos }) : t(x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? 'sate.guia.rgl_solo_pdf' : 'sate.guia.rgl_texto_completo') })])])));
+        h('span', { texto: indice.find(i => i.id === x.id)?.articulos ? t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id).articulos }) : t(x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? 'sate.guia.rgl_solo_pdf' : 'sate.guia.rgl_texto_completo') }),
+        x.soloPdf ? h('small', {'class':'rgl-libro__nota',texto:t('sate.guia.rgl_solo_pdf_nota')}) : null])])));
     const resultados = h('ul', { 'class': 'guia-resultados', hidden: true, 'aria-live': 'polite' });
     const pintarResultados = q => {
       const encontrados = registros.flatMap(reg => buscarArticulos(reg, q, 4).map(a => ({ reg, a }))).slice(0, 12);

@@ -112,9 +112,9 @@ for(const unidad of Object.keys(config.unidades)){
   const posicion=document.scrolled;
   await c.SATE.articulo('honor','34');
   const original=json('data/reglamentos/honor.json').articulos.find(a=>a.n==='34');
-  assert.equal(document.querySelector('.guia-articulo-literal').textContent,original.texto,'envolver referencias conserva cada carácter');
+  assert.equal(document.querySelector('.guia-articulo .pc-lector').textContent.replace(/\s+/g,' ').trim(),original.texto.replace(/\s+/g,' ').trim(),'los renglones separados conservan cada carácter del artículo');
   assert.ok(document.querySelector('.sate-modal--flotante'));
-  assert.ok(document.querySelectorAll('.guia-articulo-literal button').length>0,'referencias reales envueltas');
+  assert.ok(document.querySelectorAll('.guia-articulo .sate-enlace-reglamento').length>0,'referencias reales envueltas');
   document.querySelector('dialog').dispatchEvent(new Evento('cancel'));
   assert.equal(document.querySelector('dialog[open]'),null,'Esc cierra la consulta');
   assert.equal(document.scrolled,posicion,'no mueve el lector');

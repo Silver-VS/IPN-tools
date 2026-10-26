@@ -58,7 +58,7 @@ assert.equal(solicitudes.filter(s=>s.includes('reglamentos')).length, 0, 'carga 
 assert.deepEqual(scripts, [], 'lector bajo demanda');
 await c.SATE.articulo('demo','1');
 assert.ok(document.querySelector('.sate-modal__titulo').textContent.includes('1 · Reglamento ficticio'));
-assert.equal(document.querySelector('.guia-articulo-literal').textContent, reg.articulos[0].texto);
+assert.equal(document.querySelector('.guia-articulo .pc-lector').textContent.replace(/\s+/g,' ').trim(), reg.articulos[0].texto.replace(/\s+/g,' ').trim());
 assert.equal(document.querySelector('.guia-articulo').querySelectorAll('a')[0].getAttribute('href'), '#/ficticia/guia/reglamentos/demo/art-1');
 await c.SATE.articulo('demo','999');
 assert.ok(document.querySelectorAll('.guia-articulo').at(-1).textContent.includes('sate.guia.sin_articulo'));
