@@ -74,3 +74,14 @@ assert.match(css,/minmax\(0,1fr\)/);assert.match(css,/@media\(max-width:768\.98p
 const tokens=readFileSync('vendor/ipn-comun/dist/tokens.css','utf8')+readFileSync('web/sate/componentes.css','utf8')+readFileSync('web/sate/encabezado.css','utf8');
 for(const [,token]of css.matchAll(/var\((--ipn-[\w-]+)\)/g))assert.ok(tokens.includes(token+':'),token);
 console.log(`R18: migración, notas, proyectos independientes, orden, JSON y huellas; ${citas} fracciones y ${incisos} incisos idénticos al dato oficial.`);
+// R18-INV2: sin ventanas nativas, un solo desplazamiento y estado «Guardado» visible.
+assert.ok(!/(?:prompt|confirm)\(/.test(fuente),'guia.js no usa prompt() ni confirm()');
+const cssGuia=readFileSync('web/sate/guia.css','utf8'),bloqueInv=cssGuia.slice(cssGuia.indexOf('/* Investigación:'));
+assert.equal((bloqueInv.match(/overflow:(?:auto|scroll)/g)||[]).length,1,'el panel tiene un solo contenedor con desplazamiento');
+assert.match(bloqueInv,/\.rgl-investigacion \.inv-lista\{[^}]*overflow:auto/,'la lista es el único desplazamiento');
+assert.ok(!/\.rgl-investigacion\{[^}]*overflow:auto/.test(bloqueInv),'el marco fijo no desplaza');
+assert.match(cssGuia,/\.rgl-art-acciones>div>:not\(\[aria-pressed=true\]\)\{opacity:\.45\}/,'el botón guardado no se atenúa');
+assert.match(cssGuia,/\.rgl-art-acciones \[data-guardar-doc\]\[aria-pressed=true\]\{[^}]*var\(--ipn-acento-suave\)[^}]*var\(--ipn-acento\)/);
+assert.match(cssGuia,/\.inv-fraccion>button\[aria-pressed=true\]\{[^}]*var\(--ipn-acento-suave\)/);
+for(const clave of ['aceptar','cancelar','resumen','importar_menu','borrar_menu'])assert.match(readFileSync('contenido/textos/es.toml','utf8'),new RegExp('^inv_'+clave+' =','m'));
+console.log('R18-INV2: sin prompt/confirm, un solo scroll y guardado con acento.');

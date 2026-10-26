@@ -218,7 +218,7 @@ assert.ok(caja.querySelector('.rgl-copiar').getAttribute('title'));
 assert.equal(caja.querySelector('#rgl-importar').hidden,true,'selector nativo oculto');
 assert.equal(caja.querySelector('label[for="rgl-importar"]').textContent.includes('inv_importar'),true);
 assert.ok(!css.includes(':visited'),'la portada no marca reglamentos visitados');
-assert.ok(css.includes('max-height:calc(100dvh - var(--sate-barra-alto) - 2 * var(--ipn-esp-4))'),'investigación limita su altura al espacio visible');
+assert.ok(css.includes('max-height:calc(100dvh - var(--sate-barra-alto) - 2 * var(--ipn-esp-4) - var(--ipn-control-alto)'),'investigación limita su altura al espacio visible');
 assert.ok(/\.rgl-investigacion__contexto\{[^}]*position:fixed/.test(css),'investigación se abre desde un botón fijo en teléfono');
 assert.ok(css.includes('max-width:55vw'),'el campo contextual se expande al enfocarlo');
 assert.ok(css.includes("[data-guardar-doc][aria-pressed=true]::before{content:'★'}"),'estrella rellena cuando el artículo está guardado');
