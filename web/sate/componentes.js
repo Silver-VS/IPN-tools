@@ -38,27 +38,163 @@
   function estado(e) { return ESTADOS[e] ? e : 'info'; }
 
   /* ---------- Modal ---------- */
-  var dlg = null, origen = null, alCerrar = null;
+  var ventanas = [], secuencia = Date.now(), historialPendiente = 0, empujes = [];
+  function superior() { return ventanas[ventanas.length - 1]; }
+  function actualizarVentanas() {
+    ventanas.forEach(function (v, i) {
+      var arriba = i === ventanas.length - 1;
+      v.elemento.inert = !arriba;
+      if (arriba) v.elemento.setAttribute('aria-modal', 'true'); else v.elemento.removeAttribute('aria-modal');
+      v.volver.hidden = !i;
+      v.volver.textContent = i ? '‹ ' + ventanas[i - 1].titulo : '';
+      v.todo.hidden = ventanas.length < 3;
+      v.navegacion.hidden = !i && !v.cierre;
+    });
+    document.documentElement.classList.toggle('sate-sin-scroll', !!ventanas.length);
+  }
+  function registrarHistoria(v) {
+    if (!raiz.history?.pushState) return;
+    var escribir = function () {
+      if (!ventanas.includes(v)) return;
+      raiz.history.pushState(Object.assign({}, raiz.history.state, { sateVentana: v.id }), '', raiz.location.href);
+    };
+    if (historialPendiente) empujes.push(escribir); else escribir();
+  }
+  function retrocederHistoria(n) {
+    if (!n || !raiz.history?.back) return;
+    historialPendiente += n;
+    if (historialPendiente === n) raiz.history.back();
+  }
+  if (raiz.addEventListener) raiz.addEventListener('popstate', function (e) {
+    if (historialPendiente) {
+      if (--historialPendiente) raiz.history.back();
+      else empujes.splice(0).forEach(function (fn) { fn(); });
+      return;
+    }
+    var destino = ventanas.findIndex(function (v) { return v.id === e.state?.sateVentana; });
+    var saltos = 0;
+    while (ventanas.length > destino + 1) { saltos += superior().pasos - 1; quitarVentana(superior()); }
+    // Los niveles descartados por el límite ya no tienen una ventana que restaurar.
+    if (destino < 0 && e.state?.sateVentana && saltos) retrocederHistoria(saltos);
+  });
+  function quitarVentana(v) {
+    var i = ventanas.indexOf(v);
+    if (i < 0) return;
+    var eraSuperior = v === superior();
+    ventanas.splice(i, 1);
+    v.elemento.inert = false;
+    v.elemento.removeAttribute('aria-modal');
+    if (v.elemento.open) {
+      if (typeof v.elemento.close === 'function') v.elemento.close(); else v.elemento.removeAttribute('open');
+    }
+    actualizarVentanas();
+    if (eraSuperior) {
+      if (v.origen?.isConnected && !v.origen.closest('[inert]')) v.origen.focus({preventScroll:true});
+      else if (superior()) superior().elemento.focus({preventScroll:true});
+    }
+    if (v.alCerrar) {
+      try { v.alCerrar(); }
+      catch (e) { console.error('SATE: cierre de ventana fallido', {nivel:v.id, profundidad:ventanas.length, ruta:raiz.location?.hash, mensaje:e.message, pila:e.stack}); }
+    }
+    if (v.propia) v.elemento.remove(); else v.navegacion.remove();
+  }
+  function cerrarVentana(elemento) {
+    var v = superior();
+    if (!v || elemento && v.elemento !== elemento) return;
+    quitarVentana(v);
+    retrocederHistoria(v.pasos);
+  }
+  function cerrarTodo() {
+    var n = ventanas.reduce(function (n, v) { return n + v.pasos; }, 0);
+    while (ventanas.length) quitarVentana(superior());
+    retrocederHistoria(n);
+  }
+  /* Adopta también diálogos de sección sin reconstruir su contenido ni sus eventos. */
+  function abrirVentana(d, op) {
+    op = op || {};
+    if (ventanas.some(function (v) { return v.elemento === d; })) return;
+    var titulo = d.querySelector('h2'), v = {elemento:d, id:++secuencia, pasos:1, titulo:op.titulo || titulo?.textContent || d.getAttribute('aria-label'), origen:op.origen || document.activeElement, alCerrar:op.alCerrar, propia:op.propia};
+    v.volver = el('button', {type:'button', class:'sate-btn sate-modal__volver'});
+    v.todo = el('button', {type:'button', class:'sate-enlace', texto:traducir('componentes.cerrar_todo')});
+    v.navegacion = el('nav', {class:'sate-modal__navegacion', 'aria-label':traducir('componentes.ventanas')}, [v.volver, v.todo]);
+    if (op.cierre) {
+      v.cierre = el('button', {type:'button', class:'sate-modal__x', 'aria-label':traducir('componentes.cerrar'), texto:'✕'});
+      v.cierre.addEventListener('click', function () { cerrarVentana(d); });
+      v.navegacion.appendChild(v.cierre);
+    }
+    var contenedor = op.navegacion || d;
+    contenedor.insertBefore(v.navegacion, contenedor.firstChild);
+    v.volver.addEventListener('click', function () { cerrarVentana(d); });
+    v.todo.addEventListener('click', cerrarTodo);
+    d.setAttribute('tabindex', '-1');
+    d.classList.add('sate-ventana');
+    // Los manejadores se instalan una vez en diálogos persistentes.
+    if (!d.dataset.pilaVentanas) {
+      d.dataset.pilaVentanas = 'true';
+      d.addEventListener('click', function (e) {
+        var enlace = e.target.closest?.('a[href]'), href = enlace?.getAttribute('href');
+        if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || enlace?.target === '_blank' || !href?.startsWith('#/') || !raiz.location) return;
+        // La ruta se visita después de consumir las entradas de las ventanas. Así el
+        // Atrás pendiente no deshace la navegación predeterminada del enlace.
+        e.preventDefault(); e.stopImmediatePropagation?.();
+        cerrarTodo();
+        var visitar = function () { raiz.location.hash = href; };
+        if (historialPendiente) empujes.push(visitar); else visitar();
+      }, true);
+      d.addEventListener('cancel', function (e) { e.preventDefault(); e.stopImmediatePropagation?.(); cerrarVentana(d); }, true);
+      d.addEventListener('keydown', function (e) {
+        if (superior()?.elemento !== d) return;
+        if (e.key === 'Escape') { e.preventDefault(); e.stopImmediatePropagation?.(); cerrarVentana(d); return; }
+        if (e.key !== 'Tab') return;
+        var f = Array.from(d.querySelectorAll('button,a[href],input,select,textarea,summary,[tabindex]:not([tabindex="-1"])')).filter(function (x) { return !x.disabled && !x.closest('[hidden],[inert]') && x.offsetParent !== null; });
+        var a = f[0], z = f[f.length - 1];
+        if (!a) { e.preventDefault(); d.focus(); }
+        else if (e.shiftKey && (document.activeElement === a || document.activeElement === d)) { e.preventDefault(); z.focus(); }
+        else if (!e.shiftKey && (document.activeElement === z || document.activeElement === d)) { e.preventDefault(); a.focus(); }
+      }, true);
+      d.addEventListener('click', function (e) {
+        if (e.target !== d) return;
+        var r = d.getBoundingClientRect();
+        if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) cerrarVentana(d);
+      });
+      d.addEventListener('close', function () {
+        // close es asíncrono: una reapertura no debe consumir el nuevo nivel.
+        if (d.open) return;
+        var i = ventanas.findIndex(function (v) { return v.elemento === d; });
+        if (i < 0) return;
+        if (ventanas[i] === superior()) cerrarVentana(d);
+        else {
+          ventanas[i + 1].pasos += ventanas[i].pasos;
+          ventanas[i + 1].origen = ventanas[i].origen;
+          quitarVentana(ventanas[i]);
+        }
+      });
+    }
+    ventanas.push(v);
+    if (ventanas.length > 5) {
+      var vieja = ventanas[0];
+      ventanas[1].origen = vieja.origen;
+      ventanas[1].pasos += vieja.pasos;
+      quitarVentana(vieja);
+    }
+    if (typeof d.showModal === 'function') d.showModal(); else d.setAttribute('open', '');
+    actualizarVentanas(); registrarHistoria(v);
+    // El nombre accesible se anuncia al entrar; enfocar el título no altera el scroll del cuerpo.
+    if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({preventScroll:true}); }
+    else d.focus({preventScroll:true});
+    return {elemento:d, cerrar:function () { cerrarVentana(d); }};
+  }
   function crearDialogo() {
-    var d = el('dialog', { class: 'sate-modal', 'aria-labelledby': 'sate-modal-titulo' }, [
+    var tituloId = id('modal-titulo');
+    var d = el('dialog', { class: 'sate-modal', 'aria-labelledby': tituloId }, [
       el('div', { class: 'sate-modal__cab' }, [
-        el('h2', { id: 'sate-modal-titulo', class: 'sate-modal__titulo' }),
+        el('h2', { id: tituloId, class: 'sate-modal__titulo' }),
         el('button', { type: 'button', class: 'sate-modal__x', 'aria-label': traducir('componentes.cerrar'), texto: '✕' })
       ]),
       el('div', { class: 'sate-modal__cuerpo' }),
       el('div', { class: 'sate-modal__pie' })
     ]);
-    d.querySelector('.sate-modal__x').addEventListener('click', function () { cerrar(); });
-    d.addEventListener('click', function (e) { if (e.target === d) cerrar(); });   // clic en el fondo
-    d.addEventListener('cancel', function (e) { e.preventDefault(); cerrar(); });  // Esc
-    d.addEventListener('keydown', function (e) {   // respaldo del foco atrapado si showModal no existe
-      if (e.key !== 'Tab') return;
-      var f = Array.prototype.filter.call(d.querySelectorAll('button,a[href],input,select,textarea,summary,[tabindex]:not([tabindex="-1"])'), function (x) { return !x.disabled && x.offsetParent !== null; });
-      if (!f.length) return;
-      var a = f[0], z = f[f.length - 1];
-      if (e.shiftKey && document.activeElement === a) { e.preventDefault(); z.focus(); }
-      else if (!e.shiftKey && document.activeElement === z) { e.preventDefault(); a.focus(); }
-    });
+    d.querySelector('.sate-modal__x').addEventListener('click', function () { cerrarVentana(d); });
     document.body.appendChild(d);
     return d;
   }
@@ -66,10 +202,7 @@
      contenido: texto (cadena), Node o función que devuelve Node. Devuelve {cerrar, elemento}. */
   function modal(titulo, contenido, op) {
     op = op || {};
-    if (!dlg) dlg = crearDialogo();
-    var abierto = dlg.open;
-    if (!abierto) origen = document.activeElement;
-    alCerrar = op.alCerrar || null;
+    var dlg = crearDialogo();
     dlg.querySelector('.sate-modal__titulo').textContent = titulo;
     dlg.querySelector('.sate-modal__x').setAttribute('aria-label', traducir('componentes.cerrar'));
     dlg.classList.toggle('sate-modal--pequeno', !!op.pequeno);
@@ -85,26 +218,26 @@
     pie.hidden = !(op.acciones && op.acciones.length);
     (op.acciones || []).forEach(function (a) {
       var b = el('button', { type: 'button', class: 'sate-btn' + (a.primaria ? ' sate-btn--primario' : ''), texto: a.texto });
-      b.addEventListener('click', function () { if (a.onclick) a.onclick(); if (a.cierra !== false) cerrar(); });
+      b.addEventListener('click', function () {
+        var v = superior();
+        if (a.cierra === false || v?.elemento !== dlg) { if (a.onclick) a.onclick(); return; }
+        // Una acción puede cambiar la ruta. Espera al historial antes de ejecutarla;
+        // su resultado precede a alCerrar (la confirmación de PDF resuelve una promesa).
+        var fin = v.alCerrar;
+        v.alCerrar = null;
+        cerrarVentana(dlg);
+        var ejecutar = function () {
+          try { if (a.onclick) a.onclick(); }
+          finally { if (fin) fin(); }
+        };
+        if (historialPendiente) empujes.push(ejecutar); else ejecutar();
+      });
       pie.appendChild(b);
     });
-    if (!abierto) {
-      if (typeof dlg.showModal === 'function') dlg.showModal(); else dlg.setAttribute('open', '');
-      document.documentElement.classList.add('sate-sin-scroll');
-    }
-    cuerpo.scrollTop = 0;
-    var foco = dlg.querySelector('.sate-modal__pie .sate-btn--primario') || dlg.querySelector('.sate-modal__x');
-    foco.focus();
-    return { cerrar: cerrar, elemento: dlg };
+    return abrirVentana(dlg, {titulo:titulo, origen:op.origen, alCerrar:op.alCerrar, propia:true});
   }
   function cerrar() {
-    if (!dlg || !dlg.open) return;
-    if (typeof dlg.close === 'function') dlg.close(); else dlg.removeAttribute('open');
-    document.documentElement.classList.remove('sate-sin-scroll');
-    var o = origen, f = alCerrar;
-    origen = null; alCerrar = null;
-    if (o && o.focus && document.contains(o)) o.focus({preventScroll:true});
-    if (f) f();
+    cerrarVentana();
   }
 
   /* ---------- Chips de estado ---------- */
@@ -659,6 +792,7 @@ function leyendaGrafica(items,esc){
 }
 
   raiz.SateUI = { avisoMateria, definicion: (texto, titulo, definicion) => ayuda('', {}, {texto, titulo, definicion}), leyendaGrafica, indicadoresTrayectoria, fichasKardex, caminoTrayectoria, bandasMapa:rowBands, minimapaCurricular, cajaMateria, resalteCaja, cuadriculaHorario, usarTextos: usarTextos, usarAlmacen: usarAlmacen, chips: chips, recorteCalendario: recorteCalendario, aviso: aviso, avisos: avisos, modal: modal, cerrarModal: cerrar,
+    abrirVentana: abrirVentana, cerrarVentana: cerrarVentana, cerrarVentanas: cerrarTodo,
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, barraInferior: barraInferior,
     volver: volver, migas: migas, tarjetaNav: tarjetaNav, buscador: buscador, segmentado: segmentado, pregunta: pregunta, revelar: revelar };
   // Solo se aplica a una transcripción: nunca al contenedor que mezcla orientación y fuentes.

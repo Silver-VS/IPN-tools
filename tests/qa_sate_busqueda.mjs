@@ -62,7 +62,7 @@ for(const unidad of Object.keys(config.unidades)){
   assert.ok(document.querySelector('.sate-modal--flotante'));
   assert.ok(document.querySelectorAll('.guia-articulo-literal button').length>0,'referencias reales envueltas');
   document.querySelector('dialog').dispatchEvent(new Evento('cancel'));
-  assert.equal(document.querySelector('dialog').open,false,'Esc cierra la consulta');
+  assert.equal(document.querySelector('dialog[open]'),null,'Esc cierra la consulta');
   assert.equal(document.scrolled,posicion,'no mueve el lector');
  }
 }

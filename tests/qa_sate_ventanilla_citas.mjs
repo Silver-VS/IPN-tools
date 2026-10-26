@@ -32,7 +32,7 @@ for(const ancho of [1300,1024,768,375])for(const oscuro of [false,true]){
       if(clave==='sate.baja.aviso_definitiva_3')assert.match(b.textContent,/fracción I/);
       assert.equal(b.getAttribute('aria-haspopup'),'dialog');b.focus();await b.onclick();
       const modal=document.querySelector('dialog');assert.ok(modal.open);
-      assert.equal(modal.getAttribute('aria-labelledby'),'sate-modal-titulo');
+      assert.equal(modal.querySelector('h2').id,modal.getAttribute('aria-labelledby'));
       const reg=JSON.parse(leer('data/reglamentos/'+doc+'.json'));
       const a=reg.articulos.find(a=>String(a.n)===n);
       if(a)assert.equal(modal.querySelector('.guia-articulo-literal').textContent,a.texto);

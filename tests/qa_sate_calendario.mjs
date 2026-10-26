@@ -14,7 +14,7 @@ for(const e of [...base.eventos,...data.upiita.actividades,...data.upiita.evento
 }
 class Nodo{
   constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.style={};this.listeners={};this.scrollWidth=640;this.clientWidth=300;this.scrollLeft=0}
-  appendChild(n){this.children.push(n);n.parent=this;return n}
+  appendChild(n){if(n.parent)n.parent.children=n.parent.children.filter(x=>x!==n);this.children.push(n);n.parent=this;return n}
   addEventListener(k,fn){this.listeners[k]=fn}
   querySelector(s){return this.all().find(n=>n.className?.split(' ').includes(s.slice(1)))||null}
   querySelectorAll(){return this.all().filter(n=>n.tagName==='button'||n.tagName==='summary'||n.tagName==='a'&&n.getAttribute('href'))}
@@ -32,7 +32,8 @@ const paneles=Object.fromEntries(['v-hor','v-tray','sate-trayectoria'].map(id=>[
 const box=new Nodo('section'), document={addEventListener(){},createElement:t=>new Nodo(t),createElementNS:(_,t)=>new Nodo(t),getElementById:id=>paneles[id]|| (id==='sate-calendario'?box:box.all().find(n=>n.id===id))};
 const SATE={modulos:{},texto:(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}'),pestana(id,m){this.modulos[id]=m}};
 
-const c=vm.createContext({SATE,DATA:{calendario:data.upiita},SATE_CONFIG:config,SATE_UNIDAD:'upiita',document,console,
+let ventana;const SateUI={modal(t,contenido,op){ventana={t,contenido,cerrar(){op.alCerrar()}};return ventana}};
+const c=vm.createContext({SateUI,SATE,DATA:{calendario:data.upiita},SATE_CONFIG:config,SATE_UNIDAD:'upiita',document,console,
   perMeta:()=>0,perName:()=> '27/1',isPersonal:()=>false,conSim:(_,fn)=>fn(),tr:()=>({fail:[]})});
 const nucleo=leer('web/dist/sate/nucleo.js');
 // El almacén real conserva la ruta IPNT.set; sólo el medio de almacenamiento es ficticio.
@@ -319,12 +320,12 @@ c.DATA.calendario=data.upiita;
 api.hoy=()=> '2026-10-20';c.matchMedia=()=>({matches:true});mostrar();cambiar('27/1');
 assert.equal(nodos('calendario-detalle')[0].hidden,true,'Teléfono: el detalle sólo aparece como hoja');
 const item=nodos('calendario-item')[0];item.onclick();
-assert.equal(nodos('calendario-detalle')[0].getAttribute('role'),'dialog');assert.equal(nodos('calendario-detalle')[0].getAttribute('aria-modal'),'true');assert.equal(nodos('calendario-hoja-fondo').length,1);
-assert.equal(document.activeElement.id,'cal-detalle-titulo');
-const modal=nodos('calendario-detalle')[0],enlaces=modal.querySelectorAll();enlaces.at(-1).focus();modal.onkeydown({key:'Tab',preventDefault(){}});assert.equal(document.activeElement,enlaces[0]);modal.onkeydown({key:'Tab',shiftKey:true,preventDefault(){}});assert.equal(document.activeElement,enlaces.at(-1));
-modal.onkeydown({key:'Escape',preventDefault(){}});assert.equal(nodos('calendario-hoja-fondo').length,0);assert.equal(document.activeElement.id,item.id,'Cerrar devuelve el foco a la agenda');
-cambiarVista('carriles');const tactil=nodos('calendario-ev')[0];tactil.onclick();assert.equal(nodos('calendario-detalle')[0].getAttribute('role'),'dialog');
-document.getElementById('cal-cerrar').onclick();assert.equal(document.activeElement.id,tactil.id,'Cerrar devuelve el foco a la línea');
+assert.ok(ventana);assert.equal(nodos('calendario-detalle')[0].hidden,true);
+assert.ok(ventana.contenido.children.some(n=>n.id==='cal-detalle-titulo'));
+// El cierre y el foco atrapado se prueban con el componente real en qa_sate_modales.mjs.
+ventana.cerrar();assert.equal(nodos('calendario-hoja-fondo').length,0);assert.equal(document.activeElement.id,item.id,'Cerrar devuelve el foco a la agenda');
+cambiarVista('carriles');const tactil=nodos('calendario-ev')[0];tactil.onclick();assert.ok(ventana);
+ventana.cerrar();assert.equal(document.activeElement.id,tactil.id,'Cerrar devuelve el foco a la línea');
 assert.ok(document.getElementById('cal-volver'),'En teléfono la selección se limpia desde la línea');
 // En teléfono no hay copia del mes chico.
 visible(false);assert.equal(nodos('calendario-mes-chico')[1].hidden,true);assert.equal(nodos('calendario-mes-chico')[0].inert,false);

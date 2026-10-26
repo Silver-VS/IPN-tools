@@ -21,6 +21,9 @@ class Nodo {
   setAttribute(k,v){this.attrs[k]=String(v);if(k==='open')this.open=true;if(k==='id')this.id=v}
   getAttribute(k){return this.attrs[k]??null}removeAttribute(k){delete this.attrs[k]}
   appendChild(n){this.children.push(n);n.parent=this;return n}replaceChildren(...ns){this.text='';this.children=[];ns.forEach(n=>this.appendChild(n))}
+  insertBefore(n,antes){this.children.splice(antes?this.children.indexOf(antes):0,0,n);n.parent=this;return n}
+  remove(){if(this.parent)this.parent.children=this.parent.children.filter(n=>n!==this)}
+  get isConnected(){return document.body.contains(this)}
   addEventListener(k,fn){(this.eventos[k]??=[]).push(fn)}
   dispatchEvent(e){e.target??=this;(this.eventos[e.type]||[]).forEach(fn=>fn(e));return true}
   click(){if(this.tagName!=='a'||this.parent)this.focus();if(this.onclick)this.onclick();this.dispatchEvent({type:'click',target:this})}
@@ -97,7 +100,7 @@ vm.runInContext('PLAN_PASO=0',c);
 assert.equal(vm.runInContext('conPlan(()=>JSON.stringify(situacionDatos()),1)',c),real,'Situación conserva datos reales incluso desde el escenario N+1');
 assert.ok(box.textContent.includes(texto('sate.planeacion.titulo')),'A: Situación enlaza al mapa');
 const accion=box.querySelector('.sate-chip');accion.click();
-const dlg=body.querySelector('.sate-modal');assert.equal(dlg.open,true);
+let dlg=body.querySelector('.sate-modal');assert.equal(dlg.open,true);
 const focos=dlg.querySelectorAll('button'),primero=focos[0],ultimo=focos.at(-1);
 ultimo.focus();let atrapado=false;
 dlg.dispatchEvent({type:'keydown',key:'Tab',preventDefault(){atrapado=true}});
@@ -146,21 +149,21 @@ const tramite={id:'electivas',titulo:'Solicitud ficticia',pasos:[],generar:async
 const panel=document.getElementById('sate-tramites'),asistente=c.SateTramites.asistente(panel,tramite);
 const descargar=panel.querySelectorAll('button').find(n=>n.textContent==='Descargar formato');
 descargar.focus();let pendiente=asistente.descargar();
-assert.equal(dlg.open,true);assert.equal(dlg.getAttribute('aria-labelledby'),'sate-modal-titulo');
+dlg=body.querySelector('.sate-modal');assert.equal(dlg.open,true);assert.equal(dlg.getAttribute('aria-labelledby'),dlg.querySelector('h2').id);
 assert.match(dlg.textContent,/Entrega tus formatos firmados en las ventanillas de Gestión Escolar\./);
-assert.equal(document.activeElement.textContent,'Generar PDF');assert.equal(pdfsGenerados,0);
+assert.equal(document.activeElement,dlg.querySelector('h2'));assert.equal(pdfsGenerados,0);
 dlg.querySelectorAll('button').find(n=>n.textContent==='Cancelar').click();await pendiente;
 assert.equal(pdfsGenerados,0);assert.equal(dlg.open,false);assert.equal(document.activeElement,descargar);
-pendiente=asistente.descargar();dlg.dispatchEvent({type:'cancel',preventDefault(){}});await pendiente;
+pendiente=asistente.descargar();dlg=body.querySelector('.sate-modal');dlg.dispatchEvent({type:'cancel',preventDefault(){}});await pendiente;
 assert.equal(pdfsGenerados,0);assert.equal(document.activeElement,descargar);
-pendiente=asistente.descargar();dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
+pendiente=asistente.descargar();dlg=body.querySelector('.sate-modal');dlg.querySelectorAll('button').find(n=>n.textContent==='Generar PDF').click();await pendiente;
 assert.equal(pdfsGenerados,1);assert.equal(dlg.open,false);asistente.destruir();
 c.SateTramites.registrar(tramite);SATE.presente.aplicaTramite=()=>null;c.SateTramites.mostrarLista(panel);
-const desdePortada=panel.querySelectorAll('button').find(n=>n.className.includes('tramite-fila-boton')&&n.getAttribute('aria-label')?.startsWith('Electivas. '));desdePortada.focus();desdePortada.click();
+const desdePortada=panel.querySelectorAll('button').find(n=>n.className.includes('tramite-fila-boton')&&n.getAttribute('aria-label')?.startsWith('Electivas. '));desdePortada.focus();desdePortada.click();dlg=body.querySelector('.sate-modal');
 assert.equal(dlg.open,true);assert.equal(pdfsGenerados,1);assert.ok(dlg.textContent.includes('Empezar'));
 dlg.querySelectorAll('button').find(n=>n.className.includes('sate-modal__x')).click();
 assert.equal(dlg.open,false);assert.equal(document.activeElement,desdePortada);
-desdePortada.click();dlg.querySelectorAll('button').find(n=>n.textContent==='Empezar').click();
+desdePortada.click();dlg=body.querySelector('.sate-modal');dlg.querySelectorAll('button').find(n=>n.textContent==='Empezar').click();
 assert.equal(destino,'tramites/electivas');assert.equal(pdfsGenerados,1);
 console.log('Ventanilla: diálogo de resumen, foco restaurado al cerrar y Empezar conserva la ruta del trámite.');
 

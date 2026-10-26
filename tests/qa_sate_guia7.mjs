@@ -61,9 +61,9 @@ assert.ok(document.querySelector('.sate-modal__titulo').textContent.includes('1 
 assert.equal(document.querySelector('.guia-articulo-literal').textContent, reg.articulos[0].texto);
 assert.equal(document.querySelector('.guia-articulo').querySelectorAll('a')[0].getAttribute('href'), '#/ficticia/guia/reglamentos/demo/art-1');
 await c.SATE.articulo('demo','999');
-assert.ok(document.querySelector('.guia-articulo').textContent.includes('sate.guia.sin_articulo'));
+assert.ok(document.querySelectorAll('.guia-articulo').at(-1).textContent.includes('sate.guia.sin_articulo'));
 await c.SATE.articulo('sin','1');
-assert.ok(document.querySelector('.guia-articulo').querySelector('a[target="_blank"]'));
+assert.ok(document.querySelectorAll('.guia-articulo').at(-1).querySelector('a[target="_blank"]'));
 assert.equal(solicitudes.filter(s=>s.endsWith('/demo.json')).length, 1, 'caché en memoria');
 c.SateUI.cerrarModal();
 const termino = caja.querySelector('.sate-termino'); termino.click();
@@ -72,7 +72,7 @@ assert.equal(document.getElementById(termino.getAttribute('aria-describedby')).t
 document.dispatchEvent(new Evento('keydown',{key:'Escape'}));
 assert.ok(caja.querySelector('.sate-globo').hidden);
 movil = true; termino.click();
-assert.ok(document.querySelector('.sate-modal').classList.contains('sate-modal--pequeno'));
+assert.ok(document.querySelectorAll('.sate-modal').at(-1).classList.contains('sate-modal--pequeno'));
 movil = false; c.SateUI.cerrarModal();
 const ruta = c.SateRutas.ruta('#/ficticia/guia/reglamentos/demo/art-1','ficticia',config.unidades);
 assert.deepEqual(Array.from(ruta.partes), ['reglamentos','demo','art-1']);

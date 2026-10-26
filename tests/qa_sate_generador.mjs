@@ -17,7 +17,7 @@ const oferta=Array.from({length:4},(_,i)=>['X','M',1,'G'+i,i,[],[[i,480,540]],6,
 const tray={want:oferta.map(c=>c[8]),done:[],curso:[],oblig:[],fail:[]};
 const plan={sel:['elegido'],own:[]}, workspace={marks:{},plan:'A'};
 let reloj=null, fallo=false, calendarios=0;
-const c=vm.createContext({console:{error:(...args)=>errores.push(args)},setTimeout,performance:{now:()=>reloj===null?performance.now():reloj++},
+const c=vm.createContext({SateUI:{abrirVentana(d){d.showModal()},cerrarVentana(d){d.close()}},console:{error:(...args)=>errores.push(args)},setTimeout,performance:{now:()=>reloj===null?performance.now():reloj++},
   document:{addEventListener(k,f){capturas[k]=f}},$:nodo,window:{},
   txH:(k,v={})=>(config.textos['sate.horarios.'+k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??k),
   S:{car:'X',per:'actual',fit:false,gap:null,onlyWant:true,chips:[],gpref:[],gavoid:[],gt:'*',gen:null},

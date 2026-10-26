@@ -284,9 +284,8 @@ async function exportPdfAll(){
   return r.startsWith('Listo')?`${r} (${ids.length} ${ids.length>1?'horarios':'horario'} en ${n} ${n>1?'hojas':'hoja'})`:r;
 }
 // módulo de exportación (ventana)
-function abrirExportacion(){const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||ownVis().length?'':txH('exportacion_vacia');dl.showModal?dl.showModal():dl.setAttribute('open','')}
-$('#exp-x').addEventListener('click',()=>$('#exp-dlg').close());
-$('#exp-dlg').addEventListener('click',e=>{if(e.target.id==='exp-dlg')e.target.close()});
+function abrirExportacion(){const dl=$('#exp-dlg'),n=plansConContenido().length;$('#b-pdfall').hidden=n<2;$('#b-pdfall').textContent=`PDF con todos los horarios (${n})`;$('#exp-dmsg').textContent=selected().length||ownVis().length?'':txH('exportacion_vacia');SateUI.abrirVentana(dl)}
+$('#exp-x').addEventListener('click',()=>SateUI.cerrarVentana($('#exp-dlg')));
 const renderExpStyle=()=>{document.querySelectorAll('[data-exps]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.exps===EXP.style)));
   document.querySelectorAll('[data-ext]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.ext==='dark')===EXP.dark)));
   document.querySelectorAll('[data-exper]').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.exper===EXP.perPage)))};

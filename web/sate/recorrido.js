@@ -16,7 +16,7 @@
     if(activo)return;
     activo=true;
     let ui,origen=document.activeElement,elemento,indice=-1,pasos=[],ocupado=false,cerrado=false;
-    const salir=()=>{if(cerrado)return;cerrado=true;activo=false;removeEventListener('resize',colocar);removeEventListener('scroll',colocar,true);removeEventListener('blur',salir);document.removeEventListener('visibilitychange',alCambiarVisibilidad);ui?.elemento.remove();if(origen?.isConnected)origen.focus()};
+    const salir=()=>{if(cerrado)return;cerrado=true;activo=false;removeEventListener('resize',colocar);removeEventListener('scroll',colocar,true);removeEventListener('blur',salir);document.removeEventListener('visibilitychange',alCambiarVisibilidad);if(ui)SateUI.cerrarVentana(ui.elemento);ui?.elemento.remove();if(origen?.isConnected)origen.focus()};
     const alCambiarVisibilidad=()=>{if(document.visibilityState==='hidden')salir()};
     function colocar(){
       if(!elemento||!ui||!ui.elemento.open)return;
@@ -66,7 +66,7 @@
         tarjeta.append(titulo,texto,boton);lista.appendChild(tarjeta);
       }
       ui.lista=lista;ui.tarjeta.insertBefore(lista,ui.acciones);ui.acciones.hidden=true;
-      ui.elemento.showModal();
+      SateUI.abrirVentana(ui.elemento,{alCerrar:salir,cierre:true,navegacion:ui.tarjeta});
       const botones={};
       for(const k of ['anterior','siguiente','salir']){const b=document.createElement('button');b.type='button';b.className='sate-btn';b.textContent=tx(k);b.onclick=()=>k==='salir'?salir():mover(k==='anterior'?-1:1).catch(()=>SateUI.modal(tx('bienvenida'),tx('error'),{pequeno:true}));ui.acciones.appendChild(b);botones[k]=b}
       async function iniciarPestana(pestana){pasos=pasos.filter(p=>p.pestana===pestana);indice=-1;ui.acciones.hidden=false;await mover(1)}
