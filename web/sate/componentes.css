@@ -1250,3 +1250,32 @@ html[data-vista=guia-vinculada] #sate-nombre{display:none}
   .sate-marca:has(#b-plataforma) #sate-titulo{font-size:var(--ipn-tamano-s)}
   .sate-marca:has(#b-plataforma) .sate-sep{margin-inline:var(--ipn-esp-1)}
 }
+/* Investigación: misma separación entre dato oficial y escritura propia en ambas vistas. */
+.inv-vista{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,3fr);gap:var(--ipn-esp-6);align-items:start}
+.inv-proyectos,.inv-contenido{display:flex;flex-direction:column;gap:var(--ipn-esp-3);min-width:0;overflow-wrap:anywhere}
+.inv-proyectos{align-self:start}
+.inv-proyectos__lista{display:flex;flex-direction:column;gap:var(--ipn-esp-2)}
+.inv-vista h3{font-size:var(--ipn-tamano-l);margin:0}
+.inv-vista h4{font-size:var(--ipn-tamano-m);margin:var(--ipn-esp-5) 0 0}
+.inv-resumen-articulo{display:none;font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.rgl-renglon>.inv-fraccion{grid-column:2}
+.inv-cita{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--ipn-esp-4);padding-block:var(--ipn-esp-5);border-bottom:1px solid var(--ipn-linea);min-width:0}
+.inv-oficial{min-width:0;overflow-wrap:anywhere}
+.inv-oficial p{white-space:pre-wrap}
+.inv-oficial [data-oficial]{font-size:var(--ipn-tamano-m);line-height:1.6}
+.inv-oficial>p:first-child{font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.inv-nota{display:flex;flex-direction:column;gap:var(--ipn-esp-2);min-width:0;background:var(--ipn-hundido);color:var(--ipn-texto);padding:var(--ipn-esp-3);border-radius:var(--ipn-radio);font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
+.inv-nota[data-tipo=hecho]{background:var(--ipn-ok-suave)}
+.inv-nota[data-tipo=pregunta]{background:var(--ipn-acento-suave)}
+.inv-nota[data-tipo=verificar]{background:var(--ipn-aviso-suave)}
+.inv-nota .guia-chips{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1)}
+.inv-nota button[aria-pressed=true],.inv-proyectos button[aria-pressed=true]{border-color:var(--ipn-acento);font-weight:700}
+.inv-vista :is(button,select,textarea),.inv-fraccion :is(button,textarea){box-sizing:border-box;min-height:var(--ipn-control-alto);max-width:100%;min-width:0;padding:var(--ipn-esp-2);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit}
+.inv-vista textarea,.inv-nota textarea{width:100%;resize:vertical}
+.inv-fraccion{min-width:0;font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
+.inv-orden{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2);grid-column:1/-1}
+.inv-cambio{color:var(--ipn-error);font-weight:600}
+.inv-vista :focus-visible,.inv-fraccion :focus-visible{outline:2px solid var(--ipn-acento);outline-offset:2px}
+.inv-vista button:disabled{color:var(--ipn-tenue);cursor:default}
+@media(hover:hover) and (pointer:fine){.inv-fraccion>button[aria-pressed=false]{opacity:0}.rgl-fr:hover>.inv-fraccion>button,.rgl-fr:hover>div>.inv-fraccion>button,.rgl-inc:hover>div>.inv-fraccion>button,.inv-fraccion:focus-within>button{opacity:1}}
+@media(max-width:768.98px){.inv-vista,.inv-cita{grid-template-columns:minmax(0,1fr)}.inv-proyectos{position:static}.inv-proyectos__lista{display:none}.inv-resumen-articulo:not(:empty){display:block}.rgl:has(.rgl-investigacion){padding-bottom:calc(var(--ipn-control-alto) + var(--ipn-esp-6))}}

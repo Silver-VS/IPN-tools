@@ -3,6 +3,7 @@ import vm from 'node:vm';
 import assert from 'node:assert/strict';
 import {readFileSync, readdirSync, existsSync} from 'node:fs';
 import {crearEntorno} from './dom_minimo.mjs';
+import {webcrypto} from 'node:crypto';
 const leer = f => readFileSync(f, 'utf8');
 const c = vm.createContext({});
 vm.runInContext(leer('web/sate/guia.js'), c);
@@ -122,7 +123,7 @@ const eventos = new Map(), cuadros = [];
 let pestana, movil = false;
 const avisos = [];
 const almacen=new Map();
-const contexto = vm.createContext({document, setTimeout, clearTimeout,
+const contexto = vm.createContext({document, setTimeout, clearTimeout, crypto:webcrypto, TextEncoder, Uint8Array,
   localStorage:{getItem:k=>almacen.get(k)||null}, IPNT:{set:(k,v)=>almacen.set(k,v)}, prompt:()=> 'Proyecto ficticio', confirm:()=>true, Event:Evento,
   dispatchEvent:e=>eventos.get(e.type)?.(e),
   console:{...console,warn:(...p)=>avisos.push(p)},
@@ -153,10 +154,10 @@ assert.ok(caja.querySelectorAll('.guia-resultados a').length>0,'sugerencias busc
 await pestana.mostrar({partes:['reglamentos','ri']});
 assert.equal(avisos.length,0, JSON.stringify(avisos));
 const guardar=caja.querySelector('.rgl-articulo header').querySelectorAll('button')[1];
-guardar.click();
+await guardar._ev.click[0]();
 assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos[0].marcadores[0].n,'1','guardar usa IPNT por unidad');
 assert.equal(guardar.getAttribute('aria-pressed'),'true','guardar expone el estado activo');
-guardar.click();
+await guardar._ev.click[0]();
 assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos[0].marcadores.length,0,'segundo clic borra marcador');
 assert.equal(guardar.getAttribute('aria-pressed'),'false','quitar vuelve al estado normal');
 assert.equal(caja.querySelectorAll('.rgl-articulo').length,ri.articulos.length+1,'todos los artículos y transitorios en el lienzo');
@@ -234,14 +235,37 @@ await pestana.mostrar({partes:['reglamentos','rge','art-1']});
 assert.notEqual(caja.querySelector('.rgl-riel').hidden,true,'la rejilla se conserva al cambiar a un artículo sin citas (sin saltos)');
 assert.ok(!caja.querySelector('.rgl').classList.contains('rgl--sin-riel'),'sin cambio de columnas');
 for (const lector of caja.querySelectorAll('.rgl-cuerpo')) {
-  assert.equal(lector.getAttribute('data-oficial'), 'rge');
-  for (const n of lector.querySelectorAll('*')) assert.equal(n.getAttribute('data-oficial'), 'rge', 'R14: cada elemento documental conserva el origen');
+  for (const n of lector.querySelectorAll('p,dt,dd,.rgl-renglon__texto,.rgl-renglon__marca')) {
+    if(!n.closest('.inv-fraccion'))assert.equal(n.getAttribute('data-oficial'), 'rge', 'R18: cada texto documental conserva el origen');
+  }
+  for(const n of lector.querySelectorAll('.inv-fraccion'))assert.equal(n.closest('[data-oficial]'),null,'R18: controles y notas propios fuera del texto oficial');
 }
 assert.equal(caja.querySelector('.rgl-riel').getAttribute('data-oficial'), null, 'orientación fuera del texto literal');
 contexto.location.hash='#/ficticia/guia/reglamentos/honor/art-21.I?frpos=14';
 await pestana.mostrar({partes:['reglamentos','honor','art-21.I']});
 assert.equal(document.scrolled.getAttribute('data-fraccion-pos'),'14','numeración repetida conserva el destino exacto');
 assert.equal(document.scrolled.querySelector('p').textContent,reg('honor').articulos.find(a=>a.n==='21').fracciones[13].texto);
+// R18: guardado, nota y tipo en el renglón exacto; vista dedicada con dato oficial literal.
+const fraccion=document.scrolled;
+const accionFr=Array.from(fraccion.querySelectorAll('[data-guardar-frpos]')).find(b=>b.getAttribute('data-guardar-frpos')==='14'&&!b.getAttribute('data-guardar-inciso'));
+assert.ok(accionFr,'acción para la fracción con numeral repetido');
+await accionFr._ev.click[0]();
+assert.equal(fraccion.querySelector('p').textContent,reg('honor').articulos.find(a=>a.n==='21').fracciones[13].texto);
+const entradaNota=fraccion.querySelector('.inv-nota textarea');
+assert.ok(entradaNota,'nota bajo la fracción guardada');
+entradaNota.value='Hecho ficticio';entradaNota.dispatchEvent(new Evento('input'));
+assert.equal(fraccion.querySelector('.inv-nota textarea'),entradaNota,'guardar no reemplaza el campo durante la escritura');
+await new Promise(resolve=>setTimeout(resolve,0));
+assert.equal(fraccion.querySelector('.inv-nota textarea'),entradaNota,'la actualización del panel conserva el campo de escritura');
+fraccion.querySelectorAll('.inv-nota button')[1].click();
+const guardada=JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos.at(-1).marcadores.at(-1);
+assert.equal(guardada.frpos,14);assert.equal(guardada.nota,'Hecho ficticio');assert.equal(guardada.tipo,'hecho');
+await pestana.mostrar({partes:['investigacion']});
+assert.ok(caja.querySelector('.inv-vista'));
+assert.equal(caja.querySelector('.inv-oficial [data-oficial]').textContent,reg('honor').articulos.find(a=>a.n==='21').fracciones[13].texto);
+assert.equal(caja.querySelector('.inv-nota textarea').value,'Hecho ficticio');
+const peticion=caja.querySelectorAll('textarea').at(-1);peticion.value='Petición ficticia';peticion.dispatchEvent(new Evento('input'));
+assert.equal(JSON.parse(almacen.get('hu.ficticia.investigaciones')).proyectos.at(-1).peticion,'Petición ficticia');
 pestana.ocultar();
 assert.equal(eventos.has('scroll'),false,'se retira el seguimiento al salir');
 assert.equal(eventos.has('resize'),false,'se retira el ajuste al salir');

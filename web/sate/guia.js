@@ -278,6 +278,18 @@
   }
   // El intercambio no contiene perfil, unidad ni información del SAES. Se reconstruye una lista blanca.
   function validarInvestigacion(d) {
+    if (d?.version === 2) {
+      if (typeof d.peticion !== 'string' || d.peticion.length > 20000) throw new Error('Petición inválida');
+      const base = validarInvestigacion({...d, version:1});
+      base.version=2; base.peticion=d.peticion;
+      base.marcadores.forEach((m,i)=>{
+        const original=d.marcadores[i];
+        if (typeof original.nota !== 'string' || original.nota.length>4000 || !tiposNota.includes(original.tipo) || typeof original.inciso !== 'string' || !/^[a-z0-9]*$/i.test(original.inciso) || !(original.huella === '' || /^[a-f0-9]{64}$/.test(original.huella))) throw new Error('Cita inválida');
+        if(original.frpos!=null&&(!Number.isSafeInteger(original.frpos)||original.frpos<1||original.frpos>1000))throw new Error('Posición inválida');
+        Object.assign(m,{inciso:original.inciso,nota:original.nota,tipo:original.tipo,huella:original.huella,pendienteHuella:original.pendienteHuella===true,...(original.frpos?{frpos:original.frpos}:{})});
+      });
+      return base;
+    }
     const plano = (s,max) => typeof s === 'string' && s.length <= max && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f<>]/.test(s);
     if (!d || d.formato !== 'sate-investigacion' || d.version !== 1 || !plano(d.nombre,120) || !d.nombre.trim() || !['solicitud','queja','propuesta','estudio'].includes(d.proposito) || !plano(d.autor,120) || !Array.isArray(d.etiquetas) || d.etiquetas.length>20 || !d.etiquetas.every(x=>plano(x,40)) || !Array.isArray(d.marcadores) || d.marcadores.length>300) throw new Error('Investigación inválida');
     const marcadores = d.marcadores.map(m => {
@@ -289,10 +301,71 @@
     });
     return {formato:d.formato,version:1,nombre:d.nombre,proposito:d.proposito,autor:d.autor,etiquetas:d.etiquetas.slice(),marcadores};
   }
-  function alternarMarcador(p,doc,n,fr='') {
-    const i=p.marcadores.findIndex(m=>m.doc===doc && m.n===String(n) && m.fr===fr);
-    if(i<0) p.marcadores.push({doc,n:String(n),fr,anotaciones:[]}); else p.marcadores.splice(i,1);
+  function alternarMarcador(p,doc,n,fr='',inciso='',frpos=0) {
+    const i=p.marcadores.findIndex(m=>m.doc===doc && m.n===String(n) && m.fr===fr&&(m.inciso||'')===inciso&&(m.frpos||0)===frpos);
+    if(i<0) p.marcadores.push({doc,n:String(n),fr,anotaciones:[],...(p.version===2?{inciso,huella:'',nota:'',tipo:'personal',pendienteHuella:true,...(frpos?{frpos}:{})}:{})}); else p.marcadores.splice(i,1);
   }
+  const tiposNota = ['personal','hecho','pregunta','verificar'];
+  function migrarInvestigacion(d) {
+    const p=validarInvestigacion(d);
+    if(p.version===2)return p;
+    return {...p,version:2,peticion:'',marcadores:p.marcadores.map(m=>({...m,inciso:'',huella:'',nota:'',tipo:'personal',pendienteHuella:true}))};
+  }
+  // La cita se resuelve siempre desde el dato oficial, nunca desde texto importado.
+  function textoCita(reg,m) {
+    const a=reg.articulos?.find(a=>String(a.n)===m.n) || (m.n==='texto'?reg:null);
+    if(!a)return null;
+    if(!m.fr&&!m.inciso)return a.texto;
+    const f=m.frpos?a.fracciones?.[m.frpos-1]:a.fracciones?.find(f=>f.fr===m.fr);
+    if(f&&f.fr!==m.fr)return null;
+    if(!f){
+      const bloques=bloquesNormativos(a.texto);
+      const fracciones=bloques.map((b,i)=>/^[IVXLCDM]+[.)]/.test(b.marca)?i:-1).filter(i=>i>=0);
+      const inicio=m.fr?(m.frpos?fracciones[m.frpos-1]:fracciones.find(i=>bloques[i].marca.replace(/[.)\s]/g,'')===m.fr)):0;
+      if(inicio==null)return null;
+      if(m.fr&&bloques[inicio].marca.replace(/[.)\s]/g,'')!==m.fr)return null;
+      const fin=fracciones.find(i=>i>inicio)??bloques.length;
+      const desde=m.inciso?bloques.findIndex((b,i)=>i>=inicio&&i<fin&&b.marca.replace(/[)\s]/g,'')===m.inciso):inicio;
+      if(desde<0)return null;
+      const hasta=m.inciso?bloques.findIndex((b,i)=>i>desde&&i<fin&&b.marca):fin;
+      const limite=hasta<0?fin:hasta;
+      return bloques.slice(desde,limite).map((b,i)=>(i?b.marca:'')+b.texto).join('');
+    }
+    return m.inciso ? f.incisos?.find(i=>i.inciso===m.inciso)?.texto ?? null : f.texto;
+  }
+  async function huellaCita(texto) {
+    const bytes=await raiz.crypto.subtle.digest('SHA-256',new TextEncoder().encode(texto));
+    return Array.from(new Uint8Array(bytes),x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  async function revisarInvestigacion(d,cargar,migracion=false) {
+    const p=migrarInvestigacion(d);
+    for(const m of p.marcadores){
+      const texto=textoCita(await cargar(m.doc),m);
+      const actual=texto===null?null:await huellaCita(texto);
+      if(migracion && !m.huella && actual)m.huella=actual;
+      m.pendienteHuella=false;
+      m.cambio=!actual || m.huella!==actual;
+    }
+    return p;
+  }
+  function moverCita(p,desde,hasta) {
+    if(!Number.isInteger(desde)||!Number.isInteger(hasta)||desde<0||hasta<0||desde>=p.marcadores.length||hasta>=p.marcadores.length)return;
+    p.marcadores.splice(hasta,0,p.marcadores.splice(desde,1)[0]);
+  }
+  function editarNota(m,nota,tipo) {
+    if(typeof nota!=='string'||nota.length>4000||!tiposNota.includes(tipo))throw new Error('Nota inválida');
+    m.nota=nota;m.tipo=tipo;
+  }
+  async function exportarMarkdownInv(p,cargar,etiqueta,enlace) {
+    let md='# '+p.nombre+'\n\n';
+    for(const m of p.marcadores){
+      const texto=textoCita(await cargar(m.doc),m);
+      const estado=texto!==null&&m.huella===await huellaCita(texto)?'sin_cambios':'cambio';
+      md+='## '+m.doc.toUpperCase()+' · '+etiqueta('articulo',{n:m.n})+(m.fr?' · '+etiqueta('fraccion',{fr:m.fr}):'')+(m.inciso?' · '+etiqueta('inciso',{inciso:m.inciso}):'')+'\n\n'+etiqueta('oficial')+' · '+etiqueta(estado)+'\n\n'+(texto??etiqueta('no_disponible'))+'\n\n'+etiqueta('huella')+': '+m.huella+'\n\n'+enlace(m)+'\n\n'+etiqueta('propia')+' · '+etiqueta(m.tipo)+'\n\n'+m.nota+'\n\n'+m.anotaciones.map(a=>etiqueta('nota')+' · '+etiqueta(a.etiqueta)+': '+a.nota).join('\n\n')+'\n\n';
+    }
+    return md+'## '+etiqueta('peticion')+' · '+etiqueta('propia')+'\n\n'+p.peticion;
+  }
+  Object.assign(raiz.SateGuia,{tiposNota,migrarInvestigacion,textoCita,huellaCita,revisarInvestigacion,moverCita,editarNota,exportarMarkdownInv});
   function fundamentoInv(p, documentos) {
     const grupos = new Map();
     for(const m of p.marcadores) {if(!grupos.has(m.doc)) grupos.set(m.doc,new Set()); grupos.get(m.doc).add(m.n);}
@@ -601,11 +674,11 @@
     if (!E.partes.has(a)) E.partes.set(a, partesArticulo(a));
     const p = E.partes.get(a), nodos = [];
     if (p.intro) nodos.push(...textoEnBloques(p.intro));
-    if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones' }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
+    if (p.definiciones) nodos.push(h('dl', { 'class': 'rgl-definiciones', 'data-oficial':doc }, p.definiciones.map(x => h('div', {}, [h('dt', { texto: x.termino }), h('dd', { texto: x.texto })]))));
     if (p.fracciones.length) nodos.push(h('ol', { 'class': 'rgl-fracciones' }, p.fracciones.map(f => fila('rgl-fr', f.fr + '.', anclaArticulo(a.n, f.fr), t('sate.guia.rgl_enlace_fraccion', { fr: f.fr }), [
       ...textoEnBloques(f.texto),
       f.incisos.length ? h('ol', { 'class': 'rgl-incisos' }, f.incisos.map(x => fila('rgl-inc', x.inciso + ')', anclaArticulo(a.n, f.fr, x.inciso), t('sate.guia.rgl_enlace_inciso', { inciso: x.inciso }), textoEnBloques(x.texto)))) : null]))));
-    const cuerpo = h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc }, nodos);
+    const cuerpo = h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial' }, nodos);
     cuerpo.querySelectorAll('.rgl-fr').forEach((n,i) => {
       n.setAttribute('data-fraccion-pos',i+1);
       if (p.fracciones.filter(f=>f.fr===p.fracciones[i].fr).length > 1) {
@@ -613,7 +686,31 @@
         enlace.setAttribute('href',enlace.getAttribute('href')+'?frpos='+(i+1));
       }
     });
-    return envolverReferencias(cuerpo, doc, a);
+    envolverReferencias(cuerpo, doc, a);
+    if(!p.fracciones.length){
+      let fr='',pos=0;
+      for(const nodo of cuerpo.querySelectorAll('.rgl-renglon--marcado')){
+        const marca=nodo.querySelector('.rgl-renglon__marca').textContent.replace(/[.)\s]/g,'');
+        const inciso=/^[a-z]$/.test(marca)?marca:'';
+        if(!inciso){fr=marca;pos++;}
+        nodo.removeAttribute('data-oficial');
+        nodo.setAttribute('data-ancla',anclaArticulo(a.n,fr,inciso));
+        if(!inciso)nodo.setAttribute('data-fraccion-pos',pos);
+        const zona=h('div',{'class':'inv-fraccion'},[botonGuardarInv(doc,a.n,fr,inciso,pos)]);
+        nodo.appendChild(zona);
+      }
+    }
+    for(const nodo of cuerpo.querySelectorAll('.rgl-fr,.rgl-inc')){
+      const ancla=nodo.getAttribute('data-ancla');
+      const cita=leerAncla(ancla);
+      if(!cita)continue;
+      const frpos=nodo.closest('.rgl-fr')?.getAttribute('data-fraccion-pos');
+      const repetida=p.fracciones.filter(f=>f.fr===cita.fr).length>1;
+      const zona=h('div',{'class':'inv-fraccion'},[botonGuardarInv(doc,a.n,cita.fr||'',cita.inciso||'',repetida?Number(frpos):0)]);
+      Array.from(nodo.children).find(n=>n.tagName==='DIV').appendChild(zona);
+    }
+    estadoMarcadoresInv();
+    return cuerpo;
   }
   SATE.articulo = async function (doc, n, fr) {
     // La lectura literal también funciona desde otra vista si no se pudo cargar la Guía.
@@ -997,25 +1094,152 @@
   const claveInv = () => 'hu.' + unidad() + '.investigaciones';
   function leerInvestigaciones() {
     if(!raiz.localStorage)return {activa:0,proyectos:[]};
-    try {const v=JSON.parse(raiz.localStorage.getItem(claveInv()) || '{"activa":0,"proyectos":[]}'); return {activa:v.activa,proyectos:v.proyectos.map(validarInvestigacion)};} catch(e) {console.warn('SATE investigaciones: almacenamiento inválido',e.message); return {activa:0,proyectos:[]};}
+    try {const v=JSON.parse(raiz.localStorage.getItem(claveInv()) || '{"activa":0,"proyectos":[]}'); return {version:2,activa:Math.max(0,Math.min(Number(v.activa)||0,v.proyectos.length-1)),proyectos:v.proyectos.map(migrarInvestigacion)};} catch(e) {console.warn('SATE investigaciones: almacenamiento inválido',e.message); return {activa:0,proyectos:[]};}
   }
-  function guardarInvestigaciones(v) {raiz.IPNT.set(claveInv(),JSON.stringify(v));}
+  function guardarInvestigaciones(v) {v.version=2; if(raiz.IPNT.set(claveInv(),JSON.stringify(v))===false)throw new Error('Almacenamiento no disponible');}
   const ti = (k,v) => t('sate.guia.inv_'+k,v);
   function botonInv(k,fn) {const b=h('button',{type:'button','class':'btn',texto:ti(k)}); b.addEventListener('click',fn); return b;}
-  function botonGuardarInv(doc,n,fr='') {
-    const b=botonInv('guardar',()=>{if(!investigacionCompartida){guardarArticuloInv(doc,n,fr);estadoMarcadoresInv();}});
-    b.setAttribute('data-guardar-doc',doc);b.setAttribute('data-guardar-n',n);b.setAttribute('data-guardar-fr',fr);return b;
+  function botonGuardarInv(doc,n,fr='',inciso='',frpos=0) {
+    const b=botonInv('guardar',()=>!investigacionCompartida?guardarArticuloInv(doc,n,fr,inciso,frpos).catch(errorInv):undefined);
+    for(const [k,v] of Object.entries({doc,n,fr,inciso,frpos}))b.setAttribute('data-guardar-'+k,v);
+    return b;
+  }
+  function errorInv(e) {
+    console.warn('SATE investigación',{unidad:unidad(),ruta:raiz.location.hash,mensaje:e.message});
+    const aviso=h('p',{role:'alert',texto:ti('error')});
+    (document.querySelector('.rgl-investigacion__cuerpo')||document.getElementById('sate-guia')).appendChild(aviso);
   }
   function estadoMarcadoresInv() {
     const v=leerInvestigaciones(),p=investigacionCompartida||v.proyectos[v.activa];
-    for(const b of document.querySelectorAll('[data-guardar-doc]')){const guardado=p?.marcadores.some(m=>m.doc===b.getAttribute('data-guardar-doc')&&m.n===b.getAttribute('data-guardar-n')&&m.fr===b.getAttribute('data-guardar-fr'));
-      b.hidden=!!investigacionCompartida;b.setAttribute('aria-pressed',String(!!guardado));b.textContent=ti(guardado?'guardado':'guardar');b.setAttribute('aria-label',b.textContent);b.setAttribute('title',b.textContent);}
+    for(const b of document.querySelectorAll('[data-guardar-doc]')){
+      const doc=b.getAttribute('data-guardar-doc'),n=b.getAttribute('data-guardar-n'),fr=b.getAttribute('data-guardar-fr'),inciso=b.getAttribute('data-guardar-inciso')||'';
+      const frpos=Number(b.getAttribute('data-guardar-frpos'))||0;
+      const m=p?.marcadores.find(m=>m.doc===doc&&m.n===n&&m.fr===fr&&(m.inciso||'')===inciso&&(m.frpos||0)===frpos);
+      const cantidad=!fr?new Set(p?.marcadores.filter(m=>m.doc===doc&&m.n===n&&m.fr).map(m=>m.fr+':'+(m.frpos||0))||[]).size:0;
+      b.hidden=!!investigacionCompartida;b.setAttribute('aria-pressed',String(!!m||!!cantidad));
+      b.textContent=cantidad?ti('fracciones_guardadas',{n:cantidad}):ti(m?'guardado':'guardar');
+      b.setAttribute('aria-label',b.textContent);b.setAttribute('title',b.textContent);
+      const zona=b.closest('.inv-fraccion');
+      if(zona){
+        const editor=zona.querySelector('.inv-nota');
+        // La hidratación de otros artículos no debe quitar el foco ni la selección de escritura.
+        if(editor&&m&&editor.querySelector('textarea')?.value===m.nota&&editor.getAttribute('data-tipo')===m.tipo)continue;
+        editor?.remove();
+        if(m)zona.appendChild(editorNota(m,()=>{
+          const actual=leerInvestigaciones(),c=actual.proyectos[actual.activa]?.marcadores.find(x=>claveCita(x)===claveCita(m));
+          if(c){editarNota(c,m.nota,m.tipo);guardarInvestigaciones(actual);raiz.dispatchEvent(new Event('sate-investigacion-nota'));}
+        }));
+      }
+    }
+    for(const estado of document.querySelectorAll('[data-resumen-articulo]')){
+      const citas=p?.marcadores.filter(m=>m.doc===estado.getAttribute('data-resumen-doc')&&m.n===estado.getAttribute('data-resumen-articulo'))||[];
+      const n=new Set(citas.filter(m=>m.fr).map(m=>m.fr+':'+(m.frpos||0))).size;
+      estado.textContent=n?ti('fracciones_guardadas',{n}):citas.length?ti('guardado'):'';
+    }
   }
-  function guardarArticuloInv(doc,n,fr='') {
+  const claveCita=m=>[m.doc,m.n,m.fr,m.inciso||'',m.frpos||0].join(':');
+  function nuevaInv(nombre) {return migrarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]});}
+  async function guardarArticuloInv(doc,n,fr='',inciso='',frpos=0) {
     const v=leerInvestigaciones();
-    if(!v.proyectos.length) {const nombre=raiz.prompt(ti('nombre')); if(!nombre?.trim()) return; v.proyectos.push(validarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]})); v.activa=0;}
-    alternarMarcador(v.proyectos[v.activa],doc,n,fr); guardarInvestigaciones(v);
-    raiz.dispatchEvent(new Event('sate-investigacion'));
+    if(!v.proyectos.length){const nombre=raiz.prompt(ti('nombre'));if(!nombre?.trim())return;v.proyectos.push(nuevaInv(nombre));v.activa=0;}
+    const p=v.proyectos[v.activa],m={doc,n:String(n),fr,inciso,anotaciones:[],nota:'',tipo:'personal',huella:'',...(frpos?{frpos}:{})};
+    const i=p.marcadores.findIndex(x=>claveCita(x)===claveCita(m));
+    if(i>=0)p.marcadores.splice(i,1);
+    else {const texto=textoCita(await cargarReglamento(doc),m);if(texto===null)throw new Error('Cita no encontrada: '+claveCita(m));m.huella=await huellaCita(texto);p.marcadores.push(m);}
+    guardarInvestigaciones(v);raiz.dispatchEvent(new Event('sate-investigacion'));estadoMarcadoresInv();
+  }
+  function editorNota(m,guardar) {
+    const zona=h('div',{'class':'inv-nota','data-tipo':m.tipo}),grupo=h('div',{'class':'guia-chips',role:'group','aria-label':ti('tipo')});
+    for(const tipo of tiposNota){
+      const b=botonInv(tipo,()=>{m.tipo=tipo;zona.setAttribute('data-tipo',tipo);for(const x of grupo.children)x.setAttribute('aria-pressed',String(x===b));try{guardar();}catch(e){errorInv(e);}});
+      b.setAttribute('aria-pressed',String(m.tipo===tipo));grupo.appendChild(b);
+    }
+    const entrada=h('textarea',{'aria-label':ti('propia'),maxlength:4000,rows:3});entrada.value=m.nota;
+    entrada.addEventListener('input',()=>{m.nota=entrada.value;try{guardar();}catch(e){errorInv(e);}});
+    zona.append(h('strong',{texto:ti('propia')}),grupo,entrada);return zona;
+  }
+  let regresoInv='';
+  const versionesPanelInv=new WeakMap();
+  async function panelInvestigacion(contenedor,completa=false,filtro='') {
+    const version=(versionesPanelInv.get(contenedor)||0)+1;versionesPanelInv.set(contenedor,version);
+    const v=leerInvestigaciones(),p=v.proyectos[v.activa];
+    const repintar=()=>{estadoMarcadoresInv();return panelInvestigacion(contenedor,completa,filtro).catch(errorInv);};
+    const guardar=()=>{guardarInvestigaciones(v);};
+    contenedor.replaceChildren();
+    const herramientas=h('nav',{'class':'inv-proyectos','aria-label':ti('proyecto')});
+    const selector=h('select',{'aria-label':ti('proyecto')},v.proyectos.map((p,i)=>h('option',{value:i,texto:p.nombre,selected:i===v.activa})));
+    selector.addEventListener('change',()=>{v.activa=Number(selector.value);guardar();repintar();});
+    herramientas.appendChild(selector);
+    if(completa){
+      const lista=h('div',{'class':'inv-proyectos__lista'});
+      v.proyectos.forEach((p,i)=>{const b=h('button',{type:'button','class':'btn',texto:p.nombre,'aria-pressed':String(i===v.activa)});b.addEventListener('click',()=>{v.activa=i;guardar();repintar();});lista.appendChild(b);});
+      herramientas.appendChild(lista);
+    }
+    herramientas.appendChild(botonInv('nueva',()=>{const nombre=raiz.prompt(ti('nombre'));if(!nombre?.trim())return;try{v.proyectos.push(nuevaInv(nombre));v.activa=v.proyectos.length-1;guardar();repintar();}catch(e){errorInv(e);}}));
+    if(p){
+      herramientas.append(botonInv('renombrar',()=>{const nombre=raiz.prompt(ti('nombre'),p.nombre);if(nombre?.trim()&&raiz.confirm(ti('confirmar_nombre'))){try{p.nombre=nombre;validarInvestigacion(p);guardar();repintar();}catch(e){errorInv(e);}}}),botonInv('borrar',()=>{if(raiz.confirm(ti('confirmar'))){v.proyectos.splice(v.activa,1);v.activa=0;guardar();repintar();}}));
+    }
+    const archivo=h('input',{type:'file',id:'rgl-importar',hidden:true,accept:'.json,application/json','aria-label':ti('importar')});
+    archivo.addEventListener('change',async()=>{try{
+      const f=archivo.files[0];if(!f||f.size>2000000)throw new Error('Tamaño inválido');
+      const entrada=validarInvestigacion(JSON.parse(await f.text()));
+      const importada=await revisarInvestigacion(entrada,cargarReglamento,entrada.version===1);
+      const actual=leerInvestigaciones();actual.proyectos.push(importada);actual.activa=actual.proyectos.length-1;guardarInvestigaciones(actual);estadoMarcadoresInv();await repintar();contenedor.appendChild(h('p',{role:'status',texto:ti('importada')}));
+    }catch(e){errorInv(e);}});
+    herramientas.append(h('label',{'class':'sate-sr',for:'rgl-importar',texto:ti('importar')}),botonInv('importar',()=>archivo.click()),archivo);contenedor.appendChild(herramientas);
+    if(!p){contenedor.appendChild(h('p',{texto:ti('vacia')}));return;}
+    const principal=h('div',{'class':'inv-contenido'});contenedor.appendChild(principal);
+    principal.appendChild(h(completa?'h3':'h4',{texto:p.nombre}));
+    if(!completa){const abrir=h('a',{href:rutaGuia('investigacion'),texto:ti('abrir')});abrir.addEventListener('click',()=>{regresoInv=raiz.location.hash;});principal.appendChild(abrir);}
+    else {
+      const tipos=h('select',{'aria-label':ti('tipo')},['',...tiposNota].map(x=>h('option',{value:x,selected:x===filtro,texto:ti(x||'todos_tipos')})));
+      tipos.addEventListener('change',()=>{filtro=tipos.value;repintar();});principal.appendChild(tipos);
+    }
+    // Solo la migración de un marcador antiguo establece su primera huella.
+    for(const m of p.marcadores){
+      const reg=await cargarReglamento(m.doc),oficial=textoCita(reg,m),actual=oficial===null?null:await huellaCita(oficial);
+      if(versionesPanelInv.get(contenedor)!==version||!contenedor.isConnected)return;
+      if(m.pendienteHuella&&actual){
+        m.huella=actual;m.pendienteHuella=false;
+        const vigente=leerInvestigaciones(),c=vigente.proyectos[v.activa]?.marcadores.find(x=>claveCita(x)===claveCita(m));
+        if(c?.pendienteHuella){c.huella=actual;c.pendienteHuella=false;guardarInvestigaciones(vigente);}
+      }
+      const cambio=!actual||m.huella!==actual;
+      if(filtro&&m.tipo!==filtro)continue;
+      const enlace=rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+(m.frpos?'?frpos='+m.frpos:'');
+      const rotulo=m.doc.toUpperCase()+' · '+ti('articulo',{n:m.n})+(m.fr?' · '+ti('fraccion',{fr:m.fr}):'')+(m.inciso?' · '+ti('inciso',{inciso:m.inciso}):'');
+      const fila=h('article',{'class':completa?'inv-cita':'rgl-investigacion__item'});
+      const cita=h('div',{'class':'inv-oficial'},[h('p',{},[ti('oficial')+' · ',h('a',{href:enlace,texto:rotulo}),' · ',h('span',{'class':cambio?'inv-cambio':'',texto:ti(cambio?'cambio':'sin_cambios')})])]);
+      if(completa)cita.appendChild(h('p',{'class':'pc-oficial','data-oficial':oficial===null?null:m.doc,texto:oficial??ti('no_disponible')}));
+      fila.appendChild(cita);
+      if(completa){
+        fila.appendChild(editorNota(m,guardar));
+        for(const a of m.anotaciones)fila.appendChild(h('p',{'class':'inv-nota',texto:ti('nota')+' · '+ti(a.etiqueta)+': '+a.nota}));
+        const acciones=h('div',{'class':'inv-orden'}),i=p.marcadores.indexOf(m);
+        for(const [k,d] of [['subir',-1],['bajar',1]]){const b=botonInv(k,()=>{moverCita(p,i,i+d);guardar();repintar();});b.disabled=i+d<0||i+d>=p.marcadores.length;acciones.appendChild(b);}
+        const arrastre=botonInv('ordenar',()=>{});arrastre.draggable=true;
+        arrastre.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',String(i));e.dataTransfer.effectAllowed='move';});
+        fila.addEventListener('dragover',e=>e.preventDefault());fila.addEventListener('drop',e=>{e.preventDefault();const desde=Number(e.dataTransfer.getData('text/plain'));moverCita(p,desde,i);guardar();repintar();});
+        acciones.appendChild(arrastre);fila.appendChild(acciones);
+      }else fila.appendChild(h('p',{texto:m.nota.slice(0,160)||m.anotaciones.map(a=>a.nota).join(' · ').slice(0,160)||ti('sin_nota')}));
+      fila.appendChild(botonInv('quitar',()=>{p.marcadores.splice(p.marcadores.indexOf(m),1);guardar();repintar();}));principal.appendChild(fila);
+    }
+    if(!p.marcadores.length)principal.appendChild(h('p',{texto:ti('vacia')}));
+    if(completa){
+      const peticion=h('textarea',{'aria-label':ti('peticion'),maxlength:20000,rows:5});peticion.value=p.peticion;
+      peticion.addEventListener('input',()=>{p.peticion=peticion.value;try{guardar();}catch(e){errorInv(e);}});
+      principal.append(h('h4',{texto:ti('peticion')}),peticion);
+    }
+    principal.append(botonInv('json',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json')),botonInv('markdown',async()=>{
+      try{descargarInv('investigacion.md',await exportarMarkdownInv(p,cargarReglamento,ti,enlaceExportacion),'text/markdown');}catch(e){errorInv(e);}
+    }));
+  }
+  const enlaceExportacion=m=>raiz.location.href.split('#')[0]+rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+(m.frpos?'?frpos='+m.frpos:'');
+  async function vistaInvestigacion(raizGuia) {
+    const titulo=h('h2',{tabindex:-1,texto:ti('panel')});
+    const cuerpo=h('div',{'class':'inv-vista'});
+    raizGuia.append(h('header',{'class':'guia-cab'},[h('a',{href:regresoInv||rutaGuia('reglamentos'),texto:ti('regresar')}),titulo]),cuerpo);
+    await panelInvestigacion(cuerpo,true);return titulo;
   }
   function descargarInv(nombre,texto,tipo) {
     const url=URL.createObjectURL(new Blob([texto],{type:tipo})), a=h('a',{href:url,download:nombre});
@@ -1035,7 +1259,7 @@
       // Sin articulado (código, lineamientos escaneados): el texto corrido, sin índice.
       const lineas = !reg.sin_texto && reg.texto ? String(reg.texto).split(/\n+/).filter(Boolean) : [];
       raizGuia.append(cab.nodo, contextoPlano, h('div', { 'class': 'guia-apartado' }, [avisoOcr, lineas.length
-        ? h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc, 'data-ancla': 'texto' }, lineas.map(x => h('p', { texto: x })))
+        ? h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-ancla': 'texto' }, lineas.map(x => h('p', { texto: x })))
         : h('p', { role: 'status', texto: t('sate.guia.sin_articulo') }), fuenteDoc]));
       return { titulo: cab.titulo };
     }
@@ -1094,61 +1318,11 @@
     invContexto.addEventListener('click',()=>{investigacion.open=!investigacion.open;invContexto.setAttribute('aria-expanded',String(investigacion.open));});
     investigacion.addEventListener('toggle',()=>invContexto.setAttribute('aria-expanded',String(investigacion.open)));
     investigacion.appendChild(invCuerpo); contexto.appendChild(invContexto);
-    let filtroInv='', busquedaInv='', resultadoImportacion='';
     async function pintarInvestigacion() {
       estadoMarcadoresInv();
-      const v=leerInvestigaciones(), p=investigacionCompartida || v.proyectos[v.activa], solo=!!investigacionCompartida;
-      invCuerpo.replaceChildren();
-      invContexto.textContent=ti('boton')+' ('+new Set(p?.marcadores.map(m=>m.doc+':'+m.n)||[]).size+')';
-      const error=e=>{console.warn('SATE investigación',{mensaje:e.message}); invCuerpo.appendChild(h('p',{role:'alert',texto:ti('error')}));};
-      const accion=(k,fn)=>invCuerpo.appendChild(botonInv(k,()=>Promise.resolve().then(fn).catch(error)));
-      accion('nueva',()=>{const nombre=raiz.prompt(ti('nombre')); if(!nombre?.trim())return; v.proyectos.push(validarInvestigacion({formato:'sate-investigacion',version:1,nombre,proposito:'estudio',autor:'',etiquetas:[],marcadores:[]})); v.activa=v.proyectos.length-1; investigacionCompartida=null; guardarInvestigaciones(v); pintarInvestigacion();});
-      const archivo=h('input',{type:'file',id:'rgl-importar',hidden:true,accept:'.json,application/json','aria-label':ti('importar')});
-      const importar=botonInv('importar',()=>archivo.click());
-      invCuerpo.append(h('label',{'class':'sate-sr',for:'rgl-importar',texto:ti('importar')}),importar,h('p',{role:'status',texto:resultadoImportacion}));
-      archivo.addEventListener('change',async()=>{try{const f=archivo.files[0]; if(!f || f.size>2000000)throw new Error('Tamaño inválido'); investigacionCompartida=validarInvestigacion(JSON.parse(await f.text())); resultadoImportacion=ti('importada'); pintarInvestigacion();}catch(e){error(e);}}); invCuerpo.appendChild(archivo);
-      if(!p){pintarAnotaciones();return;}
-      invCuerpo.appendChild(h('h4',{texto:p.nombre}));
-      if(solo)invCuerpo.appendChild(h('p',{texto:ti('solo_lectura')}));
-      if(p.autor)invCuerpo.appendChild(h('p',{texto:p.autor}));
-      invCuerpo.appendChild(h('p',{texto:ti(p.proposito)+' · '+p.etiquetas.join(', ')}));
-      if(solo) accion('copia',()=>{v.proyectos.push(validarInvestigacion(p));v.activa=v.proyectos.length-1;guardarInvestigaciones(v);investigacionCompartida=null;pintarInvestigacion();});
-      else {
-        const selector=h('select',{'aria-label':ti('proyecto')},v.proyectos.map((x,i)=>h('option',{value:i,selected:i===v.activa,texto:x.nombre})));
-        selector.addEventListener('change',()=>{v.activa=Number(selector.value);guardarInvestigaciones(v);pintarInvestigacion();});invCuerpo.appendChild(selector);
-        accion('renombrar',()=>{const n=raiz.prompt(ti('nombre'),p.nombre);if(n?.trim()){p.nombre=n;guardarInvestigaciones({...v,proyectos:v.proyectos.map(validarInvestigacion)});pintarInvestigacion();}});
-        accion('borrar',()=>{if(raiz.confirm(ti('confirmar'))){v.proyectos.splice(v.activa,1);v.activa=0;guardarInvestigaciones(v);pintarInvestigacion();}});
-        const proposito=h('select',{'aria-label':ti('proposito')},['solicitud','queja','propuesta','estudio'].map(x=>h('option',{value:x,selected:x===p.proposito,texto:ti(x)})));
-        proposito.addEventListener('change',()=>{p.proposito=proposito.value;guardarInvestigaciones(v);});invCuerpo.appendChild(proposito);
-        for(const campo of ['autor','etiquetas']) {const input=h('input',{'aria-label':ti(campo),placeholder:ti(campo),value:campo==='etiquetas'?p.etiquetas.join(', '):p.autor,maxlength:120});input.addEventListener('change',()=>{p[campo]=campo==='etiquetas'?input.value.split(',').map(x=>x.trim()).filter(Boolean):input.value;try{validarInvestigacion(p);guardarInvestigaciones(v);}catch(e){error(e);}});invCuerpo.appendChild(input);}
-      }
-      const filtro=h('select',{'aria-label':ti('filtro')},['',...etiquetasInv].map(x=>h('option',{value:x,selected:x===filtroInv,texto:ti(x||'todas')})));
-      filtro.addEventListener('change',()=>{filtroInv=filtro.value;pintarInvestigacion();});
-      const buscar=h('input',{type:'search',value:busquedaInv,placeholder:ti('buscar_notas'),'aria-label':ti('buscar_notas')});buscar.addEventListener('change',()=>{busquedaInv=buscar.value;pintarInvestigacion();});invCuerpo.append(filtro,buscar);
-      for(const m of p.marcadores) {
-        const anotaciones=m.anotaciones.filter(a=>(!filtroInv||a.etiqueta===filtroInv)&&(!busquedaInv||norm(a.nota).includes(norm(busquedaInv))));
-        if((filtroInv||busquedaInv)&&!anotaciones.length)continue;
-        invCuerpo.appendChild(h('div',{'class':'rgl-investigacion__item'},[h('a',{href:rutaReglamento(m.doc,anclaArticulo(m.n,m.fr))+sufijoInvestigacion(),texto:m.doc.toUpperCase()+' · '+ti('articulo',{n:m.n})}),h('small',{texto:ti('conteo',{n:anotaciones.length})}),...anotaciones.map(a=>h('p',{texto:ti(a.etiqueta)+' · '+(a.nota||a.literal)})),solo?null:botonInv('quitar',()=>{alternarMarcador(p,m.doc,m.n,m.fr);guardarInvestigaciones(v);estadoMarcadoresInv();pintarInvestigacion();})]));
-      }
-      const documentos={...d.documentos,[doc]:reg};
-      for(const m of p.marcadores)documentos[m.doc]=await cargarReglamento(m.doc);
-      const grupos=fundamentoInv(p,documentos), fundamento=ti('fundamento',{articulos:grupos.map(g=>ti('grupo',{numeros:g.numeros.join(', '),documento:g.titulo})).join(' y ')});
-      invCuerpo.append(h('h4',{texto:ti('fundamento_titulo')}),h('p',{texto:fundamento}));
-      accion('copiar_fundamento',()=>raiz.navigator.clipboard.writeText(fundamento));
-      const citas=async()=>{const rs=[];for(const m of p.marcadores){const r=await cargarReglamento(m.doc),a=r.articulos.find(x=>x.n===m.n);if(a)rs.push({titulo:r.titulo,n:m.n,texto:m.fr?a.fracciones?.find(f=>f.fr===m.fr)?.texto||a.texto:a.texto,anotaciones:m.anotaciones});}return rs;};
-      accion('json',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json'));
-      accion('pdf',async()=>{
-        if(!raiz.PDFLib)await SATE.script('../assets/vendor/pdf-lib.min.js');
-        const lib=raiz.PDFLib, pdf=await lib.PDFDocument.create(), fuente=await pdf.embedFont(lib.StandardFonts.Helvetica);
-        let pagina=pdf.addPage(), y=790;
-        const escribir=s=>{let linea='';for(const palabra of s.split(/\s+/)){const siguiente=linea?linea+' '+palabra:palabra;if(fuente.widthOfTextAtSize(siguiente,11)>490&&linea){if(y<55){pagina=pdf.addPage();y=790;}pagina.drawText(linea,{x:50,y,size:11,font:fuente});y-=16;linea=palabra;}else linea=siguiente;}if(linea){if(y<55){pagina=pdf.addPage();y=790;}pagina.drawText(linea,{x:50,y,size:11,font:fuente});y-=24;}};
-        escribir(p.nombre);escribir(fundamento);for(const x of await citas()){escribir(x.titulo+', art. '+x.n);escribir(x.texto);for(const a of x.anotaciones){escribir(a.literal);escribir(ti(a.etiqueta)+': '+a.nota);}}
-        descargarInv('investigacion.pdf',await pdf.save(),'application/pdf');
-      });
-      accion('markdown',async()=>descargarInv('investigacion.md','# '+p.nombre+'\n\n'+fundamento+'\n\n'+(await citas()).map(x=>'## '+x.titulo+', art. '+x.n+'\n\n'+x.texto+'\n\n'+x.anotaciones.map(a=>'> '+a.literal+'\n\n'+ti(a.etiqueta)+': '+a.nota).join('\n\n')).join('\n\n'),'text/markdown'));
-      accion('latex',async()=>{const esc=s=>s.replace(/[\\{}$&#%_~^]/g,c=>'\\char'+c.charCodeAt(0)+'{}');descargarInv('investigacion.tex','\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\begin{document}\n'+esc(p.nombre)+'\n\n'+esc(fundamento)+'\n\n'+(await citas()).map(x=>esc(x.titulo+', art. '+x.n)+'\n\n'+esc(x.texto)+'\n\n'+x.anotaciones.map(a=>esc(a.literal+' '+ti(a.etiqueta)+': '+a.nota)).join('\n\n')).join('\n\n')+'\n\\end{document}','application/x-tex');});
-      accion('compartir',async()=>{const s=await codificarInv(p);if(s.length>7000){invCuerpo.appendChild(h('p',{role:'status',texto:ti('largo')}));return;}await raiz.navigator.clipboard.writeText(raiz.location.href.split('#')[0]+rutaReglamento(doc)+'?inv='+s);});
-      accion('enlace',()=>raiz.navigator.clipboard.writeText(raiz.location.href.split('#')[0]+rutaReglamento(doc)+'?arts='+encodeURIComponent(p.marcadores.map(m=>m.doc+':'+m.n+(m.fr?':'+m.fr:'')).join(','))));
+      await panelInvestigacion(invCuerpo,false);
+      const v=leerInvestigaciones(),p=v.proyectos[v.activa];
+      invContexto.textContent=ti('boton')+' ('+(p?.marcadores.length||0)+')';
       pintarAnotaciones();
     }
     function pintarAnotaciones() {
@@ -1156,13 +1330,15 @@
       for(const n of texto.querySelectorAll('.rgl-notas'))n.remove();
       const rangos=Object.fromEntries(etiquetasInv.map(x=>[x,[]]));
       for(const m of p?.marcadores||[])if(m.doc===doc){const seccion=secciones.get(m.n), cuerpo=seccion?.querySelector('.rgl-cuerpo');if(!cuerpo)continue;
-        const nodos=[],walker=document.createTreeWalker?.(cuerpo,4);if(!walker)continue;while(walker.nextNode())nodos.push(walker.currentNode);
+        const nodos=[],walker=document.createTreeWalker?.(cuerpo,4);if(!walker)continue;while(walker.nextNode())if(!walker.currentNode.parentElement?.closest('.inv-fraccion'))nodos.push(walker.currentNode);
         for(const a of m.anotaciones){const posiciones=segmentosAnotacion(nodos.map(n=>n.textContent),a);if(!posiciones)continue;const r=document.createRange();r.setStart(nodos[posiciones.inicio[0]],posiciones.inicio[1]);r.setEnd(nodos[posiciones.fin[0]],posiciones.fin[1]);rangos[a.etiqueta].push(r);seccion.appendChild(h('p',{'class':'rgl-notas',texto:ti(a.etiqueta)+' · '+a.nota}));}
       }
       if(raiz.CSS?.highlights && raiz.Highlight)etiquetasInv.forEach(x=>raiz.CSS.highlights.set('sate-inv-'+x,new raiz.Highlight(...rangos[x])));
     }
-    const actualizarInv=()=>{estadoMarcadoresInv();pintarInvestigacion().catch(e=>console.warn('SATE investigación',e.message));};
+    const actualizarInv=()=>{estadoMarcadoresInv();pintarInvestigacion().catch(errorInv);};
     raiz.addEventListener('sate-investigacion',actualizarInv);
+    const actualizarNotas=()=>panelInvestigacion(invCuerpo,false).catch(errorInv);
+    raiz.addEventListener('sate-investigacion-nota',actualizarNotas);
     const estrecho = () => pantallaChica() || (rejilla.clientWidth > 0 && rejilla.clientWidth <= 672);
     if (fuenteDoc || avisoOcr) cab.nodo.appendChild(h('div', { 'class': 'rgl-datos' }, [fuenteDoc, avisoOcr]));
     const mapa = mapaReglamento(reg);
@@ -1261,14 +1437,15 @@
         () => { estado.textContent = t('sate.guia.rgl_copiado'); },
         () => { estado.textContent = t('sate.guia.rgl_copiar_error'); }));
       const guardar = botonGuardarInv(doc,a.n);
-      guardar.classList.add('rgl-icono');
+      guardar.classList.add('inv-guardar-articulo');
       guardar.setAttribute('aria-label',ti('guardar')); guardar.setAttribute('title',ti('guardar'));
       const acciones = h('details',{'class':'rgl-art-acciones',open:!pantallaChica()},[h('summary',{'aria-label':ti('acciones'),title:ti('acciones'),texto:'⋯'}),h('div',{},[copiarArticulo,guardar])]);
       const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-' + anc, 'data-articulo': a.n }, [
-        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), acciones, estado])]);
+        h('header', { 'class': 'rgl-cab' }, [h('h4', {}, [enlaceAncla('rgl-cita', anc, t('sate.guia.articulo_rotulo', { n: a.n }))]), acciones, estado]),
+        h('p',{'class':'inv-resumen-articulo','data-resumen-doc':doc,'data-resumen-articulo':a.n})]);
       // Reservar altura evita que los títulos posteriores colapsen mientras llega su texto.
       seccion.style.minHeight = Math.max(110, Math.ceil((a.texto || '').length / 80) * 24 + 64) + 'px';
-      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a,doc,fila)); seccion.style.minHeight = ''; if(investigacionCompartida || leerInvestigaciones().proyectos.length)pintarAnotaciones(); });
+      pendientes.set(a.n, () => { seccion.appendChild(cuerpoArticulo(a,doc,fila)); seccion.style.minHeight = ''; estadoMarcadoresInv(); if(investigacionCompartida || leerInvestigaciones().proyectos.length)pintarAnotaciones(); });
       if (Math.abs(posicion.get(a.n) - centro) <= 3) completar(a.n);
       contenedores[contenedores.length - 1].appendChild(seccion);
       secciones.set(a.n, seccion);
@@ -1276,7 +1453,7 @@
     }
     if (transitorios.length) {
       const seccion = h('section', { 'class': 'rgl-articulo', id: 'rgl-transitorios', 'data-articulo': 'transitorios' }, [
-        h('h3', { texto: t('sate.guia.transitorios') }), h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial': doc },
+        h('h3', { texto: t('sate.guia.transitorios') }), h('div', { 'class': 'rgl-cuerpo pc-lector pc-oficial', 'data-oficial':doc },
           transitorios.map(x => h('p', { 'data-transitorio':x.n, texto: x.n + '. ' + x.texto })))]);
       texto.appendChild(seccion);
       secciones.set('transitorios', seccion);
@@ -1287,16 +1464,17 @@
     function capturarSeleccion() {
       const s=raiz.getSelection?.();if(!s?.rangeCount||s.isCollapsed)return;
       const r=s.getRangeAt(0), inicio=r.startContainer.parentElement?.closest('.rgl-cuerpo'), fin=r.endContainer.parentElement?.closest('.rgl-cuerpo');
-      if(!inicio || inicio!==fin || !texto.contains(inicio))return;
+      if(!inicio || inicio!==fin || !texto.contains(inicio)||r.startContainer.parentElement?.closest('.inv-fraccion')||r.endContainer.parentElement?.closest('.inv-fraccion'))return;
       const previo=document.createRange();previo.selectNodeContents(inicio);previo.setEnd(r.startContainer,r.startOffset);
       const literal=r.toString(), n=inicio.closest('[data-articulo]').getAttribute('data-articulo'), fr=r.startContainer.parentElement?.closest('.rgl-fr')?.getAttribute('data-ancla')?.split('.')[1]||'';
-      seleccionActual={n,fr,inicio:previo.toString().length,fin:previo.toString().length+literal.length,literal};seleccionBarra.hidden=false;
+      const copia=previo.cloneContents();for(const propio of copia.querySelectorAll('.inv-fraccion'))propio.remove();
+      seleccionActual={n,fr,inicio:copia.textContent.length,fin:copia.textContent.length+literal.length,literal};seleccionBarra.hidden=false;
     }
     function anotar(nota) {
       if(!seleccionActual || investigacionCompartida)return;
       const v=leerInvestigaciones(),p=v.proyectos[v.activa];if(!p){guardarArticuloInv(doc,seleccionActual.n);if(leerInvestigaciones().proyectos.length)anotar(nota);return;}
       let m=p.marcadores.find(x=>x.doc===doc&&x.n===seleccionActual.n&&x.fr===seleccionActual.fr);
-      if(!m){m={doc,n:seleccionActual.n,fr:seleccionActual.fr,anotaciones:[]};p.marcadores.push(m);}
+      if(!m){m={doc,n:seleccionActual.n,fr:seleccionActual.fr,inciso:'',huella:'',pendienteHuella:true,nota:'',tipo:'personal',anotaciones:[]};p.marcadores.push(m);}
       m.anotaciones.push({inicio:seleccionActual.inicio,fin:seleccionActual.fin,literal:seleccionActual.literal,nota:nota||'',etiqueta:etiquetaSeleccion.value||'favor'});
       validarInvestigacion(p);guardarInvestigaciones(v);seleccionBarra.hidden=true;actualizarInv();
     }
@@ -1317,7 +1495,7 @@
       vecindad(clave);
       if (cambio) pintar(clave);
       const final = p && clave === p.n && p.fr ? anclaArticulo(p.n, p.fr, p.inciso) : tr ? anclaDestino : clave === 'transitorios' ? 'transitorios' : anclaArticulo(clave);
-      const fr = final.includes('.') ? Array.from(texto.querySelectorAll('li[data-ancla]')).find(x => x.getAttribute('data-ancla') === final) : null;
+      const fr = final.includes('.') ? Array.from(texto.querySelectorAll('[data-ancla]')).find(x => x.tagName!=='A'&&x.getAttribute('data-ancla') === final) : null;
       for (const x of texto.querySelectorAll('.rgl-activa')) x.classList.remove('rgl-activa');
       (tr || fr || secciones.get(clave))?.classList.add('rgl-activa');
       // La hidratación incremental conserva el destino de ruta aunque el lector visible cambie.
@@ -1428,7 +1606,7 @@
     for (const n of secciones.values()) interseccion?.observe(n);
     raiz.addEventListener('beforeprint', completarTodo);
     tarea = enReposo(continuar);
-    limpiarLector = () => { raiz.removeEventListener('sate-investigacion',actualizarInv); if(raiz.CSS?.highlights)for(const etiqueta of etiquetasInv)raiz.CSS.highlights.delete('sate-inv-'+etiqueta); detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchmove', soltarAncla); raiz.removeEventListener('pointerdown', soltarBarra); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
+    limpiarLector = () => { raiz.removeEventListener('sate-investigacion-nota',actualizarNotas); raiz.removeEventListener('sate-investigacion',actualizarInv); if(raiz.CSS?.highlights)for(const etiqueta of etiquetasInv)raiz.CSS.highlights.delete('sate-inv-'+etiqueta); detenido = true; if (raiz.cancelIdleCallback) raiz.cancelIdleCallback(tarea); else raiz.clearTimeout(tarea); interseccion?.disconnect(); raiz.removeEventListener('beforeprint', completarTodo); if (consulta?.removeEventListener) consulta.removeEventListener('change', ajustar); observador?.disconnect(); raiz.removeEventListener('resize', ajustar); raiz.removeEventListener('scroll', seguir); raiz.removeEventListener('wheel', soltarAncla); raiz.removeEventListener('touchmove', soltarAncla); raiz.removeEventListener('pointerdown', soltarBarra); raiz.removeEventListener('keydown', soltarAnclaTeclado); raiz.cancelAnimationFrame(cuadro); };
     const qInicial = parametroGuia('q');
     const frpos = parametroGuia('frpos');
     const fr = ir(ancla && ancla !== 'texto' ? ancla : '', false);
@@ -1718,7 +1896,8 @@
     caja.replaceChildren(raizGuia);
     try {
       let foco;
-      if (apartado === 'ruta' && cfg().guiaDatos) foco=rutaGuiada(raizGuia,await datos(),id);
+      if (apartado === 'investigacion' && cfg().guiaDatos) foco=await vistaInvestigacion(raizGuia);
+      else if (apartado === 'ruta' && cfg().guiaDatos) foco=rutaGuiada(raizGuia,await datos(),id);
       else if (!apartado || !(apartado === 'glosario' && cfg().guiaDatos) && !apartados().some(a => a.id === apartado && !a.vista)) foco = await portada(raizGuia);
       else {
         const d = await datos();
