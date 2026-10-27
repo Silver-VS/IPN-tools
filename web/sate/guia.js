@@ -1178,9 +1178,12 @@
     return h('div',{'class':'inv-nota','data-tipo':m.tipo},[h('strong',{texto:ti('propia')+' · '+ti(m.tipo)}),h('p',{texto:m.nota||ti('sin_nota')})]);
   }
   function sinInvestigacionCompartida(ruta) {
-    const [base,consulta='']=ruta.split('?'),params=new URLSearchParams(consulta);
-    params.delete('inv');params.delete('arts');
-    return base+(params.size?'?'+params:'');
+    const [base,consulta='']=ruta.split('?'),params=consulta.split('&').filter(p=>{
+      const clave=p.slice(0,p.indexOf('=')<0?p.length:p.indexOf('=')).replace(/\+/g,' ');
+      try { return !['inv','arts'].includes(decodeURIComponent(clave)); }
+      catch(e) { return true; }
+    });
+    return base+(params.length?'?'+params.join('&'):'');
   }
   function salirInvestigacionCompartida() {
     investigacionCompartida=null;
