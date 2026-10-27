@@ -1771,6 +1771,7 @@ inv_resumen = "{c, plural, one {# cita} other {# citas}} · {n, plural, one {# n
 inv_importada = "Investigación importada."
 inv_acciones = "Acciones del artículo"
 inv_copia = "Guardar una copia en mis investigaciones"
+inv_salir = "Salir de la investigación compartida"
 inv_nombre_inicial = "Mi investigación"
 inv_nombre_n = "Investigación {n}"
 inv_error = "No se pudo abrir o guardar la investigación. Revisa el archivo y sus límites."

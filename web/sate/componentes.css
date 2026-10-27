@@ -1317,6 +1317,7 @@ html[data-vista=guia-vinculada] #sate-nombre{display:none}
 .inv-nota button[aria-pressed=true],.inv-proyectos button[aria-pressed=true]{border-color:var(--ipn-acento);font-weight:700}
 .inv-vista :is(button,select,textarea),.inv-fraccion :is(button,textarea){box-sizing:border-box;min-height:var(--ipn-control-alto);max-width:100%;min-width:0;padding:var(--ipn-esp-2);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit}
 .inv-vista textarea,.inv-nota textarea{width:100%;resize:vertical}
+.inv-peticion{white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--ipn-tamano-m)}
 .inv-fraccion{min-width:0;font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
 .inv-orden{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2);grid-column:1/-1}
 .inv-cambio{color:var(--ipn-error);font-weight:600}
