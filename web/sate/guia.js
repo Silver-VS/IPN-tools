@@ -1114,7 +1114,7 @@
     (document.querySelector('.rgl-investigacion__cuerpo')||document.getElementById('sate-guia')).appendChild(aviso);
   }
   function estadoMarcadoresInv() {
-    const v=leerInvestigaciones(),p=investigacionCompartida||v.proyectos[v.activa];
+    const p=investigacionVisible();
     for(const b of document.querySelectorAll('[data-guardar-doc]')){
       const doc=b.getAttribute('data-guardar-doc'),n=b.getAttribute('data-guardar-n'),fr=b.getAttribute('data-guardar-fr'),inciso=b.getAttribute('data-guardar-inciso')||'';
       const frpos=Number(b.getAttribute('data-guardar-frpos'))||0;
@@ -1127,9 +1127,9 @@
       if(zona){
         const editor=zona.querySelector('.inv-nota');
         // La hidratación de otros artículos no debe quitar el foco ni la selección de escritura.
-        if(editor&&m&&editor.querySelector('textarea')?.value===m.nota&&editor.getAttribute('data-tipo')===m.tipo)continue;
+        if(!investigacionCompartida&&editor&&m&&editor.querySelector('textarea')?.value===m.nota&&editor.getAttribute('data-tipo')===m.tipo)continue;
         editor?.remove();
-        if(m)zona.appendChild(editorNota(m,()=>{
+        if(m)zona.appendChild(investigacionCompartida?notaCompartida(m):editorNota(m,()=>{
           const actual=leerInvestigaciones(),c=actual.proyectos[actual.activa]?.marcadores.find(x=>claveCita(x)===claveCita(m));
           if(c){editarNota(c,m.nota,m.tipo);guardarInvestigaciones(actual);raiz.dispatchEvent(new Event('sate-investigacion-nota'));}
         }));
@@ -1170,14 +1170,41 @@
   }
   const rotuloCita=m=>m.doc.toUpperCase()+' · '+ti('articulo',{n:m.n})+(m.fr?', '+ti('fraccion',{fr:m.fr}):'')+(m.inciso?', '+ti('inciso',{inciso:m.inciso}):'');
   const notasDe=p=>p.marcadores.reduce((s,m)=>s+(m.nota?1:0)+m.anotaciones.filter(a=>a.nota).length,0);
+  function investigacionVisible() {
+    if(investigacionCompartida)return investigacionCompartida;
+    const v=leerInvestigaciones();return v.proyectos[v.activa];
+  }
+  function notaCompartida(m) {
+    return h('div',{'class':'inv-nota','data-tipo':m.tipo},[h('strong',{texto:ti('propia')+' · '+ti(m.tipo)}),h('p',{texto:m.nota||ti('sin_nota')})]);
+  }
+  function sinInvestigacionCompartida(ruta) {
+    const [base,consulta='']=ruta.split('?'),params=new URLSearchParams(consulta);
+    params.delete('inv');params.delete('arts');
+    return base+(params.size?'?'+params:'');
+  }
+  function salirInvestigacionCompartida() {
+    investigacionCompartida=null;
+    regresoInv=sinInvestigacionCompartida(regresoInv);
+    raiz.location.hash=sinInvestigacionCompartida(raiz.location.hash);
+  }
   let regresoInv='';
   const versionesPanelInv=new WeakMap();
   async function panelInvestigacion(contenedor,completa=false,filtro='') {
     const version=(versionesPanelInv.get(contenedor)||0)+1;versionesPanelInv.set(contenedor,version);
-    const v=leerInvestigaciones(),p=v.proyectos[v.activa];
+    const compartida=!!investigacionCompartida,v=compartida?null:leerInvestigaciones(),p=compartida?investigacionCompartida:v.proyectos[v.activa];
     const repintar=()=>{estadoMarcadoresInv();return panelInvestigacion(contenedor,completa,filtro).catch(errorInv);};
     const guardar=()=>{guardarInvestigaciones(v);};
     contenedor.replaceChildren();
+    if(compartida){
+      contenedor.append(h('h3',{texto:ti('compartida')+' · '+p.nombre}),h('p',{'class':'inv-conteo',texto:[p.autor,...p.etiquetas].filter(Boolean).join(' · ')}),h('p',{'class':'inv-conteo',texto:ti('solo_lectura')}));
+      const acciones=h('div',{'class':'inv-campo'});
+      acciones.append(botonInv('copia',async()=>{try{
+        const copia=await revisarInvestigacion(p,cargarReglamento,p.version===1),local=leerInvestigaciones();
+        local.proyectos.push(copia);local.activa=local.proyectos.length-1;guardarInvestigaciones(local);
+        salirInvestigacionCompartida();await repintar();
+      }catch(e){errorInv(e);}}),botonInv('salir',()=>{salirInvestigacionCompartida();repintar();}));
+      contenedor.appendChild(acciones);
+    }else{
     // Selector de la investigación activa: un control con su nombre y el menú de acciones (sin ventanas nativas).
     const cab=h('nav',{'class':'inv-proyectos','aria-label':ti('proyecto')});
     const zona=h('div',{'class':'inv-cab'}),menu=h('div',{'class':'inv-menu',role:'menu'});
@@ -1211,11 +1238,12 @@
       }));
     }
     normal();cab.append(zona,h('label',{'class':'sate-sr',for:'rgl-importar',texto:ti('importar')}),archivo);contenedor.appendChild(cab);
+    }
     if(!p){contenedor.appendChild(h('p',{texto:ti('vacia')}));return;}
     const principal=h('div',{'class':'inv-contenido'});contenedor.appendChild(principal);
-    if(completa)principal.appendChild(h('h3',{texto:p.nombre}));
+    if(completa&&!compartida)principal.appendChild(h('h3',{texto:p.nombre}));
     principal.appendChild(h('p',{'class':'inv-conteo',texto:ti('resumen',{c:p.marcadores.length,n:notasDe(p)})}));
-    if(completa){
+    if(completa&&!compartida){
       const tipos=h('select',{'aria-label':ti('tipo')},['',...tiposNota].map(x=>h('option',{value:x,selected:x===filtro,texto:ti(x||'todos_tipos')})));
       tipos.addEventListener('change',()=>{filtro=tipos.value;repintar();});principal.appendChild(tipos);
     }
@@ -1224,22 +1252,24 @@
     for(const m of p.marcadores){
       const reg=await cargarReglamento(m.doc),oficial=textoCita(reg,m),actual=oficial===null?null:await huellaCita(oficial);
       if(versionesPanelInv.get(contenedor)!==version||!contenedor.isConnected)return;
-      if(m.pendienteHuella&&actual){
+      if(m.pendienteHuella&&actual&&!compartida){
         m.huella=actual;m.pendienteHuella=false;
         const vigente=leerInvestigaciones(),c=vigente.proyectos[v.activa]?.marcadores.find(x=>claveCita(x)===claveCita(m));
         if(c?.pendienteHuella){c.huella=actual;c.pendienteHuella=false;guardarInvestigaciones(vigente);}
       }
       const cambio=!actual||m.huella!==actual;
       if(filtro&&m.tipo!==filtro)continue;
-      const enlace=rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+(m.frpos?'?frpos='+m.frpos:'');
+      const sufijo=sufijoInvestigacion();
+      const enlace=rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+sufijo+(m.frpos?(sufijo?'&':'?')+'frpos='+m.frpos:'');
       const rotulo=rotuloCita(m);
       const fila=h('article',{'class':completa?'inv-cita':'rgl-investigacion__item'});
       if(completa){
         const cita=h('div',{'class':'inv-oficial'},[h('p',{},[ti('oficial')+' · ',h('a',{href:enlace,texto:rotulo}),' · ',h('span',{'class':cambio?'inv-cambio':'',texto:ti(cambio?'cambio':'sin_cambios')})])]);
         cita.appendChild(h('p',{'class':'pc-oficial','data-oficial':oficial===null?null:m.doc,texto:oficial??ti('no_disponible')}));
         fila.appendChild(cita);
-        fila.appendChild(editorNota(m,guardar));
+        fila.appendChild(compartida?notaCompartida(m):editorNota(m,guardar));
         for(const a of m.anotaciones)fila.appendChild(h('p',{'class':'inv-nota',texto:ti('nota')+' · '+ti(a.etiqueta)+': '+a.nota}));
+        if(!compartida){
         const acciones=h('div',{'class':'inv-orden'}),i=p.marcadores.indexOf(m);
         for(const [k,d] of [['subir',-1],['bajar',1]]){const b=botonInv(k,()=>{moverCita(p,i,i+d);guardar();repintar();});b.disabled=i+d<0||i+d>=p.marcadores.length;acciones.appendChild(b);}
         const arrastre=botonInv('ordenar',()=>{});arrastre.draggable=true;
@@ -1247,16 +1277,19 @@
         fila.addEventListener('dragover',e=>e.preventDefault());fila.addEventListener('drop',e=>{e.preventDefault();const desde=Number(e.dataTransfer.getData('text/plain'));moverCita(p,desde,i);guardar();repintar();});
         acciones.appendChild(arrastre);fila.appendChild(acciones);
         fila.appendChild(botonInv('quitar',()=>{p.marcadores.splice(p.marcadores.indexOf(m),1);guardar();repintar();}));
+        }
       }else{
         const quitar=h('button',{type:'button','class':'inv-quitar','aria-label':ti('quitar'),title:ti('quitar'),texto:'✕'});
         quitar.addEventListener('click',()=>{p.marcadores.splice(p.marcadores.indexOf(m),1);guardar();repintar();});
         const nota=m.nota||m.anotaciones.map(a=>a.nota).filter(Boolean).join(' · ');
-        fila.append(h('div',{'class':'inv-item__cab'},[h('a',{'class':'inv-ref',href:enlace,texto:rotulo}),cambio?h('span',{'class':'inv-cambio',texto:ti('cambio')}):null,quitar]),h('p',{'class':nota?'inv-item__nota':'inv-item__nota inv-item__nota--vacia',texto:nota.slice(0,160)||ti('sin_nota')}));
+        fila.append(h('div',{'class':'inv-item__cab'},[h('a',{'class':'inv-ref',href:enlace,texto:rotulo}),cambio?h('span',{'class':'inv-cambio',texto:ti('cambio')}):null,compartida?null:quitar]),h('p',{'class':nota?'inv-item__nota':'inv-item__nota inv-item__nota--vacia',texto:compartida?ti(m.tipo)+' · '+(nota||ti('sin_nota')):nota.slice(0,160)||ti('sin_nota')}));
       }
       lista.appendChild(fila);
     }
     if(!p.marcadores.length)lista.appendChild(h('p',{texto:ti('vacia')}));
-    if(completa){
+    if(completa&&compartida){
+      principal.append(h('h4',{texto:ti('peticion')}),h('p',{'class':'inv-peticion',texto:p.peticion}));
+    }else if(completa){
       const peticion=h('textarea',{'aria-label':ti('peticion'),maxlength:20000,rows:5});peticion.value=p.peticion;
       peticion.addEventListener('input',()=>{p.peticion=peticion.value;try{guardar();}catch(e){errorInv(e);}});
       principal.append(h('h4',{texto:ti('peticion')}),peticion);
@@ -1264,14 +1297,15 @@
         try{descargarInv('investigacion.md',await exportarMarkdownInv(p,cargarReglamento,ti,enlaceExportacion),'text/markdown');}catch(e){errorInv(e);}
       }));
     }else{
-      const abrir=h('a',{'class':'inv-abrir',href:rutaGuia('investigacion'),texto:ti('abrir')});abrir.addEventListener('click',()=>{regresoInv=raiz.location.hash;});principal.appendChild(abrir);
+      const abrir=h('a',{'class':'inv-abrir',href:rutaGuia('investigacion')+sufijoInvestigacion(),texto:ti('abrir')});abrir.addEventListener('click',()=>{regresoInv=raiz.location.hash;});principal.appendChild(abrir);
     }
   }
   const enlaceExportacion=m=>raiz.location.href.split('#')[0]+rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+(m.frpos?'?frpos='+m.frpos:'');
   async function vistaInvestigacion(raizGuia) {
     const titulo=h('h2',{tabindex:-1,texto:ti('panel')});
     const cuerpo=h('div',{'class':'inv-vista'});
-    raizGuia.append(h('header',{'class':'guia-cab'},[h('a',{href:regresoInv||rutaGuia('reglamentos'),texto:ti('regresar')}),titulo]),cuerpo);
+    const regreso=sinInvestigacionCompartida(regresoInv||rutaGuia('reglamentos'));
+    raizGuia.append(h('header',{'class':'guia-cab'},[h('a',{href:regreso+sufijoInvestigacion().replace('?',regreso.includes('?')?'&':'?'),texto:ti('regresar')}),titulo]),cuerpo);
     await panelInvestigacion(cuerpo,true);return titulo;
   }
   function descargarInv(nombre,texto,tipo) {
@@ -1354,12 +1388,12 @@
     async function pintarInvestigacion() {
       estadoMarcadoresInv();
       await panelInvestigacion(invCuerpo,false);
-      const v=leerInvestigaciones(),p=v.proyectos[v.activa];
-      invContexto.textContent=ti('boton')+' ('+(p?.marcadores.length||0)+')';
+      const p=investigacionVisible();
+      invContexto.textContent=ti(investigacionCompartida?'compartida':'boton')+' ('+(p?.marcadores.length||0)+')';
       pintarAnotaciones();
     }
     function pintarAnotaciones() {
-      const p=investigacionCompartida || leerInvestigaciones().proyectos[leerInvestigaciones().activa];
+      const p=investigacionVisible();
       for(const n of texto.querySelectorAll('.rgl-notas'))n.remove();
       const rangos=Object.fromEntries(etiquetasInv.map(x=>[x,[]]));
       for(const m of p?.marcadores||[])if(m.doc===doc){const seccion=secciones.get(m.n), cuerpo=seccion?.querySelector('.rgl-cuerpo');if(!cuerpo)continue;
@@ -1516,10 +1550,6 @@
     elementosBarra.push(etiquetaSeleccion,botonInv('subrayar',()=>anotar('')),botonInv('nota',()=>{seleccionBarra.replaceChildren(campoInv(ti('nota'),'',4000,nota=>{restaurarBarra();anotar(nota);},restaurarBarra));}),botonInv('cita',()=>{if(seleccionActual)raiz.navigator.clipboard.writeText(seleccionActual.literal+' ('+reg.titulo+', art. '+seleccionActual.n+(seleccionActual.fr?', fracc. '+seleccionActual.fr:'')+').');}));
     restaurarBarra();contexto.appendChild(seleccionBarra);texto.addEventListener('mouseup',capturarSeleccion);texto.addEventListener('keyup',capturarSeleccion);texto.addEventListener('touchend',capturarSeleccion);
     actualizarInv();
-    const compartido=parametroGuia('inv');
-    if(compartido)decodificarInv(compartido).then(p=>{investigacionCompartida=p;actualizarInv();}).catch(e=>{console.warn('SATE investigación compartida',e.message);invCuerpo.appendChild(h('p',{role:'alert',texto:ti('error')}));});
-    const artsCompartidos=parametroGuia('arts');
-    if(artsCompartidos && !compartido){try{investigacionCompartida=validarInvestigacion({formato:'sate-investigacion',version:1,nombre:ti('compartida'),proposito:'estudio',autor:'',etiquetas:[],marcadores:artsCompartidos.split(',').map(x=>{const [doc,n,fr='']=x.split(':');return {doc,n,fr,anotaciones:[]};})});actualizarInv();}catch(e){console.warn('SATE marcadores compartidos',e.message);}}
     // Muestra el artículo o la fracción de un ancla; sin ancla válida, el primer artículo. Devuelve el nodo de la fracción, si hay.
     let anclaFijada = null;
     function ir(anclaDestino, empujar) {
@@ -1546,7 +1576,7 @@
     raizGuia.addEventListener('click', e => {
       const a = e.target.closest && e.target.closest('a[data-ancla]');
       if (!a || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
-      if (a.getAttribute('href')?.includes('?frpos=')) return;
+      if (/[?&]frpos=/.test(a.getAttribute('href')||'')) return;
       e.preventDefault();
       ir(a.getAttribute('data-ancla'), true);
     });
@@ -1952,6 +1982,16 @@
     const raizGuia = h('div', { 'class': 'tmr guia' });
     caja.replaceChildren(raizGuia);
     try {
+      const compartido=parametroGuia('inv'),artsCompartidos=parametroGuia('arts');
+      investigacionCompartida=null;
+      if(compartido){
+        const entrada=await decodificarInv(compartido);
+        const revisada=await revisarInvestigacion(entrada,cargarReglamento,entrada.version===1);
+        if(mi!==token)return;
+        investigacionCompartida=revisada;
+      }else if(artsCompartidos){
+        investigacionCompartida=migrarInvestigacion({formato:'sate-investigacion',version:1,nombre:ti('compartida'),proposito:'estudio',autor:'',etiquetas:[],marcadores:artsCompartidos.split(',').map(x=>{const [doc,n,fr='']=x.split(':');return {doc,n,fr,anotaciones:[]};})});
+      }
       let foco;
       if (apartado === 'investigacion' && cfg().guiaDatos) foco=await vistaInvestigacion(raizGuia);
       else if (apartado === 'ruta' && cfg().guiaDatos) foco=rutaGuiada(raizGuia,await datos(),id);
