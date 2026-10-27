@@ -320,6 +320,8 @@
 .rgl-biblioteca li{min-width:0}
 .rgl-libro{box-sizing:border-box;display:flex;flex-direction:column;gap:var(--ipn-esp-3);height:100%;padding:var(--ipn-esp-5);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);text-decoration:none;overflow-wrap:anywhere}
 .rgl-libro:hover{border-color:var(--ipn-acento)}
+/* Una tarjeta abierta se ve igual que las demás (dueño, 2026-10-26): anula el a:visited global. */
+.rgl-libro:visited{color:var(--ipn-texto)}
 .rgl-libro h4{margin:0;font-size:var(--ipn-tamano-m)}
 .rgl-libro small{color:var(--ipn-tenue)}
 .rgl-siglas{color:var(--ipn-acento);font-size:var(--ipn-tamano-xl)}
