@@ -105,16 +105,7 @@ function renderSinUbicar(){
 /* Cadena de requisitos y dependientes de la materia bajo el cursor (o de la fila elegida en «requisitos»).
    Devuelve null sin resaltado, o un Set con .pre (antes) y .post (después). Pura: solo usa sus argumentos. */
 function calcHot(mapHover,reqHover,pre){
-  if(mapHover&&reqHover){
-    const hot=new Set([mapHover,...reqHover]);hot.pre=new Set([mapHover]);hot.post=new Set(reqHover);return hot;
-  }
-  if(!mapHover)return null;
-  const hot=new Set([mapHover]);
-  const post={};Object.entries(pre).forEach(([b,as])=>as.forEach(a=>(post[a]=post[a]||[]).push(b)));
-  const walk=(k,g)=>{(g[k]||[]).forEach(x=>{if(!hot.has(x)){hot.add(x);walk(x,g)}})};
-  walk(mapHover,pre);hot.pre=new Set([...hot].filter(x=>x!==mapHover));   // requisitos (antes)
-  const antes=new Set(hot);walk(mapHover,post);hot.post=new Set([...hot].filter(x=>!antes.has(x)));   // lo que desbloquea (después)
-  return hot;
+  return SateUI.cadenaMapa(mapHover,reqHover,pre);
 }
 // estado de resaltado de una flecha a->b: clases y marcador de punta
 function resalteArista(hot,a,b,mapHover){
@@ -211,7 +202,7 @@ function renderMap0(){
   L.edges.forEach(([s,d,p,larga,ls,ld])=>{
     const bs=L.boxes[s];if(!kOf(bandOf(bs[1]+bs[3]/2)))return;   // sale de un semestre plegado: no se dibuja
     const a=L.boxes[s][4], b=L.boxes[d][4], r=resalteArista(hot,a,b,S.mapHover);
-    const pts=[];for(let i=0;i<p.length;i+=2)pts.push([p[i],Y(p[i+1])]);
+    const pts=SateUI.puntosMapa(p,Y);
     const pasada=isPersonal()&&done.has(b);
     // las flechas lejanas existen siempre pero solo se ven al resaltarlas (clase «lejana», sin redibujar al pasar el cursor)
     const cls=`edge${L.propuesto?' prop':''}${L.rutas&&larga?' lejana':''}${r.cls}${!hot&&pasada?' past':''}`, mk=`marker-end="url(#${r.marker})"`, dt=`data-a="${a}" data-b="${b}"${pasada?' data-past="1"':''}`;

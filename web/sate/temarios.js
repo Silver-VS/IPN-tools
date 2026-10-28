@@ -662,9 +662,15 @@
     function pintarTrayectoria() {
       const colores = new Map((ind.carreras[G.carrera].areas || []).map(a => [a.nombre, a.color]));
       const grupos = agrupar(filtrar(ind.materias, { carrera: G.carrera, nivel: '*', tipo: '*' }, null));
-      tray.replaceChildren(...grupos.map(g => h('section', { 'class': 'gd-sem' }, [
+      const lista = h('div', { 'class': 'gd-tray-lista' }, grupos.map(g => h('section', { 'class': 'gd-sem' }, [
         h('h4', { texto: g.nivel ? t('temarios.lista.nivel', { n: g.nivel }) : t('sate.guia.linea_otras') }),
         h('ul', {}, g.items.map(i => h('li', {}, [chip(i, 'gd-chip--sem', [h('span', { texto: i.n }), h('small', { texto: i.clave })], colores.get(i.a))])))])));
+      const materias = Object.fromEntries(Object.entries(ind.materias).filter(([,m]) => m.c === G.carrera));
+      const curricular = SateUI.mapaConsulta(ind.carreras[G.carrera].layout, materias, {
+        etiqueta: t('sate.guia.mapa_curricular'), documento: 'temarios', nivel: n => t('temarios.lista.nivel', {n}),
+        abrir: (clave, origen) => abrir(clave, origen)
+      });
+      tray.replaceChildren(curricular, lista);
     }
     function pintarMapa() {
       const filas = lineasDeAprendizaje(ind.materias, G.carrera, ind.carreras[G.carrera].areas);

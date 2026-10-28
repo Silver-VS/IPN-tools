@@ -348,6 +348,38 @@ function el(document, tag, attrs = {}, hijos = []) {
   assert.equal(estado.scroll.length, scrolls, 'la página no se desplaza');
   assert.equal(portada.querySelectorAll('.tmr-ficha').length, 0, 'la ficha no se agrega a la página');
   fd.querySelector('.sate-modal__x').click();
+  // El mapa curricular conserva sus nodos y su desplazamiento durante la consulta.
+  const curricular = portada.querySelector('.sate-mapa-consulta');
+  const cajaMapa = curricular.querySelector('[data-clave=B103]');
+  const lienzoMapa = curricular.firstChild;
+  curricular.scrollLeft = 81; curricular.scrollTop = 63;
+  cajaMapa.click();
+  assert.equal(cajaMapa.getAttribute('aria-pressed'), 'true');
+  assert.equal(curricular.firstChild, lienzoMapa, 'resaltar no reconstruye el mapa');
+  const descendientes = new Set();
+  const recorrer = k => Object.entries(indice.materias).filter(([,m]) => m.r?.includes(k)).forEach(([x]) => {
+    if (!descendientes.has(x)) { descendientes.add(x); recorrer(x); }
+  });
+  recorrer('B103');
+  assert.ok(descendientes.size > 0);
+  for (const k of descendientes) {
+    const b = curricular.querySelector(`[data-clave="${k}"]`);
+    if (b) assert.ok(b.classList.contains('hpost'), k + ': consecuente resaltado');
+  }
+  cajaMapa.dispatchEvent(new Evento('keydown', {key:'Escape', target:cajaMapa}));
+  assert.equal(curricular.querySelectorAll('.hot,.hpre,.hpost,.dim').length, 0);
+  cajaMapa.click(); cajaMapa.click();
+  await dormir(30);
+  const vistazoMapa = document.querySelector('.sate-modal');
+  assert.equal(vistazoMapa.querySelector('.tmr-completa').getAttribute('href'), '#/upiita/guia/programas/bionica/B103');
+  vistazoMapa.querySelector('.sate-modal__x').click();
+  assert.equal(document.activeElement, cajaMapa, 'el foco vuelve a la materia');
+  assert.equal(curricular.scrollLeft, 81); assert.equal(curricular.scrollTop, 63);
+  cajaMapa.dispatchEvent(new Evento('keydown', {key:'ArrowRight', target:cajaMapa}));
+  assert.equal(document.activeElement.dataset.nivel, cajaMapa.dataset.nivel);
+  cajaMapa.dispatchEvent(new Evento('keydown', {key:'Enter', target:cajaMapa}));
+  await dormir(30);
+  document.querySelector('.sate-modal .sate-modal__x').click();
   // Líneas y especializaciones: metro por omisión, matriz con el conmutador
   const rel = T_.relaciones(indice.materias, 'B103');
   assert.ok(rel.despues.length > 0, 'B103 desbloquea otras materias por la seriación real');
@@ -806,3 +838,27 @@ est.click(); await dormir(30);
   assert.equal(c.PoliCORE.lector.activos(), 3);
 }
 console.log('OK temarios: adaptador, lector de PoliCORE reutilizable, mapa dedicado a planear, vistazo, selector con trayectoria visual, vista única, enlaces profundos y unidades sin temarios.');
+
+// Las tres carreras comparten geometría y componente; el mapa no recibe estado del alumnado.
+for (const [id, carrera] of Object.entries(indice.carreras)) {
+  const {c, document, Evento} = contexto();
+  const materias = Object.fromEntries(Object.entries(indice.materias).filter(([,m]) => m.c === id));
+  const abiertos = [];
+  const mapa = c.SateUI.mapaConsulta(carrera.layout, materias, {etiqueta:'Mapa', nivel:n=>'Nivel '+n, abrir:k=>abiertos.push(k)});
+  document.body.appendChild(mapa);
+  const clavesMapa = new Set(carrera.layout.boxes.map(b=>b[4]).filter(k=>materias[k]));
+  assert.equal(mapa.querySelectorAll('.sate-mapa-caja').length, clavesMapa.size, id);
+  assert.ok(clavesMapa.size > 40, id + ': mapa completo');
+  assert.ok(mapa.querySelectorAll('.sate-mapa-arista').length > 0, id + ': seriación');
+  const clave = [...clavesMapa].find(k=>materias[k].r?.some(x=>clavesMapa.has(x)));
+  const caja = mapa.querySelector(`[data-clave="${clave}"]`);
+  caja.click();
+  for (const k of materias[clave].r) {
+    const b = mapa.querySelector(`[data-clave="${k}"]`);
+    if (b) assert.ok(b.classList.contains('hpre'), id + ': antecedente ' + k);
+  }
+  caja.dispatchEvent(new Evento('keydown', {key:'Enter', target:caja}));
+  igual(abiertos, [clave]);
+  mapa.click();
+  assert.equal(mapa.querySelectorAll('.hot,.hpre,.hpost,.dim').length, 0);
+}
