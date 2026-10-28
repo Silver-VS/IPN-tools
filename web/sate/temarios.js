@@ -671,6 +671,7 @@
         abrir: (clave, origen) => abrir(clave, origen)
       });
       tray.replaceChildren(curricular, lista);
+      desplazamiento(curricular)();
     }
     function pintarMapa() {
       const filas = lineasDeAprendizaje(ind.materias, G.carrera, ind.carreras[G.carrera].areas);

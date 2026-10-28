@@ -840,6 +840,31 @@ est.click(); await dormir(30);
 console.log('OK temarios: adaptador, lector de PoliCORE reutilizable, mapa dedicado a planear, vistazo, selector con trayectoria visual, vista única, enlaces profundos y unidades sin temarios.');
 
 // Las tres carreras comparten geometría y componente; el mapa no recibe estado del alumnado.
+// GMAPA2: el ancho manda y el alto sigue exactamente el contenido, sin navegador.
+{
+  let ajustar;
+  const {c, document} = contexto({ResizeObserver:class {constructor(fn){ajustar=fn}observe(){}}});
+  const ejemplo = {w:2071.2,h:779.5,boxes:[[40,40,120,30,'X']],edges:[],rows:[[1,55]],pitch:50};
+  for(const L of [ejemplo, indice.carreras.bionica.layout]){
+    const materias = L===ejemplo ? {X:{n:'Unidad ficticia de nombre suficientemente largo',v:1,r:[]}} : indice.materias;
+    const mapa = c.SateUI.mapaConsulta(L,materias,{etiqueta:'Mapa',nivel:n=>'Nivel '+n,abrir(){}});
+    document.body.appendChild(mapa);
+    for(const ancho of [1400,1360,944,700,1751,1360]){
+      mapa.clientWidth=ancho;
+      ajustar();
+      const lienzo=mapa.querySelector('.sate-mapa-lienzo'), w=parseFloat(lienzo.style.width), h=parseFloat(lienzo.style.height);
+      const escala=w/L.w;
+      assert.ok(w<=ancho+0.01 || Math.abs(escala-5.5/9)<0.0001, `ancho ${ancho}: solo desborda al mínimo legible, recibido ${w}`);
+      if(ancho>=1360)assert.ok(w<=ancho+0.01,'Biónica cabe en escritorio');
+      assert.ok(Math.abs(h-L.h*escala)<0.01,'el alto corresponde al contenido completo');
+      for(const b of mapa.querySelectorAll('.sate-mapa-caja'))assert.ok(parseFloat(b.style.fontSize)>=5.5,'mínimo del Mapa');
+    }
+  }
+  const css=leer('web/sate/componentes.css').match(/\.sate-mapa-consulta\{([^}]+)\}/)[1];
+  assert.doesNotMatch(css,/max-height|height\s*:/,'sin límite vertical interno');
+  assert.match(leer('web/sate/componentes.css'),/@media\(max-width:600px\)\{\.gd-tray \.gd-desplazamiento:has\(>\.sate-mapa-consulta\)\{display:none\}/,'el indicio del mapa también se oculta en teléfono');
+  assert.match(leer('web/sate/temarios.css'),/@media\(max-width:600px\)\{\.gd-tray \.sate-mapa-consulta\{display:none\}/,'teléfono conserva lista por niveles');
+}
 for (const [id, carrera] of Object.entries(indice.carreras)) {
   const {c, document, Evento} = contexto();
   const materias = Object.fromEntries(Object.entries(indice.materias).filter(([,m]) => m.c === id));

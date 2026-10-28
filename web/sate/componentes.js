@@ -649,7 +649,9 @@ function resalteCaja(hot,k,mapHover,reqHover){
 }
 function cajaConsulta(ctx,k,x,y,w,h,sc,sem){
     const b=el('button',{type:'button',class:'box sate-mapa-caja','data-clave':k,'data-nivel':sem,'aria-haspopup':'dialog','aria-pressed':'false'});
-    b.appendChild(el('small',{texto:k}));b.appendChild(el('span',{texto:ctx.nombre(k),'data-oficial':ctx.documento}));
+    b.setAttribute('title',k+' · '+ctx.nombre(k));
+    b.setAttribute('aria-label',k+' · '+ctx.nombre(k));
+    b.appendChild(el('span',{texto:ctx.nombre(k),'data-oficial':ctx.documento}));
     Object.assign(b.style,{left:x*sc+'px',top:y*sc+'px',width:w*sc+'px',height:h*sc+'px'});
     return b;
 }
@@ -688,8 +690,8 @@ function puntosMapa(p,Y=y=>y){
 function mapaConsulta(L,materias,op){
   const raiz=el('div',{class:'sate-mapa-consulta',role:'region',tabindex:'-1','aria-label':op.etiqueta});
   const lienzo=el('div',{class:'sate-mapa-lienzo'}), ns='http://www.w3.org/2000/svg';
-  // No se reduce la letra para ajustar el mapa: el contenedor permite desplazarse.
-  const sc=Math.max(1, ...L.boxes.map(b=>Math.max(180/b[2],100/b[3])));
+  // Como el Mapa, se ajusta al ancho; 5.5 px es su mínimo para nombres largos (9 px).
+  const sc=1;
   Object.assign(lienzo.style,{width:L.w*sc+'px',height:L.h*sc+'px'});
   const svg=document.createElementNS(ns,'svg');
   svg.setAttribute('viewBox',`0 0 ${L.w} ${L.h}`);svg.setAttribute('aria-hidden','true');
@@ -738,7 +740,26 @@ function mapaConsulta(L,materias,op){
   }
   raiz.addEventListener('click',e=>{if(!e.target.closest('[data-clave]'))seleccionar(null)});
   raiz.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();seleccionar(null)}});
-  raiz.appendChild(lienzo);return raiz;
+  raiz.appendChild(lienzo);
+  function ajustar(){
+    if(!raiz.clientWidth)return;
+    const escala=Math.max(5.5/9,Math.min(1.1,raiz.clientWidth/L.w));
+    Object.assign(lienzo.style,{width:L.w*escala+'px',height:L.h*escala+'px'});
+    const colocar=(n,x,y,w,h)=>Object.assign(n.style,{left:x*escala+'px',top:y*escala+'px',width:w*escala+'px',height:h*escala+'px'});
+    L.boxes.forEach(([x,y,w,h,k,slot])=>{
+      const b=cajas.get(k);
+      if(b){colocar(b,x,y,w,h);b.style.fontSize=Math.max(5.5,(materias[k].n.length>34?9:10.5)*escala)+'px'}
+    });
+    lienzo.querySelectorAll('.sate-mapa-hueco').forEach((n,i)=>{
+      const [x,y,w,h]=L.boxes.filter(b=>!b[4]&&b[5])[i];colocar(n,x,y,w,h);
+      n.style.fontSize=Math.max(5.5,9*escala)+'px';
+    });
+    lienzo.querySelectorAll('.sate-mapa-nivel').forEach((n,i)=>{n.style.top=rowBands(L)[i][2]*escala+'px'});
+    raiz.dispatchEvent(new Event('scroll'));
+  }
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(ajustar).observe(raiz);
+  if(typeof requestAnimationFrame!=='undefined')requestAnimationFrame(ajustar);
+  return raiz;
 }
 function lanes(items){
   const out=[];
