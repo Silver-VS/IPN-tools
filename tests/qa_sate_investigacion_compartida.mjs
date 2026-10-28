@@ -36,7 +36,7 @@ if(!existsSync(archivoEnlace)){
   const reg=JSON.parse(leer('web/dist/sate/datos/reglamentos/lo.json'));
   const p={formato:'sate-investigacion',version:2,nombre:'Investigación ficticia',autor:'Autor ficticio',proposito:'estudio',etiquetas:['Prueba'],peticion:'Petición ficticia',marcadores:[]};
   for(const a of reg.articulos.slice(0,10))p.marcadores.push({doc:'lo',n:String(a.n),fr:'',inciso:'',huella:await G.huellaCita(a.texto),nota:'Nota ficticia '+a.n,tipo:'hecho',anotaciones:[]});
-  location.hash+='?inv='+await G.codificarInv(p);
+  location.hash='#'+(await G.enlaceInvestigacion(p,location.href,'#/upiita/guia/reglamentos/lo')).split('#')[1];
 }
 const inv=location.hash.split('?inv=')[1];
 const compartida=await G.decodificarInv(inv);
@@ -106,3 +106,46 @@ assert.equal(caja.querySelectorAll('.inv-selector').length,1,'quitar el parámet
 assert.equal(almacen.get(clave),JSON.stringify(guardadas));
 assert.equal(avisos.length,0,JSON.stringify(avisos));
 console.log('R18-COMP: 10 huellas oficiales, lector/vista de solo lectura sin almacenamiento, rutas, copia independiente, salida y texto cambiado.');
+// Acciones recuperadas en el DOM actual: selector, vista dedicada y avisos en línea.
+const portapapeles=[];
+contexto.navigator={clipboard:{writeText:async texto=>portapapeles.push(texto)}};
+await boton('compartir_enlace')._ev.click[0]();
+assert.ok(caja.textContent.includes('sate.guia.inv_enlace_copiado'));
+const intercambiada=await G.decodificarInv(portapapeles.at(-1).split('?inv=')[1]);
+assert.deepEqual(JSON.parse(JSON.stringify(intercambiada)),JSON.parse(JSON.stringify(G.validarInvestigacion(guardadas.proyectos[1]))));
+const buscar=caja.querySelector('input[type=search]'),tipos=caja.querySelector('select');
+buscar.value='no existe esta nota';buscar.dispatchEvent(new Evento('input'));
+assert.ok(Array.from(caja.querySelectorAll('.inv-cita')).every(n=>n.hidden));
+assert.ok(caja.textContent.includes('sate.guia.inv_mostrando 0 · 10'));
+buscar.value=guardadas.proyectos[1].marcadores[0].nota;buscar.dispatchEvent(new Evento('input'));
+assert.ok(Array.from(caja.querySelectorAll('.inv-cita')).some(n=>!n.hidden));
+tipos.value='pregunta';tipos.dispatchEvent(new Evento('change'));
+assert.ok(Array.from(caja.querySelectorAll('.inv-cita')).every(n=>n.hidden));
+tipos.value='hecho';tipos.dispatchEvent(new Evento('change'));
+const primera=caja.querySelector('.inv-cita');
+primera.querySelector('.inv-nota button').click();
+assert.equal(primera.hidden,true,'editar el tipo actualiza el filtro sin reconstruir el editor');
+buscar.value='';buscar.dispatchEvent(new Evento('input'));tipos.value='';tipos.dispatchEvent(new Evento('change'));
+await boton('copiar_fundamento')._ev.click[0]();
+assert.ok(!portapapeles.at(-1).includes(guardadas.proyectos[1].marcadores[0].nota));
+caja.querySelector('input[type=checkbox]').checked=true;
+await boton('copiar_fundamento')._ev.click[0]();
+assert.ok(portapapeles.at(-1).includes(guardadas.proyectos[1].marcadores[0].nota));
+delete contexto.navigator.clipboard;
+const compartirVista=Array.from(caja.querySelectorAll('.inv-contenido button')).find(b=>b.textContent.trim()==='sate.guia.inv_compartir_enlace');
+assert.ok(compartirVista);await compartirVista._ev.click[0]();
+assert.ok(caja.querySelector('.inv-intercambio input').value.includes('?inv='),'sin portapapeles ofrece el enlace seleccionable');
+contexto.navigator.clipboard={writeText:async()=>{throw new Error('Permiso denegado ficticio');}};
+await boton('copiar_fundamento')._ev.click[0]();
+assert.ok(caja.querySelector('.inv-intercambio pre').textContent.includes(guardadas.proyectos[1].marcadores[0].nota));
+// Un enlace demasiado largo ofrece archivo y no intenta copiarlo.
+const grande=JSON.parse(almacen.get(clave));
+// Datos pseudoaleatorios reproducibles para evitar que deflate reduzca la muestra por debajo del límite.
+let semilla=17;
+grande.proyectos[1].peticion=Array.from({length:19000},()=>{semilla=(semilla*1664525+1013904223)>>>0;return String.fromCharCode(33+semilla%90);}).join('');
+almacen.set(clave,JSON.stringify(grande));
+await pestana.mostrar({partes:['investigacion']});
+await boton('compartir_enlace')._ev.click[0]();
+assert.ok(boton('exportar_archivo'));assert.ok(caja.textContent.includes('sate.guia.inv_largo'));
+assert.ok(!caja.querySelector('.inv-intercambio input'));
+console.log('R19-INV3 DOM: compartir desde selector/vista, filtro combinado y conteo, fundamento con/sin notas, portapapeles ausente/denegado y límite de enlace.');

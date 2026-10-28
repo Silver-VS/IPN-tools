@@ -376,6 +376,41 @@
     const comprimido = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
     return btoa(Array.from(comprimido,x=>String.fromCharCode(x)).join('')).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
   }
+  async function enlaceInvestigacion(p,base,ruta) {
+    return base.split('#')[0]+ruta+'?inv='+await codificarInv(p);
+  }
+  function filtrarCitasInv(p,documentos,consulta='',tipo='') {
+    const ts=terminos(consulta);
+    return p.marcadores.filter(m=>{
+      const reg=documentos[m.doc]||{},articulo=reg.articulos?.find(a=>String(a.n)===m.n);
+      const texto=norm([m.nota,...m.anotaciones.map(a=>a.nota),articulo?.texto,textoCita(reg,m)].join(' '));
+      return (!tipo||m.tipo===tipo)&&ts.every(t=>texto.includes(t));
+    });
+  }
+  const referenciaInv=(m,reg,etiqueta)=>etiqueta('referencia',{n:m.n})+(m.fr?', '+etiqueta('referencia_fraccion',{fr:m.fr}):'')+(m.inciso?', '+etiqueta('inciso',{inciso:m.inciso}):'')+', '+reg.titulo;
+  function copiarFundamentoInv(marcadores,documentos,etiqueta,incluirNotas=false) {
+    const orden=marcadores.slice().sort((a,b)=>a.doc.localeCompare(b.doc)||a.n.localeCompare(b.n,'es',{numeric:true})||(a.frpos||0)-(b.frpos||0));
+    let doc='';
+    return orden.map(m=>{
+      const reg=documentos[m.doc],texto=textoCita(reg,m);
+      const titulo=doc===m.doc?'':reg.titulo+'\n\n';doc=m.doc;
+      const notas=[m.nota,...m.anotaciones.map(a=>a.nota)].filter(Boolean);
+      return titulo+(texto??etiqueta('no_disponible'))+'\n('+referenciaInv(m,reg,etiqueta)+')'+(incluirNotas&&notas.length?'\n\n'+etiqueta('propia')+': '+notas.join('\n'):'');
+    }).join('\n\n');
+  }
+  const escaparLatexInv=s=>String(s).replace(/[&%$#_{}~^\\]/g,c=>({'~':'\\textasciitilde{}','^':'\\textasciicircum{}','\\':'\\textbackslash{}'}[c]||'\\'+c));
+  async function exportarLatexInv(p,cargar,etiqueta) {
+    const esc=escaparLatexInv;
+    let tex='\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage[T1]{fontenc}\n\\usepackage[spanish]{babel}\n\\begin{document}\n\\section*{'+esc(p.nombre)+'}\n';
+    for(const m of p.marcadores){
+      const reg=await cargar(m.doc),texto=textoCita(reg,m);
+      tex+='\n\\begin{quote}\n'+esc(texto??etiqueta('no_disponible'))+'\n\n'+esc(referenciaInv(m,reg,etiqueta))+'\n\\end{quote}\n';
+      const notas=[m.nota,...m.anotaciones.map(a=>a.nota)].filter(Boolean);
+      if(notas.length)tex+='\n'+esc(etiqueta('propia'))+': '+notas.map(esc).join('\n\n')+'\n';
+    }
+    return tex+'\n\\end{document}\n';
+  }
+  Object.assign(raiz.SateGuia,{enlaceInvestigacion,filtrarCitasInv,copiarFundamentoInv,escaparLatexInv,exportarLatexInv});
   async function decodificarInv(s) {
     if(!/^[\w-]+$/.test(s) || s.length>2000000) throw new Error('Enlace inválido');
     const bytes = Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),x=>x.charCodeAt(0));
@@ -1192,11 +1227,29 @@
   }
   let regresoInv='';
   const versionesPanelInv=new WeakMap();
-  async function panelInvestigacion(contenedor,completa=false,filtro='') {
+  async function panelInvestigacion(contenedor,completa=false,filtro='',busqueda='') {
     const version=(versionesPanelInv.get(contenedor)||0)+1;versionesPanelInv.set(contenedor,version);
     const compartida=!!investigacionCompartida,v=compartida?null:leerInvestigaciones(),p=compartida?investigacionCompartida:v.proyectos[v.activa];
-    const repintar=()=>{estadoMarcadoresInv();return panelInvestigacion(contenedor,completa,filtro).catch(errorInv);};
+    const repintar=()=>{estadoMarcadoresInv();return panelInvestigacion(contenedor,completa,filtro,busqueda).catch(errorInv);};
     const guardar=()=>{guardarInvestigaciones(v);};
+    const avisos=h('div',{'class':'inv-intercambio','aria-live':'polite'});
+    const copiar=async(texto)=>{
+      avisos.replaceChildren();
+      try{
+        if(!raiz.navigator?.clipboard?.writeText)throw new Error('Portapapeles no disponible');
+        await raiz.navigator.clipboard.writeText(texto);avisos.appendChild(h('p',{role:'status',texto:ti('copiado')}));
+      }catch(e){
+        if(texto.includes('\n')){avisos.append(h('p',{texto:ti('copiar_manual')}),h('pre',{tabindex:0,texto}));return;}
+        const campo=h('input',{type:'text',readonly:true,'aria-label':ti('copiar_manual')});campo.value=texto;
+        campo.addEventListener('focus',()=>campo.select?.());avisos.append(h('p',{texto:ti('copiar_manual')}),campo);campo.focus?.();campo.select?.();
+      }
+    };
+    const compartir=async()=>{try{
+      const url=await enlaceInvestigacion(p,raiz.location.href,rutaGuia('investigacion'));
+      if(url.length>8000){avisos.replaceChildren(h('p',{role:'status',texto:ti('largo')}),botonInv('exportar_archivo',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json')));return;}
+      await copiar(url);
+      if(avisos.querySelector('[role="status"]'))avisos.querySelector('[role="status"]').textContent=ti('enlace_copiado');
+    }catch(e){errorInv(e);}};
     contenedor.replaceChildren();
     if(compartida){
       contenedor.append(h('h3',{texto:ti('compartida')+' · '+p.nombre}),h('p',{'class':'inv-conteo',texto:[p.autor,...p.etiquetas].filter(Boolean).join(' · ')}),h('p',{'class':'inv-conteo',texto:ti('solo_lectura')}));
@@ -1218,11 +1271,12 @@
     cab.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hasAttribute('hidden')){abrirMenu(false);selector.focus?.();}});
     const normal=()=>zona.replaceChildren(selector,menu);
     const mostrar=nodo=>{abrirMenu(false);zona.replaceChildren(nodo);};
-    const item=(texto,fn,activo)=>{const b=h('button',{type:'button','class':'inv-menu__item',role:activo===undefined?'menuitem':'menuitemradio',texto});if(activo!==undefined)b.setAttribute('aria-checked',String(activo));b.addEventListener('click',()=>{abrirMenu(false);fn();});return b;};
+    const item=(texto,fn,activo)=>{const b=h('button',{type:'button','class':'inv-menu__item',role:activo===undefined?'menuitem':'menuitemradio',texto});if(activo!==undefined)b.setAttribute('aria-checked',String(activo));b.addEventListener('click',()=>{abrirMenu(false);return fn();});return b;};
     v.proyectos.forEach((x,i)=>menu.appendChild(item(x.nombre,()=>{v.activa=i;guardar();repintar();},i===v.activa)));
     menu.appendChild(h('hr',{'class':'inv-menu__linea'}));
     menu.appendChild(item('+ '+ti('nueva'),()=>{try{v.proyectos.push(nuevaInv(ti('nombre_n',{n:v.proyectos.length+1})));v.activa=v.proyectos.length-1;guardar();repintar();}catch(e){errorInv(e);}}));
     if(p){
+      menu.appendChild(item(ti('compartir_enlace'),compartir));
       menu.appendChild(item(ti('renombrar'),()=>mostrar(campoInv(ti('nombre'),p.nombre,120,valor=>{if(!valor.trim())return;try{p.nombre=valor.trim();validarInvestigacion(p);guardar();repintar();}catch(e){errorInv(e);}},()=>{normal();selector.focus?.();}))));
     }
     const archivo=h('input',{type:'file',id:'rgl-importar',hidden:true,accept:'.json,application/json','aria-label':ti('importar')});
@@ -1244,16 +1298,28 @@
     }
     if(!p){contenedor.appendChild(h('p',{texto:ti('vacia')}));return;}
     const principal=h('div',{'class':'inv-contenido'});contenedor.appendChild(principal);
+    principal.appendChild(avisos);
     if(completa&&!compartida)principal.appendChild(h('h3',{texto:p.nombre}));
     principal.appendChild(h('p',{'class':'inv-conteo',texto:ti('resumen',{c:p.marcadores.length,n:notasDe(p)})}));
-    if(completa&&!compartida){
-      const tipos=h('select',{'aria-label':ti('tipo')},['',...tiposNota].map(x=>h('option',{value:x,selected:x===filtro,texto:ti(x||'todos_tipos')})));
-      tipos.addEventListener('change',()=>{filtro=tipos.value;repintar();});principal.appendChild(tipos);
+    const documentos={},filas=new Map();
+    const buscar=h('input',{type:'search','aria-label':ti('buscar_notas'),placeholder:ti('buscar_notas')}),conteo=h('p',{'class':'inv-conteo',role:'status'});
+    buscar.value=busqueda;
+    const tipos=h('select',{'aria-label':ti('tipo')},['',...tiposNota].map(x=>h('option',{value:x,selected:x===filtro,texto:ti(x||'todos_tipos')})));
+    let visibles=p.marcadores;
+    const filtrar=()=>{
+      busqueda=buscar.value||'';visibles=filtrarCitasInv(p,documentos,busqueda,filtro);
+      for(const [m,fila] of filas)fila.hidden=!visibles.includes(m);
+      conteo.textContent=ti('mostrando',{n:visibles.length,m:p.marcadores.length});
+    };
+    if(completa){
+      buscar.addEventListener('input',filtrar);tipos.addEventListener('change',()=>{filtro=tipos.value;filtrar();});
+      principal.append(h('div',{'class':'inv-campo'},[h('label',{},[ti('buscar_notas'),buscar]),h('label',{},[ti('tipo'),tipos])]),conteo);
     }
     const lista=h('div',{'class':'inv-lista'});principal.appendChild(lista);
     // Solo la migración de un marcador antiguo establece su primera huella.
     for(const m of p.marcadores){
       const reg=await cargarReglamento(m.doc),oficial=textoCita(reg,m),actual=oficial===null?null:await huellaCita(oficial);
+      documentos[m.doc]=reg;
       if(versionesPanelInv.get(contenedor)!==version||!contenedor.isConnected)return;
       if(m.pendienteHuella&&actual&&!compartida){
         m.huella=actual;m.pendienteHuella=false;
@@ -1261,7 +1327,6 @@
         if(c?.pendienteHuella){c.huella=actual;c.pendienteHuella=false;guardarInvestigaciones(vigente);}
       }
       const cambio=!actual||m.huella!==actual;
-      if(filtro&&m.tipo!==filtro)continue;
       const sufijo=sufijoInvestigacion();
       const enlace=rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+sufijo+(m.frpos?(sufijo?'&':'?')+'frpos='+m.frpos:'');
       const rotulo=rotuloCita(m);
@@ -1288,6 +1353,13 @@
         fila.append(h('div',{'class':'inv-item__cab'},[h('a',{'class':'inv-ref',href:enlace,texto:rotulo}),cambio?h('span',{'class':'inv-cambio',texto:ti('cambio')}):null,compartida?null:quitar]),h('p',{'class':nota?'inv-item__nota':'inv-item__nota inv-item__nota--vacia',texto:compartida?ti(m.tipo)+' · '+(nota||ti('sin_nota')):nota.slice(0,160)||ti('sin_nota')}));
       }
       lista.appendChild(fila);
+      filas.set(m,fila);
+    }
+    if(completa){
+      filtrar();lista.addEventListener('input',filtrar);lista.addEventListener('change',filtrar);lista.addEventListener('click',filtrar);
+      const incluir=h('input',{type:'checkbox'}),acciones=h('div',{'class':'inv-campo'});
+      acciones.append(h('label',{},[incluir,ti('incluir_notas')]),botonInv('copiar_fundamento',()=>copiar(copiarFundamentoInv(visibles,documentos,ti,incluir.checked))),botonInv('compartir_enlace',compartir));
+      principal.appendChild(acciones);
     }
     if(!p.marcadores.length)lista.appendChild(h('p',{texto:ti('vacia')}));
     if(completa&&compartida){
@@ -1298,7 +1370,7 @@
       principal.append(h('h4',{texto:ti('peticion')}),peticion);
       principal.append(botonInv('json',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json')),botonInv('markdown',async()=>{
         try{descargarInv('investigacion.md',await exportarMarkdownInv(p,cargarReglamento,ti,enlaceExportacion),'text/markdown');}catch(e){errorInv(e);}
-      }));
+      }),botonInv('latex',async()=>{try{descargarInv('investigacion.tex',await exportarLatexInv(p,cargarReglamento,ti),'application/x-tex');}catch(e){errorInv(e);}}));
     }else{
       const abrir=h('a',{'class':'inv-abrir',href:rutaGuia('investigacion')+sufijoInvestigacion(),texto:ti('abrir')});abrir.addEventListener('click',()=>{regresoInv=raiz.location.hash;});principal.appendChild(abrir);
     }

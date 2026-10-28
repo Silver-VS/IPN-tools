@@ -1315,7 +1315,13 @@ html[data-vista=guia-vinculada] #sate-nombre{display:none}
 .inv-nota[data-tipo=verificar]{background:var(--ipn-aviso-suave)}
 .inv-nota .guia-chips{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1)}
 .inv-nota button[aria-pressed=true],.inv-proyectos button[aria-pressed=true]{border-color:var(--ipn-acento);font-weight:700}
-.inv-vista :is(button,select,textarea),.inv-fraccion :is(button,textarea){box-sizing:border-box;min-height:var(--ipn-control-alto);max-width:100%;min-width:0;padding:var(--ipn-esp-2);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit}
+.inv-vista :is(button,select,textarea,input:not([type=checkbox])),.inv-fraccion :is(button,textarea){box-sizing:border-box;min-height:var(--ipn-control-alto);max-width:100%;min-width:0;padding:var(--ipn-esp-2);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit}
+.inv-vista .inv-campo{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-3);align-items:center}
+.inv-vista .inv-campo label{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);min-width:0;min-height:var(--ipn-control-alto)}
+.inv-intercambio:empty{display:none}
+.inv-lista>[hidden]{display:none}
+.inv-intercambio input{box-sizing:border-box;max-width:100%;width:100%;min-width:0}
+.inv-intercambio pre{white-space:pre-wrap;overflow-wrap:anywhere;font:inherit;user-select:text}
 .inv-vista textarea,.inv-nota textarea{width:100%;resize:vertical}
 .inv-peticion{white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--ipn-tamano-m)}
 .inv-fraccion{min-width:0;font-family:var(--ipn-fuente-texto);font-size:var(--ipn-tamano-s)}
