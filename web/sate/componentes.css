@@ -1,4 +1,19 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
+.sate-mapa-consulta{overflow:auto;max-width:100%;max-height:75vh;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
+.sate-mapa-lienzo{position:relative;isolation:isolate}
+.sate-mapa-lienzo>svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:-1}
+.sate-mapa-banda{fill:var(--ipn-hundido)}
+.sate-mapa-banda.par{fill:var(--ipn-superficie)}
+.sate-mapa-arista{fill:none;stroke:var(--ipn-tenue);stroke-width:1}
+.sate-mapa-arista.hot{stroke:var(--ipn-acento);stroke-width:2}
+.sate-mapa-arista.dim,.sate-mapa-caja.dim{opacity:.35}
+.sate-mapa-nivel{position:absolute;left:var(--ipn-esp-1);font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
+.sate-mapa-hueco{position:absolute;display:grid;place-items:center;box-sizing:border-box;padding:var(--ipn-esp-2);border:1px dashed var(--ipn-borde-control);border-radius:var(--ipn-radio);font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
+.sate-mapa-lienzo>.sate-mapa-caja{position:absolute;display:flex;flex-direction:column;justify-content:center;gap:var(--ipn-esp-1);box-sizing:border-box;padding:var(--ipn-esp-2);font:inherit;font-size:var(--ipn-tamano-s);line-height:1.3;color:var(--ipn-texto);background:var(--ipn-superficie);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);cursor:pointer;text-align:center;overflow-wrap:anywhere}
+.sate-mapa-caja small{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
+.sate-mapa-lienzo>.sate-mapa-caja:is(.hot,.hpre,.hpost){border:2px solid var(--ipn-acento);background:var(--ipn-hundido)}
+.sate-mapa-lienzo>.sate-mapa-caja.hot{outline:2px solid var(--ipn-acento);outline-offset:var(--ipn-esp-1)}
+.sate-mapa-lienzo>.sate-mapa-caja:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:var(--ipn-esp-1)}
 :root{--ipn-control-compacto:32px}
 :root{--ipn-formato-ancho:900px;--ipn-papel:#fff;--ipn-tinta:#18181b;--ipn-tinta-tenue:#52525b;--ipn-papel-linea:#d9d9de;--ipn-indice-ancho:16rem;--ipn-tarjeta-titulo-min:12ch;--ipn-radio-interior:max(0px,calc(var(--ipn-radio) - var(--ipn-esp-1)))}
 /* La altura es mínima: las acciones con texto en varias líneas pueden crecer. */

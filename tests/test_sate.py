@@ -231,7 +231,7 @@ class SateBuild(unittest.TestCase):
             data = {'carreras': {'B': 'INGENIERÍA BIÓNICA'}, 'mapas': {'B': {'cur': {'B103': ['ÁLGEBRA LINEAL', 7.5, 1, 'O']}}}}
             self.assertTrue(build_sate.escribir_temarios(data, t))
             indice = json.loads((t / 'temarios/indice.json').read_text(encoding='utf-8'))
-            self.assertEqual(indice['carreras']['bionica'], {'letra': 'B', 'nombre': 'Ingeniería Biónica', 'plan': '09', 'total': 72, 'areas': [], 'lineas': []})
+            self.assertEqual(indice['carreras']['bionica'], {'letra': 'B', 'nombre': 'Ingeniería Biónica', 'plan': '09', 'total': 72, 'areas': [], 'lineas': [], 'layout': {}})
             self.assertEqual(indice['materias']['B103'], {'c': 'bionica', 'n': 'Álgebra lineal', 'v': 1, 't': 'obligatoria'})
             self.assertIn('B307', indice['materias'])   # clave en minúsculas en el OCR
             crudo = (t / 'temarios/bionica.json').read_text(encoding='utf-8')

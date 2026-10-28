@@ -1035,7 +1035,8 @@ def escribir_temarios(data, datos):
                    "claves": [k for k in l.get("claves", []) if k in cur]}
                   for l in mapa.get("lineas", []) if l.get("claves")]
         carreras[d["carrera"]] = {"letra": letra, "nombre": nombre_propio(data["carreras"].get(letra, d["carrera"])),
-                                  "plan": d["plan"], "total": len(salida), "areas": columnas, "lineas": lineas}
+                                  "plan": d["plan"], "total": len(salida), "areas": columnas, "lineas": lineas,
+                                  "layout": layout}
         (destino / (d["carrera"] + ".json")).write_text(json.dumps(
             {"carrera": d["carrera"], "plan": d["plan"], "materias": salida}, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     for m in materias.values():   # el explorador solo enlaza materias que tienen ficha

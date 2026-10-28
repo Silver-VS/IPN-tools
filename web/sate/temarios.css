@@ -168,7 +168,9 @@
 .tmr-bloque{scroll-margin-top:calc(var(--sate-barra-alto) + var(--ipn-esp-5))}
 
 /* Trayectoria escolar: una columna por semestre; ficha en ventana emergente */
-.gd-tray{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:var(--ipn-esp-4);align-items:start}
+.gd-tray{min-width:0}
+.gd-tray-lista{display:none}
+@media(max-width:600px){.gd-tray .sate-mapa-consulta{display:none}.gd-tray-lista{display:grid;grid-template-columns:repeat(auto-fit,minmax(10rem,1fr));gap:var(--ipn-esp-4);align-items:start}}
 .gd-sem{display:grid;gap:var(--ipn-esp-2);align-content:start;min-width:0}
 .gd-sem>h4{padding-bottom:var(--ipn-esp-2);border-bottom:2px solid var(--ipn-acento);font-size:var(--ipn-tamano-m);line-height:1.25;font-weight:600}
 .gd-sem ul{display:grid;gap:var(--ipn-esp-2);margin:0;padding:0;list-style:none}

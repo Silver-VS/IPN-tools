@@ -647,7 +647,14 @@ function resalteCaja(hot,k,mapHover,reqHover){
   if(!hot.has(k))return ' dim';
   return k===mapHover?(reqHover?' hpre':' hot'):hot.pre?.has(k)?' hpre':hot.post?.has(k)?' hpost':'';
 }
+function cajaConsulta(ctx,k,x,y,w,h,sc,sem){
+    const b=el('button',{type:'button',class:'box sate-mapa-caja','data-clave':k,'data-nivel':sem,'aria-haspopup':'dialog','aria-pressed':'false'});
+    b.appendChild(el('small',{texto:k}));b.appendChild(el('span',{texto:ctx.nombre(k),'data-oficial':ctx.documento}));
+    Object.assign(b.style,{left:x*sc+'px',top:y*sc+'px',width:w*sc+'px',height:h*sc+'px'});
+    return b;
+}
 function cajaMateria(ctx,k,x,y,w,h,sc,want,off,hot,sem,req){
+  if(ctx.consulta)return cajaConsulta(ctx,k,x,y,w,h,sc,sem);
   const {cur,statusOf,planAsignado,isElec,MARK,S,fmtCr,porNiveles,esc,SATE,PLAN_DOS_PERIODOS,planEtiqueta}=ctx;
   const [n,cr,niv]=cur()[k]||[k,0,1];
   const st=statusOf(k), paso=planAsignado(k);
@@ -661,6 +668,77 @@ function cajaMateria(ctx,k,x,y,w,h,sc,want,off,hot,sem,req){
   const tip=`${k} · ${n} · ${ctx.textoCreditos?ctx.textoCreditos(k,cr,true):fmtCr(cr)+' créditos'} · nivel ${niv}${sem&&!porNiveles()?` · semestre propuesto ${sem}`:''}${el?' · consulta su acreditación con Gestión Escolar':off.has(k)?'':' · sin grupos este periodo'}${st.startsWith('late fail')?' · '+SATE.texto('sate.planeacion.desfase_aviso'):st.startsWith('fail')?' · reprobada: por recursar':st==='curso'?' · en curso':st.startsWith('late')?' · atrasada según el semestre propuesto':st.includes('far')?' · más de un año adelante de tu semestre de referencia: aún no puedes inscribirla':st.includes('lock')?' · le faltan requisitos':MARK.avail.has(k)?' · puedes cursarla el siguiente periodo':''}${MARK.sug.has(k)?' · sugerida para tu carga':''}${req&&req.has(k)?' · conviene cursarla antes que una materia elegida':''}`;
   /* escala del mapa */
   return `<div class="${cls}" data-box="${esc(k)}" role="button" tabindex="0" aria-pressed="${paso===S.planPaso}" aria-label="${esc(tip+(paso==null?'':' · '+SATE.texto('sate.planeacion.periodo_elegido',{marca:paso+1,periodo:planEtiqueta(paso)})))}" style="--nv:var(--n${niv});left:${x*sc}px;top:${y*sc}px;width:${w*sc}px;height:${h*sc}px;font-size:${Math.max(5.5,(n.length>34?9:10.5)*sc)}px" title="${esc(tip)}">${esc(n)}${paso==null||!PLAN_DOS_PERIODOS?'':`<span class="plan-marca" aria-hidden="true">${paso===0&&S.planPaso===1?'en ':''}${esc(planEtiqueta(paso))}</span>`}</div>`;
+}
+// La cadena se comparte con el Mapa de SATE para conservar la misma seriación transitiva.
+function cadenaMapa(mapHover,reqHover,pre){
+  if(mapHover&&reqHover){
+    const hot=new Set([mapHover,...reqHover]);hot.pre=new Set([mapHover]);hot.post=new Set(reqHover);return hot;
+  }
+  if(!mapHover)return null;
+  const hot=new Set([mapHover]);
+  const post={};Object.entries(pre).forEach(([b,as])=>as.forEach(a=>(post[a]=post[a]||[]).push(b)));
+  const walk=(k,g)=>{(g[k]||[]).forEach(x=>{if(!hot.has(x)){hot.add(x);walk(x,g)}})};
+  walk(mapHover,pre);hot.pre=new Set([...hot].filter(x=>x!==mapHover));
+  const antes=new Set(hot);walk(mapHover,post);hot.post=new Set([...hot].filter(x=>!antes.has(x)));
+  return hot;
+}
+function puntosMapa(p,Y=y=>y){
+  const pts=[];for(let i=0;i<p.length;i+=2)pts.push([p[i],Y(p[i+1])]);return pts;
+}
+function mapaConsulta(L,materias,op){
+  const raiz=el('div',{class:'sate-mapa-consulta',role:'region',tabindex:'-1','aria-label':op.etiqueta});
+  const lienzo=el('div',{class:'sate-mapa-lienzo'}), ns='http://www.w3.org/2000/svg';
+  // No se reduce la letra para ajustar el mapa: el contenedor permite desplazarse.
+  const sc=Math.max(1, ...L.boxes.map(b=>Math.max(180/b[2],100/b[3])));
+  Object.assign(lienzo.style,{width:L.w*sc+'px',height:L.h*sc+'px'});
+  const svg=document.createElementNS(ns,'svg');
+  svg.setAttribute('viewBox',`0 0 ${L.w} ${L.h}`);svg.setAttribute('aria-hidden','true');
+  const punta='sate-mapa-punta-'+(++contador),defs=document.createElementNS(ns,'defs'),marker=document.createElementNS(ns,'marker');
+  for(const [k,v] of Object.entries({id:punta,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'}))marker.setAttribute(k,v);
+  const triangulo=document.createElementNS(ns,'path');triangulo.setAttribute('d','M0 0L10 5L0 10z');triangulo.setAttribute('fill','var(--ipn-tenue)');
+  marker.appendChild(triangulo);defs.appendChild(marker);svg.appendChild(defs);
+  rowBands(L).forEach(([n,y,a,b],i)=>{
+    const r=document.createElementNS(ns,'rect');
+    for(const [k,v] of Object.entries({x:0,y:a,width:L.w,height:b-a,class:i%2?'sate-mapa-banda par':'sate-mapa-banda'}))r.setAttribute(k,v);
+    svg.appendChild(r);
+    const txt=el('span',{class:'sate-mapa-nivel',texto:op.nivel(n)});
+    txt.style.top=a*sc+'px';lienzo.appendChild(txt);
+  });
+  const aristas=[];
+  L.edges.forEach(([a,b,p])=>{
+    const ka=L.boxes[a][4],kb=L.boxes[b][4];if(!materias[ka]||!materias[kb])return;
+    const linea=document.createElementNS(ns,'polyline');linea.setAttribute('points',puntosMapa(p).map(q=>q.join(',')).join(' '));
+    linea.setAttribute('class','sate-mapa-arista');linea.setAttribute('marker-end',`url(#${punta})`);svg.appendChild(linea);aristas.push({linea,a:ka,b:kb});
+  });
+  lienzo.appendChild(svg);
+  const cajas=new Map();let elegida=null;
+  L.boxes.forEach(([x,y,w,h,k,slot,n])=>{
+    if(!k&&slot){
+      const hueco=el('span',{class:'sate-mapa-hueco',texto:slot});
+      Object.assign(hueco.style,{left:x*sc+'px',top:y*sc+'px',width:w*sc+'px',height:h*sc+'px'});
+      lienzo.appendChild(hueco);return;
+    }
+    if(!materias[k])return;
+    const b=cajaMateria({consulta:true,nombre:k=>materias[k].n,documento:op.documento},k,x,y,w,h,sc,null,null,null,n??materias[k].v);
+    cajas.set(k,b);lienzo.appendChild(b);
+    b.addEventListener('click',()=>{if(elegida===k)op.abrir(k,b);else seleccionar(k)});
+    b.addEventListener('keydown',e=>{
+      if(e.key==='Enter'){e.preventDefault();op.abrir(k,b);return}
+      if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key))return;
+      e.preventDefault();const fila=[...cajas.values()].filter(c=>c.dataset.nivel===b.dataset.nivel);
+      const paso=['ArrowLeft','ArrowUp'].includes(e.key)?-1:1;
+      fila[(fila.indexOf(b)+paso+fila.length)%fila.length].focus();
+    });
+  });
+  function seleccionar(k){
+    elegida=k;
+    const hot=cadenaMapa(k,null,Object.fromEntries(Object.entries(materias).map(([clave,m])=>[clave,m.r||[]])));
+    cajas.forEach((b,clave)=>{b.className='box sate-mapa-caja'+resalteCaja(hot,clave,k,null);b.setAttribute('aria-pressed',String(clave===k))});
+    aristas.forEach(({linea,a,b})=>linea.setAttribute('class','sate-mapa-arista'+(!hot?'':hot.has(a)&&hot.has(b)?' hot':' dim')));
+  }
+  raiz.addEventListener('click',e=>{if(!e.target.closest('[data-clave]'))seleccionar(null)});
+  raiz.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();seleccionar(null)}});
+  raiz.appendChild(lienzo);return raiz;
 }
 function lanes(items){
   const out=[];
@@ -796,6 +874,9 @@ function leyendaGrafica(items,esc){
     abrirVentana: abrirVentana, cerrarVentana: cerrarVentana, cerrarVentanas: cerrarTodo,
     ayuda: ayuda, desplegable: desplegable, pestanas: pestanas, iconoPestana: iconoPestana, barraInferior: barraInferior,
     volver: volver, migas: migas, tarjetaNav: tarjetaNav, buscador: buscador, segmentado: segmentado, pregunta: pregunta, revelar: revelar };
+  raiz.SateUI.mapaConsulta = mapaConsulta;
+  raiz.SateUI.cadenaMapa = cadenaMapa;
+  raiz.SateUI.puntosMapa = puntosMapa;
   // Solo se aplica a una transcripción: nunca al contenedor que mezcla orientación y fuentes.
   raiz.SateUI.oficial = function (nodo, documento) {
     if (!nodo || !documento) return nodo;
