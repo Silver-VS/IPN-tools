@@ -728,7 +728,8 @@
       n.setAttribute('data-fraccion-pos',i+1);
       if (p.fracciones.filter(f=>f.fr===p.fracciones[i].fr).length > 1) {
         const enlace = n.querySelector('a');
-        enlace.setAttribute('href',enlace.getAttribute('href')+'?frpos='+(i+1));
+        const href=enlace.getAttribute('href');
+        enlace.setAttribute('href',href+(href.includes('?')?'&':'?')+'frpos='+(i+1));
       }
     });
     envolverReferencias(cuerpo, doc, a);
@@ -1200,7 +1201,7 @@
     else {const texto=textoCita(await cargarReglamento(doc),m);if(texto===null)throw new Error('Cita no encontrada: '+claveCita(m));m.huella=await huellaCita(texto);p.marcadores.push(m);}
     guardarInvestigaciones(v);raiz.dispatchEvent(new Event('sate-investigacion'));estadoMarcadoresInv();
   }
-  function editorNota(m,guardar) {
+  function editorNota(m,guardar,plegable=false) {
     const zona=h('div',{'class':'inv-nota','data-tipo':m.tipo}),grupo=h('div',{'class':'guia-chips',role:'group','aria-label':ti('tipo')});
     for(const tipo of tiposNota){
       const b=botonInv(tipo,()=>{m.tipo=tipo;zona.setAttribute('data-tipo',tipo);for(const x of grupo.children)x.setAttribute('aria-pressed',String(x===b));try{guardar();}catch(e){errorInv(e);}});
@@ -1208,7 +1209,14 @@
     }
     const entrada=h('textarea',{'aria-label':ti('propia'),maxlength:4000,rows:3});entrada.value=m.nota;
     entrada.addEventListener('input',()=>{m.nota=entrada.value;try{guardar();}catch(e){errorInv(e);}});
-    zona.append(h('strong',{texto:ti('propia')}),grupo,entrada);return zona;
+    if(plegable){
+      const lectura=h('p',{'class':'inv-nota__texto',texto:m.nota||ti('sin_nota')}),etiqueta=h('summary',{texto:ti(m.tipo)});
+      const editor=h('details',{'class':'inv-nota__editor'},[etiqueta,grupo,entrada]);
+      entrada.addEventListener('input',()=>{lectura.textContent=m.nota||ti('sin_nota');});
+      grupo.addEventListener('click',()=>{etiqueta.textContent=ti(m.tipo);});
+      zona.append(h('strong',{texto:ti('propia')}),lectura,editor);
+    }else zona.append(h('strong',{texto:ti('propia')}),grupo,entrada);
+    return zona;
   }
   function campoInv(etiqueta,valor,max,aceptar,cancelar) {
     const caja=h('div',{'class':'inv-campo'}),entrada=h('input',{type:'text',maxlength:max,'aria-label':etiqueta});entrada.value=valor;
@@ -1240,6 +1248,26 @@
   }
   let regresoInv='';
   const versionesPanelInv=new WeakMap();
+  function menuAccionesInv(acciones) {
+    const menu=h('details',{'class':'inv-acciones'}),resumen=h('summary',{'aria-label':ti('acciones_proyecto'),title:ti('acciones_proyecto'),texto:'⋯'});
+    menu.append(resumen,h('div',{'class':'inv-menu'},acciones));
+    menu.addEventListener('keydown',e=>{if(e.key==='Escape'){menu.open=false;resumen.focus?.();}});
+    return menu;
+  }
+  function documentoInvestigacion(p,documentos,cambios) {
+    const doc=h('article',{'class':'inv-documento','aria-label':p.nombre},[h('h2',{texto:p.nombre})]);
+    if(p.autor)doc.appendChild(h('p',{texto:p.autor}));
+    for(const m of p.marcadores){
+      const oficial=textoCita(documentos[m.doc],m),bloque=h('section',{'class':'inv-documento__cita'});
+      bloque.append(h('p',{'class':'inv-documento__referencia',texto:rotuloCita(m)+' · '+documentos[m.doc].titulo}),h('blockquote',{'data-oficial':oficial===null?null:m.doc,texto:oficial??ti('no_disponible')}));
+      if(cambios.has(m))bloque.appendChild(h('p',{'class':'inv-cambio',texto:ti('cambio')}));
+      if(m.nota)bloque.appendChild(h('p',{'class':'inv-documento__nota',texto:ti(m.tipo)+' · '+m.nota}));
+      for(const a of m.anotaciones)if(a.nota)bloque.appendChild(h('p',{'class':'inv-documento__nota',texto:ti(a.etiqueta)+' · '+a.nota}));
+      doc.appendChild(bloque);
+    }
+    if(p.peticion)doc.append(h('h3',{texto:ti('peticion')}),h('p',{'class':'inv-peticion',texto:p.peticion}));
+    return doc;
+  }
   async function panelInvestigacion(contenedor,completa=false,filtro='',busqueda='') {
     const version=(versionesPanelInv.get(contenedor)||0)+1;versionesPanelInv.set(contenedor,version);
     const compartida=!!investigacionCompartida,v=compartida?null:leerInvestigaciones(),p=compartida?investigacionCompartida:v.proyectos[v.activa];
@@ -1265,20 +1293,19 @@
     }catch(e){errorInv(e);}};
     contenedor.replaceChildren();
     if(compartida){
-      contenedor.append(h('h3',{texto:ti('compartida')+' · '+p.nombre}),h('p',{'class':'inv-conteo',texto:[p.autor,...p.etiquetas].filter(Boolean).join(' · ')}),h('p',{'class':'inv-conteo',texto:ti('solo_lectura')}));
-      const acciones=h('div',{'class':'inv-campo'});
-      acciones.append(botonInv('copia',async()=>{try{
+      const titulo=h('h3',{'class':'inv-titulo',title:p.nombre,texto:p.nombre});
+      const acciones=menuAccionesInv([botonInv('copia',async()=>{try{
         const copia=await revisarInvestigacion(p,cargarReglamento,p.version===1),local=leerInvestigaciones();
         local.proyectos.push(copia);local.activa=local.proyectos.length-1;guardarInvestigaciones(local);
         salirInvestigacionCompartida();await repintar();
-      }catch(e){errorInv(e);}}),botonInv('salir',()=>{salirInvestigacionCompartida();repintar();}));
-      contenedor.appendChild(acciones);
+      }catch(e){errorInv(e);}}),botonInv('salir',()=>{salirInvestigacionCompartida();repintar();})]);
+      contenedor.append(h('div',{'class':'inv-compartida-cab'},[titulo,acciones]),h('p',{'class':'inv-conteo',texto:[p.autor,...p.etiquetas].filter(Boolean).join(' · ')}),h('p',{'class':'inv-conteo',texto:ti('solo_lectura')}));
     }else{
     // Selector de la investigación activa: un control con su nombre y el menú de acciones (sin ventanas nativas).
     const cab=h('nav',{'class':'inv-proyectos','aria-label':ti('proyecto')});
     const zona=h('div',{'class':'inv-cab'}),menu=h('div',{'class':'inv-menu',role:'menu'});
     menu.setAttribute('hidden','');
-    const selector=h('button',{type:'button','class':'inv-selector','aria-haspopup':'menu','aria-expanded':'false','aria-label':ti('proyecto')+': '+(p?p.nombre:ti('nombre_inicial'))},[h('span',{'class':'inv-selector__nombre',texto:p?p.nombre:ti('nombre_inicial')}),h('span',{'aria-hidden':'true',texto:'▾'})]);
+    const selector=h('button',{type:'button','class':'inv-selector',title:p?p.nombre:ti('nombre_inicial'),'aria-haspopup':'menu','aria-expanded':'false','aria-label':ti('proyecto')+': '+(p?p.nombre:ti('nombre_inicial'))},[h('span',{'class':'inv-selector__nombre',texto:p?p.nombre:ti('nombre_inicial')}),h('span',{'aria-hidden':'true',texto:'▾'})]);
     const abrirMenu=abrir=>{if(abrir)menu.removeAttribute('hidden');else menu.setAttribute('hidden','');selector.setAttribute('aria-expanded',String(abrir));};
     selector.addEventListener('click',()=>abrirMenu(menu.hasAttribute('hidden')));
     cab.addEventListener('keydown',e=>{if(e.key==='Escape'&&!menu.hasAttribute('hidden')){abrirMenu(false);selector.focus?.();}});
@@ -1314,7 +1341,7 @@
     principal.appendChild(avisos);
     if(completa&&!compartida)principal.appendChild(h('h3',{texto:p.nombre}));
     principal.appendChild(h('p',{'class':'inv-conteo',texto:ti('resumen',{c:p.marcadores.length,n:notasDe(p)})}));
-    const documentos={},filas=new Map();
+    const documentos={},filas=new Map(),cambios=new Set();
     const buscar=h('input',{type:'search','aria-label':ti('buscar_notas'),placeholder:ti('buscar_notas')}),conteo=h('p',{'class':'inv-conteo',role:'status'});
     buscar.value=busqueda;
     const tipos=h('select',{'aria-label':ti('tipo')},['',...tiposNota].map(x=>h('option',{value:x,selected:x===filtro,texto:ti(x||'todos_tipos')})));
@@ -1326,7 +1353,7 @@
     };
     if(completa){
       buscar.addEventListener('input',filtrar);tipos.addEventListener('change',()=>{filtro=tipos.value;filtrar();});
-      principal.append(h('div',{'class':'inv-campo'},[h('label',{},[ti('buscar_notas'),buscar]),h('label',{},[ti('tipo'),tipos])]),conteo);
+      principal.append(h('div',{'class':'inv-filtros'},[buscar,tipos]),conteo);
     }
     const lista=h('div',{'class':'inv-lista'});principal.appendChild(lista);
     // Solo la migración de un marcador antiguo establece su primera huella.
@@ -1340,6 +1367,7 @@
         if(c?.pendienteHuella){c.huella=actual;c.pendienteHuella=false;guardarInvestigaciones(vigente);}
       }
       const cambio=!actual||m.huella!==actual;
+      if(cambio)cambios.add(m);
       const sufijo=sufijoInvestigacion();
       const enlace=rutaReglamento(m.doc,anclaArticulo(m.n,m.fr,m.inciso))+sufijo+(m.frpos?(sufijo?'&':'?')+'frpos='+m.frpos:'');
       const rotulo=rotuloCita(m);
@@ -1348,42 +1376,54 @@
         const cita=h('div',{'class':'inv-oficial'},[h('p',{},[ti('oficial')+' · ',h('a',{href:enlace,texto:rotulo}),' · ',h('span',{'class':cambio?'inv-cambio':'',texto:ti(cambio?'cambio':'sin_cambios')})])]);
         cita.appendChild(h('p',{'class':'pc-oficial','data-oficial':oficial===null?null:m.doc,texto:oficial??ti('no_disponible')}));
         fila.appendChild(cita);
-        fila.appendChild(compartida?notaCompartida(m):editorNota(m,guardar));
-        for(const a of m.anotaciones)fila.appendChild(h('p',{'class':'inv-nota',texto:ti('nota')+' · '+ti(a.etiqueta)+': '+a.nota}));
+        const notas=compartida?notaCompartida(m):editorNota(m,guardar,true);
+        fila.appendChild(notas);
+        for(const a of m.anotaciones)notas.appendChild(h('p',{'class':'inv-nota__texto',texto:ti('nota')+' · '+ti(a.etiqueta)+': '+a.nota}));
         if(!compartida){
         const acciones=h('div',{'class':'inv-orden'}),i=p.marcadores.indexOf(m);
         for(const [k,d] of [['subir',-1],['bajar',1]]){const b=botonInv(k,()=>{moverCita(p,i,i+d);guardar();repintar();});b.disabled=i+d<0||i+d>=p.marcadores.length;acciones.appendChild(b);}
         const arrastre=botonInv('ordenar',()=>{});arrastre.draggable=true;
         arrastre.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',String(i));e.dataTransfer.effectAllowed='move';});
         fila.addEventListener('dragover',e=>e.preventDefault());fila.addEventListener('drop',e=>{e.preventDefault();const desde=Number(e.dataTransfer.getData('text/plain'));moverCita(p,desde,i);guardar();repintar();});
-        acciones.appendChild(arrastre);fila.appendChild(acciones);
-        fila.appendChild(botonInv('quitar',()=>{p.marcadores.splice(p.marcadores.indexOf(m),1);guardar();repintar();}));
+        acciones.append(arrastre,botonInv('quitar',()=>{p.marcadores.splice(p.marcadores.indexOf(m),1);guardar();repintar();}));
+        const simbolos=['↑','↓','⠿','×'];
+        Array.from(acciones.children).forEach((b,i)=>{b.setAttribute('aria-label',b.textContent);b.setAttribute('title',b.textContent);b.textContent=simbolos[i];});
+        fila.appendChild(acciones);
         }
       }else{
         const quitar=h('button',{type:'button','class':'inv-quitar','aria-label':ti('quitar'),title:ti('quitar'),texto:'✕'});
         quitar.addEventListener('click',()=>{p.marcadores.splice(p.marcadores.indexOf(m),1);guardar();repintar();});
         const nota=m.nota||m.anotaciones.map(a=>a.nota).filter(Boolean).join(' · ');
-        fila.append(h('div',{'class':'inv-item__cab'},[h('a',{'class':'inv-ref',href:enlace,texto:rotulo}),cambio?h('span',{'class':'inv-cambio',texto:ti('cambio')}):null,compartida?null:quitar]),h('p',{'class':nota?'inv-item__nota':'inv-item__nota inv-item__nota--vacia',texto:compartida?ti(m.tipo)+' · '+(nota||ti('sin_nota')):nota.slice(0,160)||ti('sin_nota')}));
+        fila.append(h('div',{'class':'inv-item__cab'},[h('a',{'class':'inv-ref',href:enlace,title:rotulo,texto:rotulo}),cambio?h('span',{'class':'inv-cambio',texto:ti('cambio')}):null,compartida?null:quitar]),h('p',{'class':nota?'inv-item__nota':'inv-item__nota inv-item__nota--vacia',title:nota,texto:compartida?ti(m.tipo)+' · '+(nota||ti('sin_nota')):nota||ti('sin_nota')}));
       }
       lista.appendChild(fila);
       filas.set(m,fila);
     }
     if(completa){
+      const leer=botonInv('leer_documento',()=>{
+        const documento=documentoInvestigacion(p,documentos,cambios);
+        const barra=h('nav',{'class':'inv-visor-barra','aria-label':ti('leer_documento')},[botonInv('volver_investigacion',repintar),botonInv('imprimir_documento',()=>raiz.print())]);
+        contenedor.replaceChildren(barra,documento);
+      });
+      principal.insertBefore(leer,principal.firstChild);
       filtrar();lista.addEventListener('input',filtrar);lista.addEventListener('change',filtrar);lista.addEventListener('click',filtrar);
       const incluir=h('input',{type:'checkbox'}),acciones=h('div',{'class':'inv-campo'});
       acciones.append(h('label',{},[incluir,ti('incluir_notas')]),botonInv('copiar_fundamento',()=>copiar(copiarFundamentoInv(visibles,documentos,ti,incluir.checked))),botonInv('compartir_enlace',compartir));
       principal.appendChild(acciones);
     }
     if(!p.marcadores.length)lista.appendChild(h('p',{texto:ti('vacia')}));
-    if(completa&&compartida){
-      principal.append(h('h4',{texto:ti('peticion')}),h('p',{'class':'inv-peticion',texto:p.peticion}));
-    }else if(completa){
-      const peticion=h('textarea',{'aria-label':ti('peticion'),maxlength:20000,rows:5});peticion.value=p.peticion;
+    if(completa){
+      const peticionSeccion=h('details',{'class':'inv-peticion-seccion'},[h('summary',{texto:ti('peticion')})]);
+      principal.appendChild(peticionSeccion);
+      if(compartida)peticionSeccion.appendChild(h('p',{'class':'inv-peticion',texto:p.peticion}));
+      else {
+      const peticion=h('textarea',{'aria-label':ti('peticion'),maxlength:20000,rows:2});peticion.value=p.peticion;
       peticion.addEventListener('input',()=>{p.peticion=peticion.value;try{guardar();}catch(e){errorInv(e);}});
-      principal.append(h('h4',{texto:ti('peticion')}),peticion);
-      principal.append(botonInv('json',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json')),botonInv('markdown',async()=>{
+      peticionSeccion.appendChild(peticion);
+      principal.appendChild(menuAccionesInv([botonInv('json',()=>descargarInv('investigacion.json',JSON.stringify(validarInvestigacion(p),null,2),'application/json')),botonInv('markdown',async()=>{
         try{descargarInv('investigacion.md',await exportarMarkdownInv(p,cargarReglamento,ti,enlaceExportacion),'text/markdown');}catch(e){errorInv(e);}
-      }),botonInv('latex',async()=>{try{descargarInv('investigacion.tex',await exportarLatexInv(p,cargarReglamento,ti),'application/x-tex');}catch(e){errorInv(e);}}));
+      }),botonInv('latex',async()=>{try{descargarInv('investigacion.tex',await exportarLatexInv(p,cargarReglamento,ti),'application/x-tex');}catch(e){errorInv(e);}})]));
+      }
     }else{
       const abrir=h('a',{'class':'inv-abrir',href:rutaGuia('investigacion')+sufijoInvestigacion(),texto:ti('abrir')});abrir.addEventListener('click',()=>{regresoInv=raiz.location.hash;});principal.appendChild(abrir);
     }
@@ -1403,6 +1443,7 @@
   // Lector de tres paneles: índice | articulado continuo | trámites y preguntas del artículo actual.
   function montarReglamento(raizGuia, d, reg, doc, ancla) {
     const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos'), href: rutaGuia('reglamentos') }, { texto: reg.titulo }], reg.titulo, reg.gaceta);
+    cab.nodo.classList.add('rgl-portada');
     const articulos = reg.sin_texto ? [] : reg.articulos || [], transitorios = reg.sin_texto ? [] : reg.transitorios || [];
     const fuenteDoc = reg.url ? h('p', { 'class': 'rgl-fuente' }, [enlaceExterno('', reg.url, t('sate.guia.pdf_oficial'))]) : null;
     const avisoOcr = reg.ocr && !reg.sin_texto ? h('p', { 'class': 'guia-aviso-ocr', texto: t('sate.guia.aviso_ocr') }) : null;
@@ -1421,7 +1462,7 @@
     const posicion = new Map(articulos.map((a, i) => [a.n, i]));
     const arbol = arbolReglamento(reg), tramites = cfg().tramites || [];
     const grupos = new Map(), enlaces = new Map();     // artículo -> grupos que lo contienen / enlace del índice
-    const enlaceAncla = (clase, anclaDe, contenido, extra) => h('a', { 'class': clase, href: rutaReglamento(doc, anclaDe), 'data-ancla': anclaDe, ...extra }, contenido);
+    const enlaceAncla = (clase, anclaDe, contenido, extra) => h('a', { 'class': clase, href: rutaReglamento(doc, anclaDe)+sufijoInvestigacion(), 'data-ancla': anclaDe, ...extra }, contenido);
     const chip = (n, ancestros) => {
       const a = enlaceAncla('rgl-art', anclaArticulo(n), t('sate.guia.rgl_art_corto', { n }));
       enlaces.set(n, a);
@@ -1502,15 +1543,14 @@
       ['directos', mapa.filter(x => x.aplicacion === 'directo').reduce((s, x) => s + x.articulos.length, 0)]
     ].map(([clave, n]) => h('div', {}, [h('dt', { texto: t('sate.guia.rgl_' + clave) }), h('dd', { texto: String(n) })])));
     const barra = h('div', { 'class': 'rgl-mapa__barra' }, mapa.map(x => {
-      const a = enlaceAncla('rgl-mapa__tramo rgl-aplica--' + x.aplicacion, anclaArticulo(x.articulos[0]), [h('span', { 'class': 'rgl-mapa__color' }), h('span', { 'class': 'rgl-mapa__etiqueta', texto: x.etiqueta }), h('span', { 'class': 'rgl-mapa__completo', texto: x.titulo })],
+      const a = enlaceAncla('rgl-mapa__tramo rgl-aplica--' + x.aplicacion, anclaArticulo(x.articulos[0]), [h('span', { 'class': 'rgl-mapa__color' }), h('span', { 'class': 'rgl-mapa__etiqueta', texto: x.etiqueta }), h('span', { 'class': 'rgl-mapa__intervalo', texto: ti(x.articulos.length===1?'intervalo_uno':'intervalo',{desde:x.articulos[0],hasta:x.articulos[x.articulos.length-1]})+' · '+t('sate.guia.rgl_'+x.aplicacion) }), h('span', { 'class': 'rgl-mapa__completo', texto: x.titulo })],
         { title: x.titulo + ' · ' + ti(x.articulos.length===1?'intervalo_uno':'intervalo',{desde:x.articulos[0],hasta:x.articulos[x.articulos.length-1]}), 'aria-label': x.titulo + ' · ' + t('sate.guia.rgl_' + x.aplicacion) });
-      a.style.flex = x.articulos.length + ' 0 0';
-      if (x.articulos.length / articulos.length < 0.04) a.classList.add('rgl-mapa__tramo--angosto');
       return a;
     }));
     const mapaVista = h('section', { 'class': 'rgl-mapa' }, [h('h3', { texto: t('sate.guia.rgl_mapa') }),
       h('ul', { 'class': 'rgl-leyenda' }, ['directo', 'parcial', 'organizacion'].map(x => h('li', { 'class': 'rgl-aplica--' + x, texto: t('sate.guia.rgl_' + x) }))), barra]);
-    raizGuia.append(cab.nodo, contexto, cifras);
+    cab.nodo.appendChild(contexto);
+    raizGuia.append(cab.nodo, cifras);
     if (mapa.length) raizGuia.appendChild(mapaVista);
     raizGuia.appendChild(rejilla);
 
@@ -1681,28 +1721,13 @@
         !!raiz.matchMedia?.('(max-width:1024.98px)').matches);
       if (rielEnIndice && riel.parentNode !== cuerpoIndice) cuerpoIndice.insertBefore(riel, arbolNav);
       else if (!rielEnIndice && riel.parentNode !== rejilla) rejilla.appendChild(riel);
-      // Los nombres oficiales ocupan varias líneas: cada encabezado se fija debajo de sus ancestros reales.
+      // Los capítulos quedan en el flujo. Solo se reserva la barra global para las anclas.
       const altoContexto = contexto.offsetHeight || 0;
       raizGuia.style.setProperty('--ipn-lector-contexto-alto', altoContexto + 'px');
       const altoBarraFija = parseFloat(raiz.getComputedStyle?.(raizGuia).getPropertyValue('--sate-barra-alto')) || 0;
-      const base = altoBarraFija + altoContexto + (chico ? indice.querySelector('summary').offsetHeight || 48 : 0);
-      const alturas = new Map(Array.from(texto.querySelectorAll('.rgl-encabezado'), n => [n, n.offsetHeight || 48]));
-      const cambios = [];
-      for (const [cab, alto] of alturas) {
-        let tope = base;
-        for (let padre = cab.parentNode.parentNode; padre && padre !== texto; padre = padre.parentNode)
-          if (padre.classList.contains('rgl-seccion')) tope += alturas.get(padre.firstChild) || 48;
-        cambios.push([cab, 'top', tope + 'px']);
-      }
-      for (const seccion of secciones.values()) {
-        let tope = base;
-        for (let padre = seccion.parentNode; padre && padre !== texto; padre = padre.parentNode) {
-          if (padre.classList.contains('rgl-seccion')) tope += alturas.get(padre.firstChild) || 48;
-        }
-        cambios.push([seccion, 'scrollMarginTop', (tope + 16) + 'px']);
-      }
-      // Leer toda la geometría antes de escribir estilos: un layout por ajuste.
-      for (const [n, propiedad, valor] of cambios) if (n.style[propiedad] !== valor) n.style[propiedad] = valor;
+      const margen=(altoBarraFija + 16) + 'px';
+      for (const seccion of texto.querySelectorAll('.rgl-articulo,.rgl-fr,.rgl-inc,.rgl-renglon'))
+        if(seccion.style.scrollMarginTop!==margen)seccion.style.scrollMarginTop=margen;
     };
     if (consulta?.addEventListener) consulta.addEventListener('change', ajustar);
     ajustar();
@@ -1769,7 +1794,8 @@
     const preciso = /^\d+$/.test(frpos) && secciones.get(actual)?.querySelector('[data-fraccion-pos="'+frpos+'"]');
     if (preciso) {
       fr?.classList.remove('rgl-activa'); preciso.classList.add('rgl-activa');
-      history.replaceState(null,'',rutaReglamento(doc,ancla)+'?frpos='+frpos);
+      const sufijo=sufijoInvestigacion();
+      history.replaceState(null,'',rutaReglamento(doc,ancla)+sufijo+(sufijo?'&':'?')+'frpos='+frpos);
     }
     const destino = preciso || (ancla && ancla !== 'texto' ? fr || secciones.get(actual) : null);
     // Salto inmediato: un desplazamiento suave largo lo interrumpe el dibujo por partes y no llega al artículo.
