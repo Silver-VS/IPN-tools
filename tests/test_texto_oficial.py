@@ -25,6 +25,20 @@ def test_espacios_y_puntuacion():
         assert h(texto) != h('Artículo 1. Texto')
 
 
+def test_huellas_independientes_del_formato_json(tmp_path):
+    """El build puede compactar JSON sin alterar texto ni procedencia protegidos."""
+    (tmp_path / 'data').mkdir()
+    inventario = {'archivos': {'data/documento.json': {
+        'oficial': True, 'fuente': {'documento': 'Manual'}, 'campos': ['/texto']}}}
+    (tmp_path / 'data/texto_oficial.json').write_text(json.dumps(inventario), encoding='utf-8')
+    documento = {'fuente': {'doc': 'manual', 'pagina': 9}, 'texto': 'Artículo 1.\nTexto literal: á, ñ.'}
+    ruta = tmp_path / 'data/documento.json'
+    ruta.write_text(json.dumps(documento, ensure_ascii=False, indent=2), encoding='utf-8')
+    antes = calcular(tmp_path)
+    ruta.write_text(json.dumps(documento, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    assert calcular(tmp_path) == antes
+
+
 def test_seleccion_y_fuente_heredada():
     d = {'fuente': {'doc': 'manual', 'pagina': 9}, 'funciones': [{'texto': 'Literal.'}], 'orientacion': 'Propia.'}
     textos = list(seleccionar(d, ['funciones', '*', 'texto']))

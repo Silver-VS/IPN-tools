@@ -45,8 +45,8 @@ const texto=(k,v={})=>config.textos[k].replace(/\{(\w+)\}/g,(_,p)=>v[p]??'{'+p+'
 const llamadas=[],nodos=[{dataset:{ayudaCreditos:'calculado'},appendChild(n){llamadas.push(n)}}];
 const c=vm.createContext({SATE:{texto},cur:()=>({...upiita.mapas.B.cur,...escom.mapas.C_09.cur}),
   document:{querySelectorAll:()=>nodos},SateUI:{ayuda:(clave,vars)=>({clave,vars})}});
-const nucleo=leer('web/dist/sate/nucleo.js');
-vm.runInContext(nucleo.slice(nucleo.indexOf('const fmtCr='),nucleo.indexOf('/* ---------- perfil IPN-tools')),c);
+const nucleo=leer('web/sate/nucleo.js');
+vm.runInContext(nucleo.slice(nucleo.indexOf('const fmtCr='),nucleo.indexOf('/*__CUENTA_JS__*/')),c);
 assert.equal(vm.runInContext("textoCreditos('B101',7.5,true)",c),'7.5 créditos (SATCA: 4.76)');
 assert.match(vm.runInContext("textoCreditos('C101',6,true)",c),/^≈ 6 créditos \(SATCA: 4.39\)$/);
 assert.match(vm.runInContext("ayudaCreditos('C101')",c),/data-ayuda-creditos="calculado"/);

@@ -1,21 +1,33 @@
 """Contratos de partición de datos y build compatible, sin navegador."""
 import pathlib
-import functools
-import http.server
 import json
 import re
 import sys
-import threading
 import subprocess
 import unittest
 import unittest.mock
-import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tools'))
 
 
 class SateBuild(unittest.TestCase):
+    def test_fragmentos_guia_conservan_contenido(self):
+        """Recomponer los fragmentos recupera literalmente cada campo del agregado."""
+        for unidad in ('upiita', 'escom', 'upibi'):
+            base = ROOT / 'web/dist/sate/datos' / unidad
+            leer = lambda ruta: json.loads(ruta.read_text(encoding='utf-8'))
+            with self.subTest(unidad=unidad):
+                completo = leer(base / 'guia.json')
+                reconstruido = leer(base / 'guia/indice.json')
+                for campo in ('preguntas', 'acudir', 'organigrama', 'actividades'):
+                    fragmento = leer(base / 'guia' / (campo + '.json'))
+                    if campo in completo:
+                        reconstruido.update(fragmento)
+                self.assertEqual(reconstruido, completo)
+                self.assertLess((base / 'guia/indice.json').stat().st_size,
+                                (base / 'guia.json').stat().st_size)
+
     def test_marcador_completo_sin_descarga(self):
         """La instalación sin cargador también incluye ventana, lector y cupos."""
         import saes
@@ -253,41 +265,32 @@ class SateBuild(unittest.TestCase):
                 self.assertFalse(build_sate.escribir_temarios({}, pathlib.Path(t)))
                 self.assertFalse((pathlib.Path(t) / 'temarios').exists())
 
-    def test_recursos_publicados_por_http(self):
-        """Resuelve las rutas como http.server --directory web, sin navegador."""
-        class Servidor(http.server.SimpleHTTPRequestHandler):
-            def log_message(self, formato, *args):
-                pass
-
-        handler = functools.partial(Servidor, directory=str(ROOT / 'web'))
-        with http.server.ThreadingHTTPServer(('127.0.0.1', 0), handler) as servidor:
-            hilo = threading.Thread(target=servidor.serve_forever, daemon=True)
-            hilo.start()
-            try:
-                base = f'http://127.0.0.1:{servidor.server_port}/dist/sate/'
-                with urllib.request.urlopen(base + 'index.html') as respuesta:
-                    html = respuesta.read().decode('utf-8')
-                rutas = set(re.findall(r'(?:src|href)="([^"#]+)"', html))
-                rutas = {r for r in rutas if not re.match(r'[a-z]+:', r)}
-                rutas.update(('nucleo.js', 'situacion.js', 'desempeno.js', 'mapa.js',
-                              'cupos.html', 'cupos.js', 'cupos-comun.js', 'cupos-receptor.js', '../cupos.js',
-                              'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js', 'bajas.js',
-                              '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js',
-                              '../tramites/pdf-bajas.js', '../assets/vendor/pdf-lib.min.js',
-                              'temarios.js', 'temarios.css', '../policore/lector.js', '../policore/lector.css'))
-                config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', html, re.S)[1])
-                for unidad, cfg in config['unidades'].items():
-                    rutas.update(f'datos/{unidad}/{nombre}.json' for nombre in ('nucleo', 'oferta'))
-                    rutas.update(f'datos/{unidad}/temarios/{n}.json' for v in cfg.get('vistas', []) if v['id'] == 'temarios'
-                                 for n in ('indice', *json.loads((ROOT / f'web/dist/sate/datos/{unidad}/temarios/indice.json').read_text(encoding='utf-8'))['carreras']))
-                    rutas.update('../' + cfg['logo'][tema] for tema in ('claro', 'oscuro') if 'logo' in cfg)
-                for ruta in sorted(rutas):
-                    with self.subTest(ruta=ruta):
-                        with urllib.request.urlopen(base + ruta) as respuesta:
-                            self.assertEqual(respuesta.status, 200, ruta)
-            finally:
-                servidor.shutdown()
-                hilo.join()
+    def test_recursos_publicados_sin_red(self):
+        """Resuelve los destinos publicados sin abrir sockets ni navegadores."""
+        from urllib.parse import unquote, urlsplit
+        base = ROOT / 'web/dist/sate'
+        html = (base / 'index.html').read_text(encoding='utf-8')
+        rutas = set(re.findall(r'(?:src|href)="([^"#]+)"', html))
+        rutas = {r for r in rutas if not re.match(r'[a-z]+:', r)}
+        rutas.update(('nucleo.js', 'situacion.js', 'desempeno.js', 'mapa.js',
+                      'cupos.html', 'cupos.js', 'cupos-comun.js', 'cupos-receptor.js', '../cupos.js',
+                      'horarios.js', 'exportacion.js', 'saes-dialogo.js', 'tramites.js', 'bajas.js',
+                      '../tramites/pdf-comun.js', '../tramites/pdf-dictamen.js', '../tramites/pdf-electivas.js',
+                      '../tramites/pdf-bajas.js', '../assets/vendor/pdf-lib.min.js',
+                      'temarios.js', 'temarios.css', '../policore/lector.js', '../policore/lector.css'))
+        config = json.loads(re.search(r'window.SATE_CONFIG=(.*?);</script>', html, re.S)[1])
+        for unidad, cfg in config['unidades'].items():
+            rutas.update(f'datos/{unidad}/{nombre}.json' for nombre in ('nucleo', 'oferta'))
+            rutas.update(f'datos/{unidad}/temarios/{n}.json' for v in cfg.get('vistas', []) if v['id'] == 'temarios'
+                         for n in ('indice', *json.loads((base / f'datos/{unidad}/temarios/indice.json').read_text(encoding='utf-8'))['carreras']))
+            rutas.update('../' + cfg['logo'][tema] for tema in ('claro', 'oscuro') if 'logo' in cfg)
+        for ruta in sorted(rutas):
+            with self.subTest(ruta=ruta):
+                archivo = (base / unquote(urlsplit(ruta).path)).resolve()
+                if archivo.is_dir():
+                    archivo /= 'index.html'
+                self.assertTrue(archivo.is_file(), ruta)
+                self.assertTrue(archivo.is_relative_to(ROOT / 'web/dist'), ruta)
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ assert.match(texto('sate.trayectoria.sin_datos'),/SAES.*Sin ellos puedes explora
 const nodos=new Map();
 const nodo=id=>{if(!nodos.has(id))nodos.set(id,{eventos:{},addEventListener(k,f){this.eventos[k]=f}});return nodos.get(id)};
 const desempe=leer('web/dist/sate/desempeno.js');
-const montar=desempe.slice(desempe.indexOf('  montar(){')+11,desempe.indexOf('\n  },',desempe.indexOf('  montar(){')));
+const montar=desempe.match(/\bmontar\(\)\{([\s\S]*?)\n\s*\},/)[1];
 let destino,abierto=false;
 vm.runInNewContext(montar,{$:nodo,prepararSeccion(){},SAES:{open(){abierto=true}},SATE:{texto,ir:id=>destino=id}});
 assert.equal(nodo('#desempeno-lector').textContent,'Traer mis datos del SAES');

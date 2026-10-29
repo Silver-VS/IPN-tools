@@ -508,7 +508,7 @@
       if (!op.nombre && raiz.history?.replaceState) raiz.history.replaceState(null,'',rutaGuia() + (q ? '?q='+encodeURIComponent(q) : ''));
       if (op.destino) op.destino.hidden = !!q;
       lista.replaceChildren();
-      op.alPintar?.(q);
+      Promise.resolve(op.alPintar?.(q)).catch(e=>console.warn('SATE: respuesta directa no disponible',{unidad:u,consulta:q,mensaje:e.message,pila:e.stack}));
       if (!terminos(q).length) return;
       lista.appendChild(h('p', {role:'status', texto:bt('cargando')}));
       try {
@@ -620,11 +620,21 @@
   }
   cargarCss();
 
-  function datos() {
+  function datos(seccion = '') {
     const u = unidad();
+    if (seccion) {
+      const campos = seccion === 'acudir' ? ['acudir','organigrama'] : seccion === 'actividades' ? ['preguntas','actividades'] : ['preguntas'];
+      return Promise.all([datos(), ...campos.map(c => {
+        const clave = u + '/' + c;
+        if (!E.datos.has(clave)) E.datos.set(clave, (SATE.json ? SATE.json('datos/' + u + '/guia/' + c + '.json') : fetch('datos/' + u + '/guia/' + c + '.json').then(r => {
+          if (!r.ok) throw new Error(c + ': HTTP ' + r.status); return r.json();
+        })).catch(e => { E.datos.delete(clave); throw e; }));
+        return E.datos.get(clave);
+      })]).then(([indice, ...fragmentos]) => Object.assign({}, indice, ...fragmentos));
+    }
     if (E.datos.has(u)) return E.datos.get(u);
-    const promesa = (SATE.json ? SATE.json('datos/' + u + '/guia.json') : fetch('datos/' + u + '/guia.json').then(r => {
-      if (!r.ok) throw new Error('datos/' + unidad() + '/guia.json: HTTP ' + r.status);
+    const promesa = (SATE.json ? SATE.json('datos/' + u + '/guia/indice.json') : fetch('datos/' + u + '/guia/indice.json').then(r => {
+      if (!r.ok) throw new Error('datos/' + unidad() + '/guia/indice.json: HTTP ' + r.status);
       return r.json();
     })).then(d => {
       E.nombres.clear();
@@ -860,7 +870,10 @@
     const directa=h('div',{'class':'guia-respuesta-directa'});
     let versionDirecta=0;
     const pintarDirecta=async q=>{
-      const mi=++versionDirecta, u=unidad(), r=respuestaDirecta(d,q);
+      const mi=++versionDirecta, u=unidad();
+      if (q.trim()) d = await datos('preguntas');
+      if (mi!==versionDirecta || u!==unidad()) return;
+      const r=respuestaDirecta(d,q);
       directa.replaceChildren();
       if (!r.definiciones.length) {
         if(r.pregunta)directa.appendChild(tarjetaSolucion(d,r.pregunta,s,'respuesta_directa'));
@@ -1772,7 +1785,12 @@
     const cab = cabecera([...migasBase(), { texto: tituloApartado('reglamentos') }], tituloApartado('reglamentos'), t('sate.guia.reglamentos_intro'));
     const indice = await cargarReglamento('indice');
     const docs = Object.entries(d.documentos).filter(([id, x]) => x.reglamento && indice.some(i => i.id === id)).map(([id, x]) => ({ id, ...x }));
-    const registros = await Promise.all(docs.map(x => cargarReglamento(x.id)));
+    const registros = [];
+    let registrosListos, versionBusqueda = 0;
+    async function prepararRegistros() {
+      return registrosListos ||= Promise.all(docs.map(x => cargarReglamento(x.id)))
+        .then(rs => { registros.push(...rs); }).catch(e => { registrosListos = null; throw e; });
+    }
     if (!vigente()) return {};
     const lista = h('ul', { 'class': 'rgl-biblioteca' }, docs.map(x => h('li', {}, [
       h('a', { href: x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? x.url : rutaGuia('reglamentos', x.id), 'class': 'rgl-libro' }, [
@@ -1781,7 +1799,10 @@
         h('span', { texto: indice.find(i => i.id === x.id)?.articulos ? t('sate.guia.numero_articulos', { n: indice.find(i => i.id === x.id).articulos }) : t(x.soloPdf || indice.find(i => i.id === x.id)?.sin_texto ? 'sate.guia.rgl_solo_pdf' : 'sate.guia.rgl_texto_completo') }),
         x.soloPdf ? h('small', {'class':'rgl-libro__nota',texto:t('sate.guia.rgl_solo_pdf_nota')}) : null])])));
     const resultados = h('ul', { 'class': 'guia-resultados', hidden: true, 'aria-live': 'polite' });
-    const pintarResultados = q => {
+    const pintarResultados = async q => {
+      const mi = ++versionBusqueda;
+      if (terminos(q).length) await prepararRegistros();
+      if (mi !== versionBusqueda || !vigente()) return;
       const encontrados = registros.flatMap(reg => buscarArticulos(reg, q, 4).map(a => ({ reg, a }))).slice(0, 12);
       resultados.hidden = !terminos(q).length;
       resultados.replaceChildren(...encontrados.map(({ reg, a }) => h('li', {}, [h('a', {
@@ -1789,13 +1810,14 @@
       }, [h('strong', { texto: reg.titulo + ' · ' + (a.n === 'texto' ? t('sate.guia.rgl_texto_completo') : t('sate.guia.rgl_art_corto', { n: a.n })) }), h('small', { texto: fragmento(a.texto,q) })])])));
       if (!encontrados.length) resultados.appendChild(h('li', { 'class': 'guia-vacio', texto: t('sate.guia.rgl_resultados', { n: 0 }) }));
     };
-    const buscar = SateUI.buscador({ etiqueta: t('sate.guia.rgl_buscar_todos'), marcador: t('sate.guia.rgl_buscar_marcador'), alCambiar: pintarResultados });
+    const falloBusqueda=e=>console.warn('SATE: búsqueda en reglamentos no disponible',{unidad:unidad(),mensaje:e.message,pila:e.stack});
+    const buscar = SateUI.buscador({ etiqueta: t('sate.guia.rgl_buscar_todos'), marcador: t('sate.guia.rgl_buscar_marcador'), alCambiar: q=>pintarResultados(q).catch(falloBusqueda) });
     const sugerencias = h('div', { 'class': 'rgl-sugerencias' }, ['baja', 'recursar', 'plazo'].map(clave => {
       const boton = h('button', { type: 'button', 'class': 'btn', texto: t('sate.guia.rgl_sugerencia_' + clave) });
       boton.addEventListener('click', () => {
         const q = t('sate.guia.rgl_sugerencia_' + clave);
         buscar.raiz.querySelector('input').value = q;
-        pintarResultados(q);
+        pintarResultados(q).catch(falloBusqueda);
       });
       return boton;
     }));
@@ -1803,12 +1825,18 @@
     const temaArticulos = h('div', { 'class': 'rgl-temas__articulos', 'aria-live': 'polite' });
     const temas = [ ['trayectoria', /regular|plazo|trayectoria/], ['oportunidades', /recurs|acredita|ets/], ['carga', /carga|creditos/],
       ['bajas', /baja/], ['dictamen', /dictamen/], ['inconformidad', /inconform|reconsidera|apelacion/] ];
-    function elegirTema(clave, patron) {
+    let versionTema = 0;
+    async function elegirTema(clave, patron) {
+      const mi = ++versionTema;
+      const completo = await datos('preguntas');
+      const preguntas = (completo.preguntas || []).filter(p => patron.test(norm([p.pregunta, ...(p.palabras || [])].join(' '))));
+      const ids = [...new Set(preguntas.flatMap(p => (p.fuentes || []).map(f => f.doc)))];
+      const documentos = await Promise.all(ids.map(cargarReglamento));
+      if (mi !== versionTema || !vigente()) return;
       for (const boton of temasLista.children) boton.setAttribute('aria-pressed', String(boton.dataset.tema === clave));
-      const preguntas = (d.preguntas || []).filter(p => patron.test(norm([p.pregunta, ...(p.palabras || [])].join(' '))));
       const citas = new Map();
       for (const p of preguntas) for (const f of p.fuentes || []) for (const n of f.arts || []) {
-        const reg = registros.find(x => x.id === f.doc), a = reg?.articulos.find(x => x.n === n);
+        const reg = documentos.find(x => x.id === f.doc), a = reg?.articulos?.find(x => x.n === n);
         if (a && !citas.has(f.doc + ':' + n)) citas.set(f.doc + ':' + n, { reg, a, pregunta: p.pregunta });
       }
       temaArticulos.replaceChildren(h('h4', { texto: t('sate.guia.rgl_tema_' + clave) }), h('ul', { 'class': 'rgl-temas__lista' }, [...citas.values()].map(({ reg, a, pregunta }) => h('li', {}, [
@@ -1818,10 +1846,9 @@
     }
     for (const [clave, patron] of temas) {
       const boton = h('button', { type: 'button', 'data-tema': clave, texto: t('sate.guia.rgl_tema_' + clave), 'aria-pressed': 'false' });
-      boton.addEventListener('click', () => elegirTema(clave, patron));
+      boton.addEventListener('click', () => elegirTema(clave, patron).catch(falloBusqueda));
       temasLista.appendChild(boton);
     }
-    elegirTema(...temas[3]);
     const portal = d.documentos.normatividad;
     raizGuia.append(cab.nodo, h('div', { 'class': 'guia-apartado rgl-explorador' }, [buscar.raiz, sugerencias, resultados,
       h('section', {}, [h('h3', { texto: t('sate.guia.rgl_biblioteca') }), lista]),
@@ -2069,10 +2096,10 @@
       }
       let foco;
       if (apartado === 'investigacion' && cfg().guiaDatos) foco=await vistaInvestigacion(raizGuia);
-      else if (apartado === 'ruta' && cfg().guiaDatos) foco=rutaGuiada(raizGuia,await datos(),id);
+      else if (apartado === 'ruta' && cfg().guiaDatos) foco=rutaGuiada(raizGuia,await datos('actividades'),id);
       else if (!apartado || !(apartado === 'glosario' && cfg().guiaDatos) && !apartados().some(a => a.id === apartado && !a.vista)) foco = await portada(raizGuia);
       else {
-        const d = await datos();
+        const d = await datos(apartado === 'acudir' ? 'acudir' : apartado === 'actividades' ? 'actividades' : ['reglamentos','glosario'].includes(apartado) ? '' : 'preguntas');
         const a = infoApartado(apartado);
         if (mi !== token) return;
         const x = apartado === 'glosario' ? apartadoGlosario(raizGuia, d, id) : a.datos === 'actividades' ? apartadoActividades(raizGuia, d, id) : a.datos === 'faq' ? apartadoPreguntas(raizGuia, d, apartado, id) : a.datos === 'documentos' ? await apartadoReglamentos(raizGuia, d, id, ancla, () => mi === token) : apartadoAcudir(raizGuia, d, id);

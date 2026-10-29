@@ -29,6 +29,7 @@
   const unidad = inicial?.unidad || solicitada;
   window.SATE_UNIDAD = config[unidad] ? unidad : null;
   const u = window.SATE_UNIDAD, cfg = config[u];
+  const guiaLigera = inicial?.pestana === 'guia' || inicial?.padre === 'guia';
   let unidadRealce = u;
   const raiz = document.documentElement, temaSistema = typeof matchMedia === 'function' ? matchMedia('(prefers-color-scheme: dark)') : { matches: false, addEventListener() {} };
   function colorHalo(id) {
@@ -176,7 +177,7 @@
     if (id === 'horarios' && cfg.cupos) { await script('cupos.js'); await script('cupos-vista.js'); }
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
     if (id === 'guia') await Promise.all([script('bibliotecas.js'), script('guia.js')]);
-    if (id === 'temarios') await Promise.all([script('bibliotecas.js'), script('temarios.js')]);
+    if (id === 'temarios') await Promise.all([script('bibliotecas.js'), script('guia.js'), script('temarios.js')]);
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
@@ -310,6 +311,8 @@
   }
   async function activar(r) {
     if (!r || !api) return;
+    // El núcleo académico conserva sus globales: se inicia al cruzar a SATE.
+    if (guiaLigera && r.pestana !== 'guia' && r.padre !== 'guia') { location.reload(); return; }
     const medida = window.SateMedicion?.iniciar('ruta', r.pestana);
     let v;
     try {
@@ -328,7 +331,7 @@
     // El mapa y sus sugeridas necesitan los grupos; no pintar una copia parcial de la oferta.
     const [m] = await Promise.all([modulo(r.pestana),
       !cfg.generica && (r.pestana === 'mapa' || r.pestana === 'horarios') ? cargarOferta() : null,
-      r.pestana === 'guia' && cfg.guiaDatos ? json('guia') : null,
+      r.pestana === 'guia' && cfg.guiaDatos ? json('guia/indice') : null,
       r.pestana === 'temarios' ? json('temarios/indice') : null]);
     if (v !== version) return;
     if (r.pestana === 'tramites' && r.tramite) await prepararTramite(r.tramite);
@@ -368,8 +371,8 @@
   }
   function repintar() {
     if (!actual) return;
-    if (!cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios','guia'].includes(actual.pestana)) { ir('horarios'); return; }
-    api.renderTop(); api.renderAviso(); SATE.presente.avisos();
+    if (!guiaLigera && !cfg.generica && window.SATE_DATA.mapas[api.estado.car]?.generico && !['horarios','calendario','temarios','guia'].includes(actual.pestana)) { ir('horarios'); return; }
+    api.renderTop(); api.renderAviso(); SATE.presente?.avisos();
     const m = window.SateMedicion;
     const guiaSola = actual.padre==='guia' || actual.pestana==='guia';
     document.title = texto(actual.tramite ? 'sate.tramite.' + actual.tramite + '.titulo' : 'sate.pestana.' + (actual.padre || actual.pestana) + '.titulo') + (guiaSola ? ' — ' + texto('sate.pestana.guia.titulo') : ' — SATE');
@@ -389,7 +392,7 @@
     async visitar(id) { const r=SateRutas.ruta('#/'+u+'/'+id,u,config);if(!r)return;history.replaceState(null,'',location.pathname+location.search+r.hash);await activar(r); },
     articulo: async (doc, n) => { await script('guia.js'); return SATE.articulo(doc, n); },
     async nucleoListo(a) {
-      api = a; if (!cfg.generica) await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
+      api = a; if (!cfg.generica && !guiaLigera) await script('situacion.js'); SateUI.usarAlmacen({leer,guardar:(k,v)=>IPNT.set(k,v)});
       const r = SateRutas.ruta((cuposReducida||location.hash==='#cupos')&&cfg.cupos?'#/'+u+'/horarios':location.hash, u, config) ||
         SateRutas.ruta('#/' + u + '/' + (api.personal() && cfg.pestanas.includes('trayectoria') ? 'trayectoria' : 'mapa'), u, config);
       actualizarPestanas(r.vista ? r.padre : r.pestana);
@@ -398,7 +401,7 @@
       // Un hash ajeno pertenece a cuenta/tema/demo: nunca se reemplaza por una ruta SATE.
       if (!location.hash) history.replaceState(null,'',location.pathname+location.search+r.hash);
       await activar(r);
-      if (!cfg.generica) precarga.reposo([...cfg.pestanas, ...(cfg.vistas || []).map(v=>v.id)].filter(id=>id!==r.pestana));
+      // Las otras pestañas solo se descargan por intención, nunca por estar en reposo.
       document.getElementById('sate-ayuda-recorrido').onclick=()=>iniciarRecorrido();
       if(cuposReducida&&cfg.cupos){await script('cupos-vista.js');await SateCuposVista.montar();await script('cupos-receptor.js')}
     }, actualizarPestanas
@@ -475,6 +478,14 @@
     }
   }
   medicionLista.then(() => {
+    if (guiaLigera) {
+      botonUnidad.addEventListener('click', elegirUnidad);
+      document.getElementById('saes-open').addEventListener('click', () => {
+        location.hash = '#/' + u + '/trayectoria'; location.reload();
+      });
+      return SATE.nucleoListo({estado:{}, personal:()=>false,
+        store:{set(){},get:(_k,d)=>d},renderTop(){},renderAviso(){}});
+    }
     if (cfg.generica) return script('generico.js');
     return json('nucleo').then(d=>{window.SATE_DATA=Object.assign({periodos:{actual:[],proximo:[]},asig:[],prof:[]},d);return script('nucleo.js')});
   }).catch(error);

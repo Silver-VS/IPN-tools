@@ -331,7 +331,7 @@ class DatosSinPaginas(unittest.TestCase):
         out = {}
         for p in sorted(base.rglob('*')):
             rel = p.relative_to(base).as_posix()
-            if p.is_file() and '/datos/' not in rel and not rel.startswith(('dist/qa', 'qa-')):
+            if p.is_file() and '/datos/' not in rel and not rel.startswith(('dist/qa', 'qa-')) and rel not in ('dist/sw.js', 'dist/sw-manifest.json'):
                 out[rel] = hashlib.sha256(p.read_bytes()).hexdigest()
         return out
 
@@ -344,6 +344,9 @@ class DatosSinPaginas(unittest.TestCase):
                            env=dict(os.environ, UNIDAD='upiita'), capture_output=True, text=True, encoding='utf-8', timeout=300)
         self.assertEqual(r.returncode, 0, r.stderr[-500:])
         self.assertEqual(self.snapshot(), antes)
+        manifiesto = json.loads((ROOT / 'web/dist/sw-manifest.json').read_text(encoding='utf-8'))
+        for ruta, huella in manifiesto['archivos'].items():
+            self.assertEqual(hashlib.sha256((ROOT / 'web/dist' / ruta).read_bytes()).hexdigest(), huella, ruta)
         datos = ROOT / 'web/dist/sate/datos/upiita'
         for nombre in ('nucleo.json', 'oferta.json', 'tramites.json', 'electivas.json'):
             self.assertTrue((datos / nombre).is_file(), nombre)

@@ -16,7 +16,7 @@ idle.shift()();await new Promise(setImmediate);
 assert.deepEqual(json,['datos/ficticia/oferta.json']);
 assert.ok(enlaces.some(n=>n.href==='mapa.js'&&n.rel==='preload'&&n.as==='script'),'Script descargado sin ejecutarlo');
 await p.precargar('mapa');assert.equal(json.length,1,'Hover/foco reutiliza solicitudes');
-await p.precargar('guia');assert.ok(json.includes('datos/ficticia/guia.json'));
+await p.precargar('guia');assert.ok(json.includes('datos/ficticia/guia/indice.json'));
 assert.ok(enlaces.some(n=>n.href==='guia.css'&&n.as==='style'));
 const pedidos=json.length+enlaces.length;c.navigator.connection.saveData=true;
 await p.precargar('horarios');p.reposo(['horarios']);

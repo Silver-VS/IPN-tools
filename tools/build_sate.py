@@ -870,6 +870,9 @@ def main(solo_datos=False):
     datos_json = json.loads(payload)
     if solo_datos:
         escribir_datos(datos_json)
+        destino = ROOT / 'web/dist/sate'
+        if (destino.parent / 'sw-manifest.json').exists():
+            escribir_cache(destino)
         print("SATE (solo datos)", UNIDAD, {k: len(v) for k, v in data["periodos"].items()})
         return
     escribir_sate(datos_json)
@@ -1183,6 +1186,18 @@ def escribir_guia(datos):
             p['formato'] = {'texto': formato['texto'], 'url': bajas['base'] + quote(bajas[clave])}
     guia.pop('_fuente', None)
     (datos / 'guia.json').write_text(json.dumps(guia, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    # El agregado se conserva para validadores e índices del build; el navegador usa fragmentos.
+    carpeta = datos / 'guia'
+    carpeta.mkdir(exist_ok=True)
+    indice = dict(guia)
+    for campo in ('preguntas', 'acudir', 'organigrama', 'actividades'):
+        (carpeta / (campo + '.json')).write_text(json.dumps({campo: guia.get(campo, [] if campo in ('preguntas', 'acudir') else None)}, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
+    indice.pop('organigrama', None)
+    indice['preguntas'] = [{k: v for k, v in p.items() if k in ('id', 'pregunta', 'apartado', 'etapa', 'formato', 'ventanilla', 'acudir', 'palabras')} for p in guia['preguntas']]
+    indice['acudir'] = [{k: v for k, v in a.items() if k in ('id', 'nombre', 'fuente', 'para', 'pendiente', 'ambito')} for a in guia['acudir']]
+    if guia.get('actividades'):
+        indice['actividades'] = {'elementos': [{} for _ in guia['actividades']['elementos']]}
+    (carpeta / 'indice.json').write_text(json.dumps(indice, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 
 def escribir_datos(data):
@@ -1219,7 +1234,12 @@ def escribir_datos(data):
     from guia_busqueda import generar
     generar(datos, UNIDAD)
     import shutil
-    shutil.copytree(ROOT / 'data/reglamentos', ROOT / 'web/dist/sate/datos/reglamentos', dirs_exist_ok=True)
+    reglamentos = ROOT / 'web/dist/sate/datos/reglamentos'
+    shutil.copytree(ROOT / 'data/reglamentos', reglamentos, dirs_exist_ok=True)
+    # --solo-datos debe producir los mismos bytes públicos que el build completo.
+    for archivo in reglamentos.rglob('*.json'):
+        documento = json.loads(archivo.read_text(encoding='utf-8'))
+        archivo.write_text(json.dumps(documento, ensure_ascii=False, separators=(',', ':')), encoding='utf-8', newline='\n')
     return datos
 
 
@@ -1421,6 +1441,7 @@ document.addEventListener('click', e => {
     calendario_api = core[core.index('SATE.calendario={'):core.index('let CALAP=')]
     generico = generico.replace('(function () {', calendario_api + '\n(function () {', 1)
     (destino / 'generico.js').write_text(generico, encoding='utf-8')
+    optimizar_sate(destino)
     if os.environ.get('SATE_QA') == '1':
         # Una copia separada conserva los destinos y validaciones de producción intactos.
         qa = dist / 'qa-sate'
@@ -1447,6 +1468,112 @@ document.addEventListener('click', e => {
         for nombre in ('qa-sate.js', 'qa-saes-simulado.html'):
             (dist / nombre).unlink(missing_ok=True)
     print("datos SATE", UNIDAD, {p.name:p.stat().st_size for p in datos.glob("*.json")})
+
+
+def optimizar_sate(destino):
+    """Publicación compacta y caché atómica. No modifica fuentes ni transcripciones."""
+    # Pygments ya está disponible en el entorno de compilación. Sus tokens conservan
+    # literales y regexp; una sustitución de comentarios con regex rompería ambos.
+    from pygments.lexers import JavascriptLexer, CssLexer
+    from pygments.token import Comment, Text
+
+    # CssLexer clasifica !important como Comment.Preproc, pero es código CSS.
+    comentario = lambda tipo: tipo in Comment and tipo not in Comment.Preproc
+
+    def compactar(src, lexer):
+        tokens = list(lexer.get_tokens_unprocessed(src))
+        if ''.join(v for _, _, v in tokens) != src:
+            raise ValueError('El lexer alteró el texto de entrada')
+        partes = []
+        for _, tipo, valor in tokens:
+            if comentario(tipo):
+                valor = '\n' * valor.count('\n') if '\n' in valor else ' '
+            elif tipo in Text:
+                # Se preservan los saltos (ASI) y el espacio entre tokens CSS.
+                valor = re.sub(r'[^\S\n]+', ' ', valor)
+            partes.append(valor)
+        resultado = ''.join(partes)
+        significativos = lambda ts: [(t, v) for _, t, v in ts if t not in Text and not comentario(t)]
+        if significativos(tokens) != significativos(lexer.get_tokens_unprocessed(resultado)):
+            raise ValueError('La compactación cambió tokens de código o literales')
+        return resultado
+
+    publicados = [p for carpeta in (destino, destino.parent / 'policore', destino.parent / 'tramites') for p in carpeta.rglob('*')]
+    for archivo in sorted(publicados):
+        if archivo.suffix == '.json':
+            d = json.loads(archivo.read_text(encoding='utf-8'))
+            archivo.write_text(json.dumps(d, ensure_ascii=False, separators=(',', ':')), encoding='utf-8', newline='\n')
+        elif archivo.suffix in ('.js', '.css') and archivo.name != 'medicion.js':
+            src = archivo.read_text(encoding='utf-8')
+            archivo.write_text(compactar(src, JavascriptLexer() if archivo.suffix == '.js' else CssLexer()), encoding='utf-8', newline='\n')
+
+    pagina = destino / 'index.html'
+    html = pagina.read_text(encoding='utf-8')
+    # El armazón común se descubre en el HTML, sin esperar al router ni al núcleo.
+    recursos = ['componentes.js', 'rutas.js', 'inicio.js', 'bibliotecas.js', 'guia.js', 'guia.css', 'temarios.css', '../policore/lector.css']
+    enlaces = ''.join('<link rel="preload" href="' + r + '" as="script">' for r in recursos[:3])
+    # El hash no se transmite al servidor: elegir la unidad antes de pedir su índice.
+    precarga = r"""<script>
+(()=>{const rutaGuiaInicial=location.hash.match(/^#\/([a-z0-9-]+)\/guia(?:\/([a-z0-9_-]+))?(?:\/([a-z0-9_-]+))?/i);
+if(!rutaGuiaInicial)return;const [,u,seccion,id]=rutaGuiaInicial;
+if(!__UNIDADES__.includes(u))return;
+const pedir=(href,as)=>{const l=document.createElement('link');l.rel='preload';l.as=as;l.href=href;if(as==='fetch')l.crossOrigin='anonymous';document.head.appendChild(l)};
+for(const r of __RECURSOS__)pedir(r,r.endsWith('.css')?'style':'script');
+for(const r of (__LOGOS__[u]||[]))pedir('../'+r,'image');
+const dato=r=>pedir('datos/'+u+'/'+r+'.json','fetch');
+if(seccion==='programas'){pedir('temarios.js','script');dato('temarios/indice')}
+else {dato('guia/indice');
+if(seccion==='acudir'){dato('guia/acudir');dato('guia/organigrama')}
+else if(seccion==='actividades'||seccion==='ruta'){dato('guia/preguntas');dato('guia/actividades')}
+else if(seccion==='reglamentos'){if(id){pedir('datos/reglamentos/'+id+'.json','fetch');pedir('datos/referencias.json','fetch')}else pedir('datos/reglamentos/indice.json','fetch')}
+else if(seccion&&!['glosario','investigacion'].includes(seccion))dato('guia/preguntas');}
+})();
+</script>"""
+    precarga = precarga.replace('__UNIDADES__', json.dumps([u for u in json.loads((ROOT / 'data/sate.json').read_text(encoding='utf-8'))['unidades'] if tiene_guia(u)]))
+    precarga = precarga.replace('__RECURSOS__', json.dumps(recursos[3:]))
+    unidades = json.loads((ROOT / 'data/sate.json').read_text(encoding='utf-8'))['unidades']
+    identidades_unidad = identidades()
+    logos = {u: [c['logo'][tema] for tema in ('claro', 'oscuro')] if c.get('logo') else
+             ['assets/logos/unidades/' + identidades_unidad[u]['logo'] + '.webp'] for u, c in unidades.items()}
+    precarga = precarga.replace('__LOGOS__', json.dumps(logos))
+    html = html.replace("worker-src 'none'", "worker-src 'self'")
+    marca = '<meta name="referrer" content="strict-origin-when-cross-origin">'
+    html = html.replace(marca, marca + enlaces + precarga, 1)
+    # El JS/CSS que inyectan los módulos compartidos también se compacta por tokens.
+    html = re.sub(r'(<script\b[^>]*>)(.*?)(</script>)', lambda m: m[1] + compactar(m[2], JavascriptLexer()) + m[3], html, flags=re.S)
+    html = re.sub(r'(<style\b[^>]*>)(.*?)(</style>)', lambda m: m[1] + compactar(m[2], CssLexer()) + m[3], html, flags=re.S)
+    # Registrar después de load evita competir con la portada en conexiones lentas.
+    registro = """<script>
+if('serviceWorker' in navigator) addEventListener('load',()=>{
+navigator.serviceWorker.addEventListener('controllerchange',()=>location.reload());
+navigator.serviceWorker.register('../sw.js',{scope:'../',updateViaCache:'none'}).catch(e=>console.warn('SATE: caché sin conexión no disponible',{mensaje:e.message}));
+});
+</script>"""
+    pagina.write_text(html + registro, encoding='utf-8', newline='\n')
+    escribir_cache(destino, recursos, logos)
+
+
+def escribir_cache(destino, recursos=None, logos=None):
+    """Recalcula la huella también cuando cambian únicamente los datos."""
+    import hashlib
+    html = (destino / 'index.html').read_text(encoding='utf-8')
+    dist = destino.parent
+    # Solo recursos públicos conocidos. Ni cuentas ni respuestas de otros orígenes.
+    archivos = [p for p in destino.rglob('*') if p.is_file() and p.suffix in ('.html', '.css', '.js', '.json')]
+    archivos += [p for carpeta in ('policore', 'assets/logos') for p in (dist / carpeta).rglob('*') if p.is_file()]
+    manifiesto = {p.relative_to(dist).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(archivos)}
+    sw = (ROOT / 'web/sate/sw.js').read_text(encoding='utf-8')
+    version = hashlib.sha256((json.dumps(manifiesto, sort_keys=True) + sw).encode()).hexdigest()[:20]
+    if recursos is None:
+        shell = json.loads((dist / 'sw-manifest.json').read_text(encoding='utf-8'))['precache']
+    else:
+        shell = ['sate/index.html', *['sate/' + r for r in recursos if not r.startswith('../')], 'sate/encabezado.css', 'sate/encabezado.js', 'policore/lector.css']
+        shell += [p for p in manifiesto if p.endswith('/guia/indice.json')]
+        shell += sorted({r[3:] for r in re.findall(r'<img[^>]*src="(\.\./[^"?]+)"', html) if r[3:] in manifiesto})
+        shell += sorted({r for rutas in (logos or {}).values() for r in rutas if r in manifiesto and r not in shell})
+    config = {'version': version, 'precache': shell, 'archivos': manifiesto}
+    (dist / 'sw-manifest.json').write_text(json.dumps(config, separators=(',', ':')), encoding='utf-8')
+    (dist / 'sw.js').write_text(sw.replace('/*__BUILD__*/null', json.dumps(config, separators=(',', ':'))), encoding='utf-8')
 
 
 if __name__ == "__main__":

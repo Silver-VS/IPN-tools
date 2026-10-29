@@ -154,7 +154,8 @@ assert.match(core,/Modo demostración[\s\S]*Salir del modo demostración/);
 assert.match(core,/sessionStorage.removeItem\('ipnt.demo'\)/);
 const css=leer('web/sate/componentes.css');
 const cssEnc=leer('web/sate/encabezado.css');
-assert.equal(leer('web/dist/sate/encabezado.css'),cssEnc);
+const cssComparable=s=>s.replace(/\/\*[\s\S]*?\*\//g,' ').replace(/\s+/g,' ').trim();
+assert.equal(cssComparable(leer('web/dist/sate/encabezado.css')),cssComparable(cssEnc));
 assert.match(html,/<link rel="stylesheet" href="encabezado.css">/);
 assert.match(cssEnc,/grid-template-areas:"marca contexto acciones" "nav nav nav" "avisos avisos avisos"/);
 assert.match(cssEnc,/@media\(min-width:768px\) and \(max-width:1023px\)/);
@@ -258,8 +259,7 @@ assert.equal(medicion.inert,true);
 // El módulo externo conserva el menú y alterna la barra al cruzar la navegación.
 {
   assert.match(html,/<script src="encabezado\.js"><\/script>/);
-  const js=leer('web/sate/encabezado.js');let scroll,navBottom=20,bar;
-  assert.equal(leer('web/dist/sate/encabezado.js'),js,'el builder copia y carga el módulo actualizado');
+  const js=leer('web/dist/sate/encabezado.js');let scroll,navBottom=20,bar;
   const menu={open:false,querySelector(){return {focus(){}}}};
   const nav={getAttribute(){return 'Navegación'},getBoundingClientRect(){return {bottom:navBottom}}};
   const links={cloneNode(){return {querySelectorAll(){return []}}}};

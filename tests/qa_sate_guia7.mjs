@@ -113,6 +113,6 @@ caja.querySelector('[data-id="idiomas"]').click();
 assert.ok(caja.textContent.includes('Centro de Lenguas oficial'), 'la pestaña cambia de categoría');
 assert.equal(caja.querySelectorAll('[data-actividad]').length, 1);
 for (const n of readdirSync('data/reglamentos').filter(n=>n.endsWith('.json'))) {
-  assert.equal(leer('web/dist/sate/datos/reglamentos/'+n), leer('data/reglamentos/'+n), n+': copia publicada');
+  assert.deepEqual(JSON.parse(leer('web/dist/sate/datos/reglamentos/'+n)), JSON.parse(leer('data/reglamentos/'+n)), n+': texto publicado intacto tras compactar JSON');
 }
 console.log('OK GUIA7: fusión, capacidades, marcas seguras, artículo, caché, glosario, lector y copia a dist');

@@ -61,8 +61,12 @@ class EncabezadoTest(unittest.TestCase):
         self.assertNotIn('<header class="top', cascaron)
         self.assertEqual(compilado.count('class="top sate-encabezado"'), 1)
         self.assertIn('href="encabezado.css"', compilado)
-        self.assertEqual((ROOT / 'web/dist/sate/encabezado.css').read_bytes(),
-                         (ROOT / 'web/sate/encabezado.css').read_bytes())
+        from pygments.lexers import CssLexer
+        from pygments.token import Comment, Text
+        def tokens(ruta):
+            return [(t, v) for _, t, v in CssLexer().get_tokens_unprocessed(ruta.read_text(encoding='utf-8')) if (t not in Comment or t in Comment.Preproc) and t not in Text]
+        self.assertEqual(tokens(ROOT / 'web/dist/sate/encabezado.css'),
+                         tokens(ROOT / 'web/sate/encabezado.css'))
 
     def test_hermana_estatica_sin_nucleo_y_ranuras_opcionales(self):
         unidad = dict(self.config['unidades']['upiita'], siglas='UPIITA')

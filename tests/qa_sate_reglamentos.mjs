@@ -147,8 +147,12 @@ assert.ok(cgc.textContent.includes('sate.guia.rgl_solo_pdf'), 'sin conteo engañ
 assert.ok(cgc.textContent.includes('sate.guia.rgl_solo_pdf_nota'),'explica por qué el CGC conserva el enlace al PDF');
 assert.ok(Array.from(caja.querySelectorAll('.rgl-libro')).find(n => n.getAttribute('href') === '#/ficticia/guia/reglamentos/etica').textContent.includes('sate.guia.rgl_texto_completo'), 'se conserva el lector del código sin articulado');
 assert.equal(caja.querySelectorAll('.rgl-temas__opciones button').length,6);
+assert.equal(caja.querySelectorAll('.rgl-temas__articulos a').length,0,'sin descargar articulados antes de elegir tema');
+caja.querySelectorAll('.rgl-temas__opciones button')[3].click();
+await new Promise(setImmediate);
 assert.ok(caja.querySelectorAll('.rgl-temas__articulos a').length>0,'temas con citas reales');
 caja.querySelector('.rgl-sugerencias button').click();
+await new Promise(setImmediate);
 assert.equal(caja.querySelector('.guia-resultados').hidden,false);
 assert.ok(caja.querySelectorAll('.guia-resultados a').length>0,'sugerencias buscan artículos');
 await pestana.mostrar({partes:['reglamentos','ri']});
