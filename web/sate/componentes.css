@@ -1,4 +1,26 @@
 /* Componentes de SATE: tokens comunes y realce local por unidad. */
+/* Densidad de escritorio SATE; si funciona, promover estos valores al origen en ipn-comun. */
+@media (min-width:640px) and (pointer:fine){
+  :root{
+    --ipn-tamano-xs:.75rem;
+    --ipn-tamano-s:.8125rem;
+    --ipn-tamano-m:.9375rem;
+    --ipn-tamano-l:1.1875rem;
+    --ipn-tamano-xl:1.375rem;
+    --ipn-tamano-xxl:var(--ipn-tamano-xl);
+    --ipn-control-alto:38px;
+    --ipn-objetivo-tactil:38px;
+    --ipn-esp-1:.25rem;
+    --ipn-esp-2:.375rem;
+    --ipn-esp-3:.5rem;
+    --ipn-esp-4:.75rem;
+    --ipn-esp-5:1rem;
+    --ipn-esp-6:1.25rem;
+    --ipn-esp-7:1.5rem;
+    --ipn-esp-8:2rem;
+    --ipn-radio:.5rem;
+  }
+}
 .sate-mapa-consulta{overflow-x:auto;max-width:100%;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
 @media(max-width:600px){.gd-tray .gd-desplazamiento:has(>.sate-mapa-consulta){display:none}}
 .sate-mapa-lienzo{position:relative;isolation:isolate}
@@ -289,7 +311,8 @@ button.tramite-paso-ir .tramite-paso-t{text-decoration:underline;text-underline-
 .sate-navegacion[data-controles-separados=true]>#sate-tabs{flex-basis:100%}
 .sate-navegacion[data-controles-separados=true]>.sate-controles{flex-basis:100%}
 .sate-navegacion[data-controles-separados=true]>.sate-controles .field{max-width:100%}
-body.sate-flotante #sate-tabs{display:none}
+/* Mantener la fila en el flujo reserva su alto mientras la copia fija aparece al desplazar. */
+body.sate-flotante #sate-tabs{visibility:hidden}
 .sate-medicion{position:absolute;width:0;height:0;overflow:hidden;visibility:hidden;pointer-events:none}
 :is(#sate-tabs,.sate-medicion).sate-medicion .sate-pestanas{width:max-content;max-width:none}
 :is(#sate-tabs,.sate-medicion).sate-medicion .sate-pestana{flex:none;font-weight:600}
