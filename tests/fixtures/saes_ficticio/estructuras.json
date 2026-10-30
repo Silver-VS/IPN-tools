@@ -29,6 +29,7 @@
     "carrera": "Z",
     "carrera_nombre": "",
     "plan": null,
+    "baja": false,
     "promedio": null,
     "reprobadas_num": null,
     "cita": {
