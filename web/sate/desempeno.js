@@ -36,7 +36,7 @@ function renderKardexLista(){
   const chip=r=>`<span class="kx-nota kx-g${r.cal>=9?'9':r.cal>=8?'8':r.cal>=6?'6':'5'}" title="${esc(r.clave+' · '+r.nombre+' · '+(FORMAS[r.codigo]||r.codigo))}">${r.cal}${({EXT:'E',ETS:'T',REC:'R',EQV:'Q',REV:'Q',DIC:'Q'})[r.codigo]?`<sub>${({EXT:'E',ETS:'T',REC:'R',EQV:'Q',REV:'Q',DIC:'Q'})[r.codigo]}</sub>`:''}</span>`;
   const medias=periodos.map(p=>{const rs=rows.filter(r=>r.periodo===p);return rs.reduce((s,r)=>s+r.cal,0)/rs.length});
   const strip=$('#kx-periodos');strip.innerHTML=periodos.map((p,i)=>{const rs=rows.filter(r=>r.periodo===p), delta=i?medias[i]-medias[i-1]:0, cr=rs.every(r=>r.cr!=null)?fmtCr(rs.reduce((s,r)=>s+(r.acreditada?+r.cr:0),0)):'—';return `<button type="button" class="chip kx-periodo" data-kx-periodo="${esc(p)}" aria-pressed="${filtro.periodo===p}"><span class="kx-periodo-cab"><b>${esc(p)}</b><strong>${medias[i].toFixed(2)} <small class="${delta<0?'kx-baja':'kx-sube'}">${i?delta>0?'▲':delta<0?'▼':'=':''}</small></strong></span><span class="kx-fichas">${rs.map(chip).join('')}</span><span class="kx-periodo-pie">${tx('unidades',{n:rs.length})}<span>${cr} ${tx('cr')}</span></span></button>`}).join('');
-  const seleccionado=strip.querySelector('[aria-pressed="true"]');if(seleccionado&&typeof strip.scrollTo==='function')strip.scrollTo({left:Math.max(0,seleccionado.offsetLeft-(strip.clientWidth-seleccionado.offsetWidth)/2),behavior:'instant'});
+  centrarKardex();
   $('#kx-filtros').innerHTML=[['*','todos'],['reprobadas','riesgo'],['multi','multi'],['eqv','eqv']].map(([v,k])=>`<button type="button" class="chip" data-kx-estado="${v}" aria-pressed="${filtro.estado===v}">${tx(k)}</button>`).join('');
   $('#kx-todos').setAttribute('aria-pressed',String(filtro.periodo==='*'));
   $('#kx-cuenta').textContent=SATE.texto('sate.trayectoria.kardex_cuenta',{n:visibles.length,m:rows.length});
@@ -45,6 +45,12 @@ function renderKardexLista(){
   const proy=promOficialSim(), proyEl=$('#kx-prom-proyeccion');proyEl.textContent=proy?`${proy.exacto?'':'≈ '}${proy.despues.toFixed(2)}`:'';proyEl.parentElement.parentElement.hidden=!proy;
   let grupo=null;
   $('#kx-lista').innerHTML=visibles.length?visibles.map(r=>{const g=r.adeudo?tx('adeudos'):esc(r.periodo)||'—', cab=g!==grupo?`<tr class="kx-grupo"><th colspan="6">${g}</th></tr>`:'';grupo=g;return `${cab}<tr${r.adeudo?' class="kx-adeudo"':''}><td data-label="${tx('ua')}"><b>${esc(r.clave)}</b> · ${esc(r.nombre)}${r.adeudo?` <strong class="kx-marca">${tx('adeudo')}</strong>`:''}</td><td data-label="${tx('periodo')}">${esc(r.periodo)||'—'}</td><td data-label="${tx('nota')}">${chip(r)}</td><td data-label="${tx('forma')}">${esc(FORMAS[r.codigo]||r.codigo)||'—'}</td><td data-label="${tx('veces')}">${veces(r.clave)}</td><td data-label="${tx('creditos')}">${r.cr==null?'—':fmtCr(r.cr)}</td></tr>`}).join(''):`<tr><td colspan="6">${tx('vacio')}</td></tr>`;
+}
+// Centra el periodo elegido; con el kárdex plegado la tira no mide nada, así que se repite al abrirlo.
+function centrarKardex(){
+  const strip=$('#kx-periodos'), sel=strip?.querySelector('[aria-pressed="true"]');
+  if(!sel||!strip.clientWidth||typeof strip.scrollTo!=='function')return;
+  strip.scrollTo({left:Math.max(0,sel.offsetLeft-(strip.clientWidth-sel.offsetWidth)/2),behavior:'instant'});
 }
 function kardexCurso(){
   const tx=k=>esc(SATE.texto('sate.trayectoria.kardex_'+k)), A=ALUMNO;
@@ -219,7 +225,7 @@ async function renderStatsVista(){
     ec:Dc.simulado?0:[...new Set(tr().enCurso)].reduce((t,k)=>t+(cur()[k]?.[1]||0),0),info},$('#ch-camino').clientWidth);
   montarAyudasCreditos();
   // 2) kárdex por periodo: cada materia es un cuadro con su calificación; encabezado con promedio y créditos
-  renderKardexLista();prepararSeccion($('#trayectoria-kardex'),'kardex');
+  renderKardexLista();prepararSeccion($('#trayectoria-kardex'),'kardex',()=>new Promise(r=>requestAnimationFrame(()=>{centrarKardex();r()})));
   // Dos materias evitan presentar una sola calificación como una afinidad consolidada.
   const grupos=new Map();for(const r of Da.rows){if(!grupos.has(r.cat))grupos.set(r.cat,[]);grupos.get(r.cat).push(r)}
   const porArea=[...grupos].map(([cat,v])=>({cat,media:v.reduce((a,r)=>a+r.cal,0)/v.length,n:v.length,
@@ -265,7 +271,6 @@ $('#kstats').addEventListener('click',e=>{
   document.querySelector(`[data-kx-${campo}="${CSS.escape(valor)}"]`)?.focus();
 });
 $('#kstats').addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight'].includes(e.key)||!e.target.closest('#kx-periodos'))return;e.preventDefault();const items=[...$('#kx-periodos').querySelectorAll('.kx-periodo')],idx=items.indexOf(e.target.closest('.kx-periodo')),next=items[Math.max(0,Math.min(items.length-1,idx+(e.key==='ArrowRight'?1:-1)))];if(!next)return;next.click();$('#kx-periodos').querySelector(`[data-kx-periodo="${CSS.escape(next.dataset.kxPeriodo)}"]`)?.focus()});
-$('#kstats').addEventListener('scroll',e=>{if(e.target.id==='kx-periodos')actualizarBordesKardex()},true);
 $('#kstats').addEventListener('input',e=>{if(e.target.id!=='prom-meta')return;const v=+e.target.value;if(!(v>=6&&v<=10))return;
   store.set('promMeta.'+S.car,v);store.set('pmCal.'+S.car,{});const D=statsDatos(),M=promMeta(D,v);
   $('#pm-res').innerHTML=promMetaHtml(M)});
@@ -283,7 +288,10 @@ $('#kstats').addEventListener('click',e=>{
 {const redibuja=()=>{if(!$('#kstats')?.hidden)renderStats()};
   try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',redibuja)}catch(e){}
   new MutationObserver(redibuja).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']})}
-$('#est-sim').addEventListener('change',e=>{if(e.target.id==='sim-on'){SIM.on=e.target.checked;simTodos();simSave()}});
+// Al repintar, el interruptor se queda en el mismo lugar de la pantalla (sin saltos).
+$('#est-sim').addEventListener('change',e=>{if(e.target.id!=='sim-on')return;const y0=e.target.getBoundingClientRect().top;SIM.on=e.target.checked;simTodos();simSave();
+  const fija=()=>{const n=$('#sim-on');if(n&&n.getClientRects().length)window.scrollBy({top:n.getBoundingClientRect().top-y0,behavior:'instant'})};
+  const t0=performance.now(),cuadro=()=>{fija();if(performance.now()-t0<1500)requestAnimationFrame(cuadro)};fija();requestAnimationFrame(cuadro);$('#sim-on')?.focus({preventScroll:true})});
 $('#est-sim').addEventListener('click',e=>{if(e.target.closest('#sim-reset')){SIM.res={};SIM.rec={};SIM.on=true;simTodos();simSave();return}
   const b=e.target.closest('[data-simok],[data-simko]');if(!b||b.disabled)return;
   const k=b.dataset.simok||b.dataset.simko;SIM.res[k]={...(SIM.res[k]||{}),ok:!!b.dataset.simok};simSave()});
