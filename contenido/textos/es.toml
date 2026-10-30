@@ -402,6 +402,8 @@ cc_horas = "{ht} h teóricas + {hp} h prácticas por semana · {creditos} crédi
 cc_materia = "{clave} · {nombre}{agregada}"
 cc_ya_agregada = " (ya agregada)"
 cc_resumen = "{n, plural, one {# materia} other {# materias}} · {ht} h teóricas + {hp} h prácticas por semana · {creditos} créditos"
+cc_origen = "Kárdex de {unidad} · carrera {carrera} · plan {plan}"
+cc_propuesta = "Propuesta: {n, plural, one {# materia} other {# materias}} · {creditos} créditos · {faltan, plural, =0 {cubren tus electivas} one {te faltaría # crédito} other {te faltarían # créditos}}"
 
 [sate.tramite.electivas]
 titulo = "Electivas"

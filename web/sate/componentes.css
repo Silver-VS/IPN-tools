@@ -80,9 +80,9 @@
 .tramite-chips,.tramite-acciones,.tramite-acciones-extra{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
 .tramite-compuesto,.tramite-chips>*{min-width:0;max-width:100%}
 #sate-tramites button{box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere}
-.tramite-acciones{position:sticky;bottom:calc(5rem + env(safe-area-inset-bottom,0px));z-index:2;background:var(--ipn-superficie);padding-block:var(--ipn-esp-2)}
+.tramite-acciones{position:sticky;bottom:var(--ipn-esp-3);z-index:2;box-sizing:border-box;width:100%;margin-top:var(--ipn-esp-4);padding:var(--ipn-esp-3);border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);box-shadow:var(--ipn-sombra)}
 .tramite-acciones{justify-content:flex-end}.tramite-acciones button{flex:0 1 auto;min-width:0}
-@media(min-width:1025px){.tramite-acciones{bottom:0}}
+@media(min-width:1025px){.tramite-acciones{bottom:var(--ipn-esp-3)}}
 .tramite-revision>div{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-2);padding-block:var(--ipn-esp-3);border-bottom:1px solid var(--ipn-borde-control)}
 .tramite-revision dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
 .tramite-preview{display:block;min-width:0}
@@ -143,6 +143,24 @@
 .tramite-chips [aria-pressed=true]{background:var(--ipn-acento);color:var(--sate-sobre-realce);border-color:var(--ipn-acento)}
 .electivas-actividad{box-sizing:border-box;max-width:100%;overflow-wrap:anywhere;border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);padding:var(--ipn-esp-3);margin-block:var(--ipn-esp-3);min-width:0}
 .electivas-resumen{position:sticky;top:var(--sate-barra-alto);z-index:1;background:var(--ipn-superficie);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control)}
+.electivas-cc-lista{display:grid;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-4)}
+.electivas-cc-lista+.tramite-campo{margin-top:var(--ipn-esp-3)}
+.electivas-cc-fila{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3) 0;border-bottom:1px solid var(--ipn-linea);cursor:pointer}
+.electivas-cc-fila input{width:var(--ipn-esp-4);height:var(--ipn-esp-4);margin:0;accent-color:var(--ipn-acento)}
+.electivas-cc-nombre{display:grid;gap:var(--ipn-esp-1);min-width:0}
+.electivas-cc-nombre small,.electivas-cc-propuesta{color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.electivas-cc-propuesta{margin-block:var(--ipn-esp-2)}
+.electivas-cc-entrada{display:grid;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-3)}
+.electivas-cc-entrada textarea{box-sizing:border-box;width:100%;min-height:calc(var(--ipn-control-alto) * 3);padding:var(--ipn-esp-3);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);font:inherit;resize:vertical}
+.electivas-cc-entrada[hidden]{display:none}
+.electivas-cc-origen{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-3);color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.electivas-cc>summary{display:flex;align-items:center;min-height:var(--ipn-control-alto);padding:var(--ipn-esp-2) var(--ipn-esp-3);border-radius:var(--ipn-radio);background:var(--ipn-hundido);cursor:pointer;font-weight:600;list-style:none}
+.electivas-cc>summary::-webkit-details-marker{display:none}
+.electivas-cc>p:first-of-type{margin-block:var(--ipn-esp-3)}
+.electivas-cc>summary{margin-bottom:var(--ipn-esp-3)}
+.electivas-cc-entrada p{margin:0;color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
+.electivas-cc-acciones{display:flex;justify-content:flex-end;margin-top:var(--ipn-esp-4)}
+.electivas-cc-aviso{margin-block:var(--ipn-esp-4);color:var(--ipn-tenue);font-size:var(--ipn-tamano-s)}
 .tramite-compuesto details button{display:block;text-align:left;max-width:100%;white-space:normal;margin-block:var(--ipn-esp-2)}
 @media(min-width:1025px){.tramite-revision>div{grid-template-columns:minmax(0,1fr) minmax(0,2fr) auto}}
 /* Ventanilla digital (VEN1): portada por grupos, pasos navegables, campos en tarjetas y resumen imprimible. */
@@ -218,7 +236,10 @@ button.tramite-paso-ir .tramite-paso-t{text-decoration:underline;text-underline-
 .tramite-ver-fila small{color:var(--ipn-tenue)}
 .tramite-guardado{display:inline-flex;align-items:center;gap:var(--ipn-esp-2);margin-right:auto;font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
 .tramite-guardado::before{content:"";width:7px;height:7px;border-radius:var(--ipn-radio-circulo);background:var(--ipn-ok)}
-.tramite-acciones{align-items:center;border-top:1px solid var(--ipn-linea)}
+.tramite-acciones{align-items:center}
+.tramite-pantalla,.tramite-datos{padding-bottom:var(--ipn-esp-7)}
+@media(min-width:640px){.tramite-acciones{width:min(100%,var(--ipn-formulario-ancho,100%));margin-inline:auto}}
+@media(max-width:639px){.tramite-acciones{bottom:calc(var(--ipn-barra-alto) + var(--ipn-esp-2) + env(safe-area-inset-bottom,0px))}}
 .tramite-revision dt{font-size:var(--ipn-tamano-s);color:var(--ipn-tenue)}
 .tramite-revision dd{font-weight:600}
 .tramite-solo-impresion{display:none}
