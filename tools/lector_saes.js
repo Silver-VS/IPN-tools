@@ -16,6 +16,8 @@
   }
   var UNIDAD = UM[1].toLowerCase();
   var SIG = __LECTOR_NOMBRES__[UNIDAD] || UNIDAD.toUpperCase();
+  // Cuenta de baja (cambio de carrera o de unidad): solo hay kárdex, sin cita, estado general ni horario.
+  var BAJA = /\/alumnos_baja\//i.test(location.pathname);
   if (TOOL) TOOL = TOOL.replace(/horarios(-[a-z]+)?\.html$/, __LECTOR_UNIDADES__.includes(UNIDAD) ? 'horarios-' + UNIDAD + '.html' : 'sate/index.html?sateUnidad=' + UNIDAD);
   // claves: letra + 3 dígitos (B101) o con letras (optativas de la ESCOM); siempre con al menos un dígito
   var CLAVE = /^(?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6}$/i;
@@ -56,8 +58,9 @@
 
   resultado(undefined, TOOL, SIG);
   try {
-    var cita = await get('/Alumnos/Reinscripciones/fichas_reinscripcion.aspx');
-    var kx = await get('/Alumnos/boleta/kardex.aspx');
+    var cita = BAJA ? null : await get('/Alumnos/Reinscripciones/fichas_reinscripcion.aspx');
+    var kx = await get(BAJA ? '/Alumnos_baja/kardex.aspx' : '/Alumnos/boleta/kardex.aspx');
+    if (BAJA) cita = kx;
     var gen = clean((byId(cita, 'Lbl_General') || {}).textContent);
     var p = pairs(cita);
     var acred = [], kxRep = [], materias = {}, creditosMaterias = {};
@@ -125,6 +128,7 @@
        las no cursadas y desfasadas aparecen en los planes por semestre (ESCOM). Renglón: No_Periodo | clave | nombre | periodo | veces */
     var estado = [], curso = [], horario = [], secc = { reprobadas: [], no_cursadas: [], desfasadas: [] };
     try {
+      if (BAJA) throw new Error('baja');
       var est = await getRaw('/Alumnos/boleta/Estado_Alumno.aspx'), sec = 'reprobadas';
       est.querySelectorAll('[id*="mainCopy_"]').forEach(function (el) {
         var t = clean(el.value || (el.tagName === 'TABLE' ? '' : el.textContent));
@@ -142,6 +146,7 @@
       estado = secc.reprobadas.map(function (r) { return r.slice(0, 3); });
     } catch (e) { estado = null; secc = null; }
     try {
+      if (BAJA) throw new Error('baja');
       var hor = await getRaw('/Alumnos/Informacion_semestral/Horario_Alumno.aspx');
       hor.querySelectorAll('[id*="GV_Horario"] [id*="Lbl_Materia"]').forEach(function (s) {
         var m = clean(s.textContent).match(/^((?=[A-Z0-9]*\d)[A-Z][A-Z0-9]{2,6})\b/i);
@@ -192,8 +197,9 @@
       boleta: (gen.match(/BOLETA:\s*(\d{10})/i) || [])[1] || ((label(cita, /^BOLETA:?$/i) || '').match(/\d{10}/) || [])[0] || null,
       nombre: (gen.match(/NOMBRE:\s*(.+?)\s*(CARRERA|PLAN|$)/i) || [])[1] || label(cita, /^NOMBRE:?$/i) || clean((byId(cita, 'Lbl_Nombre') || {}).textContent),
       carrera: claveCar,
-      carrera_nombre: clean((cita.querySelector('[id$="mainCopy_DpdCarrera"] option:checked') || {}).textContent),
-      plan: (cita.querySelector('[id$="mainCopy_dpdPlanEstudios"] option:checked') || {}).value || null,
+      carrera_nombre: clean((cita.querySelector('[id$="mainCopy_DpdCarrera"] option:checked') || byId(kx, 'Lbl_Carrera') || {}).textContent),
+      plan: (cita.querySelector('[id$="mainCopy_dpdPlanEstudios"] option:checked') || {}).value || clean((byId(kx, 'Lbl_Plan') || {}).textContent) || null,
+      baja: BAJA,
       // el promedio aparece en la cita de reinscripción; si no está publicada, se busca en el kárdex («PROMEDIO: 8.14»)
       promedio: num(pick(p, /^promedio/i)) ?? num(label(kx, /^promedio/i)) ??
         num(((clean(kx.body ? kx.body.textContent : kx.textContent) || '').match(/PROMEDIO(?:\s+GENERAL)?\s*:?\s*(\d{1,2}(?:\.\d{1,2})?)/i) || [])[1]),

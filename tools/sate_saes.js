@@ -59,13 +59,13 @@
       {id:'abrir',icono:'↗',texto:'ventana_abrir',accion:()=>{if(url)window.open(url,'_blank','noopener')}},
       {id:'cupos',icono:'▦',texto:'consultar',accion:consultar}
     ];
-    function botones(){el('funciones').replaceChildren();for(const f of funciones){if(f.requiereDatos&&!datos)continue;const b=document.createElement('button');b.type='button';b.setAttribute('data-funcion',f.id);if(f.id==='copiar')b.className='primario';
-      const icono=document.createElement('span');icono.textContent=f.icono;icono.setAttribute('aria-hidden','true');const titulo=document.createElement('strong');titulo.textContent=tx(f.texto);const detalle=document.createElement('small');detalle.textContent=tx('ventana_'+f.id+'_detalle');b.appendChild(icono);b.appendChild(titulo);b.appendChild(detalle);b.onclick=f.accion;el('funciones').appendChild(b)}}
+    function botones(){el('funciones').replaceChildren();for(const f of funciones){if(f.requiereDatos&&!datos)continue;if(datos?.baja&&f.id!=='copiar')continue;const b=document.createElement('button');b.type='button';b.setAttribute('data-funcion',f.id);if(f.id==='copiar')b.className='primario';
+      const icono=document.createElement('span');icono.textContent=f.icono;icono.setAttribute('aria-hidden','true');const titulo=document.createElement('strong');titulo.textContent=tx(f.texto);const detalle=document.createElement('small');detalle.textContent=tx('ventana_'+(datos?.baja&&f.id==='copiar'?'baja_copiar':f.id)+'_detalle');b.appendChild(icono);b.appendChild(titulo);b.appendChild(detalle);b.onclick=f.accion;el('funciones').appendChild(b)}}
     // El lector captura este receptor antes de esperar la red; una respuesta tardía no afecta otra instancia.
     window.IPNTSateResultado=(d,tool,sig)=>{
       datos=d;url=tool;if(sig)box.querySelector('h2').textContent=tx('ventana_titulo').replace('{unidad}',sig);
       const nombre=String(d?.nombre||'').trim();el('saludo').textContent=nombre?tx('ventana_saludo').replace('{nombre}',nombre.split(/\s+/)[0]):'';
-      el('estado').textContent=d===undefined?tx('ventana_leyendo'):d?tx('ventana_listos').replace('{boleta}',d.boleta||tx('ventana_sin_boleta')):tx('ventana_sin_datos');botones();
+      el('estado').textContent=d===undefined?tx('ventana_leyendo'):d?.baja?tx('ventana_baja'):d?tx('ventana_listos').replace('{boleta}',d.boleta||tx('ventana_sin_boleta')):tx('ventana_sin_datos');botones();
     };
     const resultado=window.IPNTSateResultado;
     window.IPNTSateLeer=()=>new Promise(resolve=>leer((d,tool,sig)=>{resultado(d,tool,sig);if(d!==undefined)resolve(d)}));
