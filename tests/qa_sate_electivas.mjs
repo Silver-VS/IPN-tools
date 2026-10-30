@@ -6,8 +6,8 @@ const leer=p=>readFileSync(p,'utf8'),plano=v=>JSON.parse(JSON.stringify(v));
 const ref=vm.createContext({});
 vm.runInContext(leer('tests/fixtures/ventanilla/electivas-calculo.js')+';globalThis.reglas={REQ,MOD,EJE,CAT,CATK,hoursOf,credOf,warnOf,valid,search,hourOpt,totals}',ref);
 class Nodo{
-  constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.value='';this.textContent='';this.className=''}
-  appendChild(n){this.children.push(n);return n}replaceChildren(){this.children=[]}
+  constructor(tag){this.tagName=tag;this.children=[];this.attrs={};this.value='';this.textContent='';this.className='';this.dataset={};this.style={setProperty(){}};const c=new Set();this.classList={add:(...x)=>x.forEach(v=>c.add(v)),remove:(...x)=>x.forEach(v=>c.delete(v)),toggle:(v,f)=>{(f??!c.has(v))?c.add(v):c.delete(v)},contains:v=>c.has(v)}}
+  appendChild(n){this.children.push(n);return n}append(...ns){for(const n of ns)this.appendChild(n)}addEventListener(){}removeEventListener(){}replaceChildren(...ns){this.children=[...ns]}
   setAttribute(k,v){this.attrs[k]=String(v)}getAttribute(k){return this.attrs[k]??null}
   removeAttribute(k){delete this.attrs[k];if(k==='src')delete this.src}
   querySelector(s){return this.todos().find(n=>s.startsWith('#')?n.id===s.slice(1):s.startsWith('[')?(()=>{const m=s.match(/^\[([^=\]]+)(?:="([^"]*)")?\]$/);return m&&(m[2]==null?n.attrs[m[1]]!=null:n.attrs[m[1]]===m[2])})():n.tagName===s)||null}

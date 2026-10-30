@@ -157,7 +157,7 @@ for(const regla of cssVentanilla.matchAll(/([^{}]+)\{([^{}]+)\}/g))if(regla[2].i
   assert.match(regla[2],/outline:2px solid var\(--sate-realce\)/);
 }
 assert.match(cssVentanilla,/#sate-tramites button\{[^}]*max-width:100%[^}]*white-space:normal[^}]*overflow-wrap:anywhere/);
-assert.match(cssVentanilla,/\.tramite-acciones\{[^}]*position:sticky[^}]*safe-area-inset-bottom/);
+assert.match(cssVentanilla,/\.tramite-acciones\{[^}]*position:sticky[^}]*\}[\s\S]*@media\(max-width:639px\)\{\.tramite-acciones\{bottom:calc\([^}]*safe-area-inset-bottom/);
 assert.match(cssVentanilla,/\.tramite-acciones button\{[^}]*min-width:0/);
 assert.match(cssVentanilla,/\.electivas-actividad\{[^}]*box-sizing:border-box[^}]*max-width:100%[^}]*overflow-wrap:anywhere/);
 console.log('Ventanilla: estados, rutas, confirmación, apellidos compuestos, pasos, revisión, validación, memoria sensible y vista previa correctos.');

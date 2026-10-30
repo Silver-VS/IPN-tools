@@ -70,7 +70,7 @@
 .electivas-cc-lista h5{margin-block:var(--ipn-esp-3) var(--ipn-esp-1)}
 .electivas-cc-lista .tramite-campo{flex-direction:row;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-1)}
 .electivas-cc-lista>small{display:block;margin:0 0 var(--ipn-esp-2) calc(1rem + var(--ipn-esp-2));color:var(--ipn-tenue)}
-.electivas-cc-aviso{padding:var(--ipn-esp-2);border-inline-start:3px solid var(--sate-realce);background:var(--ipn-superficie-secundaria);}
+.electivas-cc-aviso{padding:var(--ipn-esp-2);border-inline-start:3px solid var(--ipn-acento);background:var(--ipn-superficie-secundaria);}
 .tramite-proceso{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4);min-width:0}
 .tramite-asistente{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
 .tramite-pantalla,.tramite-datos{min-width:0;max-width:100%;overflow-wrap:anywhere}
@@ -799,8 +799,9 @@ body.sate-flotante .sate-barra{display:flex}
 .kx-curso-lista li>span:last-child:not(.kx-curso-materia){color:var(--ipn-tenue);white-space:nowrap}
 .kx-periodos-marco{position:relative;min-width:0}
 .kx-periodos{display:flex;gap:var(--ipn-esp-3);overflow-x:auto;max-width:100%;padding-block:var(--ipn-esp-3);scroll-snap-type:x mandatory;scroll-padding-inline:50%;overscroll-behavior-inline:contain}
-.kx-periodos-nav{display:flex;justify-content:flex-end;gap:var(--ipn-esp-2)}
+.kx-periodos-nav{display:flex;justify-content:flex-end;align-items:center;gap:var(--ipn-esp-2)}
 .kx-periodos-nav button{min-width:var(--ipn-control-alto);min-height:var(--ipn-control-alto)}
+.kx-periodos-nav .kx-reinicio{min-width:0;padding-inline:var(--ipn-esp-2);color:var(--ipn-acento);background:transparent;border:0;text-decoration:underline}
 .kx-periodo{flex:0 0 calc(var(--ipn-esp-8)*4);min-width:0;display:flex;flex-direction:column;gap:var(--ipn-esp-3);padding:var(--ipn-esp-3);text-align:left;border:1px solid var(--ipn-linea);border-radius:var(--ipn-radio);background:var(--ipn-superficie);color:var(--ipn-texto);cursor:pointer;scroll-snap-align:start}
 .kx-periodo-cab,.kx-periodo-pie{display:flex;justify-content:space-between;gap:var(--ipn-esp-2)}
 .kx-periodo-cab{font-size:var(--ipn-tamano-s);font-variant-numeric:tabular-nums}
@@ -814,7 +815,8 @@ body.sate-flotante .sate-barra{display:flex}
 .kx-g5,.kx-adeudo{background:var(--ipn-error-suave)}
 .kx-g5,.kx-baja{color:var(--ipn-error)}
 .kx-sube{color:var(--ipn-ok)}
-#kx-filtros{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-2)}
+#kx-filtros{display:flex;flex-wrap:wrap;gap:var(--ipn-esp-1);padding:var(--ipn-esp-1);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio);min-width:0}
+#kx-filtros .chip[aria-pressed="true"]{background:var(--ipn-acento);color:var(--ipn-superficie);border-color:var(--ipn-acento)}
 .kx-periodo:focus-visible{outline:2px solid var(--ipn-acento);outline-offset:-2px}
 .kx-periodo[aria-pressed="true"]{border-color:var(--ipn-acento);box-shadow:inset 0 0 0 1px var(--ipn-acento)}
 .kx-leyenda,#kx-cuenta{font-size:var(--ipn-tamano-xs);color:var(--ipn-tenue)}
@@ -823,6 +825,9 @@ body.sate-flotante .sate-barra{display:flex}
 .kx-tabla thead,.kx-grupo{background:var(--ipn-hundido);font-size:var(--ipn-tamano-xs)}
 @media(max-width:1023px){.kx-cabecera{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:639px){
+  .kx-estados{align-items:flex-start;flex:1 1 100%;min-width:0}
+  #kx-filtros{flex-wrap:nowrap;overflow-x:auto;max-width:100%;overscroll-behavior-inline:contain}
+  #kx-filtros .chip{flex:0 0 auto}
   .kx-periodo{flex-basis:min(80%,calc(var(--ipn-esp-8)*4));scroll-snap-align:center}
   .kx-periodos{scroll-padding-inline:10%}
   .kx-promedios{grid-template-columns:minmax(0,1fr)}
@@ -1185,6 +1190,8 @@ body.sate-flotante #v-tray{padding-bottom:calc(var(--sate-plan-alto,var(--ipn-es
 .kx-curso-materia b{font-family:var(--ipn-fuente-mono);font-size:var(--ipn-tamano-xs);font-weight:400;color:var(--ipn-tenue);margin-right:var(--ipn-esp-2)}
 .kx-curso-lista li{align-items:baseline;font-size:var(--ipn-tamano-s);line-height:1.5}
 .kx-chips{display:flex;flex-wrap:wrap;align-items:center;gap:var(--ipn-esp-2);min-width:0}
+.kx-estados{display:flex;align-items:center;gap:var(--ipn-esp-2);min-width:0}
+.kx-estados>span{font-size:var(--ipn-tamano-s);font-weight:600;white-space:nowrap}
 #kx-cuenta{margin-inline-start:auto}
 .kx-leyenda{margin:0;text-align:left;line-height:1.5}
 .kx-nota sub{font-size:inherit;font-weight:400}
