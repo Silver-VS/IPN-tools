@@ -12,7 +12,7 @@ const identidades = JSON.parse(readFileSync('data/unidades_identidad.json','utf8
 for(const [id,cfg] of Object.entries(config)){
   const {realce,siglas,nombre}=identidades[id];Object.assign(cfg,{realce,siglas,nombre});
 }
-for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#demo','#error=denied','']) {
+for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#/upiita/tramites/electivas','#code=abc','#demo','#error=denied','']) {
  for(const personal of (hashInicial? [false]:[false,true])) {
   const eventos = {}, archivos = [], fetches = [], guardado = {}, nodos = new Map(), vistos = [], seleccionados = [];
   let cambioUnidad = 0;
@@ -32,7 +32,14 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
         if(s.src==='situacion.js') c.SATE.presente={avisos(){vistos.push('avisos')},tramite(){vistos.push('procedimiento')}};
         if(s.src==='temarios.js'){c.SATE.pestana('guia',{montar(){},mostrar(){vistos.push('guia')},ocultar(){}});c.SATE.temarios={preparar:async()=>{}};c.SATE.pestana('temarios',{montar(){vistos.push('montar-temarios')},mostrar(r){vistos.push('temarios:'+r.partes.join('/'))},ocultar(){vistos.push('ocultar-temarios')}})}
         if(s.src==='calendario.js') c.SATE.pestana('calendario',{montar(){vistos.push('montar-calendario')},mostrar(){vistos.push('mes')},ocultar(){vistos.push('ocultar-calendario')}});
-        if(s.src==='tramites.js') c.SATE.pestana('tramites',{mostrar(){vistos.push('tramites')}});
+        if(s.src==='tramites.js') {
+          c.SateTramites={definiciones:new Set(),registrar(def){this.definiciones.add(def.id)}};
+          c.SATE.pestana('tramites',{mostrar(r){vistos.push(c.SateTramites.definiciones.has(r.tramite)?'tramite:'+r.tramite:'tramites')}});
+        }
+        if(s.src==='electivas.js') {
+          c.SateTramites.registrar({id:'electivas'});
+          c.SateElectivas={preparar:()=>new Promise(()=>{})};
+        }
         if(s.src==='desempeno.js') c.SATE.pestana('trayectoria',{montar(){vistos.push('montar-desempeno')},mostrar(){vistos.push('desempeno')},ocultar(){vistos.push('ocultar-desempeno')}});
         if(s.src==='horarios.js') c.SATE.pestana('horarios',{montar(){vistos.push('montar-hor')},mostrar(){vistos.push('hor')}});
         s.onload();
@@ -53,6 +60,14 @@ for (const hashInicial of ['#/upiita/mapa','#/upiita/situacion','#code=abc','#de
   vm.runInContext(readFileSync('web/sate/inicio.js','utf8'),c);
   const vaciar = async()=>{for(let i=0;i<12;i++)await new Promise(r=>setImmediate(r))};
   await vaciar();
+  if(hashInicial==='#/upiita/tramites/electivas'){
+    assert.equal(c.SATE.actual.pestana,'tramites');
+    assert.equal(c.SATE.actual.tramite,'electivas');
+    assert.ok(archivos.includes('electivas.js'),'el script que registra el trámite se carga durante la activación inicial');
+    assert.ok(vistos.includes('tramite:electivas'),'la vista profunda se pinta al arrancar sin interacción');
+    assert.equal(document.getElementById('sate-tramites').hidden,false);
+    continue;
+  }
   const trayectoria=hashInicial.endsWith('/situacion')||!hashInicial&&personal;
   assert.equal(c.SATE.actual.pestana,trayectoria?'trayectoria':'mapa');
   assert.equal(location.hash,hashInicial.endsWith('/situacion')?'#/upiita/trayectoria':hashInicial||'#/upiita/'+(personal?'trayectoria':'mapa'));

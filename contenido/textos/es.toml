@@ -27,6 +27,10 @@ pie = "Los datos del SAES solo se leen, nunca se modifican, y se guardan en este
 nombre = "Sistema de Apoyo a la Trayectoria Escolar"
 # Siglas del nombre.
 siglas = "SATE"
+# Error al cargar una vista; {detalle} es el archivo que falló.
+vista_error = "No se pudo cargar la vista. {detalle}"
+# Botón para volver a intentar cargar la vista.
+vista_reintentar = "Reintentar"
 # Leyenda de fase de prueba bajo el encabezado; {unidad} son las siglas de la unidad académica (UPIITA, ESCOM, UPIBI).
 leyenda.prueba = "SATE está en fase de prueba en la {unidad}. Puede tener errores: confirma siempre tu información en el SAES y en tu Gestión Escolar."
 

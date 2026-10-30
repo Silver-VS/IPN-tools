@@ -125,9 +125,15 @@
     const contenido=r.pestana==='guia'?document.getElementById('sate-guia'):document.getElementById('v-tray');
     contenido?.parentNode?.insertBefore(control,contenido);
   }
+  let rutaFallida = null;
   function error(e) {
     console.error('SATE: carga fallida', {unidad:u, ruta:location.hash, mensaje:e.message, pila:e.stack});
-    const p = document.getElementById('sate-carga'); p.hidden = false; p.textContent = 'No se pudo cargar la vista. Recarga la página. ' + e.message;
+    const p = document.getElementById('sate-carga');
+    p.hidden = false;
+    const mensaje = document.createElement('p'); mensaje.textContent = texto('sate.vista_error', {detalle: e.message});
+    const reintentar = document.createElement('button'); reintentar.type = 'button'; reintentar.textContent = texto('sate.vista_reintentar');
+    reintentar.onclick = () => { if (rutaFallida) activar(rutaFallida).catch(error); };
+    p.replaceChildren(mensaje, reintentar);
   }
   function script(src) {
     const medida = !cargas.has(src) && window.SateMedicion?.iniciar('recurso', src);
@@ -311,6 +317,7 @@
   }
   async function activar(r) {
     if (!r || !api) return;
+    rutaFallida = r;
     // El núcleo académico conserva sus globales: se inicia al cruzar a SATE.
     if (guiaLigera && r.pestana !== 'guia' && r.padre !== 'guia') { location.reload(); return; }
     const medida = window.SateMedicion?.iniciar('ruta', r.pestana);
@@ -335,7 +342,6 @@
       r.pestana === 'temarios' ? json('temarios/indice') : null]);
     if (v !== version) return;
     if (r.pestana === 'tramites' && r.tramite) await prepararTramite(r.tramite);
-    if (r.pestana === 'tramites' && r.tramite === 'electivas') await SateElectivas.preparar();
     if (v !== version) return;
     const origenPuente = pendientePuente || actual && {hash:actual.hash, y:window.scrollY, nombre:texto('sate.pestana.'+(actual.padre||actual.pestana)+'.titulo')};
     const cruza = actual && (actual.padre === 'guia' || actual.pestana === 'guia') !== (r.padre === 'guia' || r.pestana === 'guia');

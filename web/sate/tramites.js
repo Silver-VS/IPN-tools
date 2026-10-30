@@ -171,7 +171,8 @@
     // Regreso a la lista: el avance ya está guardado, así que no pide confirmación.
     function regreso(clase){const b=boton(tx('volver'),()=>SATE.ir('tramites'));b.className+=' sate-volver tramite-regreso '+clase;return b}
     function pintar(){
-      def.preparar?.(m.datos,m.paso);confirmado=false;
+      const preparacion=def.preparar?.(m.datos,m.paso);
+      preparacion?.catch?.(e=>SATE.error(e));confirmado=false;
       box.replaceChildren();
       const ultimo=m.paso===def.pasos.length,nombres=[...def.pasos.map(p=>p.titulo),def.revisarTitulo||tx('revisar')];
       const cabeza=el('div',null,'tramite-encabezado');cabeza.appendChild(el('h2',def.titulo));if(def.volver)cabeza.appendChild(regreso('tramite-volver'));cabeza.appendChild(boton(tx('descartar'),()=>{if(descartar(def)){m.listo=false;for(const c of m.campos)if(c.sensible)m.datos[c.id]='';revocar();SATE.ir('tramites')}}));box.appendChild(cabeza);
