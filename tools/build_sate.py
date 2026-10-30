@@ -1114,6 +1114,21 @@ def oferta_electivas():
     return rows, curric, h["capturado"]
 
 
+def mapas_electivas():
+    """Mapas disponibles para seleccionar materias de cambio de carrera."""
+    identidad = json.loads((ROOT / "data/unidades_identidad.json").read_text(encoding="utf-8"))["unidades"]
+    rutas = [("upiita", ROOT / "data/mapa_curricular_saes.json")]
+    rutas.extend((p.parent.name, p) for p in sorted((ROOT / "data/unidades").glob("*/mapa_curricular_saes.json")))
+    mapas = {}
+    for unidad, ruta in rutas:
+        if not ruta.exists():
+            continue
+        mapa = json.loads(ruta.read_text(encoding="utf-8"))
+        mapas[unidad] = {"nombre": identidad.get(unidad, {}).get("nombre", unidad.upper()),
+                         "rows": mapa["rows"]}
+    return mapas
+
+
 def datos_bajas():
     import base64
     datos = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
@@ -1217,7 +1232,7 @@ def escribir_datos(data):
     if UNIDAD == 'upiita':
         import base64
         rows, curric, cap = oferta_electivas()
-        electivas = {'oferta': rows, 'curric': curric, 'capturado': cap,
+        electivas = {'oferta': rows, 'curric': curric, 'capturado': cap, 'mapas': mapas_electivas(),
                      'pdfs': {k: base64.b64encode((ROOT / 'data/gestion_escolar' / f).read_bytes()).decode() for k, f in PDFS_ELECTIVAS.items()}}
         (datos / 'electivas-pdf.json').write_text(json.dumps(electivas.pop('pdfs'), separators=(',', ':')), encoding='utf-8')
         (datos / 'electivas.json').write_text(json.dumps(electivas, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')

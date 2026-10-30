@@ -84,6 +84,61 @@
     return {actividades:acts,formulario:{...inicial().formulario,...viejo?.f,confirmada:false}};
   }
   const tx=(k,v)=>SATE.texto('sate.electivas.'+k,v);
+  const filasMapa=(unidad,car,plan)=>recursos?.mapas?.[unidad]?.rows.filter(r=>r[0]===car&&r[1]===plan)||[];
+  const origenDe=(unidad,car,plan,row)=>({unidad,car,plan,clave:row[3]});
+  const origenId=o=>o?[o.unidad,o.car,o.plan,o.clave].join('|'):'';
+  const actividadMapa=(unidad,car,plan,row)=>({k:'CC',desc:`${row[3]} · ${row[4]}`,inst:'',folio:'',fecha:'',firma:'',h:'',ht:row[7],hp:row[8],ev:'boleta',origen:{unidad,carrera:car,plan,clave:row[3]}});
+  const yaAgregada=(o)=>actsOrigen().has(origenId(o));
+  const actsOrigen=datos=>new Set((datos?.actividades||[]).map(a=>origenId(a.origen)).filter(Boolean));
+  const catalogoOrigen=(unidad,car,plan)=>filasMapa(unidad,car,plan).map(row=>({row,origen:origenDe(unidad,car,plan,row)}));
+  const sugeridasKardex=()=>{
+    const a=alumno();if(!a)return [];
+    // Sin carrera confirmada en el trámite, el plan actual es el del SAES; sin plan, cualquiera de la carrera.
+    const car=carrera()||a.carrera,plan=identidad()?.plan||a.plan;
+    const actuales=new Set((recursos?.mapas?.[SATE_UNIDAD]?.rows||[]).filter(r=>r[0]===car&&(!plan||r[1]===plan)).map(r=>r[3]));
+    const materias=(a.acreditadas||[]).filter(r=>r&&!actuales.has(r[0]));
+    const salida=[];
+    for(const [unidad,mapa] of Object.entries(recursos?.mapas||{}))for(const r of materias){
+      const row=mapa.rows.find(x=>x[3]===r[0]);if(row&&!salida.some(x=>x.origen.clave===row[3]&&x.origen.unidad===unidad))salida.push({unidad,mapa,row,origen:origenDe(unidad,row[0],row[1],row)});
+    }
+    return salida;
+  };
+  function selectorMaterias(box,ctx,datos){
+    const panel=nodo('details');panel.appendChild(nodo('summary',tx('cc_seleccionar')));
+    const mapas=recursos?.mapas||{},unidadOpts=Object.entries(mapas).map(([id,m])=>[id,id.toUpperCase(),m.nombre||id.toUpperCase()]);
+    if(!unidadOpts.length)return;
+    const origen=nodo('div'),un=nodo('select'),car=nodo('select'),plan=nodo('select'),busca=nodo('input');busca.type='search';busca.placeholder=tx('cc_buscar_placeholder');
+    const checks=nodo('div',null,'electivas-cc-lista'),resumenElegidas=nodo('p');resumenElegidas.setAttribute('aria-live','polite');
+    let unidad=unidadOpts[0][0],carreraOrigen='',planOrigen='',marcadas=new Set();
+    const opciones=(sel,items,placeholder)=>{sel.replaceChildren();sel.appendChild(nodo('option',placeholder));sel.firstChild.value='';for(const [v,t] of items){const o=nodo('option',t);o.value=v;sel.appendChild(o)}};
+    const renderFilas=()=>{
+      checks.replaceChildren();let elegidas=0,ht=0,hp=0,creditos=0;
+      const q=R.norm(busca.value||'');
+      let semestre='';
+      for(const {row,origen:o} of catalogoOrigen(unidad,carreraOrigen,planOrigen).sort((a,b)=>+a.row[2]-+b.row[2])){
+        if(q&&!R.norm(row[3]+' '+row[4]).includes(q))continue;
+        if(String(row[2])!==semestre){semestre=String(row[2]);checks.appendChild(nodo('h5',tx('cc_semestre',{n:semestre})));}
+        const id=origenId(o),ya=actsOrigen(datos).has(id),l=nodo('label',null,'tramite-campo'),cb=nodo('input');cb.type='checkbox';cb.checked=ya||marcadas.has(id);cb.disabled=ya;cb.setAttribute('aria-label',row[3]+' · '+row[4]);
+        cb.onchange=()=>{cb.checked?marcadas.add(id):marcadas.delete(id);renderFilas()};l.appendChild(cb);l.appendChild(nodo('span',tx('cc_materia',{clave:row[3],nombre:row[4],agregada:ya?tx('cc_ya_agregada'):''})));checks.appendChild(l);
+        if(ya||marcadas.has(id)){elegidas++;ht+=+row[7]||0;hp+=+row[8]||0;creditos+=R.credOf({k:'CC',ht:row[7],hp:row[8]})}
+      }
+      resumenElegidas.textContent=tx('cc_resumen',{n:elegidas,ht:R.fmt(ht),hp:R.fmt(hp),creditos:R.fmt(creditos)});
+    };
+    const llenarPlanes=()=>{const rows=mapas[unidad]?.rows||[],cars=[...new Set(rows.map(r=>r[0]))];opciones(car,cars.map(x=>[x,(SATE_DATA?.carreras?.[x]||tx('cc_carrera_fallback',{codigo:x}))] ),tx('cc_elige_carrera'));if(!cars.includes(carreraOrigen))carreraOrigen=cars[0]||'';car.value=carreraOrigen;const planes=[...new Set(rows.filter(r=>r[0]===carreraOrigen).map(r=>r[1]))];opciones(plan,planes.map(x=>[x,x]),tx('cc_elige_plan'));if(!planes.includes(planOrigen))planOrigen=planes[0]||'';plan.value=planOrigen;renderFilas()};
+    opciones(un,unidadOpts.map(([id,sigla])=>[id,sigla]),tx('cc_elige_unidad'));un.value=unidad;
+    for(const opt of un.options){const u=unidadOpts.find(([id])=>id===opt.value);if(u)opt.title=u[2]}
+    un.onchange=()=>{unidad=un.value;carreraOrigen='';planOrigen='';llenarPlanes()};
+    car.onchange=()=>{carreraOrigen=car.value;planOrigen='';llenarPlanes()};plan.onchange=()=>{planOrigen=plan.value;renderFilas()};busca.oninput=renderFilas;
+    const campoSelector=(etiqueta,elemento)=>{const l=nodo('label',null,'tramite-campo');l.appendChild(nodo('span',etiqueta));l.appendChild(elemento);origen.appendChild(l)};
+    campoSelector(tx('cc_unidad'),un);campoSelector(tx('cc_carrera'),car);campoSelector(tx('cc_plan'),plan);campoSelector(tx('cc_buscar'),busca);
+    panel.appendChild(origen);
+    const sugeridas=sugeridasKardex().filter(x=>!actsOrigen(datos).has(origenId(x.origen)));
+    if(sugeridas.length){panel.appendChild(nodo('h5',tx('cc_kardex')));for(const x of sugeridas){const sigla=x.unidad.toUpperCase(),b=boton(`${x.row[3]} · ${x.row[4]} · ${sigla}`,()=>{agregarMapa(datos,x.origen,x.row);ctx.cambiar();ctx.repintar()});b.title=x.mapa.nombre||sigla;b.setAttribute('aria-label',`${x.row[3]} · ${x.row[4]} · ${sigla}`);panel.appendChild(b)}}
+    panel.appendChild(checks);panel.appendChild(resumenElegidas);
+    panel.appendChild(boton(tx('cc_agregar'),()=>{for(const item of marcadas){const [u,c,p,k]=item.split('|'),row=filasMapa(u,c,p).find(r=>r[3]===k);if(row&&!actsOrigen(datos).has(item))agregarMapa(datos,origenDe(u,c,p,row),row)}ctx.cambiar();ctx.repintar()}));
+    llenarPlanes();box.appendChild(panel);
+  }
+  function agregarMapa(datos,o,row){if(actsOrigen(datos).has(origenId(o)))return;datos.actividades.push(actividadMapa(o.unidad,o.car,o.plan,row));}
   function campo(box,texto,valor,cambiar,{tipo='text',opciones,validar=textoValido,ayuda}={}){
     const l=nodo('label',null,'tramite-campo'),n=nodo(opciones?'select':tipo==='textarea'?'textarea':'input'),error=nodo('small','');
     if(opciones)for(const [v,t] of opciones){const o=nodo('option',t);o.value=v;n.appendChild(o)}else if(tipo!=='textarea')n.type=tipo;
@@ -107,6 +162,7 @@
       invitacion.appendChild(boton('Importar lo que llenaste en Electivas',()=>decidir(true)));invitacion.appendChild(boton('Seguir sin importar',()=>decidir(false)));box.appendChild(invitacion);
     }
     const sum=nodo('p',null,'electivas-resumen');sum.setAttribute('aria-live','polite');box.appendChild(sum);resumen(sum,d);
+    selectorMaterias(box,ctx,d);
     const resultados=nodo('div');const buscar=campo(box,'Busca una actividad por nombre o clave','',q=>{
       resultados.replaceChildren();for(const c of R.search(q))resultados.appendChild(elegir(c));
     });buscar.type='search';box.appendChild(resultados);
@@ -192,5 +248,5 @@
     {titulo:SATE.texto('sate.ventanilla.electivas_paso_formulario'),campos:[{id:'formulario',texto:'Formulario',render:formulario,validar:validarFormulario,revision:revisionFormulario}]}
   ]};
   SateTramites.registrar(def);
-  raiz.SateElectivas={preparar,inscrito,inicial,importar,validarActividad,validarActividades,validarFormulario,medir,totales,generar,def};
+  raiz.SateElectivas={preparar,inscrito,inicial,importar,validarActividad,validarActividades,validarFormulario,medir,totales,generar,actividadMapa,origenId,def};
 })(globalThis);

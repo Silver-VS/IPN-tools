@@ -66,6 +66,9 @@
 .sate-entrada :is(input,button):focus-visible{outline:2px solid var(--sate-realce);outline-offset:2px}
 .sate-unidades>li[hidden]{display:none}
 .tramite-lista{display:block}
+.electivas-cc-lista{max-height:20rem;overflow:auto;padding-inline:var(--ipn-esp-2);border:1px solid var(--ipn-borde-control);border-radius:var(--ipn-radio)}
+.electivas-cc-lista h5{margin-block:var(--ipn-esp-3) var(--ipn-esp-1)}
+.electivas-cc-lista .tramite-campo{flex-direction:row;align-items:center;gap:var(--ipn-esp-2);margin-block:var(--ipn-esp-1)}
 .tramite-proceso{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4);min-width:0}
 .tramite-asistente{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--ipn-esp-4)}
 .tramite-pantalla,.tramite-datos{min-width:0;max-width:100%;overflow-wrap:anywhere}
