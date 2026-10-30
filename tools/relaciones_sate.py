@@ -63,10 +63,17 @@ def generar(guia, config, unidad):
         for doc, lista in grupos:
             for n in re.findall(r'\d+', lista):
                 refs.append(dict(doc=doc, articulo=n, fuente='data/gestion_escolar/instructivo.txt#pagina-3/preambulo'))
-        area = areas.get('innovacion_educativa')
-        entrega = bool('El alumno entrega la constancia en el DIE.' in texto and re.search(r'Departamento de Innovación Educat\s*iva', texto))
+        # La práctica vigente de la unidad (data/sate.json · electivas.entrega) manda sobre el instructivo, que nombra al DIE.
+        vigente = cfg.get('electivas', {}).get('entrega')
+        if vigente:
+            area, entrega = areas.get(vigente['area']), True
+            fuente_entrega = f'data/sate.json#/unidades/{unidad}/electivas/entrega'
+        else:
+            area = areas.get('innovacion_educativa')
+            entrega = bool('El alumno entrega la constancia en el DIE.' in texto and re.search(r'Departamento de Innovación Educat\s*iva', texto))
+            fuente_entrega = 'data/gestion_escolar/instructivo.txt#DIE'
         tramites.append(dict(id=electivas, pregunta=None, articulos=refs,
                              area={k: area[k] for k in ('id', 'nombre', 'fuente')} if area and entrega else None,
                              fuente=f'data/sate.json#/unidades/{unidad}/electivas/tramite',
-                             fuenteEntrega='data/gestion_escolar/instructivo.txt#DIE' if entrega else None))
+                             fuenteEntrega=fuente_entrega if area and entrega else None))
     return dict(situaciones=situaciones, articulos=articulos, tramites=tramites)

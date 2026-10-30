@@ -97,7 +97,11 @@
       "cargaCalculada": false,
       "electivas": {
         "texto": "sate.electivas.acreditacion_actividades",
-        "tramite": "electivas"
+        "tramite": "electivas",
+        "entrega": {
+          "area": "gestion_escolar",
+          "fuente": "Dueño, 2026-10-30: «Es en gestión escolar» (práctica vigente; el instructivo oficial nombra al DIE)"
+        }
       },
       "biblioteca": "UPITA",
       "actividadesDatos": "actividades-upiita.json",
