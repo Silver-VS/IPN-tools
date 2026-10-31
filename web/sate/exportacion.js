@@ -230,7 +230,13 @@ async function exportPng(){
 async function loadPdfLib(){if(!window.PDFLib)await SATE.script('../assets/vendor/pdf-lib.min.js');return window.PDFLib}
 // El texto pasa por una sola conversión para conservar lo más posible en WinAnsi.
 const pdfText=t=>String(t).replace(/[’‘]/g,"'").replace(/[“”]/g,'"').replace(/[–—―]/g,'-').replace(/…/g,'...').replace(/[^\u0000-\u00ff]/g,'?');
-const pdfColor=(ctx,s)=>{ctx.fillStyle=s;const m=String(ctx.fillStyle).match(/\d+(?:\.\d+)?/g)||[0,0,0];return m.slice(0,3).map(Number).map(n=>n/255)};
+const pdfColor=(ctx,s)=>{
+  ctx.fillStyle=s;const color=String(ctx.fillStyle);
+  // Canvas normaliza los colores opacos a hexadecimal; sus dígitos no son canales decimales.
+  if(/^#[\da-f]{6}$/i.test(color))return [1,3,5].map(i=>parseInt(color.slice(i,i+2),16)/255);
+  const m=color.match(/\d+(?:\.\d+)?/g)||[];
+  return [0,1,2].map(i=>Number(m[i]||0)/255);
+};
 function vectorContext(page,PDFLib,W,H,scale,ox=0,oy=0){
   const {rgb}=PDFLib, point=PDFLib._point||((x,y)=>({x,y})), probe=document.createElement('canvas').getContext('2d');let sx=1,sy=1,fill='#000',stroke='#000',font='400 12px Arial',align='left',alpha=1,path=[],stack=[];
   const xy=(x,y)=>({x:ox+x*scale*sx,y:oy+(H-y*sy)*scale});
@@ -243,15 +249,20 @@ function vectorContext(page,PDFLib,W,H,scale,ox=0,oy=0){
   return api;
 }
 async function drawPdfPage(doc,PDFLib,part='all',page=null,pageSize=null,placement=null){
-  const measured=await drawFor(part,1), [PW,PH]=pageSize|| (EXP.style==='min'?[612,792]:[792,612]), m=24,
+  const measured=placement?.measured||await measurePdf(doc,PDFLib,part), [PW,PH]=pageSize|| (EXP.style==='min'?[612,792]:[792,612]), m=24,
     sc=placement?.scale||Math.min((PW-2*m)/measured.width,(PH-2*m)/measured.height),
     x=placement?.x??(PW-measured.width*sc)/2, bottom=placement?.bottom??(PH-measured.height*sc)/2;
   const pg=page||doc.addPage();if(!page)pg.setSize(PW,PH);
   if(EXP.dark&&!page)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:PDFLib.rgb(.08,.07,.08)});
-  vectorContext.reg=await doc.embedFont(PDFLib.StandardFonts.Helvetica);vectorContext.bold=await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
   const g=vectorContext(pg,PDFLib,measured.width,measured.height,sc,x,bottom);
   await drawFor(part,1,g);
   return pg;
+}
+async function measurePdf(doc,PDFLib,part='all'){
+  vectorContext.reg=await doc.embedFont(PDFLib.StandardFonts.Helvetica);vectorContext.bold=await doc.embedFont(PDFLib.StandardFonts.HelveticaBold);
+  // Medir con las mismas fuentes que se dibujarán evita cortes por diferencias con el lienzo PNG.
+  const sink={drawText(){},drawRectangle(){},drawLine(){}};
+  return drawFor(part,1,vectorContext(sink,PDFLib,0,0,1));
 }
 async function pdfPage(doc,PDFLib){return drawPdfPage(doc,PDFLib)}
 async function exportPdf(){
@@ -272,12 +283,12 @@ async function exportPdfAll(){
   let pg=null, col=0;
   const nueva=()=>{pg=doc.addPage();pg.setSize(PW,PH);if(EXP.dark)pg.drawRectangle({x:0,y:0,width:PW,height:PH,color:PDFLib.rgb(.078,.071,.078)});col=0};
   try{for(const id of ids){ws().plan=id;
-    const cv=await drawFor('all',1);
+    const cv=await measurePdf(doc,PDFLib);
     const sc=Math.min(colW/cv.width,(PH-2*m)/cv.height), w=cv.width*sc, h=cv.height*sc;
     if(!pg||col>=(two?2:1))nueva();
     const x0=m+col*(colW+GAP);
     const x=x0+(colW-w)/2, bottom=PH-m-h;
-    await drawPdfPage(doc,PDFLib,'all',pg,[PW,PH],{x,bottom,scale:sc,width:cv.width,height:cv.height});col++}}finally{ws().plan=prev}
+    await drawPdfPage(doc,PDFLib,'all',pg,[PW,PH],{x,bottom,scale:sc,measured:cv});col++}}finally{ws().plan=prev}
   doc.setTitle(txH('exportacion_titulo',{unidad:DATA.siglas||UNIDAD.toUpperCase()}));
   const r=await saveFile(`horarios-${UNIDAD}.pdf`,new Blob([await doc.save()],{type:'application/pdf'}));
   const n=doc.getPageCount();

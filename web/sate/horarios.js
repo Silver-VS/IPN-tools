@@ -218,7 +218,11 @@ $('#cal').addEventListener('click',e=>{
   const g=e.target.closest('.gapcell');
   if(g){const [d,a]=g.dataset.gap.split('|').map(Number);S.gap=S.gap&&S.gap.d===d&&S.gap.a===a?null:{d,a,b:a+BLOCK};
     renderActive();renderOffer();renderCal();if(S.gap)$('#h-offer').scrollIntoView({block:'start',behavior:'smooth'});return}
-  const b=e.target.closest('.blk[data-k]:not(.ghost)');if(!b)return;const o=document.querySelector(`.opt[data-k="${CSS.escape(b.dataset.k)}"]`);if(o)o.scrollIntoView({block:'center',behavior:'smooth'})});
+  const b=e.target.closest('.blk[data-k]:not(.ghost)');if(!b)return;
+  const c=byKey(b.dataset.k);if(!c)return;
+  // La opción elegida puede estar plegada detrás de una marca «Sí» de otro grupo.
+  S.expand.add(c[4]);renderOffer();
+  const o=document.querySelector(`.opt[data-k="${CSS.escape(b.dataset.k)}"]`);if(o)o.scrollIntoView({block:'center',behavior:'smooth'})});
 $('#own-f').addEventListener('submit',e=>{
   e.preventDefault();const n=$('#own-n').value.trim(),a=toMin($('#own-a').value),b=toMin($('#own-b').value);
   const oculto=SEMANA_ACTIVA&&$('#semana-oculta').checked,hsTxt=oculto?$('#semana-hs').value:'',hs=hsTxt!==''?parseFloat(hsTxt):null;
@@ -867,7 +871,7 @@ function renderOffer(){
     const html=desfaseAcciones(k);if(html)avisadas.add(k);return html;
   };
   const pendientes=()=>{$('#hor-desfase').innerHTML=isPersonal()?desfaseAvisos(avisadas):''};
-  if(S.onlyWant&&!tr().want.length){
+  if(S.onlyWant&&!tr().want.length&&!S.fit&&!S.gap){
     pendientes();
     $('#offer-count').textContent='';
     $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;
