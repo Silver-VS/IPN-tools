@@ -234,6 +234,9 @@ $('#own-f').addEventListener('submit',e=>{
   $('#own-n').value='';S.ownDays=[];if(SEMANA_ACTIVA){$('#semana-oculta').checked=false;$('#semana-hs').value='';$('#semana-hs-campo').hidden=true}renderOwnForm();refresh();
 });
 $('#b-saeshor').addEventListener('click',()=>loadInscrito());
+$('#b-traer-inscrito').addEventListener('click',()=>{
+  if(isPersonal()&&ALUMNO.horario_inscrito?.length)loadInscrito();else SAES.open();
+});
 $('#b-clear').addEventListener('click',()=>{plan().sel=[];plan().own=[];$('#copybox').hidden=true;refresh()});
 
 
@@ -283,6 +286,11 @@ function renderActive(){
     (S.gap?`<span class="pill gap"><i>${esc(txH('hueco'))}</i>${DAYS[S.gap.d]} ${hm(S.gap.a)}–${hm(S.gap.b)}<button data-ungap="1" aria-label="${esc(txH('quitar_hueco'))}">×</button></span>`:'');
 }
 function renderHFilters(){
+  const vigente=estadoPeriodoOferta(S.per).estado==='actual';
+  if(vigente)S.soloCupo=false;
+  const filtroCupo=$('#f-cupo').closest('label');if(filtroCupo)filtroCupo.hidden=vigente;
+  $('#f-cupo-ayuda').hidden=vigente;
+  document.querySelectorAll('#v-hor .cupos-cabecera').forEach(n=>n.hidden=vigente);
   document.querySelectorAll('#v-hor [data-htexto]').forEach(el=>el.textContent=txH(el.dataset.htexto));
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
   document.querySelectorAll('[data-gt]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gt===S.gt));
@@ -917,14 +925,19 @@ function loadInscrito(){
     // sin coincidencia en la oferta capturada: se agrega con las horas del SAES
     sinOferta++;const by={};ses.forEach(([d,a,b])=>{(by[a+'-'+b]=by[a+'-'+b]||{a,b,d:[]}).d.push(d)});
     Object.values(by).forEach(x=>pl.own.push({n:`${pretty(n)} (${g})`,d:x.d.sort(),a:x.a,b:x.b,saes:true}))});
-  render();
-  $('#exp-msg').textContent=txH('inscrito_cargado',{version:ws().plan,periodo:txH(per==='proximo'?'periodo_proximo':'periodo_actual')})+
+  save();render();
+  const p=estadoPeriodoOferta(per);
+  $('#exp-msg').textContent=txH('inscrito_cargado',{version:ws().plan,periodo:txH('oferta_'+p.estado,{periodo:p.periodo||''})})+
     (sinOferta?' '+txH('inscrito_sin_oferta',{n:sinOferta}):'');
+  $('#hor-inscrito-msg').textContent=$('#exp-msg').textContent;
+  console.info('SATE: horario inscrito cargado',{periodo:estadoPeriodoOferta(per).periodo,version:ws().plan,grupos:pl.sel.length,sinOferta});
 }
 // El periodo actual ya está inscrito; en otros periodos solo la versión cargada desde SAES.
-window.SateHorarioInscrito=()=>S.per==='actual'||!!plan().inscrita;
+window.SateHorarioInscrito=()=>estadoPeriodoOferta(S.per).estado==='actual'||!!plan().inscrita;
 function renderPlans(){
-  $('#b-saeshor').hidden=!(isPersonal()&&ALUMNO.horario_inscrito?.length);
+  const vigente=estadoPeriodoOferta(S.per).estado==='actual';
+  $('#b-traer-inscrito').hidden=!vigente;
+  $('#b-saeshor').hidden=vigente||!(isPersonal()&&ALUMNO.horario_inscrito?.length);
   const ids=planIds();
   $('#plans').innerHTML=`<span class="lbl" style="margin-right:var(--ipn-esp-1)">${esc(txH('version'))}</span>`+ids.map(p=>{const pl=ws().plans[p];const cr=pl.sel.map(byKey).filter(Boolean).reduce((s,c)=>s+c[7],0);
     return `<span class="plan-tab"><button class="chip" data-plan="${esc(p)}" aria-pressed="${ws().plan===p}">${esc(txH('horario',{version:p}))}<small>${pl.sel.length?fmtCr(cr)+' créditos':esc(txH('vacio'))}</small></button>${ids.length>1&&ws().plan===p?`<button class="x" data-delplan="${esc(p)}" aria-label="${esc(txH('eliminar_horario',{version:p}))}" title="${esc(txH('eliminar_horario',{version:p}))}">×</button>`:''}</span>`}).join('')+

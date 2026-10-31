@@ -1104,6 +1104,11 @@ error_plan = "El plan elegido no corresponde a esta carrera. Se cargaron sus pla
 error_red = "No se pudo consultar el SAES. Revisa tu conexión y vuelve a pulsar «Actualizar»."
 
 [sate.horarios]
+oferta_actual = "Actual {periodo}"
+oferta_proximo = "Próximo {periodo}"
+oferta_anterior = "Anterior {periodo}"
+traer_inscrito = "Traer mi horario inscrito"
+datos_oferta = "Datos de la oferta"
 d_filtros = "Filtros"
 d_editar_opciones = "Opciones del generador"
 d_opciones_resumen = "{n} materias · {dias} · Editar"

@@ -31,15 +31,19 @@
   }
   copia.append(enlaces);
   const acciones=document.createElement('div');acciones.className='sate-barra-acciones';
-  for(const id of ['sate-ayuda-recorrido','theme-btn']){
-    const original=document.getElementById(id);if(!original)continue;
-    const boton=original.cloneNode(true);boton.removeAttribute('id');boton.addEventListener('click',()=>original.click());acciones.append(boton);
-  }
+  const origen=menu?.parentElement,mqAcciones=matchMedia('(max-width:1023px)');
+  const adaptarAcciones=()=>{if(menu)menu.open=menu.closest('.sate-barra-flotante')?!mqAcciones.matches:!matchMedia('(max-width:767px)').matches};
+  mqAcciones.addEventListener('change',adaptarAcciones);
   bar.append(marca,copia,acciones);h.after(bar);
+  bar.addEventListener('keydown',e=>{if(e.key==='Escape'&&mqAcciones.matches&&menu){menu.open=false;menu.querySelector('summary').focus()}});
   // Reservar el mismo tope antes y después del umbral: mostrar la barra no empuja los sticky.
   const sync=()=>{
-    bar.hidden=!(mq.matches&&nav.getBoundingClientRect().bottom<0);
-    document.documentElement.style.setProperty('--sate-barra-alto',(mq.matches?Math.ceil(bar.getBoundingClientRect().height):0)+'px');
+    const mostrar=(mq.matches?nav:h).getBoundingClientRect().bottom<0;
+    bar.hidden=!mostrar;
+    if(menu&&menu.parentElement!==(mostrar?acciones:origen)){
+      (mostrar?acciones:origen).append(menu);adaptarAcciones();
+    }
+    document.documentElement.style.setProperty('--sate-barra-alto',(mostrar?Math.ceil(bar.getBoundingClientRect().height):0)+'px');
   };
   let pendiente=false;
   const actualizar=()=>{if(pendiente)return;pendiente=true;requestAnimationFrame(()=>{pendiente=false;sync()})};

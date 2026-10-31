@@ -1294,6 +1294,9 @@ def escribir_sate(data):
     shutil.copy(fuente / 'recorrido.js', destino / 'recorrido.js')
     shutil.copy(ROOT / 'data/recorrido.json', destino / 'recorrido.json')
     identidad_unidades = cuenta.identidades()
+    # Las copias locales pueden carecer del catálogo de logos; evitar peticiones 404.
+    for identidad in identidad_unidades.values():
+        identidad['logoDisponible'] = (dist / 'assets/logos/unidades' / (identidad.get('logo', 'ipn') + '.webp')).is_file()
     unidades = {u["id"]: u for u in cuenta.config()["unidades"]}
     for u, c in cfg["unidades"].items():
         c["vistas"] = [v for v in c.get("vistas", []) if DATOS_VISTAS.get(v["id"], lambda _u: True)(u)]

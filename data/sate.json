@@ -19,6 +19,7 @@
   "_vistasExternas": "Capacidad opcional por unidad en vistas: {\"id\":\"grupos\",\"href\":\"grupos/\",\"externa\":true}. Añade una pestaña con enlace relativo a sate/; textos sate.pestana.grupos.titulo y .corto. habilitada:false la apaga. Documentada, sin activar en ninguna unidad; ver docs/SATE-ENCABEZADO.md.",
   "unidades": {
     "upiita": {
+      "ofertaPeriodos": {"actual": "26/2", "proximo": "27/1"},
       "pestanas": [
         "trayectoria",
         "mapa",
@@ -112,6 +113,7 @@
       }
     },
     "escom": {
+      "ofertaPeriodos": {"actual": "27/1"},
       "pestanas": [
         "trayectoria",
         "mapa",
@@ -148,6 +150,7 @@
       }
     },
     "upibi": {
+      "ofertaPeriodos": {"actual": "27/1"},
       "pestanas": [
         "trayectoria",
         "mapa",

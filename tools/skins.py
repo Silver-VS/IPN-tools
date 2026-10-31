@@ -1,7 +1,7 @@
 """Tema visual común de Horarios y Electivas: solo el institucional (neutros zinc y acento guinda) con claro/oscuro.
 
 Las variantes lab/plano/aurora y su selector se retiraron (decisión del dueño, 2026-10-06). Aquí quedan: el script que aplica
-el tema antes de pintar y la escala en pantallas anchas, el botón claro/oscuro y las reglas del aspecto antes llamado aurora.
+el tema antes de pintar, el botón claro/oscuro y las reglas del aspecto antes llamado aurora.
 Se inyecta en las plantillas en /*__SKINS__*/ (CSS) y <!--__THEME_BTN__--> (botón).
 """
 
@@ -13,7 +13,6 @@ h2{letter-spacing:-.015em}
 .btn,.chip,.seg,input,select{border-radius:var(--ipn-radio-control,.5rem)}
 .seg button{border-radius:var(--ipn-radio-control,.5rem)}
 header.top{border-bottom:1px solid var(--line)}
-body{zoom:var(--ui-zoom,1)}
 /* algunos navegadores (Firefox con zoom) no repintan el texto de ejemplo al escribir: se oculta explícitamente */
 input:not(:placeholder-shown)::placeholder,textarea:not(:placeholder-shown)::placeholder{color:transparent;opacity:0}
 .title-row{display:flex;align-items:center;gap:12px}
@@ -32,10 +31,8 @@ EARLY = ("<script>(function(){var r=document.documentElement;"
          # los tokens de ipn-comun cambian de tema con data-tema (claro/oscuro): se copia desde data-theme en todo momento
          "var sync=function(){var t=r.getAttribute('data-theme');if(t)r.setAttribute('data-tema',t==='dark'?'oscuro':'claro');else r.removeAttribute('data-tema')};"
          "sync();if(window.MutationObserver)new MutationObserver(sync).observe(r,{attributes:true,attributeFilter:['data-theme']});"
-         # escala en pantallas anchas: el contenido se diseña para ~1550 px; más ancho, todo crece (máx. 1.35×).
-         # Con zoom manual del navegador el ancho útil baja y la escala vuelve a 1 (no se acumula).
-         "var z=function(){var v=Math.min(1.35,Math.max(1,innerWidth/1550));r.style.setProperty('--ui-zoom',v.toFixed(3))};"
-         "z();addEventListener('resize',z)})()</script>")
+         # La escala la decide el navegador; compensarla con innerWidth anula su zoom.
+         "})()</script>")
 
 # Selector claro/oscuro junto al título (<!--__THEME_BTN__-->). Por defecto sigue al navegador; el botón cambia el tema
 # durante la visita y, si coincide con el del sistema o el sistema cambia, vuelve a modo automático.

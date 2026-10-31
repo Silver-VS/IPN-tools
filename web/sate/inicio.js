@@ -259,7 +259,7 @@
     const halo = document.createElement('span'); halo.className = 'sate-logo-halo'; halo.dataset.unidad = id;
     halo.style.setProperty('--halo', colorHalo(id));
     const img = document.createElement('img'); img.className = 'sate-logo-unidad';
-    img.src = '../assets/logos/unidades/' + (SATE_CONFIG.identidadUnidades?.[id]?.logo || config[id]?.logoUnidad || 'ipn') + '.webp';
+    img.src = SATE_CONFIG.identidadUnidades?.[id]?.logoDisponible===false?'../assets/logos/ipn-isologo-guinda.webp':'../assets/logos/unidades/' + (SATE_CONFIG.identidadUnidades?.[id]?.logo || config[id]?.logoUnidad || 'ipn') + '.webp';
     img.alt = nombre; img.onerror = () => { halo.hidden = true; img.hidden = true; };
     halo.appendChild(img);
     return halo;

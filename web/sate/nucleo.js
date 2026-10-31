@@ -1,6 +1,17 @@
 const DATA=window.SATE_DATA;
 const UNIDAD=DATA.unidad||window.SATE_UNIDAD;window.IPNT_UNIDAD=UNIDAD;
 const CAPACIDADES=window.SATE_CONFIG?.unidades?.[UNIDAD]||{};
+// Las claves de captura son estables: no se intercambian horarios guardados al cambiar de semestre.
+function estadoPeriodoOferta(per,hoy=new Date()){
+  const periodo=CAPACIDADES.ofertaPeriodos?.[per],fechas=window.SATE_CONFIG?.calendarioBase?.periodos?.[periodo];
+  const dia=[hoy.getFullYear(),String(hoy.getMonth()+1).padStart(2,'0'),String(hoy.getDate()).padStart(2,'0')].join('-');
+  if(!fechas){
+    const vigente=Object.entries(window.SATE_CONFIG?.calendarioBase?.periodos||{}).find(([,f])=>f.desde<=dia&&dia<=f.hasta)?.[0];
+    const indice=p=>{const m=/^(\d{2})\/([12])$/.exec(p||'');return m?+m[1]*2 + +m[2]:null};
+    return {periodo,estado:periodo&&vigente?(indice(periodo)<indice(vigente)?'anterior':indice(periodo)>indice(vigente)?'proximo':'actual'):per};
+  }
+  return {periodo,estado:dia<fechas.desde?'proximo':dia>fechas.hasta?'anterior':'actual'};
+}
 const PLAN_DOS_PERIODOS=window.SATE_CONFIG?.unidades?.[UNIDAD]?.planDosPeriodos===true;
 const planPasos=()=>PLAN_DOS_PERIODOS?[0,1]:[0];
 const DAYS=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'], DAYN=['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
@@ -857,7 +868,11 @@ function renderTop(){
   renderSimGlobal();
   if(!hasOffer(S.per)&&hasOffer('actual'))S.per='actual';
   document.querySelectorAll('[data-per]').forEach(b=>{const ok=hasOffer(b.dataset.per);b.disabled=!ok;b.title=ok?'':'El SAES aún no publica la oferta de este periodo'});
-  document.querySelectorAll('[data-per]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.per===S.per));
+  document.querySelectorAll('[data-per]').forEach(b=>{
+    const p=estadoPeriodoOferta(b.dataset.per);
+    b.textContent=SATE.texto('sate.horarios.oferta_'+p.estado,{periodo:p.periodo||''});
+    b.setAttribute('aria-pressed',b.dataset.per===S.per);
+  });
   document.querySelectorAll('[data-tab]').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===S.tab));
 
   
@@ -875,8 +890,8 @@ function renderTop(){
   if(!grupos.has(S.car))grupos.set(S.car,new Set(oferta.filter(c=>c[0]===S.car).map(c=>c[3])).size);
   const n=grupos.get(S.car);
   const nota=(clave,datos)=>SATE.texto('sate.horarios.'+clave,datos);
-  $('#notice').textContent=[nota('captura_fecha',{fecha:f}),nota('captura_grupos',{n}),
-    !hasOffer('proximo')?nota('captura_sin_proximo'):S.per==='proximo'?nota('captura_incompleta'):'',
+  if(SATE.actual?.pestana==='horarios')$('#notice').textContent=[nota('captura_fecha',{fecha:f}),nota('captura_grupos',{n}),
+    estadoPeriodoOferta(S.per).estado==='proximo'?nota('captura_incompleta'):'',
     n===0?nota('captura_sin_grupos'):'',DATA.salones?.fuente==='saes'?nota('captura_salones_saes'):(DATA.salones?.periodos?.[S.per]||(S.per==='actual'&&DATA.salones))?nota('captura_salones_aula',{periodo:(DATA.salones.periodos?.[S.per]||DATA.salones).periodo}):nota('captura_sin_salones')].filter(Boolean).join(' · ');
 }
 /* Vista en lista (teléfono): materias por semestre propuesto con su estado y un botón para agregarlas */

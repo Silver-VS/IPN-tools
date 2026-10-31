@@ -871,14 +871,9 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
 
 <div class="wrap">
   <!--__SATE_ENCABEZADO__-->
+  <div class="bar-top" hidden></div>
 
   <section id="sate-entrada" class="card sate-entrada" aria-labelledby="sate-entrada-titulo" hidden></section>
-  <div class="bar-top">
-    <div class="field" id="sate-oferta-periodo"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
-      <button data-per="proximo">Próximo</button><button data-per="actual">Actual</button>
-    </div></div>
-    <div class="notice" id="notice"></div>
-  </div>
   <div class="saes-mm" id="saes-mismatch" role="status" hidden></div>
   <div class="mobnote" id="mobnote" role="note" hidden><span>Esta herramienta se aprovecha mejor en una <b>computadora</b> o tableta. En el teléfono, <b>gíralo a horizontal</b> para ver el mapa completo; en vertical se muestra una versión simplificada en lista.</span><button class="link" type="button" id="b-mobnote">Entendido</button></div>
 
@@ -956,6 +951,9 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
     <div class="est-eqv" id="est-eqv" hidden></div>
     <div id="hor-desfase"></div>
     <section class="filters filtros-d" id="filters" aria-label="Filtros">
+      <div class="field" id="sate-oferta-periodo"><span>Periodo de la oferta</span><div class="seg" role="group" aria-label="Periodo">
+        <button data-per="proximo">Próximo</button><button data-per="actual">Actual</button>
+      </div></div>
       <div class="field search">
         <span id="q-lbl">Buscar</span>
         <input id="f-q" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="ac" aria-labelledby="q-lbl" placeholder="Materia, clave, profesor o grupo" autocomplete="off">
@@ -981,6 +979,7 @@ html[data-vista=cupos] .brand h1{font-size:var(--ipn-tamano-l);line-height:1.25}
       </div>
       <div class="active" id="active"></div>
     </section>
+    <div class="hor-oferta-acciones"><button class="btn primary" type="button" id="b-traer-inscrito" data-htexto="traer_inscrito"></button><span id="hor-inscrito-msg" role="status"></span><details><summary data-htexto="datos_oferta"></summary><div class="notice" id="notice"></div></details></div>
     <section class="filtros-d-impacto" aria-label="Resultado de los filtros">
       <div class="filtros-d-resumen"><strong id="d-cuenta" role="status"></strong><button type="button" class="link" id="d-traslapes" aria-expanded="false" aria-controls="d-traslape-lista" hidden></button><button type="button" class="link" id="d-no-ocultos" hidden></button></div>
       <ul id="d-traslape-lista" class="filtros-d-traslapes" hidden></ul>
