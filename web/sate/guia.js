@@ -612,7 +612,7 @@
   }
   function cargarCss() {
     if (!BASE || !document.head) return;
-    for (const archivo of ['guia.css', 'temarios.css', '../policore/lector.css']) {
+    for (const archivo of ['guia.css', 'actividades.css', 'temarios.css', '../policore/lector.css']) {
       const href = BASE + archivo;
       if ([...document.querySelectorAll('link[data-tmr-css]')].some(l => l.getAttribute('href') === href)) continue;
       document.head.appendChild(h('link', { rel: 'stylesheet', href, 'data-tmr-css': '' }));
@@ -936,7 +936,7 @@
       return h('a',{href:rutaGuia('ruta',r.id),'class':'guia-ruta-tarjeta','data-ruta':r.id,'aria-current':elegida===r.id?'true':null},[
         h('div',{'class':'guia-ruta-titulo'},[iconoRuta(r.id),h('h4',{texto:tx(r.id)}),s&&elegida===r.id?h('small',{'class':'guia-aplica',texto:tx('tu_situacion')}):null]),
         h('p',{texto:tx(r.id+'_detalle')}),h('ul',{},[...r.consultas.map(id=>ps.find(p=>p.id===id)).filter(Boolean).slice(0,3).map(p=>h('li',{texto:p.pregunta})),...(r.muestrasActividades||[]).map(c=>h('li',{texto:tx('muestra_'+c)}))]),
-        h('small',{texto:tx('conteo',{n:ps.length})+(formatos.size?' · '+tx(formatos.size===1?'un_formato':'n_formatos',{n:formatos.size}):'')+(n?' · '+tx('aplican',{n}):'')+(r.actividades && d.actividades?' · '+t('sate.guia.actividades_resultados',{n:d.actividades.elementos.length}):'')})]);
+        h('small',{texto:tx('conteo',{n:ps.length})+(formatos.size?' · '+tx(formatos.size===1?'un_formato':'n_formatos',{n:formatos.size}):'')+(n?' · '+tx('aplican',{n}):'')+(r.actividades && d.actividades?' · '+t('sate.guia.actividades_resultados',{n:d.actividades.total ?? d.actividades.secciones.reduce((n,s)=>n+s.items.length,0)}):'')})]);
     }))]));
     contenido.appendChild(h('section',{'class':'guia-consulta'},[h('h3',{texto:tx('consulta')}),h('div',{},['reglamentos','acudir','programas','tramites'].filter(id=>apartados().some(a=>a.id===id)).map(id=>h('a',{href:rutaGuia(id)},[h('strong',{texto:id==='tramites'?tx('formatos'):tituloApartado(id)}),h('small',{texto:t(infoApartado(id).descripcion)})])))]));
     return buscador.cab.querySelector('h2');
@@ -2028,67 +2028,18 @@
     return { titulo: cab.titulo };
   }
 
-  // Las dos entradas comparten selección, ficha y ventana; la ruta solo acota los datos.
+  // La portada y las rutas de orientación usan el mismo catálogo filtrado en la compilación.
   function catalogoActividades(d, opciones={}) {
-    const contenido=d.actividades, preguntas=opciones.preguntas || [];
-    const categorias=(opciones.categorias || contenido.categorias || [...new Set(contenido.elementos.map(a=>a.categoria))])
-      .filter(cat=>contenido.elementos.some(a=>a.categoria===cat));
-    const elementos=contenido.elementos.filter(a=>categorias.includes(a.categoria));
-    const numero=a=>String(contenido.elementos.indexOf(a)+1);
-    const actividad=elementos.find(a=>numero(a)===parametroGuia('actividad'));
-    let categoria=actividad?.categoria || (categorias.includes(opciones.categoria)?opciones.categoria:categorias[0]), elegido=actividad || elementos.find(a=>a.categoria===categoria);
-    const zona=h('section',{'class':'sate-catalogo'}), panel=h('div',{'class':'sate-catalogo__marco',id:'guia-catalogo-panel',role:'tabpanel'});
-    const nombres=cat=>t('sate.guia.actividades_'+cat);
-    // Sin íconos por categoría hasta tener uno propio para cada una: mezclados se ven desiguales.
-    const iconos={};
-    const icono=cat=>SateUI.iconoPestana(iconos[cat]);
-    const renglones=texto=>h('div',{'class':'sate-catalogo__renglones'},
-      // Conserva la puntuación y no parte correos, abreviaturas ni dominios.
-      (texto.match(/[^;]+;?\s*/g) || []).map(parte=>h('p',{texto:parte})));
-    function ficha(a) {
-      const relacionadas=preguntas.filter(p=>(p.palabras || []).some(palabra=>norm(palabra)===norm(a.categoria)) || norm(p.pregunta).includes(norm(a.categoria)));
-      const areas=[...new Set(relacionadas.flatMap(p=>p.acudir || []))].map(id=>d.acudir.find(a=>a.id===id)).filter(Boolean);
-      const relacionados=h('div',{'class':'sate-catalogo__relacionados'},areas.map(area=>h('a',{
-        href:rutaGuia('acudir',area.id),'class':'sate-catalogo__relacionado'},[
-        h('span',{'data-oficial':area.fuente?.doc,texto:area.nombre}),h('small',{texto:t('sate.guia.a_quien')})])));
-      return h('article',{'class':'sate-catalogo__ficha'},[
-        h('header',{},[h('small',{'class':'sate-catalogo__categoria'},[icono(a.categoria),nombres(a.categoria)]),h('h3',{texto:a.nombre}),h('p',{texto:a.ofrece})]),
-        h('dl',{},['donde','requisitos','inscripcion'].filter(k=>a[k]).map(k=>h('div',{},[
-          h('dt',{texto:t('sate.guia.actividades_'+k+(k==='donde'?'':'_titulo'))}),h('dd',{},[k==='donde'?h('p',{texto:a[k]}):renglones(a[k])])]))),
-        enlaceExterno('sate-btn sate-btn--primario',a.url,t('sate.guia.actividades_sitio')),
-        areas.length?h('section',{},[h('h4',{texto:t('sate.guia.actividades_relacionado')}),relacionados]):null,
-        h('footer',{},[enlaceExterno('',a.url,t('sate.guia.actividades_fuente',{sitio:a.url.split('/')[2]})),
-          h('small',{texto:t('sate.guia.actividades_consulta',{fecha:fechaRevision(a.consulta)})})])]);
+    const zona = raiz.SateActividades.crear(d.actividades, {texto:t, seccion:opciones.categoria,
+      actividad:parametroGuia('actividad')});
+    const preguntas = h('section', {'class':'act-preguntas'});
+    for (const p of opciones.preguntas || []) {
+      const b = h('button', {type:'button', 'class':'sate-btn', 'data-pregunta':p.id, texto:p.pregunta});
+      b.addEventListener('click', () => SateUI.modal(p.pregunta, respuesta(d,p), {lectura:true, flotante:true, origen:b,
+        volver:t('sate.guia.actividades_volver')}));
+      preguntas.appendChild(b);
     }
-    function seleccionar(a,origen) {
-      elegido=a;
-      for(const b of panel.querySelectorAll('[data-actividad]'))b.setAttribute('aria-current',numero(a)===b.getAttribute('data-actividad')?'true':'false');
-      panel.querySelector('.sate-catalogo__detalle')?.replaceChildren(ficha(a));
-      console.debug('SATE: catálogo de actividades',{categoria:a.categoria,actividad:numero(a),ventana:raiz.matchMedia('(max-width:600px)').matches});
-      if(raiz.matchMedia('(max-width:600px)').matches)SateUI.modal(a.nombre,ficha(a),{flotante:true,origen,volver:t('sate.guia.actividades_volver')});
-    }
-    function pintar() {
-      const lista=h('ul',{'class':'sate-catalogo__lista'});
-      for(const p of preguntas){
-        const b=h('button',{type:'button','class':'sate-catalogo__opcion','data-pregunta':p.id},[
-          h('small',{texto:t('sate.guia.actividades_pregunta')}),h('span',{texto:p.pregunta})]);
-        b.addEventListener('click',()=>SateUI.modal(p.pregunta,respuesta(d,p),{lectura:true,flotante:true,origen:b,volver:t('sate.guia.actividades_volver')}));
-        lista.appendChild(h('li',{},[b]));
-      }
-      for(const a of elementos.filter(a=>a.categoria===categoria)){
-        const b=h('button',{type:'button','class':'sate-catalogo__opcion','data-actividad':numero(a),'aria-current':a===elegido?'true':'false'},[
-          h('span',{'class':'sate-catalogo__nombre'},[icono(a.categoria),h('span',{texto:a.nombre})]),h('small',{texto:a.donde.replace(/;\s*/g,' · ')})]);
-        b.addEventListener('click',()=>seleccionar(a,b));lista.appendChild(h('li',{},[b]));
-      }
-      panel.replaceChildren(lista,h('div',{'class':'sate-catalogo__detalle','aria-live':'polite'},elegido?[ficha(elegido)]:[]));
-    }
-    if(!categorias.length)return h('p',{texto:t('sate.guia.sin_datos')});
-    const pestanas=SateUI.pestanas({etiqueta:t('sate.guia.actividades_categorias'),activa:categoria,
-      items:categorias.map(cat=>({id:cat,icono:iconos[cat],texto:nombres(cat)+' '+elementos.filter(a=>a.categoria===cat).length})),
-      alCambiar:cat=>{categoria=cat;if(elegido?.categoria!==cat)elegido=elementos.find(a=>a.categoria===cat);panel.setAttribute('aria-label',nombres(cat));pintar();}});
-    for(const b of pestanas.querySelectorAll('[role="tab"]'))b.setAttribute('aria-controls',panel.id);
-    zona.append(h('div',{'class':'sate-catalogo__pestanas'},[pestanas]),panel);
-    if(actividad && raiz.matchMedia('(max-width:600px)').matches)seleccionar(actividad,panel.querySelector('[data-actividad="'+numero(actividad)+'"]'));
+    if (preguntas.childNodes.length) zona.querySelector('.act-panel').appendChild(preguntas);
     return zona;
   }
 
@@ -2097,7 +2048,7 @@
     const rutas=(d.orientacion?.rutas || []).filter(r=>r.actividades);
     const preguntas=d.preguntas.filter(p=>rutas.some(r=>r.preguntas.includes(p.id)));
     raizGuia.append(cab.nodo,catalogoActividades(d,{categoria:id,preguntas}));
-    return {titulo:cab.titulo};
+    return {titulo:cab.titulo, destino:raizGuia.querySelector('[data-destino]')};
   }
 
   /* ---------- pestaña ---------- */

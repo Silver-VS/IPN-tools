@@ -182,8 +182,8 @@
     if (id === 'calendario') await script('calendario.js');
     if (id === 'horarios' && cfg.cupos) { await script('cupos.js'); await script('cupos-vista.js'); }
     if (id === 'mapa' || id === 'horarios') await script(id + '.js');
-    if (id === 'guia') await Promise.all([script('bibliotecas.js'), script('guia.js')]);
-    if (id === 'temarios') await Promise.all([script('bibliotecas.js'), script('guia.js'), script('temarios.js')]);
+    if (id === 'guia') await Promise.all([script('bibliotecas.js'), script('actividades.js'), script('guia.js')]);
+    if (id === 'temarios') await Promise.all([script('bibliotecas.js'), script('actividades.js'), script('guia.js'), script('temarios.js')]);
     if (id === 'tramites' && !cargas.has('tramites.json')) {
       cargas.set('tramites.json',json('tramites').then(d=>Object.assign(window.SATE_DATA,d)).catch(e=>{cargas.delete('tramites.json');throw e}));
     }
@@ -385,9 +385,11 @@
     const pendiente = m ? m.render(actual.pestana, () => modulos[actual.pestana].mostrar(actual)) : modulos[actual.pestana].mostrar(actual);
     SATE.calendario?.pintarRecorte(actual.pestana);
     document.body.setAttribute('data-sate-pestana',actual.pestana);
-    document.getElementById('sate-oferta-periodo').hidden=cfg.generica||actual.pestana!=='horarios';
-    document.getElementById('notice').hidden=cfg.generica||actual.pestana!=='horarios';
-    document.getElementById('mobnote').hidden=true;
+    // La entrada ligera de la Guía no monta los controles académicos de Horarios.
+    for (const id of ['sate-oferta-periodo','notice','mobnote']) {
+      const nodo = document.getElementById(id);
+      if (nodo) nodo.hidden = id === 'mobnote' || cfg.generica || actual.pestana !== 'horarios';
+    }
     return pendiente;
   }
   async function iniciarRecorrido() {

@@ -1188,7 +1188,9 @@ def escribir_guia(datos):
             raise ValueError('Pregunta sin ruta única: ' + p['id'])
     capacidad = leer(ROOT / 'data/sate.json').get('unidades', {}).get(UNIDAD, {}).get('actividadesDatos')
     if capacidad:
-        guia['actividades'] = json.loads((ROOT / 'data/guia' / capacidad).read_text(encoding='utf-8'))
+        catalogo = leer(ROOT / 'data' / capacidad['archivo'])
+        guia['actividades'] = {'secciones': [dict(s, items=[a for a in s['items'] if a['unidad'] in capacidad['ambitos']])
+                                            for s in catalogo['secciones'] if any(a['unidad'] in capacidad['ambitos'] for a in s['items'])]}
     if isinstance(guia.get('organigrama'), str):
         guia['organigrama'] = leer(ROOT / 'data/guia' / guia['organigrama'])
     bajas = json.loads((ROOT / 'data/gestion_escolar/bajas.json').read_text(encoding='utf-8'))
@@ -1211,7 +1213,7 @@ def escribir_guia(datos):
     indice['preguntas'] = [{k: v for k, v in p.items() if k in ('id', 'pregunta', 'apartado', 'etapa', 'formato', 'ventanilla', 'acudir', 'palabras')} for p in guia['preguntas']]
     indice['acudir'] = [{k: v for k, v in a.items() if k in ('id', 'nombre', 'fuente', 'para', 'pendiente', 'ambito')} for a in guia['acudir']]
     if guia.get('actividades'):
-        indice['actividades'] = {'elementos': [{} for _ in guia['actividades']['elementos']]}
+        indice['actividades'] = {'total': sum(len(s['items']) for s in guia['actividades']['secciones'])}
     (carpeta / 'indice.json').write_text(json.dumps(indice, ensure_ascii=False, separators=(',', ':')), encoding='utf-8')
 
 
@@ -1285,7 +1287,7 @@ def escribir_sate(data):
         shutil.copy(fuente / "medicion.js", destino / "medicion.js")
     else:
         (destino / "medicion.js").unlink(missing_ok=True)
-    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "encabezado.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "bajas.js", "temarios.js", "temarios.css", "guia.js", "guia.css", "bibliotecas.js"):
+    for nombre in ("calendario.js", "situacion.js", "mapa.js", "horarios.js", "inicio.js", "encabezado.js", "rutas.js", "componentes.js", "desempeno.js", "exportacion.js", "tramites.js", "dictamen.js", "electivas.js", "bajas.js", "temarios.js", "temarios.css", "guia.js", "guia.css", "actividades.js", "actividades.css", "bibliotecas.js"):
         shutil.copy(fuente / nombre, destino / nombre)
     shutil.copytree(ROOT / 'web/tramites', dist / 'tramites', dirs_exist_ok=True)
     shutil.copytree(ROOT / 'web/assets/vendor', dist / 'assets/vendor', dirs_exist_ok=True)
@@ -1528,7 +1530,7 @@ def optimizar_sate(destino):
     pagina = destino / 'index.html'
     html = pagina.read_text(encoding='utf-8')
     # El armazón común se descubre en el HTML, sin esperar al router ni al núcleo.
-    recursos = ['componentes.js', 'rutas.js', 'inicio.js', 'bibliotecas.js', 'guia.js', 'guia.css', 'temarios.css', '../policore/lector.css']
+    recursos = ['componentes.js', 'rutas.js', 'inicio.js', 'bibliotecas.js', 'actividades.js', 'guia.js', 'guia.css', 'actividades.css', 'temarios.css', '../policore/lector.css']
     enlaces = ''.join('<link rel="preload" href="' + r + '" as="script">' for r in recursos[:3])
     # El hash no se transmite al servidor: elegir la unidad antes de pedir su índice.
     precarga = r"""<script>
@@ -1553,6 +1555,8 @@ else if(seccion&&!['glosario','investigacion'].includes(seccion))dato('guia/preg
     identidades_unidad = identidades()
     logos = {u: [c['logo'][tema] for tema in ('claro', 'oscuro')] if c.get('logo') else
              ['assets/logos/unidades/' + identidades_unidad[u]['logo'] + '.webp'] for u, c in unidades.items()}
+    # Mismo criterio que logoDisponible: las copias locales no siempre tienen logos de unidad.
+    logos = {u: [ruta for ruta in rutas if (destino.parent / ruta).is_file()] for u, rutas in logos.items()}
     precarga = precarga.replace('__LOGOS__', json.dumps(logos))
     html = html.replace("worker-src 'none'", "worker-src 'self'")
     marca = '<meta name="referrer" content="strict-origin-when-cross-origin">'

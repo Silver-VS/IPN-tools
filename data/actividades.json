@@ -1,0 +1,823 @@
+{
+  "generado": "2026-10-31",
+  "secciones": [
+    {
+      "seccion": "Salud",
+      "items": [
+        {
+          "nombre": "Servicio de Atención a la Salud Escolar y Consulta Médica",
+          "unidad": "DAES",
+          "descripcion": "Atención médica preventiva y de primer contacto, valoración clínica general, curaciones, toma de signos vitales, expedición de certificados médicos escolares para actividades deportivas o trámites académicos, aplicación de medicamentos inyectables con receta y protocolo de estabilización o traslado en ambulancia ante urgencias.",
+          "requisitos": "Estar inscrito en el periodo lectivo vigente y presentar credencial escolar del IPN. Para curaciones o administración de inyectables es indispensable presentar receta médica vigente emitida por médico titulado y el medicamento cerrado con jeringa desechable.",
+          "horario": "no_verificado",
+          "lugar": "Consultorio médico de cada unidad académica y Unidad de Servicios Integrales de Salud Escolar en Zacatenco; Dirección de Apoyos a Estudiantes (DAES), Edificio de la Secretaría de Servicios Educativos, Zacatenco, Gustavo A. Madero, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / Correo: daes@ipn.mx",
+          "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+          "estado": "verificado",
+          "nota": "Confirmado en el portal oficial de la DAES. Los horarios específicos de atención dependen de los turnos escolares de cada plantel.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "localizador": "Servicio de Atención a la Salud Escolar y Consulta Médica"
+          }
+        },
+        {
+          "nombre": "Afiliación al Seguro de Salud para Estudiantes (Seguro Facultativo del IMSS)",
+          "unidad": "DAES",
+          "descripcion": "Cobertura médica integral que brinda el Instituto Mexicano del Seguro Social (IMSS) a los estudiantes de los niveles medio superior, superior y posgrado que no cuenten con régimen de seguridad social propio o como beneficiarios familiares, garantizando acceso a medicina familiar, especialidades, farmacia, estudios clínicos y hospitalización.",
+          "requisitos": "Estar formalmente inscrito en el IPN, tramitar o consultar el Número de Seguridad Social (NSS) ordinario, registrar los datos en el sistema institucional de servicios médicos y entregar la constancia de vigencia de derechos o cédula PrevenIMSS-Afiliación en la Jefatura de Departamento de Servicios Estudiantiles de la unidad académica.",
+          "horario": "no_verificado",
+          "lugar": "Jefatura de Departamento de Servicios Estudiantiles de cada plantel y DAES Zacatenco.",
+          "contacto": "Correo: daes@ipn.mx / Ventanillas de Servicios Estudiantiles",
+          "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+          "estado": "verificado",
+          "nota": "Verificado mediante el portal DAES. El enlace complementario institucional www.sismi.ipn.mx se listó con URLError en urls-verificadas.json.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "localizador": "Afiliación al Seguro de Salud para Estudiantes (Seguro Facultativo del IMSS)"
+          }
+        },
+        {
+          "nombre": "Póliza de Seguro Institucional de Vida y Contra Accidentes Escolares",
+          "unidad": "DAES",
+          "descripcion": "Póliza colectiva de protección que respalda económicamente a las y los alumnos del Instituto cubriendo gastos médicos derivados de lesiones corporales por accidentes ocurridos dentro de las instalaciones escolares, en trayectos directos de casa a escuela y escuela a casa, o durante visitas y competencias oficiales autorizadas.",
+          "requisitos": "Ser alumno inscrito en el ciclo escolar vigente, requisitar y firmar en tinta azul el formato oficial de Designación de Beneficiarios y entregarlo en el Departamento de Servicios Estudiantiles de su unidad académica.",
+          "horario": "no_verificado",
+          "lugar": "Departamento de Servicios Estudiantiles de cada unidad académica y oficinas centrales de la DAES.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / daes@ipn.mx",
+          "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+          "estado": "verificado",
+          "nota": "Confirmado en el catálogo oficial de servicios de la DAES.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "localizador": "Póliza de Seguro Institucional de Vida y Contra Accidentes Escolares"
+          }
+        },
+        {
+          "nombre": "Departamento de Orientación Juvenil (Salud Mental y Apoyo Socioemocional)",
+          "unidad": "DAES",
+          "descripcion": "Servicio institucional confidencial y gratuito orientado a favorecer el desarrollo humano, la permanencia escolar y el bienestar integral de la comunidad estudiantil mediante primeros auxilios psicológicos, contención inicial, asesoría individual y grupal, manejo del estrés y la ansiedad, prevención de conductas de riesgo y adicciones, y canalización a centros especializados.",
+          "requisitos": "Ser estudiante del IPN con inscripción vigente y solicitar la atención voluntariamente indicando boleta, plantel y datos de contacto.",
+          "horario": "no_verificado",
+          "lugar": "Departamento de Orientación Juvenil, Edificio de la Secretaría de Servicios Educativos, Unidad Profesional Adolfo López Mateos, Zacatenco; y áreas de Orientación Juvenil de cada escuela.",
+          "contacto": "Correo: orientacionjuvenil@ipn.mx / Teléfonos: 55 5729 6000 y 55 5729 6300, Ext. 51840",
+          "url": "https://www.ipn.mx/daes/servicios/orientacion-juvenil.html",
+          "estado": "verificado",
+          "nota": "Verificado literalmente en el sitio web oficial de Orientación Juvenil de la DAES.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/daes/servicios/orientacion-juvenil.html",
+            "url": "https://www.ipn.mx/daes/servicios/orientacion-juvenil.html",
+            "localizador": "Departamento de Orientación Juvenil (Salud Mental y Apoyo Socioemocional)"
+          }
+        },
+        {
+          "nombre": "Jornadas de Salud Preventiva, Vacunación y Donación de Sangre (POLIfest)",
+          "unidad": "DAES",
+          "descripcion": "Campañas de promoción de la salud y prevención de enfermedades en la comunidad politécnica que integran aplicación de vacunas para completar esquemas institucionales, campañas voluntarias de donación altruista de sangre, orientación en salud sexual y reproductiva, entrega de métodos anticonceptivos y actividades de bienestar en eventos POLIfest.",
+          "requisitos": "Pertenecer a la comunidad del IPN y presentar credencial escolar o institucional vigente.",
+          "horario": "no_verificado",
+          "lugar": "Explanadas, auditorios y consultorios médicos de las unidades académicas del IPN en Zacatenco, Santo Tomás y demás sedes.",
+          "contacto": "Correo: daes@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+          "estado": "verificado",
+          "nota": "Servicio oficial detectado en la página de Atención a la Salud de la DAES no desglosado en el catálogo previo.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "url": "https://www.ipn.mx/daes/servicios/atencion-a-la-salud.html",
+            "localizador": "Jornadas de Salud Preventiva, Vacunación y Donación de Sangre (POLIfest)"
+          }
+        },
+        {
+          "nombre": "Servicios Clínicos Universitarios CICS Santo Tomás (Odontología, Optometría y Psicología)",
+          "unidad": "IPN",
+          "descripcion": "Atención especializada abierta a la comunidad politécnica y sociedad en general en las clínicas del CICS UST: Clínica de Odontología (diagnóstico bucal, profilaxis, resinas, rehabilitación y cirugías mediante sistema SiSeCliO), Clínica de Optometría (evaluación integral de la salud ocular, refracción y anteojos mediante sistema SiSeCO) y Clínica de Psicología (evaluación, prevención y psicoterapia mediante sistema SiCAPPSI).",
+          "requisitos": "Presentar credencial del IPN para acceder a costos preferenciales de recuperación; agendar cita a través de los sistemas oficiales en línea (SiSeCO, SiSeCliO, SiCAPPSI) y cubrir la cuota de recuperación de insumos correspondiente.",
+          "horario": "no_verificado",
+          "lugar": "Centro Interdisciplinario de Ciencias de la Salud (CICS), Unidad Santo Tomás: Av. de los Maestros esq. Calzada de los Gallos, Col. Santo Tomás, Alcaldía Miguel Hidalgo, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / Sitio oficial CICS UST",
+          "url": "https://www.cics-sto.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado en el portal web institucional del CICS Unidad Santo Tomás.",
+          "fuente": {
+            "documento": "https://www.cics-sto.ipn.mx/",
+            "url": "https://www.cics-sto.ipn.mx/",
+            "localizador": "Servicios Clínicos Universitarios CICS Santo Tomás (Odontología, Optometría y Psicología)"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_salud"
+    },
+    {
+      "seccion": "Deportes",
+      "items": [
+        {
+          "nombre": "Oferta de Disciplinas Deportivas Formativas y Recreativas del IPN",
+          "unidad": "IPN",
+          "descripcion": "Práctica formativa y entrenamiento físico organizado en 34 disciplinas agrupadas en 6 categorías: Tiempo y Marca (Atletismo, Ciclismo, Levantamiento de Pesas, Natación, Patinaje sobre Ruedas, Pentatlón Moderno, Remo y Triatlón); De Conjunto (Baloncesto, Béisbol y Softbol, Fútbol Americano, Fútbol Siete/Asociación/Rápido, Lacrosse, Rugby, Tocho Bandera y Voleibol); Combate (Boxeo, Judo, Karate Do, Kendo, Lima Lama, Luchas Asociadas y Tae Kwon Do); Arte Competitivo (Ajedrez, Excursionismo y Montañismo, Fisicoconstructivismo, Gimnasia y Tiro con Arco); Raqueta (Frontón, Tenis y Tenis de Mesa); y Cultura Física (Activación Física para Poblaciones Especiales, Entrenamiento Multifuncional, Crossfit y Pausas Activas Laborales).",
+          "requisitos": "Copia de acta de nacimiento, CURP, credencial vigente del IPN que acredite calidad de alumno o comunidad, certificado médico reciente o vigencia de derechos de seguridad social (IMSS o ISSSTE), fotografías tamaño infantil, Formato Universal Deportivo de inscripción debidamente requisitado y firmado, y aviso de privacidad.",
+          "horario": "no_verificado",
+          "lugar": "Complejo Deportivo Zacatenco (Estadio Wilfrido Massieu, gimnasios centrales y canchas) y coordinaciones deportivas de las unidades académicas.",
+          "contacto": "Dirección de Actividades Deportivas: Av. Luis Enrique Erro S/N, Unidad Profesional Adolfo López Mateos, Zacatenco, Gustavo A. Madero, CDMX. Conmutador IPN: 55 5729 6000 ext. 54676 / Correo: deportes@ipn.mx",
+          "url": "https://www.ipn.mx/deportes/",
+          "estado": "verificado",
+          "nota": "Confirmado en el portal oficial de la Dirección de Actividades Deportivas (DAD). Se rectifica el número oficial a 34 disciplinas institucionales.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/deportes/",
+            "url": "https://www.ipn.mx/deportes/",
+            "localizador": "Oferta de Disciplinas Deportivas Formativas y Recreativas del IPN"
+          }
+        },
+        {
+          "nombre": "Equipos Representativos Institucionales y Deporte Competitivo",
+          "unidad": "IPN",
+          "descripcion": "Convocatorias abiertas y selectivos para integrar las selecciones deportivas representativas del Politécnico (Burros Blancos y selectivos institucionales) que compiten en torneos interpoblacionales, ligas de ONEFA, campeonatos federados y los Juegos Deportivos Nacionales de Educación Superior (Universiada CONDDE).",
+          "requisitos": "Mantener condición de alumno regular inscrito en el IPN, presentarse a los periodos de visorías y tryouts, aprobar los exámenes médicos integrales del Centro de Medicina de la Actividad Física y el Deporte del IPN y cumplir con el carnet de elegibilidad deportiva.",
+          "horario": "no_verificado",
+          "lugar": "Instalaciones de alto rendimiento deportivo del IPN, Unidad Profesional Adolfo López Mateos, Zacatenco, CDMX.",
+          "contacto": "Correo: deportes@ipn.mx / Conmutador IPN: 55 5729 6000 ext. 54676",
+          "url": "https://www.ipn.mx/deportes/",
+          "estado": "verificado",
+          "nota": "Confirmado en la sección de selecciones y torneos de la DAD.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/deportes/",
+            "url": "https://www.ipn.mx/deportes/",
+            "localizador": "Equipos Representativos Institucionales y Deporte Competitivo"
+          }
+        },
+        {
+          "nombre": "Complejo Acuático y Alberca Olímpica de Zacatenco",
+          "unidad": "IPN",
+          "descripcion": "Instalación acuática reglamentaria de 50 metros con fosa de clavados para impartición de clases de natación por niveles (principiantes, intermedios y avanzados), práctica de nado libre formativo, polo acuático, triatlón y justas politécnicas de curso largo y corto.",
+          "requisitos": "Credencial escolar del IPN vigente, comprobante de vigencia de seguridad social activa, examen médico dermatológico y de micosis expedido por el servicio médico de la alberca, uso obligatorio de gorra de natación de licra o silicón, traje de baño reglamentario (no bermudas), goggles, sandalias antiderrapantes y firma de la carta responsiva de natación.",
+          "horario": "no_verificado",
+          "lugar": "Complejo Acuático Zacatenco, Av. Instituto Politécnico Nacional esq. Av. Wilfrido Massieu, Unidad Profesional Adolfo López Mateos, Zacatenco, CDMX.",
+          "contacto": "Administración de la Alberca Olímpica / Conmutador IPN: 55 5729 6000 ext. 54676",
+          "url": "https://www.ipn.mx/deportes/",
+          "estado": "verificado",
+          "nota": "Confirmado en la sección de instalaciones deportivas de la DAD. Los horarios operan en bloques específicos según la convocatoria semestral.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/deportes/",
+            "url": "https://www.ipn.mx/deportes/",
+            "localizador": "Complejo Acuático y Alberca Olímpica de Zacatenco"
+          }
+        },
+        {
+          "nombre": "Beca Deportiva Institucional",
+          "unidad": "DAES",
+          "descripcion": "Estímulo económico mensual que otorga el IPN durante el ciclo escolar para apoyar a los estudiantes atletas que forman parte de los equipos representativos del Instituto avalados por la Dirección de Actividades Deportivas.",
+          "requisitos": "Estar inscrito en un programa académico de nivel medio superior o superior en el periodo escolar vigente, contar con un promedio mínimo de 6.0 en el ciclo anterior, disponer de la Constancia de Participación Deportiva oficial emitida y firmada por la persona titular de la DAD, y registrar la postulación en la plataforma SIBec.",
+          "horario": "Registro en línea 24 horas durante el calendario de convocatoria.",
+          "lugar": "Plataforma digital www.sibec.ipn.mx y Dirección de Actividades Deportivas en Zacatenco.",
+          "contacto": "Correos: becas@ipn.mx / deportes@ipn.mx",
+          "url": "https://www.sibec.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado en la Convocatoria General de Becas SIBec y portal DAD.",
+          "fuente": {
+            "documento": "https://www.sibec.ipn.mx/",
+            "url": "https://www.sibec.ipn.mx/",
+            "localizador": "Beca Deportiva Institucional"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_deportes"
+    },
+    {
+      "seccion": "Cultura",
+      "items": [
+        {
+          "nombre": "Talleres de Formación Artística y Cultural Centrales",
+          "unidad": "IPN",
+          "descripcion": "Oferta de talleres artísticos formativos extracurriculares coordinados por la Dirección de Difusión Cultural en las áreas de Música (coro, piano, guitarra, ensambles vocales, música folclórica y bandas), Danza (azteca, contemporánea, folclórica y de salón), Teatro (actuación, dirección y producción escénica) y Creación Literaria.",
+          "requisitos": "Ser estudiante formalmente inscrito en el IPN en niveles medio superior, superior o posgrado, presentar credencial escolar o tira de materias vigente, comprobante de vigencia de seguridad social y comprometerse a una asistencia mínima del 80% para tener derecho a constancia de acreditación.",
+          "horario": "no_verificado",
+          "lugar": "Centro Cultural «Jaime Torres Bodet», Av. Luis Enrique Erro S/N, Unidad Profesional Adolfo López Mateos, Zacatenco, Gustavo A. Madero, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / 55 5729 6300 (extensiones de Difusión Cultural)",
+          "url": "https://www.ipn.mx/cultura/",
+          "estado": "verificado",
+          "nota": "Confirmado en el portal de la Dirección de Difusión Cultural (DDC). Los horarios varían por disciplina y grupo conforme a la convocatoria semestral.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/cultura/",
+            "url": "https://www.ipn.mx/cultura/",
+            "localizador": "Talleres de Formación Artística y Cultural Centrales"
+          }
+        },
+        {
+          "nombre": "Elencos Artísticos Institucionales y Orquesta Sinfónica del IPN (OSIPN)",
+          "unidad": "IPN",
+          "descripcion": "Convocatorias abiertas de audición para integrar los grupos artísticos representativos institucionales (Coro Polifónico, danza folclórica y teatro), así como acceso de la comunidad politécnica a las temporadas quincenales de conciertos de la Orquesta Sinfónica del IPN (OSIPN), muestras cinematográficas, galas y conferencias en el Auditorio «Ing. Alejo Peralta» (aforo de 864 personas), Auditorio «Ing. Manuel Moreno Torres» (aforo de 304 personas) y Galería «Antonio Rodríguez».",
+          "requisitos": "Para asistir a conciertos y eventos: presentar credencial vigente del IPN para tarifas con descuento de estudiante o cortesías. Para integrarse como ejecutante: atender las convocatorias de audición de la DDC y acreditar las pruebas técnicas vocales o instrumentales.",
+          "horario": "no_verificado",
+          "lugar": "Centro Cultural «Jaime Torres Bodet», Av. Luis Enrique Erro S/N, Zacatenco, Gustavo A. Madero, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / Sitio oficial de Difusión Cultural",
+          "url": "https://www.ipn.mx/cultura/",
+          "estado": "verificado",
+          "nota": "Verificado en la DDC. Las funciones de la OSIPN se anuncian periódicamente en la cartelera semanal institucional.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/cultura/",
+            "url": "https://www.ipn.mx/cultura/",
+            "localizador": "Elencos Artísticos Institucionales y Orquesta Sinfónica del IPN (OSIPN)"
+          }
+        },
+        {
+          "nombre": "Beca Cultural Institucional",
+          "unidad": "DAES",
+          "descripcion": "Apoyo económico mensual otorgado a las y los alumnos que forman parte destacada y constante de los talleres o agrupaciones representativas culturales oficiales coordinadas por la Dirección de Difusión Cultural.",
+          "requisitos": "Estar inscrito en un programa académico de nivel superior en modalidad escolarizada, contar con un promedio general mínimo de 6.0 en el ciclo inmediato anterior, contar con la constancia de participación cultural expedida y validada por la Dirección de Difusión Cultural (DDC) con asistencia mínima del 80%, y registrar la solicitud en el SIBec.",
+          "horario": "Registro en línea 24 horas durante el calendario de convocatoria.",
+          "lugar": "Plataforma digital www.sibec.ipn.mx y Dirección de Difusión Cultural en Zacatenco.",
+          "contacto": "Correos: becas@ipn.mx / cultura@ipn.mx",
+          "url": "https://www.sibec.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado en la Convocatoria General de Becas SIBec y normativa DAES/DDC.",
+          "fuente": {
+            "documento": "https://www.sibec.ipn.mx/",
+            "url": "https://www.sibec.ipn.mx/",
+            "localizador": "Beca Cultural Institucional"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_cultura"
+    },
+    {
+      "seccion": "Idiomas",
+      "items": [
+        {
+          "nombre": "Centros de Lenguas Extranjeras (CENLEX Zacatenco y CENLEX Santo Tomás)",
+          "unidad": "IPN",
+          "descripcion": "Cursos curriculares y extracurriculares de lenguas extranjeras y originarias (inglés, francés, alemán, italiano, japonés, portugués, chino mandarín, ruso, náhuatl, lengua maya, lengua de señas mexicana y español para extranjeros) alineados al Marco Común Europeo de Referencia (MCER), en modalidades presenciales y a distancia, con cursos escolarizados entre semana o sabatinos y dominicales.",
+          "requisitos": "Haber concluido el nivel medio básico (secundaria), identificación oficial vigente, comprobante de calidad de alumno o credencial escolar del IPN vigente para tarifa preferencial de comunidad, registro en el SAES correspondiente (saes.cenlexz.ipn.mx para Zacatenco o saes.cenlexusto.ipn.mx para Santo Tomás) y pago referenciado de la cuota de recuperación.",
+          "horario": "Cursos entre semana (turnos matutino y vespertino) y sabatinos/dominicales (bloques matutinos).",
+          "lugar": "CENLEX Zacatenco: Av. Wilfrido Massieu s/n, Zacatenco, CDMX. CENLEX Santo Tomás: Manuel Carpio No. 471, Col. Santo Tomás, CDMX.",
+          "contacto": "CENLEX Zacatenco: Conmutador IPN 55 5729 6000 ext. 54300 y 54301 / DFLE central: www.ipn.mx/dfle/",
+          "url": "https://www.ipn.mx/dfle/",
+          "estado": "verificado",
+          "nota": "Confirmado en DFLE y plataforma saes.cenlexz.ipn.mx. Permite cubrir requisitos de titulación e intercambios internacionales.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/dfle/",
+            "url": "https://www.ipn.mx/dfle/",
+            "localizador": "Centros de Lenguas Extranjeras (CENLEX Zacatenco y CENLEX Santo Tomás)"
+          }
+        },
+        {
+          "nombre": "Exámenes de Diagnóstico, Acreditación y Certificación de Lenguas Extranjeras",
+          "unidad": "IPN",
+          "descripcion": "Aplicación de exámenes de ubicación diagnóstica, exámenes de acreditación de dominio y comprensión de lectura en lenguas extranjeras para procesos de titulación y posgrado del IPN, así como aplicación de certificaciones internacionales estandarizadas autorizadas (TOEFL ITP, DELF/DALF, Goethe-Zertifikat, entre otras).",
+          "requisitos": "Número de boleta del IPN o identificación oficial, registro en las fechas del calendario mensual de exámenes publicado por la DFLE y comprobante de pago bancario con la línea de captura autorizada.",
+          "horario": "no_verificado",
+          "lugar": "Dirección de Formación en Lenguas Extranjeras (DFLE), Unidad Profesional Adolfo López Mateos, Zacatenco, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / Sitio web oficial: www.ipn.mx/dfle/",
+          "url": "https://www.ipn.mx/dfle/",
+          "estado": "verificado",
+          "nota": "Verificado en la página oficial de la DFLE. Los calendarios de aplicación se publican mensualmente.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/dfle/",
+            "url": "https://www.ipn.mx/dfle/",
+            "localizador": "Exámenes de Diagnóstico, Acreditación y Certificación de Lenguas Extranjeras"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_idiomas"
+    },
+    {
+      "seccion": "Servicios Estudiantiles Centrales",
+      "items": [
+        {
+          "nombre": "Programa Institucional de Becas del IPN (Plataforma SIBec)",
+          "unidad": "DAES",
+          "descripcion": "Gestión, asignación y seguimiento de apoyos económicos monetarios institucionales dirigidos a estudiantes en modalidades escolarizada, no escolarizada o mixta: Beca Institucional, Beca de Regularización Académica, Beca de Excelencia, Beca de Transporte, Beca Deportiva, Beca Cultural y becas de vinculación con organismos externos (Bécalos, Telmex).",
+          "requisitos": "Nacionalidad mexicana, estar inscrito en un programa académico del IPN, mantener situación académica regular (salvo condiciones permitidas en convocatorias específicas), contar con el promedio mínimo estipulado según modalidad (7.0 para Beca Institucional; mayor a 9.0 para Excelencia; 6.0 para deportiva/cultural), cuenta bancaria de débito propia con CLABE interbancaria no mancomunada y cargar la solicitud con firma y documentos en formato PDF en SIBec.",
+          "horario": "Plataforma SIBec activa las 24 horas durante los plazos de la convocatoria oficial.",
+          "lugar": "Sistema Informático de Becas (www.sibec.ipn.mx) y ventanillas de becas de cada unidad académica.",
+          "contacto": "Correo: becas@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.sibec.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado en la plataforma oficial del SIBec y portal DAES.",
+          "fuente": {
+            "documento": "https://www.sibec.ipn.mx/",
+            "url": "https://www.sibec.ipn.mx/",
+            "localizador": "Programa Institucional de Becas del IPN (Plataforma SIBec)"
+          }
+        },
+        {
+          "nombre": "Sistema Institucional de Servicio Social (SISS)",
+          "unidad": "IPN",
+          "descripcion": "Gestión, consulta de programas autorizados, registro y liberación del Servicio Social de carácter formativo y obligatorio normado por la Dirección de Vinculación y Desarrollo Regional, donde las y los estudiantes prestan un mínimo de 480 horas en un lapso de 6 meses a 2 años.",
+          "requisitos": "Tener acreditado al menos el 70% de los créditos del plan de estudios en nivel superior (o 50% en nivel medio superior) o contar con estatus de egresado/pasante; mantener vigente el seguro facultativo o cobertura médica durante todo el periodo; y realizar el registro mediante el sistema oficial SISS.",
+          "horario": "Plataforma SISS accesible 24 horas en línea; validaciones y trámites en los horarios de atención de las escuelas.",
+          "lugar": "Plataforma institucional https://serviciosocial.ipn.mx/ y Departamentos de Extensión y Apoyos Educativos / UPIS de cada unidad académica.",
+          "contacto": "Correo de soporte técnico del sistema: siss@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://serviciosocial.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Confirmado en el sitio oficial del SISS y Reglamento de Servicio Social del IPN.",
+          "fuente": {
+            "documento": "https://serviciosocial.ipn.mx/",
+            "url": "https://serviciosocial.ipn.mx/",
+            "localizador": "Sistema Institucional de Servicio Social (SISS)"
+          }
+        },
+        {
+          "nombre": "Programas de Movilidad Académica Nacional e Internacional (DRI - ProMAN y ProMAI)",
+          "unidad": "IPN",
+          "descripcion": "Programas institucionales gestionados por la Dirección de Relaciones Internacionales que permiten realizar estancias académicas presenciales de un semestre lectivo en instituciones educativas nacionales con convenio (ProMAN) o en el extranjero (ProMAI), con revalidación curricular de asignaturas y asignación de apoyos económicos institucionales.",
+          "requisitos": "Ser alumno regular inscrito en modalidad escolarizada, contar con un promedio general mínimo de 8.5 en el historial académico, haber acreditado entre el 50% y el 80% de los créditos del plan de estudios al momento de postularse, no haber participado antes en dichos programas, y para movilidad internacional comprobar el dominio del idioma de instrucción requerido (nivel B1 o B2 según el MCER o lineamiento de la universidad receptora).",
+          "horario": "no_verificado",
+          "lugar": "Dirección de Relaciones Internacionales, Edificio de la Secretaría de Innovación e Integración Social, Zacatenco, Gustavo A. Madero, CDMX.",
+          "contacto": "Correos: mov.ins@ipn.mx / seguimiento.dri@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.ipn.mx/dri/",
+          "estado": "verificado",
+          "nota": "Verificado en la página oficial de la DRI y sus convocatorias de movilidad.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/dri/",
+            "url": "https://www.ipn.mx/dri/",
+            "localizador": "Programas de Movilidad Académica Nacional e Internacional (DRI - ProMAN y ProMAI)"
+          }
+        },
+        {
+          "nombre": "Centros de Apoyo a Estudiantes y Espacios Polifuncionales (CAE / CAP)",
+          "unidad": "DAES",
+          "descripcion": "Espacios y centros de servicio estudiantil equipados con infraestructura tecnológica, computadoras, conectividad a internet, herramientas de apoyo, préstamo de material, áreas de trabajo colaborativo e impresión/fotocopiado con servicios gratuitos o a bajo costo para la comunidad politécnica.",
+          "requisitos": "Presentar credencial del IPN vigente que acredite condición de alumno.",
+          "horario": "no_verificado",
+          "lugar": "Centros Polifuncionales en Zacatenco y Santo Tomás.",
+          "contacto": "Correo: daes@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.ipn.mx/daes/",
+          "estado": "verificado",
+          "nota": "Servicio oficial detectado en el portal de la DAES no incluido en el catálogo anterior.",
+          "fuente": {
+            "documento": "https://www.ipn.mx/daes/",
+            "url": "https://www.ipn.mx/daes/",
+            "localizador": "Centros de Apoyo a Estudiantes y Espacios Polifuncionales (CAE / CAP)"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_centrales"
+    },
+    {
+      "seccion": "Servicios UPIITA",
+      "items": [
+        {
+          "nombre": "Servicio Médico y Afiliación Estudiantil UPIITA",
+          "unidad": "UPIITA",
+          "descripcion": "Consulta de medicina general de primer contacto, curaciones menores, toma de signos vitales, expedición de certificados médicos escolares para deportes o trámites de titulación, y gestión y recepción de formatos para la afiliación al seguro facultativo del IMSS y seguros escolares.",
+          "requisitos": "Credencial escolar vigente de UPIITA o tira de materias timbrada. Para trámites de seguro facultativo, registro en sistema institucional y entrega de formatos de designación de beneficiarios en folder tamaño oficio.",
+          "horario": "no_verificado",
+          "lugar": "Edificio de Gobierno, Planta Baja, UPIITA (Av. Instituto Politécnico Nacional No. 2580, Col. Barrio la Laguna Ticomán, Gustavo A. Madero, CDMX).",
+          "contacto": "Dr. Rodrigo Ledezma García (Coordinador del Servicio Médico), Conmutador IPN: 55 5729 6000 ext. 56831 / Conmutador general de la unidad: ext. 56806",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Datos del médico titular y extensión confirmados en el directorio oficial de la UPIITA.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Servicio Médico y Afiliación Estudiantil UPIITA"
+          }
+        },
+        {
+          "nombre": "Servicio Dental UPIITA",
+          "unidad": "UPIITA",
+          "descripcion": "Consultorio odontológico que ofrece diagnóstico bucal, profilaxis, resinas, curaciones y tratamientos preventivos con cuotas de recuperación preferenciales para la comunidad de la unidad.",
+          "requisitos": "Credencial escolar vigente de la UPIITA y pago de cuota de recuperación de insumos.",
+          "horario": "no_verificado",
+          "lugar": "Edificio de Gobierno, Planta Baja, UPIITA.",
+          "contacto": "Dra. Griselda Leal Cruz (Servicio Dental), Conmutador IPN: 55 5729 6000 ext. 56830",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Responsable del consultorio dental y extensión verificadas en el directorio de UPIITA.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Servicio Dental UPIITA"
+          }
+        },
+        {
+          "nombre": "Coordinación de Orientación Juvenil UPIITA (Apoyo Psicológico)",
+          "unidad": "UPIITA",
+          "descripcion": "Atención socioemocional, apoyo psicológico de primer contacto, orientación sobre hábitos de estudio, manejo de ansiedad y estrés escolar, y canalización especializada para alumnas y alumnos de UPIITA.",
+          "requisitos": "Ser estudiante activo de UPIITA y solicitar la atención de forma personal o vía correo institucional.",
+          "horario": "no_verificado",
+          "lugar": "Área de Servicios Estudiantiles / Edificio de Gobierno, UPIITA.",
+          "contacto": "Mtra. Hilda Lucía Castro Pérez, correo: orientacion.upiita@ipn.mx, Conmutador IPN: 55 5729 6000 ext. 56819",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Coordinadora oficial, correo institucional y extensión verificadas en el directorio oficial.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Coordinación de Orientación Juvenil UPIITA (Apoyo Psicológico)"
+          }
+        },
+        {
+          "nombre": "Coordinación de Cultura y Actividades Deportivas UPIITA",
+          "unidad": "UPIITA",
+          "descripcion": "Coordinación de selecciones y torneos representativos de la escuela en disciplinas deportivas (fútbol soccer, fútbol rápido, básquetbol, voleibol, tocho bandera, artes marciales) y talleres formativos de expresión artística y cultural.",
+          "requisitos": "Ser alumno inscrito de UPIITA, credencial vigente, certificado médico escolar y comprobante de seguridad social.",
+          "horario": "no_verificado",
+          "lugar": "Canchas deportivas, gimnasio techado y salones de usos múltiples de UPIITA.",
+          "contacto": "Subdirección de Servicios Educativos e Integración Social / Conmutador IPN: 55 5729 6000 ext. 56806 y 56903 / Correo: difusion.upiita@ipn.mx",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Confirmado en el portal oficial y áreas deportivas de la unidad.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Coordinación de Cultura y Actividades Deportivas UPIITA"
+          }
+        },
+        {
+          "nombre": "Clubes de Robótica y Concurso «Guerra de Robots» UPIITA",
+          "unidad": "UPIITA",
+          "descripcion": "Agrupaciones extracurriculares estudiantiles como la Rama Estudiantil IEEE UPIITA y el Club de Mini Robótica, organizadores del certamen anual 'Guerra de Robots' con categorías de combate de 1 a 220 libras, minisumo, micro-sumo, insectos y seguidores de línea, obteniendo acreditaciones a competencias internacionales.",
+          "requisitos": "Ser estudiante de UPIITA con interés en la robótica y atender las convocatorias de reclutamiento y talleres de inicio de semestre.",
+          "horario": "no_verificado",
+          "lugar": "Laboratorios interdisciplinarios y cubículos de robótica de UPIITA.",
+          "contacto": "Rama Estudiantil IEEE / Conmutador IPN: 55 5729 6000 ext. 56806",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado en los registros oficiales y memorias del concurso institucional en UPIITA.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Clubes de Robótica y Concurso «Guerra de Robots» UPIITA"
+          }
+        },
+        {
+          "nombre": "Biblioteca de la UPIITA y Recursos Digitales",
+          "unidad": "UPIITA",
+          "descripcion": "Acervo bibliográfico especializado en ingeniería biónica, mecatrónica, telemática, sistemas automotrices y energía; consulta en sala, estantería abierta, acceso a la Biblioteca Digital del IPN y recursos científicos internacionales (IEEE Xplore, ScienceDirect, Springer, Wiley vía CONRICyT), y trámites de entrega de trabajos terminales y constancias de no adeudo.",
+          "requisitos": "Presentar credencial vigente de UPIITA.",
+          "horario": "no_verificado",
+          "lugar": "Edificio de Biblioteca de la UPIITA, Av. IPN No. 2580, Ticomán, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 ext. 56806",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "El horario de 08:00 a 20:00 hrs citado en el documento previo no figura explícitamente en el portal web oficial actual, por lo que se asienta como no_verificado.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Biblioteca de la UPIITA y Recursos Digitales"
+          }
+        },
+        {
+          "nombre": "CELEX UPIITA (Cursos Extracurriculares de Lenguas Extranjeras)",
+          "unidad": "UPIITA",
+          "descripcion": "Módulos de idiomas (principalmente inglés en modalidades sabatinas y en línea) para el desarrollo de competencias lingüísticas orientadas a la acreditación curricular de titulación y movilidad internacional.",
+          "requisitos": "Registro mediante el formulario oficial escolar en las fechas de convocatoria, comprobante de inscripción para cuota preferencial comunitaria y comprobante de pago bancario.",
+          "horario": "Modalidades sabatinas y virtuales según convocatoria semestral.",
+          "lugar": "Coordinación CELEX UPIITA, planta baja, edificio de gobierno.",
+          "contacto": "M. en E. Laura Adriana Revilla Cuevas (Coordinadora CELEX UPIITA) / Correo: celexupiita.alumnos@gmail.com / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Titular de coordinación y correo oficial confirmados en el portal de la unidad.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "CELEX UPIITA (Cursos Extracurriculares de Lenguas Extranjeras)"
+          }
+        },
+        {
+          "nombre": "Programa Institucional de Tutorías (PIT UPIITA), Red de Género y COSECOVI",
+          "unidad": "UPIITA",
+          "descripcion": "Acompañamiento tutorial escolar para orientación en la trayectoria curricular y prevención del rezago académico; acciones y atención por parte de la Red de Género para promover un entorno escolar libre de violencia y discriminación; y coordinación de seguridad interna, senderos seguros y protección civil a través del Comité de Seguridad y Contra la Violencia (COSECOVI).",
+          "requisitos": "Ser estudiante de UPIITA. Asignación de tutor a través del portal SAES.",
+          "horario": "Lunes a viernes de 07:00 a 14:00 hrs (Coordinación de Tutorías).",
+          "lugar": "Edificio de Gobierno de la UPIITA.",
+          "contacto": "M. en E. Maricruz Trejo Salazar (Coordinadora del PIT), correo: tutorias.upiita@ipn.mx, Conmutador IPN: 55 5729 6000 ext. 56857",
+          "url": "https://www.upiita.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Responsable, correo institucional, extensión y horario de atención verificados en el directorio oficial.",
+          "fuente": {
+            "documento": "https://www.upiita.ipn.mx/",
+            "url": "https://www.upiita.ipn.mx/",
+            "localizador": "Programa Institucional de Tutorías (PIT UPIITA), Red de Género y COSECOVI"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_unidad"
+    },
+    {
+      "seccion": "Servicios ESCOM",
+      "items": [
+        {
+          "nombre": "Servicio Médico ESCOM",
+          "unidad": "ESCOM",
+          "descripcion": "Consultas de medicina general de primer contacto por malestares agudos, expedición de certificados médicos para actividades deportivas, curaciones menores, toma de presión arterial, aplicación de inyecciones con receta médica obligatoria, determinación de niveles de glucosa por tira reactiva, orientación sobre altas y bajas del seguro facultativo (IMSS) y gestión de traslados en ambulancia cuando el estado de salud del paciente lo amerite.",
+          "requisitos": "Credencial vigente de la ESCOM o comprobante del SAES. Para inyecciones y curaciones es indispensable receta médica emitida por profesional con cédula.",
+          "horario": "Turno Matutino: Lunes a viernes de 08:00 a 15:00 hrs (Dra. Aideé Lizbeth Galván Zermeño y Dr. Daniel Mauricio Temozihui Trejo). Turno Vespertino: Lunes a viernes de 16:00 a 22:00 hrs (Dr. Óscar Cortés Jiménez y Dr. Cuauhtémoc García Hidalgo).",
+          "lugar": "Planta baja del Edificio de Gobierno (a un costado de Gestión Escolar), ESCOM Zacatenco (Av. Juan de Dios Bátiz esq. Miguel Othón de Mendizábal, Lindavista, CDMX).",
+          "contacto": "Conmutador IPN: 55 5729 6000 (o 57 29 60 00), Extensión: 52014",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado literalmente en el directorio oficial y sección de servicios de salud de la ESCOM.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Servicio Médico ESCOM"
+          }
+        },
+        {
+          "nombre": "Servicio Dental (Odontológico) ESCOM",
+          "unidad": "ESCOM",
+          "descripcion": "Diagnóstico odontológico, profilaxis, resinas, curaciones y tratamientos preventivos con cuotas de recuperación accesibles que varían según el tratamiento realizado.",
+          "requisitos": "Credencial escolar vigente de la ESCOM y pago de la cuota de recuperación de insumos.",
+          "horario": "Turno Matutino: Lunes a viernes de 08:00 a 15:00 hrs (C.D. Rocio Gómez Ruiz). Turno Vespertino: Lunes a viernes de 16:00 a 22:00 hrs (C.D. Gabriela Sanabria Paredes).",
+          "lugar": "Salón 1002, planta baja del Edificio 1 (Edificio de Aulas), junto al área médica, ESCOM.",
+          "contacto": "Turno Matutino: Ext. 52079 / Turno Vespertino: Ext. 52014 (Conmutador IPN: 55 5729 6000)",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Nombres de cirujanas dentistas, ubicación exacta, extensiones y horarios verificados oficialmente.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Servicio Dental (Odontológico) ESCOM"
+          }
+        },
+        {
+          "nombre": "Servicio de Orientación Juvenil (Apoyo Psicológico) ESCOM",
+          "unidad": "ESCOM",
+          "descripcion": "Acompañamiento psicológico gratuito y estrictamente confidencial ante situaciones personales, familiares, autoestima, rendimiento académico, manejo de la ansiedad, sexualidad, relaciones humanas, hábitos de estudio y prevención de adicciones.",
+          "requisitos": "Ser estudiante de la ESCOM y acudir a solicitar la cita o enviar correo escolar indicando nombre, boleta y turno.",
+          "horario": "Turno Matutino: Lunes a viernes de 08:00 a 16:00 hrs. Turno Vespertino: atendido por la Dra. Raquel Flores Delgado.",
+          "lugar": "Salón 1002, planta baja del Edificio de Aulas 1 (compartido con área médica/dental), ESCOM.",
+          "contacto": "Turno Matutino: Ext. 52080 / Turno Vespertino: Ext. 52014 (Conmutador IPN: 55 5729 6000)",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Verificado literalmente en el sitio web de ESCOM.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Servicio de Orientación Juvenil (Apoyo Psicológico) ESCOM"
+          }
+        },
+        {
+          "nombre": "Actividades Deportivas de la ESCOM",
+          "unidad": "ESCOM",
+          "descripcion": "Selecciones representativas, ligas y entrenamiento en Fútbol Soccer, Fútbol 7, Fútbol Rápido, Voleibol, Béisbol, Taekwondo, Ajedrez, Básquetbol, Ping Pong, Tochito Bandera, Tiro con Arco, Ultimate Frisbee y Artes Marciales Mixtas (SUCEM).",
+          "requisitos": "Ser alumno inscrito de la ESCOM, credencial escolar vigente, certificado médico escolar y seguro facultativo del IMSS activo.",
+          "horario": "Fútbol: Mar 16:00 a 19:00 h, Mié 10:00 a 18:00 h, Vie 12:00 a 20:00 h (Prof. Diego Espinosa). Béisbol: Mar y Mié 11:00 a 18:00 h, Jue 11:00 a 19:00 h, Vie 11:00 a 17:00 h (Prof. Juan Luis García). Voleibol: Mar y Jueves vespertino (Prof. Hugo Hernández).",
+          "lugar": "Canchas deportivas y explanada central de la ESCOM.",
+          "contacto": "Conmutador IPN: 55 5729 6000 ext. 52063 / Correos: cultura_y_deportes_escom@ipn.mx y lic.a.miranda@hotmail.com",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Profesores responsables, horarios por disciplina y extensión verificados en la fuente oficial.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Actividades Deportivas de la ESCOM"
+          }
+        },
+        {
+          "nombre": "Talleres Culturales y Expresión Artística ESCOM",
+          "unidad": "ESCOM",
+          "descripcion": "Talleres formativos y clubes culturales de la ESCOM: Taller de Teatro (Compañía 'ESCOM-BROS', Profa. Wendy Berenice González: Lun 15:00 a 18:00 h y Mar 11:00 a 14:00 h), Música Folklórica (Prof. Guillermo Muñoz: Mar 10:00 a 14:00 h y Jue 15:00 a 19:00 h), Oratoria y Lectura (Prof. Alejandro Arzate), Danza Contemporánea (Prof. Iván Moreno: Vie 9:00 a 15:00 h), Tuna de la ESCOM (femenil y varonil), Algoritmo de Baile (salsa y bachata), Danza Árabe y Coro ESCORUM.",
+          "requisitos": "Ser estudiante de la ESCOM con credencial escolar vigente.",
+          "horario": "Horarios asignados por taller conforme a la cartelera semestral de actividades culturales.",
+          "lugar": "Salones de usos múltiples, auditorio y explanada de la ESCOM.",
+          "contacto": "Conmutador IPN: 55 5729 6000 ext. 52063 / Correo: cultura_y_deportes_escom@ipn.mx",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Horarios, docentes y agrupaciones verificadas literalmente en la cartelera cultural de ESCOM.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Talleres Culturales y Expresión Artística ESCOM"
+          }
+        },
+        {
+          "nombre": "Clubes Académicos y Programación Competitiva (ACM ICPC, Robótica y Hackers)",
+          "unidad": "ESCOM",
+          "descripcion": "Comunidades estudiantiles y de desarrollo tecnológico: Club de Algoritmia (ACM Student Chapter) enfocado en algoritmia avanzada, campamentos y torneos del ICPC; Club de Mini-Robótica; Club de Bio-Robótica y Sistemas Embebidos; Club de Seguridad y Hacking Ético; y Club de Ciencia de Datos y Machine Learning.",
+          "requisitos": "Ser estudiante de la ESCOM con interés en el aprendizaje práctico extracurricular.",
+          "horario": "no_verificado",
+          "lugar": "Laboratorios de cómputo, cubículos de clubes y auditorio de la ESCOM.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / Portal oficial escom.ipn.mx",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Confirmado en el portal oficial y plataformas de divulgación tecnológica de ESCOM.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Clubes Académicos y Programación Competitiva (ACM ICPC, Robótica y Hackers)"
+          }
+        },
+        {
+          "nombre": "Biblioteca de la ESCOM",
+          "unidad": "ESCOM",
+          "descripcion": "Acervo especializado en ciencias de la computación, inteligencia artificial y matemáticas con más de 2,900 títulos y 17,800 volúmenes; consulta en sala de lectura, cubículos de trabajo colaborativo, préstamos a domicilio, préstamos interbibliotecarios y acceso a repositorios digitales del IPN.",
+          "requisitos": "Credencial escolar vigente de la ESCOM. Los libros identificados con punto rojo son para consulta exclusiva en sala.",
+          "horario": "Lunes a viernes de 08:30 a 20:30 hrs.",
+          "lugar": "Edificio de Biblioteca ESCOM, primer piso.",
+          "contacto": "Conmutador IPN: 55 5729 6000 ext. 52025 (Servicios Estudiantiles / Biblioteca)",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Se rectifica el horario oficial a 08:30 a 20:30 hrs (GEMINI.md indicaba erróneamente cierre a las 20:00).",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Biblioteca de la ESCOM"
+          }
+        },
+        {
+          "nombre": "CELEX ESCOM (Cursos de Lenguas Extranjeras)",
+          "unidad": "ESCOM",
+          "descripcion": "Cursos de idioma inglés (y otros idiomas según demanda) con validez oficial del IPN, impartidos en modalidades entre semana y fines de semana (sábados y domingos de 08:00 a 13:30 hrs), exámenes de colocación y exámenes de acreditación para cumplimiento de requisito de titulación.",
+          "requisitos": "Comunidad politécnica con credencial vigente para tarifa preferencial, inscripción en línea en periodo de convocatoria y pago referenciado bancario.",
+          "horario": "Sábados y domingos de 08:00 a 13:30 hrs y modalidades entre semana.",
+          "lugar": "Oficinas de CELEX ESCOM, Edificio de Gobierno / Aulas.",
+          "contacto": "Conmutador IPN: 55 5729 6000, Extensión: 52008 / Correo: celexescom@hotmail.com",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Extensión telefónica y correo electrónico de contacto verificados en el directorio oficial.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "CELEX ESCOM (Cursos de Lenguas Extranjeras)"
+          }
+        },
+        {
+          "nombre": "Programa Institucional de Tutorías (PIT ESCOM) y Red de Género",
+          "unidad": "ESCOM",
+          "descripcion": "Acompañamiento tutorial para seguimiento curricular, orientación sobre seriación y materias de alto índice de reprobación; y atención, asesoría y canalización confidencial ante actos de discriminación, violencia o acoso escolar por parte de la Red de Género.",
+          "requisitos": "Ser estudiante de la ESCOM. Asignación de tutor a través del portal SAES.",
+          "horario": "Red de Género: Lunes a viernes de 12:00 a 20:00 hrs. Tutorías: horario escolar regular.",
+          "lugar": "Red de Género: Primer piso, Edificio de Gobierno. Subdirección de Servicios Educativos e Integración Social: Salón 1201, Edificio 1.",
+          "contacto": "Red de Género: Dra. Ana María Winfield Reyes, Ext. 52090 y 52012 / Subdirección SSEIS: sseisescom@ipn.mx, Ext. 52012 / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.escom.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Ubicación, horario de atención de la Red de Género y extensiones oficiales confirmadas.",
+          "fuente": {
+            "documento": "https://www.escom.ipn.mx/",
+            "url": "https://www.escom.ipn.mx/",
+            "localizador": "Programa Institucional de Tutorías (PIT ESCOM) y Red de Género"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_unidad"
+    },
+    {
+      "seccion": "Servicios UPIBI",
+      "items": [
+        {
+          "nombre": "Servicio Médico UPIBI",
+          "unidad": "UPIBI",
+          "descripcion": "Atención médica de primer contacto ante contingencias o malestares agudos, atención inicial ante eventualidades en laboratorios químicos/biológicos, elaboración de historias clínicas, expedición de certificados médicos escolares y gestión institucional del seguro facultativo del IMSS y seguros escolares.",
+          "requisitos": "Credencial vigente del IPN o comprobante de inscripción del SAES; entrega de Cédula PrevenIMSS y constancia de vigencia en ventanilla.",
+          "horario": "Turno Matutino: 07:00 a 14:00 hrs. Turno Vespertino: 15:00 a 21:00 hrs (horarios generales de Servicios Estudiantiles).",
+          "lugar": "Edificio de Servicios a Estudiantes de la UPIBI, Av. Acueducto de Guadalupe s/n, Col. Barrio la Laguna Ticomán, Gustavo A. Madero, CDMX.",
+          "contacto": "Dr. Vicente Escamilla Aquino (Turno matutino), Extensión: 56489 / Correo: serviciomedico_upibi@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Nombre del médico a cargo, correo oficial y extensión confirmados en el directorio oficial.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Servicio Médico UPIBI"
+          }
+        },
+        {
+          "nombre": "Servicio Dental (Odontológico) UPIBI",
+          "unidad": "UPIBI",
+          "descripcion": "Consultorio dental que ofrece asesoría, diagnóstico bucal y tratamientos odontológicos preventivos y de primer contacto con cuotas de recuperación preferenciales.",
+          "requisitos": "Credencial escolar vigente del IPN y pago de cuota de recuperación de insumos.",
+          "horario": "no_verificado",
+          "lugar": "Consultorio dental, Edificio de Servicios a Estudiantes de la UPIBI.",
+          "contacto": "C.D. Edith Sandoval Hernández, Conmutador IPN: 55 5729 6000 ext. 56349",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Odontóloga titular y extensión verificadas en el directorio de la UPIBI.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Servicio Dental (Odontológico) UPIBI"
+          }
+        },
+        {
+          "nombre": "Área de Orientación Juvenil (Apoyo Psicológico) UPIBI",
+          "unidad": "UPIBI",
+          "descripcion": "Acompañamiento psicológico de primer contacto, orientación socioemocional, talleres de autocuidado, técnicas de estudio para el área médico-biológica, manejo del estrés y protocolo de atención inmediata y prioritaria de forma presencial para situaciones emocionales urgentes.",
+          "requisitos": "Ser estudiante de UPIBI. Para citas enviar correo o mensaje indicando nombre completo, número de boleta, grupo, horarios disponibles y breve motivo de consulta.",
+          "horario": "no_verificado",
+          "lugar": "Oficina de Orientación Juvenil, edificio de servicios estudiantiles de la UPIBI.",
+          "contacto": "Correo: orientaj_upibi@ipn.mx / WhatsApp oficial: 56 2734 6300 / Teléfono Matutino: 55 2855 0607 / Teléfono Vespertino: 55 1521 5408 / Conmutador IPN: 55 5729 6000 ext. 56403",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Todos los números de contacto directo por turno, canal de WhatsApp y extensión verificados en la fuente oficial.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Área de Orientación Juvenil (Apoyo Psicológico) UPIBI"
+          }
+        },
+        {
+          "nombre": "Centro de Fomento Deportivo, Artístico y Cultural UPIBI",
+          "unidad": "UPIBI",
+          "descripcion": "Instalaciones deportivas techadas (gimnasio de usos múltiples) y canchas al aire libre para entrenamiento y torneos de fútbol, básquetbol, voleibol, atletismo y tocho bandera, además de talleres de expresión artística y cultural.",
+          "requisitos": "Ser alumno vigente o personal de la unidad; solicitud de inscripción impresa con foto en color azul pastel para turno matutino o rosa pastel para vespertino; reglamento y carta responsiva firmados; certificado médico que indique aptitud física; comprobante de vigencia de derechos médicos (IMSS o ISSSTE) y comprobante de inscripción del SAES.",
+          "horario": "Turno Matutino: 07:00 a 14:00 hrs. Turno Vespertino: 15:00 a 21:00 hrs.",
+          "lugar": "Centro de Fomento Deportivo (gimnasio y canchas), UPIBI, Ticomán, CDMX.",
+          "contacto": "Lic. Griselda Adriana Rodríguez Aguilar (Jefa del Depto. de Servicios Estudiantiles), Ext. 56310 / Área de Deportes: Ext. 56402 / Correo: s.estud_upibi@ipn.mx / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Requisitos específicos de solicitud impresa por colores de turno, carta responsiva y extensiones verificados oficialmente.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Centro de Fomento Deportivo, Artístico y Cultural UPIBI"
+          }
+        },
+        {
+          "nombre": "Sociedades Científicas y Capítulos Estudiantiles UPIBI",
+          "unidad": "UPIBI",
+          "descripcion": "Agrupaciones y sociedades estudiantiles vinculadas a proyectos de bioingeniería, robótica médica y divulgación científica.",
+          "requisitos": "Ser estudiante de la UPIBI.",
+          "horario": "no_verificado",
+          "lugar": "Cubículos estudiantiles y laboratorios de investigación de UPIBI.",
+          "contacto": "Conmutador IPN: 55 5729 6000 ext. 56310",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "no_verificado",
+          "nota": "En el portal público institucional upibi.ipn.mx no existe una sección que valide el estatus o registro formal directo de agrupaciones específicas como 'iGEM / Ollin SynBio' o SMBB estudiantil, por lo que se asienta como no_verificado.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Sociedades Científicas y Capítulos Estudiantiles UPIBI"
+          }
+        },
+        {
+          "nombre": "Biblioteca Especializada de la UPIBI",
+          "unidad": "UPIBI",
+          "descripcion": "Acervo especializado en biotecnología, ingeniería ambiental, farmacia, alimentos y biomédica; préstamos en sala y a domicilio, hemeroteca, mapoteca, medioteca, acceso a internet e internet inalámbrico, y acceso a herramientas digitales y bases de datos científicas institucionales (Turnitin, Vidal Vademecum, Atlas de Anatomía 3D).",
+          "requisitos": "Presentar credencial escolar del IPN vigente.",
+          "horario": "Lunes a viernes de 08:00 a 21:00 hrs.",
+          "lugar": "Edificio de Biblioteca de la UPIBI, Ticomán, CDMX.",
+          "contacto": "Correo: biblio_upibi@ipn.mx / Conmutador IPN: 55 5729 6000, Extensiones: 56310 (Jefatura), 56300 (Coordinación Matutina) y 56380 (Coordinación Vespertina)",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Horario oficial continuo de 08:00 a 21:00 hrs y extensiones telefónicas por turno verificadas en la fuente oficial.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Biblioteca Especializada de la UPIBI"
+          }
+        },
+        {
+          "nombre": "CELEX UPIBI (Cursos Extracurriculares de Lenguas Extranjeras)",
+          "unidad": "UPIBI",
+          "descripcion": "Cursos modulares de idioma inglés general y científico para dar cumplimiento al requisito de comprensión de textos en lengua extranjera que exigen los planes de estudio de la unidad.",
+          "requisitos": "Alumnos de la UPIBI y comunidad politécnica con credencial vigente; realizar el registro en las fechas de convocatoria y entregar comprobante de pago referenciado.",
+          "horario": "no_verificado",
+          "lugar": "Edificio 60 (Planta Baja), UPIBI, Ticomán, CDMX.",
+          "contacto": "Conmutador IPN: 55 5729 6000 / Portal oficial upibi.ipn.mx",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Ubicación oficial en Edificio 60 (Planta Baja) verificada en el directorio y mapa de la unidad.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "CELEX UPIBI (Cursos Extracurriculares de Lenguas Extranjeras)"
+          }
+        },
+        {
+          "nombre": "Programa Institucional de Tutorías (PIT UPIBI) y Red de Género",
+          "unidad": "UPIBI",
+          "descripcion": "Acompañamiento tutorial para guiar el avance curricular y sesiones de nivelación académica; y atención, acompañamiento y canalización confidencial ante denuncias de hostigamiento, discriminación o violencia mediante la Red de Género.",
+          "requisitos": "Ser estudiante de UPIBI. Asignación de tutor formal mediante el sistema SAES.",
+          "horario": "Tutorías: 09:30 a 15:30 hrs.",
+          "lugar": "Tutorías: Área de talleres (a un costado del Aula T1), UPIBI.",
+          "contacto": "Tutorías: C. Mónica Montes Rangel, correo: tutorias_upibi@ipn.mx, Ext. 56410 / Red de Género: Psic. Alejandra Hernández Ortega, Ext. 56436 / Conmutador IPN: 55 5729 6000",
+          "url": "https://www.upibi.ipn.mx/",
+          "estado": "verificado",
+          "nota": "Responsables oficiales, horarios de atención, correo y extensiones directas verificadas en la fuente oficial.",
+          "fuente": {
+            "documento": "https://www.upibi.ipn.mx/",
+            "url": "https://www.upibi.ipn.mx/",
+            "localizador": "Programa Institucional de Tutorías (PIT UPIBI) y Red de Género"
+          }
+        }
+      ],
+      "tituloClave": "sate.actividades.seccion_unidad"
+    }
+  ],
+  "descartados": [
+    {
+      "nombre": "Biblioteca Nacional de Ciencia y Tecnología (BNCT) «Víctor Bravo Ahuja»",
+      "motivo": "La URL oficial asignada en el documento previo (https://www.ipn.mx/bibliotecas/) devuelve error HTTP 404 No Encontrado según urls-verificadas.json."
+    },
+    {
+      "nombre": "Sistema Institucional de Servicio Médico Integral (SISMI)",
+      "motivo": "La URL oficial asignada (https://www.sismi.ipn.mx/) presentó URLError en urls-verificadas.json y no está accesible directamente; el servicio médico y afiliación al IMSS se verifica y tramita mediante la página general de la DAES."
+    },
+    {
+      "nombre": "Portal Digital IMSS (Afiliación al Seguro Facultativo)",
+      "motivo": "La URL https://www.imss.gob.mx arrojó código HTTP 403 Forbidden en urls-verificadas.json y queda fuera del dominio institucional ipn.mx (la regla exige exclusivamente dominios ipn.mx)."
+    },
+    {
+      "nombre": "Medios Públicos de Difusión Institucional: El Once (Canal 11)",
+      "motivo": "La URL https://canalonce.mx/ responde con código 200 pero fue descartada por no pertenecer al dominio ipn.mx solicitado (regla de exclusividad para dominios ipn.mx)."
+    },
+    {
+      "nombre": "Sistema Institucional de Bolsa de Trabajo y Empleabilidad IPN",
+      "motivo": "En el documento previo no contaba con una URL específica funcional (apuntaba a la página de inicio genérica https://www.ipn.mx/) y no dispone de servicios directamente verificables en la ruta indicada."
+    }
+  ]
+}

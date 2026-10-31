@@ -55,7 +55,7 @@ for(const unidad of ['upiita','escom','upibi']){
    calItems:()=>({items:[{para:'dictamen',pasada:true,titulo:'Dictamen anterior',hasta:'2026-10-01'},{para:'dictamen',pasada:false,titulo:'Dictamen ficticio',hasta:'2026-11-02'}]}),
    SATE:{texto,json:async ruta=>ruta.includes('/busqueda/')?json('web/dist/sate/'+ruta):datos,pestana:(_,p)=>pestana=p,error:e=>{throw e;},calendario:{recorte:tipo=>{assert.equal(tipo,'guia');return [{titulo:'ETS ficticio',desde:'2026-11-01'}];}}}});
   config.unidades[unidad].guiaDatos=true;
-  vm.runInContext(leer('web/sate/componentes.js'),c);vm.runInContext(source,c);vm.runInContext(leer('web/sate/rutas.js'),c);
+  vm.runInContext(leer('web/sate/componentes.js'),c);vm.runInContext(leer('web/sate/actividades.js'),c);vm.runInContext(source,c);vm.runInContext(leer('web/sate/rutas.js'),c);
   const caja=document.createElement('div');caja.setAttribute('id','sate-guia');document.body.appendChild(caja);
   const abrir=async(...partes)=>{await pestana.mostrar({partes});assert.equal(caja.querySelector('[role="alert"]'),null,ancho+'/'+tema);};
   await abrir();
@@ -94,7 +94,7 @@ for(const unidad of ['upiita','escom','upibi']){
    assert.ok(c.SateRutas.ruta('#/'+unidad+'/guia/ruta/'+r.id,unidad,config.unidades));
    await abrir('ruta',r.id);
    if(r.actividades && datos.actividades){
-    assert.ok(caja.querySelector('.sate-catalogo'));
+    assert.ok(caja.querySelector('.sate-actividades'));
     assert.equal(caja.querySelector('.guia-ruta-panel'),null);
     assert.equal(caja.querySelector('.guia-mas'),null);
     assert.equal(caja.querySelectorAll('[data-pregunta]').length,datos.preguntas.filter(p=>r.preguntas.includes(p.id)).length);

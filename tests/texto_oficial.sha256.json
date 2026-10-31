@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "motivo": "R14-MARCA: procedencia por referencia al inventario, protegida sin duplicar fuentes",
+  "motivo": "Actividades y servicios: páginas oficiales del IPN cotejadas R27",
   "actualizaciones": [
     {
       "motivo": "R14-MARCA: línea base de transcripciones existentes, sin cotejo externo ni cambios de texto",
@@ -13,9 +13,1069 @@
     {
       "motivo": "R14-MARCA: procedencia por referencia al inventario, protegida sin duplicar fuentes",
       "numeroCambios": 19701
+    },
+    {
+      "motivo": "Actividades y servicios: páginas oficiales del IPN cotejadas R27",
+      "numeroCambios": 264
     }
   ],
   "huellas": {
+    "data/actividades.json#/secciones/0/items/0/contacto": {
+      "sha256": "09b5d01351433ed3f3bb293229c08762759de1f4d922279ef3365323bde2e08e",
+      "procedencia_sha256": "2816f9f8c572b0e4d55784c9e4ed375135d662605506b883b4486e8760540592"
+    },
+    "data/actividades.json#/secciones/0/items/0/descripcion": {
+      "sha256": "ae3d563ded1d946c756687985afcd3c38aac806e51c243d772aa035b644698ce",
+      "procedencia_sha256": "2816f9f8c572b0e4d55784c9e4ed375135d662605506b883b4486e8760540592"
+    },
+    "data/actividades.json#/secciones/0/items/0/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "2816f9f8c572b0e4d55784c9e4ed375135d662605506b883b4486e8760540592"
+    },
+    "data/actividades.json#/secciones/0/items/0/lugar": {
+      "sha256": "7e98e0014fd01ca17d265ab10311ee487ff0f00df03b2f6ddee4eba1b391d179",
+      "procedencia_sha256": "2816f9f8c572b0e4d55784c9e4ed375135d662605506b883b4486e8760540592"
+    },
+    "data/actividades.json#/secciones/0/items/0/nombre": {
+      "sha256": "1f5e06f82638ed217e8dbe8c123b4a8b7614039e366f92b9bf21b3eaa66e77ad",
+      "procedencia_sha256": "2816f9f8c572b0e4d55784c9e4ed375135d662605506b883b4486e8760540592"
+    },
+    "data/actividades.json#/secciones/0/items/0/requisitos": {
+      "sha256": "cafe526f6d1877c16a37ac83ac0d7797c449809c1b531f16adc9822e7175501c",
+      "procedencia_sha256": "2816f9f8c572b0e4d55784c9e4ed375135d662605506b883b4486e8760540592"
+    },
+    "data/actividades.json#/secciones/0/items/1/contacto": {
+      "sha256": "92a39c0897843a1138f73c6bf295b54363030c9f4580a32d0e065358cfb8c485",
+      "procedencia_sha256": "24da01e1757f6782449c85af20ed6aaed92ab24e3f664b944a48478d90da1dce"
+    },
+    "data/actividades.json#/secciones/0/items/1/descripcion": {
+      "sha256": "d7e6e1a7569182369bff9be18e867e899fa239dc736bf2aff6919e0617e08bd4",
+      "procedencia_sha256": "24da01e1757f6782449c85af20ed6aaed92ab24e3f664b944a48478d90da1dce"
+    },
+    "data/actividades.json#/secciones/0/items/1/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "24da01e1757f6782449c85af20ed6aaed92ab24e3f664b944a48478d90da1dce"
+    },
+    "data/actividades.json#/secciones/0/items/1/lugar": {
+      "sha256": "16e914094d5d0cd0d8091a08ffb22ff9d8049eabc88335c8c3638706ce2ecb67",
+      "procedencia_sha256": "24da01e1757f6782449c85af20ed6aaed92ab24e3f664b944a48478d90da1dce"
+    },
+    "data/actividades.json#/secciones/0/items/1/nombre": {
+      "sha256": "bf23554597b2a23e1059445ebb6a4d1312d3a4eabe330b67369694799bbecc2e",
+      "procedencia_sha256": "24da01e1757f6782449c85af20ed6aaed92ab24e3f664b944a48478d90da1dce"
+    },
+    "data/actividades.json#/secciones/0/items/1/requisitos": {
+      "sha256": "34addd32a7c28cfd178104a1b3c3bf315359104a387c5f77358df890cf98fd17",
+      "procedencia_sha256": "24da01e1757f6782449c85af20ed6aaed92ab24e3f664b944a48478d90da1dce"
+    },
+    "data/actividades.json#/secciones/0/items/2/contacto": {
+      "sha256": "c625b1147a5f58cc006cc3b5c7399e3689acd8efbc78d2c76cae2d4631883774",
+      "procedencia_sha256": "d14a698e851f28ab2932cde59b963d6afb3de3ad87ab5938964577288a7610d4"
+    },
+    "data/actividades.json#/secciones/0/items/2/descripcion": {
+      "sha256": "4889ce0e529ae3740d7a8521fafb09e40f927982e5533ce77b104b68bc4c53c3",
+      "procedencia_sha256": "d14a698e851f28ab2932cde59b963d6afb3de3ad87ab5938964577288a7610d4"
+    },
+    "data/actividades.json#/secciones/0/items/2/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "d14a698e851f28ab2932cde59b963d6afb3de3ad87ab5938964577288a7610d4"
+    },
+    "data/actividades.json#/secciones/0/items/2/lugar": {
+      "sha256": "b55d15d7aac23935b85ab95cfed42f3f80290f24fa09688de228f11c738b1a13",
+      "procedencia_sha256": "d14a698e851f28ab2932cde59b963d6afb3de3ad87ab5938964577288a7610d4"
+    },
+    "data/actividades.json#/secciones/0/items/2/nombre": {
+      "sha256": "a610849f00880aeac371a269233a18a8fe253ac496ec05f8440158a7f53f7246",
+      "procedencia_sha256": "d14a698e851f28ab2932cde59b963d6afb3de3ad87ab5938964577288a7610d4"
+    },
+    "data/actividades.json#/secciones/0/items/2/requisitos": {
+      "sha256": "4688f7f0384e7e619702eafb7bbc1f5de0dfaa157715eb0e93beded0c975e105",
+      "procedencia_sha256": "d14a698e851f28ab2932cde59b963d6afb3de3ad87ab5938964577288a7610d4"
+    },
+    "data/actividades.json#/secciones/0/items/3/contacto": {
+      "sha256": "b1c5c5731fd6352ac9f4fae1780452bea137cf951f78c6cf8d0dc2f5de05134c",
+      "procedencia_sha256": "465dddd78b35cfec7fb90fecd5247663b94798eef1bbc90a7168951fa2ca978a"
+    },
+    "data/actividades.json#/secciones/0/items/3/descripcion": {
+      "sha256": "33b8322a6e281e7f1ab0d2a9ca821e8ffc234b5865262f0d7d48c8162799d3d2",
+      "procedencia_sha256": "465dddd78b35cfec7fb90fecd5247663b94798eef1bbc90a7168951fa2ca978a"
+    },
+    "data/actividades.json#/secciones/0/items/3/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "465dddd78b35cfec7fb90fecd5247663b94798eef1bbc90a7168951fa2ca978a"
+    },
+    "data/actividades.json#/secciones/0/items/3/lugar": {
+      "sha256": "3da0fda2a9be05567f843307056c1f70f45a99183d71e49651fd7e2e19a31726",
+      "procedencia_sha256": "465dddd78b35cfec7fb90fecd5247663b94798eef1bbc90a7168951fa2ca978a"
+    },
+    "data/actividades.json#/secciones/0/items/3/nombre": {
+      "sha256": "2ba006e4e77f2d7c6c77dcc5ffcf0c144e3900ff9ac88691e2e7d8913d6ae4ec",
+      "procedencia_sha256": "465dddd78b35cfec7fb90fecd5247663b94798eef1bbc90a7168951fa2ca978a"
+    },
+    "data/actividades.json#/secciones/0/items/3/requisitos": {
+      "sha256": "780779374753fca1b449fcd072a0cec9dd656507b02c3465729351564a4a2810",
+      "procedencia_sha256": "465dddd78b35cfec7fb90fecd5247663b94798eef1bbc90a7168951fa2ca978a"
+    },
+    "data/actividades.json#/secciones/0/items/4/contacto": {
+      "sha256": "84daed81aaba9c21b10632887c49669c5100862d17c254c82ab6e1d02b91a37e",
+      "procedencia_sha256": "5300d5d9e4287cdbb5b549087467dece4e429d0e143b179a8fedd0f7ba2eaa55"
+    },
+    "data/actividades.json#/secciones/0/items/4/descripcion": {
+      "sha256": "3f50cd6b7c2c5fc5adaf6f5dc310d7de872ef2a5b132f2e0a199b72c7cefb8f5",
+      "procedencia_sha256": "5300d5d9e4287cdbb5b549087467dece4e429d0e143b179a8fedd0f7ba2eaa55"
+    },
+    "data/actividades.json#/secciones/0/items/4/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "5300d5d9e4287cdbb5b549087467dece4e429d0e143b179a8fedd0f7ba2eaa55"
+    },
+    "data/actividades.json#/secciones/0/items/4/lugar": {
+      "sha256": "1867bf059f9f1cb4b16e6b4db71da0123a4095e191621a2eca4a63a07c739f22",
+      "procedencia_sha256": "5300d5d9e4287cdbb5b549087467dece4e429d0e143b179a8fedd0f7ba2eaa55"
+    },
+    "data/actividades.json#/secciones/0/items/4/nombre": {
+      "sha256": "b021bc4278ad9b31af091fcb31dd3afc90842ebb91e9e854463cbcc671645baf",
+      "procedencia_sha256": "5300d5d9e4287cdbb5b549087467dece4e429d0e143b179a8fedd0f7ba2eaa55"
+    },
+    "data/actividades.json#/secciones/0/items/4/requisitos": {
+      "sha256": "dc4b417d68abfc33a948840c08f014b4f73539d10c511a48c2a39de3309b111c",
+      "procedencia_sha256": "5300d5d9e4287cdbb5b549087467dece4e429d0e143b179a8fedd0f7ba2eaa55"
+    },
+    "data/actividades.json#/secciones/0/items/5/contacto": {
+      "sha256": "389f5eab07ea0f856af8578c037263005c35aac91dbc5042407430520c18d810",
+      "procedencia_sha256": "2a01ee67fa3ba7eb9b917b3f67754c48c32a189126ac1f351c51593098732d7e"
+    },
+    "data/actividades.json#/secciones/0/items/5/descripcion": {
+      "sha256": "bd20e74e630db582e9809583245d081af5ed4cb1940baf8ad9097c1fa02079a3",
+      "procedencia_sha256": "2a01ee67fa3ba7eb9b917b3f67754c48c32a189126ac1f351c51593098732d7e"
+    },
+    "data/actividades.json#/secciones/0/items/5/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "2a01ee67fa3ba7eb9b917b3f67754c48c32a189126ac1f351c51593098732d7e"
+    },
+    "data/actividades.json#/secciones/0/items/5/lugar": {
+      "sha256": "4e6e81614f1dd803c2bc3af7d741bc4358413d4322abd1d5f83293254a5520fd",
+      "procedencia_sha256": "2a01ee67fa3ba7eb9b917b3f67754c48c32a189126ac1f351c51593098732d7e"
+    },
+    "data/actividades.json#/secciones/0/items/5/nombre": {
+      "sha256": "5f9e1a131022d20e44dceeea5b4da1e9d672411c4b69b26bc6551816b5597f13",
+      "procedencia_sha256": "2a01ee67fa3ba7eb9b917b3f67754c48c32a189126ac1f351c51593098732d7e"
+    },
+    "data/actividades.json#/secciones/0/items/5/requisitos": {
+      "sha256": "cbed78389e135109cc29ee87b700597ea02bb1a9dade71a9075ed80ad577dd6b",
+      "procedencia_sha256": "2a01ee67fa3ba7eb9b917b3f67754c48c32a189126ac1f351c51593098732d7e"
+    },
+    "data/actividades.json#/secciones/1/items/0/contacto": {
+      "sha256": "22acc0aec4ad03d1625ffae39df4a849d84b77567074ebdf5da3a9f50c5d6fb1",
+      "procedencia_sha256": "1108141e200a6493849884b6ba4ef241fc811bdf078747d0927c13109b07a8e4"
+    },
+    "data/actividades.json#/secciones/1/items/0/descripcion": {
+      "sha256": "d1262361ee64d57e3b2a46c467ab713836cd0bc0b78f2990f13b9ea5b75d66ed",
+      "procedencia_sha256": "1108141e200a6493849884b6ba4ef241fc811bdf078747d0927c13109b07a8e4"
+    },
+    "data/actividades.json#/secciones/1/items/0/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "1108141e200a6493849884b6ba4ef241fc811bdf078747d0927c13109b07a8e4"
+    },
+    "data/actividades.json#/secciones/1/items/0/lugar": {
+      "sha256": "2ff5fa55d3a2b77066bd2b7e5959d0de9c5b5be22f7383d33b97e079f68cc4bd",
+      "procedencia_sha256": "1108141e200a6493849884b6ba4ef241fc811bdf078747d0927c13109b07a8e4"
+    },
+    "data/actividades.json#/secciones/1/items/0/nombre": {
+      "sha256": "9f8d96025f71df13c5b23bc68418b997a1cc2bb57f5c3e8912fe2b5c4869860d",
+      "procedencia_sha256": "1108141e200a6493849884b6ba4ef241fc811bdf078747d0927c13109b07a8e4"
+    },
+    "data/actividades.json#/secciones/1/items/0/requisitos": {
+      "sha256": "d201d3d1cf3b527244f3ac2cf635793499c775ef246bc4c961a38080ff9e4377",
+      "procedencia_sha256": "1108141e200a6493849884b6ba4ef241fc811bdf078747d0927c13109b07a8e4"
+    },
+    "data/actividades.json#/secciones/1/items/1/contacto": {
+      "sha256": "4f8b0aa498f76884f6376c8f0093bd9df535f96bcd2f276ce1fff5c628c7d67b",
+      "procedencia_sha256": "cd6fdb87bd9e0aa8b9f48ac60d9a2e5708e42f31999ad9bdd8ca745cddb2d54b"
+    },
+    "data/actividades.json#/secciones/1/items/1/descripcion": {
+      "sha256": "618ca7578ca8b6e6659fc4f725b61d37fc2edaf5dfce5c092d1c8c0310a689d4",
+      "procedencia_sha256": "cd6fdb87bd9e0aa8b9f48ac60d9a2e5708e42f31999ad9bdd8ca745cddb2d54b"
+    },
+    "data/actividades.json#/secciones/1/items/1/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "cd6fdb87bd9e0aa8b9f48ac60d9a2e5708e42f31999ad9bdd8ca745cddb2d54b"
+    },
+    "data/actividades.json#/secciones/1/items/1/lugar": {
+      "sha256": "f854e4d5e35b1055e52cfd829ae87de740c36b2c780cd6db67b7fe265bd85002",
+      "procedencia_sha256": "cd6fdb87bd9e0aa8b9f48ac60d9a2e5708e42f31999ad9bdd8ca745cddb2d54b"
+    },
+    "data/actividades.json#/secciones/1/items/1/nombre": {
+      "sha256": "f335cbef2bea869075857c1f40dae9331623ef98a48062c08d3354df72ca0ed6",
+      "procedencia_sha256": "cd6fdb87bd9e0aa8b9f48ac60d9a2e5708e42f31999ad9bdd8ca745cddb2d54b"
+    },
+    "data/actividades.json#/secciones/1/items/1/requisitos": {
+      "sha256": "66e5c50dc72075ac468bdb3d0709752d51e74c573e3d6cd3725573b0dc7b3123",
+      "procedencia_sha256": "cd6fdb87bd9e0aa8b9f48ac60d9a2e5708e42f31999ad9bdd8ca745cddb2d54b"
+    },
+    "data/actividades.json#/secciones/1/items/2/contacto": {
+      "sha256": "50870b042584ca6fd7cb0dac7c7cf89e9f6184ce8a4da5d0fbddf40f942fcd33",
+      "procedencia_sha256": "693b4aacda10b65eceb8d0dbe7bc94904f393c5844e1c381ae07e70bac670a67"
+    },
+    "data/actividades.json#/secciones/1/items/2/descripcion": {
+      "sha256": "2db8dbf6b622d1c6ccbbc688613c6d3674fea4306503f97f5b1172f5ff0659e6",
+      "procedencia_sha256": "693b4aacda10b65eceb8d0dbe7bc94904f393c5844e1c381ae07e70bac670a67"
+    },
+    "data/actividades.json#/secciones/1/items/2/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "693b4aacda10b65eceb8d0dbe7bc94904f393c5844e1c381ae07e70bac670a67"
+    },
+    "data/actividades.json#/secciones/1/items/2/lugar": {
+      "sha256": "951b49ce6032f7893dae3ad35f524b5d2339c1c135b5b4b45475909c5cd3cb05",
+      "procedencia_sha256": "693b4aacda10b65eceb8d0dbe7bc94904f393c5844e1c381ae07e70bac670a67"
+    },
+    "data/actividades.json#/secciones/1/items/2/nombre": {
+      "sha256": "dd007939e3089ef58cf293f199063108d4c2e0dbe97586b508df0a07c0074594",
+      "procedencia_sha256": "693b4aacda10b65eceb8d0dbe7bc94904f393c5844e1c381ae07e70bac670a67"
+    },
+    "data/actividades.json#/secciones/1/items/2/requisitos": {
+      "sha256": "398479dbd96eaede62991935a94cadfbdc963a7a226429c0669620a9a77c7e61",
+      "procedencia_sha256": "693b4aacda10b65eceb8d0dbe7bc94904f393c5844e1c381ae07e70bac670a67"
+    },
+    "data/actividades.json#/secciones/1/items/3/contacto": {
+      "sha256": "61f2eaddd599fb5dd71b659ea53782c100625eec70a339d890142adf74548de9",
+      "procedencia_sha256": "e1c982617f6d1e4b8196fab07fc1b792acf1914a4ec7179f48cfa16e2a294fa7"
+    },
+    "data/actividades.json#/secciones/1/items/3/descripcion": {
+      "sha256": "4187dc1da52f3088bbad00082467a48e0e05116a13b8dff6cf4ee152292b41ae",
+      "procedencia_sha256": "e1c982617f6d1e4b8196fab07fc1b792acf1914a4ec7179f48cfa16e2a294fa7"
+    },
+    "data/actividades.json#/secciones/1/items/3/horario": {
+      "sha256": "6b3bac9003d53af8cda24eb3754b786657080ab8c010b46db6a2afee72c5e0f4",
+      "procedencia_sha256": "e1c982617f6d1e4b8196fab07fc1b792acf1914a4ec7179f48cfa16e2a294fa7"
+    },
+    "data/actividades.json#/secciones/1/items/3/lugar": {
+      "sha256": "e60eaf1fc1e996400907ef5dc32c0d9e856e013602ad4e2f336f59b537595bda",
+      "procedencia_sha256": "e1c982617f6d1e4b8196fab07fc1b792acf1914a4ec7179f48cfa16e2a294fa7"
+    },
+    "data/actividades.json#/secciones/1/items/3/nombre": {
+      "sha256": "faffb739c234dd196c9d833368a8bebbdf2ae7faafc5cdd86d85094120e50483",
+      "procedencia_sha256": "e1c982617f6d1e4b8196fab07fc1b792acf1914a4ec7179f48cfa16e2a294fa7"
+    },
+    "data/actividades.json#/secciones/1/items/3/requisitos": {
+      "sha256": "2571fc4e92bf802641261ac064458e646a4b83e493a28bbccfd942e79f33b730",
+      "procedencia_sha256": "e1c982617f6d1e4b8196fab07fc1b792acf1914a4ec7179f48cfa16e2a294fa7"
+    },
+    "data/actividades.json#/secciones/2/items/0/contacto": {
+      "sha256": "cf55ada8fc84cbcb5ebefc57b907cdac158f239e6d70b22a6533002c79609d31",
+      "procedencia_sha256": "a4eb19f3fcbcc1d3e7eddaa996ec67908ae3d672291ecff0415a9cc0f5968f2e"
+    },
+    "data/actividades.json#/secciones/2/items/0/descripcion": {
+      "sha256": "218b30d27f38fc5d73ccecd853ecc6cbd7865ba42fa424ba6b2ee46b167c9b8d",
+      "procedencia_sha256": "a4eb19f3fcbcc1d3e7eddaa996ec67908ae3d672291ecff0415a9cc0f5968f2e"
+    },
+    "data/actividades.json#/secciones/2/items/0/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "a4eb19f3fcbcc1d3e7eddaa996ec67908ae3d672291ecff0415a9cc0f5968f2e"
+    },
+    "data/actividades.json#/secciones/2/items/0/lugar": {
+      "sha256": "51fcccf4d3341a45a606c52373361860e7b68bfe1ebe03b0c9736bfa0fbfe897",
+      "procedencia_sha256": "a4eb19f3fcbcc1d3e7eddaa996ec67908ae3d672291ecff0415a9cc0f5968f2e"
+    },
+    "data/actividades.json#/secciones/2/items/0/nombre": {
+      "sha256": "d37bc42bb7ecb71b74eb443d35a6cc91b1d79095b7239e78ee260399a63047fd",
+      "procedencia_sha256": "a4eb19f3fcbcc1d3e7eddaa996ec67908ae3d672291ecff0415a9cc0f5968f2e"
+    },
+    "data/actividades.json#/secciones/2/items/0/requisitos": {
+      "sha256": "0589609f562b03565ee1d3bf626d02b049fcff7a3bdcf24a87872fee0e89a454",
+      "procedencia_sha256": "a4eb19f3fcbcc1d3e7eddaa996ec67908ae3d672291ecff0415a9cc0f5968f2e"
+    },
+    "data/actividades.json#/secciones/2/items/1/contacto": {
+      "sha256": "fcc48462acb5d5060a84fdbf9b28fda2fa9ed63a48d887a23c6bc956f7e30f04",
+      "procedencia_sha256": "27b483860c2b44b5e57e301d15545f4814f5a4b039b91ef2a550481042717bc1"
+    },
+    "data/actividades.json#/secciones/2/items/1/descripcion": {
+      "sha256": "f117e13a1670d7748edee64bb3a0921a500ebc1b43cb425ccc1b012a71ebf930",
+      "procedencia_sha256": "27b483860c2b44b5e57e301d15545f4814f5a4b039b91ef2a550481042717bc1"
+    },
+    "data/actividades.json#/secciones/2/items/1/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "27b483860c2b44b5e57e301d15545f4814f5a4b039b91ef2a550481042717bc1"
+    },
+    "data/actividades.json#/secciones/2/items/1/lugar": {
+      "sha256": "6ee840146536705955c993e64b5d7aefdf4a8f3896058cc0f65acd4a371cd932",
+      "procedencia_sha256": "27b483860c2b44b5e57e301d15545f4814f5a4b039b91ef2a550481042717bc1"
+    },
+    "data/actividades.json#/secciones/2/items/1/nombre": {
+      "sha256": "eb611595ba350d4e6faca3c5138b9f6379c31f74b321847e550e7243879ff409",
+      "procedencia_sha256": "27b483860c2b44b5e57e301d15545f4814f5a4b039b91ef2a550481042717bc1"
+    },
+    "data/actividades.json#/secciones/2/items/1/requisitos": {
+      "sha256": "d1bf262cd340fe8f715d67a864747d13ec12eda1f2b76253574991ddee89895f",
+      "procedencia_sha256": "27b483860c2b44b5e57e301d15545f4814f5a4b039b91ef2a550481042717bc1"
+    },
+    "data/actividades.json#/secciones/2/items/2/contacto": {
+      "sha256": "571ac247c31ab75ae618aaf9efbd6b0e910c8ead94275a4302c652f28ac05bf0",
+      "procedencia_sha256": "11194a63129f2def1be999ce7b281af4a1fae959c0048e5a8f2be5fc246750fd"
+    },
+    "data/actividades.json#/secciones/2/items/2/descripcion": {
+      "sha256": "9ff409fe1b4253f23feb99bfa9fa7af34e2ea00147c608a58baec49faa57fd82",
+      "procedencia_sha256": "11194a63129f2def1be999ce7b281af4a1fae959c0048e5a8f2be5fc246750fd"
+    },
+    "data/actividades.json#/secciones/2/items/2/horario": {
+      "sha256": "6b3bac9003d53af8cda24eb3754b786657080ab8c010b46db6a2afee72c5e0f4",
+      "procedencia_sha256": "11194a63129f2def1be999ce7b281af4a1fae959c0048e5a8f2be5fc246750fd"
+    },
+    "data/actividades.json#/secciones/2/items/2/lugar": {
+      "sha256": "a5507d84e40657c851a6ae248ef5378017c92d9473f69e50716b7b9543a03beb",
+      "procedencia_sha256": "11194a63129f2def1be999ce7b281af4a1fae959c0048e5a8f2be5fc246750fd"
+    },
+    "data/actividades.json#/secciones/2/items/2/nombre": {
+      "sha256": "49ff249b87a70c3d45f4c9c6a3e2348e758c5f39540cdf6941c6fa1e3a239c72",
+      "procedencia_sha256": "11194a63129f2def1be999ce7b281af4a1fae959c0048e5a8f2be5fc246750fd"
+    },
+    "data/actividades.json#/secciones/2/items/2/requisitos": {
+      "sha256": "f546ec4c49a201c3f9a2024d55d654caf2d25182b5b39af9c1a5538bfdd96531",
+      "procedencia_sha256": "11194a63129f2def1be999ce7b281af4a1fae959c0048e5a8f2be5fc246750fd"
+    },
+    "data/actividades.json#/secciones/3/items/0/contacto": {
+      "sha256": "43ac395f2e01b2fcd5666b0868bdc0edd1ec478a3a88969fd1d4f6b2ebf7c05d",
+      "procedencia_sha256": "8dc0eccec3707820a8007a1cdb6af8c0dfa459b104d64bf02e825b916f3ca953"
+    },
+    "data/actividades.json#/secciones/3/items/0/descripcion": {
+      "sha256": "7eee9ffa85866c7590f6a73a7f4e91727afa9707d2e164aa8e90aefe49c0b2f1",
+      "procedencia_sha256": "8dc0eccec3707820a8007a1cdb6af8c0dfa459b104d64bf02e825b916f3ca953"
+    },
+    "data/actividades.json#/secciones/3/items/0/horario": {
+      "sha256": "22a9afa8fd86d10989372b2a3e942d11ec3764281b4f93917fb109c42b8e9ad1",
+      "procedencia_sha256": "8dc0eccec3707820a8007a1cdb6af8c0dfa459b104d64bf02e825b916f3ca953"
+    },
+    "data/actividades.json#/secciones/3/items/0/lugar": {
+      "sha256": "35d05abf242d922893e6eb0f3e5f312da7bc2c9ae7f17708845cb4fd5b5ad4c6",
+      "procedencia_sha256": "8dc0eccec3707820a8007a1cdb6af8c0dfa459b104d64bf02e825b916f3ca953"
+    },
+    "data/actividades.json#/secciones/3/items/0/nombre": {
+      "sha256": "934bb234b2bdd51baa6748ef06c196110ee98b54391dfcd89719a7eee1007359",
+      "procedencia_sha256": "8dc0eccec3707820a8007a1cdb6af8c0dfa459b104d64bf02e825b916f3ca953"
+    },
+    "data/actividades.json#/secciones/3/items/0/requisitos": {
+      "sha256": "1948ab11dedfdfaaae919aa1f401b2a2eb775e3f4d65592d4ea431d835cf2ba9",
+      "procedencia_sha256": "8dc0eccec3707820a8007a1cdb6af8c0dfa459b104d64bf02e825b916f3ca953"
+    },
+    "data/actividades.json#/secciones/3/items/1/contacto": {
+      "sha256": "79d1c0167d3a69f5ac84e272884e9e478a9aac441133c280f487f4439bc5e5ef",
+      "procedencia_sha256": "419714e8e7a5f226438f9227924add50a1f3b3c2b63e48370f0ce1659fb92cb1"
+    },
+    "data/actividades.json#/secciones/3/items/1/descripcion": {
+      "sha256": "215cfddf2bf66bab60bb0b32c895c82d55ef52912bf09a2eb4a6c50ae35c82f9",
+      "procedencia_sha256": "419714e8e7a5f226438f9227924add50a1f3b3c2b63e48370f0ce1659fb92cb1"
+    },
+    "data/actividades.json#/secciones/3/items/1/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "419714e8e7a5f226438f9227924add50a1f3b3c2b63e48370f0ce1659fb92cb1"
+    },
+    "data/actividades.json#/secciones/3/items/1/lugar": {
+      "sha256": "1680a8084243dbf92d9fb472b2ed23962d34bfb5920d9b7ff9f685ebdf71a869",
+      "procedencia_sha256": "419714e8e7a5f226438f9227924add50a1f3b3c2b63e48370f0ce1659fb92cb1"
+    },
+    "data/actividades.json#/secciones/3/items/1/nombre": {
+      "sha256": "a7b2b3e5ebd96767e0ce078e00faec9c44c6b9246f818a64abc56a70f1a8816a",
+      "procedencia_sha256": "419714e8e7a5f226438f9227924add50a1f3b3c2b63e48370f0ce1659fb92cb1"
+    },
+    "data/actividades.json#/secciones/3/items/1/requisitos": {
+      "sha256": "1f1d1f7d955851c4c0139537be486995c15d055742e2495b71203b27d2cc3c99",
+      "procedencia_sha256": "419714e8e7a5f226438f9227924add50a1f3b3c2b63e48370f0ce1659fb92cb1"
+    },
+    "data/actividades.json#/secciones/4/items/0/contacto": {
+      "sha256": "04ad67089955a9a4abe562c718d5d80224669e8803995f963c610e90217a2586",
+      "procedencia_sha256": "1524201d10c46cd59d15d93bf5ab3c56f5b98abd3fedb8da770c8fabf8fc8660"
+    },
+    "data/actividades.json#/secciones/4/items/0/descripcion": {
+      "sha256": "a07d63077bd489569f7ed3159a558d7987d45024a27faf2e4d1b73b44a41febd",
+      "procedencia_sha256": "1524201d10c46cd59d15d93bf5ab3c56f5b98abd3fedb8da770c8fabf8fc8660"
+    },
+    "data/actividades.json#/secciones/4/items/0/horario": {
+      "sha256": "f5dcfe56f4aafaf0d715f136635180f6b316a423b52fde9749ff0510e28c3ead",
+      "procedencia_sha256": "1524201d10c46cd59d15d93bf5ab3c56f5b98abd3fedb8da770c8fabf8fc8660"
+    },
+    "data/actividades.json#/secciones/4/items/0/lugar": {
+      "sha256": "9944e0b9722e73766f9920416721ab5e0ea8895aaf1251f28bcd22f7f57d8834",
+      "procedencia_sha256": "1524201d10c46cd59d15d93bf5ab3c56f5b98abd3fedb8da770c8fabf8fc8660"
+    },
+    "data/actividades.json#/secciones/4/items/0/nombre": {
+      "sha256": "c7caf74fad35c29cb51ba84d019121182331d8194cea800f2976e82d987c19df",
+      "procedencia_sha256": "1524201d10c46cd59d15d93bf5ab3c56f5b98abd3fedb8da770c8fabf8fc8660"
+    },
+    "data/actividades.json#/secciones/4/items/0/requisitos": {
+      "sha256": "bad489139924365618f6a5aca67b977e9affaab792383ea432db55756386a3ef",
+      "procedencia_sha256": "1524201d10c46cd59d15d93bf5ab3c56f5b98abd3fedb8da770c8fabf8fc8660"
+    },
+    "data/actividades.json#/secciones/4/items/1/contacto": {
+      "sha256": "35ebbac27e2433dcfff7dbdcd790559ca01efee346a0d267b70e15ffe5d2f7cc",
+      "procedencia_sha256": "1117323e3960f90ab2f52b87433cd3a361297099baab28b7a7a354a77364c7ad"
+    },
+    "data/actividades.json#/secciones/4/items/1/descripcion": {
+      "sha256": "5bd7d20c7ca9c88a613e405fce01bcb6172dfe2e47515d36ddf29f711447883a",
+      "procedencia_sha256": "1117323e3960f90ab2f52b87433cd3a361297099baab28b7a7a354a77364c7ad"
+    },
+    "data/actividades.json#/secciones/4/items/1/horario": {
+      "sha256": "6d728a65bf7f24301debf4faccb65d3e8384460d4e068c890bc933fbcb3eeac4",
+      "procedencia_sha256": "1117323e3960f90ab2f52b87433cd3a361297099baab28b7a7a354a77364c7ad"
+    },
+    "data/actividades.json#/secciones/4/items/1/lugar": {
+      "sha256": "45ee5b314d4e502b216bb83fd0e938666f6d07d003e9bdedcca382b2c0c16100",
+      "procedencia_sha256": "1117323e3960f90ab2f52b87433cd3a361297099baab28b7a7a354a77364c7ad"
+    },
+    "data/actividades.json#/secciones/4/items/1/nombre": {
+      "sha256": "c3f6ff2a23d8aa580b7a0b203b1d65c3ee32349085dfb78b9cdd4004619cc9af",
+      "procedencia_sha256": "1117323e3960f90ab2f52b87433cd3a361297099baab28b7a7a354a77364c7ad"
+    },
+    "data/actividades.json#/secciones/4/items/1/requisitos": {
+      "sha256": "b5603147fd61ceb03707a45bdb599673992d7d18a6e629d83f5220a2304aa0b6",
+      "procedencia_sha256": "1117323e3960f90ab2f52b87433cd3a361297099baab28b7a7a354a77364c7ad"
+    },
+    "data/actividades.json#/secciones/4/items/2/contacto": {
+      "sha256": "c549a2db3c66ab1c3dfcbfec60f6e46eeda741cec8f91fb783d73bdebf9e05fa",
+      "procedencia_sha256": "3d0dca6965fca8c7f4d94de50c760d5a8e90c559fe3c363835479730face7deb"
+    },
+    "data/actividades.json#/secciones/4/items/2/descripcion": {
+      "sha256": "d060e4a26d7b10c8a32a1c5848fe1140930aed5ceb96c756ac2204233992ac59",
+      "procedencia_sha256": "3d0dca6965fca8c7f4d94de50c760d5a8e90c559fe3c363835479730face7deb"
+    },
+    "data/actividades.json#/secciones/4/items/2/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "3d0dca6965fca8c7f4d94de50c760d5a8e90c559fe3c363835479730face7deb"
+    },
+    "data/actividades.json#/secciones/4/items/2/lugar": {
+      "sha256": "c970fe983fb5f739b23ae040779b0c8c592a8346f6698b234199049dfc7551df",
+      "procedencia_sha256": "3d0dca6965fca8c7f4d94de50c760d5a8e90c559fe3c363835479730face7deb"
+    },
+    "data/actividades.json#/secciones/4/items/2/nombre": {
+      "sha256": "4f2123e947850297387d3bc37180355794c5959a142b5776f72e824dfef3f687",
+      "procedencia_sha256": "3d0dca6965fca8c7f4d94de50c760d5a8e90c559fe3c363835479730face7deb"
+    },
+    "data/actividades.json#/secciones/4/items/2/requisitos": {
+      "sha256": "8288a8911fb0f7a88cb21d4e988ccd36d330fb18dc9c1797e623c929580134b9",
+      "procedencia_sha256": "3d0dca6965fca8c7f4d94de50c760d5a8e90c559fe3c363835479730face7deb"
+    },
+    "data/actividades.json#/secciones/4/items/3/contacto": {
+      "sha256": "84daed81aaba9c21b10632887c49669c5100862d17c254c82ab6e1d02b91a37e",
+      "procedencia_sha256": "a6fe46f49cb6ab4a274d753dd854d653edabac534af4b7f2862a67f69ff9eb8f"
+    },
+    "data/actividades.json#/secciones/4/items/3/descripcion": {
+      "sha256": "d23984c3bd7623cf9289b00fc783199c7bcf8890d971e7d511d6c4a39a47179f",
+      "procedencia_sha256": "a6fe46f49cb6ab4a274d753dd854d653edabac534af4b7f2862a67f69ff9eb8f"
+    },
+    "data/actividades.json#/secciones/4/items/3/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "a6fe46f49cb6ab4a274d753dd854d653edabac534af4b7f2862a67f69ff9eb8f"
+    },
+    "data/actividades.json#/secciones/4/items/3/lugar": {
+      "sha256": "2c8129f9ae3ad74412bba535285ced473e421cec541a5129f52f085a71d501c7",
+      "procedencia_sha256": "a6fe46f49cb6ab4a274d753dd854d653edabac534af4b7f2862a67f69ff9eb8f"
+    },
+    "data/actividades.json#/secciones/4/items/3/nombre": {
+      "sha256": "b3b6b0eb2e594ab50432726392928a9f8a7fb34019f99b61161fda2f0ffefdbb",
+      "procedencia_sha256": "a6fe46f49cb6ab4a274d753dd854d653edabac534af4b7f2862a67f69ff9eb8f"
+    },
+    "data/actividades.json#/secciones/4/items/3/requisitos": {
+      "sha256": "2268663824540264c3306063d06d2dcac0711e76400a5ff645189a74bda78571",
+      "procedencia_sha256": "a6fe46f49cb6ab4a274d753dd854d653edabac534af4b7f2862a67f69ff9eb8f"
+    },
+    "data/actividades.json#/secciones/5/items/0/contacto": {
+      "sha256": "14d6f52b8ca303819474f0537f888129e12ef5a1702b75e93b536241ee2f2d92",
+      "procedencia_sha256": "6dbbec5f47464494842e7482d3a6a5abda5590e716c3d29361db23dff83d1254"
+    },
+    "data/actividades.json#/secciones/5/items/0/descripcion": {
+      "sha256": "ce1949fbf7c76560bcb3708310ca1237bd15d57d41294218baa6f4d3d9c2d53e",
+      "procedencia_sha256": "6dbbec5f47464494842e7482d3a6a5abda5590e716c3d29361db23dff83d1254"
+    },
+    "data/actividades.json#/secciones/5/items/0/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "6dbbec5f47464494842e7482d3a6a5abda5590e716c3d29361db23dff83d1254"
+    },
+    "data/actividades.json#/secciones/5/items/0/lugar": {
+      "sha256": "933ab6fbd300a726a8925a3734642281e7c6eb762ea559e9cbaef39e6364123f",
+      "procedencia_sha256": "6dbbec5f47464494842e7482d3a6a5abda5590e716c3d29361db23dff83d1254"
+    },
+    "data/actividades.json#/secciones/5/items/0/nombre": {
+      "sha256": "3018798950ffef4730bb1918d86e93129bfe4569b8eee2ccfeab365b1c1c6f09",
+      "procedencia_sha256": "6dbbec5f47464494842e7482d3a6a5abda5590e716c3d29361db23dff83d1254"
+    },
+    "data/actividades.json#/secciones/5/items/0/requisitos": {
+      "sha256": "f118ff6f54301c4521b14c5ccdc89ae03eef4933a872ae043e3b60402dab770e",
+      "procedencia_sha256": "6dbbec5f47464494842e7482d3a6a5abda5590e716c3d29361db23dff83d1254"
+    },
+    "data/actividades.json#/secciones/5/items/1/contacto": {
+      "sha256": "50d9e5b645d9f43abc8c42de5c1afaab5ad4ad4472f2930d5ec65a7377195dd9",
+      "procedencia_sha256": "a052ce84175a3ca9266507d1e200ca99c9153355ed2ac48782e68dc7963779fa"
+    },
+    "data/actividades.json#/secciones/5/items/1/descripcion": {
+      "sha256": "eb8c53e7b089e2ab60ed40fe714ab6d5753a08edf2e798bcf10661cc4ab142f3",
+      "procedencia_sha256": "a052ce84175a3ca9266507d1e200ca99c9153355ed2ac48782e68dc7963779fa"
+    },
+    "data/actividades.json#/secciones/5/items/1/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "a052ce84175a3ca9266507d1e200ca99c9153355ed2ac48782e68dc7963779fa"
+    },
+    "data/actividades.json#/secciones/5/items/1/lugar": {
+      "sha256": "4e18ca071dbe2a801f91932e20b6115a44c727faf74ce0002408525f8a868dc5",
+      "procedencia_sha256": "a052ce84175a3ca9266507d1e200ca99c9153355ed2ac48782e68dc7963779fa"
+    },
+    "data/actividades.json#/secciones/5/items/1/nombre": {
+      "sha256": "e9bf38a5442378a32edc802a15157e6bc775bd62ed49165086bb8261560ccc2d",
+      "procedencia_sha256": "a052ce84175a3ca9266507d1e200ca99c9153355ed2ac48782e68dc7963779fa"
+    },
+    "data/actividades.json#/secciones/5/items/1/requisitos": {
+      "sha256": "351e766df99a0587c9d3ab9ea775e20979cb7a531be282201e8a766f48a941d7",
+      "procedencia_sha256": "a052ce84175a3ca9266507d1e200ca99c9153355ed2ac48782e68dc7963779fa"
+    },
+    "data/actividades.json#/secciones/5/items/2/contacto": {
+      "sha256": "b3e77a838c28e400b2316c8b5700e6d9864b11bb5a1bc494f405b250e0623a12",
+      "procedencia_sha256": "415bdfbac701a06c5a9b11faf5efefede27ce1186c9d29be9c0405580eaa8cb1"
+    },
+    "data/actividades.json#/secciones/5/items/2/descripcion": {
+      "sha256": "5137871cc1064555d257601819072e6caab38f49dc1caef2915012bf70337664",
+      "procedencia_sha256": "415bdfbac701a06c5a9b11faf5efefede27ce1186c9d29be9c0405580eaa8cb1"
+    },
+    "data/actividades.json#/secciones/5/items/2/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "415bdfbac701a06c5a9b11faf5efefede27ce1186c9d29be9c0405580eaa8cb1"
+    },
+    "data/actividades.json#/secciones/5/items/2/lugar": {
+      "sha256": "94bdce0c49c0b14a6e86906cde9c58e894901700da2d3d513e203fa79499c4f1",
+      "procedencia_sha256": "415bdfbac701a06c5a9b11faf5efefede27ce1186c9d29be9c0405580eaa8cb1"
+    },
+    "data/actividades.json#/secciones/5/items/2/nombre": {
+      "sha256": "bddec7bcb362f979d16c6992cdd24418e7a6822d4ed7ad996535453a63f4f1c2",
+      "procedencia_sha256": "415bdfbac701a06c5a9b11faf5efefede27ce1186c9d29be9c0405580eaa8cb1"
+    },
+    "data/actividades.json#/secciones/5/items/2/requisitos": {
+      "sha256": "6bc6d8fb9b82e847251e550ccfc38ff024e233117592d107e95aec4a6f3052c3",
+      "procedencia_sha256": "415bdfbac701a06c5a9b11faf5efefede27ce1186c9d29be9c0405580eaa8cb1"
+    },
+    "data/actividades.json#/secciones/5/items/3/contacto": {
+      "sha256": "36b025bb3405f0cdafd252b166096310f5827da20b7e0a5f5352677e4e710b94",
+      "procedencia_sha256": "9ab2254da0a330a9ec9f595bab6e8cd9664abced5f00224d02c43d490d4e4f7a"
+    },
+    "data/actividades.json#/secciones/5/items/3/descripcion": {
+      "sha256": "551f2b95c93e1b368d233d47650f79109b319a5a41a6298f07637e1cbb6e02b6",
+      "procedencia_sha256": "9ab2254da0a330a9ec9f595bab6e8cd9664abced5f00224d02c43d490d4e4f7a"
+    },
+    "data/actividades.json#/secciones/5/items/3/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "9ab2254da0a330a9ec9f595bab6e8cd9664abced5f00224d02c43d490d4e4f7a"
+    },
+    "data/actividades.json#/secciones/5/items/3/lugar": {
+      "sha256": "9762b1cde6dce32899752f0a7791a37a72565686757c60575f81a0cf39a042a0",
+      "procedencia_sha256": "9ab2254da0a330a9ec9f595bab6e8cd9664abced5f00224d02c43d490d4e4f7a"
+    },
+    "data/actividades.json#/secciones/5/items/3/nombre": {
+      "sha256": "b5ff1bf0a2716a8235e6617f97748c6c7e81131c4c35a9719ab6685bac5657d0",
+      "procedencia_sha256": "9ab2254da0a330a9ec9f595bab6e8cd9664abced5f00224d02c43d490d4e4f7a"
+    },
+    "data/actividades.json#/secciones/5/items/3/requisitos": {
+      "sha256": "3d3e86a0c333d883553d7b9bfb13cd123506844714acdd5f870ea9fb0926e718",
+      "procedencia_sha256": "9ab2254da0a330a9ec9f595bab6e8cd9664abced5f00224d02c43d490d4e4f7a"
+    },
+    "data/actividades.json#/secciones/5/items/4/contacto": {
+      "sha256": "271df8970c07d276a2afd910f4e6f48a812d2ee676f2cdb0080f4787fdf55f46",
+      "procedencia_sha256": "ea594f1ff8fc03be5afa0cf5e14d11d4d511555a3392c6839f3b1519dbca4d78"
+    },
+    "data/actividades.json#/secciones/5/items/4/descripcion": {
+      "sha256": "fa2365dac9a6093b8a4c45019386c382e908d75924d457ce8d34c09037c91a9c",
+      "procedencia_sha256": "ea594f1ff8fc03be5afa0cf5e14d11d4d511555a3392c6839f3b1519dbca4d78"
+    },
+    "data/actividades.json#/secciones/5/items/4/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "ea594f1ff8fc03be5afa0cf5e14d11d4d511555a3392c6839f3b1519dbca4d78"
+    },
+    "data/actividades.json#/secciones/5/items/4/lugar": {
+      "sha256": "574dd9e57d80fe1d44a4c12a9b4ea032cc84814ddc74aa841a83c13035601289",
+      "procedencia_sha256": "ea594f1ff8fc03be5afa0cf5e14d11d4d511555a3392c6839f3b1519dbca4d78"
+    },
+    "data/actividades.json#/secciones/5/items/4/nombre": {
+      "sha256": "5a6a0f0357bb0064287e717453b177edd6a4ae19daa80e6caf6f596312c923a9",
+      "procedencia_sha256": "ea594f1ff8fc03be5afa0cf5e14d11d4d511555a3392c6839f3b1519dbca4d78"
+    },
+    "data/actividades.json#/secciones/5/items/4/requisitos": {
+      "sha256": "80212b1c057d6cc16f806fe14679307a0ebd629e884ba2b90f4d156ba34de049",
+      "procedencia_sha256": "ea594f1ff8fc03be5afa0cf5e14d11d4d511555a3392c6839f3b1519dbca4d78"
+    },
+    "data/actividades.json#/secciones/5/items/5/contacto": {
+      "sha256": "a32b485db7b73ee57865eeef7dda62cd03d4a5d258de4a3c8438ca726a2edc29",
+      "procedencia_sha256": "c0405df2782f32a20a4e6acd274477e65d45ad94e3ea2d6b50626058994c2d3e"
+    },
+    "data/actividades.json#/secciones/5/items/5/descripcion": {
+      "sha256": "854908f6e239eb12d4d61675ad9185b09e9a28237de5edffda3d672c6002d4f6",
+      "procedencia_sha256": "c0405df2782f32a20a4e6acd274477e65d45ad94e3ea2d6b50626058994c2d3e"
+    },
+    "data/actividades.json#/secciones/5/items/5/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "c0405df2782f32a20a4e6acd274477e65d45ad94e3ea2d6b50626058994c2d3e"
+    },
+    "data/actividades.json#/secciones/5/items/5/lugar": {
+      "sha256": "74f1626668973ddd081094aa50bba764cd8654382cab5a6ff6759e214bca3b49",
+      "procedencia_sha256": "c0405df2782f32a20a4e6acd274477e65d45ad94e3ea2d6b50626058994c2d3e"
+    },
+    "data/actividades.json#/secciones/5/items/5/nombre": {
+      "sha256": "54436b3d5232b6c8d1d7b90432d9214703ccc09fa886b98e767a9401c3ae49c3",
+      "procedencia_sha256": "c0405df2782f32a20a4e6acd274477e65d45ad94e3ea2d6b50626058994c2d3e"
+    },
+    "data/actividades.json#/secciones/5/items/5/requisitos": {
+      "sha256": "e26bfa120ec8150e2094fb71863e5099e9155faad68834e64bfac8dd81ba143e",
+      "procedencia_sha256": "c0405df2782f32a20a4e6acd274477e65d45ad94e3ea2d6b50626058994c2d3e"
+    },
+    "data/actividades.json#/secciones/5/items/6/contacto": {
+      "sha256": "cce131ded5f2c45a30499f3c5af71c74f80b5788923f07b8c215299d3004e0ca",
+      "procedencia_sha256": "d67db44f3cc73e6995b1c820b8bb55b9b12e33759e227cec748d4843ab6108bf"
+    },
+    "data/actividades.json#/secciones/5/items/6/descripcion": {
+      "sha256": "3012a468a2afcb35bd7fe4e36effb06a8f54eb615cb0bbc92c720d54a19624e3",
+      "procedencia_sha256": "d67db44f3cc73e6995b1c820b8bb55b9b12e33759e227cec748d4843ab6108bf"
+    },
+    "data/actividades.json#/secciones/5/items/6/horario": {
+      "sha256": "0e4fb980557c0258726c4706cded59066ba9825d0f569b42b311905d20363156",
+      "procedencia_sha256": "d67db44f3cc73e6995b1c820b8bb55b9b12e33759e227cec748d4843ab6108bf"
+    },
+    "data/actividades.json#/secciones/5/items/6/lugar": {
+      "sha256": "ab86742e50382d416ae632a2af95b1d59962a92939247e08af546ced3f46cbfd",
+      "procedencia_sha256": "d67db44f3cc73e6995b1c820b8bb55b9b12e33759e227cec748d4843ab6108bf"
+    },
+    "data/actividades.json#/secciones/5/items/6/nombre": {
+      "sha256": "293f12b83739108752309921990a6205d52943842a0d284561e11062fcbfc259",
+      "procedencia_sha256": "d67db44f3cc73e6995b1c820b8bb55b9b12e33759e227cec748d4843ab6108bf"
+    },
+    "data/actividades.json#/secciones/5/items/6/requisitos": {
+      "sha256": "31246a980167ebcfdec57f184a2f8d23b8b21d56f043e268e35c5bf04c557d94",
+      "procedencia_sha256": "d67db44f3cc73e6995b1c820b8bb55b9b12e33759e227cec748d4843ab6108bf"
+    },
+    "data/actividades.json#/secciones/5/items/7/contacto": {
+      "sha256": "25d858932eeeecfbb45df1d7a69229d4c62569a0612ec9670ccf40bcc3dfabd0",
+      "procedencia_sha256": "2843ee58da2d44b7a85f062fe44f675fb59c038b2dc0b51eabff0984ff4cf831"
+    },
+    "data/actividades.json#/secciones/5/items/7/descripcion": {
+      "sha256": "a90fa7deed8b4dcabe67806f53cfebb2c4a2a94d72603e8c6eb2f5a24ba0b12f",
+      "procedencia_sha256": "2843ee58da2d44b7a85f062fe44f675fb59c038b2dc0b51eabff0984ff4cf831"
+    },
+    "data/actividades.json#/secciones/5/items/7/horario": {
+      "sha256": "f1cb97ede88d2d0ee46d2dbd463ea67e274aa8cb89cb3f07ffda2ada9185a017",
+      "procedencia_sha256": "2843ee58da2d44b7a85f062fe44f675fb59c038b2dc0b51eabff0984ff4cf831"
+    },
+    "data/actividades.json#/secciones/5/items/7/lugar": {
+      "sha256": "fedc0430aa9576bd2834646063aa7d874738860683b08f6f1b32f2d65d79d4e7",
+      "procedencia_sha256": "2843ee58da2d44b7a85f062fe44f675fb59c038b2dc0b51eabff0984ff4cf831"
+    },
+    "data/actividades.json#/secciones/5/items/7/nombre": {
+      "sha256": "95a71016d704b6c707836847b5c1358c6e148b20df68ced643dca6c79275cf5c",
+      "procedencia_sha256": "2843ee58da2d44b7a85f062fe44f675fb59c038b2dc0b51eabff0984ff4cf831"
+    },
+    "data/actividades.json#/secciones/5/items/7/requisitos": {
+      "sha256": "95cf69b75be9c51cef6edbceca030f2d7cbf85391bac977f07e3e9d6e3ab62d6",
+      "procedencia_sha256": "2843ee58da2d44b7a85f062fe44f675fb59c038b2dc0b51eabff0984ff4cf831"
+    },
+    "data/actividades.json#/secciones/6/items/0/contacto": {
+      "sha256": "4292a25cdb8194bf5023fa1f34ba0a9fdb0182d9dda35de95449ce811b28e0f1",
+      "procedencia_sha256": "26230580388a1c3bd0bc317a7ccca996ad4dffac2e018c611f2e83293f916245"
+    },
+    "data/actividades.json#/secciones/6/items/0/descripcion": {
+      "sha256": "43fd16b2ee1756c120cbb971431fc0ae257306d98175776c1d082cb2ac24d8bd",
+      "procedencia_sha256": "26230580388a1c3bd0bc317a7ccca996ad4dffac2e018c611f2e83293f916245"
+    },
+    "data/actividades.json#/secciones/6/items/0/horario": {
+      "sha256": "059d83bfdc4df628863baaab1986a32df0a3ac5ff580814235f736eee8621ad8",
+      "procedencia_sha256": "26230580388a1c3bd0bc317a7ccca996ad4dffac2e018c611f2e83293f916245"
+    },
+    "data/actividades.json#/secciones/6/items/0/lugar": {
+      "sha256": "00e71a9a5ad0195c32543f489f33b4d19d2727690961f4871d5afe95ab0b66ae",
+      "procedencia_sha256": "26230580388a1c3bd0bc317a7ccca996ad4dffac2e018c611f2e83293f916245"
+    },
+    "data/actividades.json#/secciones/6/items/0/nombre": {
+      "sha256": "54b59150595623c33f40c0d5c319f76d2f7883d2dd0b6f4b1dbf623fdfc4ede9",
+      "procedencia_sha256": "26230580388a1c3bd0bc317a7ccca996ad4dffac2e018c611f2e83293f916245"
+    },
+    "data/actividades.json#/secciones/6/items/0/requisitos": {
+      "sha256": "4cd6fecae066535139c51733d977320dd8f2746d85517f8d193f12e7df8f6c0b",
+      "procedencia_sha256": "26230580388a1c3bd0bc317a7ccca996ad4dffac2e018c611f2e83293f916245"
+    },
+    "data/actividades.json#/secciones/6/items/1/contacto": {
+      "sha256": "3c92a96cfd5abad2a3dfa28b78b98ed2e38c6c47ee36a484cdbec3787da65a60",
+      "procedencia_sha256": "e267eef2fd7e7481ce56fe3e5ac6d810ab30b799b32c4ec145e3ee2588e2ac6e"
+    },
+    "data/actividades.json#/secciones/6/items/1/descripcion": {
+      "sha256": "ccf5dd1447ee3b25c771e63ce7f60dbcc67ea42afbca712fb1bce8b30e3b1f88",
+      "procedencia_sha256": "e267eef2fd7e7481ce56fe3e5ac6d810ab30b799b32c4ec145e3ee2588e2ac6e"
+    },
+    "data/actividades.json#/secciones/6/items/1/horario": {
+      "sha256": "4d1eb11b671f2765cbe2eadd2ef702c0fdc762caa05b5808198085c83abd220a",
+      "procedencia_sha256": "e267eef2fd7e7481ce56fe3e5ac6d810ab30b799b32c4ec145e3ee2588e2ac6e"
+    },
+    "data/actividades.json#/secciones/6/items/1/lugar": {
+      "sha256": "112d1d562d4a146b228d3a7ac770c08af1ccb1c93dbf32d90f94038399026ded",
+      "procedencia_sha256": "e267eef2fd7e7481ce56fe3e5ac6d810ab30b799b32c4ec145e3ee2588e2ac6e"
+    },
+    "data/actividades.json#/secciones/6/items/1/nombre": {
+      "sha256": "3a2c9f4bb680f94dfb4e4b73e446bacb8ee6f11e1d0cc0812e857699a094eb4e",
+      "procedencia_sha256": "e267eef2fd7e7481ce56fe3e5ac6d810ab30b799b32c4ec145e3ee2588e2ac6e"
+    },
+    "data/actividades.json#/secciones/6/items/1/requisitos": {
+      "sha256": "bed3f0785ed04d5ae8ff64722683cbfe3c304db4a0a14b93e31d7b969b44a1c8",
+      "procedencia_sha256": "e267eef2fd7e7481ce56fe3e5ac6d810ab30b799b32c4ec145e3ee2588e2ac6e"
+    },
+    "data/actividades.json#/secciones/6/items/2/contacto": {
+      "sha256": "b45ee86b06eb406be89b1036cb5398f452a2828f650914be5a49422ed93fcfd5",
+      "procedencia_sha256": "b0dc58c3614588154a7e3eb411da2afa1f530020df98dca6058d165701b90298"
+    },
+    "data/actividades.json#/secciones/6/items/2/descripcion": {
+      "sha256": "6960588e9eff56b16206ac28cdf72d056ab53d3ba54086882ab56d009a8368e3",
+      "procedencia_sha256": "b0dc58c3614588154a7e3eb411da2afa1f530020df98dca6058d165701b90298"
+    },
+    "data/actividades.json#/secciones/6/items/2/horario": {
+      "sha256": "3bb6fb0c255b28b2c759a9260e80193079d9c89a6df0da440745d8e6f4adf356",
+      "procedencia_sha256": "b0dc58c3614588154a7e3eb411da2afa1f530020df98dca6058d165701b90298"
+    },
+    "data/actividades.json#/secciones/6/items/2/lugar": {
+      "sha256": "605eb17a64b6b24d671da63c3a4f3220c02f57ebc9a9cfc860e6af5951de5642",
+      "procedencia_sha256": "b0dc58c3614588154a7e3eb411da2afa1f530020df98dca6058d165701b90298"
+    },
+    "data/actividades.json#/secciones/6/items/2/nombre": {
+      "sha256": "8b4224179e2eebfc2fbf73dc51f3bdd146bd5a4c7708230fbc00755869c0763e",
+      "procedencia_sha256": "b0dc58c3614588154a7e3eb411da2afa1f530020df98dca6058d165701b90298"
+    },
+    "data/actividades.json#/secciones/6/items/2/requisitos": {
+      "sha256": "460e69a34c3ec5766577be0071e5e37288e837999b044886ad8ca52576c9017c",
+      "procedencia_sha256": "b0dc58c3614588154a7e3eb411da2afa1f530020df98dca6058d165701b90298"
+    },
+    "data/actividades.json#/secciones/6/items/3/contacto": {
+      "sha256": "05b48378f885536949303555790cbfe67bc4e08e8030011fdf34bda93ee9cb98",
+      "procedencia_sha256": "beed80bebb5b5554f7d5364206d4cf3c52e127995770b08b629d7e884f9a8303"
+    },
+    "data/actividades.json#/secciones/6/items/3/descripcion": {
+      "sha256": "5ee6d694fa9493a0e81e4d57aa8b828e25cf10ad3882dfabd86f21ba329876dd",
+      "procedencia_sha256": "beed80bebb5b5554f7d5364206d4cf3c52e127995770b08b629d7e884f9a8303"
+    },
+    "data/actividades.json#/secciones/6/items/3/horario": {
+      "sha256": "a38cfb4d6ef04d9507df7e2e58ee1ef3d57c3bb6e8ede5a92b9cc8c258c4644f",
+      "procedencia_sha256": "beed80bebb5b5554f7d5364206d4cf3c52e127995770b08b629d7e884f9a8303"
+    },
+    "data/actividades.json#/secciones/6/items/3/lugar": {
+      "sha256": "0cf91dfb6cd1e888b8cc4c380a844ec860404ebae2cea39c64cccdf0d5de8298",
+      "procedencia_sha256": "beed80bebb5b5554f7d5364206d4cf3c52e127995770b08b629d7e884f9a8303"
+    },
+    "data/actividades.json#/secciones/6/items/3/nombre": {
+      "sha256": "996c7129c8501fae9ccc3d8c59f61643a754430baf758e84505862a9085ddab8",
+      "procedencia_sha256": "beed80bebb5b5554f7d5364206d4cf3c52e127995770b08b629d7e884f9a8303"
+    },
+    "data/actividades.json#/secciones/6/items/3/requisitos": {
+      "sha256": "d07da3d658cb75efa072448223549588b1e218f1ba78a671aae6697fc94b89a5",
+      "procedencia_sha256": "beed80bebb5b5554f7d5364206d4cf3c52e127995770b08b629d7e884f9a8303"
+    },
+    "data/actividades.json#/secciones/6/items/4/contacto": {
+      "sha256": "6977c79c5151585f0349145e5cb474c523681da3baf3a4525976723e38fcfcec",
+      "procedencia_sha256": "80618c0dbae46580acfde370de525395f1a0500833468b06215fb8cc4c732514"
+    },
+    "data/actividades.json#/secciones/6/items/4/descripcion": {
+      "sha256": "1c12b4c19b702cff9908f71df5751b3ed9eed07709c971e01fff7d10141b6019",
+      "procedencia_sha256": "80618c0dbae46580acfde370de525395f1a0500833468b06215fb8cc4c732514"
+    },
+    "data/actividades.json#/secciones/6/items/4/horario": {
+      "sha256": "175abf219c894895dbd25c818e39a94df32ac099fcd8d715bbbafeb23ad3deaa",
+      "procedencia_sha256": "80618c0dbae46580acfde370de525395f1a0500833468b06215fb8cc4c732514"
+    },
+    "data/actividades.json#/secciones/6/items/4/lugar": {
+      "sha256": "73a7b46520d52d592889da9cd2ea52c09242e8f0e3f39ebf22de0b759b1c15d4",
+      "procedencia_sha256": "80618c0dbae46580acfde370de525395f1a0500833468b06215fb8cc4c732514"
+    },
+    "data/actividades.json#/secciones/6/items/4/nombre": {
+      "sha256": "4f98649f21865c78e6a42845391c3e89f8e3433c84a0e1b068949d99efda0335",
+      "procedencia_sha256": "80618c0dbae46580acfde370de525395f1a0500833468b06215fb8cc4c732514"
+    },
+    "data/actividades.json#/secciones/6/items/4/requisitos": {
+      "sha256": "7bff85e4e17025a1b5e9f777d16318474e5cb313e000fa6d7f698968a2f7ac03",
+      "procedencia_sha256": "80618c0dbae46580acfde370de525395f1a0500833468b06215fb8cc4c732514"
+    },
+    "data/actividades.json#/secciones/6/items/5/contacto": {
+      "sha256": "907964b63302a01686bf7268a84eb0b40be0b6f7e7d8354221c0f6d51bb466b6",
+      "procedencia_sha256": "b981675795040c421e4349869ac161bd5f1b6f57d1024bfcc8d60ff11fac54f9"
+    },
+    "data/actividades.json#/secciones/6/items/5/descripcion": {
+      "sha256": "f058508680011ed1271ef1bfa045c409732741ee79738858b12a4efc15c332f6",
+      "procedencia_sha256": "b981675795040c421e4349869ac161bd5f1b6f57d1024bfcc8d60ff11fac54f9"
+    },
+    "data/actividades.json#/secciones/6/items/5/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "b981675795040c421e4349869ac161bd5f1b6f57d1024bfcc8d60ff11fac54f9"
+    },
+    "data/actividades.json#/secciones/6/items/5/lugar": {
+      "sha256": "cc477b7152ea4486d40b03672d0faf0f676bab3fae47227edfd50cdc5989d12e",
+      "procedencia_sha256": "b981675795040c421e4349869ac161bd5f1b6f57d1024bfcc8d60ff11fac54f9"
+    },
+    "data/actividades.json#/secciones/6/items/5/nombre": {
+      "sha256": "1b3f97aec5919699a65b5bc1ecaad3049c37d7495d816fbf8e4312a9f245285e",
+      "procedencia_sha256": "b981675795040c421e4349869ac161bd5f1b6f57d1024bfcc8d60ff11fac54f9"
+    },
+    "data/actividades.json#/secciones/6/items/5/requisitos": {
+      "sha256": "c2eea4627ddbf577f94bbdd3e2b94a6d269f0188097bd07849aaafd47bf9042a",
+      "procedencia_sha256": "b981675795040c421e4349869ac161bd5f1b6f57d1024bfcc8d60ff11fac54f9"
+    },
+    "data/actividades.json#/secciones/6/items/6/contacto": {
+      "sha256": "211c0881de78fa44bfcd01239132126a1c196d3aa498d5f33ee941db7b5d18f1",
+      "procedencia_sha256": "d6fb6e194afffe47a5d6e96f1ab403c18e2516b087455d02435aa44277f7d407"
+    },
+    "data/actividades.json#/secciones/6/items/6/descripcion": {
+      "sha256": "852d044d3e51db7a82f2eceeb7bb4e0f5a845da314d4d7fdb311dce2b533ecc7",
+      "procedencia_sha256": "d6fb6e194afffe47a5d6e96f1ab403c18e2516b087455d02435aa44277f7d407"
+    },
+    "data/actividades.json#/secciones/6/items/6/horario": {
+      "sha256": "25df2bd697682db5f907542900a35e201792dee3d77c920730d24c07182c7f07",
+      "procedencia_sha256": "d6fb6e194afffe47a5d6e96f1ab403c18e2516b087455d02435aa44277f7d407"
+    },
+    "data/actividades.json#/secciones/6/items/6/lugar": {
+      "sha256": "0b9081e2d33816b7c28c7f0d77f3e978d7b3d11d04fb360b9b094fe4ab5edc7f",
+      "procedencia_sha256": "d6fb6e194afffe47a5d6e96f1ab403c18e2516b087455d02435aa44277f7d407"
+    },
+    "data/actividades.json#/secciones/6/items/6/nombre": {
+      "sha256": "975ff816fc634ec03869f278a9a2036525ba87bb0151e36090d413c1d51b38a5",
+      "procedencia_sha256": "d6fb6e194afffe47a5d6e96f1ab403c18e2516b087455d02435aa44277f7d407"
+    },
+    "data/actividades.json#/secciones/6/items/6/requisitos": {
+      "sha256": "06034fbd2dfc41000193a5471a0b9ecc38119231cb1f64309380a572f323597a",
+      "procedencia_sha256": "d6fb6e194afffe47a5d6e96f1ab403c18e2516b087455d02435aa44277f7d407"
+    },
+    "data/actividades.json#/secciones/6/items/7/contacto": {
+      "sha256": "6ff729e7e1013134197faee16d5325c73c5b18015b47ae6d216636b2d34f4811",
+      "procedencia_sha256": "fa9f90144aad3889f4a0e2c0bc15fafef88638068e69882219e559d57e7ec6f1"
+    },
+    "data/actividades.json#/secciones/6/items/7/descripcion": {
+      "sha256": "c809c99cc0f33c010c6c1805a793aa7c590210f6b4d64e30438a3a7dd159889c",
+      "procedencia_sha256": "fa9f90144aad3889f4a0e2c0bc15fafef88638068e69882219e559d57e7ec6f1"
+    },
+    "data/actividades.json#/secciones/6/items/7/horario": {
+      "sha256": "ae82ecc408c9b4220a8121754e3136798e2bd17212433ea9994fb42e738f2776",
+      "procedencia_sha256": "fa9f90144aad3889f4a0e2c0bc15fafef88638068e69882219e559d57e7ec6f1"
+    },
+    "data/actividades.json#/secciones/6/items/7/lugar": {
+      "sha256": "6f0a723c02e32f2531570bd45bcb16bad4a74776a965fc45d17e8622ed03970a",
+      "procedencia_sha256": "fa9f90144aad3889f4a0e2c0bc15fafef88638068e69882219e559d57e7ec6f1"
+    },
+    "data/actividades.json#/secciones/6/items/7/nombre": {
+      "sha256": "86268eb9c19ad8f140665c2aa010e803eef4b0e83bdde56f06b42f335ea50a8d",
+      "procedencia_sha256": "fa9f90144aad3889f4a0e2c0bc15fafef88638068e69882219e559d57e7ec6f1"
+    },
+    "data/actividades.json#/secciones/6/items/7/requisitos": {
+      "sha256": "38762e4bf39c5bcfe3a6454e8572f2f8cf6b4b4c7e8cd15ae3ff26f1f881311c",
+      "procedencia_sha256": "fa9f90144aad3889f4a0e2c0bc15fafef88638068e69882219e559d57e7ec6f1"
+    },
+    "data/actividades.json#/secciones/6/items/8/contacto": {
+      "sha256": "11760aa5dd32ceb938f057227185fc5a7872f8b3a62dc9b8ac3f40c7b245ffc2",
+      "procedencia_sha256": "d3e00a32d8e138360b64747c88d4c6a5e23c8fb97411ccbd9b7eafdef3fe46a9"
+    },
+    "data/actividades.json#/secciones/6/items/8/descripcion": {
+      "sha256": "c6b47ae56cba9d2b7e6cadea9145978c5e390d35ce7e564ec1052e0366bcd249",
+      "procedencia_sha256": "d3e00a32d8e138360b64747c88d4c6a5e23c8fb97411ccbd9b7eafdef3fe46a9"
+    },
+    "data/actividades.json#/secciones/6/items/8/horario": {
+      "sha256": "2fb25903cdc4ffa96c81dfffa4555453e59b06634385d837f2b8832a0a453411",
+      "procedencia_sha256": "d3e00a32d8e138360b64747c88d4c6a5e23c8fb97411ccbd9b7eafdef3fe46a9"
+    },
+    "data/actividades.json#/secciones/6/items/8/lugar": {
+      "sha256": "f177ba391cbba0430d3c162c3d1eafb1ef280b248cbd534e4149bbef89abb5c8",
+      "procedencia_sha256": "d3e00a32d8e138360b64747c88d4c6a5e23c8fb97411ccbd9b7eafdef3fe46a9"
+    },
+    "data/actividades.json#/secciones/6/items/8/nombre": {
+      "sha256": "ab9883a811c4acd71904c33786a379bcca0ef0379bc5555eac3b354cd18f104c",
+      "procedencia_sha256": "d3e00a32d8e138360b64747c88d4c6a5e23c8fb97411ccbd9b7eafdef3fe46a9"
+    },
+    "data/actividades.json#/secciones/6/items/8/requisitos": {
+      "sha256": "45c0e14c8d25794a38ecc4f9d54e1b73699d483f7ae65cfe0bbcc399528eaa28",
+      "procedencia_sha256": "d3e00a32d8e138360b64747c88d4c6a5e23c8fb97411ccbd9b7eafdef3fe46a9"
+    },
+    "data/actividades.json#/secciones/7/items/0/contacto": {
+      "sha256": "c7cd3dd3e70172a860685182d740cf7bf160cc595d7cd3f349f1c3e4a8e08938",
+      "procedencia_sha256": "e0248968a0ac33f14b6869b5619677761268dbe4a3ddd13c87ec99039291fb07"
+    },
+    "data/actividades.json#/secciones/7/items/0/descripcion": {
+      "sha256": "c018d2a6978b6599663ef830565b6e1042fad2bc10b1a7b439db4e09096466e9",
+      "procedencia_sha256": "e0248968a0ac33f14b6869b5619677761268dbe4a3ddd13c87ec99039291fb07"
+    },
+    "data/actividades.json#/secciones/7/items/0/horario": {
+      "sha256": "a67f09278920e3761379ea5acc8b4d88909e533967ec53074976a67fcdc0babe",
+      "procedencia_sha256": "e0248968a0ac33f14b6869b5619677761268dbe4a3ddd13c87ec99039291fb07"
+    },
+    "data/actividades.json#/secciones/7/items/0/lugar": {
+      "sha256": "7bbcf88da41d465474686d148413406d6b3f9569b453a30f59f2759d67dc151a",
+      "procedencia_sha256": "e0248968a0ac33f14b6869b5619677761268dbe4a3ddd13c87ec99039291fb07"
+    },
+    "data/actividades.json#/secciones/7/items/0/nombre": {
+      "sha256": "dbe19254b6dd1db15e120558f700dc0eb57f246b09c40f7927200742fdb5d775",
+      "procedencia_sha256": "e0248968a0ac33f14b6869b5619677761268dbe4a3ddd13c87ec99039291fb07"
+    },
+    "data/actividades.json#/secciones/7/items/0/requisitos": {
+      "sha256": "e9a470c3e8111e1f00451185c07f454b55481d86ded084da45bc5bf7e25085c6",
+      "procedencia_sha256": "e0248968a0ac33f14b6869b5619677761268dbe4a3ddd13c87ec99039291fb07"
+    },
+    "data/actividades.json#/secciones/7/items/1/contacto": {
+      "sha256": "6fbc2366e8eb35d69f9a87c03eb87142685ba607bd051e82f84e13d284100b61",
+      "procedencia_sha256": "3040f426b930d8b5e89502fbb274baed500b3d3a4784c1b3c2521ba72e62d806"
+    },
+    "data/actividades.json#/secciones/7/items/1/descripcion": {
+      "sha256": "a23ae6df5b3fe5e743db64d28a6fda848e02da7f5172247c9f4c11629571e5a8",
+      "procedencia_sha256": "3040f426b930d8b5e89502fbb274baed500b3d3a4784c1b3c2521ba72e62d806"
+    },
+    "data/actividades.json#/secciones/7/items/1/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "3040f426b930d8b5e89502fbb274baed500b3d3a4784c1b3c2521ba72e62d806"
+    },
+    "data/actividades.json#/secciones/7/items/1/lugar": {
+      "sha256": "26ffbb5cde0e250e2442f44d084018a57fb8b951b8b012968e20f2da6c4e335b",
+      "procedencia_sha256": "3040f426b930d8b5e89502fbb274baed500b3d3a4784c1b3c2521ba72e62d806"
+    },
+    "data/actividades.json#/secciones/7/items/1/nombre": {
+      "sha256": "688f12acacdfb1dfeab3fec4b47c41c5ae5a603becf31462bef56657d269fc52",
+      "procedencia_sha256": "3040f426b930d8b5e89502fbb274baed500b3d3a4784c1b3c2521ba72e62d806"
+    },
+    "data/actividades.json#/secciones/7/items/1/requisitos": {
+      "sha256": "98b47cd391e6cbd57c6f956bcd3540f8f31b8cf030ba41a44cbc4ea2936939c3",
+      "procedencia_sha256": "3040f426b930d8b5e89502fbb274baed500b3d3a4784c1b3c2521ba72e62d806"
+    },
+    "data/actividades.json#/secciones/7/items/2/contacto": {
+      "sha256": "9cb93abb005a8d9207fe605042bb4898d2d1ffb9bdce98f8fd9f0ccd3c237be0",
+      "procedencia_sha256": "0c94aa0efeb0ed070737c881276ef9294f2293c8b1686d9900e2096b888a552e"
+    },
+    "data/actividades.json#/secciones/7/items/2/descripcion": {
+      "sha256": "5de71e2d92b42e11d878e8d796dd843145e4e1cbfb82618445f85cdc6095af43",
+      "procedencia_sha256": "0c94aa0efeb0ed070737c881276ef9294f2293c8b1686d9900e2096b888a552e"
+    },
+    "data/actividades.json#/secciones/7/items/2/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "0c94aa0efeb0ed070737c881276ef9294f2293c8b1686d9900e2096b888a552e"
+    },
+    "data/actividades.json#/secciones/7/items/2/lugar": {
+      "sha256": "f6a8de3c011cc65cada4b8b17ba8ce2901d10388f3d63faf727371bdf9ab2047",
+      "procedencia_sha256": "0c94aa0efeb0ed070737c881276ef9294f2293c8b1686d9900e2096b888a552e"
+    },
+    "data/actividades.json#/secciones/7/items/2/nombre": {
+      "sha256": "d4a10fbbd3d4253dc5d7387129074909bad1a06e66bef0c60ccd7a7b9609a6ef",
+      "procedencia_sha256": "0c94aa0efeb0ed070737c881276ef9294f2293c8b1686d9900e2096b888a552e"
+    },
+    "data/actividades.json#/secciones/7/items/2/requisitos": {
+      "sha256": "3ad4b8107bd52ef2629c644846af2c9b80176c7a277e22848b72bd5ee4238f51",
+      "procedencia_sha256": "0c94aa0efeb0ed070737c881276ef9294f2293c8b1686d9900e2096b888a552e"
+    },
+    "data/actividades.json#/secciones/7/items/3/contacto": {
+      "sha256": "69993a2e49fb012bb52431333b406ac8377df747d9db11750c7e7dec8cbd9cf3",
+      "procedencia_sha256": "c3e4407505c8ea1954fcfea845d03d3fc9f39e217b63c3fbadb3bd1d2d554ad3"
+    },
+    "data/actividades.json#/secciones/7/items/3/descripcion": {
+      "sha256": "496d669749fdeade77407bdcd56b435026f55567663b1d8a8297897e0e9f381f",
+      "procedencia_sha256": "c3e4407505c8ea1954fcfea845d03d3fc9f39e217b63c3fbadb3bd1d2d554ad3"
+    },
+    "data/actividades.json#/secciones/7/items/3/horario": {
+      "sha256": "95dc670c594118fb56d3ff024870df35deab693306b111fe911f01d6f3373cec",
+      "procedencia_sha256": "c3e4407505c8ea1954fcfea845d03d3fc9f39e217b63c3fbadb3bd1d2d554ad3"
+    },
+    "data/actividades.json#/secciones/7/items/3/lugar": {
+      "sha256": "26354e6ba8c875e318af60444e40c16cbb9fb826b7afe637d2eaef88aad3d9d3",
+      "procedencia_sha256": "c3e4407505c8ea1954fcfea845d03d3fc9f39e217b63c3fbadb3bd1d2d554ad3"
+    },
+    "data/actividades.json#/secciones/7/items/3/nombre": {
+      "sha256": "85f64c5aadabd1a0fa19795fcae3718aeea859b344213065afe7f638c1be8be4",
+      "procedencia_sha256": "c3e4407505c8ea1954fcfea845d03d3fc9f39e217b63c3fbadb3bd1d2d554ad3"
+    },
+    "data/actividades.json#/secciones/7/items/3/requisitos": {
+      "sha256": "7f93adcaad96dc289131801d551072c392fc6cb98935c74b467a50c6b3818830",
+      "procedencia_sha256": "c3e4407505c8ea1954fcfea845d03d3fc9f39e217b63c3fbadb3bd1d2d554ad3"
+    },
+    "data/actividades.json#/secciones/7/items/4/contacto": {
+      "sha256": "2162c2cbf0549eb89772cd1da462e72ea0c5198d75f50a01ab315cb1fad4f8b2",
+      "procedencia_sha256": "1b49e7942fbe686d5d6a2d3d2031782a0574efbaba3746be685d172ccaab740a"
+    },
+    "data/actividades.json#/secciones/7/items/4/descripcion": {
+      "sha256": "a71714852fd8904a9147470436ff025dd384c40c03e27d4cf27e831aee61000f",
+      "procedencia_sha256": "1b49e7942fbe686d5d6a2d3d2031782a0574efbaba3746be685d172ccaab740a"
+    },
+    "data/actividades.json#/secciones/7/items/4/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "1b49e7942fbe686d5d6a2d3d2031782a0574efbaba3746be685d172ccaab740a"
+    },
+    "data/actividades.json#/secciones/7/items/4/lugar": {
+      "sha256": "3b9c622689375a0e9862f1b917983b6e8f8240b63f185945e828833e7db24674",
+      "procedencia_sha256": "1b49e7942fbe686d5d6a2d3d2031782a0574efbaba3746be685d172ccaab740a"
+    },
+    "data/actividades.json#/secciones/7/items/4/nombre": {
+      "sha256": "d66680c553064e50951a2b262aa15fa14320b5125341c4f59b5b26b77a60160d",
+      "procedencia_sha256": "1b49e7942fbe686d5d6a2d3d2031782a0574efbaba3746be685d172ccaab740a"
+    },
+    "data/actividades.json#/secciones/7/items/4/requisitos": {
+      "sha256": "c89217c9726ad01b5bd8927b899a7cbce8459a14323c1c24c982b4ae921adc19",
+      "procedencia_sha256": "1b49e7942fbe686d5d6a2d3d2031782a0574efbaba3746be685d172ccaab740a"
+    },
+    "data/actividades.json#/secciones/7/items/5/contacto": {
+      "sha256": "da8a6f08aa947fb677b82e15d373756fc726cb1228bb009e61204946126ba80b",
+      "procedencia_sha256": "499734953547ea5a2cffdf5b97a130c961161c2c50d3de9c2fd77bcd938dbb23"
+    },
+    "data/actividades.json#/secciones/7/items/5/descripcion": {
+      "sha256": "ba830cb8ac5e4fa7fa9d24fd24bccfb3a45d62985b414e39efec8efef53107f1",
+      "procedencia_sha256": "499734953547ea5a2cffdf5b97a130c961161c2c50d3de9c2fd77bcd938dbb23"
+    },
+    "data/actividades.json#/secciones/7/items/5/horario": {
+      "sha256": "f84ffa7609cc170ab76bce12324ecabff967009f0ec370536a7d7d5e680b97ce",
+      "procedencia_sha256": "499734953547ea5a2cffdf5b97a130c961161c2c50d3de9c2fd77bcd938dbb23"
+    },
+    "data/actividades.json#/secciones/7/items/5/lugar": {
+      "sha256": "691def9aeb9b6d889528d39c7c0f48fdc79550c2252943b9b0ca2959b72b0e6a",
+      "procedencia_sha256": "499734953547ea5a2cffdf5b97a130c961161c2c50d3de9c2fd77bcd938dbb23"
+    },
+    "data/actividades.json#/secciones/7/items/5/nombre": {
+      "sha256": "eac7eb5e1f73aff738f82f9d65e18f820f8cfa1b7d9b8ce1a0d343dcb61d5fdb",
+      "procedencia_sha256": "499734953547ea5a2cffdf5b97a130c961161c2c50d3de9c2fd77bcd938dbb23"
+    },
+    "data/actividades.json#/secciones/7/items/5/requisitos": {
+      "sha256": "bea8e5282b7cf9dc20864f53a5f4cc7d56c82ac9555717721c4665adc09de247",
+      "procedencia_sha256": "499734953547ea5a2cffdf5b97a130c961161c2c50d3de9c2fd77bcd938dbb23"
+    },
+    "data/actividades.json#/secciones/7/items/6/contacto": {
+      "sha256": "dc96f7f7f32800945b28ad65e834328c6bc98bdd5842c00ab0df06c27beadb1d",
+      "procedencia_sha256": "a445027f40d37a697da736a961263efa32be2ee0ab2a6cf95eba3168d57ea592"
+    },
+    "data/actividades.json#/secciones/7/items/6/descripcion": {
+      "sha256": "7e33d72a8b29ef2ab751059788a081fd23f131e461ec240ddaa15a7b5b3282c0",
+      "procedencia_sha256": "a445027f40d37a697da736a961263efa32be2ee0ab2a6cf95eba3168d57ea592"
+    },
+    "data/actividades.json#/secciones/7/items/6/horario": {
+      "sha256": "3525041fa4f750839b94dd1a55174895229008776b2951fb3e094c468ada7eca",
+      "procedencia_sha256": "a445027f40d37a697da736a961263efa32be2ee0ab2a6cf95eba3168d57ea592"
+    },
+    "data/actividades.json#/secciones/7/items/6/lugar": {
+      "sha256": "d2e74b4e76af906d3134c101fd60c6268d7258170ba379b337e19f009442004a",
+      "procedencia_sha256": "a445027f40d37a697da736a961263efa32be2ee0ab2a6cf95eba3168d57ea592"
+    },
+    "data/actividades.json#/secciones/7/items/6/nombre": {
+      "sha256": "b701cb0c270efd1ee6ecc7d4619bae47b377d5a946e0c25e21c177d14e8e50bf",
+      "procedencia_sha256": "a445027f40d37a697da736a961263efa32be2ee0ab2a6cf95eba3168d57ea592"
+    },
+    "data/actividades.json#/secciones/7/items/6/requisitos": {
+      "sha256": "e70c984d19e0362493f08c90cc684f82319a7dd58a532f102544b52b19184d5e",
+      "procedencia_sha256": "a445027f40d37a697da736a961263efa32be2ee0ab2a6cf95eba3168d57ea592"
+    },
+    "data/actividades.json#/secciones/7/items/7/contacto": {
+      "sha256": "9c80b0be935be5a432673eabd5ce8a8a752b900cadb0d7f1324ad4441f736494",
+      "procedencia_sha256": "d0291ffe5f0357100de63805710e4a3cf1e8ac3002e90d72332be54c4eaed803"
+    },
+    "data/actividades.json#/secciones/7/items/7/descripcion": {
+      "sha256": "ae8ab1d8689fee23865ba66dda28caffb7c5657cd706b0f36ee3ff5f5b3d5dd8",
+      "procedencia_sha256": "d0291ffe5f0357100de63805710e4a3cf1e8ac3002e90d72332be54c4eaed803"
+    },
+    "data/actividades.json#/secciones/7/items/7/horario": {
+      "sha256": "7b574e26c86ba492afd0cc179e273027208e97db24ac98e9d747c902cdb5579a",
+      "procedencia_sha256": "d0291ffe5f0357100de63805710e4a3cf1e8ac3002e90d72332be54c4eaed803"
+    },
+    "data/actividades.json#/secciones/7/items/7/lugar": {
+      "sha256": "184e62c303eebebb79eddb0a39ee2d2572859a52ae03bc0b4d683477a7b8416e",
+      "procedencia_sha256": "d0291ffe5f0357100de63805710e4a3cf1e8ac3002e90d72332be54c4eaed803"
+    },
+    "data/actividades.json#/secciones/7/items/7/nombre": {
+      "sha256": "3ff081279b628ee58148724d5abf060ad67bac2a56d5ae1889b807efa441b5c7",
+      "procedencia_sha256": "d0291ffe5f0357100de63805710e4a3cf1e8ac3002e90d72332be54c4eaed803"
+    },
+    "data/actividades.json#/secciones/7/items/7/requisitos": {
+      "sha256": "0c26ff3e61dc4d9022ee2c15e5cccce1cef3e5304fc29566dac154c1b992338e",
+      "procedencia_sha256": "d0291ffe5f0357100de63805710e4a3cf1e8ac3002e90d72332be54c4eaed803"
+    },
     "data/calendario.json#/upiita/actividades/0/desde": {
       "sha256": "903952e394cd91c74dc593a3135bfdb8cdf03a2330dc1c62b2af5bf8cdfca3a5",
       "procedencia_sha256": "378800403c8fb63d9aaeee227539c5b41cd616d83749356346be1fefcb9cb131"

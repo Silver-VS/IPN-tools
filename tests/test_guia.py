@@ -243,7 +243,9 @@ class TestCompilacion(unittest.TestCase):
             esperado['orientacion'] = json.loads((RAIZ / 'data/guia/rutas.json').read_text(encoding='utf-8'))
             capacidad = json.loads((RAIZ / 'data/sate.json').read_text(encoding='utf-8'))['unidades'][u].get('actividadesDatos')
             if capacidad:
-                esperado['actividades'] = json.loads((RAIZ / 'data/guia' / capacidad).read_text(encoding='utf-8'))
+                catalogo = json.loads((RAIZ / 'data' / capacidad['archivo']).read_text(encoding='utf-8'))
+                esperado['actividades'] = {'secciones': [dict(s, items=[a for a in s['items'] if a['unidad'] in capacidad['ambitos']])
+                                                        for s in catalogo['secciones'] if any(a['unidad'] in capacidad['ambitos'] for a in s['items'])]}
             if isinstance(esperado.get('organigrama'), str):
                 esperado['organigrama'] = json.loads((RAIZ / 'data/guia' / esperado['organigrama']).read_text(encoding='utf-8'))
             for p in esperado['preguntas']:

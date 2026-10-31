@@ -735,6 +735,21 @@
       "campos": [
         "/texto"
       ]
+    },
+    "data/actividades.json": {
+      "oficial": true,
+      "fuente": {
+        "documento": "Actividades y servicios: páginas oficiales del IPN cotejadas R27",
+        "localizador": "secciones/items/fuente: URL oficial y nombre del servicio; catálogo cotejado del 2026-10-31, maqueta-v3"
+      },
+      "campos": [
+        "/secciones/*/items/*/nombre",
+        "/secciones/*/items/*/descripcion",
+        "/secciones/*/items/*/requisitos",
+        "/secciones/*/items/*/horario",
+        "/secciones/*/items/*/lugar",
+        "/secciones/*/items/*/contacto"
+      ]
     }
   }
 }

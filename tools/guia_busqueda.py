@@ -181,8 +181,10 @@ def generar(datos, unidad):
         nombre = textos.get(a.get('nombreClave', ''), a.get('nombre', ''))
         para = textos.get(a.get('paraClave', ''), a.get('para', ''))
         agregar('acudir', nombre, para, base + 'acudir/' + a['id'], ['acudir', nombre])
-    for i, a in enumerate(guia.get('actividades', {}).get('elementos', [])):
-        agregar('actividades', a['nombre'], ' '.join(str(a.get(k, '')) for k in ('ofrece', 'requisitos', 'inscripcion', 'donde')), base + 'actividades/' + a['categoria'] + '?actividad=' + str(i + 1), ['actividades', a['nombre']])
+    for i, seccion in enumerate(guia.get('actividades', {}).get('secciones', [])):
+        for j, a in enumerate(seccion['items']):
+            agregar('actividades', a['nombre'], ' '.join(str(a.get(k, '')) for k in ('descripcion', 'requisitos', 'horario', 'lugar', 'contacto')),
+                    base + 'actividades/' + str(i) + '?actividad=' + str(j), ['actividades', a['nombre']], oficial=a['url'])
     indice = leer(datos / 'temarios/indice.json') if (datos / 'temarios/indice.json').exists() else {}
     for carrera, c in indice.get('carreras', {}).items():
         p = datos / 'temarios' / (carrera + '.json')

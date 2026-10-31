@@ -72,7 +72,8 @@ El inventario ejecutable es `data/texto_oficial.json`: cada archivo declara `ofi
 | `contenido/textos/es.toml` | Redacción y rótulos propios. Las claves documentales migradas se conservan en la API de `tools/contenido.py`, pero sus valores viven en `data/denominaciones_oficiales.json`. |
 | `data/guia/*.json` | Preguntas, respuestas, pasos, glosario, resúmenes de documentos, `para`, orientación, necesidades, participación en procedimientos y notas son redacción propia. Solo los campos del inventario son literales. |
 | `data/temarios/upiita/descripciones/*.json` | Descripciones redactadas para SATE; no son el programa oficial. |
-| `data/recursos/**`, `data/guia/actividades-upiita.json` | Selección y fichas de orientación propias; enlaces a terceros no son transcripciones. |
+| `data/recursos/**` | Selección y fichas de orientación propias; enlaces a terceros no son transcripciones. |
+| `data/actividades.json` | Catálogo R27 cotejado: `nombre`, `descripcion`, `requisitos`, `horario`, `lugar` y `contacto` se conservan literalmente del bloque aprobado. Cada elemento declara su URL y localizador en `fuente`; `nota`, `estado`, `seccion` y controles son metadatos u orientación. `no_verificado` se muestra mediante una clave de texto propio. |
 | `data/calendario.json` | Fechas procedentes de avisos protegidas; títulos abreviados, instrucciones, condiciones y notas son adaptaciones propias. |
 | `data/categorias.json`, `data/energia_areas.json`, `data/unidades/*/areas_*.json` | Clasificación propuesta por el proyecto, no nombres de departamentos de los manuales. |
 | `data/especialidades.json`, `data/unidades/*/optativas.json` | Agrupaciones de trayectorias y propuestas; no atribuirles carácter normativo. Los nombres de materias se protegen en las capturas y mapas. |
