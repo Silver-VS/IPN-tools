@@ -48,5 +48,5 @@ for(const ancho of [1300,1024,768,375])for(const oscuro of [false,true]){
   }
 }
 const css=leer('web/sate/componentes.css');
-assert.match(css,/sate-modal\.sate-modal--lectura\{[^}]*height:100dvh;[^}]*border-radius:0;animation:none/);
+assert.match(css,/sate-modal\.sate-modal--lectura\{[^}]*height:100dvh;[^}]*border-radius:0 \/\* forma: no-control \*\/;animation:none/);
 console.log('Ventanilla: claves, literalidad, foco y cierre DOM en 1300/1024/768/375, claro y oscuro OK');

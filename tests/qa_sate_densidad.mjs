@@ -7,7 +7,7 @@ const componentes = readFileSync('web/sate/componentes.css', 'utf8');
 const encabezado = readFileSync('web/sate/encabezado.css', 'utf8');
 const jsEncabezado = readFileSync('web/sate/encabezado.js', 'utf8');
 
-const bloquesDensidad = componentes.match(/@media\s*\(\s*min-width\s*:\s*640px\s*\)\s*and\s*\(\s*pointer\s*:\s*fine\s*\)\s*\{[\s\S]*?--ipn-tamano-m\s*:[^;]+;[\s\S]*?--ipn-control-alto\s*:[^;]+;[\s\S]*?--ipn-esp-1\s*:[^;]+;[\s\S]*?--ipn-radio\s*:[^;]+;[\s\S]*?\n\s*\}/g) || [];
+const bloquesDensidad = componentes.match(/@media\s*\(\s*min-width\s*:\s*640px\s*\)\s*and\s*\(\s*pointer\s*:\s*fine\s*\)\s*\{[\s\S]*?--ipn-tamano-m\s*:[^;]+;[\s\S]*?--ipn-control-alto\s*:[^;]+;[\s\S]*?--ipn-esp-1\s*:[^;]+;[\s\S]*?\n\s*\}/g) || [];
 assert.equal(bloquesDensidad.length, 1, 'Debe existir un solo bloque central de densidad de escritorio');
 
 function cssFiles(dir) {

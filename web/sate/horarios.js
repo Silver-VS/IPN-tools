@@ -1,84 +1,56 @@
 const txH=(clave,vars)=>SATE.texto('sate.horarios.'+clave,vars);
-// Prueba privada: no modifica los controles existentes si está apagada.
-const FILTROS_D=(()=>{const url=globalThis.SATE_CONFIG?.pruebaFiltrosD||globalThis.location?.hash?.includes('#filtros-d');try{return url||localStorage.getItem('sate.prueba.filtrosD')==='1'}catch{return !!url}})();
+// Filtros de Horarios: todo a la vista, sin panel desplegable. Los grupos que chocan con el horario no se muestran.
+const FILTROS_D=true;
+function limpiarFiltrosD(){
+  Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],onlyWant:false,hideDone:false,soloCupo:false,cursables:false,dias:[],fit:false,gap:null,gavoid:[]});
+  store.set('excl',[]);
+  Object.assign(GT,{a:'',b:''});gtSave();$('#f-q').value='';
+  for(const k of ['tur','niv','onlyWant','hideDone','soloCupo','cursables','dias'])store.set(k,S[k]);
+  renderHFilters();renderGTime();renderOffer();
+}
+function quitarFiltroD(k){
+  if(k.startsWith('chip:'))S.chips.splice(+k.slice(5),1);
+  else if(k.startsWith('prof:')){S.gavoid.splice(+k.slice(5),1);store.set('excl',S.gavoid)}
+  else if(k.startsWith('no:')){delete ws().marks[k.slice(3)];save()}
+  else if(k==='a'||k==='b'){GT[k]='';gtSave()}
+  else if(k==='dias'){S.dias=[];store.set('dias',S.dias)}
+  else{S[k]=['tur','niv'].includes(k)?'*':k==='q'?'':k==='gap'?null:false;store.set(k,S[k])}
+  $('#f-q').value=S.q;renderHFilters();renderGTime();renderOffer();
+}
 function montarFiltrosD(){
-  if(!FILTROS_D||$('#filters').classList.contains('filtros-d'))return;
-  const filtros=$('#filters'),mas=$('#f-more .more-filters');
-  filtros.classList.add('filtros-d');
-  filtros.prepend($('#f-q').closest('.field'));
-  mas.prepend($('#f-nivel').closest('.field'));
-  for(const id of ['f-cupo','f-fit'])filtros.insertBefore($('#'+id).closest('label'),$('#f-more'));
-  $('#f-fit').closest('label').lastChild.textContent=txH('d_sin_choques');
-  const impacto=document.createElement('section');impacto.className='filtros-d-impacto';
-  impacto.innerHTML=`<strong id="d-cuenta" role="status"></strong><details><summary>${esc(txH('d_por_que'))}</summary><ul id="d-reglas"></ul></details><div id="d-activos" class="active"></div>`;
-  filtros.after(impacto);
+  const filtros=$('#filters');if(filtros.dataset.montado)return;
+  filtros.dataset.montado='1';
   $('#active').hidden=true;
-  $('#f-hide').closest('label').hidden=true;
-  $('#b-reset').hidden=true;
-  for(const id of ['g-src'])$('#'+id).closest('.field').hidden=true;
-  $('[data-gt]').closest('.field').hidden=true;
-  $('#cupos-omitir').closest('label').hidden=true;
-  $('#cupos-omitir-ayuda').hidden=true;
-  $('#h-offer').parentElement.appendChild($('[data-view]').closest('.field'));
-  filtros.insertBefore($('#g-window'),$('#f-more'));
-  const panel=document.createElement('dialog');panel.className='filtros-d-panel';panel.setAttribute('aria-label',txH('mas_filtros'));
-  const cerrar=document.createElement('button');cerrar.type='button';cerrar.className='btn';cerrar.textContent=txH('d_cerrar');
-  const cab=document.createElement('header');cab.className='tramite-encabezado';
-  const titulo=document.createElement('h2');titulo.textContent=txH('d_filtros');
-  cerrar.textContent='×';cerrar.setAttribute('aria-label',txH('d_cerrar'));
-  cab.append(titulo,cerrar);panel.append(cab,mas);$('#v-hor').appendChild(panel);
-  const resumen=document.createElement('p');resumen.id='d-panel-resumen';resumen.setAttribute('role','status');
-  panel.insertBefore(resumen,mas);
-  const grupo=(clave,elementos)=>{
-    const seccion=document.createElement('section'),titulo=document.createElement('h3');
-    titulo.textContent=txH(clave);seccion.appendChild(titulo);
-    for(const el of elementos)seccion.appendChild(el);
-    mas.appendChild(seccion);
+  const ocultar=(sel,padre)=>{const e=$(sel)?.closest(padre);if(e)e.hidden=true};
+  ocultar('#g-src','.field');ocultar('[data-gt]','.field');ocultar('#cupos-omitir','label');
+  const ayuda=$('#cupos-omitir-ayuda');if(ayuda)ayuda.hidden=true;
+  $('#d-traslapes').addEventListener('click',e=>{const b=e.currentTarget,l=$('#d-traslape-lista');l.hidden=!l.hidden;b.setAttribute('aria-expanded',String(!l.hidden))});
+  $('#d-no-ocultos').addEventListener('click',()=>{for(const [k,m] of Object.entries(ws().marks))if(m.s==='no')delete ws().marks[k];save();renderOffer()});
+  const clic=e=>{
+    if(e.target.closest('[data-d-limpiar]'))return limpiarFiltrosD();
+    const b=e.target.closest('[data-d-quitar]');if(b)quitarFiltroD(b.dataset.dQuitar);
   };
-  const cupo=document.createElement('div');cupo.className='d-cupo';cupo.append($('#f-cupo').closest('label'),$('#f-cupo-ayuda'));
-  grupo('d_que',[$('#f-nivel').closest('.field'),$('#f-done').closest('label'),cupo]);
-  const horas=document.createElement('div');horas.className='trange';
-  for(const [id,k] of [['d-from','d_entrada'],['d-to','d_salida']]){
-    const campo=document.createElement('label');campo.className='field';
-    campo.innerHTML=`<span>${esc(txH(k))}</span><select id="${id}" aria-label="${esc(txH(k))}"></select>`;horas.appendChild(campo);
-  }
-  grupo('d_cuando',[horas,$('#f-fit').closest('label')]);
-  grupo('d_quien',[$('#g-avoid').closest('.field')]);
-  for(const [id,k] of [['#d-from','a'],['#d-to','b']])$(id).addEventListener('change',e=>{GT[k]=e.target.value;renderGTime();gtChanged()});
-  $('#f-more-title').addEventListener('click',e=>{e.preventDefault();SateUI.abrirVentana(panel);cerrar.focus()});
-  cerrar.addEventListener('click',()=>SateUI.cerrarVentana(panel));
-  panel.addEventListener('cancel',()=>$('#f-more-title').focus());
-  const limpiar=document.createElement('button');limpiar.type='button';limpiar.className='link';limpiar.textContent=txH('d_limpiar');
-  const activos=document.createElement('div');activos.className='active';
-  panel.insertBefore(activos,mas);activos.append(resumen,limpiar);
-  limpiar.addEventListener('click',()=>{
-    Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],onlyWant:false,hideDone:false,soloCupo:false,fit:false,gap:null,gavoid:[]});
-    store.set('excl',[]);
-    Object.assign(GT,{a:'',b:''});gtSave();$('#f-q').value='';
-    for(const k of ['tur','niv','onlyWant','hideDone','soloCupo'])store.set(k,S[k]);
-    renderHFilters();renderGTime();renderOffer();
-  });
-  const quitar=e=>{
-    const b=e.target.closest('[data-d-quitar]');if(!b)return;
-    const k=b.dataset.dQuitar;
-    if(k.startsWith('chip:'))S.chips.splice(+k.slice(5),1);
-    else if(k.startsWith('prof:')){S.gavoid.splice(+k.slice(5),1);store.set('excl',S.gavoid)}
-    else if(k.startsWith('no:')){delete ws().marks[k.slice(3)];save()}
-    else if(k==='a'||k==='b'){GT[k]='';gtSave()}
-    else{S[k]=['tur','niv'].includes(k)?'*':k==='q'?'':k==='gap'?null:false;store.set(k,S[k])}
-    $('#f-q').value=S.q;renderHFilters();renderGTime();renderOffer();
-  };
-  $('#d-activos').addEventListener('click',quitar);
-  resumen.addEventListener('click',quitar);
-  const oferta=$('#offer');oferta.addEventListener('click',quitar);
+  $('#d-activos').addEventListener('click',clic);
   if(typeof renderGTime==='function')renderGTime();
 }
+// Choques de un grupo con lo ya agregado al horario y con las actividades propias (otras opciones de la misma materia no cuentan).
+function choquesDe(c){
+  if(plan().sel.includes(keyOf(c)))return[];
+  const out=[];
+  for(const x of [...selected().filter(s=>s[4]!==c[4]),...ownAsClasses()])
+    if(overlaps(x,c))for(const [d,a,b] of slots(c))for(const [d2,a2,b2] of slots(x))
+      if(d===d2&&a<b2&&a2<b)out.push({con:x.own?x.n:name(x),d,a:Math.max(a,a2),b:Math.min(b,b2)});
+  return out;
+}
+const motivoChoque=ch=>txH('d_traslape_motivo',{con:ch.con,dia:DAYS[ch.d],desde:hm(ch.a),hasta:hm(ch.b)});
 function ocultosFiltrosD(list){
-  const visibles=new Set(list.map(keyOf)),grupos=new Map();
+  const visibles=new Set(list.map(keyOf)),grupos=new Map(),traslapes=[];
   for(const c of classes().filter(c=>c[0]===S.car&&!visibles.has(keyOf(c)))){
     const r=[];
     if(S.tur!=='*'&&c[1]!==S.tur)r.push(['tur',txH('d_turno',{valor:TURNOS[S.tur]||S.tur})]);
     if(S.niv!=='*'&&c[2]!==S.niv)r.push(['niv',txH('nivel',{n:S.niv})]);
+    if(S.dias.length&&!c[6].every(([d])=>S.dias.includes(d)))r.push(['dias',txH('d_dias',{valor:S.dias.map(d=>DAYS[d]).join(', ')})]);
+    if(S.cursables&&isPersonal()&&!available(c[8]))r.push(['cursables',txH('d_cursables')]);
     if(S.onlyWant&&!tr().want.includes(c[8])&&!S.fit&&!S.gap)r.push(['onlyWant',txH('d_mis_materias')]);
     if(outWin(c))r.push([GT.b?'b':'a',txH('d_fuera_hora')]);
     if(isExcl(c))r.push(['prof:'+S.gavoid.findIndex(p=>c[5].some(i=>norm(DATA.prof[i]).includes(norm(p)))),txH('profesor_excluido')]);
@@ -92,7 +64,11 @@ function ocultosFiltrosD(list){
       if(!cabe)r.push([S.fit?'fit':'gap',txH('d_sin_choques')]);
       if(S.gap&&!c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b))r.push(['gap',txH('d_fuera_hueco')]);
     }
-    if(!r.length)r.push(['chips',txH('d_seleccion_busqueda')]);
+    if(!r.length){
+      const ch=choquesDe(c);
+      if(ch.length){traslapes.push({c,motivo:motivoChoque(ch[0])});continue}
+      r.push(['chips',txH('d_seleccion_busqueda')]);
+    }
     const g=grupos.get(c[4])||{c,items:[]};g.items.push({c,r});grupos.set(c[4],g);
   }
   let ceros=0;
@@ -101,6 +77,14 @@ function ocultosFiltrosD(list){
     return `<article class="subj"><header><h3>${esc(name(c))}</h3></header>${cero?`<p>${esc(txH('d_cero',{n:items.length}))}</p>`:''}<details><summary>${esc(txH('d_ocultos',{n:items.length}))}</summary>${items.map(({c,r})=>`<p>${esc(c[3])} · ${esc(r.map(x=>x[1]).join(' · '))}${cero&&r[0][0]!=='chips'?` <button type="button" class="link" data-d-quitar="${esc(r[0][0])}">${esc(txH('d_quitar_regla',{nombre:r[0][1]}))}</button>`:''}</p>`).join('')}</details></article>`;
   }).join('');
   $('#d-cuenta').textContent=txH('d_cuenta',{n:list.length,total:classes().filter(c=>c[0]===S.car).length})+' · '+txH('d_sin_grupos',{n:ceros});
+  const bt=$('#d-traslapes');
+  if(bt){
+    bt.hidden=!traslapes.length;bt.textContent=txH('d_traslapes_n',{n:traslapes.length});
+    $('#d-traslape-lista').innerHTML=traslapes.map(({c,motivo})=>`<li><b>${esc(name(c))}</b> · ${esc(c[3])} · ${esc(motivo)}</li>`).join('');
+    if(!traslapes.length){$('#d-traslape-lista').hidden=true;bt.setAttribute('aria-expanded','false')}
+  }
+  const nos=Object.values(ws().marks).filter(m=>m.s==='no').length,bn=$('#d-no-ocultos');
+  if(bn){bn.hidden=!nos;bn.textContent=txH('d_no_ocultos',{n:nos})}
   return html;
 }
 function reglasFiltrosD(){
@@ -108,9 +92,11 @@ function reglasFiltrosD(){
   if(S.onlyWant)r.push(txH('d_mis_materias'));
   if(S.tur!=='*')r.push(txH('d_turno',{valor:TURNOS[S.tur]||S.tur}));
   if(S.niv!=='*')r.push(txH('nivel',{n:S.niv}));
+  if(S.dias.length)r.push(txH('d_dias',{valor:S.dias.map(d=>DAYS[d]).join(', ')}));
   if(S.q.trim())r.push(txH('d_busqueda',{valor:S.q.trim()}));
   for(const x of S.chips)r.push(x.t==='m'?DATA.asig[x.v]:x.t==='p'?DATA.prof[x.v]:x.v);
   if(S.soloCupo)r.push(txH('solo_cupo'));
+  if(S.cursables)r.push(txH('d_cursables'));
   if(S.fit)r.push(txH('d_sin_choques'));
   if(S.hideDone&&isPersonal())r.push(txH('ocultar_acreditadas'));
   if(GT.a)r.push(txH('d_desde',{hora:GT.a}));
@@ -121,11 +107,8 @@ function reglasFiltrosD(){
   return r;
 }
 function renderFiltrosD(){
-  if(!FILTROS_D)return;
   montarFiltrosD();
   const reglas=reglasFiltrosD();
-  $('#d-panel-resumen').textContent=reglas.join(' · ')||txH('d_sin_filtros');
-  $('#f-want-l').textContent=txH('d_mis_materias');
   $('#d-cuenta').textContent=txH('d_cuenta',{n:filtered().length,total:classes().filter(c=>c[0]===S.car).length});
   $('#d-reglas').innerHTML=(reglas.length?reglas:[txH('d_sin_filtros')]).map(r=>`<li>${esc(r)}</li>`).join('');
   $('#d-reglas').innerHTML+=`<li>${esc(txH('d_fijos'))}</li>`;
@@ -134,13 +117,14 @@ function renderFiltrosD(){
   if(GT.n)generador.push(txH('d_gen_materias',{n:GT.n==='auto'?txH('d_automatico'):GT.n}));
   for(const b of GT.breaks||[])generador.push(txH('d_gen_descanso',{minutos:b.d,desde:b.a,hasta:b.b,dias:(b.days?.length?b.days.map(d=>DAYS[d]):DAYS.slice(0,5)).join(', ')}));
   $('#d-reglas').innerHTML+=generador.map(r=>`<li>${esc(r)}</li>`).join('');
-  const claves=[...(S.onlyWant?['onlyWant']:[]),...(S.tur!=='*'?['tur']:[]),...(S.niv!=='*'?['niv']:[]),...(S.q.trim()?['q']:[]),...S.chips.map((_,i)=>'chip:'+i),...(S.soloCupo?['soloCupo']:[]),...(S.fit?['fit']:[]),...(S.hideDone&&isPersonal()?['hideDone']:[]),...(GT.a?['a']:[]),...(GT.b?['b']:[]),...S.gavoid.map((_,i)=>'prof:'+i),...Object.entries(ws().marks).filter(([,m])=>m.s==='no').map(([k])=>'no:'+k),...(S.gap?['gap']:[])];
-  $('#d-activos').innerHTML=reglas.map((r,i)=>`<span class="chip">${esc(r)}<button type="button" data-d-quitar="${esc(claves[i])}" aria-label="${esc(txH('quitar_filtro',{nombre:r}))}">×</button></span>`).join('');
-  $('#d-panel-resumen').innerHTML=$('#d-activos').innerHTML||esc(txH('d_sin_filtros'));
+  const claves=[...(S.onlyWant?['onlyWant']:[]),...(S.tur!=='*'?['tur']:[]),...(S.niv!=='*'?['niv']:[]),...(S.dias.length?['dias']:[]),...(S.q.trim()?['q']:[]),...S.chips.map((_,i)=>'chip:'+i),...(S.soloCupo?['soloCupo']:[]),...(S.cursables?['cursables']:[]),...(S.fit?['fit']:[]),...(S.hideDone&&isPersonal()?['hideDone']:[]),...(GT.a?['a']:[]),...(GT.b?['b']:[]),...S.gavoid.map((_,i)=>'prof:'+i),...Object.entries(ws().marks).filter(([,m])=>m.s==='no').map(([k])=>'no:'+k),...(S.gap?['gap']:[])];
+  $('#d-activos').innerHTML=reglas.map((r,i)=>`<span class="chip">${esc(r)}<button type="button" data-d-quitar="${esc(claves[i])}" aria-label="${esc(txH('quitar_filtro',{nombre:r}))}">×</button></span>`).join('')+(reglas.length?`<button type="button" class="link" data-d-limpiar>${esc(txH('d_limpiar_filtros'))}</button>`:'');
 }
 if(typeof CUPOS!=='undefined')CUPOS.montar();
 $('#offer').addEventListener('click',e=>{
   if(e.target.closest('[data-oferta-mapa]'))SATE.ir('mapa');
+  if(e.target.closest('[data-d-limpiar]'))return limpiarFiltrosD();
+  const quitar=e.target.closest('[data-d-quitar]');if(quitar)return quitarFiltroD(quitar.dataset.dQuitar);
   if(e.target.closest('[data-oferta-toda]')){S.onlyWant=false;store.set('onlyWant',false);renderHFilters();renderOffer()}
   const temario=e.target.closest('[data-temario]');
   if(temario){
@@ -161,6 +145,7 @@ $('#f-hide').addEventListener('change',e=>{S.hide=e.target.checked;store.set('hi
 $('#f-done').addEventListener('change',e=>{S.hideDone=e.target.checked;store.set('hideDone',S.hideDone);renderOffer()});
 $('#f-cupo').addEventListener('change',e=>{S.soloCupo=e.target.checked;store.set('soloCupo',S.soloCupo);renderOffer();if(S.gen||generacion)iniciarGeneracion()});
 $('#f-fit').addEventListener('change',e=>{S.fit=e.target.checked;renderOffer()});
+$('#f-curs').addEventListener('change',e=>{S.cursables=e.target.checked;store.set('cursables',S.cursables);renderOffer()});
 $('#f-want').addEventListener('change',e=>{S.onlyWant=e.target.checked;store.set('onlyWant',S.onlyWant);renderOffer()});
 $('#f-weekend').addEventListener('change',e=>{S.weekend=e.target.checked;store.set('weekend',S.weekend);renderCal()});
 $('#f-q').addEventListener('input',e=>{S.q=e.target.value;S.acIdx=-1;renderAC();renderOffer()});
@@ -186,9 +171,9 @@ const gtChanged=()=>{gtSave();renderOffer();if(S.gen||generacion)iniciarGeneraci
 $('#g-from').addEventListener('change',e=>{GT.a=e.target.value;renderGTime();gtChanged()});
 $('#g-to').addEventListener('change',e=>{GT.b=e.target.value;renderGTime();gtChanged()});
 $('#b-reset').addEventListener('click',()=>{
-  Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,soloCupo:false,fit:false,gap:null,onlyWant:true,gavoid:[],gt:'*',gpref:[],gen:null});S.expand=new Set();
+  Object.assign(S,{tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,soloCupo:false,cursables:false,dias:[],fit:false,gap:null,onlyWant:true,gavoid:[],gt:'*',gpref:[],gen:null});S.expand=new Set();
   ws().marks={};save();   // también quita las marcas «Sí / Quizá / No» (y sus notas) del periodo consultado
-  ['tur','niv'].forEach(k=>store.set(k,'*'));store.set('hide',false);store.set('hideDone',true);store.set('soloCupo',false);store.set('onlyWant',true);store.set('excl',[]);
+  ['tur','niv'].forEach(k=>store.set(k,'*'));store.set('hide',false);store.set('hideDone',true);store.set('soloCupo',false);store.set('cursables',false);store.set('dias',[]);store.set('onlyWant',true);store.set('excl',[]);
   Object.assign(GT,{a:'',b:'',breaks:[],days:'',n:'',src:''});gtSave();$('#f-q').value='';$('#g-avoid').value='';$('#g-pref').value='';
   if($('#gen'))$('#gen').open=false;renderGTime();render()});
 $('#g-src').addEventListener('click',e=>{const b=e.target.closest('[data-gsrc]');if(!b)return;GT.src=b.dataset.gsrc;renderGTime();gtChanged()});
@@ -259,7 +244,7 @@ function filtered(){
   const fits=c=>c[6].length&&!have.has(c[4])&&!done.has(c[8])&&![...sel,...own].some(x=>overlaps(x,c))&&
     (!S.gap||c[6].some(([d,a,b])=>d===S.gap.d&&a<S.gap.b&&S.gap.a<b));
   const mine=new Set(plan().sel);
-  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!(filtrosD||S.hide)||mine.has(keyOf(c))||!isExcl(c))&&(!S.soloCupo||mine.has(keyOf(c))||typeof CUPOS==='undefined'||!CUPOS.fila(c)||CUPOS.fila(c).disponibles>0)&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
+  return base().filter(c=>(mine.has(keyOf(c))||!outWin(c))&&(!(filtrosD||S.hide)||mine.has(keyOf(c))||!isExcl(c))&&(!S.soloCupo||mine.has(keyOf(c))||typeof CUPOS==='undefined'||!CUPOS.fila(c)||CUPOS.fila(c).disponibles>0)&&(hunt?(mine.has(keyOf(c))||fits(c)):(!S.onlyWant||want.has(c[8])))&&(!S.dias.length||mine.has(keyOf(c))||c[6].every(([d])=>S.dias.includes(d)))&&(!S.cursables||!isPersonal()||mine.has(keyOf(c))||available(c[8]))&&(mine.has(keyOf(c))||![...sel.filter(s=>s[4]!==c[4]),...own].some(x=>overlaps(x,c)))&&(!m.length||m.includes(c[4]))&&(!p.length||c[5].some(i=>p.includes(i)))&&(!g.length||g.includes(c[3]))&&
     (!S.hideDone||mine.has(keyOf(c))||!done.has(c[8]))&&(!(filtrosD||S.hide)||marks[keyOf(c)]?.s!=='no'||mine.has(keyOf(c)))&&
     (!q||norm(name(c)+' '+c[8]+' '+profs(c)+' '+c[3]).includes(q)));
 }
@@ -297,7 +282,7 @@ function renderHFilters(){
   document.querySelectorAll('#v-hor [data-htexto]').forEach(el=>el.textContent=txH(el.dataset.htexto));
   document.querySelectorAll('[data-view]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.view===S.view));
   document.querySelectorAll('[data-gt]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.gt===S.gt));
-  $('#f-hide').checked=S.hide;$('#f-done').checked=S.hideDone;$('#f-done').disabled=!isPersonal();$('#f-fit').checked=S.fit;$('#f-weekend').checked=S.weekend;
+  $('#f-curs').checked=S.cursables;$('#f-curs').disabled=!isPersonal();$('#f-hide').checked=S.hide;$('#f-done').checked=S.hideDone;$('#f-done').disabled=!isPersonal();$('#f-fit').checked=S.fit;$('#f-weekend').checked=S.weekend;
   const compatibles=typeof CUPOS!=='undefined'&&CUPOS.disponible, datos=compatibles?CUPOS.datos:null;
   $('#f-cupo').checked=S.soloCupo;$('#f-cupo').disabled=!compatibles;$('#f-cupo-ayuda').textContent=compatibles?SATE.texto('sate.horarios.cupo_ultima',{hora:CUPOS.fecha(datos)}):txH('cupo_sin_datos');
   const n=tr().want.length;$('#f-want').checked=S.onlyWant;$('#f-want').disabled=false;
@@ -305,20 +290,17 @@ function renderHFilters(){
   const mine=classes().filter(c=>c[0]===S.car);
   const turs=[...new Set(mine.map(c=>c[1]))].sort();
   if(S.tur!=='*'&&!turs.includes(S.tur)) S.tur='*';
-  $('#f-turno').innerHTML=[['*',txH('todos')],...turs.map(t=>[t,TURNOS[t]||t])].map(([v,l])=>`<button class="chip" data-tur="${esc(v)}" aria-pressed="${v===S.tur}">${esc(l)}</button>`).join('');
+  $('#f-turno').innerHTML=[...turs,'*'].map(v=>[v,v==='*'?txH('todos'):TURNOS[v]||v]).map(([v,l])=>`<button type="button" data-tur="${esc(v)}" aria-pressed="${v===S.tur}">${esc(l)}</button>`).join('');
   const nivs=[...new Set(mine.map(c=>c[2]))].sort((a,b)=>a-b);
   if(S.niv!=='*'&&!nivs.includes(S.niv)) S.niv='*';
   $('#f-nivel').innerHTML=[['*',txH('todos')],...nivs.map(n=>[n,n])].map(([v,l])=>`<button class="chip" data-niv="${esc(v)}" aria-pressed="${v===S.niv}">${esc(l)}</button>`).join('');
+  const dias=[...new Set(mine.flatMap(c=>c[6].map(b=>b[0])))].sort((x,y)=>x-y);
+  $('#f-dia').innerHTML=dias.map(d=>`<button class="chip" type="button" data-dia="${d}" aria-pressed="${S.dias.includes(d)}" aria-label="${esc(DAYN[d])}">${esc(DAYS[d])}</button>`).join('');
   $('#proflist').innerHTML=[...new Set(mine.flatMap(c=>c[5]))].map(i=>`<option value="${esc(DATA.prof[i])}">`).join('');
   renderActive();renderGPrefs();
   renderGTime();
 }
-function renderMasFiltros(){
-  if(typeof renderFiltrosD==='function')renderFiltrosD();
-  const n=[S.hide,S.fit,!!(GT.a||GT.b),S.gavoid.length>0,S.hideDone&&isPersonal(),S.soloCupo].filter(Boolean).length;
-  $('#f-more-title').textContent=txH(n?'mas_filtros_activos':'mas_filtros',{n});
-  if(n&&(typeof FILTROS_D==='undefined'||!FILTROS_D))$('#f-more').open=true;
-}
+function renderMasFiltros(){renderFiltrosD()}
 /* Salones (índice 10, paralelo a los bloques; solo periodo actual, del PDF de horarios por aula de la unidad) */
 const shortRoom=r=>String(r||'').replace(/^Aula\s+/,'');
 const roomAt=(c,d,a)=>{const i=(c[6]||[]).findIndex(x=>x[0]===d&&x[1]===a);return i>=0&&c[10]?c[10][i]||'':''};
@@ -340,7 +322,7 @@ function optRow(c,sel,inGroup){
   if(isExcl(c)) tags+=`<span class="tag soft">${esc(txH('profesor_excluido'))}</span>`;
   return `<div class="opt${mk.s==='no'||isExcl(c)?' no':''}" data-k="${esc(k)}"><span class="grp">${inGroup?'':esc(c[3])}</span><span class="who">${who}${inGroup?botonTemario(c):''}</span>
     <div class="right"><button class="add" data-toggle="${esc(k)}" aria-pressed="${on}">${esc(txH(on?'quitar_opcion':'agregar'))}</button>
-      <span class="marks" role="group" aria-label="${esc(txH('marcar'))}"${isExcl(c)?` title="${esc(txH('profesor_excluido_ayuda'))}"`:''}>${[['si',txH('si')],['quiza',txH('quiza')],['no',txH('no')]].map(([m,l])=>isExcl(c)?`<button disabled data-m="${m}" aria-pressed="${m==='no'}">${esc(l)}</button>`:`<button data-mark="${m}" data-m="${m}" data-k="${esc(k)}" aria-pressed="${mk.s===m}">${esc(l)}</button>`).join('')}</span></div>
+      <span class="marks" role="group" aria-label="${esc(txH('marcar'))}"${isExcl(c)?` title="${esc(txH('profesor_excluido_ayuda'))}"`:''}>${[['si',txH('si')],['quiza',txH('quiza')]].map(([m,l])=>isExcl(c)?`<button disabled data-m="${m}" aria-pressed="${m==='no'}">${esc(l)}</button>`:`<button data-mark="${m}" data-m="${m}" data-k="${esc(k)}" aria-pressed="${mk.s===m}">${esc(l)}</button>`).join('')}</span><button type="button" class="ocultar" data-mark="no" data-m="no" data-k="${esc(k)}" aria-pressed="${mk.s==='no'}" aria-label="${esc(txH('d_ocultar_grupo',{grupo:c[3]}))}" title="${esc(txH('d_ocultar_grupo',{grupo:c[3]}))}"${isExcl(c)?' disabled':''}><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M10.6 6.1A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a12 12 0 0 1-2.4 3.2M6.5 7.6A12 12 0 0 0 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.8-.4 4-.9"/></svg></button></div>
     <span class="when">${pattern(c).map(p=>`<span>${p}</span>`).join('')}${roomsTxt(c)?`<span class="room">${esc(txH('salon'))} ${roomsTxt(c)}</span>`:''}</span>
     ${tags?`<span class="tags">${tags}</span>`:''}
     ${mk.s?`<input class="note" type="text" data-note="${esc(k)}" value="${esc(mk.n||'')}" placeholder="${esc(txH('nota_placeholder'))}" aria-label="${esc(txH('nota'))}">`:''}</div>`;
@@ -885,7 +867,7 @@ function renderOffer(){
     const html=desfaseAcciones(k);if(html)avisadas.add(k);return html;
   };
   const pendientes=()=>{$('#hor-desfase').innerHTML=isPersonal()?desfaseAvisos(avisadas):''};
-  if(S.onlyWant&&!tr().want.length&&!FILTROS_D){
+  if(S.onlyWant&&!tr().want.length){
     pendientes();
     $('#offer-count').textContent='';
     $('#offer').innerHTML=`<div class="empty"><p>${esc(SATE.texto('sate.planeacion.oferta_vacia'))}</p><div class="actions"><button class="btn" type="button" data-oferta-mapa>${esc(SATE.texto('sate.planeacion.elegir_mapa'))}</button><button class="btn" type="button" data-oferta-toda>${esc(SATE.texto('sate.planeacion.oferta_toda'))}</button></div></div>`;return;

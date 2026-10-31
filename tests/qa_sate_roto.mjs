@@ -39,8 +39,7 @@ for(const ancho of [2560,1440,1024,768,375]){
 const comunes=regla(css,'.seg,.sate-segmentado,.sate-pestanas--seg');
 assert.match(comunes,/padding:var\(--ipn-esp-1\)/);
 assert.match(comunes,/overflow:visible/);
-assert.match(css,/--ipn-radio-interior:max\(0px,calc\(var\(--ipn-radio\) - var\(--ipn-esp-1\)\)\)/);
-assert.match(regla(css,'.seg button,.seg.sm button,.sate-segmentado button,.sate-pestanas--seg .sate-pestana'),/min-height:var\(--ipn-control-alto\);height:auto;margin:0;border-radius:var\(--ipn-radio-interior\)/);
+assert.match(regla(css,'.seg button,.seg.sm button,.sate-segmentado button,.sate-pestanas--seg .sate-pestana'),/min-height:var\(--ipn-control-alto\);height:auto;margin:0;border-radius:var\(--ipn-radio-control\)/);
 assert.match(regla(css,'.sate-pestanas--seg .sate-pestana[aria-selected=true]'),/box-shadow:inset/);
 for(const selector of ['.rgl-grupo>summary','.rgl-indice-titulo']){
   const reglas=[...guia.matchAll(new RegExp(selector.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'\\{([^}]+)\\}','g'))].map(m=>m[1]).join(';');

@@ -155,32 +155,32 @@ CSS = r"""
 .saes-tactil{display:none}
 @media(hover:none){.saes-arrastre{display:none}.saes-tactil{display:block}}
 .saes-videos{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0 2px;font-size:.88rem}
-.saes-vid{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:999px;text-decoration:none;color:var(--fg);font-weight:600;background:var(--surface)}
+.saes-vid{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border:1px solid var(--line);border-radius:var(--ipn-radio-control,.5rem);text-decoration:none;color:var(--fg);font-weight:600;background:var(--surface)}
 .saes-vid:hover{border-color:var(--accent)}
 .saes-vlist{color:var(--accent);font-weight:600;margin-left:4px}
 .saes-vid svg{color:var(--accent)}
 .saes-vid.rec{border-color:var(--accent);background:var(--accent-soft,var(--surface));color:var(--accent)}
 .saes-open{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
-.saes-open::before{content:"";width:9px;height:9px;border-radius:50%;border:2px solid currentColor;flex:none}
+.saes-open::before{content:"";width:9px;height:9px;border-radius:50%/* forma: no-control */;border:2px solid currentColor;flex:none}
 .saes-open.on::before{background:var(--ok);border-color:var(--ok)}
-.saes-dlg{width:min(600px,calc(100vw / var(--ui-zoom,1) - 32px));max-height:calc(100vh / var(--ui-zoom,1) - 48px);overflow:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--fg);padding:20px 22px;box-shadow:0 24px 60px -16px rgba(0,0,0,.45)}
+.saes-dlg{width:min(600px,calc(100vw / var(--ui-zoom,1) - 32px));max-height:calc(100vh / var(--ui-zoom,1) - 48px);overflow:auto;border:1px solid var(--line);border-radius:var(--ipn-radio-superficie,.75rem);background:var(--surface);color:var(--fg);padding:20px 22px;box-shadow:0 24px 60px -16px rgba(0,0,0,.45)}
 .saes-dlg::backdrop{background:rgba(20,12,16,.45)}
 .saes-dlg h2{margin:0;font-size:1.25rem}
 .saes-dlg .dl-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:6px}
 .saes-dlg .x{border:0;background:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--muted);padding:2px 6px}
 .saes-dlg ol{margin:10px 0;padding-left:1.3rem;display:flex;flex-direction:column;gap:12px;font-size:.92rem}
 .saes-dlg li>p{margin:4px 0}
-.saes-dlg details{margin-top:6px;font-size:.86rem;border-left:3px solid var(--line);padding:2px 0 2px 10px}
+.saes-dlg details{margin-top:6px;font-size:.86rem;padding:2px 0 2px 10px}
 .saes-dlg summary{cursor:pointer;color:var(--accent);font-weight:600}
 .saes-dlg details ul{margin:6px 0;padding-left:1.1rem;display:flex;flex-direction:column;gap:4px}
-.saes-dlg kbd{font-family:var(--f-mono,ui-monospace,monospace);font-size:.8em;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--bg)}
-.saes-bm{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-fg);border-radius:999px;padding:5px 14px;font-weight:600;text-decoration:none;cursor:grab}
+.saes-dlg kbd{font-family:var(--f-mono,ui-monospace,monospace);font-size:.8em;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px/* forma: no-control */;padding:0 4px;background:var(--bg)}
+.saes-bm{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:var(--accent-fg);border-radius:var(--ipn-radio-control,.5rem);padding:5px 14px;font-weight:600;text-decoration:none;cursor:grab}
 .saes-paste{width:100%;min-height:2.8rem;resize:none;font-size:.9rem}
 .saes-note{font-size:.8rem;color:var(--muted)}
 .saes-code{display:flex;gap:8px;align-items:stretch;margin:6px 0 4px}
 .saes-code textarea{flex:1;min-width:0;font:12px/1.4 ui-monospace,Consolas,monospace;resize:vertical;word-break:break-all}
 .saes-mm[hidden]{display:none}
-.saes-mm{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:12px;padding:10px 12px 10px 14px;border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--r);background:var(--surface);font-size:.88rem}
+.saes-mm{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;margin-top:12px;padding:10px 12px 10px 14px;border:1px solid var(--line);border-radius:var(--ipn-radio-superficie,.75rem);background:var(--surface);font-size:.88rem}
 .saes-mm p{margin:0;flex:1 1 360px;min-width:0}
 .saes-mm .mm-act{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 .saes-mm .x{border:0;background:none;font-size:1.3rem;line-height:1;cursor:pointer;color:var(--muted);padding:2px 6px}

@@ -69,7 +69,7 @@ assert.match(fuente,/apartado === 'investigacion'/);
 assert.match(fuente,/nodo\.getAttribute\('data-ancla'\)/);
 assert.match(fuente,/addEventListener\('input'/);
 assert.match(fuente,/m\.pendienteHuella&&actual/,'Solo los marcadores migrados reciben una huella inicial');
-const css=readFileSync('web/sate/componentes.css','utf8').split('/* Investigación:')[1].split('/*')[0];
+const css=readFileSync('web/sate/componentes.css','utf8').split('/* Investigación:')[1].split(/\/\*(?! forma:)/)[0];
 assert.match(css,/minmax\(0,1fr\)/);assert.match(css,/@media\(max-width:768\.98px\)/);
 const tokens=readFileSync('vendor/ipn-comun/dist/tokens.css','utf8')+readFileSync('web/sate/componentes.css','utf8')+readFileSync('web/sate/encabezado.css','utf8');
 for(const [,token]of css.matchAll(/var\((--ipn-[\w-]+)\)/g))assert.ok(tokens.includes(token+':'),token);

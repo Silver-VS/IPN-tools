@@ -49,7 +49,7 @@ const ALM=DEMO?sessionStorage:(window.IPNT?.almacen||localStorage);
 const store={get(k,d){try{const v=ALM.getItem(HU+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){if(DEMO){try{ALM.setItem(HU+k,JSON.stringify(v))}catch(e){}}else IPNT.set(HU+k,JSON.stringify(v))}};   // IPNT: perfil sincronizable (tools/cuenta.py)
 
 const S={tab:store.get('tab','tray'),per:store.get('per','proximo'),car:store.get('car','B'),tur:store.get('tur','*'),niv:store.get('niv','*'),q:'',view:store.get('view','materia'),
-  hide:store.get('hide',false),hideDone:store.get('hideDone',true),soloCupo:store.get('soloCupo',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
+  hide:store.get('hide',false),hideDone:store.get('hideDone',true),soloCupo:store.get('soloCupo',false),dias:store.get('dias',[]),cursables:store.get('cursables',false),fit:false,gap:null,onlyWant:store.get('onlyWant',true),weekend:store.get('weekend',false),chips:[],hover:null,acIdx:-1,acItems:[],ownDays:[],
   mode:'want',zoom:null,mapHover:null,gt:'*',gpref:[],gavoid:store.get('excl',[]),gen:null};
 if(!DATA.carreras[S.car]) S.car=Object.keys(DATA.carreras)[0];
 S.expand=new Set();S.mview=store.get('mview',null);S.cview=store.get('cview',null);S.mapFocus=false;S.lfocus=null;
@@ -1218,6 +1218,7 @@ document.addEventListener('click',e=>{
   else if(d.zoom!==undefined){const L=MAP().layout, base=$('#map').offsetWidth/(L?.w||$('#map').offsetWidth);ZOOM=d.zoom==='0'?null:Math.min(2,Math.max(.4,(ZOOM??base)*(d.zoom==='1'?1.2:1/1.2)));renderMap()}
   else if(d.view){S.view=d.view;store.set('view',S.view);renderHFilters();renderOffer()}
   else if(d.tur){S.tur=d.tur;store.set('tur',S.tur);renderHFilters();renderOffer()}
+  else if(d.dia!==undefined){const n=+d.dia;S.dias=S.dias.includes(n)?S.dias.filter(x=>x!==n):[...S.dias,n].sort();store.set('dias',S.dias);renderHFilters();renderOffer()}
   else if(d.niv){S.niv=d.niv==='*'?'*':+d.niv;store.set('niv',S.niv);renderHFilters();renderOffer()}
   else if(d.ungap){S.gap=null;renderActive();renderOffer();renderCal()}
   else if(d.unchip){if(d.unchip==='all')S.chips=[];else S.chips.splice(+d.unchip,1);renderActive();renderOffer()}

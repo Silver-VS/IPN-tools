@@ -5,7 +5,7 @@ import vm from 'node:vm';
 
 export function auditar(css, archivo) {
   const filas=[], errores=[];
-  css=css.replace(/\/\*[\s\S]*?\*\//g,'');
+  css=css.replace(/\s*\/\*\s*forma: no-control\s*\*\//g,' !nc').replace(/\/\*[\s\S]*?\*\//g,'');
   const sticky=new Set([...css.matchAll(/([^{}]+)\{([^{}]*position:\s*sticky[^{}]*)\}/g)].flatMap(m=>m[1].trim().split(',').map(s=>s.trim())));
   const botones=new Set([...css.matchAll(/([^{}]+)\{([^{}]*cursor:\s*pointer[^{}]*)\}/g)].flatMap(m=>m[1].split(',').map(s=>s.trim().match(/(?:^|[ >+~])([.#][\w-]+)(?:\[[^\]]+\])?$/)?.[1]).filter(Boolean)));
   for(const bloque of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
@@ -22,9 +22,7 @@ export function auditar(css, archivo) {
       }
     }
     for(const [propiedad,valor] of Object.entries(propiedades).filter(([p])=>/^border-(?:(?:top|bottom)-(?:left|right)-)?radius$/.test(p))) {
-      if(!/^(?:0|var\(--ipn-radio(?:-pastilla|-circulo|-interior)?\))(?: (?:0|var\(--ipn-radio\)))*$/.test(valor)) errores.push(`${archivo}: ${selector}: ${propiedad} ${valor}`);
-      if(valor==='var(--ipn-radio-pastilla)' && !/^(?:\.(?:tramite-estado|calendario-pildora|sate-chip|sel-area|chip|wchip|tag-rel|simchip|dpill|k-chip|eqv-f|an-tag)|\.guia-chips button)$/.test(selector)) errores.push(`${archivo}: ${selector}: pastilla fuera de filtros/estado`);
-      if(valor==='var(--ipn-radio-circulo)' && !/^(?:\.tmr-paso|\.guia-estado::before|\.guia-etapa-num|\.guia-pasos li::before|\.sate-tarjeta-nav__icono|\.sate-chip__marca|\.sate-estado-dato|\.calendario-(?:ficha-punto|signo)|\.gd-estacion-punto|\.sel-area::before|\.tramite-(?:estado|guardado)::before|\.box\.curso::after|\.legend i\.l-curso::after|\.tgl-ui::after|\.cupos-interruptor-pista::after|\.cal-l::before|\.info|\.mm-leg i)$/.test(selector)) errores.push(`${archivo}: ${selector}: círculo fuera de pasos/íconos`);
+      if(!/ !nc$/.test(valor) && !/^(?:0|var\(--ipn-radio-(?:control|superficie)(?:,[^)]*)?\))(?: (?:0|var\(--ipn-radio-(?:control|superficie)(?:,[^)]*)?\)))*$/.test(valor)) errores.push(`${archivo}: ${selector}: ${propiedad} ${valor}`);
     }
     if(propiedades.top && (propiedades.position==='sticky' || selector.split(',').some(s=>sticky.has(s.trim())) || /rgl-(?:encabezado|nivel)/.test(selector)) && !propiedades.top.includes('--sate-barra-alto')) errores.push(`${archivo}: ${selector}: sticky top ${propiedades.top}`);
     if(radio || /button|btn|chip|pestana|volver|calendario-(?:ficha|dia|item)/.test(selector) || propiedades.cursor==='pointer') filas.push({archivo,selector,radio,alto:propiedades.height,minimo:propiedades['min-height'],fondo:propiedades.background,borde:propiedades.border,padding:propiedades.padding,color:propiedades.color,fuente:propiedades['font-size'],peso:propiedades['font-weight']});
@@ -43,7 +41,7 @@ assert.equal(auditar('.x{position:sticky}.x{top:0}', 'prueba').errores.length,1)
 assert.equal(auditar('.x{border-top-left-radius:8px}', 'prueba').errores.length,1);
 assert.equal(auditar('.accion{border-radius:var(--ipn-radio-pastilla)}', 'prueba').errores.length,1);
 assert.equal(auditar('.tarjeta{border-radius:var(--ipn-radio-circulo)}', 'prueba').errores.length,1);
-assert.equal(auditar('.x{border-radius:var(--ipn-radio);position:sticky;top:calc(var(--sate-barra-alto) + var(--ipn-esp-4))}.y{position:sticky;left:0}', 'prueba').errores.length,0);
+assert.equal(auditar('.x{border-radius:var(--ipn-radio-control);position:sticky;top:calc(var(--sate-barra-alto) + var(--ipn-esp-4))}.y{position:sticky;left:0}', 'prueba').errores.length,0);
 // Integración del encabezado: desplazamiento real, redimensionamiento y regreso a móvil.
 {
   let bottom=10, alto=44, escritorio=true, resize;

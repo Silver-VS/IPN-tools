@@ -105,6 +105,6 @@ assert.match(leer('web/dist/sate/situacion.js'),/trayectoria-orientacion/);
 assert.ok(pasos.every(p=>shell.includes(p.selector.split(/[ .]/)[0].slice(1))||p.selector.startsWith('.')),'Selectores ligados a raíces del cascarón');
 documento.visibilityState='hidden';eventosDocumento.get('visibilitychange')();assert.ok(cerrada);assert.equal(eventos.size,0);assert.equal(eventosDocumento.size,0);
 cerrada=false;documento.visibilityState='visible';await entorno.SateRecorrido.iniciar();eventos.get('blur')();assert.ok(cerrada);assert.equal(eventos.size,0);assert.equal(eventosDocumento.size,0);
-assert.match(css,/\.sate-recorrido__marco::before\{[^}]*border-radius:0;[^}]*box-shadow:0 0 0 100vmax/);
+assert.match(css,/\.sate-recorrido__marco::before\{[^}]*border-radius:0 \/\* forma: no-control \*\/;[^}]*box-shadow:0 0 0 100vmax/);
 assert.doesNotMatch(css,/\.sate-recorrido__marco\{[^}]*box-shadow/);
 console.log('OK recorrido: anclas, pasos por pestaña, reposición y no solapamiento en anchos solicitados.');

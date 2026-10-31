@@ -545,11 +545,11 @@ var IPNT=window.IPNT=(()=>{
 """
 
 CSS = r"""
-.ipnt-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:4px 12px 4px 6px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;white-space:nowrap;position:relative}
+.ipnt-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:var(--ipn-radio-control,.5rem);padding:4px 12px 4px 6px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;white-space:nowrap;position:relative}
 .ipnt-btn:hover{border-color:var(--accent)}
 .ipnt-btn svg{flex:none;color:var(--muted)}
 .ipnt-btn.on svg{color:var(--ok)}
-.ipnt-btn.warn::after{content:"";position:absolute;top:1px;right:1px;width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.ipnt-btn.warn::after{content:"";position:absolute;top:1px;right:1px;width:8px;height:8px;border-radius:50%/* forma: no-control */;background:var(--warn)}
 @media (max-width:600px){.ipnt-btn span{display:none}.ipnt-btn{padding:4px 6px}}
 .ipnt-dlg h3{margin:16px 0 6px;font-size:1rem}
 .ipnt-dlg .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -562,22 +562,22 @@ CSS = r"""
 .ipnt-ms{display:inline-flex;align-items:center;gap:8px}
 .ipnt-dlg button:disabled{opacity:.5;cursor:not-allowed}
 .ipnt-conf-op{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;margin-top:10px}
-.ipnt-conf-op .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 14px;border-radius:10px;height:auto;white-space:normal}
+.ipnt-conf-op .btn{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:10px 14px;border-radius:var(--ipn-radio-control,.5rem);height:auto;white-space:normal}
 .ipnt-conf-op small{font-weight:400;font-size:.8rem;color:inherit;opacity:.85}
-.ipnt-prueba{margin:10px 0 0;font-size:.84rem;padding:8px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.ipnt-prueba{margin:10px 0 0;font-size:.84rem;padding:8px 12px;border:1px solid var(--line);border-radius:var(--ipn-radio-superficie,.75rem);background:var(--surface)}
 .ipnt-mig-link{margin:12px 0 0;font-size:.84rem}.ipnt-mig-link .link{white-space:normal;text-align:start}
-.ipnt-mig{margin:12px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.ipnt-mig{margin:12px 0 0;padding:12px 14px;border:1px solid var(--line);border-radius:var(--ipn-radio-superficie,.75rem);background:var(--surface)}
 .ipnt-mig h3{margin:0 0 8px}
 .ipnt-mig ol{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:14px}
-.ipnt-mig li{display:grid;gap:4px;padding-left:12px;border-left:3px solid var(--line);opacity:.7}
-.ipnt-mig li.ahora{border-left-color:var(--accent);opacity:1}
-.ipnt-mig li.hecho{border-left-color:var(--ok)}
+.ipnt-mig li{display:grid;gap:4px;padding-left:12px;opacity:.7}
+.ipnt-mig li.ahora{opacity:1;font-weight:600}
+.ipnt-mig li.hecho{color:var(--ok)}
 .ipnt-mig li p{margin:0;font-size:.86rem;color:var(--muted)}
 .ipnt-mig li .row{margin-top:4px}
 .ipnt-hola{width:min(640px,calc(100vw / var(--ui-zoom,1) - 32px));max-height:calc(100dvh - 24px);overflow:auto}
 .ipnt-hola .lead{margin:0;font-size:.95rem;color:var(--muted)}
 .ipnt-unis{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
-.ipnt-uni{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:10px;padding:10px 12px;font:inherit;cursor:pointer}
+.ipnt-uni{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:var(--ipn-radio-control,.5rem);padding:10px 12px;font:inherit;cursor:pointer}
 .ipnt-uni b{font-size:1rem} .ipnt-uni small{color:var(--muted);font-size:.78rem;line-height:1.3}
 .ipnt-uni em{font-style:normal;font-size:.72rem;font-weight:600;color:var(--warn)}
 .ipnt-uni[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}

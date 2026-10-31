@@ -10,14 +10,14 @@ body{background:radial-gradient(1100px 380px at 12% -120px,var(--glow1),transpar
 .card,.subj,section.step,.mapwrap,.calwrap,.insp{box-shadow:var(--shadow)}
 h1{letter-spacing:-.025em;font-weight:700}
 h2{letter-spacing:-.015em}
-.btn,.chip,.seg,input,select{border-radius:999px}
-.seg button{border-radius:999px}
+.btn,.chip,.seg,input,select{border-radius:var(--ipn-radio-control,.5rem)}
+.seg button{border-radius:var(--ipn-radio-control,.5rem)}
 header.top{border-bottom:1px solid var(--line)}
 body{zoom:var(--ui-zoom,1)}
 /* algunos navegadores (Firefox con zoom) no repintan el texto de ejemplo al escribir: se oculta explícitamente */
 input:not(:placeholder-shown)::placeholder,textarea:not(:placeholder-shown)::placeholder{color:transparent;opacity:0}
 .title-row{display:flex;align-items:center;gap:12px}
-.theme-btn{display:inline-grid;place-items:center;flex:none;width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;padding:0}
+.theme-btn{display:inline-grid;place-items:center;flex:none;width:36px;height:36px;border-radius:var(--ipn-radio-control,.5rem);border:1px solid var(--line);background:var(--surface);color:var(--muted);cursor:pointer;padding:0}
 .theme-btn:hover{color:var(--fg);border-color:var(--edge)}
 .theme-btn .i-sun{display:none}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .theme-btn .i-sun{display:block}:root:not([data-theme="light"]) .theme-btn .i-moon{display:none}}

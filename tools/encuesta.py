@@ -37,14 +37,14 @@ CSS = r"""
 .enc-esc.n11{grid-template-columns:repeat(11,1fr);gap:4px}
 .enc-esc label,.enc-opc label{position:relative}
 .enc-esc input,.enc-opc input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
-.enc-esc span{display:flex;align-items:center;justify-content:center;min-height:40px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer}
+.enc-esc span{display:flex;align-items:center;justify-content:center;min-height:40px;border:1px solid var(--line);border-radius:var(--ipn-radio-control,.5rem);background:var(--surface);font-weight:600;font-variant-numeric:tabular-nums;cursor:pointer}
 .enc-esc.n11 span{min-height:36px;font-size:.85rem}
 .enc-esc input:checked+span,.enc-opc input:checked+span{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
 .enc-esc input:focus-visible+span,.enc-opc input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
 .enc-ext{display:flex;justify-content:space-between;font-size:.78rem;color:var(--muted);margin-top:-2px}
 .enc-opc{display:flex;flex-wrap:wrap;gap:6px}
-.enc-opc span{display:inline-flex;align-items:center;padding:7px 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font-size:.86rem;cursor:pointer}
-.enc-dlg textarea{width:100%;box-sizing:border-box;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--fg);padding:8px 10px;font:inherit;font-size:.9rem}
+.enc-opc span{display:inline-flex;align-items:center;padding:7px 12px;border:1px solid var(--line);border-radius:var(--ipn-radio-control,.5rem);background:var(--surface);font-size:.86rem;cursor:pointer}
+.enc-dlg textarea{width:100%;box-sizing:border-box;min-height:64px;resize:vertical;border:1px solid var(--line);border-radius:var(--ipn-radio-control,.5rem);background:var(--bg);color:var(--fg);padding:8px 10px;font:inherit;font-size:.9rem}
 .enc-dlg .enc-nota{font-size:.8rem;color:var(--muted);margin:0}
 .enc-dlg .enc-acc{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end}
 .enc-dlg .enc-acc .enc-no{margin-right:auto;border:0;background:none;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:.82rem;padding:4px 0}
@@ -54,7 +54,7 @@ CSS = r"""
 .enc-apoyo-pie{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);text-align:center}
 .enc-gracias{text-align:center;padding:18px 4px 6px}
 .enc-gracias b{display:block;font-size:1.15rem;margin-bottom:6px}
-.enc-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:4px 12px 4px 8px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;white-space:nowrap}
+.enc-btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:var(--ipn-radio-control,.5rem);padding:4px 12px 4px 8px;font:inherit;font-size:.86rem;font-weight:600;cursor:pointer;white-space:nowrap}
 .enc-btn:hover{border-color:var(--accent)}
 .enc-btn svg{flex:none;color:var(--accent)}
 .enc-btn[hidden]{display:none}

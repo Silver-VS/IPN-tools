@@ -140,7 +140,7 @@ assert.match(base['--ipn-acento-suave'],/color-mix.*var\(--sate-realce\)/);
 assert.match(leer('tools/institucional.py'),/\.inst\{[^}]*border-bottom:3px solid var\(--sate-realce,var\(--accent\)\)/);
 assert.match(leer('tools/encuesta.py'),/\.enc-btn svg\{[^}]*color:var\(--accent\)/);
 assert.match(fuente,/\.seg button\[aria-pressed="true"\][^{]*\{background:var\(--ipn-acento-suave\);color:var\(--ipn-acento\)/);
-assert.match(fuente,/\.plan-resumen span\{[^}]*border-left:4px solid var\(--ipn-acento\)/);
+assert.match(fuente,/\.plan-resumen span\{[^}]*font-weight:600/);
 assert.match(fuente,/\.btn.primary\{[^}]*background:var\(--ipn-acento\)[^}]*color:var\(--ipn-sobre-acento\)/);
 assert.match(css,/\.sate-pestana\[aria-selected=true\]\{color:var\(--ipn-acento\)/);
 assert.match(css,/\.sate-btn--primario\{[^}]*color:var\(--sate-sobre-realce\)/);
@@ -258,22 +258,21 @@ assert.ok(!leer('web/sate/mapa.js').includes('function slotFill('),'Optativas se
 assert.ok(!leer('web/sate/mapa.js').includes('<circle'),'Mapa reutiliza los puntos del núcleo');
 // Horarios: oferta ficticia, controles y persistencia sin navegador ni red.
 const hor=leer('web/sate/horarios.js'), shell=leer('web/sate/cascaron.html');
-const extra=shell.match(/<details id="f-more">([\s\S]*?)<\/details>/)[1];
-for(const id of ['f-hide','f-fit','g-from','g-to','g-avoid','f-done','b-reset'])assert.ok(extra.includes('id="'+id+'"'),id+' dentro de Más filtros');
-for(const id of ['f-q','f-turno','f-nivel','f-want'])assert.ok(!extra.includes('id="'+id+'"'),id+' visible');
+for(const id of ['f-hide','f-fit','g-from','g-to','g-avoid','f-done','b-reset','f-q','f-turno','f-nivel','f-want','f-cupo','f-curs'])assert.ok(shell.includes('id="'+id+'"'),id+' presente');
+assert.ok(!shell.includes('id="f-more"'),'Los filtros van a la vista, sin Más filtros');
 assert.match(nucleo,/hideDone:store.get\('hideDone',true\)/);
 assert.ok(nucleo.includes('IPNT.set(HU+k,JSON.stringify(v))'));
 const controles=new Map(), guardado=new Map();
 const control=id=>{if(!controles.has(id))controles.set(id,{textContent:'',open:false,addEventListener(tipo,fn){this[tipo]=fn}});return controles.get(id)};
 let personalHor=true;
-const estado={car:'B',tur:'*',niv:'*',q:'',chips:[],hide:false,hideDone:true,fit:false,gap:null,onlyWant:false,gavoid:[]};
+const estado={car:'B',tur:'*',niv:'*',q:'',dias:[],cursables:false,chips:[],hide:false,hideDone:true,fit:false,gap:null,onlyWant:false,gavoid:[]};
 const trayectoria={done:['A'],want:['B']}, oferta=['A','B','C','D'].map((k,i)=>['B','M',1,'DEMO'+i,i,[],[[0,480,540]],4.5,k]);
 const traduccion=(k,v={})=>(config.textos[k]||k).replace(/\{(\w+)\}/g,(_,k)=>v[k]??'{'+k+'}');
 const hc=vm.createContext({S:estado,GT:{a:'',b:''},$:control,SATE:{texto:traduccion},store:{set:(k,v)=>guardado.set(k,v)},norm:s=>s.toLowerCase(),
   ws:()=>({marks:{}}),tr:()=>trayectoria,plan:()=>({sel:[]}),selected:()=>[],ownAsClasses:()=>[],classes:()=>oferta,
   isPersonal:()=>personalHor,keyOf:c=>c[8],outWin:()=>false,isExcl:()=>false,overlaps:()=>false,name:c=>c[8],profs:()=>'',
   cur:()=>({A:[],B:[],C:[],D:[]}),statusOf:k=>({A:'done',B:'rest',C:'fail',D:'late'}[k]),renderOffer(){}});
-vm.runInContext(hor.slice(0,hor.indexOf("$('#offer').addEventListener"))+
+vm.runInContext(hor.slice(0,hor.indexOf("$('#offer').addEventListener('click',e=>{"))+
   hor.slice(hor.indexOf('function base()'),hor.indexOf('function suggest('))+
   hor.slice(hor.indexOf('function renderMasFiltros()'),hor.indexOf('/* Salones'))+
   hor.match(/const prio=k=>[^\n]+/)[0],hc);
@@ -282,9 +281,6 @@ estado.hideDone=false;assert.equal(hc.filtered().length,4,'Se pueden consultar l
 estado.hideDone=true;personalHor=false;assert.equal(hc.filtered().length,4,'Sin SAES no se ocultan materias');
 personalHor=true;estado.onlyWant=true;assert.deepEqual(Array.from(hc.filtered(),c=>c[8]),['B']);estado.onlyWant=false;
 assert.deepEqual(vm.runInContext("['A','B','C','D'].map(prio)",hc).join(','),'2,0,1,1','Elegidas, adeudos/desfase, resto');
-hc.renderMasFiltros();assert.equal(control('#f-more-title').textContent,'Más filtros (1)');assert.equal(control('#f-more').open,true);
-estado.hide=true;hc.renderMasFiltros();assert.equal(control('#f-more-title').textContent,'Más filtros (2)');
-estado.hide=false;estado.hideDone=false;control('#f-more').open=false;hc.renderMasFiltros();assert.equal(control('#f-more-title').textContent,'Más filtros');assert.equal(control('#f-more').open,false);
 vm.runInContext(hor.match(/\$\('#f-done'\)\.addEventListener[^\n]+/)[0],hc);
 control('#f-done').change({target:{checked:true}});assert.equal(guardado.get('hideDone'),true);
 control('#f-done').change({target:{checked:false}});assert.equal(guardado.get('hideDone'),false);
