@@ -10,6 +10,8 @@ from pypdf import PdfReader
 class HorariosPdf(unittest.TestCase):
     def test_texto_en_todas_las_modalidades(self):
         carpeta = Path('web/dist/qa-r27-hor')
+        if not (carpeta / 'expected.json').exists():
+            self.skipTest('Requiere los PDF que genera tests/qa_r27_hor.mjs')
         esperado = json.loads((carpeta / 'expected.json').read_text(encoding='utf-8'))
         nombre, segundo = esperado['name'], esperado['second']
         archivos = list(carpeta.glob('*.pdf'))
