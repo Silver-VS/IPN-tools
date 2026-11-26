@@ -307,6 +307,16 @@ class VigilanciaSalones(unittest.TestCase):
         self.html.write_text('<html>sin PDF</html>', encoding='utf-8')
         self.assertEqual(self.correr(), 2)
 
+    def test_pagina_ilegible_deja_salida_valida_para_github_output(self):
+        # Regresión: el aviso en stdout invalidaba $GITHUB_OUTPUT y la corrida fallaba.
+        import contextlib, io
+        salida, errores = io.StringIO(), io.StringIO()
+        with patch.dict(os.environ, {'FORZAR_REVISION': 'true'}),              patch.object(semestre, 'cmd_vigilar', return_value=2),              contextlib.redirect_stdout(salida), contextlib.redirect_stderr(errores):
+            self.assertEqual(vigilancia_salones.main(), 0)
+        lineas = salida.getvalue().splitlines()
+        self.assertEqual(lineas, ['changed=false'])
+        self.assertIn('::warning::', errores.getvalue())
+
     def test_ritmo_diario_y_semanal_desde_configuracion(self):
         self.assertTrue(vigilancia_salones.toca_hoy(dt.date(2026, 8, 10)))
         self.assertTrue(vigilancia_salones.toca_hoy(dt.date(2026, 10, 9)))

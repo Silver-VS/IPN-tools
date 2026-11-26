@@ -44,7 +44,9 @@ def main():
         print(f"fecha={detalle['despues']['actualizado']}")
     elif resultado == 2:
         mensaje = 'La página de salones no pudo leerse o cambió de estructura; se reintentará en la siguiente corrida.'
-        print(f'::warning::{mensaje}')
+        # El stdout de este script se redirige a $GITHUB_OUTPUT, que solo admite líneas clave=valor;
+        # el aviso va a stderr, donde el runner también procesa los comandos de workflow.
+        print(f'::warning::{mensaje}', file=sys.stderr)
         resumen = os.environ.get('GITHUB_STEP_SUMMARY')
         if resumen:
             with open(resumen, 'a', encoding='utf-8') as f:
